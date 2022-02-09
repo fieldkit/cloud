@@ -5,11 +5,12 @@
         </router-link>
         <div
             class="header-account"
+            :class="isAuthenticated ? 'loggedin' : ''"
             v-on:click="onAccountClick()"
             v-on:mouseenter="onAccountHover($event)"
             v-on:mouseleave="onAccountHover($event)"
         >
-            <div class="header-avatar">
+            <div v-if="user" class="header-avatar">
                 <i class="badge">
                     <span>{{ numberOfUnseenNotifications }}</span>
                 </i>
@@ -23,7 +24,7 @@
                 {{ $t("layout.header.login") }}
             </router-link>
 
-            <div class="notifications-container" v-bind:class="{ active: isAccountHovered && !hiding }">
+            <div v-if="user" class="notifications-container" v-bind:class="{ active: isAccountHovered && !hiding }">
                 <header class="notifications-header">
                     <span class="notifications-header-text">{{ $t("layout.header.notifications") }}</span>
                     <div class="flex">
@@ -176,7 +177,9 @@ export default Vue.extend({
                 display: none;
             }
         }
+    }
 
+    .loggedin {
         &:after {
             content: "";
             background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
