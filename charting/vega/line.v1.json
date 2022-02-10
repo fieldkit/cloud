@@ -61,6 +61,27 @@
       },
       "layer": [
         {
+          "transform": [
+            {
+              "filter": {
+                "field": "value",
+                "valid": true
+              }
+            }
+          ],
+          "mark": {
+            "type": "line",
+            "color": "#bbbbbb",
+            "strokeWidth": 1,
+            "strokeDash": [
+              4,
+              4
+            ],
+            "interpolate": "monotone",
+            "tension": 1
+          }
+        },
+        {
           "mark": {
             "type": "line",
             "color": {
