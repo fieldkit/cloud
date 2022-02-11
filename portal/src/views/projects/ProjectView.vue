@@ -183,8 +183,10 @@ export default Vue.extend({
         margin-right: 14px;
         font-size: 17px;
 
-        &:before {
-            color: var(--color-primary);
+        body.floodnet & {
+            &:before {
+                color: var(--color-dark);
+            }
         }
     }
 }

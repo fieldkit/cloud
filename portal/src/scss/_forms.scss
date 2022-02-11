@@ -43,9 +43,16 @@
     &-header {
         &-logo {
             margin-bottom: 82px;
+            font-size: 45px;
+            display: block;
+
+            &:before {
+                color: #fff;
+            }
 
             @include bp-down($xs) {
                 margin-bottom: 30px;
+                font-size: 25px;
             }
         }
 

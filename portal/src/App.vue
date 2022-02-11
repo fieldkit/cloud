@@ -26,6 +26,10 @@ export default Vue.extend({
             console.log("initialize error", err, err.stack);
         }
     },
+    mounted() {
+        this.setCustomFavicon();
+        this.setCustomPageTitle();
+    },
     beforeUpdate() {
         this.applyCustomClasses();
     },
@@ -40,11 +44,23 @@ export default Vue.extend({
     methods: {
         applyCustomClasses(): void {
             if (window.location.hostname.indexOf("floodnet.") === 0) {
-                document.body.classList.add("floodnet");
+                document.body.classList.add(FKPartnersEnum.floodnet);
             }
         },
         isFloodnetCustomisationEnabled(): boolean {
             return isCustomisationEnabledFor(FKPartnersEnum.floodnet);
+        },
+        setCustomFavicon(): void {
+            const faviconEl = document.getElementById("favicon") as HTMLAnchorElement;
+
+            if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
+                faviconEl.href = window.location.origin + "/favicon-floodnet.ico";
+            }
+        },
+        setCustomPageTitle(): void {
+            if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
+                document.title = "Data Dashboard - Floodnet";
+            }
         },
     },
 });

@@ -98,15 +98,4 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/forms.scss";
 
-.form-header-logo {
-    font-size: 45px;
-
-    &:before {
-        color: #fff;
-    }
-
-    @include bp-down($xs) {
-        font-size: 25px;
-    }
-}
 </style>

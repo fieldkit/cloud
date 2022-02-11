@@ -361,6 +361,8 @@ export default Vue.extend({
 .details-icon {
     width: 23px;
     flex-shrink: 0;
+
+    body.floodnet & {}
 }
 
 .right-actions {
