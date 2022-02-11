@@ -31,6 +31,10 @@ export default {
             type: String,
             required: true,
         },
+        thresholds: {
+            type: Array,
+            required: true,
+        },
     },
     mounted: function() {
         console.log("vega-mounted");
@@ -48,11 +52,17 @@ export default {
     },
     methods: {
         async refresh() {
-            lineSpec.config = chartConfig;
-            lineSpec.data = { name: "table", values: this.data.data };
-            lineSpec.layer[0].encoding.y.axis.title = this.label;
-            lineSpec.width = "container";
-            lineSpec.height = 300;
+            const spec = _.cloneDeep(lineSpec);
+            spec.config = chartConfig;
+            spec.data = { name: "table", values: this.data.data };
+            spec.layer[0].encoding.y.axis.title = this.label;
+            spec.width = "container";
+            spec.height = 300;
+
+            if (this.thresholds.length > 0) {
+                console.log("viz-thresholds", this.thresholds);
+                spec.layer[0].layer = this.thresholds;
+            }
 
             expressionFunction("fkHumanReadable", (datum) => {
                 if (_.isUndefined(datum)) {
@@ -64,7 +74,7 @@ export default {
                 return `${datum.toFixed(3)}`;
             });
 
-            await vegaEmbed(this.$el, lineSpec, {
+            await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },

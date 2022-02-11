@@ -28,6 +28,10 @@ export default {
             type: Array,
             required: true,
         },
+        thresholds: {
+            type: Array,
+            required: true,
+        },
     },
     mounted: function() {
         console.log("vega-mounted");
@@ -45,13 +49,22 @@ export default {
     },
     methods: {
         async refresh() {
-            doubleLineSpec.config = chartConfig;
-            doubleLineSpec.layer[0].data = { name: "table0", values: this.data[0].data };
-            doubleLineSpec.layer[0].encoding.y.title = this.labels[0];
-            doubleLineSpec.layer[1].data = { name: "table1", values: this.data[1].data };
-            doubleLineSpec.layer[1].encoding.y.title = this.labels[1];
-            doubleLineSpec.width = "container";
-            doubleLineSpec.height = 300;
+            const spec = _.cloneDeep(doubleLineSpec);
+            spec.config = chartConfig;
+            spec.layer[0].data = { name: "table0", values: this.data[0].data };
+            spec.layer[0].encoding.y.title = this.labels[0];
+            spec.layer[1].data = { name: "table1", values: this.data[1].data };
+            spec.layer[1].encoding.y.title = this.labels[1];
+            spec.width = "container";
+            spec.height = 300;
+
+            if (this.thresholds.length > 0) {
+                for (let i = 0; i < 2; ++i) {
+                    if (this.thresholds[i].length > 0) {
+                        // spec.layer[i].layer = this.thresholds[i];
+                    }
+                }
+            }
 
             expressionFunction("fkHumanReadable", (datum) => {
                 if (_.isUndefined(datum)) {
@@ -63,7 +76,7 @@ export default {
                 return `${datum.toFixed(3)}`;
             });
 
-            await vegaEmbed(this.$el, doubleLineSpec, {
+            await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },

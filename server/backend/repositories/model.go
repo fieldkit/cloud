@@ -11,9 +11,22 @@ type SensorRanges struct {
 	Maximum float64 `json:"maximum"`
 }
 
+type VizThreshold struct {
+	Label map[string]string `json:"label"`
+	Value float64           `json:"value"`
+	Color string            `json:"color"`
+}
+
+type VizThresholds struct {
+	Label  map[string]string `json:"label"`
+	Levels []*VizThreshold   `json:"levels"`
+}
+
 type VizConfig struct {
-	Name     string `json:"name"`
-	Disabled bool   `json:"disabled"`
+	Name       string         `json:"name"`
+	Disabled   bool           `json:"disabled"`
+	YZero      bool           `json:"y_zero"`
+	Thresholds *VizThresholds `json:"thresholds"`
 }
 
 type SensorMeta struct {

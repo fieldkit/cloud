@@ -30,6 +30,10 @@ class Chart {
     throw new Error("charting: NOT IMPLEMENTED");
   }
 
+  thresholds(index, data) {
+    throw new Error("charting: NOT IMPLEMENTED");
+  }
+
   data(index, data) {
     throw new Error("charting: NOT IMPLEMENTED");
   }
@@ -56,6 +60,53 @@ class TimeSeriesChart extends Chart {
     }
   }
 
+  thresholds(index, vizConfig) {
+    const EnglishLocale = "en-US"; // TODO This has a dash, portal strips this.
+    const thresholdLayers = vizConfig.levels
+      .map((d, i) => {
+        return {
+          transform: [
+            {
+              calculate: "datum.value <= " + d.value + " ? datum.value : null",
+              as: "layerValue" + i,
+            },
+            {
+              calculate:
+                "datum.layerValue" +
+                i +
+                " <= " +
+                d.value +
+                " ? '" +
+                d.label[EnglishLocale] +
+                "' : null",
+              as: vizConfig.label[EnglishLocale],
+            },
+          ],
+          encoding: {
+            y: { field: "layerValue" + i },
+            stroke: {
+              field: vizConfig.label[EnglishLocale],
+              legend: {
+                orient: "top",
+              },
+              scale: {
+                domain: vizConfig.levels.map((d) => d.label[EnglishLocale]),
+                range: vizConfig.levels.map((d) => d.color),
+              },
+            },
+          },
+          mark: {
+            type: "line",
+            interpolate: "monotone",
+            tension: 1,
+          },
+        };
+      })
+      .reverse();
+
+    this.spec.layer[0].layer = thresholdLayers;
+  }
+
   data(index, data) {
     if (this.double) {
       this.spec.layer[index].data = {
@@ -78,6 +129,10 @@ class RangeChart extends Chart {
     this.spec.encoding.y.axis.title = label;
   }
 
+  thresholds(index, data) {
+    // IGNORED
+  }
+
   data(index, data) {
     this.spec.data = { name: "table", values: data.data };
   }
@@ -91,6 +146,10 @@ class HistogramChart extends Chart {
 
   sensor(index, label, units) {
     this.spec.encoding.x.axis.title = label;
+  }
+
+  thresholds(index, data) {
+    // IGNORED
   }
 
   data(index, data) {
@@ -205,6 +264,11 @@ app.get("/charting/rendered", async (req, res, next) => {
                     const sensor = byKey[0];
 
                     const name = sensor.strings["en-us"]["label"] || "Unknown";
+
+                    if (sensor.viz.length > 0) {
+                      // TODO Check viz Name, no need now until other chart types support this.
+                      chart.thresholds(index, sensor.viz[0].thresholds);
+                    }
 
                     console.log(
                       `charting:handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`

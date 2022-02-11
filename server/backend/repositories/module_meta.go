@@ -114,6 +114,55 @@ func init() {
 		},
 	}
 
+	floodingTimeSeries := []VizConfig{
+		VizConfig{
+			Name:  "D3TimeSeriesGraph",
+			YZero: true,
+			Thresholds: &VizThresholds{
+				Label: map[string]string{
+					"en-US": "Severity of Flooding",
+				},
+				Levels: []*VizThreshold{
+					&VizThreshold{
+						Value: 8,
+						Color: "#00CCFF",
+						Label: map[string]string{
+							"en-US": "None",
+						},
+					},
+					&VizThreshold{
+						Value: 8.5,
+						Color: "#0099FF",
+						Label: map[string]string{
+							"en-US": "Almost",
+						},
+					},
+					&VizThreshold{
+						Value: 9,
+						Color: "#0066FF",
+						Label: map[string]string{
+							"en-US": "Some",
+						},
+					},
+					&VizThreshold{
+						Value: 9.5,
+						Color: "#0033FF",
+						Label: map[string]string{
+							"en-US": "Flooding",
+						},
+					},
+					&VizThreshold{
+						Value: 10,
+						Color: "#0000FF",
+						Label: map[string]string{
+							"en-US": "Severe",
+						},
+					},
+				},
+			},
+		},
+	}
+
 	moduleMeta = []*ModuleMeta{
 		&ModuleMeta{
 			Key: "fk.water.ph",
@@ -966,7 +1015,7 @@ func init() {
 					Key:           "depth",
 					FirmwareKey:   "depth",
 					UnitOfMeasure: "inches",
-					VizConfigs:    mapAndTimesSeriesOnly,
+					VizConfigs:    floodingTimeSeries,
 					Ranges: []SensorRanges{
 						SensorRanges{
 							Minimum: 0.0,
