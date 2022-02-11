@@ -1,9 +1,11 @@
 package repositories
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/common/errors"
 )
 
@@ -35,6 +37,7 @@ type HeaderFields struct {
 }
 
 type ModuleMetaRepository struct {
+	db *sqlxcache.DB
 }
 
 // TODO This needs to move with all the other meta data to the database.
@@ -1157,12 +1160,12 @@ func init() {
 	}
 }
 
-func NewModuleMetaRepository() *ModuleMetaRepository {
-	return &ModuleMetaRepository{}
+func NewModuleMetaRepository(db *sqlxcache.DB) *ModuleMetaRepository {
+	return &ModuleMetaRepository{db: db}
 }
 
-func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
+func (r *ModuleMetaRepository) FindByFullKey(ctx context.Context, fullKey string) (mm *SensorAndModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1182,8 +1185,8 @@ func (r *ModuleMetaRepository) FindByFullKey(fullKey string) (mm *SensorAndModul
 	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
 }
 
-func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta()
+func (r *ModuleMetaRepository) FindModuleMeta(ctx context.Context, m *HeaderFields) (mm *ModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -1197,8 +1200,8 @@ func (r *ModuleMetaRepository) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, 
 	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
 }
 
-func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
-	all, err := r.FindAllModulesMeta()
+func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1233,6 +1236,16 @@ func (r *ModuleMetaRepository) FindSensorMeta(m *HeaderFields, sensor string) (m
 	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
-func (r *ModuleMetaRepository) FindAllModulesMeta() (mm []*ModuleMeta, err error) {
+func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*ModuleMeta, err error) {
+	modules := []*PersistedModuleMeta{}
+	if err := r.db.SelectContext(ctx, &modules, `SELECT * FROM fieldkit.module_meta`); err != nil {
+		return nil, err
+	}
+
+	sensors := []*PersistedSensorMeta{}
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.sensor_meta`); err != nil {
+		return nil, err
+	}
+
 	return moduleMeta, nil
 }

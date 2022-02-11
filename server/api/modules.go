@@ -19,9 +19,9 @@ func NewModulesService(ctx context.Context, options *ControllerOptions) *Modules
 }
 
 func (ms *ModulesService) Meta(ctx context.Context) (*modules.MetaResult, error) {
-	r := repositories.NewModuleMetaRepository()
+	r := repositories.NewModuleMetaRepository(ms.options.Database)
 
-	mm, err := r.FindAllModulesMeta()
+	mm, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
 	}

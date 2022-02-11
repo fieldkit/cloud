@@ -21,27 +21,6 @@ type Options struct {
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 }
 
-type PersistedModuleMeta struct {
-	ID           int32         `db:"id" json:"id"`
-	Key          string        `db:"key" json:"key"`
-	Manufacturer uint32        `db:"manufacturer" json:"manufacturer"`
-	Kinds        pq.Int32Array `db:"kinds" json:"kinds"`
-	Version      pq.Int32Array `db:"version" json:"version"`
-	Internal     bool          `db:"internal" json:"internal"`
-}
-type PersistedSensorMeta struct {
-	ID            int32          `db:"id" json:"id"`
-	ModuleID      int32          `db:"module_id" json:"module_id"`
-	SensorKey     string         `db:"sensor_key" json:"sensor_key"`
-	FullKey       string         `db:"full_key" json:"full_key"`
-	UnitOfMeasure string         `db:"uom" json:"uom"`
-	Ordering      int32          `db:"ordering" json:"ordering"`
-	Internal      bool           `db:"internal" json:"internal"`
-	Strings       types.JSONText `db:"strings" json:"strings"`
-	Viz           types.JSONText `db:"viz" json:"viz"`
-	Ranges        types.JSONText `db:"ranges" json:"ranges"`
-}
-
 func process(ctx context.Context, options *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
@@ -52,9 +31,9 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	mmr := repositories.NewModuleMetaRepository()
+	mmr := repositories.NewModuleMetaRepository(db)
 
-	all, err := mmr.FindAllModulesMeta()
+	all, err := mmr.FindAllModulesMeta(ctx)
 	if err != nil {
 		return err
 	}
@@ -67,7 +46,7 @@ func process(ctx context.Context, options *Options) error {
 			kinds[i] = int32(mm.Header.AllKinds[i])
 		}
 
-		pmm := &PersistedModuleMeta{
+		pmm := &repositories.PersistedModuleMeta{
 			Key:          mm.Key,
 			Manufacturer: mm.Header.Manufacturer,
 			Kinds:        pq.Int32Array(kinds),
@@ -101,7 +80,7 @@ func process(ctx context.Context, options *Options) error {
 				return err
 			}
 
-			psm := &PersistedSensorMeta{
+			psm := &repositories.PersistedSensorMeta{
 				ModuleID:      pmm.ID,
 				Ordering:      int32(sm.Order),
 				SensorKey:     sm.Key,
