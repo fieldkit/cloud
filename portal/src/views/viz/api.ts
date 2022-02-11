@@ -8,6 +8,14 @@ export interface SensorRange {
 export interface VizConfig {
     name: string;
     disabled: boolean;
+    thresholds: {
+        label: { [index: string]: string };
+        levels: {
+            label: { [index: string]: string };
+            value: number;
+            color: string;
+        }[];
+    };
 }
 
 export interface ModuleSensorMeta {

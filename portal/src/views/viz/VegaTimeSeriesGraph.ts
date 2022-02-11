@@ -71,7 +71,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
                 return vizInfo.unitOfMeasure, vizInfo.unitOfMeasure;
             });
         },
-        thresholds() {
+        thresholds(): any[] {
             return this.viz.dataSets.map((ds) => {
                 const vizInfo = this.workspace.vizInfo(this.viz, ds);
                 if (vizInfo.viz.length == 0) {
