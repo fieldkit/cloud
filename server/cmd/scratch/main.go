@@ -32,7 +32,7 @@ func process(ctx context.Context, options *Options) error {
 
 	mmr := repositories.NewModuleMetaRepository(db)
 
-	all, err := mmr.FindAllModulesMetaInMemory(ctx)
+	all, err := mmr.FindAllModulesMeta /*InMemory*/ (ctx)
 	if err != nil {
 		return err
 	}
