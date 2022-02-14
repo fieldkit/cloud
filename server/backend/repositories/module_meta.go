@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -1232,8 +1233,20 @@ func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFiel
 		}
 	}
 
-	message := fmt.Sprintf("missing sensor meta (%v, %v, %v)", m.Manufacturer, m.Kind, sensor)
+	message := fmt.Sprintf("missing sensor meta (manuf=%v, kind=%v, sensor=%v)", m.Manufacturer, m.Kind, sensor)
 	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
+}
+
+func toUint32Array(a []int32) []uint32 {
+	u := make([]uint32, len(a))
+	for i, _ := range a {
+		u[i] = uint32(a[i])
+	}
+	return u
+}
+
+func (r *ModuleMetaRepository) FindAllModulesMetaInMemory(ctx context.Context) (mm []*ModuleMeta, err error) {
+	return moduleMeta, nil
 }
 
 func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*ModuleMeta, err error) {
@@ -1247,5 +1260,56 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*Mo
 		return nil, err
 	}
 
-	return moduleMeta, nil
+	fromDb := make([]*ModuleMeta, 0)
+
+	for _, pmm := range modules {
+		mm := &ModuleMeta{
+			Key: pmm.Key,
+			Header: ModuleHeader{
+				Manufacturer: pmm.Manufacturer,
+				Kind:         uint32(pmm.Kinds[0]),
+				AllKinds:     toUint32Array(pmm.Kinds),
+				Version:      toUint32Array(pmm.Version)[0],
+			},
+			Internal: pmm.Internal,
+			Sensors:  make([]*SensorMeta, 0),
+		}
+
+		for _, psm := range sensors {
+			if psm.ModuleID != pmm.ID {
+				continue
+			}
+
+			ranges := make([]SensorRanges, 0)
+			if err := json.Unmarshal(psm.Ranges, &ranges); err != nil {
+				return nil, err
+			}
+
+			strings := make(map[string]map[string]string)
+			if err := json.Unmarshal(psm.Strings, &strings); err != nil {
+				return nil, err
+			}
+
+			viz := make([]VizConfig, 0)
+			if err := json.Unmarshal(psm.Viz, &viz); err != nil {
+				return nil, err
+			}
+
+			mm.Sensors = append(mm.Sensors, &SensorMeta{
+				Key:           psm.SensorKey,
+				FullKey:       psm.FullKey,
+				FirmwareKey:   psm.FirmwareKey,
+				UnitOfMeasure: psm.UnitOfMeasure,
+				Internal:      psm.Internal,
+				Order:         psm.Ordering,
+				Ranges:        ranges,
+				Strings:       strings,
+				VizConfigs:    viz,
+			})
+		}
+
+		fromDb = append(fromDb, mm)
+	}
+
+	return fromDb, nil
 }

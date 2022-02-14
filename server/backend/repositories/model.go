@@ -76,6 +76,7 @@ type DataMetaSensor struct {
 	Number        int            `json:"number"`
 	Name          string         `json:"name"`
 	Key           string         `json:"key"`
+	FirmwareKey   string         `json:"firmware_key"`
 	FullKey       string         `json:"full_key"`
 	UnitOfMeasure string         `json:"unit_of_measure"`
 	Internal      bool           `json:"internal"`
@@ -202,9 +203,10 @@ type PersistedSensorMeta struct {
 	ID            int32          `db:"id" json:"id"`
 	ModuleID      int32          `db:"module_id" json:"module_id"`
 	SensorKey     string         `db:"sensor_key" json:"sensor_key"`
+	FirmwareKey   string         `db:"firmware_key" json:"firmware_key"`
 	FullKey       string         `db:"full_key" json:"full_key"`
 	UnitOfMeasure string         `db:"uom" json:"uom"`
-	Ordering      int32          `db:"ordering" json:"ordering"`
+	Ordering      int            `db:"ordering" json:"ordering"`
 	Internal      bool           `db:"internal" json:"internal"`
 	Strings       types.JSONText `db:"strings" json:"strings"`
 	Viz           types.JSONText `db:"viz" json:"viz"`

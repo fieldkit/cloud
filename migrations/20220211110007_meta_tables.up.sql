@@ -12,6 +12,7 @@ CREATE TABLE fieldkit.sensor_meta (
 	module_id INTEGER NOT NULL REFERENCES fieldkit.module_meta(id),
     ordering INTEGER NOT NULL,
     sensor_key TEXT NOT NULL,
+    firmware_key TEXT NOT NULL,
     full_key TEXT NOT NULL,
     internal BOOL NOT NULL,
     uom TEXT NOT NULL,

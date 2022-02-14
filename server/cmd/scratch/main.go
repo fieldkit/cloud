@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"fmt"
 
 	"github.com/lib/pq"
 
@@ -33,17 +32,19 @@ func process(ctx context.Context, options *Options) error {
 
 	mmr := repositories.NewModuleMetaRepository(db)
 
-	all, err := mmr.FindAllModulesMeta(ctx)
+	all, err := mmr.FindAllModulesMetaInMemory(ctx)
 	if err != nil {
 		return err
 	}
 
 	for _, mm := range all {
-		fmt.Printf("%v\n", mm)
-
 		kinds := make([]int32, len(mm.Header.AllKinds))
 		for i, _ := range mm.Header.AllKinds {
 			kinds[i] = int32(mm.Header.AllKinds[i])
+		}
+
+		if len(kinds) == 0 {
+			kinds = append(kinds, int32(mm.Header.Kind))
 		}
 
 		pmm := &repositories.PersistedModuleMeta{
@@ -82,9 +83,10 @@ func process(ctx context.Context, options *Options) error {
 
 			psm := &repositories.PersistedSensorMeta{
 				ModuleID:      pmm.ID,
-				Ordering:      int32(sm.Order),
+				Ordering:      sm.Order,
 				SensorKey:     sm.Key,
 				FullKey:       sm.FullKey,
+				FirmwareKey:   sm.FirmwareKey,
 				UnitOfMeasure: sm.UnitOfMeasure,
 				Internal:      sm.Internal,
 				Strings:       types.JSONText(stringsSerialized),
@@ -93,8 +95,8 @@ func process(ctx context.Context, options *Options) error {
 			}
 
 			if err := db.NamedGetContext(ctx, psm, `
-			INSERT INTO fieldkit.sensor_meta (module_id, ordering, sensor_key, full_key, internal, uom, strings, viz, ranges)
-			VALUES (:module_id, :ordering, :sensor_key, :full_key, :internal, :uom, :strings, :viz, :ranges) RETURNING id
+			INSERT INTO fieldkit.sensor_meta (module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges)
+			VALUES (:module_id, :ordering, :sensor_key, :firmware_key, :full_key, :internal, :uom, :strings, :viz, :ranges) RETURNING id
 			`, psm); err != nil {
 				return err
 			}
