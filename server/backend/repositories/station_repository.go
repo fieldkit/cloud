@@ -101,11 +101,11 @@ func (r *StationRepository) UpdateOwner(ctx context.Context, station *data.Stati
 }
 
 func (r *StationRepository) UpdatePhoto(ctx context.Context, station *data.Station) (err error) {
-    if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET photo_id = :photo_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
-        return err
-    }
+	if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET photo_id = :photo_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (station *data.Station, err error) {
@@ -164,17 +164,17 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 }
 
 func (r *StationRepository) QueryStationByPhotoID(ctx context.Context, id int32) (station *data.Station, err error) {
-    station = &data.Station{}
+	station = &data.Station{}
 
-    if err := r.db.GetContext(ctx, station, `
+	if err := r.db.GetContext(ctx, station, `
         SELECT
             id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
             recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
         FROM fieldkit.station WHERE id IN (SELECT station_id FROM notes_media WHERE id = $1)
         `, id); err != nil {
-        return nil, err
-    }
-    return station, nil
+		return nil, err
+	}
+	return station, nil
 }
 
 func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Context, metaRecordID int64) (*data.StationConfiguration, error) {
@@ -1229,13 +1229,13 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		byStation[int32(id)] = make([]*StationSensor, 0)
 	}
 
-	metaRepository := NewModuleMetaRepository()
+	metaRepository := NewModuleMetaRepository(sr.db)
 
 	for _, row := range rows {
 		if !strings.HasPrefix(row.ModuleKey, "fk.") && !strings.HasPrefix(row.ModuleKey, "wh.") {
 			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
 		}
-		moduleAndSensor, _ := metaRepository.FindByFullKey(row.SensorKey)
+		moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, row.SensorKey)
 		order := 0
 		if moduleAndSensor != nil {
 			order = moduleAndSensor.Sensor.Order

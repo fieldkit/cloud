@@ -3,6 +3,9 @@ package repositories
 import (
 	"time"
 
+	"github.com/jmoiron/sqlx/types"
+	"github.com/lib/pq"
+
 	pb "github.com/fieldkit/data-protocol"
 )
 
@@ -73,6 +76,7 @@ type DataMetaSensor struct {
 	Number        int            `json:"number"`
 	Name          string         `json:"name"`
 	Key           string         `json:"key"`
+	FirmwareKey   string         `json:"firmware_key"`
 	FullKey       string         `json:"full_key"`
 	UnitOfMeasure string         `json:"unit_of_measure"`
 	Internal      bool           `json:"internal"`
@@ -185,4 +189,26 @@ type DataSummary struct {
 	End                 *time.Time `db:"end"`
 	NumberOfDataRecords int64      `db:"number_of_data_records"`
 	NumberOfMetaRecords int64      `db:"number_of_meta_records"`
+}
+
+type PersistedModuleMeta struct {
+	ID           int32         `db:"id" json:"id"`
+	Key          string        `db:"key" json:"key"`
+	Manufacturer uint32        `db:"manufacturer" json:"manufacturer"`
+	Kinds        pq.Int32Array `db:"kinds" json:"kinds"`
+	Version      pq.Int32Array `db:"version" json:"version"`
+	Internal     bool          `db:"internal" json:"internal"`
+}
+type PersistedSensorMeta struct {
+	ID            int32          `db:"id" json:"id"`
+	ModuleID      int32          `db:"module_id" json:"module_id"`
+	SensorKey     string         `db:"sensor_key" json:"sensor_key"`
+	FirmwareKey   string         `db:"firmware_key" json:"firmware_key"`
+	FullKey       string         `db:"full_key" json:"full_key"`
+	UnitOfMeasure string         `db:"uom" json:"uom"`
+	Ordering      int            `db:"ordering" json:"ordering"`
+	Internal      bool           `db:"internal" json:"internal"`
+	Strings       types.JSONText `db:"strings" json:"strings"`
+	Viz           types.JSONText `db:"viz" json:"viz"`
+	Ranges        types.JSONText `db:"ranges" json:"ranges"`
 }

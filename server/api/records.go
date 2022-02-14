@@ -127,7 +127,7 @@ func (c *RecordsService) Resolved(ctx context.Context, payload *records.Resolved
 		return nil, err
 	}
 
-	metaFactory := repositories.NewMetaFactory()
+	metaFactory := repositories.NewMetaFactory(c.options.Database)
 	for _, dbMeta := range dbMetas {
 		_, err := metaFactory.Add(ctx, dbMeta, false)
 		if err != nil {

@@ -38,7 +38,7 @@ setup: portal/src/secrets.ts
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -75,6 +75,8 @@ sanitizer: $(BUILD)/sanitizer
 
 webhook: $(BUILD)/webhook
 
+scratch: $(BUILD)/scratch
+
 $(BUILD)/server: $(SERVER_SOURCES)
 	cd server/cmd/server && $(GO) build -o $@
 
@@ -92,6 +94,9 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 
 $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 	cd server/cmd/webhook && $(GO) build -o $@ *.go
+
+$(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
+	cd server/cmd/scratch && $(GO) build -o $@ *.go
 
 generate:
 ifeq (, $(shell which goa))

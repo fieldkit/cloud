@@ -7,6 +7,7 @@ import (
 
 	"goa.design/goa/v3/security"
 
+	"github.com/conservify/sqlxcache"
 	information "github.com/fieldkit/cloud/server/api/gen/information"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -51,7 +52,7 @@ func (c *InformationService) DeviceLayout(ctx context.Context, payload *informat
 
 	_ = p
 
-	return transformStationLayout(layout)
+	return transformStationLayout(ctx, c.options.Database, layout)
 }
 
 func (c *InformationService) FirmwareStatistics(ctx context.Context, payload *information.FirmwareStatisticsPayload) (response *information.FirmwareStatisticsResult, err error) {
@@ -100,7 +101,7 @@ func (s *InformationService) JWTAuth(ctx context.Context, token string, scheme *
 	})
 }
 
-func transformStationLayout(sl *repositories.StationLayout) (*information.DeviceLayoutResponse, error) {
+func transformStationLayout(ctx context.Context, db *sqlxcache.DB, sl *repositories.StationLayout) (*information.DeviceLayoutResponse, error) {
 	configurations := make([]*information.StationConfiguration, 0)
 	modulesByConfiguration := make(map[int64][]*information.StationModule)
 	sensorsByModule := make(map[int64][]*data.ModuleSensor)
@@ -108,7 +109,7 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 	sensorsByKey := make(map[string][]*information.StationSensor)
 	moduleHeaders := make(map[int64]*repositories.HeaderFields)
 
-	mr := repositories.NewModuleMetaRepository()
+	mr := repositories.NewModuleMetaRepository(db)
 
 	for _, sm := range sl.Modules {
 		sensorsWmByModule[sm.ID] = make([]*information.StationSensor, 0)
@@ -124,7 +125,7 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 	}
 
 	for _, ms := range sl.Sensors {
-		if _, sensorMeta, err := mr.FindSensorMeta(moduleHeaders[ms.ModuleID], ms.Name); err == nil {
+		if _, sensorMeta, err := mr.FindSensorMeta(ctx, moduleHeaders[ms.ModuleID], ms.Name); err == nil {
 			ranges := make([]*information.SensorRange, 0)
 			for _, r := range sensorMeta.Ranges {
 				ranges = append(ranges, &information.SensorRange{
@@ -154,7 +155,7 @@ func transformStationLayout(sl *repositories.StationLayout) (*information.Device
 		hardwareID := hex.EncodeToString(sm.HardwareID)
 		sensors := sensorsWmByModule[sm.ID]
 
-		if moduleMeta, err := mr.FindModuleMeta(moduleHeaders[sm.ID]); err == nil {
+		if moduleMeta, err := mr.FindModuleMeta(ctx, moduleHeaders[sm.ID]); err == nil {
 			modulesByConfiguration[sm.ConfigurationID] = append(modulesByConfiguration[sm.ConfigurationID], &information.StationModule{
 				ID:         sm.ID,
 				HardwareID: &hardwareID,

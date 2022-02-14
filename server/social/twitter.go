@@ -138,7 +138,7 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	mmr := repositories.NewModuleMetaRepository()
+	mmr := repositories.NewModuleMetaRepository(tw.db)
 
 	sensorIdToKey := make(map[int64]string)
 	for _, row := range sensorRows {
@@ -167,7 +167,7 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 
 			sensorKey := sensorIdToKey[s.SensorID]
 
-			sensorMeta, err := mmr.FindByFullKey(sensorKey)
+			sensorMeta, err := mmr.FindByFullKey(ctx, sensorKey)
 			if err != nil {
 				log.Errorw("error-internal", "error", err)
 				w.WriteHeader(http.StatusInternalServerError)
