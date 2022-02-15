@@ -231,6 +231,28 @@ export default Vue.extend({
 }
 */
 
+#vg-tooltip-element {
+    background-color: #f4f5f7;
+    border-radius: 1px;
+    box-shadow: none;
+    border: none;
+}
+#vg-tooltip-element .key {
+    display: none;
+}
+#vg-tooltip-element table tr:first-of-type td.value {
+    text-align: center;
+    font-family: "Avenir", sans-serif;
+    font-size: 16px;
+    color: #2c3e50;
+}
+#vg-tooltip-element table tr:nth-of-type(2) td.value {
+    text-align: center;
+    font-family: "Avenir", sans-serif;
+    font-size: 13px;
+    color: #2c3e50;
+}
+
 .explore-view {
     text-align: left;
     background-color: #fcfcfc;

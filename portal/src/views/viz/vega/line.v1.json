@@ -42,7 +42,6 @@
             "zero": false
           },
           "axis": {
-            "domain": true,
             "gridDash": [
               2,
               2

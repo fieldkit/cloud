@@ -8,7 +8,8 @@
     "titleFontSize": 14,
     "titlePadding": 20,
     "tickSize": 10,
-    "tickOpacity": 0
+    "tickOpacity": 0,
+    "domain": false
   },
   "axisX": {
     "title": null
