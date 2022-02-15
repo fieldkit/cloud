@@ -1,6 +1,6 @@
 <template>
     <div class="form-container" v-if="credentialsNecessary">
-        <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+        <Logo class="form-header-logo"></Logo>
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="false" @login="save" />
     </div>
 </template>
@@ -14,11 +14,13 @@ import LoginForm from "./LoginForm.vue";
 import FKApi, { LoginPayload } from "@/api/api";
 import { ActionTypes, DiscourseParams, LoginDiscourseAction } from "@/store";
 import { toSingleValue } from "@/utilities";
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     components: {
         ...CommonComponents,
         LoginForm,
+        Logo,
     },
     props: {},
     data(): {

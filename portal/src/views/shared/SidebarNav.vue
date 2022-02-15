@@ -58,7 +58,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import {interpolatePartner} from "./PartnerCustomisationHelper";
+import { interpolatePartner } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -211,8 +211,10 @@ export default Vue.extend({
     margin: 0 10px 0 5px;
     font-size: 16px;
 
-    &:before {
-        color: var(--color-primary);
+    body.floodnet & {
+        &:before {
+            color: var(--color-dark);
+        }
     }
 }
 .selected {

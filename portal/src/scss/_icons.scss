@@ -1,10 +1,18 @@
+@import "variables";
+
 .icon {
     &-heart {
         font-size: 15px;
         font-weight: 600;
 
-        &--gray {
-            color: #575757;
+        &:before {
+            color: $color-fieldkit-secondary;
+        }
+
+        &.gray {
+            &:before {
+                color: #575757;
+            }
         }
     }
 
@@ -16,3 +24,4 @@
         font-size: 18px;
     }
 }
+

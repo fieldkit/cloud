@@ -269,7 +269,7 @@ export default Vue.extend({
     @include position(absolute, -5px null null -7px);
     height: 20px;
     width: 20px;
-    background: #1b80c9;
+    background: var(--color-primary);
     border-radius: 50%;
 
     > * {
@@ -279,6 +279,10 @@ export default Vue.extend({
         font-size: 11px;
         font-style: normal;
         font-family: $font-family-bold;
+
+        body.floodnet & {
+            color: var(--color-dark);
+        }
     }
 }
 
