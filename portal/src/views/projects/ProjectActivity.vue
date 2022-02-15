@@ -52,7 +52,7 @@
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { DisplayProject } from "@/store";
-import { FKPartnersEnum, isCustomisationEnabledFor } from "@/views/shared/PartnerCustomisationHelper";
+import { isCustomisationEnabled } from "@/views/shared/PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "ProjectActivity",
@@ -135,8 +135,8 @@ export default Vue.extend({
         onClose(): void {
             this.$emit("close");
         },
-        isFloodnetCustomisationEnabled(): boolean {
-            return isCustomisationEnabledFor(FKPartnersEnum.floodnet);
+        isCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
         },
     },
 });
