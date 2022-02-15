@@ -700,7 +700,7 @@ form > .outer-input-container {
 
     &.active {
         color: white;
-        background-color: #2c3e50;
+        background-color: var(--color-dark);
     }
 }
 

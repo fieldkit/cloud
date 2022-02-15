@@ -416,5 +416,11 @@ export default Vue.extend({
     &:before {
         color: var(--color-primary);
     }
+
+    body.floodnet & {
+        &:before {
+            color: var(--color-dark);
+        }
+    }
 }
 </style>

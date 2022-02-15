@@ -186,7 +186,7 @@ export default {
     }
 
     span {
-      margin-bottom: -2px;
+        margin-bottom: -2px;
     }
 }
 .invited-container .accept {
@@ -222,6 +222,12 @@ export default {
     &-tick {
         font-size: 12px;
         color: var(--color-primary);
+
+        body.floodnet & {
+            &:before {
+                color: var(--color-dark);
+            }
+        }
     }
 
     &-close {

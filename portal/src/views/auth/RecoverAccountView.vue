@@ -1,6 +1,6 @@
 <template>
     <div class="form-container">
-        <img class="form-header-logo" alt="FieldKit Logo" src="@/assets/FieldKit_Logo_White.png" />
+        <Logo class="form-header-logo"></Logo>
         <div v-if="!attempted">
             <form class="form" @submit.prevent="save">
                 <h1 class="form-title">Recover Account</h1>
@@ -40,11 +40,13 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import Logo from '@/views/shared/Logo.vue';
 
 export default Vue.extend({
     name: "RecoverAccountView",
     components: {
         ...CommonComponents,
+        Logo,
     },
     data(): {
         form: {
