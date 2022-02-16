@@ -214,10 +214,9 @@ li {
 }
 
 .app-logo {
-    @include position(fixed, null null 15px 15px);
+    @include position(fixed, null null 15px 43px);
     z-index: $z-index-app-logo;
-    font-size: 28px;
-    text-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
 
     &:before {
         color: var(--color-dark);

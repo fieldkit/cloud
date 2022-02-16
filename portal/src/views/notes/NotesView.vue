@@ -382,7 +382,7 @@ export default Vue.extend({
     }
 
     &.active {
-        border-left: 4px solid #1b80c9;
+        border-left: 4px solid var(--color-primary);
 
         @include bp-down($md) {
             border-left: 0;
