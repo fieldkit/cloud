@@ -39,7 +39,7 @@ export default {
             rangeSpec.data = { name: "table", values: this.data.data };
             rangeSpec.encoding.y.axis.title = this.label;
             rangeSpec.width = "container";
-            rangeSpec.height = 300;
+            rangeSpec.height = "container";
 
             const vegaView = await vegaEmbed(".rangechart", rangeSpec, {
                 renderer: "svg",

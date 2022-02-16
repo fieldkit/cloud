@@ -27,9 +27,10 @@
 
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
-            <div class="workspace-container">
+            <div v-bind:class="{ 'workspace-container': true, busy: busy }">
+                <div class="busy-panel">&nbsp;</div>
+
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
-                <div class="busy" v-else><Spinner /></div>
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>
@@ -105,6 +106,9 @@ export default Vue.extend({
         }),
         addIcon(): unknown {
             return this.$loadAsset("icon-compare.svg");
+        },
+        busy(): boolean {
+            return !this.workspace || this.workspace.busy;
         },
     },
     watch: {
@@ -212,24 +216,6 @@ export default Vue.extend({
 
 <style lang="scss">
 @import "../../scss/layout";
-
-/*
-.graph .x-axis {
-    color: #7f7f7f;
-}
-
-.graph .y-axis {
-    color: #7f7f7f;
-}
-
-.graph .x-axis text {
-    font-size: 7pt;
-}
-
-.graph .y-axis text {
-    font-size: 7pt;
-}
-*/
 
 #vg-tooltip-element {
     background-color: #f4f5f7;
@@ -343,13 +329,39 @@ export default Vue.extend({
 
 .vega-embed {
     width: 100%;
+
     summary {
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
 }
-.scrubber .vega-embed summary {
-    display: none;
+.graph .vega-embed {
+    height: 340px;
+}
+.scrubber .vega-embed {
+    height: 40px;
+
+    summary {
+        display: none;
+    }
+}
+
+.workspace-container {
+    position: relative;
+
+    .busy-panel {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+        z-index: 10;
+        opacity: 0.5;
+    }
+
+    &.busy .busy-panel {
+        display: block;
+        background-color: #efefef;
+    }
 }
 
 .controls-container {

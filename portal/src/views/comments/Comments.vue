@@ -352,7 +352,7 @@ button {
 
     &.data-view {
         margin-top: 0;
-        padding-top: 45px;
+        // padding-top: 45px;
         box-shadow: none;
         border: 0;
     }

@@ -27,6 +27,11 @@ export const VizGroup = Vue.extend({
     mounted() {
         this.group.log("mounted", this.group, this.topGroup);
     },
+    computed: {
+        busy() {
+            return this.group.busy;
+        },
+    },
     methods: {
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
             return this.$emit("group-time-zoomed", zoom, ...args);
@@ -60,33 +65,29 @@ export const VizGroup = Vue.extend({
         },
     },
     template: `
-		<div class="">
-			<div class="group-container">
-				<template v-for="(viz, index) in group.vizes" :key="viz.id">
-                    <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
-					<div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': isLinked(index), 'unlinked': !isLinked(index) }">
-						<div class="invisible-spacing-icon"></div>
-						<div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'icon-open-link': !isLinked(index), 'icon-link': isLinked(index) }"></div>
-						<div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
-					</div>
+        <div v-bind:class="{ 'group-container': true, 'busy': false }">
+            <div v-for="(viz, index) in group.vizes" :key="viz.id" v-bind:class="{ 'viz-container': true, 'busy': false }">
+                <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
 
-					<VizGraph :viz="viz" :workspace="workspace"
-						@viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
-						@viz-geo-zoomed="(...args) => raiseVizGeoZoomed(viz, ...args)"
-						@viz-remove="(...args) => raiseRemove(viz, ...args)"
-						@viz-compare="(...args) => raiseCompare(viz, ...args)"
-						@viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"
-						@viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
-						/>
-					</component>
-				</template>
-				<div v-if="group.scrubbers && !group.scrubbers.empty">
-					<Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
-				</div>
-				<div v-else class="loading-scrubber">
-					Loading Scrubber
-				</div>
-			</div>
-		</div>
+                <div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': isLinked(index), 'unlinked': !isLinked(index) }">
+                    <div class="invisible-spacing-icon"></div>
+                    <div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'icon-open-link': !isLinked(index), 'icon-link': isLinked(index) }"></div>
+                    <div class="icon remove-icon" v-on:click="(ev) => raiseRemove(viz)"></div>
+                </div>
+
+                <VizGraph :viz="viz" :workspace="workspace"
+                    @viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
+                    @viz-geo-zoomed="(...args) => raiseVizGeoZoomed(viz, ...args)"
+                    @viz-remove="(...args) => raiseRemove(viz, ...args)"
+                    @viz-compare="(...args) => raiseCompare(viz, ...args)"
+                    @viz-change-sensors="(...args) => raiseChangeSensors(viz, ...args)"
+                    @viz-change-chart="(...args) => raiseChangeChart(viz, ...args)"
+                    />
+                </component>
+            </div>
+            <div v-if="group.scrubbers && !group.scrubbers.empty">
+                <Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+            </div>
+        </div>
 	`,
 });

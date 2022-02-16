@@ -507,6 +507,10 @@ export class Group {
         return this.vizes.length == 0;
     }
 
+    public get busy() {
+        return this.vizes.filter((v) => v.busy).length > 0;
+    }
+
     public contains(viz: Viz): boolean {
         return this.vizes.indexOf(viz) >= 0;
     }
@@ -626,6 +630,10 @@ export class Workspace {
 
     public get empty(): boolean {
         return this.allVizes.length === 0;
+    }
+
+    public get busy(): boolean {
+        return this.groups.filter((g) => g.busy).length > 0;
     }
 
     public get allStationIds(): StationID[] {

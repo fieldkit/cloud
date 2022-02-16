@@ -39,11 +39,23 @@ export const SensorSelectionRow = Vue.extend({
     },
     computed: {
         selectedStation(): number | null {
+            if (this.disabled) {
+                return null;
+            }
             return this.ds.vizSensor[0]; // TODO VizSensor
         },
         selectedSensor(): string | null {
+            if (this.disabled) {
+                return null;
+            }
             const sensorAndModule = this.ds.vizSensor[1]; // TODO VizSensor
             return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
+        },
+        disabled(): boolean {
+            if (this.stationOptions.length == 0 || this.sensorOptions.length == 0) {
+                return true;
+            }
+            return this.viz.busy;
         },
     },
     methods: {
@@ -66,14 +78,14 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
-            <treeselect :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
-            <treeselect :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
+            <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,
 });
 
 export const SelectionControls = Vue.extend({
-    name: "SensorControls",
+    name: "SelectionControls",
     components: {
         SensorSelectionRow,
     },
@@ -89,6 +101,9 @@ export const SelectionControls = Vue.extend({
     },
     computed: {
         stationOptions(): StationTreeOption[] {
+            if (this.viz.busy) {
+                return [];
+            }
             this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
         },
@@ -98,12 +113,12 @@ export const SelectionControls = Vue.extend({
         showAdd(): boolean {
             return this.viz.dataSets.length <= 1;
         },
-        visible(): boolean {
-            return this.stationOptions.length > 0;
-        },
     },
     methods: {
         sensorOptions(vizSensor: VizSensor): SensorTreeOption[] {
+            if (this.stationOptions.length == 0) {
+                return [];
+            }
             const stationId = vizSensor[0]; // TODO VizSensor
             const sensorOptions = this.workspace.sensorOptions(stationId);
             this.viz.log("sensor-options", { options: sensorOptions });
@@ -126,7 +141,7 @@ export const SelectionControls = Vue.extend({
         },
     },
     template: `
-		<div class="left half" v-if="visible">
+		<div class="left half">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
                 <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" />
                 <div class="actions" v-if="showAdd || showRemove">
@@ -242,9 +257,8 @@ export const ViewingControls = Vue.extend({
     template: `
 		<div class="controls-container">
 			<div class="row row-1">
-				<div class="left buttons" v-if="!viz.busy">
+				<div class="left">
 				</div>
-				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">
 					<span class="view-by">View By:</span>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
@@ -278,7 +292,7 @@ export const ViewingControls = Vue.extend({
 
 				<div class="right half" v-if="chartTypes.length > 1">
                     <div class="chart-type">
-                        <treeselect :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+                        <treeselect :disabled="viz.busy" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>
 			</div>

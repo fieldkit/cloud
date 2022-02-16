@@ -57,7 +57,7 @@ export default {
             spec.data = { name: "table", values: this.data.data };
             spec.layer[0].encoding.y.axis.title = this.label;
             spec.width = "container";
-            spec.height = 300;
+            spec.height = "container";
 
             if (this.thresholds.length > 0) {
                 console.log("viz-thresholds", this.thresholds);
