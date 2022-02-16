@@ -362,6 +362,12 @@ export default Vue.extend({
         display: block;
         background-color: #efefef;
     }
+
+    .viz-loading {
+        height: 300px;
+        display: flex;
+        align-items: center;
+    }
 }
 
 .controls-container {

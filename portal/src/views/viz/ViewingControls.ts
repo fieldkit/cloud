@@ -4,8 +4,6 @@ import Vue, { PropType } from "vue";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import Spinner from "@/views/shared/Spinner.vue";
-
 import { TimeRange, VizSensor } from "./common";
 import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
@@ -158,7 +156,6 @@ export const ViewingControls = Vue.extend({
     components: {
         SelectionControls,
         Treeselect,
-        Spinner,
     },
     props: {
         viz: {

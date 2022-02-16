@@ -28,7 +28,7 @@ export const VizGroup = Vue.extend({
         this.group.log("mounted", this.group, this.topGroup);
     },
     computed: {
-        busy() {
+        busy(): boolean {
             return this.group.busy;
         },
     },

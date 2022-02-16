@@ -134,7 +134,6 @@ export const VegaTimeSeriesGraph = Vue.extend({
     },
     template: `
         <div class="viz time-series-graph">
-            <div v-if="allSeries.length == 0" class="viz-loading">&nbsp;</div>
             <div class="chart" @dblclick="onDouble" v-if="allSeries.length == 2">
                 <DoubleLineChart :data="allSeries" :labels="labels" :valueSuffixes="valueSuffixes" :thresholds="thresholds" v-bind:key="allSeries[0].key + allSeries[1].key" @time-zoomed="raiseTimeZoomed" />
             </div>

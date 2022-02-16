@@ -2,8 +2,11 @@ import _ from "lodash";
 import Vue from "vue";
 import { Graph, Workspace, ChartType } from "./viz";
 
+import Spinner from "@/views/shared/Spinner.vue";
+
 import { ViewingControls } from "./ViewingControls";
 import { DebuggingPanel } from "./DebuggingPanel";
+
 /*
 import { D3TimeSeriesGraph as TimeSeriesGraph } from "./D3TimeSeriesGraph";
 import { D3Histogram as Histogram } from "./D3Histogram";
@@ -15,10 +18,19 @@ import { VegaRange as Range } from "./VegaRange";
 
 import { D3Map as Map } from "./D3Map";
 
+const Loading = Vue.extend({
+    name: "Loading",
+    components: {
+        Spinner,
+    },
+    template: `<div class="viz-loading"><Spinner /></div>`,
+});
+
 export const VizGraph = Vue.extend({
     name: "VizGraph",
     components: {
         ViewingControls,
+        Loading,
         DebuggingPanel,
         TimeSeriesGraph,
         Histogram,
@@ -72,6 +84,10 @@ export const VizGraph = Vue.extend({
             this.$emit("viz-change-chart", ...args);
         },
         uiNameOf(graph: Graph): string {
+            if (this.viz.loadedDataSets.length == 0) {
+                return "Loading";
+            }
+
             switch (graph.chartType) {
                 case ChartType.TimeSeries:
                     return "TimeSeriesGraph";
@@ -82,6 +98,7 @@ export const VizGraph = Vue.extend({
                 case ChartType.Map:
                     return "Map";
             }
+
             this.viz.log("unknown chart type");
             return "TimeSeriesGraph";
         },

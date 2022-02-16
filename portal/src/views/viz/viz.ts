@@ -7,6 +7,7 @@ import FKApi from "@/api/api";
 
 export * from "./common";
 
+import { promiseAfter } from "@/utilities";
 import { ColorScale, createSensorColorScale } from "./d3-helpers";
 
 type SensorReadAtType = string;
@@ -318,6 +319,24 @@ export class Graph extends Viz {
         super();
     }
 
+    public get loadedDataSets(): DataSetSeries[] {
+        if (this.dataSets.length) {
+            const all = _.flatten(
+                this.dataSets.map((ds) => {
+                    if (ds && ds.graphing) {
+                        return [ds];
+                    }
+                    return [];
+                })
+            );
+
+            if (all.length == this.dataSets.length) {
+                return all;
+            }
+        }
+        return [];
+    }
+
     public get visibleTimeRange(): TimeRange {
         return this.visible;
     }
@@ -574,7 +593,12 @@ export class Querier {
 
         const key = queryParams.toString();
         if (this.info[key]) {
-            return Promise.resolve(this.info[key]);
+            iq.howBusy(1);
+
+            return promiseAfter(1).then(() => {
+                iq.howBusy(-1);
+                return this.info[key];
+            });
         }
 
         iq.howBusy(1);
@@ -598,8 +622,13 @@ export class Querier {
         const queryParams = params.queryParams();
         const key = queryParams.toString();
         if (this.data[key]) {
-            vq.resolve(this.data[key]);
-            return Promise.resolve(this.data[key]);
+            vq.howBusy(1);
+
+            return promiseAfter(1).then(() => {
+                vq.resolve(this.data[key]);
+                vq.howBusy(-1);
+                return this.data[key];
+            });
         }
 
         vq.howBusy(1);
@@ -612,12 +641,12 @@ export class Querier {
                 this.data[key] = filtered;
                 return filtered;
             })
-            .finally(() => {
-                vq.howBusy(-1);
-            })
             .then((data) => {
                 vq.resolve(data);
                 return data;
+            })
+            .finally(() => {
+                vq.howBusy(-1);
             });
     }
 }
