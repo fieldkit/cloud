@@ -10,8 +10,9 @@ import (
 )
 
 type SensorRanges struct {
-	Minimum float64 `json:"minimum"`
-	Maximum float64 `json:"maximum"`
+	Minimum     float64 `json:"minimum"`
+	Maximum     float64 `json:"maximum"`
+	Constrained *bool   `json:"constrained"`
 }
 
 type VizThreshold struct {
