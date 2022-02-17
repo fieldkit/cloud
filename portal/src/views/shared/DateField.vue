@@ -1,8 +1,8 @@
 <template>
-    <v-date-picker :value="value" :masks="{ input: format }" :min-date="minDate">
+    <v-date-picker :value="value" :masks="{ input: format }" :min-date="minDate" @input="onInput">
         <template v-slot="{ inputValue, inputEvents }">
             <label class="has-float-label">
-                <input type="text" :value="inputValue" @input="onInput" v-on="inputEvents" :placeholder="label" />
+                <input type="text" :value="inputValue" v-on="inputEvents" :placeholder="label" />
                 <span v-if="label">{{ label }}</span>
                 <i class="icon icon-calendar"></i>
             </label>
@@ -12,6 +12,7 @@
 
 <script>
 import Vue from "vue";
+import moment from "moment";
 
 export default Vue.extend({
     name: "DateField.vue",
@@ -22,7 +23,7 @@ export default Vue.extend({
         },
         format: {
             type: String,
-            default: "MM/DD/YY",
+            default: "M/D/YYYY",
         },
         label: {
             type: String,
@@ -34,8 +35,8 @@ export default Vue.extend({
         },
     },
     methods: {
-        onInput(ev) {
-            this.$emit("input", ev.target.value);
+        onInput(value) {
+            this.$emit("input", moment(value).format(this.format));
         },
     },
 });

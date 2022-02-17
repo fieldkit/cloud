@@ -48,17 +48,7 @@
 
             <div class="dates-row">
                 <DateField v-model="form.startTime" :label="$tc('project.form.startDate')"></DateField>
-
-                <div class="validation-errors" v-if="$v.form.startTime.$error">
-                    <div v-if="!$v.form.startTime.date">{{ $t("project.form.startTime.date") }}</div>
-                </div>
-
                 <DateField v-model="form.endTime" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
-
-                <div class="validation-errors" v-if="$v.form.endTime.$error">
-                    <div v-if="!$v.form.endTime.date">{{ $t("project.form.endTime.date") }}</div>
-                    <div v-if="!$v.form.endTime.minValue">{{ $t("project.form.endTime.minValue") }}</div>
-                </div>
             </div>
 
             <div class="outer-input-container tags-container">
@@ -184,8 +174,6 @@ export default Vue.extend({
             tag: string;
             public: boolean;
             privacy: number;
-            pickedStart: number | null;
-            pickedEnd: number | null;
             showStations: boolean;
             bounds: BoundingRectangle;
         };
@@ -205,8 +193,6 @@ export default Vue.extend({
                 tag: "",
                 public: false,
                 privacy: 1,
-                pickedStart: null,
-                pickedEnd: null,
                 showStations: false,
                 bounds: MappedStations.defaultBounds(),
             },
@@ -230,23 +216,6 @@ export default Vue.extend({
                 required,
                 maxLength: maxLength(100),
             },
-            startTime: {
-                date: function(value) {
-                    if (value && value.length > 0) {
-                        return moment(value).isValid();
-                    }
-                    return true;
-                },
-            },
-            endTime: {
-                date: function(value) {
-                    if (value && value.length > 0) {
-                        return moment(value).isValid();
-                    }
-                    return true;
-                },
-                minValue: afterOtherDate("startTime"),
-            },
             tags: {
                 maxLength: (value) => {
                     const raw = JSON.stringify(value.map((tag) => tag.text));
@@ -262,13 +231,11 @@ export default Vue.extend({
                 description: this.project.description,
                 goal: this.project.goal,
                 location: this.project.location,
-                startTime: this.prettyDate(this.project.startTime),
-                endTime: this.prettyDate(this.project.endTime),
+                startTime: this.project.startTime,
+                endTime: this.project.endTime,
                 tags: tryParseTags(this.project.tags),
                 public: this.project.privacy > 0,
                 privacy: this.project.privacy == 0 ? 1 : this.project.privacy,
-                pickedStart: null,
-                pickedEnd: null,
                 showStations: this.project.showStations,
                 bounds: new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max),
                 tag: "",
@@ -300,8 +267,6 @@ export default Vue.extend({
             this.tagsFocused = false;
         },
         async saveForm(): Promise<void> {
-            console.log("radoi form", this.form);
-
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
@@ -400,18 +365,6 @@ export default Vue.extend({
                     return this.$router.push({ name: "projects" });
                 });
             }
-        },
-        updateStart(date): void {
-            this.form.startTime = date ? moment(date).format("M/D/YYYY") : "";
-        },
-        updateEnd(date, ...args): void {
-            this.form.endTime = date ? moment(date).format("M/D/YYYY") : "";
-        },
-        prettyDate(date): string {
-            if (date) {
-                return moment(date).format("M/D/YYYY");
-            }
-            return "";
         },
         async closeForm(): Promise<void> {
             if (this.project) {
