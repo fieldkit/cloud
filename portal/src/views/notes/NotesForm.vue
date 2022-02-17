@@ -241,6 +241,12 @@ export default Vue.extend({
     color: #0a67aa;
     font-size: 14px;
     font-weight: 600;
+
+    body.floodnet & {
+        color: #6a6d71;
+        font-size: 13px;
+        font-weight: 500;
+    }
 }
 
 .header .buttons {

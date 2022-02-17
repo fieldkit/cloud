@@ -52,13 +52,19 @@
                 <i role="img" class="icon" :class="narrowSidebarLogoIconClass" :aria-label="narrowSidebarLogoAlt"></i>
             </router-link>
         </div>
+
+        <div v-if="isPartnerCustomisationEnabled()" class="app-logo">
+            <span>Made by</span>
+            <br />
+            <i role="img" :aria-label="$tc('layout.logo.fieldkit')" class="icon icon-logo-fieldkit"></i>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import { interpolatePartner } from "./PartnerCustomisationHelper";
+import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -124,6 +130,9 @@ export default Vue.extend({
             this.sidebar.narrow = !this.sidebar.narrow;
             this.$emit("sidebar-toggle");
         },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
     },
 });
 </script>
@@ -132,6 +141,7 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .container-side {
+    position: relative;
     background: #fff;
     width: 65px;
     flex: 0 0 65px;
@@ -310,6 +320,23 @@ export default Vue.extend({
         @include bp-down($md) {
             left: 188px;
         }
+    }
+}
+
+.app-logo {
+    @include position(absolute, null null 15px 43px);
+    z-index: $z-index-app-logo;
+    font-size: 16px;
+    text-align: left;
+
+    span {
+        font-family: var(--font-family-bold);
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    i:before {
+        color: var(--color-dark);
     }
 }
 </style>
