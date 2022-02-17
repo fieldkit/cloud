@@ -53,7 +53,7 @@
             </router-link>
         </div>
 
-        <div v-if="isFloodnetCustomisationEnabled()" class="app-logo">
+        <div v-if="isPartnerCustomisationEnabled()" class="app-logo">
             <span>Made by</span>
             <br />
             <i role="img" :aria-label="$tc('layout.logo.fieldkit')" class="icon icon-logo-fieldkit"></i>
@@ -64,7 +64,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import { FKPartnersEnum, interpolatePartner, isCustomisationEnabledFor } from "./PartnerCustomisationHelper";
+import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -130,8 +130,8 @@ export default Vue.extend({
             this.sidebar.narrow = !this.sidebar.narrow;
             this.$emit("sidebar-toggle");
         },
-        isFloodnetCustomisationEnabled(): boolean {
-            return isCustomisationEnabledFor(FKPartnersEnum.floodnet);
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
         },
     },
 });
