@@ -47,31 +47,13 @@
             </div>
 
             <div class="dates-row">
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.startTime" label="Start" />
-                    </div>
-                    <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
-                        <button type="button">
-                            <img :alt="$t('project.form.startTime.alt')" src="@/assets/icon-calendar-gray.svg" />
-                        </button>
-                    </v-date-picker>
-                </div>
+                <DateField v-model="form.startTime" :label="$tc('project.form.startDate')"></DateField>
 
                 <div class="validation-errors" v-if="$v.form.startTime.$error">
                     <div v-if="!$v.form.startTime.date">{{ $t("project.form.startTime.date") }}</div>
                 </div>
 
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.endTime" label="End" />
-                    </div>
-                    <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
-                        <button type="button">
-                            <img :alt="$t('project.form.endTime.alt')" src="@/assets/icon-calendar-gray.svg" />
-                        </button>
-                    </v-date-picker>
-                </div>
+                <DateField v-model="form.endTime" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
 
                 <div class="validation-errors" v-if="$v.form.endTime.$error">
                     <div v-if="!$v.form.endTime.date">{{ $t("project.form.endTime.date") }}</div>
@@ -163,7 +145,7 @@ import { mapState } from "vuex";
 import StationsMap from "@/views/shared/StationsMap.vue";
 
 const afterOtherDate = (afterOtherDate) =>
-    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
+    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function(this: any, value, parentVm) {
         const other = helpers.ref(afterOtherDate, this, parentVm);
         if (!other || other.length === 0) {
             return true;
@@ -249,7 +231,7 @@ export default Vue.extend({
                 maxLength: maxLength(100),
             },
             startTime: {
-                date: function (value) {
+                date: function(value) {
                     if (value && value.length > 0) {
                         return moment(value).isValid();
                     }
@@ -257,7 +239,7 @@ export default Vue.extend({
                 },
             },
             endTime: {
-                date: function (value) {
+                date: function(value) {
                     if (value && value.length > 0) {
                         return moment(value).isValid();
                     }
@@ -318,6 +300,8 @@ export default Vue.extend({
             this.tagsFocused = false;
         },
         async saveForm(): Promise<void> {
+            console.log("radoi form", this.form);
+
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
@@ -724,5 +708,10 @@ form > .outer-input-container {
 .tags-help {
     margin-top: 0.5em;
     color: #6a6d71;
+}
+
+.date-picker-hidden-input {
+    opacity: 0;
+    @include position(absolute, 0 null 3px null);
 }
 </style>

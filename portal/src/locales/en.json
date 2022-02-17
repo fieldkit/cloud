@@ -173,7 +173,9 @@
             "hideStations": "Hide Stations",
             "mapTextShow": "Others will see stations and exact GPS coordinates on the map",
             "mapTextHide": "Stations will not be visible on the map for others",
-            "mapHint": "Pan or zoom to set map view"
+            "mapHint": "Pan or zoom to set map view",
+            "startDate": "Start date",
+            "endDate": "End date"
         },
         "invite": {
             "accept": "Accept Invite",
