@@ -3,6 +3,7 @@ import { ModuleID } from "./common";
 export interface SensorRange {
     minimum: number;
     maximum: number;
+    constrained: boolean | null;
 }
 
 export interface VizConfig {

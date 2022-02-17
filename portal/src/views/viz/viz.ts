@@ -1,6 +1,6 @@
 import _, { map } from "lodash";
 import moment, { Moment } from "moment";
-import { SensorsResponse, SensorDataResponse, SensorInfoResponse, VizConfig } from "./api";
+import { SensorsResponse, SensorDataResponse, SensorInfoResponse, VizConfig, SensorRange } from "./api";
 import { ModuleID, SensorSpec, Ids, TimeRange, StationID, Stations, Sensors, SensorParams, DataQueryParams, VizSensor } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
@@ -113,8 +113,13 @@ export class VizInfo {
         public readonly station: { name: string; location: [number, number] },
         public readonly unitOfMeasure: string,
         public readonly firmwareKey: string,
-        public readonly viz: VizConfig[]
+        public readonly viz: VizConfig[],
+        public readonly ranges: SensorRange[]
     ) {}
+
+    public get constrainedRanges(): SensorRange[] {
+        return this.ranges.filter((r) => r.constrained === true);
+    }
 }
 
 export enum FastTime {
@@ -305,6 +310,10 @@ export class DataSetSeries {
 
     public get sensorAndModule() {
         return this.vizSensor[1];
+    }
+
+    public get constrainDataAxis(): boolean {
+        return this.graphing != null && this.graphing.dataRange[0] == this.graphing.dataRange[1];
     }
 }
 
@@ -773,7 +782,7 @@ export class Workspace {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, details.viz || []);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, details.viz || [], details.ranges);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

@@ -35,6 +35,10 @@ export default {
             type: Array,
             required: true,
         },
+        constrainDataAxis: {
+            type: Array,
+            required: true,
+        },
     },
     mounted: function() {
         console.log("vega-mounted");
@@ -62,6 +66,11 @@ export default {
             if (this.thresholds.length > 0) {
                 console.log("viz-thresholds", this.thresholds);
                 spec.layer[0].layer = this.thresholds;
+            }
+
+            if (this.constrainDataAxis && this.constrainDataAxis.length > 0) {
+                const range = this.constrainDataAxis[0];
+                spec.layer[0].encoding.y.scale.domain = [range.minimum, range.maximum];
             }
 
             expressionFunction("fkHumanReadable", (datum) => {

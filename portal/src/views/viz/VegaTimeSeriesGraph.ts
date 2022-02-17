@@ -2,7 +2,7 @@ import _ from "lodash";
 import Vue from "vue";
 import i18n from "@/i18n";
 
-import { DataRow } from "./api";
+import { DataRow, SensorRange } from "./api";
 import { TimeRange, Margins, ChartLayout } from "./common";
 import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
 
@@ -13,6 +13,8 @@ interface SeriesData {
     key: string;
     data: DataRow[];
 }
+
+type AxisRange = SensorRange;
 
 export const VegaTimeSeriesGraph = Vue.extend({
     name: "VegaTimeSeriesGraph",
@@ -35,26 +37,13 @@ export const VegaTimeSeriesGraph = Vue.extend({
     },
     computed: {
         allSeries(): SeriesData[] | null {
-            if (this.viz.dataSets.length) {
-                const all = _.flatten(
-                    this.viz.dataSets.map((ds) => {
-                        if (ds && ds.graphing) {
-                            return [
-                                {
-                                    key: ds.graphing.key,
-                                    data: ds.graphing.data,
-                                },
-                            ];
-                        }
-                        return [];
-                    })
-                );
-
-                if (all.length == this.viz.dataSets.length) {
-                    return all;
-                }
-            }
-            return [];
+            return this.viz.loadedDataSets.map((ds) => {
+                if (!ds.graphing) throw new Error(`viz: No data`);
+                return {
+                    key: ds.graphing.key,
+                    data: ds.graphing.data,
+                };
+            });
         },
         labels(): string[] {
             return this.viz.dataSets.map((ds) => {
@@ -71,6 +60,20 @@ export const VegaTimeSeriesGraph = Vue.extend({
                 return vizInfo.unitOfMeasure, vizInfo.unitOfMeasure;
             });
         },
+        constrainDataAxis(): AxisRange[] {
+            return _.flatten(
+                this.viz.dataSets.map((ds) => {
+                    if (ds.constrainDataAxis) {
+                        const vizInfo = this.workspace.vizInfo(this.viz, ds);
+                        if (vizInfo.viz.length == 0) {
+                            return [];
+                        }
+                        return vizInfo.constrainedRanges;
+                    }
+                    return [];
+                })
+            );
+        },
         thresholds(): any[] {
             return this.viz.dataSets.map((ds) => {
                 const vizInfo = this.workspace.vizInfo(this.viz, ds);
@@ -78,7 +81,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
                     return [];
                 }
 
-                const vizConfig = vizInfo.viz[0];
+                const vizConfig = vizInfo.viz[0]; // TODO Pick for TimeSeries
                 if (!vizConfig.thresholds) {
                     return [];
                 }
@@ -135,10 +138,10 @@ export const VegaTimeSeriesGraph = Vue.extend({
     template: `
         <div class="viz time-series-graph">
             <div class="chart" @dblclick="onDouble" v-if="allSeries.length == 2">
-                <DoubleLineChart :data="allSeries" :labels="labels" :valueSuffixes="valueSuffixes" :thresholds="thresholds" v-bind:key="allSeries[0].key + allSeries[1].key" @time-zoomed="raiseTimeZoomed" />
+                <DoubleLineChart :data="allSeries" :labels="labels" :valueSuffixes="valueSuffixes" :thresholds="thresholds" :constrainDataAxis="constrainDataAxis" v-bind:key="allSeries[0].key + allSeries[1].key" @time-zoomed="raiseTimeZoomed" />
             </div>
             <div class="chart" @dblclick="onDouble" v-if="allSeries.length == 1">
-                <LineChart :data="allSeries[0]" :label="labels[0]" :valueSuffix="valueSuffixes[0]" :thresholds="thresholds[0]" v-bind:key="allSeries[0].key" @time-zoomed="raiseTimeZoomed" />
+                <LineChart :data="allSeries[0]" :label="labels[0]" :valueSuffix="valueSuffixes[0]" :thresholds="thresholds[0]" :constrainDataAxis="constrainDataAxis" v-bind:key="allSeries[0].key" @time-zoomed="raiseTimeZoomed" />
             </div>
         </div>
     `,

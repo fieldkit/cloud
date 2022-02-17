@@ -32,6 +32,10 @@ export default {
             type: Array,
             required: true,
         },
+        constrainDataAxis: {
+            type: Array,
+            required: true,
+        },
     },
     mounted: function() {
         console.log("vega-mounted");
@@ -56,13 +60,20 @@ export default {
             spec.layer[1].data = { name: "table1", values: this.data[1].data };
             spec.layer[1].encoding.y.title = this.labels[1];
             spec.width = "container";
-            spec.height = 300;
+            spec.height = "container";
 
             if (this.thresholds.length > 0) {
                 for (let i = 0; i < 2; ++i) {
                     if (this.thresholds[i].length > 0) {
-                        // spec.layer[i].layer = this.thresholds[i];
+                        // spec.layer[i].layer = this.thresholds[i]; TODO
                     }
+                }
+            }
+
+            if (this.constrainDataAxis.length > 0) {
+                for (let i = 0; i < 2; ++i) {
+                    const range = this.constrainDataAxis[i];
+                    spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
                 }
             }
 
