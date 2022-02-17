@@ -53,15 +53,10 @@
             </router-link>
         </div>
 
-        <div class="app-logo">
+        <div v-if="isFloodnetCustomisationEnabled()" class="app-logo">
             <span>Made by</span>
             <br />
-            <i
-                v-if="isFloodnetCustomisationEnabled()"
-                role="img"
-                :aria-label="$tc('layout.logo.fieldkit')"
-                class="icon icon-logo-fieldkit"
-            ></i>
+            <i role="img" :aria-label="$tc('layout.logo.fieldkit')" class="icon icon-logo-fieldkit"></i>
         </div>
     </div>
 </template>
