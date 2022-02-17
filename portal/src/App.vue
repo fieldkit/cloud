@@ -1,12 +1,6 @@
 <template>
     <div id="app">
         <router-view />
-        <i
-            v-if="isFloodnetCustomisationEnabled()"
-            role="img"
-            :aria-label="$tc('layout.logo.fieldkit')"
-            class="icon icon-logo-fieldkit app-logo"
-        ></i>
     </div>
 </template>
 
@@ -46,9 +40,6 @@ export default Vue.extend({
             if (window.location.hostname.indexOf("floodnet.") === 0) {
                 document.body.classList.add(FKPartnersEnum.floodnet);
             }
-        },
-        isFloodnetCustomisationEnabled(): boolean {
-            return isCustomisationEnabledFor(FKPartnersEnum.floodnet);
         },
         setCustomFavicon(): void {
             const faviconEl = document.getElementById("favicon") as HTMLAnchorElement;
@@ -211,16 +202,5 @@ li {
 
 .vc-nav-header * {
     color: #fff !important;
-}
-
-.app-logo {
-    @include position(fixed, null null 15px 15px);
-    z-index: $z-index-app-logo;
-    font-size: 28px;
-    text-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
-
-    &:before {
-        color: var(--color-dark);
-    }
 }
 </style>
