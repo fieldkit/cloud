@@ -152,15 +152,6 @@
                 "help": "Press Enter to separate tags.",
                 "maxLength": "This field has a limit of 100 characters."
             },
-            "startTime": {
-                "date": "Please enter a valid date.",
-                "alt": "Calendar"
-            },
-            "endTime": {
-                "date": "Please enter a valid date.",
-                "minValue": "Please enter a date after the start date.",
-                "alt": "Calendar"
-            },
             "makePublic": "Make this project public",
             "showExact": "Show exact location of stations",
             "showGeneral": "Show general location of stations",
@@ -173,7 +164,9 @@
             "hideStations": "Hide Stations",
             "mapTextShow": "Others will see stations and exact GPS coordinates on the map",
             "mapTextHide": "Stations will not be visible on the map for others",
-            "mapHint": "Pan or zoom to set map view"
+            "mapHint": "Pan or zoom to set map view",
+            "startDate": "Start date",
+            "endDate": "End date"
         },
         "invite": {
             "accept": "Accept Invite",
