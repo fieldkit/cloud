@@ -71,6 +71,7 @@ body {
     --color-secondary: #{$color-fieldkit-secondary};
     --color-dark: #{$color-fieldkit-dark};
     --color-border: #{$color-fieldkit-border};
+    --color-danger: #{$color-fieldkit-danger};
     --font-family-medium: #{$font-family-fieldkit-medium};
     --font-family-light: #{$font-family-fieldkit-light};
     --font-family-bold: #{$font-family-fieldkit-bold};
@@ -91,6 +92,7 @@ body {
         --color-secondary: #{$color-floodnet-dark};
         --color-dark: #{$color-floodnet-dark};
         --color-border: #{$color-floodnet-border};
+        --color-danger: #{$color-fieldkit-danger};
         --font-family-medium: #{$font-family-floodnet-medium};
         --font-family-light: #{$font-family-floodnet-medium};
         --font-family-bold: #{$font-family-floodnet-bold};

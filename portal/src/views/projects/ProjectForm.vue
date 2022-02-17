@@ -1,5 +1,5 @@
 <template>
-    <div class="form-edit">
+    <div class="form-edit" id="projectForm">
         <div class="header-row">
             <h2 v-if="!project">{{ $t("project.create.title") }}</h2>
             <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
@@ -270,6 +270,7 @@ export default Vue.extend({
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
+                (document.getElementById("projectForm") as HTMLElement).scrollIntoView();
                 return;
             }
 
