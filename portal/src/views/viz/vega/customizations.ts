@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { expressionFunction } from "vega";
 
-expressionFunction("fkHumanReadable", (datum) => {
+expressionFunction("fkHumanReadable", (datum, other) => {
+    // console.log(datum, other);
     if (_.isUndefined(datum)) {
         return "N/A";
     }

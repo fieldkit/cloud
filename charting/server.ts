@@ -32,6 +32,7 @@ class Chart {
   prepare(metaResponses, dataResponses) {
     const series = metaResponses.map((row, index) => {
       const { vizSensor, sensor, station } = row;
+      const name = sensor.strings["en-us"]["label"] || "Unknown";
       const data = dataResponses[index];
       const scale = [];
       const vizInfo = new VizInfo(
@@ -40,11 +41,11 @@ class Chart {
         station,
         sensor.unitOfMeasure,
         data.key,
+        name,
         sensor.viz || [],
         sensor.ranges
       );
 
-      const name = sensor.strings["en-us"]["label"] || "Unknown";
       const make = () => {
         if (sensor.unit_of_measure) {
           return `${name} (${sensor.unit_of_measure})`;

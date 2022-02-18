@@ -29,6 +29,10 @@ import { createSensorColorScale } from "./d3-helpers";
 
 type SensorReadAtType = string;
 
+function getString(d) {
+    return d["enUS"] || d["enUs"] || d["en-US"]; // HACK
+}
+
 export class SensorMeta {
     constructor(
         public readonly moduleId: ModuleID,
@@ -709,7 +713,7 @@ export class Workspace implements VizInfoFactory {
             ds = viz.dataSets[0];
         }
 
-        console.log(`viz:vizInfo:ds`, ds);
+        // console.log(`viz:vizInfo:ds`, ds);
 
         const stationId = ds.stationId;
         const sensor = ds.sensorAndModule;
@@ -721,7 +725,13 @@ export class Workspace implements VizInfoFactory {
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, details.viz || [], details.ranges);
+        // console.log(`viz:vizInfo:sensor`, details);
+
+        const strings = getString(details.strings);
+
+        // console.log(`viz:vizInfo:sensor`, strings);
+
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

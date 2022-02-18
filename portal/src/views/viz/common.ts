@@ -160,6 +160,7 @@ export class VizInfo {
         public readonly station: { name: string; location: [number, number] },
         public readonly unitOfMeasure: string,
         public readonly firmwareKey: string,
+        public readonly name: string,
         public readonly viz: VizConfig[],
         public readonly ranges: SensorRange[]
     ) {}
@@ -170,9 +171,9 @@ export class VizInfo {
 
     public get label(): string {
         if (this.unitOfMeasure) {
-            return /*i18n.tc(this.firmwareKey)*/ "LABEL" + " (" + _.capitalize(this.unitOfMeasure) + ")";
+            return this.name + " (" + _.capitalize(this.unitOfMeasure) + ")";
         }
-        return /*i18n.tc(this.firmwareKey)*/ "LABEL";
+        return this.name;
     }
 }
 

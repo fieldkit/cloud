@@ -25,6 +25,8 @@ export interface VizConfig {
     };
 }
 
+type SensorStrings = { [index: string]: Record<string, string> };
+
 export interface ModuleSensorMeta {
     key: string;
     fullKey: string;
@@ -34,6 +36,7 @@ export interface ModuleSensorMeta {
     order: number;
     ranges: SensorRange[];
     viz: VizConfig[];
+    strings: SensorStrings;
 }
 
 export interface Module {
