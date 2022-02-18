@@ -1,5 +1,5 @@
 <template>
-    <div class="form-edit">
+    <div class="form-edit" id="projectForm">
         <div class="header-row">
             <h2 v-if="!project">{{ $t("project.create.title") }}</h2>
             <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
@@ -47,36 +47,8 @@
             </div>
 
             <div class="dates-row">
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.startTime" label="Start" />
-                    </div>
-                    <v-date-picker :value="form.pickedStart" @input="updateStart" :popover="{ placement: 'auto', visibility: 'click' }">
-                        <button type="button">
-                            <img :alt="$t('project.form.startTime.alt')" src="@/assets/icon-calendar-gray.svg" />
-                        </button>
-                    </v-date-picker>
-                </div>
-
-                <div class="validation-errors" v-if="$v.form.startTime.$error">
-                    <div v-if="!$v.form.startTime.date">{{ $t("project.form.startTime.date") }}</div>
-                </div>
-
-                <div class="date-container">
-                    <div class="outer-input-container">
-                        <TextField v-model="form.endTime" label="End" />
-                    </div>
-                    <v-date-picker :value="form.pickedEnd" @input="updateEnd" :popover="{ placement: 'auto', visibility: 'click' }">
-                        <button type="button">
-                            <img :alt="$t('project.form.endTime.alt')" src="@/assets/icon-calendar-gray.svg" />
-                        </button>
-                    </v-date-picker>
-                </div>
-
-                <div class="validation-errors" v-if="$v.form.endTime.$error">
-                    <div v-if="!$v.form.endTime.date">{{ $t("project.form.endTime.date") }}</div>
-                    <div v-if="!$v.form.endTime.minValue">{{ $t("project.form.endTime.minValue") }}</div>
-                </div>
+                <DateField v-model="form.startTime" :label="$tc('project.form.startDate')"></DateField>
+                <DateField v-model="form.endTime" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
             </div>
 
             <div class="outer-input-container tags-container">
@@ -163,7 +135,7 @@ import { mapState } from "vuex";
 import StationsMap from "@/views/shared/StationsMap.vue";
 
 const afterOtherDate = (afterOtherDate) =>
-    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
+    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function(this: any, value, parentVm) {
         const other = helpers.ref(afterOtherDate, this, parentVm);
         if (!other || other.length === 0) {
             return true;
@@ -202,8 +174,6 @@ export default Vue.extend({
             tag: string;
             public: boolean;
             privacy: number;
-            pickedStart: number | null;
-            pickedEnd: number | null;
             showStations: boolean;
             bounds: BoundingRectangle;
         };
@@ -223,8 +193,6 @@ export default Vue.extend({
                 tag: "",
                 public: false,
                 privacy: 1,
-                pickedStart: null,
-                pickedEnd: null,
                 showStations: false,
                 bounds: MappedStations.defaultBounds(),
             },
@@ -248,23 +216,6 @@ export default Vue.extend({
                 required,
                 maxLength: maxLength(100),
             },
-            startTime: {
-                date: function (value) {
-                    if (value && value.length > 0) {
-                        return moment(value).isValid();
-                    }
-                    return true;
-                },
-            },
-            endTime: {
-                date: function (value) {
-                    if (value && value.length > 0) {
-                        return moment(value).isValid();
-                    }
-                    return true;
-                },
-                minValue: afterOtherDate("startTime"),
-            },
             tags: {
                 maxLength: (value) => {
                     const raw = JSON.stringify(value.map((tag) => tag.text));
@@ -280,13 +231,11 @@ export default Vue.extend({
                 description: this.project.description,
                 goal: this.project.goal,
                 location: this.project.location,
-                startTime: this.prettyDate(this.project.startTime),
-                endTime: this.prettyDate(this.project.endTime),
+                startTime: this.project.startTime,
+                endTime: this.project.endTime,
                 tags: tryParseTags(this.project.tags),
                 public: this.project.privacy > 0,
                 privacy: this.project.privacy == 0 ? 1 : this.project.privacy,
-                pickedStart: null,
-                pickedEnd: null,
                 showStations: this.project.showStations,
                 bounds: new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max),
                 tag: "",
@@ -321,6 +270,7 @@ export default Vue.extend({
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 console.log("save form, validation error");
+                (document.getElementById("projectForm") as HTMLElement).scrollIntoView();
                 return;
             }
 
@@ -416,18 +366,6 @@ export default Vue.extend({
                     return this.$router.push({ name: "projects" });
                 });
             }
-        },
-        updateStart(date): void {
-            this.form.startTime = date ? moment(date).format("M/D/YYYY") : "";
-        },
-        updateEnd(date, ...args): void {
-            this.form.endTime = date ? moment(date).format("M/D/YYYY") : "";
-        },
-        prettyDate(date): string {
-            if (date) {
-                return moment(date).format("M/D/YYYY");
-            }
-            return "";
         },
         async closeForm(): Promise<void> {
             if (this.project) {
@@ -724,5 +662,10 @@ form > .outer-input-container {
 .tags-help {
     margin-top: 0.5em;
     color: #6a6d71;
+}
+
+.date-picker-hidden-input {
+    opacity: 0;
+    @include position(absolute, 0 null 3px null);
 }
 </style>
