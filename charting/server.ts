@@ -1,36 +1,73 @@
-const _ = require("lodash");
-const express = require("express");
-const vega = require("vega");
-const vegaLite = require("vega-lite");
-const os = require("os");
-const axios = require("axios");
+import _ from "lodash";
+import express from "express";
+import * as vega from "vega";
+import * as vegaLite from "vega-lite";
+import axios from "axios";
+
 const app = express();
 
-const chartConfig = require("./vega/chartConfig.json");
-const lineSpec = require("./vega/line.v1.json");
-const histogramSpec = require("./vega/histogram.v1.json");
-const rangeSpec = require("./vega/range.v1.json");
-const doubleLineSpec = require("./vega/doubleLine.v1.json");
+import chartConfig from "./vega/chartConfig.json";
+import lineSpec from "./vega/line.v1.json";
+import histogramSpec from "./vega/histogram.v1.json";
+import rangeSpec from "./vega/range.v1.json";
+import doubleLineSpec from "./vega/doubleLine.v1.json";
+
+import {
+  TimeRange,
+  QueriedData,
+  VizInfo,
+  SeriesData,
+  DataSetSeries,
+} from "./common";
+import { applySensorMetaConfiguration } from "./customizations";
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
 const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
 
-vega.expressionFunction("fkHumanReadable", (datum) => {
-  if (_.isUndefined(datum)) {
-    return "N/A";
-  }
-  if (this.valueSuffix) {
-    return `${datum.toFixed(3)} ${this.valueSuffix}`;
-  }
-  return `${datum.toFixed(3)}`;
-});
+type VegaSpec = any;
 
 class Chart {
-  sensor(index, label, units) {
-    throw new Error("charting: NOT IMPLEMENTED");
+  spec: VegaSpec;
+
+  prepare(metaResponses, dataResponses) {
+    const series = metaResponses.map((row, index) => {
+      const { vizSensor, sensor, station } = row;
+      const data = dataResponses[index];
+      const scale = [];
+      const vizInfo = new VizInfo(
+        data.key,
+        scale,
+        station,
+        sensor.unitOfMeasure,
+        data.key,
+        sensor.viz || [],
+        sensor.ranges
+      );
+
+      const name = sensor.strings["en-us"]["label"] || "Unknown";
+      const make = () => {
+        if (sensor.unit_of_measure) {
+          return `${name} (${sensor.unit_of_measure})`;
+        }
+        return `${name}`;
+      };
+
+      this.sensor(index, make(), sensor.unit_of_measure);
+
+      this.data(index, data);
+
+      return new SeriesData(
+        data.key,
+        new DataSetSeries(vizSensor, data),
+        data.data,
+        vizInfo
+      );
+    });
+
+    applySensorMetaConfiguration(this.spec, series);
   }
 
-  thresholds(index, data) {
+  sensor(index, label, units) {
     throw new Error("charting: NOT IMPLEMENTED");
   }
 
@@ -40,6 +77,8 @@ class Chart {
 }
 
 class TimeSeriesChart extends Chart {
+  double: boolean;
+
   constructor(viz) {
     super();
     this.double = viz[0].length > 1;
@@ -58,53 +97,6 @@ class TimeSeriesChart extends Chart {
         this.spec.layer[0].encoding.y.axis.title = label;
       }
     }
-  }
-
-  thresholds(index, vizConfig) {
-    const EnglishLocale = "en-US"; // TODO This has a dash, portal strips this.
-    const thresholdLayers = vizConfig.levels
-      .map((d, i) => {
-        return {
-          transform: [
-            {
-              calculate: "datum.value <= " + d.value + " ? datum.value : null",
-              as: "layerValue" + i,
-            },
-            {
-              calculate:
-                "datum.layerValue" +
-                i +
-                " <= " +
-                d.value +
-                " ? '" +
-                d.label[EnglishLocale] +
-                "' : null",
-              as: vizConfig.label[EnglishLocale],
-            },
-          ],
-          encoding: {
-            y: { field: "layerValue" + i },
-            stroke: {
-              field: vizConfig.label[EnglishLocale],
-              legend: {
-                orient: "top",
-              },
-              scale: {
-                domain: vizConfig.levels.map((d) => d.label[EnglishLocale]),
-                range: vizConfig.levels.map((d) => d.color),
-              },
-            },
-          },
-          mark: {
-            type: "line",
-            interpolate: "monotone",
-            tension: 1,
-          },
-        };
-      })
-      .reverse();
-
-    this.spec.layer[0].layer = thresholdLayers;
   }
 
   data(index, data) {
@@ -129,10 +121,6 @@ class RangeChart extends Chart {
     this.spec.encoding.y.axis.title = label;
   }
 
-  thresholds(index, data) {
-    // IGNORED
-  }
-
   data(index, data) {
     this.spec.data = { name: "table", values: data.data };
   }
@@ -148,16 +136,17 @@ class HistogramChart extends Chart {
     this.spec.encoding.x.axis.title = label;
   }
 
-  thresholds(index, data) {
-    // IGNORED
-  }
-
   data(index, data) {
     this.spec.data = { name: "table", values: data.data };
   }
 }
 
-const charts = [TimeSeriesChart, HistogramChart, RangeChart, TimeSeriesChart];
+const chartCtors = [
+  TimeSeriesChart,
+  HistogramChart,
+  RangeChart,
+  TimeSeriesChart,
+];
 
 const statusHandler = (req, res) => {
   res.send({
@@ -168,6 +157,19 @@ const statusHandler = (req, res) => {
     git: { hash: process.env.GIT_HASH },
   });
 };
+
+const queryArgument = (args): string => {
+  return args;
+};
+
+type Handler = (key: string, qd: unknown) => void;
+
+interface KeyedHandler {
+  key: string;
+  index: number;
+  url: string;
+  handle: Handler;
+}
 
 app.get("/", statusHandler);
 
@@ -186,15 +188,16 @@ app.get("/charting/rendered", async (req, res, next) => {
       return;
     }
 
-    const bookmark = JSON.parse(req.query.bookmark);
+    const bookmark = JSON.parse(queryArgument(req.query.bookmark));
     const w = req.query.w || 800;
     const h = req.query.h || 418;
 
     console.log(`charting:bookmark`, JSON.stringify(bookmark));
 
-    const specs = [];
+    const specs: VegaSpec[] = [];
+    const charts: Chart[] = [];
 
-    const allQueries = _.flattenDeep(
+    const allQueries: KeyedHandler[] = _.flattenDeep(
       bookmark.g.map((g1) => {
         return g1.map((g2) => {
           return g2.map((viz) => {
@@ -202,25 +205,24 @@ app.get("/charting/rendered", async (req, res, next) => {
 
             const chartTypeBookmark = viz[3];
 
-            const chartCtor = charts[chartTypeBookmark];
+            const chartCtor = chartCtors[chartTypeBookmark];
             if (!chartCtor) throw new Error("charting: Unknown chart type");
 
             const chart = new chartCtor(viz);
+            const chartIndex = charts.length;
 
             const spec = chart.spec;
             spec.config = chartConfig;
             spec.width = w;
             spec.height = h;
             specs.push(spec);
+            charts.push(chart);
 
             return viz[0].map((vizSensor, index) => {
               const when = viz[1];
 
               const stationId = vizSensor[0];
               const sensorId = vizSensor[1][1];
-
-              const metaParams = new URLSearchParams();
-              metaParams.append("stations", stationId.toString());
 
               const dataParams = new URLSearchParams();
               dataParams.append("start", when[0].toString());
@@ -232,7 +234,8 @@ app.get("/charting/rendered", async (req, res, next) => {
 
               return [
                 {
-                  key: metaParams.toString(),
+                  index: chartIndex,
+                  key: "all-meta",
                   url: `${baseUrl}/sensors`,
                   handle: (key, data) => {
                     const sensorKeysById = _(data.sensors)
@@ -261,54 +264,36 @@ app.get("/charting/rendered", async (req, res, next) => {
                         `charting: Missing sensor meta: ${sensorKey}`
                       );
                     }
+
                     const sensor = byKey[0];
-
-                    const name = sensor.strings["en-us"]["label"] || "Unknown";
-
-                    if (sensor.viz.length > 0) {
-                      // TODO Check viz Name, no need now until other chart types support this.
-                      chart.thresholds(index, sensor.viz[0].thresholds);
-                    }
 
                     console.log(
                       `charting:handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
                     );
 
-                    const make = () => {
-                      if (sensor.unit_of_measure) {
-                        return `${name} (${sensor.unit_of_measure})`;
-                      }
-                      return `${name}`;
+                    const station = {
+                      name: "STATION",
+                      location: "LOCATION",
                     };
 
-                    chart.sensor(index, make(), sensor.unit_of_measure);
+                    return {
+                      vizSensor: vizSensor,
+                      sensor: sensor,
+                      station: station,
+                    };
                   },
                 },
-                /*
                 {
-                  key: metaParams.toString(),
-                  url: `${baseUrl}/sensors/data?${metaParams.toString()}`,
-                  handle: (key, data) => {
-                    const moduleId = vizSensor[1][0];
-                    const meta = _.first(
-                      data.stations[stationId].filter(
-                        (row) => row.moduleId == moduleId
-                      )
-                    );
-
-                    console.log(
-                      `charting:handle-meta(${key}) ${moduleId}`,
-                      meta
-                    );
-                  },
-                },
-                */
-                {
+                  index: chartIndex,
                   key: dataParams.toString(),
                   url: `${baseUrl}/sensors/data?${dataParams.toString()}`,
                   handle: (key, data) => {
                     console.log(`charting:handle-data(${key})`);
-                    chart.data(index, data);
+                    return new QueriedData(
+                      key,
+                      new TimeRange(when[0], when[1]),
+                      data
+                    );
                   },
                 },
               ];
@@ -327,20 +312,31 @@ app.get("/charting/rendered", async (req, res, next) => {
 
     const responses = await Promise.all(
       uniqueQueries.map((axiosQuery) =>
-        axios(axiosQuery).then((response) => {
+        axios({ url: axiosQuery.url }).then((response) => {
           const handlers = handlersByKey[axiosQuery.key].map((q) => q.handle);
+          const params = handlers.map((h) => h(axiosQuery.key, response.data));
 
           return {
             key: axiosQuery.key,
+            index: axiosQuery.index,
             data: response.data,
             handlers: handlers,
-            handled: handlers.map((h) => h(axiosQuery.key, response.data)),
+            handled: params,
           };
         })
       )
     );
 
-    console.log(`charting:data-queries-done`, responses);
+    const byChartIndex = _(responses)
+      .groupBy((r) => r.index)
+      .mapValues((r) => r.map((c) => c.handled))
+      .mapValues((r, k) => {
+        const chart = charts[k];
+        return chart.prepare(r[0], r[1]);
+      })
+      .value();
+
+    console.log(`charting:data-queries-done`, byChartIndex);
 
     const vegaSpec = vegaLite.compile(specs[0]);
     const parsedSpec = vega.parse(vegaSpec.spec);
@@ -350,7 +346,7 @@ app.get("/charting/rendered", async (req, res, next) => {
     }).finalize();
 
     const canvas = await view.toCanvas();
-    const stream = canvas.createPNGStream();
+    const stream = (canvas as any).createPNGStream();
 
     stream.pipe(res);
   } catch (error) {

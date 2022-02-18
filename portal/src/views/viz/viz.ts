@@ -1,14 +1,31 @@
 import _, { map } from "lodash";
 import moment, { Moment } from "moment";
-import { SensorsResponse, SensorDataResponse, SensorInfoResponse, VizConfig, SensorRange } from "./api";
-import { ModuleID, SensorSpec, Ids, TimeRange, StationID, Stations, Sensors, SensorParams, DataQueryParams, VizSensor } from "./common";
+import {
+    SensorsResponse,
+    SensorDataResponse,
+    SensorInfoResponse,
+    ModuleID,
+    SensorSpec,
+    Ids,
+    TimeRange,
+    StationID,
+    Stations,
+    Sensors,
+    SensorParams,
+    DataQueryParams,
+    VizSensor,
+    VizInfo,
+    DataSetSeries,
+    SeriesData,
+    QueriedData,
+} from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
 export * from "./common";
 
 import { promiseAfter } from "@/utilities";
-import { ColorScale, createSensorColorScale } from "./d3-helpers";
+import { createSensorColorScale } from "./d3-helpers";
 
 type SensorReadAtType = string;
 
@@ -54,74 +71,6 @@ export class SensorTreeOption {
     ) {}
 }
 
-function makeRange(values: number[]): [number, number] {
-    const min = _.min(values);
-    const max = _.max(values);
-    if (min === undefined) throw new Error(`no min: ${values.length}`);
-    if (max === undefined) throw new Error(`no max: ${values.length}`);
-    if (min === max) {
-        console.warn(`range-warning: min == max ${values.length}`);
-    }
-    return [min, max];
-}
-
-export class QueriedData {
-    empty = true;
-    dataRange: number[] = [];
-    timeRangeData: number[] = [];
-    timeRange: number[] = [];
-
-    constructor(public readonly key: string, public readonly timeRangeQueried: TimeRange, private readonly sdr: SensorDataResponse) {
-        if (this.sdr.data.length > 0) {
-            const filtered = this.sdr.data.filter((d) => _.isNumber(d.value));
-            const values = filtered.map((d) => d.value);
-            const times = filtered.map((d) => d.time);
-
-            if (values.length == 0) throw new Error(`empty data ranges`);
-            if (times.length == 0) throw new Error(`empty time ranges`);
-
-            this.dataRange = makeRange(values);
-            this.timeRangeData = makeRange(times);
-
-            if (this.timeRangeQueried.isExtreme()) {
-                this.timeRange = this.timeRangeData;
-            } else {
-                this.timeRange = this.timeRangeQueried.toArray();
-            }
-            this.empty = false;
-        }
-    }
-
-    get data() {
-        return this.sdr.data;
-    }
-
-    public removeDuplicates(): QueriedData {
-        const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
-            data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
-        };
-        return new QueriedData(this.key, this.timeRangeQueried, filtered);
-    }
-}
-
-export class VizInfo {
-    constructor(
-        public readonly key: string,
-        public readonly colorScale: ColorScale,
-        public readonly station: { name: string; location: [number, number] },
-        public readonly unitOfMeasure: string,
-        public readonly firmwareKey: string,
-        public readonly viz: VizConfig[],
-        public readonly ranges: SensorRange[]
-    ) {}
-
-    public get constrainedRanges(): SensorRange[] {
-        return this.ranges.filter((r) => r.constrained === true);
-    }
-}
-
 export enum FastTime {
     Custom = -1,
     Day = 1,
@@ -163,6 +112,10 @@ export abstract class Viz {
     public abstract clone(): Viz;
 
     public abstract bookmark(): VizBookmark;
+}
+
+export interface VizInfoFactory {
+    vizInfo(viz: Viz, ds: DataSetSeries): VizInfo;
 }
 
 type ResolveData = (qd: QueriedData) => void;
@@ -295,28 +248,6 @@ export class NewParams implements HasSensorParams {
     constructor(public readonly sensorParams: SensorParams) {}
 }
 
-export class DataSetSeries {
-    public graphing: QueriedData | null = null;
-
-    constructor(public readonly vizSensor: VizSensor) {}
-
-    public bookmark(): VizSensor {
-        return this.vizSensor;
-    }
-
-    public get stationId(): StationID {
-        return this.vizSensor[0];
-    }
-
-    public get sensorAndModule() {
-        return this.vizSensor[1];
-    }
-
-    public get constrainDataAxis(): boolean {
-        return this.graphing != null && this.graphing.dataRange[0] == this.graphing.dataRange[1];
-    }
-}
-
 export class Graph extends Viz {
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
@@ -344,6 +275,14 @@ export class Graph extends Viz {
             }
         }
         return [];
+    }
+
+    public allSeries(vizInfoFactory: VizInfoFactory): SeriesData[] {
+        return this.loadedDataSets.map((ds) => {
+            if (!ds.graphing) throw new Error(`viz: No data`);
+            const vizInfo = vizInfoFactory.vizInfo(this, ds);
+            return new SeriesData(ds.graphing.key, ds, ds.graphing.data, vizInfo);
+        });
     }
 
     public get visibleTimeRange(): TimeRange {
@@ -660,7 +599,7 @@ export class Querier {
     }
 }
 
-export class Workspace {
+export class Workspace implements VizInfoFactory {
     private stationIds: StationID[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};

@@ -1,7 +1,5 @@
 import * as d3 from "d3";
-import { ChartLayout } from "@/views/viz/common";
-
-export type ColorScale = any;
+import { ColorScale, ChartLayout } from "@/views/viz/common";
 
 export interface SensorDetails {
     key: string;

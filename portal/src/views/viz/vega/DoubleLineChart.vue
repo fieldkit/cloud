@@ -5,34 +5,18 @@
 <script>
 import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
-import { expressionFunction } from "vega";
 
 import doubleLineSpec from "./doubleLine.v1.json";
 import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";
 import { TimeZoom } from "../viz";
+import { applySensorMetaConfiguration } from "./customizations";
 
 export default {
     name: "DoubleLineChart",
     props: {
-        data: {
-            type: Array,
-            required: true,
-        },
-        labels: {
-            type: Array,
-            required: true,
-        },
-        valueSuffixes: {
-            type: Array,
-            required: true,
-        },
-        thresholds: {
-            type: Array,
-            required: true,
-        },
-        constrainDataAxis: {
+        series: {
             type: Array,
             required: true,
         },
@@ -55,37 +39,14 @@ export default {
         async refresh() {
             const spec = _.cloneDeep(doubleLineSpec);
             spec.config = chartConfig;
-            spec.layer[0].data = { name: "table0", values: this.data[0].data };
-            spec.layer[0].encoding.y.title = this.labels[0];
-            spec.layer[1].data = { name: "table1", values: this.data[1].data };
-            spec.layer[1].encoding.y.title = this.labels[1];
+            spec.layer[0].data = { name: "table0", values: this.series[0].data };
+            spec.layer[0].encoding.y.title = this.series[0].vizInfo.label;
+            spec.layer[1].data = { name: "table1", values: this.series[1].data };
+            spec.layer[1].encoding.y.title = this.series[1].vizInfo.label;
             spec.width = "container";
             spec.height = "container";
 
-            if (this.thresholds.length > 0) {
-                for (let i = 0; i < 2; ++i) {
-                    if (this.thresholds[i].length > 0) {
-                        // spec.layer[i].layer = this.thresholds[i]; TODO
-                    }
-                }
-            }
-
-            if (this.constrainDataAxis.length > 0) {
-                for (let i = 0; i < 2; ++i) {
-                    const range = this.constrainDataAxis[i];
-                    spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
-                }
-            }
-
-            expressionFunction("fkHumanReadable", (datum) => {
-                if (_.isUndefined(datum)) {
-                    return "N/A";
-                }
-                if (this.valueSuffixes) {
-                    return `${datum.toFixed(3)} ${this.valueSuffixes[0]}`;
-                }
-                return `${datum.toFixed(3)}`;
-            });
+            applySensorMetaConfiguration(spec, this.series);
 
             await vegaEmbed(this.$el, spec, {
                 renderer: "svg",

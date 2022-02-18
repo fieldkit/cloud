@@ -6,82 +6,56 @@
     </div>
 </template>
 
-<script>
+<script lang="js">
 import _ from "lodash";
+import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
-import { expressionFunction } from "vega";
 import lineSpec from "./line.v1.json";
 import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";
-import { TimeZoom } from "../viz";
+import { TimeZoom, SeriesData } from "../viz";
+import { applySensorMetaConfiguration } from "./customizations"
 
 export default {
     name: "LineChart",
     props: {
-        data: {
-            type: Object,
-            required: true,
-        },
-        label: {
-            type: String,
-            required: true,
-        },
-        valueSuffix: {
-            type: String,
-            required: true,
-        },
-        thresholds: {
-            type: Array,
-            required: true,
-        },
-        constrainDataAxis: {
-            type: Array,
+        series: {
+            type: Array, // Function as PropType<() => SeriesData>,
             required: true,
         },
     },
-    mounted: function() {
+    data()/*: {
+        vegaView: unknown | undefined;
+    }*/ {
+        return {
+            vegaView: undefined,
+        };
+    },
+    mounted()/*: void*/ {
         console.log("vega-mounted");
         this.refresh();
     },
     watch: {
-        label() {
+        label()/*: void*/ {
             console.log("vega-watch-label");
             this.refresh();
         },
-        data() {
+        data()/*: void*/ {
             console.log("vega-watch-data");
             this.refresh();
         },
     },
     methods: {
-        async refresh() {
+        async refresh()/*: Promise<void>*/ {
             const spec = _.cloneDeep(lineSpec);
             spec.config = chartConfig;
-            spec.data = { name: "table", values: this.data.data };
-            spec.layer[0].encoding.y.axis.title = this.label;
+            spec.data = { name: "table", values: this.series[0].data };
+            spec.layer[0].encoding.y.axis.title = this.series[0].vizInfo.label;
             spec.width = "container";
             spec.height = "container";
 
-            if (this.thresholds.length > 0) {
-                console.log("viz-thresholds", this.thresholds);
-                spec.layer[0].layer = this.thresholds;
-            }
-
-            if (this.constrainDataAxis && this.constrainDataAxis.length > 0) {
-                const range = this.constrainDataAxis[0];
-                spec.layer[0].encoding.y.scale.domain = [range.minimum, range.maximum];
-            }
-
-            expressionFunction("fkHumanReadable", (datum) => {
-                if (_.isUndefined(datum)) {
-                    return "N/A";
-                }
-                if (this.valueSuffix) {
-                    return `${datum.toFixed(3)} ${this.valueSuffix}`;
-                }
-                return `${datum.toFixed(3)}`;
-            });
+            applySensorMetaConfiguration(spec, this.series);
 
             await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
@@ -102,7 +76,7 @@ export default {
             });
         },
         // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
-        async downloadChart(fileFormat) {
+        async downloadChart(fileFormat/*: string*/)/*: Promise<void>*/ {
             await this.vegaView.view
                 .toImageURL(fileFormat, 2)
                 .then(function(url) {

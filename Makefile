@@ -31,9 +31,20 @@ WORKING_DIRECTORY ?= $(shell pwd)
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 DOCKER_TAG ?= main
 
-default: setup binaries jstests gotests
+default: setup binaries jstests gotests charting-shared
 
 setup: portal/src/secrets.ts
+
+charting-shared: charting/customizations.ts charting/api.ts charting/common.ts
+
+charting/customizations.ts: portal/src/views/viz/vega/customizations.ts
+	cp $^ $@
+
+charting/api.ts: portal/src/views/viz/api.ts
+	cp $^ $@
+
+charting/common.ts: portal/src/views/viz/common.ts
+	cp $^ $@
 
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
