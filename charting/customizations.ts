@@ -63,8 +63,10 @@ export function applySensorMetaConfiguration(spec, series) {
             }
         }
 
-        const suffix = s.vizInfo.unitOfMeasure;
-        spec.layer[1].encoding.tooltip[0].format = suffix;
+        if (series.length == 1) {
+            const suffix = s.vizInfo.unitOfMeasure;
+            spec.layer[1].encoding.tooltip[0].format = suffix;
+        }
 
         const constrained = s.vizInfo.constrainedRanges;
         if (s.ds.constrainDataAxis && constrained.length > 0) {
