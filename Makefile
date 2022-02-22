@@ -110,7 +110,7 @@ $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go
 
 generate:
-	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
+	cd server/api && $(GOPATH)/bin/goa gen github.com/fieldkit/cloud/server/api/design
 
 clean:
 	rm -rf $(BUILD)
