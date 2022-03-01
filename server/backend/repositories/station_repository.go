@@ -1201,20 +1201,19 @@ func (a StationSensorByOrder) Less(i, j int) bool { return a[i].Order < a[j].Ord
 func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT
+	query, args, err := sqlx.In(`
+		SELECT    
 			station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
 			sensor_id, s.key AS sensor_key,
-            MAX(agg.time) AS sensor_read_at
-		FROM %s AS agg
-		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
-		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
-		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
+			updated.time AS sensor_read_at                                                                                                                      
+		FROM fieldkit.aggregated_sensor_updated AS updated
+		JOIN fieldkit.aggregated_sensor AS s ON (s.id = updated.sensor_id)
+		JOIN fieldkit.station AS station ON (updated.station_id = station.id)
+		JOIN fieldkit.station_module AS station_module ON (updated.module_id = station_module.id)
 		WHERE station_id IN (?)
-		GROUP BY station_id, station.name, station.location, station_module.name, station_module.hardware_id, sensor_id, s.key
-        ORDER BY sensor_read_at DESC
-		`, "fieldkit.aggregated_10m"), stations)
+		ORDER BY sensor_read_at DESC
+		`, stations)
 	if err != nil {
 		return nil, err
 	}
