@@ -23,7 +23,7 @@
                     v-if="de.downloadUrl"
                     v-bind:class="{ downloaded: false }"
                     :href="$config.baseUrl + de.downloadUrl"
-                    @click="(ev) => onDownload(ev, de)"
+                    @click="(ev) => onDownload(de)"
                 >
                     <template v-if="isDownloaded(de.id)">Downloaded</template>
                     <template v-else>Download</template>
@@ -92,18 +92,18 @@ export default Vue.extend({
             };
             return map[kind] || "Unknown";
         },
-        onClose() {
+        async onClose(): Promise<void> {
             this.$emit("close");
         },
-        onExportCSV() {
+        async onExportCSV(): Promise<void> {
             console.log("viz: exporting");
-            return this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ csv: true })));
+            await this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ csv: true })));
         },
-        onExportJSONLines() {
+        async onExportJSONLines(): Promise<void> {
             console.log("viz: exporting");
-            return this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ jsonLines: true })));
+            await this.$store.dispatch(new ExportDataAction(this.bookmark, new ExportParams({ jsonLines: true })));
         },
-        onDownload(ev: any, de: ExportStatus) {
+        onDownload(de: ExportStatus): void {
             console.log("viz: download", de);
             Vue.set(this.downloaded, de.id, true);
         },
@@ -112,8 +112,6 @@ export default Vue.extend({
 </script>
 
 <style>
-.export-panel {
-}
 .export-panel .heading {
     padding: 1em;
     display: flex;
@@ -121,8 +119,6 @@ export default Vue.extend({
 .export-panel .heading .title {
     font-size: 20px;
     font-weight: 500;
-}
-.export-panel .export {
 }
 .export-panel .heading .close-button {
     margin-left: auto;
