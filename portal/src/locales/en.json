@@ -72,6 +72,10 @@
             "projects": {
                 "title": "Projects"
             },
+            "sensors": {
+                "title": "Sensors",
+                "empty": "No sensors added"
+            },
             "stations": {
                 "title": "Stations",
                 "empty": "No stations added"

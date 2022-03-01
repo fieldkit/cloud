@@ -19,8 +19,7 @@
             @close="onCloseEditStationModal"
             v-if="editingStation"
         />
-        <div class="section-heading stations-heading">
-            {{ $t("project.stations.title") }}
+        <StationOrSensor class="section-heading stations-heading">
             <div class="stations-cta-container" v-if="admin">
                 <div class="stations-cta" v-on:click="showAddStationPicker">
                     <i class="icon icon-plus-round"></i>
@@ -31,7 +30,7 @@
                     {{ $t("project.stations.edit.trigger") }}
                 </div>
             </div>
-        </div>
+        </StationOrSensor>
         <div class="section-body">
             <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
@@ -80,14 +79,17 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import * as ActionTypes from "@/store/actions";
+
 import StationSummary from "@/views/shared/StationSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
 import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
+import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
+
+import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -97,6 +99,7 @@ export default Vue.extend({
         StationsMap,
         PaginationControls,
         TinyStation,
+        StationOrSensor,
     },
     data(): {
         activeStationId: number | null;

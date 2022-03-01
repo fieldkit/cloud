@@ -32,7 +32,7 @@
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
                         <i class="icon icon-stations"></i>
-                        <span v-bind:class="{ selected: viewingStations }">{{ $t("layout.side.stations.title") }}</span>
+                        <span v-bind:class="{ selected: viewingStations }"><StationOrSensor /></span>
                     </div>
                 </router-link>
                 <div v-for="station in stations" v-bind:key="station.id">
@@ -44,7 +44,9 @@
                         {{ station.name }}
                     </span>
                 </div>
-                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">{{ $t("layout.side.stations.empty") }}</div>
+                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">
+                    <StationOrSensor stationsKey="layout.side.stations.empty" sensorsKey="layout.side.sensors.empty" />
+                </div>
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
@@ -64,12 +66,14 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
+import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
 import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
     components: {
         Logo,
+        StationOrSensor,
     },
     props: {
         viewingProject: { type: Object, default: null },
