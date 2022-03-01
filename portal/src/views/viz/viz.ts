@@ -544,6 +544,9 @@ export class Querier {
         queryParams.append("stations", params.join(","));
 
         const key = queryParams.toString();
+
+        console.log(`vis: query-info`, key);
+
         if (this.info[key]) {
             iq.howBusy(1);
 
@@ -553,17 +556,20 @@ export class Querier {
             });
         }
 
-        iq.howBusy(1);
-
-        const api = new FKApi();
-        return api
-            .sensorData(queryParams)
-            .then((info: SensorInfoResponse) => {
-                this.info[key] = info;
-                return info;
+        return Promise.resolve()
+            .then(() => {
+                iq.howBusy(1);
             })
-            .finally(() => {
-                iq.howBusy(-1);
+            .then(() => {
+                return new FKApi()
+                    .sensorData(queryParams)
+                    .then((info: SensorInfoResponse) => {
+                        this.info[key] = info;
+                        return info;
+                    })
+                    .finally(() => {
+                        iq.howBusy(-1);
+                    });
             });
     }
 
@@ -573,6 +579,9 @@ export class Querier {
         const params = vq.params;
         const queryParams = params.queryParams();
         const key = queryParams.toString();
+
+        console.log(`vis: query-data`, key);
+
         if (this.data[key]) {
             vq.howBusy(1);
 
@@ -583,22 +592,26 @@ export class Querier {
             });
         }
 
-        vq.howBusy(1);
-
-        return new FKApi()
-            .sensorData(queryParams)
-            .then((sdr: SensorDataResponse) => {
-                const queried = new QueriedData(key, params.when, sdr);
-                const filtered = queried.removeDuplicates();
-                this.data[key] = filtered;
-                return filtered;
+        return Promise.resolve()
+            .then(() => {
+                vq.howBusy(1);
             })
-            .then((data) => {
-                vq.resolve(data);
-                return data;
-            })
-            .finally(() => {
-                vq.howBusy(-1);
+            .then(() => {
+                return new FKApi()
+                    .sensorData(queryParams)
+                    .then((sdr: SensorDataResponse) => {
+                        const queried = new QueriedData(key, params.when, sdr);
+                        const filtered = queried.removeDuplicates();
+                        this.data[key] = filtered;
+                        return filtered;
+                    })
+                    .then((data) => {
+                        vq.resolve(data);
+                        return data;
+                    })
+                    .finally(() => {
+                        vq.howBusy(-1);
+                    });
             });
     }
 }
@@ -669,7 +682,7 @@ export class Workspace implements VizInfoFactory {
             .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
-        console.log("workspace: querying", uniqueQueries.length, "data", infoQueries.length, "info");
+        console.log("viz: workspace: querying", uniqueQueries.length, "data", infoQueries.length, "info");
 
         // Make all the queries and then give the queried data to the
         // resolve call for that query. This will end up calling the
@@ -685,7 +698,7 @@ export class Workspace implements VizInfoFactory {
                         );
                         const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
                         this.stations[station.id] = station;
-                        console.log("station-meta", { station, info });
+                        console.log("viz: station-meta", { station, info });
                         return station;
                     });
                 }) as Promise<unknown>
@@ -696,7 +709,7 @@ export class Workspace implements VizInfoFactory {
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             // Update options here if doing so lazily.
-            console.log("workspace: query done ");
+            console.log("viz: workspace: query done ");
             this.version++;
         });
     }
@@ -751,7 +764,7 @@ export class Workspace implements VizInfoFactory {
 
     public async addStationIds(ids: number[]): Promise<Workspace> {
         this.stationIds = [...this.stationIds, ...ids];
-        console.log("viz:workspace-add-station-ids", this.stationIds);
+        console.log("viz: workspace-add-station-ids", this.stationIds);
         return this.query();
     }
 

@@ -17,8 +17,15 @@ export const VizWorkspace = Vue.extend({
     data() {
         return {};
     },
-    mounted() {
-        // console.log("workspace: mounted", this.workspace);
+    async mounted(): Promise<void> {
+        if (this.workspace.allStationIds.length == 1) {
+            console.log(`viz: include-associated(1)`, this.workspace.allStationIds.length);
+            const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]);
+            const ids = associated.stations.map((s) => s.id);
+            console.log(`viz: include-associated(1)`, associated);
+            await this.workspace.addStationIds(ids);
+        }
+
         return this.workspace.query();
     },
     methods: {
