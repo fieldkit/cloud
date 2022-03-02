@@ -7,9 +7,8 @@
             </div>
         </div>
         <div class="share-options">
-            <div class="button" @click="onShareTwitter">Twitter</div>
-            <a class="twitter-share-button" :href="'https://twitter.com/intent/tweet?url=' + vizUrl">
-                Tweet
+            <a class="twitter-share-button" :href="twitterUrl" target="blank">
+                <div class="button">Twitter</div>
             </a>
         </div>
     </div>
@@ -42,9 +41,13 @@ export default Vue.extend({
     },
     computed: {
         ...mapState({}),
-
+        twitterUrl(): string {
+            const qs = new URLSearchParams();
+            qs.append("url", this.vizUrl);
+            return "https://twitter.com/intent/tweet" + "?" + qs.toString();
+        },
         vizUrl(): string {
-            return "https://portal.fieldkit.org/dashboard/explore/" + JSON.stringify(this.bookmark);
+            return "https://portal.fkdev.org/dashboard/explore/" + JSON.stringify(this.bookmark);
         },
     },
     methods: {
