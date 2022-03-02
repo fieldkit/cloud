@@ -1,3 +1,3 @@
 #!/bin/bash
 
-(cd charting && nodemon server.js)
+(cd charting && nodemon server.ts)
