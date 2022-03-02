@@ -10,5 +10,7 @@ COPY *.ts /usr/app/
 COPY vega /usr/app/vega/
 ADD static.env /etc/static.env
 
+ENV PATH="/usr/app/node_modules/.bin:${PATH}"
+
 CMD [ "ts-node", "server.ts" ] 
 
