@@ -1,6 +1,9 @@
 <template>
-    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
+    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
+
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closeShare" />
+
         <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
@@ -18,6 +21,7 @@
                         </div>
                     </template>
                     <template v-slot:default>
+                        <div class="button" @click="openShare">Share</div>
                         <div class="button" @click="openExports">Export</div>
                     </template>
                 </DoubleHeader>
@@ -39,11 +43,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import Promise from "bluebird";
+
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
+import SharePanel from "./SharePanel.vue";
 
 import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
@@ -60,6 +66,7 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
+        SharePanel,
         ExportPanel,
         Comments,
     },
@@ -69,6 +76,10 @@ export default Vue.extend({
             required: false,
         },
         exportsVisible: {
+            type: Boolean,
+            default: false,
+        },
+        shareVisible: {
             type: Boolean,
             default: false,
         },
@@ -154,6 +165,13 @@ export default Vue.extend({
         async closeExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
             await this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
+        },
+        async openShare(): Promise<void> {
+            const encoded = JSON.stringify(this.bookmark);
+            await this.$router.push({ name: "shareBookmark", params: { bookmark: encoded } });
+        },
+        async closeShare(): Promise<void> {
+            await this.closeExports();
         },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
@@ -327,6 +345,7 @@ export default Vue.extend({
     width: 100%;
 
     summary {
+        z-index: 0 !important;
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
@@ -511,6 +530,7 @@ export default Vue.extend({
     margin-bottom: 20px;
 }
 
+.share-floating,
 .exports-floating {
     position: absolute;
     right: 0;

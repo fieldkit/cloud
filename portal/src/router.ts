@@ -329,6 +329,21 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/share/:bookmark",
+        name: "shareBookmark",
+        component: ExploreView,
+        props: (route) => {
+            return {
+                bookmark: deserializeBookmark(route.params.bookmark),
+                shareVisible: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/projects/:projectId/notes",
         name: "viewProjectNotes",
         component: NotesView,
