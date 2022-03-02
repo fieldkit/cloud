@@ -22,8 +22,8 @@ export function applySensorMetaConfiguration(spec, series) {
         if (s.vizInfo.viz.length > 0) {
             const vizConfig = s.vizInfo.viz[0];
             const thresholds = vizConfig.thresholds;
-            const levels = thresholds.levels;
-            if (levels && levels.length > 0) {
+            if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
+                const levels = thresholds.levels;
                 const thresholdLayers = levels
                     .map((d, i) => {
                         return {

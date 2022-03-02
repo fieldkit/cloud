@@ -67,6 +67,7 @@ export default Vue.extend({
     name: "HeaderBar",
     components: {
         ...CommonComponents,
+        NotificationsList,
         Logo,
     },
     data(): { isAccountHovered: boolean; hiding: boolean } {

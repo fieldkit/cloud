@@ -104,19 +104,21 @@ export default Vue.extend({
     },
     mounted() {
         const services = this.$services;
-        const text = this.value;
+
         const changed = (value) => {
             this.$emit("input", value);
         };
-        const saved = () => {
-            this.$emit("save");
+        const saved = (editor, ...args) => {
+            if (!editor.isEmpty) {
+                this.$emit("save", editor.getJSON());
+            }
         };
 
         const ModifyEnter = Extension.create({
             addKeyboardShortcuts() {
                 return {
-                    Enter: () => {
-                        saved();
+                    Enter: (...args) => {
+                        saved(this.editor);
                         // return true prevents default behaviour
                         return true;
                     },
@@ -231,7 +233,9 @@ export default Vue.extend({
             console.log("on-change", args);
         },
         onSave() {
-            this.$emit("save");
+            if (!this.editor.isEmpty) {
+                this.$emit("save");
+            }
         },
     },
 });

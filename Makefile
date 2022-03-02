@@ -110,12 +110,7 @@ $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go
 
 generate:
-ifeq (, $(shell which goa))
-ifeq (, $(BUILD_NUMBER))
-$(error "No goa in PATH, please run: env GO111MODULE=on go get -u goa.design/goa/v3/...@v3")
-endif
-endif
-	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
+	cd server/api && $(GOPATH)/bin/goa gen github.com/fieldkit/cloud/server/api/design
 
 clean:
 	rm -rf $(BUILD)

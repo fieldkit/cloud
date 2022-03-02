@@ -168,9 +168,11 @@ export default Vue.extend({
         },
         async save(comment: NewComment): Promise<void> {
             this.errorMessage = null;
+
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
+
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {

@@ -1,6 +1,9 @@
 <template>
-    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
+    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
+
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closeShare" />
+
         <div class="explore-view">
             <div class="explore-header">
                 <DoubleHeader
@@ -18,6 +21,7 @@
                         </div>
                     </template>
                     <template v-slot:default>
+                        <div class="button" @click="openShare">Share</div>
                         <div class="button" @click="openExports">Export</div>
                     </template>
                 </DoubleHeader>
@@ -39,11 +43,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import Promise from "bluebird";
+
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
+import SharePanel from "./SharePanel.vue";
 
 import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
@@ -60,6 +66,7 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
+        SharePanel,
         ExportPanel,
         Comments,
     },
@@ -69,6 +76,10 @@ export default Vue.extend({
             required: false,
         },
         exportsVisible: {
+            type: Boolean,
+            default: false,
+        },
+        shareVisible: {
             type: Boolean,
             default: false,
         },
@@ -124,21 +135,22 @@ export default Vue.extend({
             await this.$services.api.getAllSensors().then(async (sensorKeys) => {
                 // Check for a bookmark that is just to a station with no groups.
                 if (this.bookmark.s.length > 0) {
-                    console.log("viz-before-show-station", this.bookmark);
+                    console.log("viz: before-show-station", this.bookmark);
                     return this.showStation(this.bookmark.s[0]);
                 }
-                console.log("viz-before-create-workspace", this.bookmark);
+                console.log("viz: before-create-workspace", this.bookmark);
                 await this.createWorkspaceIfNecessary();
             });
         }
     },
     methods: {
         async addChart() {
-            console.log("viz-add");
+            console.log("viz: add");
             if (!this.workspace) throw new Error("viz-add: no workspace");
             return this.workspace.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
+            console.log("viz: change");
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
@@ -154,6 +166,13 @@ export default Vue.extend({
             const encoded = JSON.stringify(this.bookmark);
             await this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
         },
+        async openShare(): Promise<void> {
+            const encoded = JSON.stringify(this.bookmark);
+            await this.$router.push({ name: "shareBookmark", params: { bookmark: encoded } });
+        },
+        async closeShare(): Promise<void> {
+            await this.closeExports();
+        },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
                 return this.workspace;
@@ -162,51 +181,46 @@ export default Vue.extend({
             const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
             if (this.bookmark) {
                 this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
-                void this.includeAssociatedStations(this.workspace);
             } else {
                 this.workspace = new Workspace(allSensors);
             }
 
-            return this.workspace;
-        },
-        async includeAssociatedStations(ws: Workspace): Promise<void> {
-            // console.log(`include-associated`, ws.allStationIds);
-            if (ws.allStationIds.length != 1) {
-                return;
-            }
+            console.log(`viz: workspace-created`);
 
-            return this.$services.api.getAssociatedStations(ws.allStationIds[0]).then((associated) => {
-                console.log("quick-sensors-associated", associated);
-                const ids = associated.stations.map((s) => s.id);
-                return ws.addStationIds(ids);
-            });
+            return this.workspace;
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
             this.stationId = stationId;
 
-            return this.createWorkspaceIfNecessary().then((workspace) => {
-                return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
+            return await this.createWorkspaceIfNecessary().then(async (workspace) => {
+                return await this.$services.api.getQuickSensors([stationId]).then(async (quickSensors) => {
                     console.log("viz: quick-sensors", quickSensors);
                     if (quickSensors.stations[stationId].length == 0) {
-                        console.log("viz: no sensors");
+                        console.log("viz: no sensors TODO: FIX");
                         this.showNoSensors = true;
                         return Promise.delay(5000).then(() => {
                             this.showNoSensors = false;
                         });
                     }
 
-                    console.log("quick-sensors", quickSensors);
-
                     const vizSensor = [
                         stationId,
                         [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
                     ];
 
+                    const associated = await this.$services.api.getAssociatedStations(stationId);
+                    console.log(`viz: show-station-associated`, associated);
+
                     return workspace
                         .addStandardGraph(vizSensor)
                         .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
+                        .then(async (ws) => {
+                            await workspace.addStationIds(associated.stations.map((station) => station.id));
+
+                            console.log(`viz: show-station-querying`);
+                            return await ws.query();
+                        });
                 });
             });
         },
@@ -331,6 +345,7 @@ export default Vue.extend({
     width: 100%;
 
     summary {
+        z-index: 0 !important;
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
@@ -515,6 +530,7 @@ export default Vue.extend({
     margin-bottom: 20px;
 }
 
+.share-floating,
 .exports-floating {
     position: absolute;
     right: 0;
