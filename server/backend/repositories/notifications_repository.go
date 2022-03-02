@@ -16,37 +16,12 @@ func NewNotificationRepository(db *sqlxcache.DB) (rr *NotificationRepository) {
 	return &NotificationRepository{db: db}
 }
 
-func (r *NotificationRepository) QueryByUserID(ctx context.Context, userID int32) ([]*data.Notification, error) {
-	notifications := []*data.Notification{}
-	if err := r.db.SelectContext(ctx, &notifications, `
-		SELECT * FROM fieldkit.notification WHERE user_id = $1 AND NOT seen ORDER BY created_at
-		`, userID); err != nil {
-		return nil, err
-	}
-	return notifications, nil
-}
-
-func (r *NotificationRepository) QueryByUserIDWithPost(ctx context.Context, userID int32) ([]*data.NotificationPost, error) {
-	notifications := []*data.NotificationPost{}
-	if err := r.db.SelectContext(ctx, &notifications, `
-		SELECT n.*, p.project_id, p.context  FROM fieldkit.notification as n
-		LEFT JOIN fieldkit.discussion_post AS p ON ( n.post_id = p.id)
-		WHERE n.user_id = $1 AND NOT n.seen
-		ORDER BY n.created_at
-		`, userID); err != nil {
-		return nil, err
-	}
-	return notifications, nil
-}
-
-func (r *NotificationRepository) QueryByIDWithPost(ctx context.Context, notificationID int32) ([]*data.NotificationPost, error) {
-	notification := []*data.NotificationPost{}
-	if err := r.db.SelectContext(ctx, &notification, `
-		SELECT n.*, p.project_id, p.context  FROM fieldkit.notification as n
-		LEFT JOIN fieldkit.discussion_post AS p ON ( n.post_id = p.id)
-		WHERE n.id = $1 AND NOT n.seen
-		ORDER BY n.created_at
-		`, notificationID); err != nil {
+func (r *NotificationRepository) AddNotification(ctx context.Context, notification *data.Notification) (*data.Notification, error) {
+	if err := r.db.NamedGetContext(ctx, notification, `
+		INSERT INTO fieldkit.notification (created_at, user_id, post_id, key, kind, body, seen)
+		VALUES (:created_at, :user_id, :post_id, :key, :kind, :body, :seen)
+		RETURNING id
+		`, notification); err != nil {
 		return nil, err
 	}
 	return notification, nil
@@ -61,15 +36,22 @@ func (r *NotificationRepository) MarkNotificationSeen(ctx context.Context, userI
 	return nil
 }
 
-func (r *NotificationRepository) AddNotification(ctx context.Context, notification *data.Notification) (*data.Notification, error) {
-	if err := r.db.NamedGetContext(ctx, notification, `
-		INSERT INTO fieldkit.notification (created_at, user_id, post_id, key, kind, body, seen)
-		VALUES (:created_at, :user_id, :post_id, :key, :kind, :body, :seen)
-		RETURNING id
-		`, notification); err != nil {
+func (r *NotificationRepository) QueryByUserID(ctx context.Context, userID int32) ([]*data.NotificationPost, error) {
+	// TODO When we have more notification types, this should query for the
+	// notification details separately and then merge them. Or we can use a
+	// technique similar to how we handled the polymorphism in project_activity.
+	// For now, it's just easier to assume we've got nothing but discussion
+	// related notifications.
+	notifications := []*data.NotificationPost{}
+	if err := r.db.SelectContext(ctx, &notifications, `
+		SELECT n.*, p.project_id, p.context  FROM fieldkit.notification as n
+		LEFT JOIN fieldkit.discussion_post AS p ON ( n.post_id = p.id)
+		WHERE n.user_id = $1 AND NOT n.seen
+		ORDER BY n.created_at
+		`, userID); err != nil {
 		return nil, err
 	}
-	return notification, nil
+	return notifications, nil
 }
 
 func (r *NotificationRepository) DeleteByPostID(ctx context.Context, postID int64) error {

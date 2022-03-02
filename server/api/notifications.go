@@ -28,7 +28,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 
 	listener := NewListener(c.options, stream, func(ctx context.Context, userID int32) error {
 		nr := repositories.NewNotificationRepository(c.options.Database)
-		notifications, err := nr.QueryByUserIDWithPost(ctx, userID)
+		notifications, err := nr.QueryByUserID(ctx, userID)
 		if err != nil {
 			return err
 		}
@@ -98,17 +98,17 @@ func (c *NotificationsService) Seen(ctx context.Context, payload *notifications.
 	log := Logger(ctx).Sugar()
 	log.Infow("seen", "ids", payload.Ids)
 
-    p, err := NewPermissions(ctx, c.options).Unwrap()
-    if err != nil {
-        return err
-    }
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
 
-    nr := repositories.NewNotificationRepository(c.options.Database)
-    for _, id := range payload.Ids {
-        if err := nr.MarkNotificationSeen(ctx, p.UserID(), id); err != nil {
-           return err
-        }
-    }
+	nr := repositories.NewNotificationRepository(c.options.Database)
+	for _, id := range payload.Ids {
+		if err := nr.MarkNotificationSeen(ctx, p.UserID(), id); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
