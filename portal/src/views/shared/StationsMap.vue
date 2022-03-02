@@ -162,19 +162,51 @@ export default Vue.extend({
                 });
 
                 map.addLayer({
-                    id: "station-markers",
-                    type: "symbol",
+                    id: "station-shadow",
+                    type: "circle",
                     source: "stations",
                     filter: ["==", "$type", "Point"],
+                    paint: {
+                        "circle-color": "#000",
+                        "circle-radius": 20,
+                        "circle-blur": 0.5,
+                        "circle-opacity": 0.5,
+                    },
+                    // layout: {
+                    //     "icon-image": "dot",
+                    //     "text-field": "{title}",
+                    //     "icon-ignore-placement": true,
+                    //     "icon-allow-overlap": true,
+                    //     "text-allow-overlap": true,
+                    //     "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                    //     "text-offset": [0, 0.75],
+                    //     "text-variable-anchor": ["top", "right", "bottom", "left"],
+                    // },
+                });
+                map.addLayer({
+                    id: "station-markers",
+                    type: "circle",
+                    source: "stations",
+                    filter: ["==", "$type", "Point"],
+                    paint: {
+                        "circle-color": "red",
+                        "circle-stroke-color": "#fff",
+                        "circle-stroke-width": 2,
+                        "circle-stroke-opacity": 0.65,
+                        "circle-radius": 14,
+                    },
+                });
+                map.addLayer({
+                    id: "station-value",
+                    type: "symbol",
+                    source: "stations",
+                    paint: {
+                        "text-color": "#fff",
+                    },
                     layout: {
-                        "icon-image": "dot",
-                        "text-field": "{title}",
-                        "icon-ignore-placement": true,
-                        "icon-allow-overlap": true,
-                        "text-allow-overlap": true,
-                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                        "text-offset": [0, 0.75],
-                        "text-variable-anchor": ["top", "right", "bottom", "left"],
+                        "text-field": "{id}",
+                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"], // fixme: wrong font
+                        "text-size": 12,
                     },
                 });
 
@@ -190,6 +222,10 @@ export default Vue.extend({
             if (this.bounds) {
                 map.fitBounds(this.bounds, { duration: 0 });
             }
+            console.log("MAPPED STATIONS", this.mapped.stations[0].configurations.all[0].modules[0].position)
+            this.mapped.stations.map( (station) => {
+                console.log( station.configurations.all[0].modules.filter((module) => module.position === 255) )
+                })
         },
     },
 });
