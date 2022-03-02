@@ -97,6 +97,19 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 func (c *NotificationsService) Seen(ctx context.Context, payload *notifications.SeenPayload) error {
 	log := Logger(ctx).Sugar()
 	log.Infow("seen", "ids", payload.Ids)
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	nr := repositories.NewNotificationRepository(c.options.Database)
+	for _, id := range payload.Ids {
+		if err := nr.MarkNotificationSeen(ctx, p.UserID(), id); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
