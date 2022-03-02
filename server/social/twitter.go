@@ -214,4 +214,5 @@ func (tw *TwitterContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
 	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
+	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
 }
