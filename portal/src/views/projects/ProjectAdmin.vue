@@ -51,11 +51,9 @@
                 <div class="details-bottom">
                     <div class="details-team">
                         <div class="title">Team</div>
-                        <div class="flex details-team-list">
-                            <template v-for="projectUser in displayProject.users">
-                                <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" v-bind:key="projectUser.user.email" />
-                            </template>
-                        </div>
+                        <template v-for="projectUser in displayProject.users">
+                            <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" v-bind:key="projectUser.user.email" />
+                        </template>
                     </div>
                     <div class="details-modules">
                         <div class="title">Modules</div>
@@ -336,17 +334,15 @@ export default Vue.extend({
     }
 }
 .details-bottom .details-team {
+    display: flex;
+    flex-wrap: wrap;
     flex: 1;
+    padding-right: 15px;
 
     @include bp-down($xs) {
         flex-basis: 100%;
         margin-bottom: 15px;
     }
-}
-
-.details-team-list {
-    flex-wrap: wrap;
-    width: calc(100% - 15px);
 }
 
 .details-bottom .details-modules {
@@ -355,6 +351,7 @@ export default Vue.extend({
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;
+    flex-basis: 100%;
 
     body.floodnet & {
         font-family: $font-family-floodnet-bold;
