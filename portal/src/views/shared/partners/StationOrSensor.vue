@@ -11,6 +11,11 @@ import Vue from "vue";
 import { TranslateResult } from "vue-i18n";
 import { isCustomisationEnabled } from "../PartnerCustomisationHelper";
 
+// Keeping this logic in this file.
+export function callStationsStations() {
+    return !isCustomisationEnabled();
+}
+
 export default Vue.extend({
     name: "StationOrSensor",
     props: {
@@ -25,10 +30,10 @@ export default Vue.extend({
     },
     computed: {
         label(): TranslateResult {
-            if (isCustomisationEnabled()) {
-                return this.$t(this.sensorsKey);
+            if (callStationsStations()) {
+                return this.$t(this.stationsKey);
             }
-            return this.$t(this.stationsKey);
+            return this.$t(this.sensorsKey);
         },
     },
 });
