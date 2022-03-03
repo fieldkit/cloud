@@ -11,9 +11,6 @@
             v-on:mouseleave="onAccountHover($event)"
         >
             <div v-if="user" class="header-avatar">
-                <i class="badge">
-                    <span>{{ numberOfUnseenNotifications }}</span>
-                </i>
                 <UserPhoto v-if="user" :user="user" />
                 <span v-if="isAccountHovered" class="triangle"></span>
             </div>
@@ -26,7 +23,7 @@
 
             <div v-if="user" class="notifications-container" v-bind:class="{ active: isAccountHovered && !hiding }">
                 <header class="notifications-header">
-                    <span class="notifications-header-text">{{ $t("layout.header.notifications") }}</span>
+                    <span class="notifications-header-text">{{ $t("layout.header.myAccount") }}</span>
                     <div class="flex">
                         <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">
                             {{ $t("layout.header.admin") }}
@@ -40,7 +37,7 @@
                     </div>
                 </header>
 
-                <template v-if="numberOfUnseenNotifications > 0">
+                <template v-if="false && numberOfUnseenNotifications > 0">
                     <NotificationsList v-on:notification-click="notificationNavigate"></NotificationsList>
 
                     <footer class="notifications-footer">
@@ -304,8 +301,10 @@ button {
     &-header {
         @include flex(center, space-between);
         height: 50px;
+        /*
         border-bottom: solid 1px #d8dce0;
         margin-bottom: 15px;
+        */
         letter-spacing: 0.1px;
         padding: 0 13px;
 
@@ -334,7 +333,7 @@ button {
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         border: solid 1px #e9e9e9;
-        height: 80vh;
+        /*height: 80vh;*/
         flex-direction: column;
         width: 320px;
         z-index: -1;
