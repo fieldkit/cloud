@@ -49,7 +49,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 	if _, ok := v.stations[p.ID]; !ok {
 		station, err := v.stationRepository.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {
-			// TODO Mark giving up?
+			log.Infow("station-missing", "device_id", p.DeviceID)
 			return nil
 		}
 
