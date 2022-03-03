@@ -59,10 +59,10 @@
     "layout": {
         "logo": {
             "fieldkit": {
-                "alt": "FieldKit Logo"
+                "alt": "FieldKit"
             },
             "floodnet": {
-                "alt": "Floodnet Logo"
+                "alt": "Floodnet"
             },
             "compass": {
                 "alt": "FieldKit Compass Logo"
