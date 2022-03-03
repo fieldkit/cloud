@@ -57,11 +57,13 @@
                 <div class="details-bottom">
                     <div class="details-team">
                         <div class="title">Team</div>
-                        <UserPhoto
-                            v-for="projectUser in displayProject.users"
-                            v-bind:key="projectUser.user.email"
-                            :user="projectUser.user"
-                        />
+                        <div class="flex details-team-list">
+                            <UserPhoto
+                                v-for="projectUser in displayProject.users"
+                                v-bind:key="projectUser.user.email"
+                                :user="projectUser.user"
+                            />
+                        </div>
                     </div>
                     <div class="details-modules">
                         <div class="title">Modules</div>
@@ -87,7 +89,6 @@
                 :userStations="userStations"
             />
         </div>
-
     </div>
 </template>
 
