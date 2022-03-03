@@ -151,6 +151,7 @@ export default Vue.extend({
 .image-container img {
     max-width: 124px;
     max-height: 100px;
+    padding: 5px;
 }
 .station-name {
     font-size: 18px;
