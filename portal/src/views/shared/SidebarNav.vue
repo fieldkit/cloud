@@ -55,11 +55,16 @@
             </router-link>
         </div>
 
-        <div v-if="isPartnerCustomisationEnabled()" class="app-logo">
-            <span>Made by</span>
-            <br />
-            <i role="img" :aria-label="$tc('layout.logo.fieldkit')" class="icon icon-logo-fieldkit"></i>
-        </div>
+        <template v-if="isPartnerCustomisationEnabled()">
+            <div v-if="sidebar.narrow" class="app-logo app-logo--narrow">
+                <i role="img" class="icon icon-logo-narrow-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+            </div>
+            <div v-else class="app-logo">
+                <span>Made by</span>
+                <br />
+                <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -145,6 +150,8 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .container-side {
+    @include flex();
+    flex-direction: column;
     position: relative;
     background: #fff;
     width: 65px;
@@ -170,7 +177,7 @@ export default Vue.extend({
     margin-top: 10px;
 }
 .sidebar-header {
-    height: 66px;
+    flex: 0 0 66px;
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
     transition: 0.25s all;
@@ -183,7 +190,7 @@ export default Vue.extend({
     @include bp-down($sm) {
         justify-content: flex-start;
         padding: 0 20px;
-        height: 54px;
+        flex: 0 0 54px;
     }
 
     > a {
@@ -199,11 +206,12 @@ export default Vue.extend({
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.33s ease-in;
+    overflow-y: auto;
 
     @at-root .container-side.active & {
         opacity: 1;
         visibility: visible;
-        width: 200px;
+        width: 240px;
     }
 }
 .nav-section {
@@ -328,10 +336,22 @@ export default Vue.extend({
 }
 
 .app-logo {
-    @include position(absolute, null null 15px 43px);
-    z-index: $z-index-app-logo;
     font-size: 16px;
     text-align: left;
+    margin: auto 0 15px 45px;
+    padding-top: 10px;
+
+    &--narrow {
+        margin: auto auto 7px auto;
+
+        @include bp-down($sm) {
+            display: none;
+        }
+
+        i {
+            font-size: 58px;
+        }
+    }
 
     span {
         font-family: var(--font-family-bold);

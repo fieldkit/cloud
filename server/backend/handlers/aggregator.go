@@ -8,7 +8,6 @@ import (
 	"github.com/montanaflynn/stats"
 
 	"github.com/conservify/sqlxcache"
-	"github.com/jmoiron/sqlx"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -272,8 +271,6 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 		}
 	}
 
-	keeping := make([]int64, 0)
-
 	for key, value := range d.Values {
 		if v.sensors[key.SensorKey] == nil {
 			newSensor := &data.Sensor{
@@ -301,32 +298,10 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 			INSERT INTO %s (station_id, sensor_id, module_id, time, location, value, nsamples)
 			VALUES (:station_id, :sensor_id, :module_id, :time, ST_SetSRID(ST_GeomFromText(:location), 4326), :value, :nsamples)
 			ON CONFLICT (time, station_id, sensor_id, module_id)
-				DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location,
-							  nsamples = EXCLUDED.nsamples
+			DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location, nsamples = EXCLUDED.nsamples
 			RETURNING id
 			`, a.table), row); err != nil {
 			return fmt.Errorf("error upserting sensor reading: %v", err)
-		}
-
-		keeping = append(keeping, row.ID)
-	}
-
-	// Delete any other rows for this station in this time.
-	if len(keeping) > 0 {
-		query, args, err := sqlx.In(fmt.Sprintf(`
-			DELETE FROM %s WHERE station_id = ? AND time = ? AND id NOT IN (?)
-		`, a.table), v.stationID, d.Time, keeping)
-		if err != nil {
-			return err
-		}
-		if _, err := v.db.ExecContext(ctx, v.db.Rebind(query), args...); err != nil {
-			return fmt.Errorf("error deleting old sensor readings: %v", err)
-		}
-	} else {
-		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`
-			DELETE FROM %s WHERE station_id = $1 AND time = $2
-		`, a.table), v.stationID, d.Time); err != nil {
-			return fmt.Errorf("error deleting old sensor readings: %v", err)
 		}
 	}
 
@@ -356,9 +331,7 @@ func (v *Aggregator) DeleteEmptyAggregates(ctx context.Context) error {
 			return fmt.Errorf("error deleting empty aggregates: %v", err)
 		}
 
-		if total > 0 {
-			log.Infow("nsamples-delete", "table", child.table, "records", total)
-		}
+		log.Infow("nsamples-delete", "table", child.table, "records", total)
 
 		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
 			return fmt.Errorf("error deleting empty aggregates: %v", err)

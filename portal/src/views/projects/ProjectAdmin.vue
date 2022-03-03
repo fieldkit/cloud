@@ -334,19 +334,24 @@ export default Vue.extend({
     }
 }
 .details-bottom .details-team {
+    display: flex;
+    flex-wrap: wrap;
     flex: 1;
+    padding-right: 15px;
 
     @include bp-down($xs) {
         flex-basis: 100%;
         margin-bottom: 15px;
     }
 }
+
 .details-bottom .details-modules {
     flex: 1;
 }
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;
+    flex-basis: 100%;
 
     body.floodnet & {
         font-family: $font-family-floodnet-bold;
