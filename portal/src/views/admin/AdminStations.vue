@@ -261,7 +261,7 @@ export default Vue.extend({
     margin-top: 50px;
     width: 300px;
     height: 45px;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: none;
     color: white;
     font-size: 18px;
@@ -287,7 +287,7 @@ export default Vue.extend({
 }
 .stations thead tr th {
     background-color: #fcfcfc;
-    border-bottom: 2px solid #d8dce0;
+    border-bottom: 2px solid var(--color-border);
 }
 .stations tbody tr {
     padding: 5px;

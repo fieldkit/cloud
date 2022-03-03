@@ -178,7 +178,7 @@ export default Vue.extend({
     margin-top: 50px;
     width: 300px;
     height: 45px;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: none;
     color: white;
     font-size: 18px;

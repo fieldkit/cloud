@@ -1,0 +1,22 @@
+{
+  "customFormatTypes": true,
+  "axis": {
+    "labelFont": "Avenir Light",
+    "labelFontSize": 12,
+    "labelColor": "#6a6d71",
+    "titleFont": "Avenir Light",
+    "titleFontSize": 14,
+    "titlePadding": 20,
+    "tickSize": 10,
+    "tickOpacity": 0,
+    "domain": false
+  },
+  "axisX": {
+    "title": null
+  },
+  "axisY": {},
+  "view": {
+    "fill": "#ffffff",
+    "stroke": "transparent"
+  }
+}

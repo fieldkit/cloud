@@ -69,7 +69,7 @@ require (
 	github.com/kinbiko/jsonassert v1.0.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2
 	github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.10.4
 	github.com/llgcode/draw2d v0.0.0-20161104081029-1286d3b2030a
 	github.com/lucasb-eyer/go-colorful v0.0.0-20170223221042-c900de9dbbc7
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d

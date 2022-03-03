@@ -8,7 +8,7 @@
         </div>
         <div class="feed-container" v-if="visibleActivities.length > 0">
             <div v-for="activity in visibleActivities" v-bind:key="activity.id" class="activity">
-                <div class="icon">
+                <div class="icon" v-if="!isFloodnetCustomisationEnabled()">
                     <img :src="activity.icon" />
                 </div>
                 <div class="panel" v-if="activity.type == 'ingestion'">
@@ -52,6 +52,7 @@
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { DisplayProject } from "@/store";
+import { isCustomisationEnabled } from "@/views/shared/PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "ProjectActivity",
@@ -134,6 +135,9 @@ export default Vue.extend({
         onClose(): void {
             this.$emit("close");
         },
+        isCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
     },
 });
 </script>
@@ -166,7 +170,7 @@ export default Vue.extend({
 .feed-container .activity {
     display: flex;
     flex-direction: row;
-    padding-right: 1em;
+    padding: 0 1em;
 }
 
 .feed-container .activity .icon {
@@ -174,8 +178,6 @@ export default Vue.extend({
     flex-direction: column;
 }
 .activity .icon {
-    width: 40px;
-    padding-left: 1em;
     padding-right: 1em;
 }
 .activity .icon img {
@@ -184,7 +186,7 @@ export default Vue.extend({
 .feed-container .activity .panel {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
 }
 .activity-heading {
     display: flex;

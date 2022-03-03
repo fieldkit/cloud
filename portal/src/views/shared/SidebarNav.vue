@@ -2,7 +2,7 @@
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.alt')" id="header-logo" src="@/assets/logo-fieldkit.svg" />
+                <Logo />
             </router-link>
         </div>
         <a class="sidebar-trigger" v-on:click="toggleSidebar">
@@ -12,7 +12,7 @@
             <div class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
-                        <img alt="Projects" src="@/assets/icon-projects.svg" />
+                        <i class="icon icon-projects"></i>
                         <span v-bind:class="{ selected: viewingProjects }">{{ $t("layout.side.projects.title") }}</span>
                     </div>
                 </router-link>
@@ -28,11 +28,11 @@
                 </div>
             </div>
 
-            <div class="nav-section">
+            <div class="nav-section" v-if="stations.length > 0">
                 <router-link :to="{ name: 'mapAllStations' }">
                     <div class="nav-label">
-                        <img alt="Stations" src="@/assets/icon-stations.svg" />
-                        <span v-bind:class="{ selected: viewingStations }">{{ $t("layout.side.stations.title") }}</span>
+                        <i class="icon icon-stations"></i>
+                        <span v-bind:class="{ selected: viewingStations }"><StationOrSensor /></span>
                     </div>
                 </router-link>
                 <div v-for="station in stations" v-bind:key="station.id">
@@ -44,22 +44,37 @@
                         {{ station.name }}
                     </span>
                 </div>
-                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">{{ $t("layout.side.stations.empty") }}</div>
+                <div v-if="isAuthenticated && stations.length == 0" class="nav-link">
+                    <StationOrSensor stationsKey="layout.side.stations.empty" sensorsKey="layout.side.sensors.empty" />
+                </div>
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
             <router-link :to="{ name: 'projects' }">
-                <img :alt="$t('layout.logo.compass.alt')" src="@/assets/logo-compass.svg" width="45" height="45" />
+                <i role="img" class="icon" :class="narrowSidebarLogoIconClass" :aria-label="narrowSidebarLogoAlt"></i>
             </router-link>
+        </div>
+
+        <div v-if="isPartnerCustomisationEnabled()" class="app-logo">
+            <span>Made by</span>
+            <br />
+            <i role="img" :aria-label="$tc('layout.logo.fieldkit')" class="icon icon-logo-fieldkit"></i>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import Logo from "@/views/shared/Logo.vue";
+import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
+import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "SidebarNav",
+    components: {
+        Logo,
+        StationOrSensor,
+    },
     props: {
         viewingProject: { type: Object, default: null },
         viewingStation: { type: Object, default: null },
@@ -94,11 +109,15 @@ export default Vue.extend({
         sidebar: {
             narrow: boolean;
         };
+        narrowSidebarLogoIconClass: string;
+        narrowSidebarLogoAlt: string;
     } {
         return {
             sidebar: {
                 narrow: window.screen.availWidth <= 1040,
             },
+            narrowSidebarLogoIconClass: interpolatePartner("icon-logo-narrow-"),
+            narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
         };
     },
     methods: {
@@ -115,6 +134,9 @@ export default Vue.extend({
             this.sidebar.narrow = !this.sidebar.narrow;
             this.$emit("sidebar-toggle");
         },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
     },
 });
 </script>
@@ -123,6 +145,7 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .container-side {
+    position: relative;
     background: #fff;
     width: 65px;
     flex: 0 0 65px;
@@ -162,13 +185,10 @@ export default Vue.extend({
         padding: 0 20px;
         height: 54px;
     }
-}
-#header-logo {
-    width: 140px;
-    margin: 16px auto;
 
-    @include bp-down($md) {
-        display: none;
+    > a {
+        height: 100%;
+        display: flex;
     }
 }
 
@@ -195,19 +215,30 @@ export default Vue.extend({
 }
 .nav-label {
     @include flex(center);
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 16px;
     margin: 12px 0;
     cursor: pointer;
 }
-.nav-label img {
+.nav-label .icon {
     vertical-align: sub;
     margin: 0 10px 0 5px;
+    font-size: 16px;
+
+    body.floodnet & {
+        &:before {
+            color: var(--color-dark);
+        }
+    }
 }
 .selected {
-    border-bottom: 2px solid #1b80c9;
+    border-bottom: 2px solid $color-primary;
     height: 100%;
     display: inline-block;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .unselected {
     display: inline-block;
@@ -231,6 +262,16 @@ export default Vue.extend({
         padding-bottom: 2px;
     }
 }
+
+#header-logo {
+    font-size: 32px;
+    @include flex(center);
+
+    @include bp-down($md) {
+        display: none;
+    }
+}
+
 .sidebar-compass {
     display: flex;
     align-items: center;
@@ -251,10 +292,22 @@ export default Vue.extend({
     @include bp-down($md) {
         display: none;
     }
+
+    i {
+        display: flex;
+        align-items: center;
+        font-size: 50px;
+
+        &:before {
+            color: var(--color-primary);
+
+            body.floodnet & {
+                color: var(--color-dark);
+            }
+        }
+    }
 }
-.sidebar-compass img {
-    align-self: center;
-}
+
 .sidebar-trigger {
     transition: all 0.25s;
     cursor: pointer;
@@ -271,6 +324,23 @@ export default Vue.extend({
         @include bp-down($md) {
             left: 188px;
         }
+    }
+}
+
+.app-logo {
+    @include position(absolute, null null 15px 43px);
+    z-index: $z-index-app-logo;
+    font-size: 16px;
+    text-align: left;
+
+    span {
+        font-family: var(--font-family-bold);
+        margin-bottom: 5px;
+        font-size: 12px;
+    }
+
+    i:before {
+        color: var(--color-dark);
     }
 }
 </style>

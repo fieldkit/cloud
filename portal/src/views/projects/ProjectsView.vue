@@ -1,12 +1,12 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div class="projects-view">
-            <div class="container mine">
+            <div class="container mine" v-if="userProjects.length > 0">
                 <div class="header">
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <img alt="Add project" src="@/assets/icon-plus-round.svg" />
+                        <i class="icon icon-plus-round"> </i>
                         <span>{{ $t("projects.add") }}</span>
                     </div>
                 </div>
@@ -29,7 +29,6 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
-import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -50,9 +49,11 @@ export default Vue.extend({
         }),
     },
     mounted() {
-        return this.$services.api.getInvitesByUser().then((invites) => {
-            this.invites = invites;
-        });
+        if (this.isAuthenticated) {
+            return this.$services.api.getInvitesByUser().then((invites) => {
+                this.invites = invites;
+            });
+        }
     },
     methods: {
         goBack() {
@@ -91,7 +92,7 @@ export default Vue.extend({
 }
 
 .container.community {
-    border-top: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
 }
 .container .header {
     display: flex;
@@ -140,13 +141,12 @@ export default Vue.extend({
 #add-project {
     margin-left: auto;
     cursor: pointer;
-    @include flex(flex-end);
+    font-size: 16px;
+    @include flex(center);
 
-    img {
+    i {
         margin-right: 7px;
+        margin-top: -3px;
     }
-}
-#add-project img {
-    vertical-align: bottom;
 }
 </style>

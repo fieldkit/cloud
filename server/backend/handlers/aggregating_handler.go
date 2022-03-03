@@ -31,7 +31,7 @@ type AggregatingHandler struct {
 func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:                db,
-		metaFactory:       repositories.NewMetaFactory(),
+		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
 		stations:          make(map[int64]*Aggregator),
 		seen:              make(map[int32]*data.Station),

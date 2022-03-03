@@ -225,7 +225,7 @@ type GetCurrentPayload struct {
 // ListByProjectPayload is the payload type of the user service list by project
 // method.
 type ListByProjectPayload struct {
-	Auth      string
+	Auth      *string
 	ProjectID int32
 }
 

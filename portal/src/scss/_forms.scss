@@ -1,4 +1,4 @@
-@import './mixins.scss';
+@import "./mixins.scss";
 
 .form {
     width: 460px;
@@ -33,17 +33,26 @@
             padding: 40px 0;
             justify-content: flex-start;
         }
+
+        body.floodnet & {
+            background-image: unset;
+            background-color: var(--color-dark);
+        }
     }
 
     &-header {
-
         &-logo {
-            width: 211px;
             margin-bottom: 82px;
+            font-size: 45px;
+            display: block;
+
+            &:before {
+                color: #fff;
+            }
 
             @include bp-down($xs) {
-                width: 117px;
                 margin-bottom: 30px;
+                font-size: 25px;
             }
         }
 
@@ -93,11 +102,11 @@
         width: 100%;
         max-width: 300px;
         height: 45px;
-        background-color: #ce596b;
+        background-color: var(--color-secondary);
         border: none;
         color: white;
         font-size: 18px;
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
         border-radius: 3px;
         letter-spacing: 0.1px;
 
@@ -138,7 +147,7 @@
         margin: 25px auto 0 auto;
 
         ::v-deep input:-webkit-autofill::first-line {
-            font-size: 16px!important;
+            font-size: 16px !important;
         }
     }
 
@@ -150,7 +159,7 @@
 
     .login-failed {
         color: #c42c44;
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
         margin-top: 25px;
     }
 }
@@ -160,7 +169,7 @@
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        border: 1px solid #d8dce0;
+        border: 1px solid var(--color-border);
         background: white;
         padding: 0 22px 14px;
         width: 700px;

@@ -71,11 +71,11 @@
 
                         <div class="actions">
                             <button @click="addReply(post)">
-                                <img src="@/assets/icon-reply.svg" />
+                                <i class="icon icon-reply"></i>
                                 Reply
                             </button>
                             <button v-if="viewType === 'data'" @click="viewDataClick(post)">
-                                <img src="@/assets/icon-view-data.svg" />
+                                <i class="icon icon-view-data"></i>
                                 View Data
                             </button>
                         </div>
@@ -168,9 +168,11 @@ export default Vue.extend({
         },
         async save(comment: NewComment): Promise<void> {
             this.errorMessage = null;
+
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
+
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
@@ -345,16 +347,16 @@ button {
     border: 1px solid $color-border;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
-    &.data-view {
-        margin-top: 0;
-        padding-top: 45px;
-        box-shadow: none;
-        border: 0;
-    }
-
     @include bp-down($xs) {
         margin: 20px -10px 0;
         padding: 0 10px 30px 10px;
+    }
+
+    &.data-view {
+        margin-top: 0;
+        // padding-top: 45px;
+        box-shadow: none;
+        border: 0;
     }
 }
 
@@ -369,6 +371,10 @@ header {
         font-size: 18px;
         height: auto;
         border: none;
+    }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
     }
 }
 
@@ -472,6 +478,7 @@ header {
         @include flex(center);
         padding: 0 10px;
         font-weight: 900;
+        flex-shrink: 0;
 
         @include bp-down($sm) {
             bottom: 25px;
@@ -611,15 +618,23 @@ header {
         @include flex(flex-start);
     }
 
-    img {
-        width: 14px;
+    .icon {
+        font-size: 11px;
+        margin-right: 5px;
+    }
+
+    .icon-view-data {
+        font-size: 14px;
         margin-right: 6px;
     }
 }
 
 .timestamp {
-    @include position(absolute, 0 0 null null);
     font-family: $font-family-light;
+    flex-shrink: 0;
+    margin-left: auto;
+    line-height: 1.5;
+    padding-left: 10px;
 }
 
 .fade-enter-active,

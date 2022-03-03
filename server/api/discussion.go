@@ -65,6 +65,7 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 
 	bookmark, err := data.ParseBookmark(payload.Bookmark)
 	if err != nil {
+		panic(err)
 		return nil, err
 	}
 
@@ -94,6 +95,10 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 
 	if payload.Post.ProjectID == nil && payload.Post.Bookmark == nil {
 		return nil, fmt.Errorf("malformed request: missing project or bookmark")
+	}
+
+	if payload.Post.Body == "" {
+		return nil, discService.MakeBadRequest(fmt.Errorf("empty post body"))
 	}
 
 	// TODO Check that the user can post to this Project
@@ -257,7 +262,7 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 		if saved, err := nr.AddNotification(ctx, notif); err != nil {
 			return err
 		} else {
-			message := saved.ToMap()
+			message := data.PostNotificationToMap(saved, post)
 			log.Infow("notification", "notification", message)
 			if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
 				log.Errorw("notification", "error", err)

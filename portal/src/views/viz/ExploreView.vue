@@ -1,15 +1,25 @@
 <template>
-    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible">
+    <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
-        <div class="container-wrap explore-view">
+
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closeShare" />
+
+        <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader
-                    title="Data View"
-                    :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
-                    :backRoute="backRoute"
-                    :backRouteParams="backRouteParams"
-                >
-                    <div class="button" @click="openExports">Export</div>
+                <DoubleHeader :backTitle="$t(backLabelKey)" :backRoute="backRoute" :backRouteParams="backRouteParams">
+                    <template v-slot:title>
+                        <div class="one">
+                            Data View
+                            <div class="button compare" alt="Add Chart" @click="addChart">
+                                <img :src="addIcon" />
+                                <div>Add Chart</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-slot:default>
+                        <!-- div class="button" @click="openShare">Share</div -->
+                        <div class="button" @click="openExports">Export</div>
+                    </template>
                 </DoubleHeader>
             </div>
 
@@ -17,9 +27,10 @@
 
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
-            <div class="workspace-container">
+            <div v-bind:class="{ 'workspace-container': true, busy: busy }">
+                <div class="busy-panel">&nbsp;</div>
+
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
-                <div class="busy" v-else><Spinner /></div>
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
             </div>
@@ -28,17 +39,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import Promise from "bluebird";
+
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
-
+import SharePanel from "./SharePanel.vue";
+import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
 import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark } from "./viz";
+import { Workspace, Bookmark, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
 import Comments from "../comments/Comments.vue";
@@ -49,6 +62,7 @@ export default Vue.extend({
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
+        SharePanel,
         ExportPanel,
         Comments,
     },
@@ -58,6 +72,10 @@ export default Vue.extend({
             required: false,
         },
         exportsVisible: {
+            type: Boolean,
+            default: false,
+        },
+        shareVisible: {
             type: Boolean,
             default: false,
         },
@@ -93,6 +111,18 @@ export default Vue.extend({
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
         }),
+        addIcon(): unknown {
+            return this.$loadAsset("icon-compare.svg");
+        },
+        busy(): boolean {
+            return !this.workspace || this.workspace.busy;
+        },
+        backLabelKey(): string {
+            if (this.backRoute === "viewProject") {
+                return "layout.backProjectDashboard";
+            }
+            return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
@@ -107,20 +137,28 @@ export default Vue.extend({
             await this.$services.api.getAllSensors().then(async (sensorKeys) => {
                 // Check for a bookmark that is just to a station with no groups.
                 if (this.bookmark.s.length > 0) {
-                    console.log("viz-before-show-station", this.bookmark);
+                    console.log("viz: before-show-station", this.bookmark);
                     return this.showStation(this.bookmark.s[0]);
                 }
-                console.log("viz-before-create-workspace", this.bookmark);
+                console.log("viz: before-create-workspace", this.bookmark);
                 await this.createWorkspaceIfNecessary();
             });
         }
     },
     methods: {
+        async addChart() {
+            console.log("viz: add");
+            if (!this.workspace) throw new Error("viz-add: no workspace");
+            return this.workspace.addChart().query();
+        },
         async onChange(bookmark: Bookmark): Promise<void> {
+            console.log("viz: change");
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bookmark) } }).then(() => this.workspace);
+            await this.$router
+                .push({ name: "exploreBookmark", params: { bookmark: serializeBookmark(bookmark) } })
+                .then(() => this.workspace);
         },
         async openExports(): Promise<void> {
             const encoded = JSON.stringify(this.bookmark);
@@ -130,6 +168,13 @@ export default Vue.extend({
             const encoded = JSON.stringify(this.bookmark);
             await this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
         },
+        async openShare(): Promise<void> {
+            const encoded = JSON.stringify(this.bookmark);
+            await this.$router.push({ name: "shareBookmark", params: { bookmark: encoded } });
+        },
+        async closeShare(): Promise<void> {
+            await this.closeExports();
+        },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
                 return this.workspace;
@@ -138,49 +183,46 @@ export default Vue.extend({
             const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
             if (this.bookmark) {
                 this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
-                void this.includeAssociatedStations(this.workspace);
             } else {
                 this.workspace = new Workspace(allSensors);
             }
 
-            return this.workspace;
-        },
-        async includeAssociatedStations(ws: Workspace): Promise<void> {
-            console.log(`include-associated`, ws.allStationIds);
-            if (ws.allStationIds.length != 1) {
-                return;
-            }
+            console.log(`viz: workspace-created`);
 
-            return this.$services.api.getAssociatedStations(ws.allStationIds[0]).then((associated) => {
-                console.log("quick-sensors-associated", associated);
-                const ids = associated.stations.map((s) => s.id);
-                return ws.addStationIds(ids);
-            });
+            return this.workspace;
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
             this.stationId = stationId;
 
-            return this.createWorkspaceIfNecessary().then((workspace) => {
-                return this.$services.api.getQuickSensors([stationId]).then((quickSensors) => {
+            return await this.createWorkspaceIfNecessary().then(async (workspace) => {
+                return await this.$services.api.getQuickSensors([stationId]).then(async (quickSensors) => {
                     console.log("viz: quick-sensors", quickSensors);
                     if (quickSensors.stations[stationId].length == 0) {
-                        console.log("viz: no sensors");
+                        console.log("viz: no sensors TODO: FIX");
                         this.showNoSensors = true;
                         return Promise.delay(5000).then(() => {
                             this.showNoSensors = false;
                         });
                     }
 
-                    console.log("quick-sensors", quickSensors);
+                    const vizSensor = [
+                        stationId,
+                        [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
+                    ];
 
-                    const stations = [stationId];
-                    const sensors = [[quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId]];
+                    const associated = await this.$services.api.getAssociatedStations(stationId);
+                    console.log(`viz: show-station-associated`, associated);
 
                     return workspace
-                        .addStandardGraph(stations, sensors)
+                        .addStandardGraph(vizSensor)
                         .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then((ws) => Promise.all([ws.query(), this.includeAssociatedStations(workspace)]));
+                        .then(async (ws) => {
+                            await workspace.addStationIds(associated.stations.map((station) => station.id));
+
+                            console.log(`viz: show-station-querying`);
+                            return await ws.query();
+                        });
                 });
             });
         },
@@ -191,23 +233,32 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 
-.graph .x-axis {
-    color: #7f7f7f;
+#vg-tooltip-element {
+    background-color: #f4f5f7;
+    border-radius: 1px;
+    box-shadow: none;
+    border: none;
 }
-
-.graph .y-axis {
-    color: #7f7f7f;
+#vg-tooltip-element .key {
+    display: none;
 }
-
-.graph .x-axis text {
-    font-size: 7pt;
+#vg-tooltip-element table tr:first-of-type td.value {
+    text-align: center;
+    font-family: "Avenir", sans-serif;
+    font-size: 16px;
+    color: #2c3e50;
 }
-
-.graph .y-axis text {
-    font-size: 7pt;
+#vg-tooltip-element table tr:nth-of-type(2) td.value {
+    text-align: center;
+    font-family: "Avenir", sans-serif;
+    font-size: 13px;
+    color: #2c3e50;
 }
 
 .explore-view {
+    text-align: left;
+    background-color: #fcfcfc;
+    padding: 40px;
     flex-grow: 1;
 }
 .explore-header {
@@ -272,26 +323,17 @@ export default Vue.extend({
 .icons-container .icon {
     background-color: #fcfcfc;
     box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 50%;
     cursor: pointer;
+    font-size: 28px;
+    padding: 5px;
+
+    &:before {
+        color: var(--color-dark);
+    }
 }
-.icons-container .unlink-icon {
-    background-position: center;
-    background-image: url(../../assets/link.png);
-    background-size: 30px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 40px;
-}
-.icons-container .link-icon {
-    background-position: center;
-    background-image: url(../../assets/open_link.png);
-    background-size: 30px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 40px;
-}
+
 .icons-container .remove-icon {
     background-position: center;
     background-image: url(../../assets/Icon_Close_Circle.png);
@@ -301,9 +343,48 @@ export default Vue.extend({
     height: 20px;
 }
 
-/* HACK d3 Real talk, no idea how to do this elsewhere. -jlewallen */
-.brush-container .selection {
-    opacity: 0.3;
+.vega-embed {
+    width: 100%;
+
+    summary {
+        z-index: 0 !important;
+        margin-left: 0.25em;
+        margin-right: 0.5em;
+    }
+}
+.graph .vega-embed {
+    height: 340px;
+}
+.scrubber .vega-embed {
+    height: 40px;
+
+    summary {
+        display: none;
+    }
+}
+
+.workspace-container {
+    position: relative;
+
+    .busy-panel {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+        z-index: 10;
+        opacity: 0.5;
+    }
+
+    &.busy .busy-panel {
+        display: block;
+        background-color: #efefef;
+    }
+
+    .viz-loading {
+        height: 300px;
+        display: flex;
+        align-items: center;
+    }
 }
 
 .controls-container {
@@ -330,39 +411,65 @@ export default Vue.extend({
     padding: 10px;
 }
 
-.controls-container .tree {
-    flex-basis: 50%;
-}
-
-.controls-container .tree div {
-    flex-basis: 50%;
-}
-
 .controls-container .left {
     display: flex;
     align-items: center;
+    flex-direction: column;
+}
+
+.controls-container .left .row {
+    align-items: center;
+    display: flex;
+
+    .actions {
+        margin-left: 1em;
+        display: flex;
+        align-items: center;
+
+        .button {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.controls-container .half {
+    flex-basis: 50%;
+}
+
+.controls-container .tree-pair {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.controls-container .tree-pair div {
+    flex-basis: 50%;
 }
 
 .controls-container .right {
     display: flex;
-    justify-content: center;
-    align-items: baseline;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.controls-container .row-2 .right {
-    flex-basis: 10%;
+.controls-container .right .chart-type {
+    flex-basis: 25%;
 }
 
 .controls-container .right {
     font-size: 12px;
 }
 
+.controls-container .right.half {
+    align-items: flex-start;
+}
+
 .controls-container .view-by {
-    margin: 35px 10px 0 10px;
+    margin: 0px 10px 0 10px;
 }
 
 .controls-container .fast-time {
-    margin: 35px 10px 0 10px;
+    margin: 0px 10px 0 10px;
     cursor: pointer;
 }
 
@@ -425,13 +532,14 @@ export default Vue.extend({
     margin-bottom: 20px;
 }
 
+.share-floating,
 .exports-floating {
     position: absolute;
     right: 0;
     top: 70px;
     bottom: 0;
     background-color: #fcfcfc;
-    border-left: 2px solid #d8dce0;
+    border-left: 2px solid var(--color-border);
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
@@ -449,5 +557,21 @@ export default Vue.extend({
     div {
         padding-left: 1em;
     }
+}
+
+.brush_brush_bg path {
+    body.floodnet & {
+        fill: var(--color-border);
+        fill-opacity: 1;
+    }
+}
+
+.layer_1_marks path {
+    fill: var(--color-primary);
+}
+
+.one {
+    display: flex;
+    flex-direction: row;
 }
 </style>

@@ -1,0 +1,27 @@
+@import "variables";
+
+.icon {
+    &-heart {
+        font-size: 15px;
+        font-weight: 600;
+
+        &:before {
+            color: $color-fieldkit-secondary;
+        }
+
+        &.gray {
+            &:before {
+                color: #575757;
+            }
+        }
+    }
+
+    &-plus-round {
+        font-size: 18px;
+    }
+
+    &-minus-round {
+        font-size: 18px;
+    }
+}
+

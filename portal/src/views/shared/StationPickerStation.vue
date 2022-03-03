@@ -61,7 +61,7 @@ export default Vue.extend({
 
 .sps {
     display: flex;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     padding: 1px;
     border-radius: 3px;
     position: relative;

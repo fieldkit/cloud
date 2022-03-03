@@ -18,17 +18,12 @@ var JWTAuth = JWTSecurity("jwt", func() {
 })
 
 var Origins = []string{
-	"https://fieldkit.org:8080",
-	"https://*.fieldkit.org:8080",
 	"https://fieldkit.org",
 	"https://*.fieldkit.org",
 	"https://fkdev.org",
 	"https://*.fkdev.org",
-	"/(.+[.])?192.168.\\d+.\\d+:\\d+/", // Dev
-	"/(.+[.])?127.0.0.1:\\d+/",         // Dev
-	"/(.+[.])?localhost:\\d+/",         // Dev
-	"/(.+[.])?fieldkit.org:\\d+/",      // Dev
-	"/(.+[.])?local.fkdev.org:\\d+/",   // Dev
+	"/(.+[.])?fklocal.org:\\d+/", // Dev
+	"/127.0.0.1:\\d+/",           // Dev
 }
 
 func commonOptions() {

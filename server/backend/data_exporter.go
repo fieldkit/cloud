@@ -60,7 +60,7 @@ type stationInfo struct {
 func NewExporter(db *sqlxcache.DB) (*Exporter, error) {
 	return &Exporter{
 		db:          db,
-		metaFactory: repositories.NewMetaFactory(),
+		metaFactory: repositories.NewMetaFactory(db),
 		walker:      NewRecordWalker(db),
 		byProvision: make(map[int64]*stationInfo),
 	}, nil
@@ -76,7 +76,7 @@ func contains(ids []int64, value int64) bool {
 }
 
 func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format ExportFormat, progressFunc ExportProgressFunc, writer io.Writer) error {
-	mr := repositories.NewModuleMetaRepository()
+	mr := repositories.NewModuleMetaRepository(e.db)
 
 	sr := repositories.NewStationRepository(e.db)
 
@@ -101,7 +101,7 @@ func (e *Exporter) Export(ctx context.Context, criteria *ExportCriteria, format 
 				panic("wtf")
 			}
 
-			sam, err := mr.FindByFullKey(sensor.Key)
+			sam, err := mr.FindByFullKey(ctx, sensor.Key)
 			if err != nil {
 				return err
 			}

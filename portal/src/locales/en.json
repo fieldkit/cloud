@@ -58,7 +58,12 @@
     "random.random_9": "Random 9",
     "layout": {
         "logo": {
-            "alt": "FieldKit Logo",
+            "fieldkit": {
+                "alt": "FieldKit Logo"
+            },
+            "floodnet": {
+                "alt": "Floodnet Logo"
+            },
             "compass": {
                 "alt": "FieldKit Compass Logo"
             }
@@ -66,6 +71,10 @@
         "side": {
             "projects": {
                 "title": "Projects"
+            },
+            "sensors": {
+                "title": "Sensors",
+                "empty": "No sensors added"
             },
             "stations": {
                 "title": "Stations",
@@ -84,7 +93,8 @@
         "backProjectDashboard": "Back to Project Dashboard",
         "backToPrevious": "Back to Previous",
         "backProject": "Back to {name}",
-        "backToStations": "Back to Stations"
+        "backToStations": "Back to Stations",
+        "backToSensors": "Back to Sensors"
     },
     "projects": {
         "title": {
@@ -147,15 +157,6 @@
                 "help": "Press Enter to separate tags.",
                 "maxLength": "This field has a limit of 100 characters."
             },
-            "startTime": {
-                "date": "Please enter a valid date.",
-                "alt": "Calendar"
-            },
-            "endTime": {
-                "date": "Please enter a valid date.",
-                "minValue": "Please enter a date after the start date.",
-                "alt": "Calendar"
-            },
             "makePublic": "Make this project public",
             "showExact": "Show exact location of stations",
             "showGeneral": "Show general location of stations",
@@ -168,7 +169,9 @@
             "hideStations": "Hide Stations",
             "mapTextShow": "Others will see stations and exact GPS coordinates on the map",
             "mapTextHide": "Stations will not be visible on the map for others",
-            "mapHint": "Pan or zoom to set map view"
+            "mapHint": "Pan or zoom to set map view",
+            "startDate": "Start date",
+            "endDate": "End date"
         },
         "invite": {
             "accept": "Accept Invite",
@@ -313,5 +316,17 @@
         "agreeButton": "Accept",
         "disagreeButton": "Disagree"
     },
-    "selected": "Selected"
+    "selected": "Selected",
+    "notifications": {
+        "title": "Notifications",
+        "viewAllButton": "View All",
+        "dismissAllButton": "Dismiss All",
+        "filters": {
+            "all": "All",
+            "unread": "Unread",
+            "comment": "Comment",
+            "reply": "Reply",
+            "mention": "Mention"
+        }
+    }
 }

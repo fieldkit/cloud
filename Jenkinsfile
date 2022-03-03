@@ -33,7 +33,7 @@ timestamps {
 	make clean
 	make ci
 	make ci-db-tests
-	make aws-image
+	make docker-images
 	make write-version
 	"""
 					}
@@ -49,7 +49,7 @@ timestamps {
 					git branch: 'main', url: "https://github.com/conservify/dev-ops.git"
 
 					withAWS(credentials: 'AWS Default', region: 'us-east-1') {
-						sh "cd amis && make clean && make portal-stack -j3"
+						sh "cd amis && make clean && make portal-stack charting-stack -j3"
 					}
 				}
 			}

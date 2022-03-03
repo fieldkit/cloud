@@ -4,20 +4,88 @@ import Vue, { PropType } from "vue";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import Spinner from "@/views/shared/Spinner.vue";
-
-import { TimeRange } from "./common";
-import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType } from "./viz";
+import { TimeRange, VizSensor } from "./common";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
 
-export const ViewingControls = Vue.extend({
-    name: "ViewingControls",
+export const SensorSelectionRow = Vue.extend({
+    name: "SensorSelectionRow",
     components: {
         Treeselect,
-        Spinner,
     },
-    data(): {} {
-        return {};
+    props: {
+        viz: {
+            type: Object as PropType<Graph>,
+            required: true,
+        },
+        workspace: {
+            type: Object as PropType<Workspace>,
+            required: true,
+        },
+        ds: {
+            type: Object as PropType<DataSetSeries>,
+            required: true,
+        },
+        stationOptions: {
+            type: Array as PropType<StationTreeOption[]>,
+            required: true,
+        },
+        sensorOptions: {
+            type: Array as PropType<StationTreeOption[]>,
+            required: true,
+        },
+    },
+    computed: {
+        selectedStation(): number | null {
+            if (this.disabled) {
+                return null;
+            }
+            return this.ds.vizSensor[0]; // TODO VizSensor
+        },
+        selectedSensor(): string | null {
+            if (this.disabled) {
+                return null;
+            }
+            const sensorAndModule = this.ds.vizSensor[1]; // TODO VizSensor
+            return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
+        },
+        disabled(): boolean {
+            if (this.stationOptions.length == 0 || this.sensorOptions.length == 0) {
+                return true;
+            }
+            return this.viz.busy;
+        },
+    },
+    methods: {
+        raiseChangeStation(node: StationTreeOption): void {
+            vueTickHack(() => {
+                const newSeries = this.workspace.makeSeries(Number(node.id), this.ds.sensorAndModule);
+                console.log("raising viz-change-series", newSeries);
+                this.$emit("viz-change-series", newSeries);
+            });
+        },
+        raiseChangeSensor(node: SensorTreeOption): void {
+            vueTickHack(() => {
+                if (!node.moduleId) throw new Error();
+                if (!node.sensorId) throw new Error();
+                const newSeries = this.workspace.makeSeries(this.ds.stationId, [node.moduleId, node.sensorId]);
+                console.log("raising viz-change-series", newSeries);
+                this.$emit("viz-change-series", newSeries);
+            });
+        },
+    },
+    template: `
+		<div class="tree-pair">
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
+            <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
+		</div>
+    `,
+});
+
+export const SelectionControls = Vue.extend({
+    name: "SelectionControls",
+    components: {
+        SensorSelectionRow,
     },
     props: {
         viz: {
@@ -30,9 +98,76 @@ export const ViewingControls = Vue.extend({
         },
     },
     computed: {
-        compareIcon() {
-            return this.$loadAsset("icon-compare.svg");
+        stationOptions(): StationTreeOption[] {
+            if (this.viz.busy) {
+                return [];
+            }
+            this.viz.log("station-options", { options: this.workspace.stationOptions });
+            return this.workspace.stationOptions;
         },
+        showRemove(): boolean {
+            return this.viz.dataSets.length >= 2;
+        },
+        showAdd(): boolean {
+            return this.viz.dataSets.length <= 1;
+        },
+    },
+    methods: {
+        sensorOptions(vizSensor: VizSensor): SensorTreeOption[] {
+            if (this.stationOptions.length == 0) {
+                return [];
+            }
+            const stationId = vizSensor[0]; // TODO VizSensor
+            const sensorOptions = this.workspace.sensorOptions(stationId);
+            this.viz.log("sensor-options", { options: sensorOptions });
+            return sensorOptions;
+        },
+        raiseChangeSeries(index: number, newSeries: DataSetSeries): void {
+            const newParams = this.viz.modifySeries(index, [newSeries.stationId, newSeries.sensorAndModule]);
+            this.viz.log("raise viz-change-sensors", index, newSeries);
+            this.$emit("viz-change-sensors", newParams);
+        },
+        addSeries() {
+            const newParams = this.viz.addSeries();
+            this.viz.log("raise viz-change-sensors", newParams);
+            this.$emit("viz-change-sensors", newParams);
+        },
+        removeSeries(index: number) {
+            const newParams = this.viz.removeSeries(index);
+            this.viz.log("raise viz-change-sensors", newParams);
+            this.$emit("viz-change-sensors", newParams);
+        },
+    },
+    template: `
+		<div class="left half">
+            <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" />
+                <div class="actions" v-if="showAdd || showRemove">
+                    <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
+                    <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
+                </div>
+            </div>
+        </div>
+    `,
+});
+
+export const ViewingControls = Vue.extend({
+    name: "ViewingControls",
+    components: {
+        SelectionControls,
+        Treeselect,
+    },
+    props: {
+        viz: {
+            type: Object as PropType<Graph>,
+            required: true,
+        },
+        workspace: {
+            type: Object as PropType<Workspace>,
+            required: true,
+        },
+    },
+    computed: {
         chartTypes(): { label: string; id: ChartType }[] {
             const vizInfo = this.workspace.vizInfo(this.viz);
             const allTypes = [
@@ -63,25 +198,6 @@ export const ViewingControls = Vue.extend({
             const names = vizInfo.viz.map((vc) => vc.name);
             return allTypes.filter((type) => _.some(names, (name) => name == type.vueName));
         },
-        stationOptions(): StationTreeOption[] {
-            this.viz.log("station-options", { options: this.workspace.stationOptions });
-            return this.workspace.stationOptions;
-        },
-        sensorOptions(): SensorTreeOption[] {
-            this.viz.log("sensor-options", { options: this.workspace.sensorOptions });
-            const stationId = this.viz.chartParams.sensorParams.stations[0]; // this.selectedStation
-            if (stationId == null) {
-                return [];
-            }
-            return this.workspace.sensorOptions(stationId);
-        },
-        selectedStation(): number | null {
-            return this.viz.chartParams.sensorParams.stations[0];
-        },
-        selectedSensor(): string | null {
-            const sensorAndModule = this.viz.chartParams.sensorParams.sensors[0];
-            return `${sensorAndModule[0]}-${sensorAndModule[1]}`;
-        },
         manualRangeValue(): { start: Date; end: Date } | null {
             // console.log(`manual-range-value:`, this.viz.visible, this.viz.visibleTimeRange);
             if (!this.viz.visibleTimeRange || this.viz.visibleTimeRange.isExtreme()) {
@@ -109,29 +225,14 @@ export const ViewingControls = Vue.extend({
             console.log("raising viz-time-zoomed");
             this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
         },
-        raiseChangeStation(node: StationTreeOption): void {
-            const sensor = this.viz.chartParams.sensorParams.sensors[0];
-            console.log("raising viz-change-sensors", "sensor", sensor);
-            vueTickHack(() => {
-                const params = this.workspace.makeParamsForStationChange(Number(node.id), sensor);
-                this.$emit("viz-change-sensors", params);
-            });
-        },
-        raiseChangeSensor(node: SensorTreeOption): void {
-            const station = this.viz.chartParams.sensorParams.stations[0];
-            console.log("raising viz-change-sensors", "station", station);
-            vueTickHack(() => {
-                if (!node.moduleId) throw new Error();
-                if (!node.sensorId) throw new Error();
-                const params = this.workspace.makeParamsForSensorChange(station, [node.moduleId, node.sensorId]);
-                this.$emit("viz-change-sensors", params);
-            });
-        },
         raiseChangeChartType(option: { id: ChartType }): void {
             console.log("raising viz-change-chart", option.id);
             vueTickHack(() => {
                 this.$emit("viz-change-chart", Number(option.id));
             });
+        },
+        raiseChangeSensors(...args: unknown[]): void {
+            this.$emit("viz-change-sensors", ...args);
         },
         raiseManualTime(fromPicker): void {
             if (fromPicker) {
@@ -153,10 +254,8 @@ export const ViewingControls = Vue.extend({
     template: `
 		<div class="controls-container">
 			<div class="row row-1">
-				<div class="left buttons" v-if="!viz.busy">
-					<div class="button compare" @click="raiseCompare" alt="Compare"> <img :src="compareIcon" /><div>Compare Sensor Graphs</div></div>
+				<div class="left">
 				</div>
-				<div class="left busy" v-else><Spinner /></div>
 				<div class="right time">
 					<span class="view-by">View By:</span>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
@@ -186,15 +285,12 @@ export const ViewingControls = Vue.extend({
 				</div>
 			</div>
 			<div class="row row-2">
-				<div class="left tree">
-					<treeselect v-if="stationOptions.length" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
-                    <div v-else class="loading-options">Loading Options</div>
-					<treeselect v-if="sensorOptions.length" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
-					<div v-else class="loading-options">Loading Options</div>
-				</div>
+                <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
-				<div class="right chart-type" v-if="chartTypes.length > 1">
-					<treeselect v-if="stationOptions.length" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+				<div class="right half" v-if="chartTypes.length > 1">
+                    <div class="chart-type">
+                        <treeselect :disabled="viz.busy" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+                    </div>
 				</div>
 			</div>
 		</div>

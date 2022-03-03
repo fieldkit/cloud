@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/websocket"
 
 	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
 )
@@ -120,9 +121,11 @@ func (l *Listener) service(ctx context.Context) {
 		dictionary, err := l.stream.Recv()
 		if err != nil {
 			if err != io.EOF {
-				l.errors <- &ListenerError{
-					Message:   fmt.Sprintf("%v", err),
-					Connected: false,
+				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					l.errors <- &ListenerError{
+						Message:   fmt.Sprintf("%v", err),
+						Connected: false,
+					}
 				}
 			}
 			close(l.errors)

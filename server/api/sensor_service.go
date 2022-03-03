@@ -244,8 +244,8 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 		})
 	}
 
-	r := repositories.NewModuleMetaRepository()
-	modules, err := r.FindAllModulesMeta()
+	r := repositories.NewModuleMetaRepository(c.options.Database)
+	modules, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
 	}

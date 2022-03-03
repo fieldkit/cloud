@@ -107,12 +107,11 @@ var _ = Service("notes", func() {
 
 	Method("get", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("stationId", Int32)
 			Required("stationId")
 		})
@@ -128,12 +127,11 @@ var _ = Service("notes", func() {
 
 	Method("download media", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("mediaId", Int32)
 			Required("mediaId")
 		})
@@ -196,24 +194,24 @@ var _ = Service("notes", func() {
 
 	})
 
-    Method("delete media", func() {
-        Security(JWTAuth, func() {
-            Scope("api:access")
-        })
+	Method("delete media", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
 
-        Payload(func() {
-            Token("auth")
-            Required("auth")
-            Attribute("mediaId", Int32)
-            Required("mediaId")
-        })
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("mediaId", Int32)
+			Required("mediaId")
+		})
 
-        HTTP(func() {
-            DELETE("notes/media/{mediaId}")
+		HTTP(func() {
+			DELETE("notes/media/{mediaId}")
 
-            httpAuthentication()
-        })
-    })
+			httpAuthentication()
+		})
+	})
 
 	commonOptions()
 })

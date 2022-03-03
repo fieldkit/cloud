@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 27
+VERSION_PATCH = 28
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -31,14 +31,25 @@ WORKING_DIRECTORY ?= $(shell pwd)
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 DOCKER_TAG ?= main
 
-default: setup binaries jstests gotests
+default: setup binaries jstests gotests charting-shared
 
 setup: portal/src/secrets.ts
+
+charting-shared: charting/customizations.ts charting/api.ts charting/common.ts
+
+charting/customizations.ts: portal/src/views/viz/vega/customizations.ts
+	cp $^ $@
+
+charting/api.ts: portal/src/views/viz/api.ts
+	cp $^ $@
+
+charting/common.ts: portal/src/views/viz/common.ts
+	cp $^ $@
 
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -75,6 +86,8 @@ sanitizer: $(BUILD)/sanitizer
 
 webhook: $(BUILD)/webhook
 
+scratch: $(BUILD)/scratch
+
 $(BUILD)/server: $(SERVER_SOURCES)
 	cd server/cmd/server && $(GO) build -o $@
 
@@ -93,13 +106,11 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 	cd server/cmd/webhook && $(GO) build -o $@ *.go
 
+$(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
+	cd server/cmd/scratch && $(GO) build -o $@ *.go
+
 generate:
-ifeq (, $(shell which goa))
-ifeq (, $(BUILD_NUMBER))
-$(error "No goa in PATH, please run: env GO111MODULE=on go get -u goa.design/goa/v3/...@v3")
-endif
-endif
-	cd server/api && goa gen github.com/fieldkit/cloud/server/api/design
+	cd server/api && $(GOPATH)/bin/goa gen github.com/fieldkit/cloud/server/api/design
 
 clean:
 	rm -rf $(BUILD)
@@ -160,14 +171,14 @@ ci-db-tests:
 write-version:
 	echo $(VERSION) > version.txt
 
-aws-image:
+docker-images:
 	cp portal/src/secrets.ts.aws portal/src/secrets.ts
 	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh
 
 sanitize: sanitizer
 	mkdir -p sanitize-data
 	rsync -zvua schema-production/* sanitize-data
-	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d mdillon/postgis
+	docker run --rm --name fksanitize-pg -e POSTGRES_DB=fieldkit -e POSTGRES_USER=fieldkit -e POSTGRES_PASSWORD=password -p "5432:5432" -v `pwd`/sanitize-data:/docker-entrypoint-initdb.d/:ro -d postgis/postgis:12-2.5-alpine
 	$(BUILD)/sanitizer --waiting
 	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
 	docker stop fksanitize-pg

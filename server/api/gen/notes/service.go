@@ -61,14 +61,14 @@ type FieldNotes struct {
 
 // GetPayload is the payload type of the notes service get method.
 type GetPayload struct {
-	Auth      string
+	Auth      *string
 	StationID int32
 }
 
 // DownloadMediaPayload is the payload type of the notes service download media
 // method.
 type DownloadMediaPayload struct {
-	Auth    string
+	Auth    *string
 	MediaID int32
 }
 

@@ -45,8 +45,12 @@
         </div>
         <div class="view-type-container">
             <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')"></div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')"></div>
+                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
+                    <i class="icon icon-map"></i>
+                </div>
+                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
+                    <i class="icon icon-list"></i>
+                </div>
             </div>
         </div>
     </StandardLayout>
@@ -246,7 +250,7 @@ export default Vue.extend({
 
     .heading {
         font-size: 18px;
-        font-family: $font-family-bold;
+        font-family: var(--font-family-bold);
         margin-bottom: 2px;
         margin-top: 0;
     }
@@ -265,7 +269,7 @@ export default Vue.extend({
     border: solid 1px #f4f5f7;
     background-color: #ffffff;
     cursor: pointer;
-    @include flex();
+    @include flex(center, center);
 
     &-container {
         z-index: $z-index-top;
@@ -277,23 +281,26 @@ export default Vue.extend({
         }
     }
 
-    &-list {
-        background: url("../assets/icon-list.svg") no-repeat center center;
+    > div {
         flex-basis: 50%;
 
         &.active {
-            background: url("../assets/icon-list-selected.svg") no-repeat center center;
+            i:before {
+                color: var(--color-dark);
+            }
         }
     }
 
+    &-list {
+    }
+
     &-map {
-        background: url("../assets/icon-map.svg") no-repeat center center;
         flex-basis: 50%;
         border-right: solid 1px #f4f5f7;
+    }
 
-        &.active {
-            background: url("../assets/icon-map-selected.svg") no-repeat center center;
-        }
+    .icon {
+        font-size: 18px;
     }
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/conservify/sqlxcache"
 	"github.com/iancoleman/strcase"
 
 	"go.uber.org/zap"
@@ -35,10 +36,10 @@ type MetaFactory struct {
 	ordered           []*VersionMeta
 }
 
-func NewMetaFactory() *MetaFactory {
+func NewMetaFactory(db *sqlxcache.DB) *MetaFactory {
 	return &MetaFactory{
 		filtering:         NewFiltering(),
-		modulesRepository: NewModuleMetaRepository(),
+		modulesRepository: NewModuleMetaRepository(db),
 		byMetaID:          make(map[int64]*VersionMeta),
 		ordered:           make([]*VersionMeta, 0),
 	}
@@ -90,7 +91,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
-			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(&hf, sensor.Name)
+			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(ctx, &hf, sensor.Name)
 			if err != nil {
 				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 			}
@@ -113,7 +114,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			sensors = append(sensors, sensorMeta)
 		}
 
-		extraModule, err := mf.modulesRepository.FindModuleMeta(&hf)
+		extraModule, err := mf.modulesRepository.FindModuleMeta(ctx, &hf)
 		if err != nil {
 			return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 		}

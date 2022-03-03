@@ -35,10 +35,17 @@
     @include bp-down($md) {
         flex-basis: 50%;
     }
+
+    i {
+        body.floodnet & {
+            &:before {
+                color: var(--color-dark);
+            }
+        }
+    }
 }
 
 .details {
-
     &-row {
         margin-bottom: 5px;
         font-family: $font-family-light;
@@ -54,13 +61,21 @@
             padding-right: 24px;
 
             &:after {
-                content: '';
-                background: url('../../assets/icon-tooltip.svg') no-repeat center center;
+                content: "";
+                background: url("../../assets/icon-tooltip.svg") no-repeat center center;
                 background-size: contain;
                 width: 14px;
                 height: 14px;
                 @include position(absolute, 50% 0 null null);
                 transform: translateY(-50%);
+            }
+        }
+
+        .icon {
+            body.floodnet & {
+                &:before {
+                    color: var(--color-dark);
+                }
             }
         }
 
@@ -92,4 +107,3 @@
         max-height: 100%;
     }
 }
-

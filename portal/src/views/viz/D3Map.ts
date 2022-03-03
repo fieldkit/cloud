@@ -39,8 +39,8 @@ export const D3Map = Vue.extend({
     },
     computed: {
         data(): QueriedData | null {
-            if (this.viz.graphing && !this.viz.graphing.empty) {
-                return this.viz.graphing;
+            if (this.viz.dataSets.length > 0) {
+                return this.viz.dataSets[0].graphing;
             }
             return null;
         },

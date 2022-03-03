@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -113,15 +115,106 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (tw *TwitterContext) Handler(continueServing http.Handler) http.Handler {
-	r := mux.NewRouter()
+func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	log := Logger(ctx).Sugar()
+	vars := mux.Vars(req)
 
+	bookmark := vars["bookmark"]
+
+	log.Infow("twitter-workspace-card", "bookmark", bookmark)
+
+	parsed, err := data.ParseBookmark(bookmark)
+	if err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	sensorRows := []*data.Sensor{}
+	if err := tw.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	mmr := repositories.NewModuleMetaRepository(tw.db)
+
+	sensorIdToKey := make(map[int64]string)
+	for _, row := range sensorRows {
+		sensorIdToKey[row.ID] = row.Key
+	}
+
+	sr := repositories.NewStationRepository(tw.db)
+
+	sensorKeys := make([]string, 0)
+	sensorLabels := make([]string, 0)
+	stationNames := make([]string, 0)
+	ranges := make([]string, 0)
+
+	meta := make(map[string]string)
+
+	for _, v := range parsed.Vizes() {
+		log.Infow("viz:parsed", "v", v)
+
+		for _, s := range v.Sensors {
+			station, err := sr.QueryStationByID(ctx, s.StationID)
+			if err != nil {
+				log.Errorw("error-internal", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			sensorKey := sensorIdToKey[s.SensorID]
+
+			sensorMeta, err := mmr.FindByFullKey(ctx, sensorKey)
+			if err != nil {
+				log.Errorw("error-internal", "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			label := sensorMeta.Sensor.Strings["en-us"]["label"]
+			stationNames = append(stationNames, station.Name)
+			sensorKeys = append(sensorKeys, sensorKey)
+			sensorLabels = append(sensorLabels, label)
+		}
+
+		start := v.Start.Format(time.RFC1123)
+		end := v.End.Format(time.RFC1123)
+		ranges = append(ranges, fmt.Sprintf("%s to %s", start, end))
+
+		meta["twitter:title"] = fmt.Sprintf("%s: %s", stationNames[0], sensorLabels[0])
+
+		if !v.ExtremeTime {
+			meta["twitter:description"] = ranges[0]
+		}
+
+		break // NOTE Single out first Viz.
+	}
+
+	log.Infow("viz", "sensors", sensorKeys)
+
+	// We're assuming https here.
+	now := time.Now()
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", tw.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+
+	meta["twitter:card"] = "summary_large_image"
+	meta["twitter:site"] = "@FieldKitOrg"
+	meta["twitter:image"] = photoUrl
+	meta["twitter:image:alt"] = meta["twitter:description"]
+
+	if err := tw.serveMeta(w, req, meta); err != nil {
+		log.Errorw("error-internal", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+}
+
+func (tw *TwitterContext) Register(r *mux.Router) {
 	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Twitterbot.*").Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
-	r.NotFoundHandler = continueServing
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		r.ServeHTTP(w, req)
-	})
+	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
+	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
 }

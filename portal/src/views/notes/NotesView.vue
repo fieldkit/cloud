@@ -202,7 +202,6 @@ export default Vue.extend({
         const desktopBreakpoint = 768;
         const windowAny: any = window;
         const resizeObserver = new windowAny.ResizeObserver((entries) => {
-            console.log("data", this.$data.mobileView);
             const windowWidth = entries[0].contentRect.width;
 
             if (this.$data.mobileView && windowWidth > desktopBreakpoint) {
@@ -365,25 +364,25 @@ export default Vue.extend({
     flex-direction: column;
     flex-basis: 250px;
     flex-shrink: 0;
-    border-top: 1px solid #d8dce0;
-    border-left: 1px solid #d8dce0;
-    border-bottom: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
 
     @include bp-down($md) {
         flex-basis: 100%;
     }
 }
 .tab {
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
 
     @include bp-down($md) {
-        border-right: 1px solid #d8dce0;
+        border-right: 1px solid var(--color-border);
         border-bottom: 0;
     }
 
     &.active {
-        border-left: 4px solid #1b80c9;
+        border-left: 4px solid var(--color-primary);
 
         @include bp-down($md) {
             border-left: 0;
@@ -430,14 +429,14 @@ export default Vue.extend({
     &-content {
         width: calc(100% - 250px);
         z-index: $z-index-top;
-        border: 1px solid #d8dce0;
+        border: 1px solid var(--color-border);
 
         @include bp-down($md) {
             padding-top: 1px;
             width: 100%;
             max-height: 0;
             border: 0;
-            border-top: 1px solid #d8dce0;
+            border-top: 1px solid var(--color-border);
             overflow: hidden;
 
             @at-root .tab.active & {
@@ -449,7 +448,7 @@ export default Vue.extend({
 
 .vertical {
     margin-top: auto;
-    border-right: 1px solid #d8dce0;
+    border-right: 1px solid var(--color-border);
     height: 100%;
 }
 .name {

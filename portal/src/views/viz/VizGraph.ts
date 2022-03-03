@@ -2,24 +2,40 @@ import _ from "lodash";
 import Vue from "vue";
 import { Graph, Workspace, ChartType } from "./viz";
 
+import Spinner from "@/views/shared/Spinner.vue";
+
 import { ViewingControls } from "./ViewingControls";
-import { D3TimeSeriesGraph } from "./D3TimeSeriesGraph";
-import { D3Histogram } from "./D3Histogram";
-import { D3Range } from "./D3Range";
-import { D3Map } from "./D3Map";
-import { D3Scrubber } from "./D3Scrubber";
 import { DebuggingPanel } from "./DebuggingPanel";
+
+/*
+import { D3TimeSeriesGraph as TimeSeriesGraph } from "./D3TimeSeriesGraph";
+import { D3Histogram as Histogram } from "./D3Histogram";
+import { D3Range as Range } from "./D3Range";
+*/
+import { VegaTimeSeriesGraph as TimeSeriesGraph } from "./VegaTimeSeriesGraph";
+import { VegaHistogram as Histogram } from "./VegaHistogram";
+import { VegaRange as Range } from "./VegaRange";
+
+import { D3Map as Map } from "./D3Map";
+
+const Loading = Vue.extend({
+    name: "Loading",
+    components: {
+        Spinner,
+    },
+    template: `<div class="viz-loading"><Spinner /></div>`,
+});
 
 export const VizGraph = Vue.extend({
     name: "VizGraph",
     components: {
         ViewingControls,
+        Loading,
         DebuggingPanel,
-        D3TimeSeriesGraph,
-        D3Histogram,
-        D3Range,
-        D3Map,
-        D3Scrubber,
+        TimeSeriesGraph,
+        Histogram,
+        Range,
+        Map,
     },
     data(): {} {
         return {};
@@ -35,10 +51,10 @@ export const VizGraph = Vue.extend({
         },
     },
     mounted() {
-        this.viz.log("mounted");
+        this.viz.log("mounted", this.viz);
     },
     updated() {
-        this.viz.log("updated");
+        this.viz.log("updated", this.viz);
     },
     computed: {
         debug(): boolean {
@@ -68,18 +84,23 @@ export const VizGraph = Vue.extend({
             this.$emit("viz-change-chart", ...args);
         },
         uiNameOf(graph: Graph): string {
+            if (this.viz.loadedDataSets.length == 0) {
+                return "Loading";
+            }
+
             switch (graph.chartType) {
                 case ChartType.TimeSeries:
-                    return "D3TimeSeriesGraph";
+                    return "TimeSeriesGraph";
                 case ChartType.Histogram:
-                    return "D3Histogram";
+                    return "Histogram";
                 case ChartType.Range:
-                    return "D3Range";
+                    return "Range";
                 case ChartType.Map:
-                    return "D3Map";
+                    return "Map";
             }
+
             this.viz.log("unknown chart type");
-            return "D3TimeSeriesGraph";
+            return "TimeSeriesGraph";
         },
     },
     template: `

@@ -101,11 +101,11 @@ func (r *StationRepository) UpdateOwner(ctx context.Context, station *data.Stati
 }
 
 func (r *StationRepository) UpdatePhoto(ctx context.Context, station *data.Station) (err error) {
-    if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET photo_id = :photo_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
-        return err
-    }
+	if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET photo_id = :photo_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (station *data.Station, err error) {
@@ -164,17 +164,17 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 }
 
 func (r *StationRepository) QueryStationByPhotoID(ctx context.Context, id int32) (station *data.Station, err error) {
-    station = &data.Station{}
+	station = &data.Station{}
 
-    if err := r.db.GetContext(ctx, station, `
+	if err := r.db.GetContext(ctx, station, `
         SELECT
             id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
             recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
         FROM fieldkit.station WHERE id IN (SELECT station_id FROM notes_media WHERE id = $1)
         `, id); err != nil {
-        return nil, err
-    }
-    return station, nil
+		return nil, err
+	}
+	return station, nil
 }
 
 func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Context, metaRecordID int64) (*data.StationConfiguration, error) {
@@ -1201,20 +1201,19 @@ func (a StationSensorByOrder) Less(i, j int) bool { return a[i].Order < a[j].Ord
 func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT
+	query, args, err := sqlx.In(`
+		SELECT    
 			station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
 			sensor_id, s.key AS sensor_key,
-            MAX(agg.time) AS sensor_read_at
-		FROM %s AS agg
-		JOIN fieldkit.aggregated_sensor AS s ON (s.id = sensor_id)
-		JOIN fieldkit.station AS station ON (agg.station_id = station.id)
-		JOIN fieldkit.station_module AS station_module ON (agg.module_id = station_module.id)
+			updated.time AS sensor_read_at                                                                                                                      
+		FROM fieldkit.aggregated_sensor_updated AS updated
+		JOIN fieldkit.aggregated_sensor AS s ON (s.id = updated.sensor_id)
+		JOIN fieldkit.station AS station ON (updated.station_id = station.id)
+		JOIN fieldkit.station_module AS station_module ON (updated.module_id = station_module.id)
 		WHERE station_id IN (?)
-		GROUP BY station_id, station.name, station.location, station_module.name, station_module.hardware_id, sensor_id, s.key
-        ORDER BY sensor_read_at DESC
-		`, "fieldkit.aggregated_10m"), stations)
+		ORDER BY sensor_read_at DESC
+		`, stations)
 	if err != nil {
 		return nil, err
 	}
@@ -1229,13 +1228,13 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		byStation[int32(id)] = make([]*StationSensor, 0)
 	}
 
-	metaRepository := NewModuleMetaRepository()
+	metaRepository := NewModuleMetaRepository(sr.db)
 
 	for _, row := range rows {
 		if !strings.HasPrefix(row.ModuleKey, "fk.") && !strings.HasPrefix(row.ModuleKey, "wh.") {
 			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
 		}
-		moduleAndSensor, _ := metaRepository.FindByFullKey(row.SensorKey)
+		moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, row.SensorKey)
 		order := 0
 		if moduleAndSensor != nil {
 			order = moduleAndSensor.Sensor.Order

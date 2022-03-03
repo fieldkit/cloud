@@ -4,7 +4,7 @@
         <div class="header">
             <div class="name">{{ station.name }}</div>
             <div class="completed">{{ completed }}% Complete</div>
-            <div class="buttons">
+            <div class="buttons" v-if="isAuthenticated">
                 <button type="submit" class="button" v-on:click="onSave">Save</button>
             </div>
         </div>
@@ -47,16 +47,14 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
 import CommonComponents from "@/views/shared";
-import NoteEditor from "./NoteEditor.vue";
-
-import NewPhoto from "../../assets/image-placeholder.svg";
-
-import { required } from "vuelidate/lib/validators";
 
 import { Notes, AddedPhoto, NoteMedia, PortalNoteMedia } from "./model";
+import NoteEditor from "./NoteEditor.vue";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
-import * as ActionTypes from "@/store/actions";
+
+import NewPhoto from "../../assets/image-placeholder.svg";
 
 export default Vue.extend({
     name: "NotesForm",
@@ -104,6 +102,7 @@ export default Vue.extend({
         };
     },
     computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         photos(this: any) {
             return NoteMedia.onlyPhotos(this.notes.media);
         },
@@ -216,14 +215,14 @@ export default Vue.extend({
 
     @include bp-down($md) {
         padding: 25px 8px;
-        border-bottom: 1px solid #d8dce0;
+        border-bottom: 1px solid var(--color-border);
     }
 }
 
 .header {
     @include flex(center);
     padding-bottom: 11px;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
 
     @include bp-down($md) {
         border: 0;
@@ -242,6 +241,12 @@ export default Vue.extend({
     color: #0a67aa;
     font-size: 14px;
     font-weight: 600;
+
+    body.floodnet & {
+        color: #6a6d71;
+        font-size: 13px;
+        font-weight: 500;
+    }
 }
 
 .header .buttons {
@@ -265,7 +270,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     letter-spacing: 0.08px;
     color: #2c3e50;
     margin-left: 7px;

@@ -3636,7 +3636,7 @@ func NewGetCurrentPayload(auth string) *user.GetCurrentPayload {
 
 // NewListByProjectPayload builds a user service list by project endpoint
 // payload.
-func NewListByProjectPayload(projectID int32, auth string) *user.ListByProjectPayload {
+func NewListByProjectPayload(projectID int32, auth *string) *user.ListByProjectPayload {
 	v := &user.ListByProjectPayload{}
 	v.ProjectID = projectID
 	v.Auth = auth

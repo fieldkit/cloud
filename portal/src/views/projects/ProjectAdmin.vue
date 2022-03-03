@@ -23,25 +23,25 @@
                     <div class="details-right">
                         <div class="details-row" v-if="project.startTime">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-calendar.svg" class="icon" width="14px" height="14px" />
+                                <i class="icon icon-calendar"></i>
                             </div>
                             <template>{{ $t("project.started", { started: project.startTime }) }}</template>
                         </div>
                         <div class="details-row" v-if="displayProject.duration">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-time.svg" class="icon" width="14px" height="14px" />
+                                <i class="icon icon-time" role="img" aria-label="duration"></i>
                             </div>
                             <template>{{ $t("project.duration", { duration: displayProject.duration }) }}</template>
                         </div>
                         <div class="details-row location-name" v-if="project.location" width="12px" height="14px">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                                <i class="icon icon-location" role="img" aria-label="location"></i>
                             </div>
                             <template>{{ $t("project.location", { location: project.location }) }}</template>
                         </div>
                         <div class="details-row location-native" v-if="displayProject.places.native">
                             <div class="details-icon-container">
-                                <img alt="Location" src="@/assets/icon-location.svg" class="icon" width="12px" height="14px" />
+                                <i class="icon icon-location"></i>
                             </div>
                             <template>{{ $t("project.nativeLands", { nativeLands: displayProject.places.native }) }}</template>
                         </div>
@@ -207,13 +207,13 @@ export default Vue.extend({
 }
 .header .project-name {
     font-size: 24px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     margin: 0 15px 0 0;
     display: inline-block;
 }
 .header .project-dashboard {
     font-size: 20px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     margin: 0 15px 0 0;
     display: inline-block;
     margin-top: 10px;
@@ -227,7 +227,7 @@ export default Vue.extend({
 }
 .details > .left {
     max-width: 400px;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 1px;
     margin-right: 20px;
     background-color: #fff;
@@ -267,7 +267,7 @@ export default Vue.extend({
 }
 
 .details > .right {
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 1px;
     background-color: white;
     padding: 20px 30px;
@@ -304,18 +304,26 @@ export default Vue.extend({
     @include bp-down($sm) {
         padding-boottom: 25px;
     }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .details .details-heading .link {
     margin-left: auto;
 }
 .link {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 14px;
     cursor: pointer;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-button;
+    }
 }
 
 .details .details-bottom {
-    border-top: 1px solid #d8dce0;
+    border-top: 1px solid var(--color-border);
     padding-top: 20px;
     display: flex;
     flex-direction: row;
@@ -339,6 +347,10 @@ export default Vue.extend({
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .details-icon-container {
     width: 20px;
@@ -354,7 +366,7 @@ export default Vue.extend({
 }
 .project-data,
 .project-readings {
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     border-radius: 1px;
     background-color: white;
     padding: 20px 25px;

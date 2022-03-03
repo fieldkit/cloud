@@ -514,7 +514,7 @@ func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 		}`)
 }
 
-func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
+func TestDiscussionPostFirstContextDiscussionLegacyBookmark(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -561,6 +561,77 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 			}
 		}`)
 
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/discussion?bookmark=%v", bookmark), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja.Assertf(rr.Body.String(), `
+		{
+			"posts": [{
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"bookmark": "<<PRESENCE>>",
+				"body": "Message"
+			}]
+		}`)
+}
+
+func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[[%d,[2]]],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
+	payload, err := json.Marshal(
+		struct {
+			Post discService.NewPost `json:"post"`
+		}{
+			Post: discService.NewPost{
+				Bookmark: &bookmark,
+				Body:     "Message",
+			},
+		},
+	)
+	assert.NoError(err)
+
+	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
+	rrPost := tests.ExecuteRequest(reqPost, api)
+
+	assert.Equal(http.StatusOK, rrPost.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rrPost.Body.String(), `
+		{
+			"post": {
+				"id": "<<PRESENCE>>",
+				"createdAt": "<<PRESENCE>>",
+				"updatedAt": "<<PRESENCE>>",
+				"author": {
+					"id": "<<PRESENCE>>",
+					"name": "<<PRESENCE>>"
+				},
+				"replies": [],
+				"bookmark": "<<PRESENCE>>",
+				"body": "Message"
+			}
+		}`)
+
+	fmt.Printf("\n%v\n", bookmark)
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/discussion?bookmark=%v", bookmark), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)

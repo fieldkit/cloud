@@ -45,7 +45,7 @@ type MetaResult struct {
 
 // DataPayload is the payload type of the sensor service data method.
 type DataPayload struct {
-	Auth       string
+	Auth       *string
 	Start      *int64
 	End        *int64
 	Stations   *string

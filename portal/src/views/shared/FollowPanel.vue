@@ -2,14 +2,12 @@
     <div class="follow-panel">
         <FollowControl :project="project">
             <template #default="{ following, followers, follow, unfollow }">
-                <span v-if="following" v-on:click="unfollow" class="icon">
-                    <img src="@/assets/icon-heart.svg" class="icon" />
-                </span>
-                <span v-if="!following" v-on:click="follow" class="icon">
-                    <img src="@/assets/icon-heart-gray.svg" class="icon" />
-                </span>
-                <span v-show="followers > 1">{{ followers }} Follows</span>
-                <span v-show="followers <= 1">{{ followers }} Follow</span>
+                <div class="flex flex-al-center">
+                    <i v-if="following" v-on:click="unfollow" class="icon icon-heart"></i>
+                    <i v-if="!following" v-on:click="follow" class="icon icon-heart gray"></i>
+                    <span v-if="followers > 1">{{ followers }} Follows</span>
+                    <span v-if="followers <= 1">{{ followers }} Follow</span>
+                </div>
             </template>
         </FollowControl>
     </div>
@@ -43,20 +41,23 @@ export default Vue.extend({
     align-items: center;
     font-size: 18px;
     font-weight: 500;
-    color: #2c3e50;
     padding-top: 24px;
     border-radius: 1px;
-    border-top: solid 1px #d8dce0;
+    border-top: solid 1px var(--color-border);
     margin-top: 10px;
 
     @include bp-down($xs) {
         padding-top: 14px;
     }
 }
-.icon {
-    cursor: pointer;
+
+.icon-heart {
     margin-right: 10px;
-    width: 22px;
-    height: 20px;
+    margin-top: -3px;
+    font-size: 20px;
+}
+
+span {
+    font-size: 18px;
 }
 </style>

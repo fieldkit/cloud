@@ -10,7 +10,7 @@
                     v-if="displayProject"
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
-                        <img alt="Notifification" src="@/assets/icon-notification.svg" class="icon" />
+                        <i class="icon icon-notification"></i>
                         {{ $t("project.activity") }}
                     </div>
                 </DoubleHeader>
@@ -171,12 +171,23 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #ffffff;
     cursor: pointer;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     padding: 10px 22px;
     @include flex(center, center);
 
-    img {
+    body.floodnet & {
+        font-family: $font-family-floodnet-button;
+    }
+
+    .icon {
         margin-right: 14px;
+        font-size: 17px;
+
+        body.floodnet & {
+            &:before {
+                color: var(--color-dark);
+            }
+        }
     }
 }
 .project-activity-floating {
@@ -185,7 +196,7 @@ export default Vue.extend({
     top: 70px;
     bottom: 0;
     background-color: #fcfcfc;
-    border-left: 2px solid #d8dce0;
+    border-left: 2px solid var(--color-border);
     z-index: 10;
     overflow-y: scroll;
     width: 30em;

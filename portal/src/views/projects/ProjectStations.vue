@@ -19,19 +19,18 @@
             @close="onCloseEditStationModal"
             v-if="editingStation"
         />
-        <div class="section-heading stations-heading">
-            {{ $t("project.stations.title") }}
+        <StationOrSensor class="section-heading stations-heading">
             <div class="stations-cta-container" v-if="admin">
                 <div class="stations-cta" v-on:click="showAddStationPicker">
-                    <img src="@/assets/icon-plus-round.svg" />
+                    <i class="icon icon-plus-round"></i>
                     {{ $t("project.stations.add.trigger") }}
                 </div>
                 <div class="stations-cta" v-on:click="showEditStationPicker">
-                    <img src="@/assets/icon-minus-round.svg" />
+                    <i class="icon icon-minus-round"></i>
                     {{ $t("project.stations.edit.trigger") }}
                 </div>
             </div>
-        </div>
+        </StationOrSensor>
         <div class="section-body">
             <div class="stations-panel" v-show="showStationsPanel">
                 <div v-if="projectStations.length == 0" class="project-stations-no-stations">
@@ -47,7 +46,7 @@
                         @selected="showSummary(station)"
                     >
                         <div class="station-links">
-                            <img class="notes" v-on:click="openNotes(station)" src="@/assets/icon-field-notes.svg" />
+                            <i v-on:click="openNotes(station)" class="icon icon-field-notes"></i>
                         </div>
                     </TinyStation>
                 </div>
@@ -80,14 +79,17 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import * as ActionTypes from "@/store/actions";
+
 import StationSummary from "@/views/shared/StationSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
 import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
+import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
+
+import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -97,6 +99,7 @@ export default Vue.extend({
         StationsMap,
         PaginationControls,
         TinyStation,
+        StationOrSensor,
     },
     data(): {
         activeStationId: number | null;
@@ -275,7 +278,11 @@ export default Vue.extend({
     padding-top: 1em;
     padding-bottom: 1em;
     padding-left: 1em;
-    border-bottom: 1px solid #d8dce0;
+    border-bottom: 1px solid var(--color-border);
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .stations-heading {
     display: flex;
@@ -300,11 +307,6 @@ export default Vue.extend({
     font-size: 14px;
     margin-right: 1em;
     @include flex(center);
-
-    img {
-        margin-right: 7px;
-        width: 18px;
-    }
 }
 .stations-cta {
     cursor: pointer;
@@ -317,16 +319,25 @@ export default Vue.extend({
             margin-right: 15px;
         }
     }
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
+
+    .icon {
+        margin-right: 7px;
+        margin-top: -3px;
+    }
 }
 .last-seen {
     font-size: 12px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     color: #6a6d71;
 }
 .stations-container {
     margin: 25px 0 0 0;
     border-radius: 1px;
-    border: solid 1px #d8dce0;
+    border: solid 1px var(--color-border);
     background-color: #ffffff;
     overflow: hidden;
 }
@@ -360,7 +371,7 @@ export default Vue.extend({
     height: 38px;
     margin: 20px auto;
     padding: 1em;
-    border: 1px solid #d8dce0;
+    border: 1px solid var(--color-border);
     transition: opacity 0.25s;
 }
 .project-stations-no-stations {
@@ -380,21 +391,13 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    border-left: 1px solid #d8dce0;
+    border-left: 1px solid var(--color-border);
     text-align: center;
 }
 
 .station-links .remove {
     cursor: pointer;
     font-size: 12px;
-}
-
-.station-links .notes {
-    cursor: pointer;
-    font-size: 14px;
-    width: 20px;
-    height: 20px;
-    margin: auto;
 }
 
 .pagination {
@@ -406,5 +409,21 @@ export default Vue.extend({
     width: 359px;
     top: 20px;
     left: 122px;
+}
+
+.icon-field-notes {
+    font-size: 20px;
+    cursor: pointer;
+    margin: auto;
+
+    &:before {
+        color: var(--color-primary);
+    }
+
+    body.floodnet & {
+        &:before {
+            color: var(--color-dark);
+        }
+    }
 }
 </style>

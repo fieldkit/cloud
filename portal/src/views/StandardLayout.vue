@@ -29,7 +29,6 @@ import HeaderBar from "./shared/HeaderBar.vue";
 import SidebarNav from "./shared/SidebarNav.vue";
 import Zoho from "./shared/Zoho.vue";
 import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
 import { GlobalState, DisplayStation } from "@/store";
 
 export default Vue.extend({
@@ -112,6 +111,10 @@ export default Vue.extend({
     background: #fcfcfc;
     position: relative;
     width: 100%;
+
+    body.floodnet & {
+        background: #{lighten($color-floodnet-border, 5%)};
+    }
 }
 .scrolling-disabled {
     overflow-y: hidden;

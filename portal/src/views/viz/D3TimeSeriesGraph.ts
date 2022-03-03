@@ -25,8 +25,8 @@ export const D3TimeSeriesGraph = Vue.extend({
     },
     computed: {
         data(): QueriedData | null {
-            if (this.viz.graphing) {
-                return this.viz.graphing;
+            if (this.viz.dataSets.length > 0) {
+                return this.viz.dataSets[0].graphing;
             }
             return null;
         },

@@ -685,7 +685,7 @@ class FKApi {
 
     getAssociatedStations(id: number): Promise<StationsResponse> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + `/stations/${id}/associated`,
         });
@@ -700,7 +700,7 @@ class FKApi {
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/users/project/" + projectId,
         });
@@ -777,7 +777,7 @@ class FKApi {
 
     getStationsByProject(projectId) {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/" + projectId + "/stations",
         });
@@ -1017,7 +1017,7 @@ class FKApi {
 
     getAllSensors(): Promise<SensorsResponse> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/sensors",
         });
@@ -1055,7 +1055,7 @@ class FKApi {
 
     public sensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/sensors/data?" + params.toString(),
         });
@@ -1063,7 +1063,7 @@ class FKApi {
 
     public tailSensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/sensors/data?" + params.toString(),
         });
@@ -1073,7 +1073,7 @@ class FKApi {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/sensors/data?" + qp.toString(),
         });
@@ -1099,7 +1099,7 @@ class FKApi {
 
     public getStationNotes(stationId: number): Promise<any> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/stations/" + stationId + "/notes",
         });
@@ -1238,7 +1238,7 @@ class FKApi {
             return this.baseUrl + url;
         };
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             blob: true,
             url: getUrl(),
@@ -1302,7 +1302,7 @@ class FKApi {
 
         const fixed = this.parseBodies(returned.posts);
 
-        console.log("comments", returned);
+        // console.log("comments", returned);
 
         return {
             posts: fixed,
@@ -1323,7 +1323,7 @@ class FKApi {
             },
         });
 
-        console.log("comments", returned);
+        // console.log("comments", returned);
 
         return {
             post: this.parseBody(returned.post),

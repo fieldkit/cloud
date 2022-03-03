@@ -5,8 +5,12 @@
                 <span class="small-arrow">&lt;</span>
                 {{ backTitle }}
             </div>
-            <div class="one" v-if="title">{{ title }}</div>
-            <div class="two" v-if="subtitle">{{ subtitle }}</div>
+            <slot name="title">
+                <div class="one" v-if="title">{{ title }}</div>
+            </slot>
+            <slot name="subtitle">
+                <div class="two" v-if="subtitle">{{ subtitle }}</div>
+            </slot>
         </div>
         <div class="actions">
             <slot></slot>
@@ -71,15 +75,17 @@ export default Vue.extend({
 .back {
     font-size: 14px;
     letter-spacing: 0.06px;
-    color: #2c3e50;
     margin-bottom: 20px;
     cursor: pointer;
 }
 .one {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 24px;
-    color: #2c3e50;
     margin-bottom: 1px;
+
+    body.floodnet & {
+        font-family: $font-family-floodnet-bold;
+    }
 }
 .two {
     font-weight: 500;

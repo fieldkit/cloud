@@ -789,7 +789,7 @@ func NewUpdatePayload(body *UpdateRequestBody, stationID int32, auth string) *no
 }
 
 // NewGetPayload builds a notes service get endpoint payload.
-func NewGetPayload(stationID int32, auth string) *notes.GetPayload {
+func NewGetPayload(stationID int32, auth *string) *notes.GetPayload {
 	v := &notes.GetPayload{}
 	v.StationID = stationID
 	v.Auth = auth
@@ -799,7 +799,7 @@ func NewGetPayload(stationID int32, auth string) *notes.GetPayload {
 
 // NewDownloadMediaPayload builds a notes service download media endpoint
 // payload.
-func NewDownloadMediaPayload(mediaID int32, auth string) *notes.DownloadMediaPayload {
+func NewDownloadMediaPayload(mediaID int32, auth *string) *notes.DownloadMediaPayload {
 	v := &notes.DownloadMediaPayload{}
 	v.MediaID = mediaID
 	v.Auth = auth

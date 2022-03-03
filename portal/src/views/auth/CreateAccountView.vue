@@ -1,7 +1,7 @@
 <template>
     <div class="form-container">
         <div class="form-wrap">
-            <img class="form-header-logo" :alt="$t('layout.logo.alt')" src="@/assets/FieldKit_Logo_White.png" />
+            <Logo class="form-header-logo"></Logo>
             <form v-if="!created" class="form" @submit.prevent="save">
                 <h1 class="form-title">{{ $t("createAccount.form.title") }}</h1>
                 <div class="form-group">
@@ -99,11 +99,13 @@ import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
 import FKApi from "@/api/api";
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     name: "CreateAccountView",
     components: {
         ...CommonComponents,
+        Logo,
     },
     data(): {
         form: {

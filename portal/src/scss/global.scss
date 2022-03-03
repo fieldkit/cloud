@@ -5,8 +5,8 @@
     height: 45px;
     color: white;
     font-size: 18px;
-    font-family: $font-family-bold;
-    background-color: #ce596b;
+    font-family: var(--font-family-bold);
+    background-color: var(--color-secondary);
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -17,10 +17,10 @@
     height: 45px;
     font-size: 18px;
     color: white;
-    background-color: #ce596b;
+    background-color: var(--color-secondary);
     border: none;
     border-radius: 5px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     letter-spacing: 0.1px;
     margin-bottom: 20px;
 
@@ -30,8 +30,8 @@
 
     &-outline {
         background: #fff;
-        color: #ce596b;
-        border: 1px solid #ce596b;
+        color: var(--color-secondary);
+        border: 1px solid var(--color-secondary);
     }
 }
 
@@ -73,13 +73,17 @@
 .validation-errors {
     color: $color-danger;
     font-size: 14px;
+
+    > * {
+        color: $color-danger;
+    }
 }
 
 .button-social {
     height: 33px;
     padding: 0 12px;
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     letter-spacing: 0.08px;
     border-radius: 3px;
     border: solid 1px #cccdcf;

@@ -20,12 +20,14 @@ import ExploreView from "./views/viz/ExploreView.vue";
 
 import NotesView from "./views/notes/NotesView.vue";
 
+import NotificationsView from "./views/notifications/NotificationsView.vue";
+
 import AdminMain from "./views/admin/AdminMain.vue";
 import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
-import { Bookmark } from "./views/viz/viz";
+import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
@@ -304,7 +306,7 @@ const routes = [
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+                bookmark: deserializeBookmark(route.params.bookmark),
             };
         },
         meta: {
@@ -317,8 +319,23 @@ const routes = [
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: Object.assign(new Bookmark(1, []), JSON.parse(route.params.bookmark)),
+                bookmark: deserializeBookmark(route.params.bookmark),
                 exportsVisible: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/share/:bookmark",
+        name: "shareBookmark",
+        component: ExploreView,
+        props: (route) => {
+            return {
+                bookmark: deserializeBookmark(route.params.bookmark),
+                shareVisible: true,
             };
         },
         meta: {
@@ -373,6 +390,22 @@ const routes = [
                 stationId: Number(route.params.stationId),
             };
         },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/",
+        name: "root",
+        component: ProjectsView,
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/notifications",
+        name: "notifications",
+        component: NotificationsView,
         meta: {
             secured: true,
         },
@@ -463,13 +496,17 @@ export default function routerFactory(store) {
                     next("/dashboard");
                 }
             } else {
+                /*
                 if (to.name === "login") {
                     next();
                 } else {
                     next("/login");
                 }
+                */
+                next();
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
+            /*
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
@@ -487,6 +524,8 @@ export default function routerFactory(store) {
                 queryParams.append("after", to.fullPath);
                 next("/login?" + queryParams.toString());
             }
+            */
+            next();
         } else {
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {
