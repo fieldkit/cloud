@@ -143,8 +143,7 @@ export default Vue.extend({
     }
 }
 .image-container {
-    width: 124px;
-    height: 100px;
+    min-width: 124px;
     text-align: center;
     padding-right: 11px;
 }
