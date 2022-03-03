@@ -195,8 +195,10 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 
 	log.Infow("viz", "sensors", sensorKeys)
 
-	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v", tw.baseApiUrl, url.QueryEscape(bookmark))
+	// We're assuming https here.
+	now := time.Now()
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", tw.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+
 	meta["twitter:card"] = "summary_large_image"
 	meta["twitter:site"] = "@FieldKitOrg"
 	meta["twitter:image"] = photoUrl
