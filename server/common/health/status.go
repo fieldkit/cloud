@@ -85,3 +85,26 @@ func StatusHandler(ctx context.Context) http.Handler {
 		w.Write(b)
 	})
 }
+
+func RobotsHandler(ctx context.Context) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		setupResponse(&w, req)
+
+		if (*req).Method == "OPTIONS" {
+			return
+		}
+
+		ctx := req.Context()
+		log := logging.Logger(ctx).Named("robots").Sugar()
+
+		req.Header.Del("Authorization")
+
+		log.Infow("status", "headers", req.Header)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`
+User-agent: *
+Allow: /
+`))
+	})
+}
