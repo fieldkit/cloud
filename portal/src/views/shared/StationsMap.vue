@@ -23,6 +23,11 @@ import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
 import { MappedStations, LngLat, BoundingRectangle } from "@/store";
+import MapMarker from "./MapMarker";
+
+import * as d3 from "d3";
+import _ from "lodash";
+import MapMarker from "./MapMarker.vue";
 
 interface ProtectedData {
     map: any;
@@ -32,14 +37,18 @@ export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
+        MapMarker,
     },
     data(): {
         mapbox: { token: string; style: string };
         ready: boolean;
+        thresholds: object;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
+            //fixme: needs to be pulled from api
+            thresholds: {label:{"en-US":"Severity of Flooding"},"levels":[{"label":{"en-US":"None"},"value":8,"color":"#00CCFF"},{"label":{"en-US":"Almost"},"value":8.5,"color":"#0099FF"},{"label":{"en-US":"Some"},"value":9,"color":"#0066FF"},{"label":{"en-US":"Flooding"},"value":9.5,"color":"#0033FF"},{"label":{"en-US":"Severe"},"value":10,"color":"#0000FF"}]}
         };
     },
     props: {
@@ -139,6 +148,10 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
+            const markerScale = d3.scaleThreshold()
+                .domain(this.thresholds.levels.map( d => d.value ))
+                .range(this.thresholds.levels.map( d => d.color ));
+
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
 
@@ -188,6 +201,9 @@ export default Vue.extend({
                     type: "circle",
                     source: "stations",
                     filter: ["==", "$type", "Point"],
+                    layout:{
+                        //"symbol-sort-key": "id"
+                    },
                     paint: {
                         "circle-color": "red",
                         "circle-stroke-color": "#fff",
@@ -204,7 +220,7 @@ export default Vue.extend({
                         "text-color": "#fff",
                     },
                     layout: {
-                        "text-field": "{id}",
+                        "text-field": "{value}",
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"], // fixme: wrong font
                         "text-size": 12,
                     },
@@ -222,10 +238,19 @@ export default Vue.extend({
             if (this.bounds) {
                 map.fitBounds(this.bounds, { duration: 0 });
             }
-            console.log("MAPPED STATIONS", this.mapped.stations[0].configurations.all[0].modules[0].position)
-            this.mapped.stations.map( (station) => {
-                console.log( station.configurations.all[0].modules.filter((module) => module.position === 255) )
-                })
+
+            console.log("IS SINGLE?", this.mapped.isSingleType)
+            console.log(this.mapped.features)
+
+            for (const feature of this.mapped.features) {
+
+            const test = new MapMarker({propsData: { value: feature.properties.value, color: markerScale(feature.properties.value)}});
+            test.$mount();
+
+
+            // make a marker for each feature and add to the map
+            new mapboxgl.Marker(test.$el).setLngLat(feature.geometry.coordinates).addTo(map);
+            }
         },
     },
 });
@@ -242,4 +267,5 @@ export default Vue.extend({
     position: inherit;
     width: inherit;
 }
+
 </style>

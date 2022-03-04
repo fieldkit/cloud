@@ -210,34 +210,34 @@ func (c *StationService) Transfer(ctx context.Context, payload *station.Transfer
 }
 
 func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.DefaultPhotoPayload) (err error) {
-    sr := repositories.NewStationRepository(c.options.Database)
+	sr := repositories.NewStationRepository(c.options.Database)
 
-    updating, err := sr.QueryStationByID(ctx, payload.ID)
+	updating, err := sr.QueryStationByID(ctx, payload.ID)
 
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return station.MakeNotFound(errors.New("station not found"))
-        }
-        return err
-    }
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return station.MakeNotFound(errors.New("station not found"))
+		}
+		return err
+	}
 
-    p, err := NewPermissions(ctx, c.options).ForStation(updating)
-    if err != nil {
-        return err
-    }
+	p, err := NewPermissions(ctx, c.options).ForStation(updating)
+	if err != nil {
+		return err
+	}
 
-    if err := p.CanModify(); err != nil {
-        return err
-    }
+	if err := p.CanModify(); err != nil {
+		return err
+	}
 
-    updating.UpdatedAt = time.Now()
-    updating.PhotoID = payload.PhotoID
+	updating.UpdatedAt = time.Now()
+	updating.PhotoID = payload.PhotoID
 
-    if err := sr.UpdatePhoto(ctx, updating); err != nil {
-        return err
-    }
+	if err := sr.UpdatePhoto(ctx, updating); err != nil {
+		return err
+	}
 
-    return nil
+	return nil
 }
 
 func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayload) (response *station.StationFull, err error) {
@@ -303,6 +303,8 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 func (c *StationService) ListProject(ctx context.Context, payload *station.ListProjectPayload) (response *station.StationsFull, err error) {
 	pr := repositories.NewProjectRepository(c.options.Database)
 
+	log := Logger(ctx).Sugar()
+
 	project, err := pr.QueryByID(ctx, payload.ID)
 	if err != nil {
 		return nil, err
@@ -341,6 +343,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	if err != nil {
 		return nil, err
 	}
+	log.Infow("LIST PROJECTS")
 
 	response = &station.StationsFull{
 		Stations: stations,
