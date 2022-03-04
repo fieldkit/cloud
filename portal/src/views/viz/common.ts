@@ -244,8 +244,14 @@ export class DataSetSeries {
         return this.vizSensor[1];
     }
 
-    public get constrainDataAxis(): boolean {
-        return this.graphing != null && this.graphing.dataRange[0] == this.graphing.dataRange[1];
+    public shouldConstrainBy(range: [number, number]): boolean {
+        if (this.graphing == null) {
+            return false;
+        }
+        if (this.graphing.dataRange[1] > range[1]) {
+            return false;
+        }
+        return true;
     }
 }
 

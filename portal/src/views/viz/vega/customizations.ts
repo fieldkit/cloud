@@ -69,9 +69,12 @@ export function applySensorMetaConfiguration(spec, series) {
         }
 
         const constrained = s.vizInfo.constrainedRanges;
-        if (s.ds.constrainDataAxis && constrained.length > 0) {
+        if (constrained.length > 0) {
             const range = constrained[0];
-            spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
+            if (s.ds.shouldConstrainBy([range.minimum, range.maximum])) {
+                console.log("viz:constrained", range, s.ds.graphing.dataRange);
+                spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
+            }
         }
     }
 }
