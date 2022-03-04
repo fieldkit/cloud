@@ -113,7 +113,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	}
 
 	for _, moduleSchema := range pm.schema.Station.Modules {
-		sensorPrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
+		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
 		// Add or create the station module..
 		module := &data.StationModule{
@@ -122,7 +122,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			Index:           0,
 			Position:        0,
 			Flags:           0,
-			Name:            sensorPrefix,
+			Name:            modulePrefix,
 			Manufacturer:    0,
 			Kind:            0,
 			Version:         0,
@@ -132,8 +132,30 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
+		for index, sensorSchema := range moduleSchema.Sensors {
+			// sensorPrefix := fmt.Sprintf("%s.%s", modulePrefix, sensor.Key)
+
+			// Add or create the sensor..
+			sensor := &data.ModuleSensor{
+				ConfigurationID: configuration.ID,
+				ModuleID:        module.ID,
+				Index:           uint32(index),
+				Name:            sensorSchema.Key,
+				ReadingValue:    nil,
+				ReadingTime:     nil,
+			}
+
+			if sensorSchema.UnitOfMeasure != nil {
+				sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+			}
+
+			if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+				return nil, err
+			}
+		}
+
 		whStation := &WebHookStation{
-			SensorPrefix:  sensorPrefix,
+			SensorPrefix:  modulePrefix,
 			Provision:     provision,
 			Configuration: configuration,
 			Station:       station,
