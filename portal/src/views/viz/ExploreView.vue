@@ -17,7 +17,7 @@
                         </div>
                     </template>
                     <template v-slot:default>
-                        <!-- div class="button" @click="openShare">Share</div -->
+                        <div class="button" @click="openShare">Share</div>
                         <div class="button" @click="openExports">Export</div>
                     </template>
                 </DoubleHeader>
