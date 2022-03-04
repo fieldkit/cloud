@@ -66,6 +66,8 @@ class Chart {
     });
 
     applySensorMetaConfiguration(this.spec, series);
+
+    return [];
   }
 
   sensor(index, label, units) {

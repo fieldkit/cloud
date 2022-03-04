@@ -262,7 +262,7 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 		if saved, err := nr.AddNotification(ctx, notif); err != nil {
 			return err
 		} else {
-			message := saved.ToMap()
+			message := data.PostNotificationToMap(saved, post)
 			log.Infow("notification", "notification", message)
 			if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
 				log.Errorw("notification", "error", err)

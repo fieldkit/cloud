@@ -380,14 +380,17 @@ func main() {
 	}
 
 	statusHandler := health.StatusHandler(ctx)
+	robotsHandler := health.RobotsHandler(ctx)
 	services := theApi.services
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
+	robotsFinal := logging.Monitoring("robots", services.Metrics)(robotsHandler)
 	ingesterFinal := logging.Monitoring("ingester", services.Metrics)(ingester.Handler)
 	apiFinal := logging.Monitoring("api", services.Metrics)(theApi.handler)
 	staticFinal := logging.Monitoring("static", services.Metrics)(portalServer)
 
 	rootRouter := mux.NewRouter()
 	rootRouter.Handle("/status", statusFinal)
+	rootRouter.Handle("/robots.txt", robotsFinal)
 
 	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost)
 	twitterHandlerFactory.Register(rootRouter)

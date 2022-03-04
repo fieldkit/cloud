@@ -59,10 +59,10 @@
     "layout": {
         "logo": {
             "fieldkit": {
-                "alt": "FieldKit Logo"
+                "alt": "FieldKit"
             },
             "floodnet": {
-                "alt": "Floodnet Logo"
+                "alt": "Floodnet"
             },
             "compass": {
                 "alt": "FieldKit Compass Logo"
@@ -93,7 +93,8 @@
         "backProjectDashboard": "Back to Project Dashboard",
         "backToPrevious": "Back to Previous",
         "backProject": "Back to {name}",
-        "backToStations": "Back to Stations"
+        "backToStations": "Back to Stations",
+        "backToSensors": "Back to Sensors"
     },
     "projects": {
         "title": {

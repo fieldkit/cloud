@@ -6,11 +6,7 @@
 
         <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader
-                    :backTitle="backRoute === 'viewProject' ? $t('layout.backProjectDashboard') : $t('layout.backToStations')"
-                    :backRoute="backRoute"
-                    :backRouteParams="backRouteParams"
-                >
+                <DoubleHeader :backTitle="$t(backLabelKey)" :backRoute="backRoute" :backRouteParams="backRouteParams">
                     <template v-slot:title>
                         <div class="one">
                             Data View
@@ -21,7 +17,7 @@
                         </div>
                     </template>
                     <template v-slot:default>
-                        <div class="button" @click="openShare">Share</div>
+                        <!-- div class="button" @click="openShare">Share</div -->
                         <div class="button" @click="openExports">Export</div>
                     </template>
                 </DoubleHeader>
@@ -50,7 +46,7 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
-
+import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
 import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
@@ -120,6 +116,12 @@ export default Vue.extend({
         },
         busy(): boolean {
             return !this.workspace || this.workspace.busy;
+        },
+        backLabelKey(): string {
+            if (this.backRoute === "viewProject") {
+                return "layout.backProjectDashboard";
+            }
+            return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
         },
     },
     watch: {

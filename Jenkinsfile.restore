@@ -8,7 +8,7 @@ properties([
 ])
 
 timestamps {
-    node () {
+    node ("main") {
         try {
             def workEnv = "dev"
 			def branchName = params.DeployBranch ?: "main"

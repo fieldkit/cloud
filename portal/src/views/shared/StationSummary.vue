@@ -143,14 +143,14 @@ export default Vue.extend({
     }
 }
 .image-container {
-    width: 124px;
-    height: 100px;
+    min-width: 124px;
     text-align: center;
     padding-right: 11px;
 }
 .image-container img {
     max-width: 124px;
     max-height: 100px;
+    padding: 5px;
 }
 .station-name {
     font-size: 18px;

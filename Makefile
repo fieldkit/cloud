@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 27
+VERSION_PATCH = 29
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -125,6 +125,7 @@ schema-production:
 	@echo "CREATE USER server;" >> schema-production/0.sql
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
 	@echo "CREATE DATABASE keycloak;" >> schema-production/0.sql
+	@echo "UPDATE que_jobs SET run_at = run_at + INTERVAL '10 year' WHERE run_at <= NOW();" >> schema-production/2.sql
 	@for f in `find schema-production -name "*.bz2"`; do              \
 		echo $$f                                                     ;\
 		bunzip2 < $$f > schema-production/1.sql                      ;\
