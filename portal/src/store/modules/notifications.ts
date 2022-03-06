@@ -1,8 +1,9 @@
 import { ActionContext } from "vuex";
-import { Services, SendFunction } from "@/api";
+import {Services, SendFunction, SimpleUser} from "@/api";
 import * as ActionTypes from "../actions";
 import { MarkNotificationsSeen } from "../typed-actions";
 import { promiseAfter } from "@/utilities";
+import Vue from "vue";
 
 export interface Notification {
     notificationId: number;
@@ -12,6 +13,7 @@ export interface Notification {
     body: string;
     projectId?: string;
     bookmark?: string;
+    user?: { id: number; name: string; photo: object };
 }
 
 const CONNECTED = "CONNECTED";
@@ -77,7 +79,7 @@ const mutations = {
         state.notifications.push(payload);
     },
     [SEEN]: (state: NotificationsState) => {
-        state.notifications.length = 0;
+        Vue.set(state, "notifications", []);
     },
 };
 

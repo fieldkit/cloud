@@ -11,7 +11,7 @@
             v-on:mouseleave="onAccountHover($event)"
         >
             <div v-if="user" class="header-avatar">
-                <i class="badge">
+                <i class="badge" v-if="numberOfUnseenNotifications > 0">
                     <span>{{ numberOfUnseenNotifications }}</span>
                 </i>
                 <UserPhoto v-if="user" :user="user" />
@@ -44,9 +44,15 @@
                     <NotificationsList v-on:notification-click="notificationNavigate"></NotificationsList>
 
                     <footer class="notifications-footer">
-                        <button>{{ $t("notifications.viewAllButton") }}</button>
+                        <button v-on:click="viewAll()">{{ $t("notifications.viewAllButton") }}</button>
                         <button v-on:click="markAllSeen()">{{ $t("notifications.dismissAllButton") }}</button>
                     </footer>
+                </template>
+                <template v-if="numberOfUnseenNotifications === 0">
+                    <div class="no-notifications">
+                        <span>{{ $t("layout.header.noNotifications") }}</span>
+                        <img alt="Image" src="@/assets/no-notifications.png" />
+                    </div>
                 </template>
             </div>
         </div>
@@ -70,7 +76,6 @@ export default Vue.extend({
         ...CommonComponents,
         NotificationsList,
         Logo,
-        NotificationsList,
     },
     data(): { isAccountHovered: boolean; hiding: boolean } {
         return {
@@ -119,21 +124,31 @@ export default Vue.extend({
             this.hiding = true;
             await this.$store.dispatch(new MarkNotificationsSeen([]));
         },
+        viewAll() {
+            return this.$router.push({ name: "notifications" });
+        },
         notificationNavigate(notification: Notification) {
-            console.log("notification", notification);
             if (notification.projectId) {
-                return this.$router.push({
-                    name: "viewProject",
-                    params: { id: notification.projectId },
-                    hash: `#comment-id-${notification.postId}`,
-                }).catch((err)=>{return;});
+                return this.$router
+                    .push({
+                        name: "viewProject",
+                        params: { id: notification.projectId },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
             }
             if (notification.bookmark) {
-                return this.$router.push({
-                    name: "exploreBookmark",
-                    params: { bookmark: notification.bookmark },
-                    hash: `#comment-id-${notification.postId}`,
-                }).catch((err)=>{return;});
+                return this.$router
+                    .push({
+                        name: "exploreBookmark",
+                        params: { bookmark: notification.bookmark },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
             }
         },
     },
@@ -405,6 +420,14 @@ button {
 
     @include bp-down($xs) {
         font-size: 26px;
+    }
+}
+
+.no-notifications {
+    text-align: center;
+
+    img {
+        width: 100%;
     }
 }
 </style>

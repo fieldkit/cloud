@@ -1386,9 +1386,6 @@ class FKApi {
 
                 this.socket.addEventListener("message", (event) => {
                     const message = JSON.parse(event.data);
-                    if (message.body) {
-                        message.body = JSON.parse(message.body);
-                    }
                     void callback(message);
                 });
 
