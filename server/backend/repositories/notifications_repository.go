@@ -44,8 +44,9 @@ func (r *NotificationRepository) QueryByUserID(ctx context.Context, userID int32
 	// related notifications.
 	notifications := []*data.NotificationPost{}
 	if err := r.db.SelectContext(ctx, &notifications, `
-		SELECT n.*, p.project_id, p.context  FROM fieldkit.notification as n
+		SELECT n.*, p.project_id, p.context, u.id as author_id, u.name, u.username, u.media_url FROM fieldkit.notification as n
 		LEFT JOIN fieldkit.discussion_post AS p ON ( n.post_id = p.id)
+		LEFT JOIN fieldkit.user AS u ON ( p.user_id = u.id)
 		WHERE n.user_id = $1 AND NOT n.seen
 		ORDER BY n.created_at
 		`, userID); err != nil {

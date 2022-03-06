@@ -1351,6 +1351,15 @@ class FKApi {
         return returned;
     }
 
+    public async seenNotifications(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/notifications/seen",
+            data: { ids: payload.ids },
+        });
+    }
+
     private socket: WebSocket | null = null;
 
     private async send(message: unknown) {
@@ -1377,6 +1386,9 @@ class FKApi {
 
                 this.socket.addEventListener("message", (event) => {
                     const message = JSON.parse(event.data);
+                    if (message.body) {
+                        message.body = JSON.parse(message.body);
+                    }
                     void callback(message);
                 });
 

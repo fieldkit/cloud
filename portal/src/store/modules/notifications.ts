@@ -10,6 +10,8 @@ export interface Notification {
     postId: number;
     kind: string;
     body: string;
+    projectId?: string;
+    bookmark?: string;
 }
 
 const CONNECTED = "CONNECTED";
@@ -56,16 +58,10 @@ const actions = (services: Services) => {
             commit(CONNECTED, send);
         },
         [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
-            if (state.send) {
-                if (payload.ids.length == 0) {
-                    await state.send(new MarkNotificationsSeen(state.notifications.map((n) => n.notificationId)));
-                } else {
-                    await state.send(payload);
-                }
-                commit(SEEN);
-            } else {
-                // TODO Queue?
-            }
+
+            await services.api.seenNotifications({ids: state.notifications.map((n) => n.notificationId)});
+
+            commit(SEEN);
         },
     };
 };
