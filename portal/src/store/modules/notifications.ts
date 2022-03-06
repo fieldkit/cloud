@@ -1,5 +1,5 @@
 import { ActionContext } from "vuex";
-import {Services, SendFunction, SimpleUser} from "@/api";
+import { Services, SendFunction, SimpleUser } from "@/api";
 import * as ActionTypes from "../actions";
 import { MarkNotificationsSeen } from "../typed-actions";
 import { promiseAfter } from "@/utilities";
@@ -60,8 +60,7 @@ const actions = (services: Services) => {
             commit(CONNECTED, send);
         },
         [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
-
-            await services.api.seenNotifications({ids: state.notifications.map((n) => n.notificationId)});
+            await services.api.seenNotifications({ ids: state.notifications.map((n) => n.notificationId) });
 
             commit(SEEN);
         },
