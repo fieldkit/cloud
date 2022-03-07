@@ -303,6 +303,8 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 func (c *StationService) ListProject(ctx context.Context, payload *station.ListProjectPayload) (response *station.StationsFull, err error) {
 	pr := repositories.NewProjectRepository(c.options.Database)
 
+	log := Logger(ctx).Sugar()
+
 	project, err := pr.QueryByID(ctx, payload.ID)
 	if err != nil {
 		return nil, err
@@ -341,6 +343,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	if err != nil {
 		return nil, err
 	}
+	log.Infow("LIST PROJECTS")
 
 	response = &station.StationsFull{
 		Stations: stations,
