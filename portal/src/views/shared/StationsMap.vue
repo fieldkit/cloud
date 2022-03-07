@@ -34,7 +34,7 @@ export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
-        
+
     },
     data(): {
         mapbox: { token: string; style: string };
@@ -216,9 +216,6 @@ export default Vue.extend({
                         type: "circle",
                         source: "stations",
                         filter: ["==", "$type", "Point"],
-                        layout: {
-                            //"symbol-sort-key": "value"
-                        },
                         paint: {
                             "circle-color": ["get", "color"],
                             "circle-stroke-color": "#fff",
