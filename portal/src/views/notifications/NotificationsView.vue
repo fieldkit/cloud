@@ -3,26 +3,38 @@
         <div class="main-panel">
             <h1>{{ $t("notifications.title") }}</h1>
 
-            <div class="notifications-container">
+            <div class="notifications-body">
                 <div class="notifications-filters">
-                    <span class="active">{{ $t("notifications.filters.all") }}</span>
-                    <span>{{ $t("notifications.filters.unread") }}</span>
-                    <span>{{ $t("notifications.filters.comment") }}</span>
-                    <span>{{ $t("notifications.filters.reply") }}</span>
-                    <span>{{ $t("notifications.filters.mention") }}</span>
+                    <span :class="{ active: this.filter === '' }" v-on:click="viewAll()">{{ $t("notifications.filters.all") }}</span>
+                    <span :class="{ active: this.filter === 'comment' }" v-on:click="viewKind('comment')">
+                        {{ $t("notifications.filters.comment") }}
+                    </span>
+                    <span :class="{ active: this.filter === 'reply' }" v-on:click="viewKind('reply')">
+                        {{ $t("notifications.filters.reply") }}
+                    </span>
+                    <span :class="{ active: this.filter === 'mention' }" v-on:click="viewKind('mention')">
+                        {{ $t("notifications.filters.mention") }}
+                    </span>
                 </div>
-                <NotificationsList></NotificationsList>
+                <NotificationsList
+                    v-on:notification-click="notificationNavigate"
+                    :notificationsList="notificationsList"
+                ></NotificationsList>
+                <div class="no-notifications" v-if="notificationsList.length === 0">
+                    <span>{{ $t("layout.header.noNotifications") }}</span>
+                </div>
             </div>
         </div>
     </StandardLayout>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout.vue";
 import { GlobalState } from "@/store/modules/global";
 import NotificationsList from "@/views/notifications/NotificationsList.vue";
+import { Notification } from "@/store/modules/notifications";
 
 export default Vue.extend({
     name: "NotificationsView",
@@ -31,12 +43,51 @@ export default Vue.extend({
         StandardLayout,
     },
     data() {
-        return {};
+        return {
+            filter: "",
+        };
     },
     computed: {
+        ...mapGetters({
+            notifications: "notifications",
+        }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
+        notificationsList(): Notification[] {
+            return this.filter ? this.notifications.filter((item) => item.kind === this.filter) : this.notifications;
+        },
     },
-    methods: {},
+    methods: {
+        viewAll() {
+            this.filter = "";
+        },
+        viewKind(kind: string) {
+            this.filter = kind;
+        },
+        notificationNavigate(notification: Notification) {
+            if (notification.projectId) {
+                return this.$router
+                    .push({
+                        name: "viewProject",
+                        params: { id: notification.projectId },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
+            }
+            if (notification.bookmark) {
+                return this.$router
+                    .push({
+                        name: "exploreBookmark",
+                        params: { bookmark: notification.bookmark },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
+            }
+        },
+    },
 });
 </script>
 
@@ -49,8 +100,8 @@ export default Vue.extend({
     margin: 0;
 }
 
-::v-deep .notifications {
-    &-container {
+.notifications {
+    &-body {
         margin-top: 50px;
         background: #fff;
         padding: 24px 24px 112.5px 23px;
@@ -68,7 +119,7 @@ export default Vue.extend({
         }
     }
 
-    &-item {
+    ::v-deep &-item {
         margin-bottom: 0;
         padding: 14px 0 12px;
         border-bottom: 1px solid #ddd;
@@ -98,5 +149,9 @@ export default Vue.extend({
             }
         }
     }
+}
+
+.no-notifications {
+    margin-top: 15px;
 }
 </style>

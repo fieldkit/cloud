@@ -1,8 +1,9 @@
 import { ActionContext } from "vuex";
-import { Services, SendFunction } from "@/api";
+import { Services, SendFunction, SimpleUser } from "@/api";
 import * as ActionTypes from "../actions";
 import { MarkNotificationsSeen } from "../typed-actions";
 import { promiseAfter } from "@/utilities";
+import Vue from "vue";
 
 export interface Notification {
     notificationId: number;
@@ -10,6 +11,9 @@ export interface Notification {
     postId: number;
     kind: string;
     body: string;
+    projectId?: string;
+    bookmark?: string;
+    user?: { id: number; name: string; photo: object };
 }
 
 const CONNECTED = "CONNECTED";
@@ -56,16 +60,9 @@ const actions = (services: Services) => {
             commit(CONNECTED, send);
         },
         [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
-            if (state.send) {
-                if (payload.ids.length == 0) {
-                    await state.send(new MarkNotificationsSeen(state.notifications.map((n) => n.notificationId)));
-                } else {
-                    await state.send(payload);
-                }
-                commit(SEEN);
-            } else {
-                // TODO Queue?
-            }
+            await services.api.seenNotifications({ ids: state.notifications.map((n) => n.notificationId) });
+
+            commit(SEEN);
         },
     };
 };
@@ -81,7 +78,7 @@ const mutations = {
         state.notifications.push(payload);
     },
     [SEEN]: (state: NotificationsState) => {
-        state.notifications.length = 0;
+        Vue.set(state, "notifications", []);
     },
 };
 

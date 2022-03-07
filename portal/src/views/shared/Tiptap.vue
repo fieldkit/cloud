@@ -160,12 +160,12 @@ export default Vue.extend({
                     suggestion: {
                         items: (props: { query: string; editor: Editor }): any[] => {
                             if (props.query.length > 0) {
-                                return (services.api.mentionables(props.query).then((mentionables) => {
+                                return services.api.mentionables(props.query).then((mentionables) => {
                                     console.log("mentionables", mentionables);
                                     return mentionables.users;
-                                }) as unknown) as any[];
+                                }) as unknown as any[];
                             } else {
-                                return (Promise.resolve([]) as unknown) as any[];
+                                return Promise.resolve([]) as unknown as any[];
                             }
                         },
                         render: () => {
@@ -233,7 +233,7 @@ export default Vue.extend({
             console.log("on-change", args);
         },
         onSave() {
-            if (!this.editor.isEmpty) {
+            if (this.editor && !this.editor.isEmpty) {
                 this.$emit("save");
             }
         },
@@ -325,6 +325,7 @@ export default Vue.extend({
     }
 
     .tiptap-side {
+        flex-shrink: 0;
     }
 }
 </style>

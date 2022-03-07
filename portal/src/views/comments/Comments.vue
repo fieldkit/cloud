@@ -17,7 +17,13 @@
                 <header v-if="viewType === 'data'">Notes & Comments</header>
             </div>
             <transition-group name="fade">
-                <div class="comment comment-first-level" v-for="post in posts" v-bind:key="post.id">
+                <div
+                    class="comment comment-first-level"
+                    v-for="post in posts"
+                    v-bind:key="post.id"
+                    v-bind:id="'comment-id-' + post.id"
+                    :ref="post.id"
+                >
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column-post">
@@ -37,7 +43,13 @@
                     </div>
                     <div class="column">
                         <transition-group name="fade" class="comment-replies">
-                            <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
+                            <div
+                                class="comment"
+                                v-for="reply in post.replies"
+                                v-bind:key="reply.id"
+                                v-bind:id="'comment-id-' + reply.id"
+                                :ref="reply.id"
+                            >
                                 <div class="comment-main">
                                     <UserPhoto :user="reply.author"></UserPhoto>
                                     <div class="column-reply">
@@ -244,6 +256,8 @@ export default Vue.extend({
                             );
                         });
                     });
+
+                    this.highlightComment();
                 })
                 .catch(() => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
@@ -313,6 +327,21 @@ export default Vue.extend({
                     event: "delete-comment",
                 },
             ];
+        },
+        highlightComment() {
+            this.$nextTick(() => {
+                if (location.hash) {
+                    const el = document.querySelector(location.hash);
+
+                    if (el) {
+                        el.scrollIntoView({ behavior: "smooth" });
+                        el.classList.add("highlight");
+                        setTimeout(() => {
+                            el.classList.remove("highlight");
+                        }, 5000);
+                    }
+                }
+            });
         },
     },
 });
@@ -568,10 +597,8 @@ header {
         }
     }
 
-    &.highlight {
-        opacity: 0.1;
+    &.highlight > div {
         background-color: #a0dbe1;
-        @include position(absolute, 0 null null 0);
     }
 }
 
