@@ -23,11 +23,8 @@ import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
 import { MappedStations, LngLat, BoundingRectangle } from "@/store";
-import MapMarker from "./MapMarker";
 
 import * as d3 from "d3";
-import _ from "lodash";
-import MapMarker from "./MapMarker.vue";
 
 interface ProtectedData {
     map: any;
@@ -37,7 +34,7 @@ export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
-        MapMarker,
+        
     },
     data(): {
         mapbox: { token: string; style: string };
@@ -148,9 +145,18 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
+            // Marker color scale
             const markerScale = d3.scaleThreshold()
                 .domain(this.thresholds.levels.map( d => d.value ))
                 .range(this.thresholds.levels.map( d => d.color ));
+
+            // Add color value to feature data
+            const appendColor = (features) => {
+                return features.map( (d) => { 
+                    d.properties.color = markerScale(d.properties.value);
+                    return d 
+                })
+            }
 
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
@@ -159,7 +165,7 @@ export default Vue.extend({
                     type: "geojson",
                     data: {
                         type: "FeatureCollection",
-                        features: this.mapped.features,
+                        features: appendColor(this.mapped.features),
                     },
                 });
 
@@ -174,57 +180,67 @@ export default Vue.extend({
                     filter: ["==", "$type", "Polygon"],
                 });
 
-                map.addLayer({
-                    id: "station-shadow",
-                    type: "circle",
-                    source: "stations",
-                    filter: ["==", "$type", "Point"],
-                    paint: {
-                        "circle-color": "#000",
-                        "circle-radius": 20,
-                        "circle-blur": 0.5,
-                        "circle-opacity": 0.5,
-                    },
-                    // layout: {
-                    //     "icon-image": "dot",
-                    //     "text-field": "{title}",
-                    //     "icon-ignore-placement": true,
-                    //     "icon-allow-overlap": true,
-                    //     "text-allow-overlap": true,
-                    //     "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                    //     "text-offset": [0, 0.75],
-                    //     "text-variable-anchor": ["top", "right", "bottom", "left"],
-                    // },
-                });
-                map.addLayer({
-                    id: "station-markers",
-                    type: "circle",
-                    source: "stations",
-                    filter: ["==", "$type", "Point"],
-                    layout:{
-                        //"symbol-sort-key": "id"
-                    },
-                    paint: {
-                        "circle-color": "red",
-                        "circle-stroke-color": "#fff",
-                        "circle-stroke-width": 2,
-                        "circle-stroke-opacity": 0.65,
-                        "circle-radius": 14,
-                    },
-                });
-                map.addLayer({
-                    id: "station-value",
-                    type: "symbol",
-                    source: "stations",
-                    paint: {
-                        "text-color": "#fff",
-                    },
-                    layout: {
-                        "text-field": "{value}",
-                        "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"], // fixme: wrong font
-                        "text-size": 12,
-                    },
-                });
+                if(!this.mapped.isSingleType){
+                    map.addLayer({
+                        id: "station-markers",
+                        type: "symbol",
+                        source: "stations",
+                        filter: ["==", "$type", "Point"],
+                        layout: {
+                            "icon-image": "dot",
+                            "text-field": "{title}",
+                            "icon-ignore-placement": true,
+                            "icon-allow-overlap": true,
+                            "text-allow-overlap": true,
+                            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                            "text-offset": [0, 0.75],
+                            "text-variable-anchor": ["top", "right", "bottom", "left"],
+                        },
+                    });
+                }
+                else{
+                    map.addLayer({
+                        id: "station-shadow",
+                        type: "circle",
+                        source: "stations",
+                        filter: ["==", "$type", "Point"],
+                        paint: {
+                            "circle-color": "#000",
+                            "circle-radius": 20,
+                            "circle-blur": 0.5,
+                            "circle-opacity": 0.3,
+                        },
+                    });
+                    map.addLayer({
+                        id: "station-markers",
+                        type: "circle",
+                        source: "stations",
+                        filter: ["==", "$type", "Point"],
+                        layout: {
+                            //"symbol-sort-key": "value"
+                        },
+                        paint: {
+                            "circle-color": ["get", "color"],
+                            "circle-stroke-color": "#fff",
+                            "circle-stroke-width": 2,
+                            "circle-stroke-opacity": 0.65,
+                            "circle-radius": 13,
+                        },
+                    });
+                    map.addLayer({
+                        id: "station-value",
+                        type: "symbol",
+                        source: "stations",
+                        paint: {
+                            "text-color": "#fff",
+                        },
+                        layout: {
+                            "text-field": "{value}",
+                            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"], // fixme: add avenir to mapbox
+                            "text-size": 12,
+                        },
+                    });
+                }
 
                 map.on("click", "station-markers", (e) => {
                     const id = e.features[0].properties.id;
@@ -239,18 +255,6 @@ export default Vue.extend({
                 map.fitBounds(this.bounds, { duration: 0 });
             }
 
-            console.log("IS SINGLE?", this.mapped.isSingleType)
-            console.log(this.mapped.features)
-
-            for (const feature of this.mapped.features) {
-
-            const test = new MapMarker({propsData: { value: feature.properties.value, color: markerScale(feature.properties.value)}});
-            test.$mount();
-
-
-            // make a marker for each feature and add to the map
-            new mapboxgl.Marker(test.$el).setLngLat(feature.geometry.coordinates).addTo(map);
-            }
         },
     },
 });

@@ -47,11 +47,12 @@ export class DisplaySensor {
 export class DisplayModule {
     name: string;
     sensors: DisplaySensor[];
+    primary: string;
 
     constructor(module: StationModule) {
         this.name = module.name;
         this.sensors = module.sensors.map((s) => new DisplaySensor(s));
-        console.log("DISPLAY MODULE", this.sensors)
+        this.primary = "depth"; //fixme: static for testing; calulate from "ordering" in sensor_meta
     }
 }
 
@@ -70,6 +71,7 @@ export class DisplayStation {
     public readonly placeNameNative: string | null;
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
+    public readonly latestPrimary: number | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -83,6 +85,7 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
+        this.latestPrimary = _.round(_.random(8.0, 10.0, true), 1), //fixme: static until backend data issue resolved
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
@@ -112,7 +115,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number, value: number } | null = null;
+    public readonly properties: { icon: string; id: number, value: number | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -121,7 +124,7 @@ export class MapFeature {
         };
         this.properties = {
             id: station.id,
-            value: _.round(_.random(8.0, 10.0, true), 1),
+            value: station.latestPrimary,
             icon: "marker",
         };
     }
@@ -168,7 +171,7 @@ export class MappedStations {
             }) 
         })
 
-        return _.uniq(_.flatten(moduleNames)).length === 1
+        return _.uniq(_.flatten(moduleNames)).length === 1;
     }
 
     public get valid(): boolean {
