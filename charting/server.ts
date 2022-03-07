@@ -181,6 +181,8 @@ app.get("/charting", statusHandler);
 app.get("/charting/rendered", async (req, res, next) => {
   // TODO Authorization header
 
+  res.setHeader("Content-Type", "image/png");
+
   try {
     console.log(`charting:query`);
 
@@ -349,22 +351,7 @@ app.get("/charting/rendered", async (req, res, next) => {
     const canvas = await view.toCanvas();
     const stream = (canvas as any).createPNGStream();
 
-    console.log("charting:stream");
-
-    (canvas as any).toBuffer((err, buffer) => {
-      if (err) {
-        console.log("charting:error", err);
-        return;
-      }
-
-      console.log("charting:buffer", buffer.length);
-
-      res.setHeader("Content-Type", "image/png");
-
-      res.end(buffer);
-
-      console.log("charting:done");
-    });
+    stream.pipe(res);
   } catch (error) {
     console.log(`charting:error`, error.message);
     next(error);
