@@ -157,20 +157,20 @@ export default Vue.extend({
                 return Promise.resolve(this.workspace);
             }
             await this.$router
-                .push({ name: "exploreBookmark", params: { bookmark: serializeBookmark(bookmark) } })
+                .push({ name: "exploreBookmark", query: { bookmark: serializeBookmark(bookmark) } })
                 .then(() => this.workspace);
         },
         async openExports(): Promise<void> {
-            const encoded = JSON.stringify(this.bookmark);
-            await this.$router.push({ name: "exportBookmark", params: { bookmark: encoded } });
+            const encoded = serializeBookmark(this.bookmark);
+            await this.$router.push({ name: "exportBookmark", query: { bookmark: encoded } });
         },
         async closeExports(): Promise<void> {
-            const encoded = JSON.stringify(this.bookmark);
-            await this.$router.push({ name: "exploreBookmark", params: { bookmark: encoded } });
+            const encoded = serializeBookmark(this.bookmark);
+            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
         },
         async openShare(): Promise<void> {
-            const encoded = JSON.stringify(this.bookmark);
-            await this.$router.push({ name: "shareBookmark", params: { bookmark: encoded } });
+            const encoded = serializeBookmark(this.bookmark);
+            await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
         },
         async closeShare(): Promise<void> {
             await this.closeExports();

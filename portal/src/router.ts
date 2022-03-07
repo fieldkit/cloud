@@ -291,35 +291,36 @@ const routes = [
     },
     {
         path: "/dashboard/explore",
-        name: "exploreDefault",
+        name: "exploreBookmark",
         component: ExploreView,
         props: (route) => {
+            if (route.query.bookmark) {
+                return {
+                    bookmark: deserializeBookmark(route.query.bookmark),
+                };
+            }
             return {};
         },
-        meta: {
-            secured: true,
-        },
+        meta: {},
     },
     {
         path: "/dashboard/explore/:bookmark",
-        name: "exploreBookmark",
+        name: "exportBookmarkOld",
         component: ExploreView,
         props: (route) => {
             return {
                 bookmark: deserializeBookmark(route.params.bookmark),
             };
         },
-        meta: {
-            secured: true,
-        },
+        meta: {},
     },
     {
-        path: "/dashboard/export/:bookmark",
+        path: "/dashboard/export",
         name: "exportBookmark",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.params.bookmark),
+                bookmark: deserializeBookmark(route.query.bookmark),
                 exportsVisible: true,
             };
         },
@@ -329,12 +330,12 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/share/:bookmark",
+        path: "/dashboard/share",
         name: "shareBookmark",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.params.bookmark),
+                bookmark: deserializeBookmark(route.query.bookmark),
                 shareVisible: true,
             };
         },
