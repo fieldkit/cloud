@@ -8,7 +8,8 @@
         </div>
         <div class="share-options">
             <a class="twitter-share-button" :href="twitterUrl" target="blank">
-                <div class="button">Twitter</div>
+                <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
+                Twitter
             </a>
         </div>
     </div>
@@ -19,7 +20,7 @@ import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
 import { serializeBookmark } from "./viz";
 
 export default Vue.extend({
@@ -81,10 +82,20 @@ export default Vue.extend({
 .share-options {
     padding: 20px;
 
-    .button {
+    .twitter-share-button {
+        padding: 10px 10px 10px 0px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        img {
+            padding: 5px 10px 5px 5px;
+        }
+    }
+
+    .link {
         font-size: 12px;
         padding: 10px;
-        background-color: #ffffff;
         border: 1px solid rgb(215, 220, 225);
         border-radius: 4px;
         cursor: pointer;
