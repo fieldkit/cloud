@@ -120,7 +120,16 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
 
-	bookmark := vars["bookmark"]
+	bookmark := ""
+	if vars["bookmark"] != "" {
+		bookmark = vars["bookmark"]
+	}
+
+	qs := req.URL.Query()
+
+	if qs.Get("bookmark") != "" {
+		bookmark = qs.Get("bookmark")
+	}
 
 	log.Infow("twitter-workspace-card", "bookmark", bookmark)
 
@@ -217,4 +226,5 @@ func (tw *TwitterContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
 	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
 	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
+	s.HandleFunc("/dashboard/explore", tw.SharedWorkspace)
 }

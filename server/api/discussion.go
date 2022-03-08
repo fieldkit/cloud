@@ -65,7 +65,6 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 
 	bookmark, err := data.ParseBookmark(payload.Bookmark)
 	if err != nil {
-		panic(err)
 		return nil, err
 	}
 
@@ -139,7 +138,7 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		return nil, err
 	}
 
-	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
+	if err := c.notifyMentionsAndReplies(ctx, post, user); err != nil {
 		return nil, err
 	}
 
@@ -186,7 +185,7 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 		return nil, err
 	}
 
-	if err := c.notifyMentionsAndReplies(ctx, post); err != nil {
+	if err := c.notifyMentionsAndReplies(ctx, post, user); err != nil {
 		return nil, err
 	}
 
@@ -234,7 +233,7 @@ func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discServ
 	return nil
 }
 
-func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *data.DiscussionPost) error {
+func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *data.DiscussionPost, user *data.User) error {
 	log := Logger(ctx).Sugar()
 
 	notifications := make([]*data.Notification, 0)
@@ -262,7 +261,7 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 		if saved, err := nr.AddNotification(ctx, notif); err != nil {
 			return err
 		} else {
-			message := data.PostNotificationToMap(saved, post)
+			message := data.PostNotificationToMap(saved, post, user)
 			log.Infow("notification", "notification", message)
 			if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
 				log.Errorw("notification", "error", err)

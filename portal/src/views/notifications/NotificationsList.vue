@@ -1,52 +1,80 @@
 <template>
     <ul>
         <li
-            class="notifications-item notifications-item--reply"
-            v-for="notification in notifications"
+            class="notifications-item"
+            :class="`notifications-item--${notification.kind}`"
+            v-for="notification in notificationsVisible"
             :key="notification.notificationId"
             v-on:click="onClick(notification)"
         >
             <div class="notifications-avatar">
-                <UserPhoto :user="user" />
-                <span class="notifications-item-icon"></span>
+                <UserPhoto :user="notification.user" />
+                <span class="notifications-item-icon"><span :class="`icon-icon-${notification.kind}`"></span></span>
             </div>
             <div>
-                {{ display(notification) }}
+                <span>{{ notification.user.name }}</span>
+                <span class="notification-kind">{{ display(notification) }}</span>
                 <div class="notifications-timestamp">
-                    1 day ago
+                    {{ formatTimestamp(notification.createdAt) }}
                 </div>
             </div>
-            <i class="icon-ellipsis"></i>
         </li>
     </ul>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { mapGetters, mapState } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 import UserPhoto from "../shared/UserPhoto.vue";
+import moment from "moment";
+import { Notification } from "@/store/modules/notifications";
 
 export default Vue.extend({
     name: "NotificationsList",
     components: {
         UserPhoto,
     },
-    data() {
-        return {};
+    data(): {
+        notificationsData: Notification[];
+    } {
+        return {
+            notificationsData: [],
+        };
     },
     computed: {
         ...mapGetters({
             notifications: "notifications",
         }),
         ...mapState({ user: (s: GlobalState) => s.user.user }),
+        notificationsVisible() {
+            return this.notificationsList ?? this.notifications;
+        },
+    },
+    props: {
+        notificationsList: {
+            type: Array as PropType<Notification[]>,
+            required: false,
+        },
     },
     methods: {
         display(notification: Notification): string {
+            switch (notification.kind) {
+                case "reply":
+                    return "replied to your comment";
+                case "comment":
+                    return "commented on your data";
+                case "mention":
+                    return "mentioned you in a comment";
+            }
+
             return "Notification";
         },
         onClick(notification: Notification): void {
             this.$emit("notification-click", notification);
+        },
+        formatTimestamp(timestamp: number): string {
+            return moment(timestamp).fromNow();
         },
     },
 });
@@ -57,19 +85,12 @@ export default Vue.extend({
 
 .notifications {
     &-item {
-        @include flex(flex-start);
+        @include flex(center);
         color: #6a6d71;
         font-size: 14px;
         font-family: $font-family-light;
         margin-bottom: 10px;
         line-height: 1.4em;
-
-        img {
-            width: 35px;
-            height: 35px;
-            margin-right: 7px;
-            margin-top: 0;
-        }
 
         > div {
             padding-right: 7px;
@@ -81,25 +102,49 @@ export default Vue.extend({
             border-radius: 50%;
             width: 17px;
             height: 17px;
+            font-size: 10px;
+            line-height: 18px;
+
+            @include bp-down($md) {
+                @include position(absolute, 26px 0 null 20px);
+                width: 15px;
+                height: 15px;
+                font-size: 8px;
+                line-height: 16px;
+            }
 
             .notifications-item--reply & {
-                background: url(/portal/src/assets/icon-reply-white.svg) no-repeat center center #ce596b;
-                background-size: 11px;
+                background-color: #ce596b;
             }
 
             .notifications-item--comment & {
-                background: url(/portal/src/assets/icon-comment.svg) no-repeat center center #5268cc;
+                background-color: #5268cc;
             }
 
             .notifications-item--mention & {
-                background: url(/portal/src/assets/icon-mention.svg) no-repeat center center #52b5e4;
+                background-color: #52b5e4;
             }
+        }
+
+        .notification-kind {
+            color: #6a6d71;
+
+            &::before {
+                content: " ";
+            }
+        }
+
+        ::v-deep .default-user-icon {
+            width: 35px;
+            height: 35px;
+            margin-right: 7px;
+            margin-top: 0;
         }
     }
 
     &-timestamp {
         font-size: 12px;
-        margin-top: 3px;
+        color: #6a6d71;
     }
 
     &-avatar {
@@ -120,6 +165,26 @@ export default Vue.extend({
         font-size: 32px;
         font-family: $font-family-bold;
         letter-spacing: -1.5px;
+    }
+}
+
+.notifications-avatar {
+    text-align: center;
+
+    .icon-icon-reply,
+    .icon-icon-comment,
+    .icon-icon-mention {
+        font-size: 10px;
+        line-height: 18px;
+        @include bp-down($md) {
+            font-size: 8px;
+            line-height: 16px;
+        }
+    }
+    .icon-icon-reply:before,
+    .icon-icon-comment:before,
+    .icon-icon-mention:before {
+        color: white;
     }
 }
 </style>
