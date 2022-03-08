@@ -56,6 +56,9 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 
+.actions {
+    display: flex;
+}
 .double-header {
     display: flex;
     text-align: left;
@@ -69,8 +72,6 @@ export default Vue.extend({
         flex-basis: 100%;
         margin: 15px 0;
     }
-}
-.double-header > div {
 }
 .back {
     font-size: 14px;
