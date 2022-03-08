@@ -20,6 +20,7 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
 import { mapState, mapGetters } from "vuex";
+import { serializeBookmark } from "./viz";
 
 export default Vue.extend({
     name: "SharePanel",
@@ -47,7 +48,7 @@ export default Vue.extend({
             return "https://twitter.com/intent/tweet" + "?" + qs.toString();
         },
         vizUrl(): string {
-            return "https://portal.fkdev.org/dashboard/explore/" + JSON.stringify(this.bookmark);
+            return "https://portal.fkdev.org/dashboard/explore?bookmark=" + serializeBookmark(this.bookmark);
         },
     },
     methods: {
