@@ -193,6 +193,7 @@ export default Vue.extend({
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
+
             this.stationId = stationId;
 
             return await this.createWorkspaceIfNecessary().then(async (workspace) => {
@@ -371,7 +372,7 @@ export default Vue.extend({
         width: 100%;
         height: 100%;
         display: none;
-        z-index: 10;
+        z-index: 5;
         opacity: 0.5;
     }
 
