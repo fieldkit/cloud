@@ -128,15 +128,10 @@ export default Vue.extend({
 
         function asContent(v: unknown): JSONContent | null {
             if (_.isString(v)) {
-                try {
-                    if (v.length == 0) {
-                        return null;
-                    }
-                    return JSON.parse(v);
-                } catch (error) {
-                    console.log(`malformed: ${v}`);
+                if (v.length == 0) {
                     return null;
                 }
+                return JSON.parse(v);
             }
             return v as JSONContent;
         }
@@ -160,12 +155,12 @@ export default Vue.extend({
                     suggestion: {
                         items: (props: { query: string; editor: Editor }): any[] => {
                             if (props.query.length > 0) {
-                                return services.api.mentionables(props.query).then((mentionables) => {
+                                return (services.api.mentionables(props.query).then((mentionables) => {
                                     console.log("mentionables", mentionables);
                                     return mentionables.users;
-                                }) as unknown as any[];
+                                }) as unknown) as any[];
                             } else {
-                                return Promise.resolve([]) as unknown as any[];
+                                return (Promise.resolve([]) as unknown) as any[];
                             }
                         },
                         render: () => {
