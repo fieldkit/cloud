@@ -45,10 +45,12 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
-            return "https://twitter.com/intent/tweet" + "?" + qs.toString();
+            return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
-            return "https://portal.fkdev.org/dashboard/explore?bookmark=" + serializeBookmark(this.bookmark);
+            const qs = new URLSearchParams();
+            qs.append("bookmark", serializeBookmark(this.bookmark));
+            return `https://portal.fkdev.org/dashboard/explore?${qs.toString()}`;
         },
     },
     methods: {
