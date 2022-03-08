@@ -1,8 +1,8 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
-        <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
+        <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
 
-        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closeShare" />
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closePanel" />
 
         <div class="explore-view">
             <div class="explore-header">
@@ -159,16 +159,13 @@ export default Vue.extend({
             const encoded = serializeBookmark(this.bookmark);
             await this.$router.push({ name: "exportBookmark", query: { bookmark: encoded } });
         },
-        async closeExports(): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
-        },
         async openShare(): Promise<void> {
             const encoded = serializeBookmark(this.bookmark);
             await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
         },
-        async closeShare(): Promise<void> {
-            await this.closeExports();
+        async closePanel(): Promise<void> {
+            const encoded = serializeBookmark(this.bookmark);
+            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
         },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
