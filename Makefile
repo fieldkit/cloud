@@ -15,7 +15,7 @@ GOOS ?= linux
 endif
 
 ifeq ($(UNAME_S),Darwin)
-GOARCH ?= $(shell uname -m)
+GOARCH ?= amd64
 GOOS ?= darwin
 endif
 
@@ -59,8 +59,8 @@ cycle-checks:
 
 jstests: portal/node_modules
 	cd portal && $(JSPKG) install
-	cd portal && ./node_modules/.bin/vue-cli-service build
-	cd portal && ./node_modules/.bin/vue-cli-service test:unit
+	cd portal && vue-cli-service build
+	cd portal && vue-cli-service test:unit
 
 gotests:
 	cd server && go test -p 1 -coverprofile=coverage.data ./...
