@@ -37,9 +37,9 @@ export default Vue.extend({
     },
     methods: {
         applyCustomClasses(): void {
-            if (window.location.hostname.indexOf("floodnet.") === 0) {
+          //  if (window.location.hostname.indexOf("floodnet.") === 0) {
                 document.body.classList.add(FKPartnersEnum.floodnet);
-            }
+          //  }
         },
         setCustomFavicon(): void {
             const faviconEl = document.getElementById("favicon") as HTMLAnchorElement;
