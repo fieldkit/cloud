@@ -44,6 +44,7 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
+            qs.append("text", "Check out this data on FieldKit.org");
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
