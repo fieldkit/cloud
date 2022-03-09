@@ -109,6 +109,10 @@ export default Vue.extend({
         });
 
         resizeObserver.observe(document.querySelector("body"));
+        
+        if(this.narrow){
+            this.toggleSidebar();
+        }
     },
     data(): {
         sidebar: {

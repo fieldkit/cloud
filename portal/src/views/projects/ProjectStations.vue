@@ -1,5 +1,5 @@
 <template>
-    <div class="stations-container">
+    <div class="stations-container" v-if="false">
         <StationPickerModal
             :stations="userStations"
             :filter="pickFilter"

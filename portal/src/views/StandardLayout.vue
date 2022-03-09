@@ -9,6 +9,7 @@
                 :isAuthenticated="isAuthenticated"
                 :stations="stations"
                 :projects="userProjects"
+                :narrow="true"
                 @show-station="showStation"
                 @sidebar-toggle="onSidebarToggle"
             />
