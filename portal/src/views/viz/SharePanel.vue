@@ -2,9 +2,7 @@
     <div :class="'share-panel ' + containerClass">
         <div class="heading">
             <div class="title">Share</div>
-            <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
-            </div>
+            <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
             <a class="twitter-share-button" :href="twitterUrl" target="blank">
@@ -69,6 +67,7 @@ export default Vue.extend({
 .share-panel .heading {
     padding: 1em;
     display: flex;
+    align-items: center;
 }
 .share-panel .heading .title {
     font-size: 20px;
