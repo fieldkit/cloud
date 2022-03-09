@@ -430,7 +430,7 @@ header {
     }
 }
 
-.new-comment {
+::v-deep .new-comment {
     @include flex(center);
     padding: 22px 0;
     position: relative;
@@ -444,14 +444,6 @@ header {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
             padding: 18px 23px 17px 15px;
-
-            .new-comment-submit {
-                right: 33px;
-
-                @include bp-down($sm) {
-                    right: 25px;
-                }
-            }
         }
     }
 
@@ -499,35 +491,6 @@ header {
             @include bp-down($xs) {
                 padding: 7px 40px 7px 7px;
             }
-        }
-    }
-
-    &-submit {
-        @include position(absolute, null 10px 35px null);
-        @include flex(center);
-        padding: 0 10px;
-        font-weight: 900;
-        flex-shrink: 0;
-
-        @include bp-down($sm) {
-            bottom: 25px;
-        }
-
-        .data-view & {
-            right: 0;
-            bottom: 30px;
-        }
-
-        .reply & {
-            right: 12px;
-
-            @include bp-down($sm) {
-                right: 7px;
-            }
-        }
-
-        .reply & {
-            bottom: 5px;
         }
     }
 }
