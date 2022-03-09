@@ -68,6 +68,7 @@
                     v-if="activeStation"
                     :station="activeStation"
                     :readings="false"
+                    :exploreContext="exploreContext"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"
                 />
@@ -80,6 +81,11 @@
 import _ from "lodash";
 import Vue from "vue";
 
+import { ExploreContext } from "@/views/viz/common";
+
+import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
+import * as ActionTypes from "@/store/actions";
+
 import StationSummary from "@/views/shared/StationSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
@@ -87,9 +93,6 @@ import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
-
-import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
-import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -174,6 +177,9 @@ export default Vue.extend({
             }
 
             return MappedStations.defaultBounds();
+        },
+        exploreContext(): ExploreContext {
+            return new ExploreContext(this.project.id);
         },
     },
     methods: {

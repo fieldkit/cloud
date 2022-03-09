@@ -1274,8 +1274,13 @@ class FKApi {
                 replies: this.parseBodies(post.replies),
             });
         } catch (error) {
-            console.log("comments-malformed", post);
-            return post;
+            return _.extend(post, {
+                body: {
+                    type: "doc",
+                    content: [{ type: "paragraph", content: [{ type: "text", text: post.body }] }],
+                },
+                replies: this.parseBodies(post.replies),
+            });
         }
     }
 

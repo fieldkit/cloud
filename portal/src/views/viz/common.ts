@@ -263,3 +263,7 @@ export class SeriesData {
         public readonly vizInfo: VizInfo
     ) {}
 }
+
+export class ExploreContext {
+    constructor(public readonly project: number | null = null) {}
+}

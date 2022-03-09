@@ -1,12 +1,12 @@
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
-        <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closeExports" />
+        <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
 
-        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closeShare" />
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closePanel" />
 
         <div class="explore-view">
             <div class="explore-header">
-                <DoubleHeader :backTitle="$t(backLabelKey)" :backRoute="backRoute" :backRouteParams="backRouteParams">
+                <DoubleHeader :backTitle="$t(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
                             Data View
@@ -80,28 +80,15 @@ export default Vue.extend({
             default: false,
         },
     },
-    beforeRouteEnter(to, from, next) {
-        next((vm: any) => {
-            if (from.name === "exploreBookmark" || from.name === "exportBookmark") {
-                return;
-            }
-            vm.backRoute = from.name ? from.name : "mapAllStations";
-            vm.backRouteParams = from.params;
-        });
-    },
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
         stationId: number | null;
-        backRoute: string | null;
-        backRouteParams: { bounds: string | null; id: number | null };
     } {
         return {
             workspace: null,
             showNoSensors: false,
             stationId: null,
-            backRoute: null,
-            backRouteParams: { bounds: null, id: null },
         };
     },
     computed: {
@@ -118,7 +105,7 @@ export default Vue.extend({
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
-            if (this.backRoute === "viewProject") {
+            if (this.bookmark.p.length > 0) {
                 return "layout.backProjectDashboard";
             }
             return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
@@ -136,7 +123,7 @@ export default Vue.extend({
         if (this.bookmark) {
             await this.$services.api.getAllSensors().then(async (sensorKeys) => {
                 // Check for a bookmark that is just to a station with no groups.
-                if (this.bookmark.s.length > 0) {
+                if (this.bookmark.s.length > 0 && this.bookmark.g.length == 0) {
                     console.log("viz: before-show-station", this.bookmark);
                     return this.showStation(this.bookmark.s[0]);
                 }
@@ -146,6 +133,14 @@ export default Vue.extend({
         }
     },
     methods: {
+        async onBack() {
+            console.log("viz:back", this.bookmark);
+            if (this.bookmark.p && this.bookmark.p.length > 0) {
+                await this.$router.push({ name: "viewProject", params: { id: this.bookmark.p[0] } });
+            } else {
+                await this.$router.push({ name: "mapAllStations" });
+            }
+        },
         async addChart() {
             console.log("viz: add");
             if (!this.workspace) throw new Error("viz-add: no workspace");
@@ -164,16 +159,13 @@ export default Vue.extend({
             const encoded = serializeBookmark(this.bookmark);
             await this.$router.push({ name: "exportBookmark", query: { bookmark: encoded } });
         },
-        async closeExports(): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
-        },
         async openShare(): Promise<void> {
             const encoded = serializeBookmark(this.bookmark);
             await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
         },
-        async closeShare(): Promise<void> {
-            await this.closeExports();
+        async closePanel(): Promise<void> {
+            const encoded = serializeBookmark(this.bookmark);
+            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
         },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {
@@ -193,6 +185,7 @@ export default Vue.extend({
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
+
             this.stationId = stationId;
 
             return await this.createWorkspaceIfNecessary().then(async (workspace) => {
@@ -371,7 +364,7 @@ export default Vue.extend({
         width: 100%;
         height: 100%;
         display: none;
-        z-index: 10;
+        z-index: 5;
         opacity: 0.5;
     }
 
