@@ -211,7 +211,7 @@ export default Vue.extend({
     @at-root .container-side.active & {
         opacity: 1;
         visibility: visible;
-        width: 240px;
+        width: 210px;
     }
 }
 .nav-section {
@@ -357,6 +357,7 @@ export default Vue.extend({
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
         font-size: 12px;
+        min-width: 50px;
     }
 
     i:before {
