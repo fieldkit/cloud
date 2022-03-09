@@ -1,6 +1,7 @@
 package social
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -17,18 +18,28 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-type TwitterContext struct {
+type MetaSchema interface {
+	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error
+	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error
+}
+
+type SocialContext struct {
 	db                *sqlxcache.DB
 	projectRepository *repositories.ProjectRepository
 	baseApiUrl        string
+	schema            MetaSchema
 }
 
-func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext) {
-	return &TwitterContext{
-		db:                db,
-		projectRepository: repositories.NewProjectRepository(db),
-		baseApiUrl:        baseApiUrl,
-	}
+type SharedProjectPayload struct {
+	project  *data.Project
+	photoUrl string
+}
+
+type SharedWorkspacePayload struct {
+	bookmark    *data.Bookmark
+	title       string
+	description string
+	photoUrl    string
 }
 
 const metaOnlyTemplate = `
@@ -44,8 +55,8 @@ const metaOnlyTemplate = `
 	</body>
 </html>`
 
-func (tw *TwitterContext) serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
-	t, err := template.New("twitter-meta").Parse(metaOnlyTemplate)
+func serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
+	t, err := template.New("social-meta").Parse(metaOnlyTemplate)
 	if err != nil {
 		return err
 	}
@@ -66,7 +77,7 @@ func (tw *TwitterContext) serveMeta(w http.ResponseWriter, req *http.Request, me
 	return nil
 }
 
-func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request) {
+func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
@@ -78,7 +89,7 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	project, err := tw.projectRepository.QueryByID(ctx, int32(projectId))
+	project, err := sc.projectRepository.QueryByID(ctx, int32(projectId))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)
@@ -96,33 +107,31 @@ func (tw *TwitterContext) SharedProject(w http.ResponseWriter, req *http.Request
 	}
 
 	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/projects/%d/media", tw.baseApiUrl, project.ID)
+	photoUrl := fmt.Sprintf("%s/projects/%d/media", sc.baseApiUrl, project.ID)
 
-	log.Infow("twitter-project-card", "project_id", project.ID, "url", req.URL)
+	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL)
 
-	meta := make(map[string]string)
-	meta["twitter:card"] = "summary_large_image"
-	meta["twitter:site"] = "@FieldKitOrg"
-	meta["twitter:title"] = project.Name
-	meta["twitter:description"] = project.Description
-	meta["twitter:image"] = photoUrl
-	meta["twitter:image:alt"] = project.Description
+	sharedPayload := &SharedProjectPayload{
+		project:  project,
+		photoUrl: photoUrl,
+	}
 
-	if err := tw.serveMeta(w, req, meta); err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
+	err = sc.schema.SharedProject(ctx, w, req, sharedPayload)
+	if err != nil {
+		log.Errorw("error", "project_id", projectId)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 }
 
-func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
+func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
 
 	bookmark := ""
 	if vars["bookmark"] != "" {
-		bookmark = vars["bookmark"]
+		bookmark = vars["bookmark"] // Deprecated
 	}
 
 	qs := req.URL.Query()
@@ -131,7 +140,7 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 		bookmark = qs.Get("bookmark")
 	}
 
-	log.Infow("twitter-workspace-card", "bookmark", bookmark)
+	log.Infow("social-workspace-card", "bookmark", bookmark)
 
 	parsed, err := data.ParseBookmark(bookmark)
 	if err != nil {
@@ -141,27 +150,28 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 	}
 
 	sensorRows := []*data.Sensor{}
-	if err := tw.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
+	if err := sc.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
 		log.Errorw("error-internal", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	mmr := repositories.NewModuleMetaRepository(tw.db)
+	mmr := repositories.NewModuleMetaRepository(sc.db)
 
 	sensorIdToKey := make(map[int64]string)
 	for _, row := range sensorRows {
 		sensorIdToKey[row.ID] = row.Key
 	}
 
-	sr := repositories.NewStationRepository(tw.db)
+	sr := repositories.NewStationRepository(sc.db)
 
 	sensorKeys := make([]string, 0)
 	sensorLabels := make([]string, 0)
 	stationNames := make([]string, 0)
 	ranges := make([]string, 0)
 
-	meta := make(map[string]string)
+	title := ""
+	description := ""
 
 	for _, v := range parsed.Vizes() {
 		log.Infow("viz:parsed", "v", v)
@@ -193,10 +203,10 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 		end := v.End.Format(time.RFC1123)
 		ranges = append(ranges, fmt.Sprintf("%s to %s", start, end))
 
-		meta["twitter:title"] = fmt.Sprintf("%s: %s", stationNames[0], sensorLabels[0])
+		title = fmt.Sprintf("%s: %s", stationNames[0], sensorLabels[0])
 
 		if !v.ExtremeTime {
-			meta["twitter:description"] = ranges[0]
+			description = ranges[0]
 		}
 
 		break // NOTE Single out first Viz.
@@ -206,17 +216,70 @@ func (tw *TwitterContext) SharedWorkspace(w http.ResponseWriter, req *http.Reque
 
 	// We're assuming https here.
 	now := time.Now()
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", tw.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", sc.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+
+	sharedPayload := &SharedWorkspacePayload{
+		photoUrl:    photoUrl,
+		title:       title,
+		description: description,
+		bookmark:    parsed,
+	}
+
+	err = sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
+	if err != nil {
+		log.Errorw("error")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+}
+
+type TwitterContext struct {
+	SocialContext
+}
+
+type TwitterSchema struct {
+}
+
+func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error {
+	meta := make(map[string]string)
 
 	meta["twitter:card"] = "summary_large_image"
 	meta["twitter:site"] = "@FieldKitOrg"
-	meta["twitter:image"] = photoUrl
-	meta["twitter:image:alt"] = meta["twitter:description"]
+	meta["twitter:title"] = payload.project.Name
+	meta["twitter:description"] = payload.project.Description
+	meta["twitter:image:alt"] = payload.project.Description
+	meta["twitter:image"] = payload.photoUrl
 
-	if err := tw.serveMeta(w, req, meta); err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	if err := serveMeta(w, req, meta); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *TwitterSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+	meta := make(map[string]string)
+
+	meta["twitter:card"] = "summary_large_image"
+	meta["twitter:site"] = "@FieldKitOrg"
+	meta["twitter:image:alt"] = meta["twitter:description"]
+	meta["twitter:image"] = payload.photoUrl
+
+	if err := serveMeta(w, req, meta); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext) {
+	return &TwitterContext{
+		SocialContext{
+			db:                db,
+			projectRepository: repositories.NewProjectRepository(db),
+			baseApiUrl:        baseApiUrl,
+			schema:            &TwitterSchema{},
+		},
 	}
 }
 
@@ -228,4 +291,41 @@ func (tw *TwitterContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
 	s.HandleFunc("/dashboard/explore", tw.SharedWorkspace)
 	s.HandleFunc("/dashboard/share", tw.SharedWorkspace)
+}
+
+type FacebookContext struct {
+	SocialContext
+}
+
+type FacebookSchema struct {
+}
+
+func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error {
+	return nil
+
+}
+
+func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+	return nil
+}
+
+func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string) (fb *FacebookContext) {
+	return &FacebookContext{
+		SocialContext{
+			db:                db,
+			projectRepository: repositories.NewProjectRepository(db),
+			baseApiUrl:        baseApiUrl,
+			schema:            &FacebookSchema{},
+		},
+	}
+}
+
+func (fb *FacebookContext) Register(r *mux.Router) {
+	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Facebook.*").Subrouter()
+	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", fb.SharedProject)
+	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", fb.SharedProject)
+	s.HandleFunc("/dashboard/explore/{bookmark}", fb.SharedWorkspace)
+	s.HandleFunc("/dashboard/share/{bookmark}", fb.SharedWorkspace)
+	s.HandleFunc("/dashboard/explore", fb.SharedWorkspace)
+	s.HandleFunc("/dashboard/share", fb.SharedWorkspace)
 }
