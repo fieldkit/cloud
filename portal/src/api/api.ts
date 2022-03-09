@@ -1295,7 +1295,7 @@ class FKApi {
         }
 
         const returned = await this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: apiURL,
         });

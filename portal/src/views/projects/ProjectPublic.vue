@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <Comments :parentData="displayProject.id" :user="user" v-if="user"></Comments>
+        <Comments :parentData="displayProject.id" :user="user"></Comments>
     </div>
 </template>
 
@@ -169,6 +169,9 @@ export default Vue.extend({
                 console.log("hello: after-navigation");
             },
         };
+    },
+    mounted() {
+      console.log("Radoi", this.user);
     },
     props: {
         user: {

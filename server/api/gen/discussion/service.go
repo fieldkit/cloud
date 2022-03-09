@@ -47,7 +47,7 @@ var MethodNames = [5]string{"project", "data", "post message", "update message",
 
 // ProjectPayload is the payload type of the discussion service project method.
 type ProjectPayload struct {
-	Auth      string
+	Auth      *string
 	ProjectID int32
 }
 

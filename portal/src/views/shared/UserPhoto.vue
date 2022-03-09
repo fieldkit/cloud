@@ -24,7 +24,7 @@ export default Vue.extend({
     props: {
         user: {
             type: Object as PropType<UserPhoto>,
-            required: true,
+            required: false,
         },
         icon: {
             type: Boolean,

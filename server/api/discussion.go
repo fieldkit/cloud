@@ -32,10 +32,32 @@ func NewDiscussionService(ctx context.Context, options *ControllerOptions) *Disc
 }
 
 func (c *DiscussionService) Project(ctx context.Context, payload *discService.ProjectPayload) (*discService.Discussion, error) {
-	p, err := NewPermissions(ctx, c.options).Unwrap()
+
+    log := Logger(ctx).Sugar()
+
+    getting := &data.Project{}
+    if err := c.options.Database.GetContext(ctx, getting, `
+        SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
+        `, payload.ProjectID); err != nil {
+
+        return nil, err
+    }
+
+    log.Infow("checking", "privacy", getting.Privacy)
+
+    p, err := NewPermissions(ctx, c.options).ForProject(getting)
+    if err != nil {
+        return nil, err
+    }
+
+    if err := p.CanView(); err != nil {
+        return nil, err
+    }
+
+	/* p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
-	}
+	} */
 
 	_ = p
 

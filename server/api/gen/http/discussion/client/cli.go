@@ -29,9 +29,11 @@ func BuildProjectPayload(discussionProjectProjectID string, discussionProjectAut
 			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = discussionProjectAuth
+		if discussionProjectAuth != "" {
+			auth = &discussionProjectAuth
+		}
 	}
 	v := &discussion.ProjectPayload{}
 	v.ProjectID = projectID
