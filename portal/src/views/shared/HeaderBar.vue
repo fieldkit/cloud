@@ -364,7 +364,7 @@ button {
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         border: solid 1px #e9e9e9;
-        height: 80vh;
+        max-height: 80vh;
         flex-direction: column;
         width: 320px;
         z-index: -1;
@@ -402,7 +402,7 @@ button {
 
         > ul {
             overflow-y: auto;
-            padding: 10px;
+            padding: 0 10px;
         }
     }
 }
@@ -425,6 +425,7 @@ button {
 
 .no-notifications {
     text-align: center;
+    padding: 0 13px 13px;
 
     img {
         width: 100%;
