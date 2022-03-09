@@ -3,8 +3,20 @@
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
         <div class="new-comment">
-            <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+            <UserPhoto :user="user"></UserPhoto>
+            <template v-if="user">
+                <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+            </template>
+            <template v-else>
+                <p class="need-login-msg">
+                    {{ $tc("comments.loginToComment.part1") }}
+                    <router-link :to="{ name: 'login' }" class="link">{{ $tc("comments.loginToComment.part2") }}</router-link>
+                    {{ $tc("comments.loginToComment.part3") }}
+                </p>
+                <router-link :to="{ name: 'login', query: { after: $route.path } }" class="button-submit">
+                    {{ $t("login.loginButton") }}
+                </router-link>
+            </template>
         </div>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -32,7 +44,7 @@
                                     {{ post.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user.id === post.author.id || user.admin"
+                                    v-if="user && (user.id === post.author.id || user.admin)"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
@@ -81,7 +93,7 @@
                             </div>
                         </transition>
 
-                        <div class="actions">
+                        <div v-if="user" class="actions">
                             <button @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
                                 Reply
@@ -119,7 +131,7 @@ export default Vue.extend({
     props: {
         user: {
             type: Object as PropType<CurrentUser>,
-            required: true,
+            required: false,
         },
         parentData: {
             type: [Number, Object],
@@ -259,7 +271,7 @@ export default Vue.extend({
 
                     this.highlightComment();
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
                 });
         },
@@ -430,7 +442,7 @@ header {
     }
 }
 
-.new-comment {
+::v-deep .new-comment {
     @include flex(center);
     padding: 22px 0;
     position: relative;
@@ -444,14 +456,6 @@ header {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
             padding: 18px 23px 17px 15px;
-
-            .new-comment-submit {
-                right: 33px;
-
-                @include bp-down($sm) {
-                    right: 25px;
-                }
-            }
         }
     }
 
@@ -462,7 +466,7 @@ header {
     }
 
     img {
-        margin-top: 0;
+        margin-top: 0!important;
         width: 30px;
         height: 30px;
     }
@@ -499,35 +503,6 @@ header {
             @include bp-down($xs) {
                 padding: 7px 40px 7px 7px;
             }
-        }
-    }
-
-    &-submit {
-        @include position(absolute, null 10px 35px null);
-        @include flex(center);
-        padding: 0 10px;
-        font-weight: 900;
-        flex-shrink: 0;
-
-        @include bp-down($sm) {
-            bottom: 25px;
-        }
-
-        .data-view & {
-            right: 0;
-            bottom: 30px;
-        }
-
-        .reply & {
-            right: 12px;
-
-            @include bp-down($sm) {
-                right: 7px;
-            }
-        }
-
-        .reply & {
-            bottom: 5px;
         }
     }
 }
@@ -690,5 +665,20 @@ header {
 
 .post-header {
     display: flex;
+}
+
+.need-login-msg {
+    font-size: 16px;
+    margin-left: 8px;
+
+    * {
+        font-size: 16px;
+    }
+}
+
+.button-submit {
+    width: auto;
+    margin-left: auto;
+    padding: 0 40px;
 }
 </style>

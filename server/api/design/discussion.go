@@ -70,12 +70,11 @@ var NewPost = ResultType("application/vnd.app.discussion.post.new", func() {
 var _ = Service("discussion", func() {
 	Method("project", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+		    // Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("projectID", Int32)
 			Required("projectID")
 		})

@@ -53,8 +53,8 @@ func EncodeProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 		if !ok {
 			return goahttp.ErrInvalidType("discussion", "project", "*discussion.ProjectPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {

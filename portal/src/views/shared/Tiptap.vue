@@ -242,7 +242,7 @@ export default Vue.extend({
 
 .tiptap-editing {
     border: 1px solid #bfbfbf;
-    padding: 0.3em 1.4em 0.3em 0.8em;
+    padding: 0.3em 13px 0.3em 13px;
 }
 
 .tiptap-reading {
@@ -321,6 +321,13 @@ export default Vue.extend({
 
     .tiptap-side {
         flex-shrink: 0;
+
+        button {
+            background-color: transparent;
+            border: 0;
+            font-weight: 900;
+            font-size: 14px;
+        }
     }
 }
 </style>
