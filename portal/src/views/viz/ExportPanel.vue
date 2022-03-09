@@ -2,9 +2,7 @@
     <div :class="'export-panel ' + containerClass">
         <div class="heading">
             <div class="title">Export</div>
-            <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
-            </div>
+            <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="export-options">
             <div class="button" @click="onExportCSV">CSV</div>
@@ -115,6 +113,7 @@ export default Vue.extend({
 .export-panel .heading {
     padding: 1em;
     display: flex;
+    align-items: center;
 }
 .export-panel .heading .title {
     font-size: 20px;
