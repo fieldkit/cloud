@@ -145,6 +145,14 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 				ReadingTime:     nil,
 			}
 
+			for _, pr := range pm.data {
+				if pr.Key == sensorSchema.Key {
+					sensor.ReadingValue = &pr.Value
+					sensor.ReadingTime = &pm.receivedAt
+					break
+				}
+			}
+
 			if sensorSchema.UnitOfMeasure != nil {
 				sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
 			}
