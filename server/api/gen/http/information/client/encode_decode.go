@@ -340,6 +340,14 @@ func unmarshalStationModuleResponseBodyToInformationviewsStationModuleView(v *St
 	for i, val := range v.Sensors {
 		res.Sensors[i] = unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(val)
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -360,6 +368,14 @@ func unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(v *St
 	res.Ranges = make([]*informationviews.SensorRangeView, len(v.Ranges))
 	for i, val := range v.Ranges {
 		res.Ranges[i] = unmarshalSensorRangeResponseBodyToInformationviewsSensorRangeView(val)
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
 	}
 
 	return res

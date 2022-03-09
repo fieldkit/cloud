@@ -47,6 +47,7 @@ type StationModuleView struct {
 	Internal     *bool
 	FullKey      *string
 	Sensors      []*StationSensorView
+	Meta         map[string]interface{}
 }
 
 // StationSensorView is a type that runs validations on a projected type.
@@ -57,6 +58,7 @@ type StationSensorView struct {
 	Key           *string
 	FullKey       *string
 	Ranges        []*SensorRangeView
+	Meta          map[string]interface{}
 }
 
 // SensorReadingView is a type that runs validations on a projected type.

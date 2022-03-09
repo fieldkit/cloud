@@ -1674,6 +1674,14 @@ func marshalStationviewsStationModuleViewToStationModuleResponseBody(v *stationv
 			res.Sensors[i] = marshalStationviewsStationSensorViewToStationSensorResponseBody(val)
 		}
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -1695,6 +1703,14 @@ func marshalStationviewsStationSensorViewToStationSensorResponseBody(v *stationv
 		res.Ranges = make([]*SensorRangeResponseBody, len(v.Ranges))
 		for i, val := range v.Ranges {
 			res.Ranges[i] = marshalStationviewsSensorRangeViewToSensorRangeResponseBody(val)
+		}
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
 		}
 	}
 

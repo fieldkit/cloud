@@ -191,6 +191,7 @@ type StationModuleResponseBody struct {
 	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
 	FullKey      *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -201,6 +202,7 @@ type StationSensorResponseBody struct {
 	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	FullKey       *string                    `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
+	Meta          map[string]interface{}     `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
@@ -226,11 +228,11 @@ func NewDeviceLayoutResponseViewOK(body *DeviceLayoutResponseBody) *informationv
 	v.Sensors = make(map[string][]*informationviews.StationSensorView, len(body.Sensors))
 	for key, val := range body.Sensors {
 		tk := key
-		tv := make([]*informationviews.StationSensorView, len(val))
+		tvb := make([]*informationviews.StationSensorView, len(val))
 		for i, val := range val {
-			tv[i] = unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(val)
+			tvb[i] = unmarshalStationSensorResponseBodyToInformationviewsStationSensorView(val)
 		}
-		v.Sensors[tk] = tv
+		v.Sensors[tk] = tvb
 	}
 
 	return v
