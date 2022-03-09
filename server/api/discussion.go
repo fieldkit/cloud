@@ -54,11 +54,6 @@ func (c *DiscussionService) Project(ctx context.Context, payload *discService.Pr
         return nil, err
     }
 
-	/* p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return nil, err
-	} */
-
 	_ = p
 
 	dr := repositories.NewDiscussionRepository(c.db)

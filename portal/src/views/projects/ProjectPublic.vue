@@ -170,9 +170,6 @@ export default Vue.extend({
             },
         };
     },
-    mounted() {
-      console.log("Radoi", this.user);
-    },
     props: {
         user: {
             required: true,
