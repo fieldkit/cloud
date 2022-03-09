@@ -36,11 +36,15 @@ export class DisplaySensor {
     name: string;
     unitOfMeasure: string;
     reading: number | null;
+    time: number | null;
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
         this.unitOfMeasure = sensor.unitOfMeasure;
-        this.reading = sensor.reading?.last || null;
+        if (sensor.reading) {
+            this.reading = sensor.reading.last;
+            this.time = sensor.reading.time;
+        }
     }
 }
 
