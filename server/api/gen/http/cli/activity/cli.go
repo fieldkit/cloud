@@ -128,7 +128,7 @@ func ParseEndpoint(
 
 		discussionProjectFlags         = flag.NewFlagSet("project", flag.ExitOnError)
 		discussionProjectProjectIDFlag = discussionProjectFlags.String("project-id", "REQUIRED", "")
-		discussionProjectAuthFlag      = discussionProjectFlags.String("auth", "REQUIRED", "")
+		discussionProjectAuthFlag      = discussionProjectFlags.String("auth", "", "")
 
 		discussionDataFlags        = flag.NewFlagSet("data", flag.ExitOnError)
 		discussionDataBookmarkFlag = discussionDataFlags.String("bookmark", "REQUIRED", "")

@@ -3,8 +3,20 @@
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
         <div class="new-comment">
-            <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+            <UserPhoto :user="user"></UserPhoto>
+            <template v-if="user">
+                <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+            </template>
+            <template v-else>
+                <p class="need-login-msg">
+                    {{ $tc("comments.loginToComment.part1") }}
+                    <router-link :to="{ name: 'login' }" class="link">{{ $tc("comments.loginToComment.part2") }}</router-link>
+                    {{ $tc("comments.loginToComment.part3") }}
+                </p>
+                <router-link :to="{ name: 'login', query: { after: $route.path } }" class="button-submit">
+                    {{ $t("login.loginButton") }}
+                </router-link>
+            </template>
         </div>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -32,7 +44,7 @@
                                     {{ post.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user.id === post.author.id || user.admin"
+                                    v-if="user && (user.id === post.author.id || user.admin)"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
@@ -81,7 +93,7 @@
                             </div>
                         </transition>
 
-                        <div class="actions">
+                        <div v-if="user" class="actions">
                             <button @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
                                 Reply
@@ -119,7 +131,7 @@ export default Vue.extend({
     props: {
         user: {
             type: Object as PropType<CurrentUser>,
-            required: true,
+            required: false,
         },
         parentData: {
             type: [Number, Object],
@@ -259,7 +271,7 @@ export default Vue.extend({
 
                     this.highlightComment();
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
                 });
         },
@@ -454,7 +466,7 @@ header {
     }
 
     img {
-        margin-top: 0;
+        margin-top: 0!important;
         width: 30px;
         height: 30px;
     }
@@ -653,5 +665,20 @@ header {
 
 .post-header {
     display: flex;
+}
+
+.need-login-msg {
+    font-size: 16px;
+    margin-left: 8px;
+
+    * {
+        font-size: 16px;
+    }
+}
+
+.button-submit {
+    width: auto;
+    margin-left: auto;
+    padding: 0 40px;
 }
 </style>
