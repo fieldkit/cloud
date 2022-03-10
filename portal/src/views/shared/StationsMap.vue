@@ -223,7 +223,7 @@ export default Vue.extend({
                 
                 const instance = new valueMarker({
                     propsData: { color: feature.properties.color,
-                                value: feature.properties.value,
+                                value: 8,
                                 id: feature.properties.id },
                 })
                 instance.$mount()

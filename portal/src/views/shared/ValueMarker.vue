@@ -1,6 +1,6 @@
 <template>
     <div class="marker-container" @click="onClick">
-        <span class="value-label">{{ (value !== undefined) ? value : "?"  }}</span>
+        <span class="value-label">{{ (value !== undefined) ? value : "?" | prettyNum }}</span>
         <svg viewBox="0 0 36 36">
             <circle class="marker-circle" cx="18" cy="18" r="16" :fill="color"/>
         </svg>
@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import * as d3 from "d3";
 
 export default Vue.extend({
     name: "ValueMarker",
@@ -28,7 +29,18 @@ export default Vue.extend({
         onClick () {
             this.$emit("marker-click", { id: this.id });
         }
-    }
+    },
+    filters: {
+        prettyNum: function (value) {
+            if(!isNaN(value)){
+                if(value % 1 === 0){
+                    return value;
+                }
+                else return d3.format(".2s")(value);
+            }
+            else return value;
+        }
+}
 });
 </script>
 
