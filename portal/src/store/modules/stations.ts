@@ -124,7 +124,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number, value: number | null } | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -157,7 +157,6 @@ const DefaultMargin = 10000;
 export class MappedStations {
     public static make(stations: DisplayStation[]): MappedStations {
         const located = stations.filter((station) => station.location != null);
-        console.log(located)
         const features = _.flatten(located.map((ds) => MapFeature.makeFeatures(ds)));
         const around: BoundingRectangle = features.reduce(
             (bb: BoundingRectangle, feature: MapFeature) => bb.includeAll(feature.bounds),
@@ -169,16 +168,16 @@ export class MappedStations {
     constructor(
         public readonly stations: DisplayStation[] = [],
         public readonly features: MapFeature[] = [],
-        public readonly bounds: BoundingRectangle | null = null,
+        public readonly bounds: BoundingRectangle | null = null
     ) {}
 
     // Test if all displayed map sensors are of the same type
-    public get isSingleType(): boolean{
-        const moduleNames = this.stations.map( (station) => {
-            return station.configurations.all[0].modules.map( mod => {
-                return mod.name
-            }) 
-        })
+    public get isSingleType(): boolean {
+        const moduleNames = this.stations.map((station) => {
+            return station.configurations.all[0].modules.map((mod) => {
+                return mod.name;
+            });
+        });
 
         return _.uniq(_.flatten(moduleNames)).length === 1;
     }
