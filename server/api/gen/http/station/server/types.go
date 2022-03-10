@@ -1162,6 +1162,7 @@ type StationModuleResponseBody struct {
 	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
 	FullKey      string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -1172,6 +1173,7 @@ type StationSensorResponseBody struct {
 	Key           string                     `form:"key" json:"key" xml:"key"`
 	FullKey       string                     `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`
+	Meta          map[string]interface{}     `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.

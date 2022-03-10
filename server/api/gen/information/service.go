@@ -84,6 +84,7 @@ type StationModule struct {
 	Internal     bool
 	FullKey      string
 	Sensors      []*StationSensor
+	Meta         map[string]interface{}
 }
 
 type StationSensor struct {
@@ -93,6 +94,7 @@ type StationSensor struct {
 	Key           string
 	FullKey       string
 	Ranges        []*SensorRange
+	Meta          map[string]interface{}
 }
 
 type SensorReading struct {
@@ -169,11 +171,11 @@ func newDeviceLayoutResponse(vres *informationviews.DeviceLayoutResponseView) *D
 		res.Sensors = make(map[string][]*StationSensor, len(vres.Sensors))
 		for key, val := range vres.Sensors {
 			tk := key
-			tv := make([]*StationSensor, len(val))
+			tvb := make([]*StationSensor, len(val))
 			for i, val := range val {
-				tv[i] = transformInformationviewsStationSensorViewToStationSensor(val)
+				tvb[i] = transformInformationviewsStationSensorViewToStationSensor(val)
 			}
-			res.Sensors[tk] = tv
+			res.Sensors[tk] = tvb
 		}
 	}
 	return res
@@ -193,11 +195,11 @@ func newDeviceLayoutResponseView(res *DeviceLayoutResponse) *informationviews.De
 		vres.Sensors = make(map[string][]*informationviews.StationSensorView, len(res.Sensors))
 		for key, val := range res.Sensors {
 			tk := key
-			tv := make([]*informationviews.StationSensorView, len(val))
+			tvb := make([]*informationviews.StationSensorView, len(val))
 			for i, val := range val {
-				tv[i] = transformStationSensorToInformationviewsStationSensorView(val)
+				tvb[i] = transformStationSensorToInformationviewsStationSensorView(val)
 			}
-			vres.Sensors[tk] = tv
+			vres.Sensors[tk] = tvb
 		}
 	}
 	return vres
@@ -246,6 +248,14 @@ func transformInformationviewsStationModuleViewToStationModule(v *informationvie
 			res.Sensors[i] = transformInformationviewsStationSensorViewToStationSensor(val)
 		}
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -266,6 +276,14 @@ func transformInformationviewsStationSensorViewToStationSensor(v *informationvie
 		res.Ranges = make([]*SensorRange, len(v.Ranges))
 		for i, val := range v.Ranges {
 			res.Ranges[i] = transformInformationviewsSensorRangeViewToSensorRange(val)
+		}
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
 		}
 	}
 
@@ -337,6 +355,14 @@ func transformStationModuleToInformationviewsStationModuleView(v *StationModule)
 			res.Sensors[i] = transformStationSensorToInformationviewsStationSensorView(val)
 		}
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -357,6 +383,14 @@ func transformStationSensorToInformationviewsStationSensorView(v *StationSensor)
 		res.Ranges = make([]*informationviews.SensorRangeView, len(v.Ranges))
 		for i, val := range v.Ranges {
 			res.Ranges[i] = transformSensorRangeToInformationviewsSensorRangeView(val)
+		}
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
 		}
 	}
 

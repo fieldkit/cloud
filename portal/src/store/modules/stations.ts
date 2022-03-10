@@ -36,11 +36,15 @@ export class DisplaySensor {
     name: string;
     unitOfMeasure: string;
     reading: number | null;
+    time: number | null;
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
         this.unitOfMeasure = sensor.unitOfMeasure;
-        this.reading = sensor.reading?.last || null;
+        if (sensor.reading) {
+            this.reading = sensor.reading.last;
+            this.time = sensor.reading.time;
+        }
     }
 }
 
@@ -85,18 +89,23 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
-        this.latestPrimary = _.round(_.random(8.0, 10.0, true), 1), //fixme: static until backend data issue resolved
+
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
+
+        const prioritizedSensors = _.flatten(this.modules.map((m) => m.sensors));
+        if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
+            this.latestPrimary = prioritizedSensors[0].reading;
+        }
+
         if (station.location) {
             if (station.location.precise) {
                 this.location = new Location(station.location.precise[1], station.location.precise[0]);
             }
             this.regions = station.location.regions;
         }
-        console.log(this.modules)
     }
 }
 
@@ -115,7 +124,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number, value: number | null } | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -148,7 +157,6 @@ const DefaultMargin = 10000;
 export class MappedStations {
     public static make(stations: DisplayStation[]): MappedStations {
         const located = stations.filter((station) => station.location != null);
-        console.log(located)
         const features = _.flatten(located.map((ds) => MapFeature.makeFeatures(ds)));
         const around: BoundingRectangle = features.reduce(
             (bb: BoundingRectangle, feature: MapFeature) => bb.includeAll(feature.bounds),
@@ -160,16 +168,16 @@ export class MappedStations {
     constructor(
         public readonly stations: DisplayStation[] = [],
         public readonly features: MapFeature[] = [],
-        public readonly bounds: BoundingRectangle | null = null,
+        public readonly bounds: BoundingRectangle | null = null
     ) {}
 
     // Test if all displayed map sensors are of the same type
-    public get isSingleType(): boolean{
-        const moduleNames = this.stations.map( (station) => {
-            return station.configurations.all[0].modules.map( mod => {
-                return mod.name
-            }) 
-        })
+    public get isSingleType(): boolean {
+        const moduleNames = this.stations.map((station) => {
+            return station.configurations.all[0].modules.map((mod) => {
+                return mod.name;
+            });
+        });
 
         return _.uniq(_.flatten(moduleNames)).length === 1;
     }

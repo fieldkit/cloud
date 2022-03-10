@@ -42,22 +42,30 @@ func NewModuleMetaRepository(db *sqlxcache.DB) *ModuleMetaRepository {
 	return &ModuleMetaRepository{db: db}
 }
 
+func FindSensorByFullKey(all []*ModuleMeta, fullKey string) *SensorAndModuleMeta {
+	for _, module := range all {
+		for _, sensor := range module.Sensors {
+			if sensor.FullKey == fullKey {
+				return &SensorAndModuleMeta{
+					Module: module,
+					Sensor: sensor,
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (r *ModuleMetaRepository) FindByFullKey(ctx context.Context, fullKey string) (mm *SensorAndModuleMeta, err error) {
 	all, err := r.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, module := range all {
-		for _, sensor := range module.Sensors {
-			if sensor.FullKey == fullKey {
-				mm = &SensorAndModuleMeta{
-					Module: module,
-					Sensor: sensor,
-				}
-				return
-			}
-		}
+	mm = FindSensorByFullKey(all, fullKey)
+	if mm != nil {
+		return mm, nil
 	}
 
 	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
