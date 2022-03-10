@@ -89,18 +89,23 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
-        this.latestPrimary = _.round(_.random(8.0, 10.0, true), 1), //fixme: static until backend data issue resolved
+
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
+
+        const prioritizedSensors = _.flatten(this.modules.map((m) => m.sensors));
+        if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
+            this.latestPrimary = prioritizedSensors[0].reading;
+        }
+
         if (station.location) {
             if (station.location.precise) {
                 this.location = new Location(station.location.precise[1], station.location.precise[0]);
             }
             this.regions = station.location.regions;
         }
-        console.log(this.modules)
     }
 }
 
