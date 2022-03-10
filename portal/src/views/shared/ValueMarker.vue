@@ -1,6 +1,6 @@
 <template>
     <div class="marker-container" @click="onClick">
-        <span class="value-label">{{value}}</span>
+        <span class="value-label">{{ (value !== undefined) ? value : "?"  }}</span>
         <svg viewBox="0 0 36 36">
             <circle class="marker-circle" cx="18" cy="18" r="16" :fill="color"/>
         </svg>
@@ -15,7 +15,7 @@ export default Vue.extend({
     props: {
         color: {
             type: String,
-            default: "#fff",
+            default: "#ccc",
         },
         value: {
             type: Number
@@ -40,11 +40,10 @@ export default Vue.extend({
 }
 .value-label {
     position: relative;
-    left: 8px;
-    top: 28px;
+    left: 0px;
+    top: 27px;
     text-align: center;
     color: white;
-    font-family: "Avenir"; 
     font-weight: bold;
 
 }
@@ -52,5 +51,7 @@ export default Vue.extend({
     width: 32px;
     height: 32px;
     cursor: pointer;
+    text-align: center;
+    top: -18px;
 }
 </style>

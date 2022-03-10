@@ -136,9 +136,6 @@ export default Vue.extend({
             const bounds = map.getBounds();
             this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
-        onMarkerClick(e) {
-            console.log(e,this);
-        },
         updateMap(): void {
             if (!this.protectedData.map) {
                 console.log("map: update-skip.1");
@@ -160,6 +157,7 @@ export default Vue.extend({
             // Add color value to feature data
             const appendColor = (features) => {
                 return features.map( (d) => { 
+                    console.log(d)
                     d.properties.color = markerScale(d.properties.value);
                     return d 
                 })
@@ -187,7 +185,7 @@ export default Vue.extend({
                     filter: ["==", "$type", "Polygon"],
                 });
 
-                if(this.mapped.isSingleType){
+                if(!this.mapped.isSingleType){
                     map.addLayer({
                         id: "station-markers",
                         type: "symbol",
