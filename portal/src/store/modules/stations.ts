@@ -173,11 +173,13 @@ export class MappedStations {
 
     // Test if all displayed map sensors are of the same type
     public get isSingleType(): boolean {
-        const moduleNames = this.stations.map((station) => {
-            return station.configurations.all[0].modules.map((mod) => {
-                return mod.name;
+        const moduleNames = this.stations
+            .filter((station) => station.configurations.all.length > 0)
+            .map((station) => {
+                return station.configurations.all[0].modules.map((mod) => {
+                    return mod.name;
+                });
             });
-        });
 
         return _.uniq(_.flatten(moduleNames)).length === 1;
     }
