@@ -19,12 +19,16 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable vue/no-unused-components */
+
 import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
 import { MappedStations, LngLat, BoundingRectangle } from "@/store";
+import ValueMarker from "./ValueMarker.vue";
 
 import * as d3 from "d3";
+import mapboxgl from "mapbox-gl";
 
 interface ProtectedData {
     map: any;
@@ -34,7 +38,7 @@ export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
-
+        ValueMarker
     },
     data(): {
         mapbox: { token: string; style: string };
@@ -132,6 +136,9 @@ export default Vue.extend({
             const bounds = map.getBounds();
             this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
+        onMarkerClick(e) {
+            console.log(e,this);
+        },
         updateMap(): void {
             if (!this.protectedData.map) {
                 console.log("map: update-skip.1");
@@ -180,7 +187,7 @@ export default Vue.extend({
                     filter: ["==", "$type", "Polygon"],
                 });
 
-                if(!this.mapped.isSingleType){
+                if(this.mapped.isSingleType){
                     map.addLayer({
                         id: "station-markers",
                         type: "symbol",
@@ -198,46 +205,6 @@ export default Vue.extend({
                         },
                     });
                 }
-                else{
-                    map.addLayer({
-                        id: "station-shadow",
-                        type: "circle",
-                        source: "stations",
-                        filter: ["==", "$type", "Point"],
-                        paint: {
-                            "circle-color": "#000",
-                            "circle-radius": 20,
-                            "circle-blur": 0.5,
-                            "circle-opacity": 0.3,
-                        },
-                    });
-                    map.addLayer({
-                        id: "station-markers",
-                        type: "circle",
-                        source: "stations",
-                        filter: ["==", "$type", "Point"],
-                        paint: {
-                            "circle-color": ["get", "color"],
-                            "circle-stroke-color": "#fff",
-                            "circle-stroke-width": 2,
-                            "circle-stroke-opacity": 0.65,
-                            "circle-radius": 13,
-                        },
-                    });
-                    map.addLayer({
-                        id: "station-value",
-                        type: "symbol",
-                        source: "stations",
-                        paint: {
-                            "text-color": "#fff",
-                        },
-                        layout: {
-                            "text-field": "{value}",
-                            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"], // fixme: add avenir to mapbox
-                            "text-size": 12,
-                        },
-                    });
-                }
 
                 map.on("click", "station-markers", (e) => {
                     const id = e.features[0].properties.id;
@@ -250,6 +217,24 @@ export default Vue.extend({
 
             if (this.bounds) {
                 map.fitBounds(this.bounds, { duration: 0 });
+            }
+
+            //Generate custom map markers
+            const valueMarker = Vue.extend(ValueMarker)
+
+            for (const feature of this.mapped.features) {
+                
+                const instance = new valueMarker({
+                    propsData: { color: feature.properties.color,
+                                value: feature.properties.value,
+                                id: feature.properties.id },
+                })
+                instance.$mount()
+                instance.$on("marker-click", (evt) => {
+                    this.$emit("show-summary", { id: evt.id });
+                })
+
+                new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
             }
 
         },
@@ -267,6 +252,10 @@ export default Vue.extend({
     height: inherit;
     position: inherit;
     width: inherit;
+}
+.marker {
+    height: 10px;
+    width: 10px;
 }
 
 </style>
