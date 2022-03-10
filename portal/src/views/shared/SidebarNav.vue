@@ -55,11 +55,8 @@
             </router-link>
         </div>
 
-        <template v-if="isPartnerCustomisationEnabled()">
-            <div v-if="sidebar.narrow" class="app-logo app-logo--narrow">
-                <i role="img" class="icon icon-logo-narrow-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
-            </div>
-            <div v-else class="app-logo">
+        <template v-if="isPartnerCustomisationEnabled() && !sidebar.narrow">
+            <div class="app-logo">
                 <span>Made by</span>
                 <br />
                 <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
@@ -340,18 +337,6 @@ export default Vue.extend({
     text-align: left;
     margin: auto 0 15px 45px;
     padding-top: 10px;
-
-    &--narrow {
-        margin: auto auto 7px auto;
-
-        @include bp-down($sm) {
-            display: none;
-        }
-
-        i {
-            font-size: 58px;
-        }
-    }
 
     span {
         font-family: var(--font-family-bold);
