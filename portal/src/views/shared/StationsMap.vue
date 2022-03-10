@@ -157,7 +157,6 @@ export default Vue.extend({
             // Add color value to feature data
             const appendColor = (features) => {
                 return features.map( (d) => { 
-                    console.log(d)
                     d.properties.color = markerScale(d.properties.value);
                     return d 
                 })
