@@ -36,13 +36,14 @@ ALTER DATABASE fk RENAME TO "fk-${stamp}";
 
 					writeFile(file: "create.sql", text: """
 CREATE DATABASE fk;
+ALTER DATABASE fk SET search_path TO fieldkit, public;
 					""")
 
 					sh "docker run --rm -i postgres psql '${pgDbUrl}' < setup.sql"
-
+					
 					sh "docker run --rm -i postgres psql '${pgDbUrl}' < create.sql"
-
-    				sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${ws.database_url.value}'"
+    				
+					sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${ws.database_url.value}'"
 
 					notifySuccess()
 				}

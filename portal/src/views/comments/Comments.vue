@@ -466,7 +466,7 @@ header {
     }
 
     img {
-        margin-top: 0!important;
+        margin-top: 0 !important;
         width: 30px;
         height: 30px;
     }

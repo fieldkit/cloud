@@ -272,6 +272,10 @@ export default Vue.extend({
     h6 {
         line-height: 1.1;
     }
+
+    p {
+        word-break: break-all;
+    }
 }
 
 /* Placeholder (at the top) */
