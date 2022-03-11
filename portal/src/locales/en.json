@@ -190,7 +190,15 @@
         "readings": {
             "title": "Latest Readings",
             "empty": "There are no stations in this project."
-        }
+        },
+        "deployed": "Deployed",
+        "readyToDeploy": "Ready to deploy",
+        "lastSynced": "Last Synced",
+        "firmwareVersion": "Firmware version:",
+        "modules": "Modules:",
+        "nativeLand": "Native Land:",
+        "latitude": "Latitude",
+        "longitude": "Longitude"
     },
     "user": {
         "profile": {

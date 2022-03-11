@@ -6,6 +6,10 @@
     &-al-center {
         align-items: center;
     }
+
+    &-space-between {
+        justify-content: space-between;
+    }
 }
 
 .main-panel {
@@ -48,5 +52,11 @@
 
     @include bp-down($xs) {
         padding: 20px 10px;
+    }
+}
+
+.ml {
+    &-10 {
+        margin-left: 10px;
     }
 }
