@@ -609,7 +609,7 @@ export class Querier {
                     .sensorData(queryParams)
                     .then((sdr: SensorDataResponse) => {
                         const queried = new QueriedData(key, params.when, sdr);
-                        const filtered = queried.removeDuplicates();
+                        const filtered = queried.removeMalformed().removeDuplicates();
                         this.data[key] = filtered;
                         return filtered;
                     })

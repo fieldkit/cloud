@@ -219,6 +219,15 @@ export class QueriedData {
         return this.sdr.data;
     }
 
+    public removeMalformed(): QueriedData {
+        const filtered = {
+            summaries: this.sdr.summaries,
+            aggregate: this.sdr.aggregate,
+            data: this.sdr.data.filter((d) => d.sensorId),
+        };
+        return new QueriedData(this.key, this.timeRangeQueried, filtered);
+    }
+
     public removeDuplicates(): QueriedData {
         const filtered = {
             summaries: this.sdr.summaries,
