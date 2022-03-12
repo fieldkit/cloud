@@ -219,12 +219,22 @@ export class QueriedData {
         return this.sdr.data;
     }
 
+    public sorted(): QueriedData {
+        const sorted = {
+            summaries: this.sdr.summaries,
+            aggregate: this.sdr.aggregate,
+            data: _.sortBy(this.sdr.data, (d) => d.time),
+        };
+        return new QueriedData(this.key, this.timeRangeQueried, sorted);
+    }
+
     public removeMalformed(): QueriedData {
         const filtered = {
             summaries: this.sdr.summaries,
             aggregate: this.sdr.aggregate,
             data: this.sdr.data.filter((d) => d.sensorId),
         };
+        console.log(`viz:malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 
@@ -234,6 +244,7 @@ export class QueriedData {
             aggregate: this.sdr.aggregate,
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
+        console.log(`viz:duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 }
@@ -258,6 +269,7 @@ export class DataSetSeries {
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
+            console.log(`viz:constrain:nope`, this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;
