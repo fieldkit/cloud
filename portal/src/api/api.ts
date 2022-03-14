@@ -305,6 +305,7 @@ export interface Station {
     placeNameOther: string | null;
     placeNameNative: string | null;
     recordingStartedAt: Date | null;
+    firmwareNumber: number | null;
 }
 
 export interface ProjectsResponse {

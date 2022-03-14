@@ -76,6 +76,7 @@ export class DisplayStation {
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
     public readonly latestPrimary: number | null;
+    public readonly firmwareNumber: number | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -106,6 +107,8 @@ export class DisplayStation {
             }
             this.regions = station.location.regions;
         }
+
+        this.firmwareNumber = station.firmwareNumber;
     }
 }
 

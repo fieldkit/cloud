@@ -53,7 +53,7 @@
 
                         <div class="station-row">
                             <span>{{ $tc("station.firmwareVersion") }}</span>
-                            <span class="ml-10">2.00.1</span>
+                            <span class="ml-10">{{ station.firmwareNumber }}</span>
                         </div>
 
                         <div class="station-row">
@@ -75,6 +75,10 @@
                     </div>-->
                 </div>
             </section>
+
+            <section>
+                <LatestStationReadings :id="station.id" @layoutChange="layoutChange" />
+            </section>
         </div>
     </StandardLayout>
 </template>
@@ -84,6 +88,7 @@ import Vue from "vue";
 import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
+import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 // import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
 import { DisplayStation, ProjectModule } from "@/store";
 import * as utils from "@/utilities";
@@ -94,6 +99,7 @@ export default Vue.extend({
         StandardLayout,
         DoubleHeader,
         StationPhoto,
+        LatestStationReadings,
         //    AuthenticatedPhoto,
     },
     mounted() {
@@ -137,6 +143,9 @@ export default Vue.extend({
         },
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
+        },
+        layoutChange() {
+            this.$emit("layoutChange");
         },
     },
 });
