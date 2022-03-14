@@ -111,7 +111,7 @@ export default Vue.extend({
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
-            console.log(`viz: route:`, newValue);
+            console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
             }
@@ -145,24 +145,20 @@ export default Vue.extend({
             return this.workspace.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
-            console.log("viz: bookmark-change");
+            console.log("viz: bookmark-change", bookmark);
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-            return await this.openBookmark(bookmark);
+            await this.openBookmark(bookmark);
         },
         async openBookmark(bookmark: Bookmark): Promise<void> {
-            console.log("viz: bookmark-open");
-            const encoded = serializeBookmark(bookmark);
-            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } }).then(() => this.workspace);
+            this.$emit("open-bookmark", bookmark);
         },
         async openExports(): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "exportBookmark", query: { bookmark: encoded } });
+            this.$emit("export-bookmark", this.bookmark);
         },
         async openShare(): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
+            this.$emit("share-bookmark", this.bookmark);
         },
         async closePanel(): Promise<void> {
             return await this.openBookmark(this.bookmark);

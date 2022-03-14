@@ -961,10 +961,11 @@ export class Workspace implements VizInfoFactory {
     }
 
     public async updateFromBookmark(bm: Bookmark): Promise<void> {
-        console.log(`viz: update-from-bookmark`, bm);
         if (Bookmark.sameAs(this.bookmark(), bm)) {
+            console.log(`viz: update-from-bookmark:same`, bm);
             return;
         }
+        console.log(`viz: update-from-bookmark`, bm);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;
