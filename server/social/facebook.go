@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -36,9 +37,13 @@ func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWrite
 func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
 	meta := make(map[string]string)
 
-	meta["og:image"] = payload.photoUrl
+	size := 1080
+
+	meta["og:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, size, size)
 	meta["og:title"] = payload.title
 	meta["og:description"] = payload.description
+	meta["og:image:width"] = fmt.Sprintf("%d", size)
+	meta["og:image:height"] = meta["og:image:width"]
 
 	if err := serveMeta(w, req, meta); err != nil {
 		return err
