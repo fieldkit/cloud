@@ -263,6 +263,20 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 	}, nil
 }
 
+func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
+	return &sensor.SavedBookmark{
+		URL:      "/viz?v=",
+		Bookmark: payload.Bookmark,
+	}, nil
+}
+
+func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+	return &sensor.SavedBookmark{
+		URL:      fmt.Sprintf("/viz?v=%s", payload.V),
+		Bookmark: "{}",
+	}, nil
+}
+
 func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,

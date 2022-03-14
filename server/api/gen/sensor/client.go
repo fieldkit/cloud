@@ -15,15 +15,19 @@ import (
 
 // Client is the "sensor" service client.
 type Client struct {
-	MetaEndpoint goa.Endpoint
-	DataEndpoint goa.Endpoint
+	MetaEndpoint     goa.Endpoint
+	DataEndpoint     goa.Endpoint
+	BookmarkEndpoint goa.Endpoint
+	ResolveEndpoint  goa.Endpoint
 }
 
 // NewClient initializes a "sensor" service client given the endpoints.
-func NewClient(meta, data goa.Endpoint) *Client {
+func NewClient(meta, data, bookmark, resolve goa.Endpoint) *Client {
 	return &Client{
-		MetaEndpoint: meta,
-		DataEndpoint: data,
+		MetaEndpoint:     meta,
+		DataEndpoint:     data,
+		BookmarkEndpoint: bookmark,
+		ResolveEndpoint:  resolve,
 	}
 }
 
@@ -45,4 +49,24 @@ func (c *Client) Data(ctx context.Context, p *DataPayload) (res *DataResult, err
 		return
 	}
 	return ires.(*DataResult), nil
+}
+
+// Bookmark calls the "bookmark" endpoint of the "sensor" service.
+func (c *Client) Bookmark(ctx context.Context, p *BookmarkPayload) (res *SavedBookmark, err error) {
+	var ires interface{}
+	ires, err = c.BookmarkEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*SavedBookmark), nil
+}
+
+// Resolve calls the "resolve" endpoint of the "sensor" service.
+func (c *Client) Resolve(ctx context.Context, p *ResolvePayload) (res *SavedBookmark, err error) {
+	var ires interface{}
+	ires, err = c.ResolveEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*SavedBookmark), nil
 }
