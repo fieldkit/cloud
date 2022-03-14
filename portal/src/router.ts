@@ -310,11 +310,9 @@ const routes = [
         props: (route) => {
             console.log(`viz: explore-short`, route.query.v);
             if (route.query.v) {
-                /*
                 return {
-                    bookmark: null,
+                    token: route.query.v,
                 };
-                */
             }
             return {};
         },
