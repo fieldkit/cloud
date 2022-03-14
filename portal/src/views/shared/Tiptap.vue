@@ -241,8 +241,9 @@ export default Vue.extend({
 }
 
 .tiptap-editing {
-    border: 1px solid #bfbfbf;
-    padding: 0.3em 13px 0.3em 13px;
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
+    padding: 0 13px 0 13px;
 }
 
 .tiptap-reading {
@@ -316,7 +317,7 @@ export default Vue.extend({
 .tiptap-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
 
     .tiptap-main {
@@ -325,6 +326,7 @@ export default Vue.extend({
 
     .tiptap-side {
         flex-shrink: 0;
+        padding: 12px 0;
 
         button {
             background-color: transparent;
