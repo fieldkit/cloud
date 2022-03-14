@@ -129,6 +129,19 @@ export default Vue.extend({
             narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
         };
     },
+    watch:{
+        $route (to, from){
+            if(to.name === "viewProjectBigMap"){
+                this.narrow = true;
+                this.toggleSidebar();
+            }
+            if(from.name === "viewProjectBigMap"){
+                this.narrow = false;
+                this.closeMenuOnMobile();
+                this.toggleSidebar();
+            }
+        }
+    } ,
     methods: {
         showStation(station: unknown): void {
             this.$emit("show-station", station);
@@ -141,6 +154,14 @@ export default Vue.extend({
         },
         toggleSidebar(): void {
             this.sidebar.narrow = !this.sidebar.narrow;
+            this.$emit("sidebar-toggle");
+        },
+        openSidebar(): void {
+            this.sidebar.narrow = false;
+            this.$emit("sidebar-toggle");
+        },
+        closeSidebar(): void {
+            this.sidebar.narrow = true;
             this.$emit("sidebar-toggle");
         },
         isPartnerCustomisationEnabled(): boolean {

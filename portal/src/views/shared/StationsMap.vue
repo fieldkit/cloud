@@ -70,7 +70,7 @@ export default Vue.extend({
             if (this.value) {
                 return this.value.lngLat();
             }
-
+            //fixme: issue here relating to mapBounds.lngLat not returning correct bounds
             return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
         },
     },

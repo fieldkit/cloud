@@ -1,5 +1,5 @@
 <template>
-    <div class="stations-container" v-if="false">
+    <div class="stations-container">
         <StationPickerModal
             :stations="userStations"
             :filter="pickFilter"
@@ -57,6 +57,13 @@
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/icon-tab-expand.svg" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
+                
+                <router-link :to="{ name: 'viewProjectBigMap' }" class="link">
+                    <div class="map-expand">
+                        <img alt="Location" src="@/assets/icon-expand-map.svg" class="icon" />
+                    </div>
+                </router-link>
+                
                 <StationsMap
                     @show-summary="showSummary"
                     :mapped="mappedProject"
@@ -257,7 +264,7 @@ export default Vue.extend({
         },
         onNewPage(page: number): void {
             this.page = page;
-        },
+        }
     },
 });
 </script>
@@ -430,6 +437,19 @@ export default Vue.extend({
         &:before {
             color: var(--color-dark);
         }
+    }
+}
+.map-expand {
+    background-color: #ffffff;
+    z-index: 50;
+    position: relative;
+    left: 93%;
+    top: 52px;
+    display: inline-block;
+    height: 35px;
+
+    img {
+        margin: 10px;
     }
 }
 </style>

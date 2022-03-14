@@ -1,13 +1,18 @@
 <template>
-    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
-        <div class="container-wrap">
+    <StandardLayout 
+        :viewingProjects="true"
+        :viewingProject="displayProject"
+        :disableScrolling="activityVisible"
+        :sidebarNarrow="bigMap">
+
+        <div class="container-wrap" :class="{'big-map': bigMap}">
             <template v-if="displayProject">
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
                     :backTitle="isAdministrator ? $t('layout.backProjects') : $t('layout.backProjectDashboard')"
                     backRoute="projects"
-                    v-if="displayProject"
+                    v-if="displayProject  && !bigMap"
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <i class="icon icon-notification"></i>
@@ -26,7 +31,13 @@
                     <ProjectAdmin :user="user" :displayProject="displayProject" :userStations="stations" v-if="user" />
                 </div>
                 <ProjectPublic
-                    v-if="!isAdministrator && displayProject"
+                    v-if="!isAdministrator && displayProject && !bigMap"
+                    :user="user"
+                    :displayProject="displayProject"
+                    :userStations="stations"
+                />
+                <ProjectBigMap
+                    v-if="!isAdministrator && displayProject && bigMap"
                     :user="user"
                     :displayProject="displayProject"
                     :userStations="stations"
@@ -44,6 +55,8 @@ import ProjectPublic from "./ProjectPublic.vue";
 import ProjectAdmin from "./ProjectAdmin.vue";
 import ProjectActivity from "./ProjectActivity.vue";
 
+import ProjectBigMap from "./ProjectBigMap.vue";
+
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
@@ -56,6 +69,7 @@ export default Vue.extend({
         ProjectPublic,
         ProjectAdmin,
         ProjectActivity,
+        ProjectBigMap
     },
     props: {
         id: {
@@ -67,6 +81,10 @@ export default Vue.extend({
             type: Boolean,
         },
         activityVisible: {
+            type: Boolean,
+            default: false,
+        },
+        bigMap: {
             type: Boolean,
             default: false,
         },
