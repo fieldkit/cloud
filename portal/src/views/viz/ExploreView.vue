@@ -32,7 +32,7 @@
 
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user"></Comments>
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user && bookmark"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -105,7 +105,7 @@ export default Vue.extend({
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
-            if (this.bookmark.p.length > 0) {
+            if (this.bookmark && this.bookmark.p.length > 0) {
                 return "layout.backProjectDashboard";
             }
             return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
@@ -147,13 +147,16 @@ export default Vue.extend({
             return this.workspace.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
-            console.log("viz: change");
+            console.log("viz: bookmark-change");
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
                 return Promise.resolve(this.workspace);
             }
-            await this.$router
-                .push({ name: "exploreBookmark", query: { bookmark: serializeBookmark(bookmark) } })
-                .then(() => this.workspace);
+            return await this.openBookmark(bookmark);
+        },
+        async openBookmark(bookmark: Bookmark): Promise<void> {
+            console.log("viz: bookmark-open");
+            const encoded = serializeBookmark(bookmark);
+            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } }).then(() => this.workspace);
         },
         async openExports(): Promise<void> {
             const encoded = serializeBookmark(this.bookmark);
@@ -164,8 +167,7 @@ export default Vue.extend({
             await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
         },
         async closePanel(): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
+            return await this.openBookmark(this.bookmark);
         },
         async createWorkspaceIfNecessary(): Promise<Workspace> {
             if (this.workspace) {

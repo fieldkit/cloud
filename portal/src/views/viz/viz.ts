@@ -961,6 +961,7 @@ export class Workspace implements VizInfoFactory {
     }
 
     public async updateFromBookmark(bm: Bookmark): Promise<void> {
+        console.log(`viz: update-from-bookmark`, bm);
         if (Bookmark.sameAs(this.bookmark(), bm)) {
             return;
         }

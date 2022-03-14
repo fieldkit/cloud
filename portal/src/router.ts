@@ -27,7 +27,7 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
-import { deserializeBookmark } from "./views/viz/viz";
+import { Bookmark, deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
@@ -298,6 +298,23 @@ const routes = [
                 return {
                     bookmark: deserializeBookmark(route.query.bookmark),
                 };
+            }
+            return {};
+        },
+        meta: {},
+    },
+    {
+        path: "/viz",
+        name: "exploreShortBookmark",
+        component: ExploreView,
+        props: (route) => {
+            console.log(`viz: explore-short`, route.query.v);
+            if (route.query.v) {
+                /*
+                return {
+                    bookmark: null,
+                };
+                */
             }
             return {};
         },
