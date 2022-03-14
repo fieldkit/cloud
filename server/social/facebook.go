@@ -19,11 +19,31 @@ type FacebookSchema struct {
 }
 
 func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error {
-	return nil
+	meta := make(map[string]string)
 
+	meta["og:url"] = req.URL.String()
+	meta["og:title"] = payload.project.Name
+	meta["og:description"] = payload.project.Description
+	meta["og:image"] = payload.photoUrl
+
+	if err := serveMeta(w, req, meta); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+	meta := make(map[string]string)
+
+	meta["og:image"] = payload.photoUrl
+	meta["og:title"] = payload.title
+	meta["og:description"] = payload.description
+
+	if err := serveMeta(w, req, meta); err != nil {
+		return err
+	}
+
 	return nil
 }
 

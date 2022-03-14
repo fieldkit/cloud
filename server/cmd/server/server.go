@@ -395,6 +395,9 @@ func main() {
 	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost)
 	twitterHandlerFactory.Register(rootRouter)
 
+	facebookHandlerFactory := social.NewFacebookContext(services.Database, config.ApiHost)
+	facebookHandlerFactory.Register(rootRouter)
+
 	localApiOnly := rootRouter.Host("fk-service:8000").Subrouter()
 	localApiOnly.NotFoundHandler = apiFinal
 
