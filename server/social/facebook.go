@@ -59,7 +59,7 @@ func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string) (fb *FacebookContex
 }
 
 func (fb *FacebookContext) Register(r *mux.Router) {
-	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Facebook.*").Subrouter()
+	s := r.NewRoute().MatcherFunc(matchUserAgent("facebook")).Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", fb.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", fb.SharedProject)
 	s.HandleFunc("/dashboard/explore/{bookmark}", fb.SharedWorkspace)

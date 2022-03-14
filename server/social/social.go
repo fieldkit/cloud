@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -40,6 +41,18 @@ type SharedWorkspacePayload struct {
 	title       string
 	description string
 	photoUrl    string
+}
+
+func matchUserAgent(partial string) mux.MatcherFunc {
+	return func(req *http.Request, match *mux.RouteMatch) bool {
+		if userAgent, ok := req.Header[http.CanonicalHeaderKey("user-agent")]; ok {
+			if len(userAgent) == 0 {
+				return false
+			}
+			return strings.Contains(strings.ToLower(userAgent[0]), strings.ToLower(partial))
+		}
+		return false
+	}
 }
 
 const metaOnlyTemplate = `

@@ -64,7 +64,7 @@ func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext)
 }
 
 func (tw *TwitterContext) Register(r *mux.Router) {
-	s := r.NewRoute().HeadersRegexp("User-Agent", ".*Twitterbot.*").Subrouter()
+	s := r.NewRoute().MatcherFunc(matchUserAgent("twitterbot")).Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
 	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
