@@ -17,7 +17,6 @@ import { Editor, JSONContent, EditorContent, VueRenderer, Extension } from "@tip
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-import CharacterCount from "@tiptap/extension-character-count";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
@@ -302,20 +301,6 @@ export default Vue.extend({
         position: absolute;
         bottom: 2px;
         right: 25px;
-
-        /*.new-comment.reply & {
-            bottom: 0;
-        }
-
-        .data-view .new-comment & {
-            right: 45px;
-            bottom: 19px;
-        }
-
-        .data-view .new-comment.reply & {
-            right: 35px;
-            bottom: 10px;
-        }*/
 
         button {
             background-color: transparent;

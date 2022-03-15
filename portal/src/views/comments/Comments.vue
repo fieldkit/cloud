@@ -468,10 +468,6 @@ header {
         }
     }
 
-    .new-comment-wrap {
-        width: 100%;
-    }
-
     &.reply {
         padding: 0 0 0;
         margin: 10px 0 0 0;
