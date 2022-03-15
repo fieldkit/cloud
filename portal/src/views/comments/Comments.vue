@@ -5,7 +5,9 @@
         <div class="new-comment">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
-                <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                <div class="new-comment-wrap">
+                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                </div>
             </template>
             <template v-else>
                 <p class="need-login-msg">
@@ -88,8 +90,15 @@
 
                         <transition name="fade">
                             <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
-                                <UserPhoto :user="user"></UserPhoto>
-                                <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
+                                <div class="new-comment-wrap">
+                                    <UserPhoto :user="user"></UserPhoto>
+                                    <Tiptap
+                                        v-model="newReply.body"
+                                        placeholder="Reply to comment"
+                                        @save="save(newReply)"
+                                        saveLabel="Post"
+                                    />
+                                </div>
                             </div>
                         </transition>
 
@@ -443,7 +452,7 @@ header {
 }
 
 ::v-deep .new-comment {
-    @include flex(center);
+    @include flex(flex-end);
     padding: 22px 0;
     position: relative;
 
@@ -483,27 +492,11 @@ header {
         }
     }
 
-    &-input {
-        width: 100%;
+    &-wrap {
         display: flex;
-        border-radius: 2px;
-        border: solid 1px $color-border;
-
-        ::v-deep textarea {
-            margin: 0;
-            padding: 14px 60px 14px 13px;
-            outline: none;
-            width: 100%;
-            font-weight: 500;
-
-            &::placeholder {
-                color: #cccdcf;
-            }
-
-            @include bp-down($xs) {
-                padding: 7px 40px 7px 7px;
-            }
-        }
+        width: 100%;
+        position: relative;
+        background-color: #fff;
     }
 }
 
@@ -536,16 +529,6 @@ header {
         border: none;
         max-width: 550px;
         min-height: unset;
-    }
-
-    ::v-deep textarea {
-        border: 0;
-        margin: 0;
-        padding: 7px 45px 0 7px;
-
-        .reply & {
-            padding-right: 60px;
-        }
     }
 }
 
@@ -647,12 +630,6 @@ header {
 .error {
     color: $color-danger;
     margin-bottom: 10px;
-}
-
-::v-deep textarea {
-    resize: none;
-    border: 0 !important;
-    max-height: 75vh;
 }
 
 .column-reply,
