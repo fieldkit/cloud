@@ -184,6 +184,18 @@ export class MappedStations {
         return _.uniq(_.flatten(moduleNames)).length === 1;
     }
 
+    public get moduleNames(): Array<string> {
+        const moduleNames = this.stations
+            .filter((station) => station.configurations.all.length > 0)
+            .map((station) => {
+                return station.configurations.all[0].modules.map((mod) => {
+                    return mod.fullKey;
+                });
+            });
+
+        return _.uniq(_.flatten(moduleNames));
+    }
+
     public get valid(): boolean {
         return this.bounds != null;
     }
