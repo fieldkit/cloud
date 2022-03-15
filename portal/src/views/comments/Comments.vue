@@ -530,16 +530,6 @@ header {
         max-width: 550px;
         min-height: unset;
     }
-
-    ::v-deep textarea {
-        border: 0;
-        margin: 0;
-        padding: 7px 45px 0 7px;
-
-        .reply & {
-            padding-right: 60px;
-        }
-    }
 }
 
 .comment {
