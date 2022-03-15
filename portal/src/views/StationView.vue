@@ -51,7 +51,7 @@
                             <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
                         </div>
 
-                        <div class="station-row">
+                        <div v-if="station.firmwareNumber" class="station-row">
                             <span>{{ $tc("station.firmwareVersion") }}</span>
                             <span class="ml-10">{{ station.firmwareNumber }}</span>
                         </div>
