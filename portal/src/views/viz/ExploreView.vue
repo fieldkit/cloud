@@ -40,10 +40,12 @@ export default Vue.extend({
         },
     },
     data(): {
-        resolved: Bookmark | null;
+        resolved: { [index: string]: Bookmark };
+        bookmarkToToken: { [bookmark: string]: string };
     } {
         return {
-            resolved: null,
+            resolved: {},
+            bookmarkToToken: {},
         };
     },
     computed: {
@@ -51,8 +53,10 @@ export default Vue.extend({
             if (this.bookmark) {
                 return this.bookmark;
             }
-            if (this.resolved) {
-                return this.resolved;
+            if (this.token) {
+                if (this.resolved[this.token]) {
+                    return this.resolved[this.token];
+                }
             }
             return null;
         },
@@ -73,16 +77,29 @@ export default Vue.extend({
     },
     methods: {
         async refreshBookmarkFromToken(): Promise<void> {
-            console.log(`viz: bookmark-resolving`, this.token);
-            const savedBookmark = await this.$services.api.resolveBookmark(this.token);
-            console.log(`viz: bookmark-resolved`, savedBookmark);
-            this.resolved = deserializeBookmark(savedBookmark.bookmark);
+            const token = this.token;
+            console.log(`viz: bookmark-resolving`, token);
+
+            try {
+                if (!this.resolved[token]) {
+                    const savedBookmark = await this.$services.api.resolveBookmark(token);
+                    console.log(`viz: bookmark-resolved`, savedBookmark);
+                    Vue.set(this.resolved, token, deserializeBookmark(savedBookmark.bookmark));
+                }
+            } catch (error) {
+                console.log("viz: bad-token", error);
+            }
         },
         async openBookmark(bookmark: Bookmark): Promise<void> {
-            console.log(`viz: open-bookmark-saving`, bookmark);
-            const savedBookmark = await this.$services.api.saveBookmark(serializeBookmark(bookmark));
-            console.log(`viz: open-bookmark-saved`, savedBookmark.token);
-            await this.$router.push({ name: "exploreShortBookmark", query: { v: savedBookmark.token } });
+            const encoded = serializeBookmark(bookmark);
+            if (!this.bookmarkToToken[encoded]) {
+                console.log(`viz: open-bookmark-saving`, encoded);
+                const savedBookmark = await this.$services.api.saveBookmark(encoded);
+                Vue.set(this.bookmarkToToken, encoded, savedBookmark.token);
+                Vue.set(this.resolved, savedBookmark.token, bookmark);
+                console.log(`viz: open-bookmark-saved`, savedBookmark.token);
+            }
+            await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
         },
         async exportBookmark(bookmark: Bookmark): Promise<void> {
             const encoded = serializeBookmark(this.bookmark);
