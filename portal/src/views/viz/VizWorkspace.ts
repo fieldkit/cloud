@@ -17,13 +17,19 @@ export const VizWorkspace = Vue.extend({
     data() {
         return {};
     },
-    async mounted(): Promise<void> {
+    async beforeMount(): Promise<void> {
         if (this.workspace.allStationIds.length == 1) {
             console.log(`viz: include-associated(1)`, this.workspace.allStationIds.length);
-            const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]);
-            const ids = associated.stations.map((s) => s.id);
-            console.log(`viz: include-associated(1)`, associated);
-            await this.workspace.addStationIds(ids);
+            const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]).catch(async (e) => {
+                if (e.name === "ForbiddenError") {
+                    await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
+                }
+            });
+            if (associated) {
+                const ids = associated.stations.map((s) => s.id);
+                console.log(`viz: include-associated(1)`, associated);
+                await this.workspace.addStationIds(ids);
+            }
         }
 
         return this.workspace.query();
