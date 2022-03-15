@@ -1,8 +1,5 @@
 <template>
     <div>
-        <button v-on:click="pickRange([1629956332434, 1630344275971])" v-if="false">
-            Pick date range
-        </button>
         <div class="viz scrubber"></div>
     </div>
 </template>
@@ -73,13 +70,10 @@ export default {
         this.pickRange(this.visible);
     },
     methods: {
-        pickRange(timeRange) {
-            console.log("vega-scrubber:pick", timeRange, this.data.timeRange);
-            if (_.isEqual(timeRange, this.data.timeRange)) {
-                return;
-            }
+        brush(times) {
+            const x = times.map((v) => this.vegaView.view.scale("x")(v));
             this.vegaView.view
-                .signal("brush_x", [this.vegaView.view.scale("x")(timeRange[0]), this.vegaView.view.scale("x")(timeRange[1])])
+                .signal("brush_x", x)
                 .signal("brush_tuple", {
                     unit: "layer_0",
                     fields: [
@@ -89,9 +83,18 @@ export default {
                             type: "R",
                         },
                     ],
-                    values: [timeRange],
+                    values: times,
                 })
                 .runAsync();
+        },
+        pickRange(timeRange) {
+            if (_.isEqual(timeRange, this.data.timeRange)) {
+                console.log("vega-scrubber:pick:ignore", timeRange, this.data.timeRange);
+                this.brush([]);
+            } else {
+                console.log("vega-scrubber:pick", timeRange, this.data.timeRange);
+                this.brush(timeRange);
+            }
         },
     },
 };
