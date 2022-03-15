@@ -43,15 +43,12 @@ export default Vue.extend({
     data(): {
         mapbox: { token: string; style: string };
         ready: boolean;
-        thresholds: object;
         sensorMeta: Map<string, any>;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
-            //fixme: change to default/fallback scale
-            thresholds: {label:{"en-US":"Severity of Flooding"},"levels":[{"label":{"en-US":"None"},"value":8,"color":"#00CCFF"},{"label":{"en-US":"Almost"},"value":8.5,"color":"#0099FF"},{"label":{"en-US":"Some"},"value":9,"color":"#0066FF"},{"label":{"en-US":"Flooding"},"value":9.5,"color":"#0033FF"},{"label":{"en-US":"Severe"},"value":10,"color":"#0000FF"}]}
         };
     },
     props: {
@@ -85,26 +82,6 @@ export default Vue.extend({
 
             return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
         },
-    },
-    async beforeMount(): Promise<void> {
-        // get scale thresholds
-        await this.$services.api.getAllSensors().then(async (sensorKeys) => {
-           this.sensorMeta = new Map(sensorKeys.modules.map(d => {return [d.key, d.sensors]}));
-           
-            try{
-                const viz = this.sensorMeta
-                                .get(this.mapped.moduleNames[0])
-                                .filter( d => d.order === 0)[0]
-                                .viz;
-
-                if(viz.length > 0){
-                    this.thresholds = viz[0].thresholds;
-                }
-            }
-            catch(error){
-                console.error(error);
-            }
-        });
     },
     watch: {
         layoutChanges(): void {
@@ -171,15 +148,22 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
+            
             // Marker color scale
-            const markerScale = d3.scaleThreshold()
-                .domain(this.thresholds.levels.map( d => d.value ))
-                .range(this.thresholds.levels.map( d => d.color ));
-
-            // Add color value to feature data
             const appendColor = (features) => {
                 return features.map( (d) => { 
-                    d.properties.color = markerScale(d.properties.value);
+                    if(d.properties.thresholds){
+                        const markerScale = d3.scaleThreshold()
+                            .domain(d.properties.thresholds.levels.map( d => d.value ))
+                            .range(d.properties.thresholds.levels.map( d => d.color ));
+
+                            d.properties.color = markerScale(d.properties.value);
+                    }
+                    else{
+                        //default color
+                        d.properties.color = "#00CCFF";
+                    }
+                    
                     return d 
                 })
             }
