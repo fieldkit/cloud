@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"math"
@@ -9,9 +10,10 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/conservify/sqlxcache"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/conservify/sqlxcache"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 
 	"goa.design/goa/v3/security"
 
@@ -263,17 +265,60 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 	}, nil
 }
 
+type SavedBookmark struct {
+	ID           int64     `db:"id"`
+	UserID       *int32    `db:"user_id"`
+	Token        string    `db:"token"`
+	Bookmark     string    `db:"bookmark"`
+	CreatedAt    time.Time `db:"created_at"`
+	ReferencedAt time.Time `db:"referenced_at"`
+}
+
 func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
+	token, err := gonanoid.New()
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	saving := &SavedBookmark{
+		UserID:       nil,
+		Token:        token,
+		Bookmark:     payload.Bookmark,
+		CreatedAt:    now,
+		ReferencedAt: now,
+	}
+
+	if err := c.options.Database.NamedGetContext(ctx, saving, `
+		INSERT INTO fieldkit.bookmarks
+		(user_id, token, bookmark, created_at, referenced_at) VALUES (:user_id, :token, :bookmark, :created_at, :referenced_at)
+		RETURNING id
+		`, saving); err != nil {
+		return nil, err
+	}
+
 	return &sensor.SavedBookmark{
-		URL:      "/viz?v=",
+		URL:      fmt.Sprintf("/viz?v=%s", token),
+		Token:    token,
 		Bookmark: payload.Bookmark,
 	}, nil
 }
 
 func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+
+	saved := &SavedBookmark{}
+	if err := c.options.Database.GetContext(ctx, saved, `
+		SELECT id, user_id, token, bookmark, created_at, referenced_at FROM fieldkit.bookmarks WHERE token = $1
+		`, payload.V); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, sensor.MakeNotFound(errors.New("not found"))
+		}
+		return nil, err
+	}
+
 	return &sensor.SavedBookmark{
 		URL:      fmt.Sprintf("/viz?v=%s", payload.V),
-		Bookmark: "{}",
+		Bookmark: saved.Bookmark,
 	}, nil
 }
 
