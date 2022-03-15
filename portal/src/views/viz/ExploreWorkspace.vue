@@ -2,7 +2,7 @@
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
 
-        <SharePanel v-if="shareVisible" containerClass="share-floating" :bookmark="bookmark" @close="closePanel" />
+        <SharePanel v-if="shareVisible" containerClass="share-floating" :token="token" :bookmark="bookmark" @close="closePanel" />
 
         <div class="explore-view">
             <div class="explore-header">
@@ -67,6 +67,10 @@ export default Vue.extend({
         Comments,
     },
     props: {
+        token: {
+            type: String,
+            required: true,
+        },
         bookmark: {
             type: Bookmark,
             required: true,
@@ -155,10 +159,10 @@ export default Vue.extend({
             this.$emit("open-bookmark", bookmark);
         },
         async openExports(): Promise<void> {
-            this.$emit("export-bookmark", this.bookmark);
+            this.$emit("export");
         },
         async openShare(): Promise<void> {
-            this.$emit("share-bookmark", this.bookmark);
+            this.$emit("share");
         },
         async closePanel(): Promise<void> {
             return await this.openBookmark(this.bookmark);

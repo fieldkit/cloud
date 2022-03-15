@@ -21,12 +21,22 @@ import CommonComponents from "@/views/shared";
 import { mapState } from "vuex";
 import { serializeBookmark } from "./viz";
 
+function getRelativeUrl(href: string): string {
+    const link = document.createElement("a");
+    link.href = href;
+    return link.href;
+}
+
 export default Vue.extend({
     name: "SharePanel",
     components: {
         ...CommonComponents,
     },
     props: {
+        token: {
+            type: String,
+            required: true,
+        },
         bookmark: {
             type: Object,
             required: true,
@@ -49,8 +59,8 @@ export default Vue.extend({
         },
         vizUrl(): string {
             const qs = new URLSearchParams();
-            qs.append("bookmark", serializeBookmark(this.bookmark));
-            return `https://portal.fkdev.org/dashboard/explore?${qs.toString()}`;
+            qs.append("v", this.token);
+            return getRelativeUrl(`/viz?${qs.toString()}`);
         },
     },
     methods: {

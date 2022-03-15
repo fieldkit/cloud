@@ -308,7 +308,6 @@ const routes = [
         name: "exploreShortBookmark",
         component: ExploreView,
         props: (route) => {
-            console.log(`viz: explore-short`, route.query.v);
             if (route.query.v) {
                 return {
                     token: route.query.v,
@@ -330,12 +329,12 @@ const routes = [
         meta: {},
     },
     {
-        path: "/dashboard/export",
-        name: "exportBookmark",
+        path: "/viz/export",
+        name: "exportWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 exportsVisible: true,
             };
         },
@@ -345,12 +344,12 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/share",
-        name: "shareBookmark",
+        path: "/viz/share",
+        name: "shareWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 shareVisible: true,
             };
         },

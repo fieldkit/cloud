@@ -1,12 +1,13 @@
 <template>
     <ExploreWorkspace
         v-if="visibleBookmark"
+        :token="token"
         :bookmark="visibleBookmark"
         :exportsVisible="exportsVisible"
         :shareVisible="shareVisible"
         @open-bookmark="openBookmark"
-        @export-bookmark="exportBookmark"
-        @share-bookmark="shareBookmark"
+        @export="exportWorkspace"
+        @share="shareWorkspace"
     />
 </template>
 
@@ -101,13 +102,11 @@ export default Vue.extend({
             }
             await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
         },
-        async exportBookmark(bookmark: Bookmark): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "exportBookmark", query: { bookmark: encoded } });
+        async exportWorkspace(): Promise<void> {
+            await this.$router.push({ name: "exportWorkspace", query: { v: this.token } });
         },
-        async shareBookmark(bookmark: Bookmark): Promise<void> {
-            const encoded = serializeBookmark(this.bookmark);
-            await this.$router.push({ name: "shareBookmark", query: { bookmark: encoded } });
+        async shareWorkspace(): Promise<void> {
+            await this.$router.push({ name: "shareWorkspace", query: { v: this.token } });
         },
     },
 });
