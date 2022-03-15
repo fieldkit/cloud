@@ -204,6 +204,8 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
+@import "../../scss/global";
+
 .tiptap-container {
     width: 100%;
 }
@@ -214,6 +216,10 @@ export default Vue.extend({
     max-height: 70vh;
     overflow-y: auto;
     padding-right: 45px;
+
+    @include bp-down($sm) {
+        max-height: 60vh;
+    }
 }
 
 .tiptap-reading {
@@ -301,6 +307,10 @@ export default Vue.extend({
         position: absolute;
         bottom: 2px;
         right: 25px;
+
+        @include bp-down($sm) {
+            right: 10px;
+        }
 
         button {
             background-color: transparent;
