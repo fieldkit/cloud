@@ -971,11 +971,6 @@ export class Workspace implements VizInfoFactory {
         return;
     }
 
-    private eventually(callback: (ws: Workspace) => Promise<any>) {
-        callback(this);
-        return Promise.resolve(this);
-    }
-
     public with(callback: (ws: Workspace) => Workspace) {
         callback(this);
         return this;

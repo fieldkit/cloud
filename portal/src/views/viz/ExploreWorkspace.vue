@@ -51,7 +51,7 @@ import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark, serializeBookmark } from "./viz";
+import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
 import Comments from "../comments/Comments.vue";
@@ -193,23 +193,23 @@ export default Vue.extend({
                         });
                     }
 
-                    const vizSensor = [
+                    const vizSensor: VizSensor = [
                         stationId,
                         [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
                     ];
 
                     const associated = await this.$services.api.getAssociatedStations(stationId);
-                    console.log(`viz: show-station-associated`, associated);
+                    const stationIds = associated.stations.map((station) => station.id);
+                    console.log(`viz: show-station-associated`, associated, stationIds);
 
-                    return workspace
-                        .addStandardGraph(vizSensor)
-                        .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then(async (ws) => {
-                            await workspace.addStationIds(associated.stations.map((station) => station.id));
+                    const bookmark = new Bookmark(
+                        1,
+                        [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                        stationIds,
+                        []
+                    );
 
-                            console.log(`viz: show-station-querying`);
-                            return await ws.query();
-                        });
+                    this.$emit("open-bookmark", bookmark);
                 });
             });
         },
