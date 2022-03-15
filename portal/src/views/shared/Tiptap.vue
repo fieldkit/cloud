@@ -6,26 +6,6 @@
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
         </div>
-        <div
-            v-if="characters && editor"
-            :class="{ 'character-count': true, 'character-count--warning': editor.getCharacterCount() === limit }"
-        >
-            <svg height="20" width="20" viewBox="0 0 20 20" class="character-count__graph">
-                <circle r="10" cx="10" cy="10" fill="#e9ecef" />
-                <circle
-                    r="5"
-                    cx="10"
-                    cy="10"
-                    fill="transparent"
-                    stroke="currentColor"
-                    stroke-width="10"
-                    :stroke-dasharray="`calc(${percentage} * 31.4 / 100) 31.4`"
-                    transform="rotate(-90) translate(-20)"
-                />
-                <circle r="6" cx="10" cy="10" fill="white" />
-            </svg>
-            <div class="character-count__text">{{ editor.getCharacterCount() }}/{{ limit }} characters</div>
-        </div>
     </div>
 </template>
 
@@ -72,11 +52,9 @@ export default Vue.extend({
     },
     data(): {
         editor: Editor | null;
-        limit: number;
     } {
         return {
             editor: null,
-            limit: 280,
         };
     },
     watch: {
@@ -92,12 +70,6 @@ export default Vue.extend({
         },
     },
     computed: {
-        percentage(): number {
-            if (this.editor) {
-                return Math.round((100 / this.limit) * this.editor.getCharacterCount());
-            }
-            return 0;
-        },
         empty(): boolean {
             return this.editor == null || this.editor.getCharacterCount() == 0;
         },
@@ -145,9 +117,6 @@ export default Vue.extend({
                 Text,
                 Placeholder,
                 ModifyEnter,
-                CharacterCount.configure({
-                    limit: this.limit,
-                }),
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
@@ -243,7 +212,9 @@ export default Vue.extend({
 .tiptap-editing {
     border-radius: 2px;
     border: solid 1px #d8dce0;
-    padding: 0 13px 0 13px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 45px;
 }
 
 .tiptap-reading {
@@ -319,6 +290,7 @@ export default Vue.extend({
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
+    padding: 0 13px 0 13px;
 
     .tiptap-main {
         width: 100%;
@@ -327,6 +299,23 @@ export default Vue.extend({
     .tiptap-side {
         flex-shrink: 0;
         padding: 12px 0;
+        position: absolute;
+        bottom: 2px;
+        right: 25px;
+
+        /*.new-comment.reply & {
+            bottom: 0;
+        }
+
+        .data-view .new-comment & {
+            right: 45px;
+            bottom: 19px;
+        }
+
+        .data-view .new-comment.reply & {
+            right: 35px;
+            bottom: 10px;
+        }*/
 
         button {
             background-color: transparent;
