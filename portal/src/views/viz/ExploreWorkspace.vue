@@ -215,10 +215,10 @@ export default Vue.extend({
                         console.log(`viz: show-station-associated`, associated, stationIds);
 
                         const bookmark = new Bookmark(
-                            1,
+                            this.bookmark.v,
                             [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
                             stationIds,
-                            []
+                            this.bookmark.p
                         );
 
                         this.$emit("open-bookmark", bookmark);
