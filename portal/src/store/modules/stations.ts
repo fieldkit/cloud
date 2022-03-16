@@ -18,9 +18,10 @@ import {
     Activity,
     Configurations,
     Photos,
+    VizThresholds,
 } from "@/api";
-import { convertOldFirmwareResponse } from "@/utilities";
-import { SensorMeta } from "@/views/viz/viz";
+
+import { VizConfig } from "@/views/viz/viz";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
@@ -39,7 +40,9 @@ export class DisplaySensor {
     unitOfMeasure: string;
     reading: number | null;
     time: number | null;
-    meta: SensorMeta;
+    meta: {
+        viz: VizConfig[];
+    };
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
@@ -55,12 +58,10 @@ export class DisplaySensor {
 export class DisplayModule {
     name: string;
     sensors: DisplaySensor[];
-    primary: string;
 
     constructor(module: StationModule) {
         this.name = module.name;
         this.sensors = module.sensors.map((s) => new DisplaySensor(s));
-        this.primary = "depth"; //fixme: static for testing; calulate from "ordering" in sensor_meta
     }
 }
 
@@ -80,7 +81,7 @@ export class DisplayStation {
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
     public readonly latestPrimary: number | null;
-    public readonly primarySensor: DisplaySensor | null;
+    public readonly primarySensor: ModuleSensor | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -144,7 +145,7 @@ export class MapFeature {
             type: type,
             coordinates: coordinates,
         };
-        let thresholds = null;
+        let thresholds: VizThresholds | null = null;
         if (station.primarySensor && station.primarySensor.meta.viz.length > 0) {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }

@@ -7,7 +7,7 @@ import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
-import { SensorsResponse } from "@/views/viz/api";
+import { SensorsResponse, VizConfig } from "@/views/viz/api";
 import { promiseAfter } from "@/utilities";
 
 export interface PortalDeployStatus {
@@ -268,6 +268,9 @@ export interface ModuleSensor {
     key: string;
     ranges: null;
     reading: SensorReading | null;
+    meta: {
+        viz: VizConfig[];
+    };
 }
 
 export interface StationModule {
