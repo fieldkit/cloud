@@ -71,4 +71,5 @@ func (fb *FacebookContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/share/{bookmark}", fb.SharedWorkspace)
 	s.HandleFunc("/dashboard/explore", fb.SharedWorkspace)
 	s.HandleFunc("/dashboard/share", fb.SharedWorkspace)
+	s.HandleFunc("/viz", fb.SharedWorkspace)
 }

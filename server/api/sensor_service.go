@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"math"
@@ -12,8 +11,6 @@ import (
 
 	"github.com/conservify/sqlxcache"
 	"github.com/jmoiron/sqlx"
-
-	gonanoid "github.com/matoous/go-nanoid/v2"
 
 	"goa.design/goa/v3/security"
 
@@ -265,60 +262,35 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 	}, nil
 }
 
-type SavedBookmark struct {
-	ID           int64     `db:"id"`
-	UserID       *int32    `db:"user_id"`
-	Token        string    `db:"token"`
-	Bookmark     string    `db:"bookmark"`
-	CreatedAt    time.Time `db:"created_at"`
-	ReferencedAt time.Time `db:"referenced_at"`
-}
-
 func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
-	token, err := gonanoid.New()
+	repository := repositories.NewBookmarkRepository(c.options.Database)
+
+	saved, err := repository.AddNew(ctx, nil, payload.Bookmark)
 	if err != nil {
 		return nil, err
 	}
 
-	now := time.Now()
-	saving := &SavedBookmark{
-		UserID:       nil,
-		Token:        token,
-		Bookmark:     payload.Bookmark,
-		CreatedAt:    now,
-		ReferencedAt: now,
-	}
-
-	if err := c.options.Database.NamedGetContext(ctx, saving, `
-		INSERT INTO fieldkit.bookmarks
-		(user_id, token, bookmark, created_at, referenced_at) VALUES (:user_id, :token, :bookmark, :created_at, :referenced_at)
-		RETURNING id
-		`, saving); err != nil {
-		return nil, err
-	}
-
 	return &sensor.SavedBookmark{
-		URL:      fmt.Sprintf("/viz?v=%s", token),
-		Token:    token,
+		URL:      fmt.Sprintf("/viz?v=%s", saved.Token),
+		Token:    saved.Token,
 		Bookmark: payload.Bookmark,
 	}, nil
 }
 
 func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+	repository := repositories.NewBookmarkRepository(c.options.Database)
 
-	saved := &SavedBookmark{}
-	if err := c.options.Database.GetContext(ctx, saved, `
-		SELECT id, user_id, token, bookmark, created_at, referenced_at FROM fieldkit.bookmarks WHERE token = $1
-		`, payload.V); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, sensor.MakeNotFound(errors.New("not found"))
-		}
+	resolved, err := repository.Resolve(ctx, payload.V)
+	if err != nil {
 		return nil, err
+	}
+	if resolved == nil {
+		return nil, sensor.MakeNotFound(errors.New("not found"))
 	}
 
 	return &sensor.SavedBookmark{
-		URL:      fmt.Sprintf("/viz?v=%s", payload.V),
-		Bookmark: saved.Bookmark,
+		URL:      fmt.Sprintf("/viz?v=%s", resolved.Token),
+		Bookmark: resolved.Bookmark,
 	}, nil
 }
 

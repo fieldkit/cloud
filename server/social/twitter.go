@@ -71,4 +71,5 @@ func (tw *TwitterContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
 	s.HandleFunc("/dashboard/explore", tw.SharedWorkspace)
 	s.HandleFunc("/dashboard/share", tw.SharedWorkspace)
+	s.HandleFunc("/viz", tw.SharedWorkspace)
 }
