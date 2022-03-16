@@ -46,6 +46,10 @@ export default Vue.extend({
             type: Number,
             required: true,
         },
+        moduleKey: {
+            type: String,
+            required: false,
+        },
     },
     data(): {
         allSensorsMemoized: () => Promise<SensorsResponse>;
@@ -79,8 +83,16 @@ export default Vue.extend({
 
             return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
+                    console.log("DATA radoi length", data.length);
                     const sensorsToModule = _.fromPairs(
-                        _.flatten(meta.modules.map((module) => module.sensors.map((sensor) => [sensor.fullKey, module])))
+                        _.flatten(
+                            meta.modules.map((module) => {
+                              //console.log("radoi mapping", module);
+
+
+                                return module.sensors.map((sensor) => [sensor.fullKey, module]);
+                            })
+                        )
                     );
 
                     const idsToKey = _.mapValues(
@@ -114,7 +126,9 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            console.log(`sensor:`, sensor);
+                            //  console.log(`sensor:`, sensor);
+                            console.log("radoi sensor module", sensorModule);
+
                             return new SensorReading(
                                 key,
                                 classes.join(" "),

@@ -1,12 +1,8 @@
-<template v-if="mapped.valid && ready">
+<template v-if="ready">
     <mapbox
-        class="stations-map"
+        class="station-map"
         :access-token="mapbox.token"
-        :map-options="{
-            style: mapbox.style,
-            bounds: bounds,
-            zoom: 10,
-        }"
+        :map-options="{ style: mapbox.style, bounds: bounds, zoom: 10 }"
         :nav-control="{
             show: true,
             position: 'bottom-left',
@@ -19,26 +15,20 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable vue/no-unused-components */
-
 import Vue from "vue";
-import Mapbox from "mapbox-gl-vue";
+import { BoundingRectangle, DisplayStation, LngLat, MappedStations, ProjectModule } from "@/store";
+import * as utils from "@/utilities";
 import Config from "@/secrets";
-import { MappedStations, LngLat, BoundingRectangle } from "@/store";
-import ValueMarker from "./ValueMarker.vue";
-
-import * as d3 from "d3";
+import Mapbox from "mapbox-gl-vue";
+import { ProtectedData } from "@/views/shared/StationsMap.vue";
+import ValueMarker from "@/views/shared/ValueMarker.vue";
 import mapboxgl from "mapbox-gl";
-
-export interface ProtectedData {
-    map: any;
-}
+import * as d3 from "d3";
 
 export default Vue.extend({
-    name: "StationsMap",
+    name: "StationView",
     components: {
         Mapbox,
-        ValueMarker,
     },
     data(): {
         mapbox: { token: string; style: string };
@@ -48,8 +38,16 @@ export default Vue.extend({
         return {
             mapbox: Config.mapbox,
             ready: false,
-            //fixme: needs to be pulled from api
-            thresholds: {label:{"en-US":"Severity of Flooding"},"levels":[{"label":{"en-US":"None"},"value":8,"color":"#00CCFF"},{"label":{"en-US":"Almost"},"value":8.5,"color":"#0099FF"},{"label":{"en-US":"Some"},"value":9,"color":"#0066FF"},{"label":{"en-US":"Flooding"},"value":9.5,"color":"#0033FF"},{"label":{"en-US":"Severe"},"value":10,"color":"#0000FF"}]}
+            thresholds: {
+                label: { "en-US": "Severity of Flooding" },
+                levels: [
+                    { label: { "en-US": "None" }, value: 8, color: "#00CCFF" },
+                    { label: { "en-US": "Almost" }, value: 8.5, color: "#0099FF" },
+                    { label: { "en-US": "Some" }, value: 9, color: "#0066FF" },
+                    { label: { "en-US": "Flooding" }, value: 9.5, color: "#0033FF" },
+                    { label: { "en-US": "Severe" }, value: 10, color: "#0000FF" },
+                ],
+            },
         };
     },
     props: {
@@ -62,47 +60,36 @@ export default Vue.extend({
         mapBounds: {
             type: BoundingRectangle,
         },
-        showStations: {
-            type: Boolean,
-            default: false,
-        },
-        layoutChanges: {
-            type: Number,
-            default: 0,
-        },
     },
     computed: {
+        headerSubtitle() {
+            let subtitle;
+            if (this.station && this.station.deployedAt && this.$options.filters?.prettyDate) {
+                if (this.station.deployedAt) {
+                    subtitle = this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(this.station.deployedAt);
+                } else {
+                    subtitle = this.$tc("station.readyToDeploy");
+                }
+            }
+            return subtitle;
+        },
         // Mapbox maps absolutely hate being mangled by Vue
         protectedData(): ProtectedData {
             return (this as unknown) as ProtectedData;
         },
         bounds(): LngLat[] | null {
             if (this.value) {
-                return this.value.lngLat();
+                //    return this.value.lngLat();
             }
 
-            return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
-        },
-    },
-    watch: {
-        layoutChanges(): void {
-            console.log("map: layout changed");
-            if (this.protectedData.map) {
-                // TODO Not a fan of this.
-                this.$nextTick(() => {
-                    this.protectedData.map.resize();
-                });
-            }
-        },
-        mapped(): void {
-            console.log("map: mapped changed", this.mapped);
-            this.updateMap();
-        },
-        showStations(): void {
-            this.updateMap();
+            // return this.mapBounds.lngLat();
+            return null;
         },
     },
     methods: {
+        layoutChange() {
+            this.$emit("layoutChange");
+        },
         onMapInitialized(map: any): void {
             console.log("map: initialized");
             this.protectedData.map = map;
@@ -149,43 +136,27 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
-            // Marker color scale
-            const markerScale = d3.scaleThreshold()
-                .domain(this.thresholds.levels.map( d => d.value ))
-                .range(this.thresholds.levels.map( d => d.color ));
 
-            // Add color value to feature data
-            const appendColor = (features) => {
-                return features.map( (d) => {
-                    d.properties.color = markerScale(d.properties.value);
-                    return d
-                })
-            }
 
-            if (!map.getLayer("station-markers") && this.showStations) {
+
+
+            if (!map.getLayer("station-markers")) {
                 console.log("map: updating", this.mapped);
 
-                map.addSource("stations", {
-                    type: "geojson",
-                    data: {
-                        type: "FeatureCollection",
-                        features: appendColor(this.mapped.features),
-                    },
-                });
 
-                map.addLayer({
+               /* map.addLayer({
                     id: "regions",
                     type: "fill",
                     source: "stations",
                     paint: {
                         "fill-color": "#aaaaaa",
-                        "fill-opacity": 0.2,
+                        "fill-opacity": 1,
                     },
                     filter: ["==", "$type", "Polygon"],
                 });
-
-                if(!this.mapped.isSingleType){
-                    map.addLayer({
+*/
+               /* if (!this.mapped.isSingleType) {
+                   /!* map.addLayer({
                         id: "station-markers",
                         type: "symbol",
                         source: "stations",
@@ -199,9 +170,9 @@ export default Vue.extend({
                             "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                             "text-offset": [0, 0.75],
                             "text-variable-anchor": ["top", "right", "bottom", "left"],
-                        },
+                        },*!/
                     });
-                }
+                }*/
 
                 map.on("click", "station-markers", (e) => {
                     const id = e.features[0].properties.id;
@@ -217,42 +188,29 @@ export default Vue.extend({
             }
 
             //Generate custom map markers
-            const valueMarker = Vue.extend(ValueMarker)
+            const valueMarker = Vue.extend(ValueMarker);
 
             for (const feature of this.mapped.features) {
-
                 const instance = new valueMarker({
-                    propsData: { color: feature.properties.color,
-                                value: feature.properties.value,
-                                id: feature.properties.id },
-                })
-                instance.$mount()
+                    propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },
+                });
+                instance.$mount();
                 instance.$on("marker-click", (evt) => {
                     this.$emit("show-summary", { id: evt.id });
-                })
+                });
 
                 new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
             }
-
         },
     },
 });
 </script>
 
-<style scoped>
-.map-view #map {
-    height: 100%;
-    position: relative;
-    width: inherit;
-}
-.project-container #map {
-    height: inherit;
-    position: inherit;
-    width: inherit;
-}
-.marker {
-    height: 10px;
-    width: 10px;
-}
+<style scoped lang="scss">
+@import "../../scss/mixins";
+@import "../../scss/layout";
 
+.station-map {
+    height: 400px;
+}
 </style>

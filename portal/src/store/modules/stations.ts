@@ -505,6 +505,7 @@ const mutations = {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
+        console.log("SET STAT ERADOI");
         Vue.set(state.stations, payload.id, new DisplayStation(payload));
     },
     [PROJECT_LOADED]: (state: StationsState, project: Project) => {
