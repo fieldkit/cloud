@@ -153,8 +153,8 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 		bookmark = qs.Get("bookmark")
 	}
 
-	if qs.Get("token") != "" {
-		token := qs.Get("token")
+	if qs.Get("v") != "" {
+		token := qs.Get("v")
 
 		repository := repositories.NewBookmarkRepository(sc.db)
 
@@ -171,6 +171,11 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 		}
 
 		bookmark = resolved.Bookmark
+	}
+
+	if bookmark == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	log.Infow("social-workspace-card", "bookmark", bookmark)
