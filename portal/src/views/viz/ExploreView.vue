@@ -121,15 +121,22 @@ export default Vue.extend({
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
-            await this.$services.api.getAllSensors().then(async (sensorKeys) => {
-                // Check for a bookmark that is just to a station with no groups.
-                if (this.bookmark.s.length > 0 && this.bookmark.g.length == 0) {
-                    console.log("viz: before-show-station", this.bookmark);
-                    return this.showStation(this.bookmark.s[0]);
-                }
-                console.log("viz: before-create-workspace", this.bookmark);
-                await this.createWorkspaceIfNecessary();
-            });
+            await this.$services.api
+                .getAllSensors()
+                .then(async (sensorKeys) => {
+                    // Check for a bookmark that is just to a station with no groups.
+                    if (this.bookmark.s.length > 0 && this.bookmark.g.length == 0) {
+                        console.log("viz: before-show-station", this.bookmark);
+                        return this.showStation(this.bookmark.s[0]);
+                    }
+                    console.log("viz: before-create-workspace", this.bookmark);
+                    await this.createWorkspaceIfNecessary(sensorKeys);
+                })
+                .catch(async (e) => {
+                    if (e.name === "ForbiddenError") {
+                        await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
+                    }
+                });
         }
     },
     methods: {
@@ -167,21 +174,24 @@ export default Vue.extend({
             const encoded = serializeBookmark(this.bookmark);
             await this.$router.push({ name: "exploreBookmark", query: { bookmark: encoded } });
         },
-        async createWorkspaceIfNecessary(): Promise<Workspace> {
+        async createWorkspaceIfNecessary(allSensors?: SensorsResponse): Promise<Workspace> {
             if (this.workspace) {
                 return this.workspace;
             }
 
-            const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
-            if (this.bookmark) {
-                this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
-            } else {
-                this.workspace = new Workspace(allSensors);
+            allSensors = allSensors ? allSensors : await this.$services.api.getAllSensors();
+
+            if (allSensors) {
+                if (this.bookmark) {
+                    this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
+                } else {
+                    this.workspace = new Workspace(allSensors);
+                }
+
+                console.log(`viz: workspace-created`);
+
+                return this.workspace;
             }
-
-            console.log(`viz: workspace-created`);
-
-            return this.workspace;
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
@@ -189,34 +199,50 @@ export default Vue.extend({
             this.stationId = stationId;
 
             return await this.createWorkspaceIfNecessary().then(async (workspace) => {
-                return await this.$services.api.getQuickSensors([stationId]).then(async (quickSensors) => {
-                    console.log("viz: quick-sensors", quickSensors);
-                    if (quickSensors.stations[stationId].length == 0) {
-                        console.log("viz: no sensors TODO: FIX");
-                        this.showNoSensors = true;
-                        return Promise.delay(5000).then(() => {
-                            this.showNoSensors = false;
+                return await this.$services.api
+                    .getQuickSensors([stationId])
+                    .then(async (quickSensors) => {
+                        console.log("viz: quick-sensors", quickSensors);
+                        if (quickSensors.stations[stationId].length == 0) {
+                            console.log("viz: no sensors TODO: FIX");
+                            this.showNoSensors = true;
+                            return Promise.delay(5000).then(() => {
+                                this.showNoSensors = false;
+                            });
+                        }
+
+                        const vizSensor = [
+                            stationId,
+                            [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
+                        ];
+
+                        const associated = await this.$services.api.getAssociatedStations(stationId).catch(async (e) => {
+                            if (e.name === "ForbiddenError") {
+                                await this.$router.push({
+                                    name: "login",
+                                    params: { errorMessage: String(this.$t("login.privateStation")) },
+                                });
+                            }
                         });
-                    }
+                        console.log(`viz: show-station-associated`, associated);
 
-                    const vizSensor = [
-                        stationId,
-                        [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
-                    ];
+                        return workspace
+                            .addStandardGraph(vizSensor)
+                            .eventually((ws) => this.onChange(ws.bookmark()))
+                            .then(async (ws) => {
+                                if (associated) {
+                                    await workspace.addStationIds(associated.stations.map((station) => station.id));
+                                }
 
-                    const associated = await this.$services.api.getAssociatedStations(stationId);
-                    console.log(`viz: show-station-associated`, associated);
-
-                    return workspace
-                        .addStandardGraph(vizSensor)
-                        .eventually((ws) => this.onChange(ws.bookmark()))
-                        .then(async (ws) => {
-                            await workspace.addStationIds(associated.stations.map((station) => station.id));
-
-                            console.log(`viz: show-station-querying`);
-                            return await ws.query();
-                        });
-                });
+                                console.log(`viz: show-station-querying`);
+                                return await ws.query();
+                            });
+                    })
+                    .catch((e) => {
+                        if (e.name === "ForbiddenError") {
+                            return this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
+                        }
+                    });
             });
         },
     },

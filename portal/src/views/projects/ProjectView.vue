@@ -100,7 +100,11 @@ export default Vue.extend({
         },
     },
     beforeMount() {
-        return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+        return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id }).catch((e) => {
+            if (e.name === "ForbiddenError") {
+                return this.$router.push({ name: "login", params: { errorMessage: this.$t("login.privateProject") } });
+            }
+        });
     },
     methods: {
         goBack() {
