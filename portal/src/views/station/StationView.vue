@@ -425,7 +425,7 @@ export default Vue.extend({
                 flex: 0 0 calc(50% - 10px);
             }
 
-            @include bp-up($xs) {
+            @include bp-down($sm) {
                 flex: 0 0 100%;
             }
         }

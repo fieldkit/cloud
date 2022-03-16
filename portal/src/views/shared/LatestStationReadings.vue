@@ -83,7 +83,7 @@ export default Vue.extend({
 
             return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
-                    console.log("DATA radoi length", data.length);
+                    console.log("DATA radoi length", meta);
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {
