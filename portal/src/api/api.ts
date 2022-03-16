@@ -91,6 +91,17 @@ export class MissingTokenError extends TokenError {
     }
 }
 
+export class ForbiddenError extends ApiError {
+    constructor(public readonly status: number) {
+        super("403 status");
+        this.name = "ForbiddenError";
+    }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "ForbiddenError";
+    }
+}
+
 export type OnNoAuth<T> = () => Promise<T>;
 
 export const OnNoReject = () => Promise.reject(new MissingTokenError());
@@ -402,6 +413,10 @@ class FKApi {
 
                     console.log("api: refresh failed");
                     return Promise.reject(new TokenError("unauthorized"));
+                }
+
+                if (response.status === 403) {
+                    return Promise.reject(new ForbiddenError(403));
                 }
 
                 console.log("api: error", error.response.status, error.response.data);
