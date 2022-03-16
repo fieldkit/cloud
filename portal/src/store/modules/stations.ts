@@ -146,7 +146,7 @@ export class MapFeature {
             coordinates: coordinates,
         };
         let thresholds: VizThresholds | null = null;
-        if (station.primarySensor && station.primarySensor.meta.viz.length > 0) {
+        if (station.primarySensor && station.primarySensor.meta && station.primarySensor.meta.viz.length > 0) {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
         this.properties = {
