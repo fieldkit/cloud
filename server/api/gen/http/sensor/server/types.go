@@ -9,8 +9,25 @@ package server
 
 import (
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goa "goa.design/goa/v3/pkg"
 )
+
+// BookmarkResponseBody is the type of the "sensor" service "bookmark" endpoint
+// HTTP response body.
+type BookmarkResponseBody struct {
+	URL      string `form:"url" json:"url" xml:"url"`
+	Bookmark string `form:"bookmark" json:"bookmark" xml:"bookmark"`
+	Token    string `form:"token" json:"token" xml:"token"`
+}
+
+// ResolveResponseBody is the type of the "sensor" service "resolve" endpoint
+// HTTP response body.
+type ResolveResponseBody struct {
+	URL      string `form:"url" json:"url" xml:"url"`
+	Bookmark string `form:"bookmark" json:"bookmark" xml:"bookmark"`
+	Token    string `form:"token" json:"token" xml:"token"`
+}
 
 // MetaUnauthorizedResponseBody is the type of the "sensor" service "meta"
 // endpoint HTTP response body for the "unauthorized" error.
@@ -156,6 +173,172 @@ type DataBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// BookmarkUnauthorizedResponseBody is the type of the "sensor" service
+// "bookmark" endpoint HTTP response body for the "unauthorized" error.
+type BookmarkUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// BookmarkForbiddenResponseBody is the type of the "sensor" service "bookmark"
+// endpoint HTTP response body for the "forbidden" error.
+type BookmarkForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// BookmarkNotFoundResponseBody is the type of the "sensor" service "bookmark"
+// endpoint HTTP response body for the "not-found" error.
+type BookmarkNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// BookmarkBadRequestResponseBody is the type of the "sensor" service
+// "bookmark" endpoint HTTP response body for the "bad-request" error.
+type BookmarkBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResolveUnauthorizedResponseBody is the type of the "sensor" service
+// "resolve" endpoint HTTP response body for the "unauthorized" error.
+type ResolveUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResolveForbiddenResponseBody is the type of the "sensor" service "resolve"
+// endpoint HTTP response body for the "forbidden" error.
+type ResolveForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResolveNotFoundResponseBody is the type of the "sensor" service "resolve"
+// endpoint HTTP response body for the "not-found" error.
+type ResolveNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ResolveBadRequestResponseBody is the type of the "sensor" service "resolve"
+// endpoint HTTP response body for the "bad-request" error.
+type ResolveBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// NewBookmarkResponseBody builds the HTTP response body from the result of the
+// "bookmark" endpoint of the "sensor" service.
+func NewBookmarkResponseBody(res *sensorviews.SavedBookmarkView) *BookmarkResponseBody {
+	body := &BookmarkResponseBody{
+		URL:      *res.URL,
+		Bookmark: *res.Bookmark,
+		Token:    *res.Token,
+	}
+	return body
+}
+
+// NewResolveResponseBody builds the HTTP response body from the result of the
+// "resolve" endpoint of the "sensor" service.
+func NewResolveResponseBody(res *sensorviews.SavedBookmarkView) *ResolveResponseBody {
+	body := &ResolveResponseBody{
+		URL:      *res.URL,
+		Bookmark: *res.Bookmark,
+		Token:    *res.Token,
+	}
+	return body
+}
+
 // NewMetaUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "meta" endpoint of the "sensor" service.
 func NewMetaUnauthorizedResponseBody(res *goa.ServiceError) *MetaUnauthorizedResponseBody {
@@ -268,6 +451,118 @@ func NewDataBadRequestResponseBody(res *goa.ServiceError) *DataBadRequestRespons
 	return body
 }
 
+// NewBookmarkUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "bookmark" endpoint of the "sensor" service.
+func NewBookmarkUnauthorizedResponseBody(res *goa.ServiceError) *BookmarkUnauthorizedResponseBody {
+	body := &BookmarkUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewBookmarkForbiddenResponseBody builds the HTTP response body from the
+// result of the "bookmark" endpoint of the "sensor" service.
+func NewBookmarkForbiddenResponseBody(res *goa.ServiceError) *BookmarkForbiddenResponseBody {
+	body := &BookmarkForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewBookmarkNotFoundResponseBody builds the HTTP response body from the
+// result of the "bookmark" endpoint of the "sensor" service.
+func NewBookmarkNotFoundResponseBody(res *goa.ServiceError) *BookmarkNotFoundResponseBody {
+	body := &BookmarkNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewBookmarkBadRequestResponseBody builds the HTTP response body from the
+// result of the "bookmark" endpoint of the "sensor" service.
+func NewBookmarkBadRequestResponseBody(res *goa.ServiceError) *BookmarkBadRequestResponseBody {
+	body := &BookmarkBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResolveUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "resolve" endpoint of the "sensor" service.
+func NewResolveUnauthorizedResponseBody(res *goa.ServiceError) *ResolveUnauthorizedResponseBody {
+	body := &ResolveUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResolveForbiddenResponseBody builds the HTTP response body from the
+// result of the "resolve" endpoint of the "sensor" service.
+func NewResolveForbiddenResponseBody(res *goa.ServiceError) *ResolveForbiddenResponseBody {
+	body := &ResolveForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResolveNotFoundResponseBody builds the HTTP response body from the result
+// of the "resolve" endpoint of the "sensor" service.
+func NewResolveNotFoundResponseBody(res *goa.ServiceError) *ResolveNotFoundResponseBody {
+	body := &ResolveNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewResolveBadRequestResponseBody builds the HTTP response body from the
+// result of the "resolve" endpoint of the "sensor" service.
+func NewResolveBadRequestResponseBody(res *goa.ServiceError) *ResolveBadRequestResponseBody {
+	body := &ResolveBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewDataPayload builds a sensor service data endpoint payload.
 func NewDataPayload(start *int64, end *int64, stations *string, sensors *string, resolution *int32, aggregate *string, complete *bool, tail *int32, auth *string) *sensor.DataPayload {
 	v := &sensor.DataPayload{}
@@ -279,6 +574,24 @@ func NewDataPayload(start *int64, end *int64, stations *string, sensors *string,
 	v.Aggregate = aggregate
 	v.Complete = complete
 	v.Tail = tail
+	v.Auth = auth
+
+	return v
+}
+
+// NewBookmarkPayload builds a sensor service bookmark endpoint payload.
+func NewBookmarkPayload(bookmark string, auth *string) *sensor.BookmarkPayload {
+	v := &sensor.BookmarkPayload{}
+	v.Bookmark = bookmark
+	v.Auth = auth
+
+	return v
+}
+
+// NewResolvePayload builds a sensor service resolve endpoint payload.
+func NewResolvePayload(v2 string, auth *string) *sensor.ResolvePayload {
+	v := &sensor.ResolvePayload{}
+	v.V = v2
 	v.Auth = auth
 
 	return v

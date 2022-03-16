@@ -356,6 +356,11 @@ export interface InvokeParams {
     blob?: boolean | null;
 }
 
+export interface SavedBookmark {
+    url: string;
+    bookmark: string;
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
@@ -1441,6 +1446,26 @@ class FKApi {
         return;
     }
 	*/
+
+    public async saveBookmark(bookmark: string): Promise<SavedBookmark> {
+        const qp = new URLSearchParams();
+        qp.append("bookmark", bookmark);
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "POST",
+            url: this.baseUrl + `/bookmarks/save?${qp.toString()}`,
+        });
+    }
+
+    public async resolveBookmark(token: string): Promise<SavedBookmark> {
+        const qp = new URLSearchParams();
+        qp.append("v", token);
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + `/bookmarks/resolve?${qp.toString()}`,
+        });
+    }
 }
 
 export default FKApi;

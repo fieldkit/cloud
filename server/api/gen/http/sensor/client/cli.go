@@ -110,3 +110,43 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 
 	return v, nil
 }
+
+// BuildBookmarkPayload builds the payload for the sensor bookmark endpoint
+// from CLI flags.
+func BuildBookmarkPayload(sensorBookmarkBookmark string, sensorBookmarkAuth string) (*sensor.BookmarkPayload, error) {
+	var bookmark string
+	{
+		bookmark = sensorBookmarkBookmark
+	}
+	var auth *string
+	{
+		if sensorBookmarkAuth != "" {
+			auth = &sensorBookmarkAuth
+		}
+	}
+	v := &sensor.BookmarkPayload{}
+	v.Bookmark = bookmark
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildResolvePayload builds the payload for the sensor resolve endpoint from
+// CLI flags.
+func BuildResolvePayload(sensorResolveV2 string, sensorResolveAuth string) (*sensor.ResolvePayload, error) {
+	var v2 string
+	{
+		v2 = sensorResolveV2
+	}
+	var auth *string
+	{
+		if sensorResolveAuth != "" {
+			auth = &sensorResolveAuth
+		}
+	}
+	v := &sensor.ResolvePayload{}
+	v.V = v2
+	v.Auth = auth
+
+	return v, nil
+}

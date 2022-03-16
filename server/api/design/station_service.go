@@ -221,7 +221,7 @@ var PageOfStations = ResultType("application/vnd.app.stations.essential.page", f
 })
 
 var StationJob = ResultType("application/vnd.app.stations.job", func() {
-	TypeName("StationJob ")
+	TypeName("StationJob")
 	Attributes(func() {
 		Attribute("title", String)
 		Attribute("startedAt", Int64)
@@ -240,7 +240,7 @@ var StationJob = ResultType("application/vnd.app.stations.job", func() {
 })
 
 var StationProgress = ResultType("application/vnd.app.stations.progress", func() {
-	TypeName("StationProgress ")
+	TypeName("StationProgress")
 	Attributes(func() {
 		Attribute("jobs", ArrayOf(StationJob))
 		Required("jobs")
