@@ -19,6 +19,8 @@ import {
     Configurations,
     Photos,
 } from "@/api";
+import { convertOldFirmwareResponse } from "@/utilities";
+import { SensorMeta } from "@/views/viz/viz";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
@@ -37,9 +39,11 @@ export class DisplaySensor {
     unitOfMeasure: string;
     reading: number | null;
     time: number | null;
+    meta: SensorMeta;
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
+        this.meta = sensor.meta;
         this.unitOfMeasure = sensor.unitOfMeasure;
         if (sensor.reading) {
             this.reading = sensor.reading.last;
@@ -76,6 +80,7 @@ export class DisplayStation {
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
     public readonly latestPrimary: number | null;
+    public readonly primarySensor: DisplaySensor | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -89,6 +94,14 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
+
+        if (station.configurations.all.length > 0) {
+            const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
+            if (ordered[0]) {
+                const orderedSensor = _.orderBy(ordered[0].sensors, ["order"])[0];
+                this.primarySensor = orderedSensor;
+            }
+        }
 
         this.modules =
             _(station.configurations.all)
@@ -124,17 +137,22 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null } | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
             type: type,
             coordinates: coordinates,
         };
+        let thresholds = null;
+        if (station.primarySensor && station.primarySensor.meta.viz.length > 0) {
+            thresholds = station.primarySensor.meta.viz[0].thresholds;
+        }
         this.properties = {
             id: station.id,
             value: station.latestPrimary,
             icon: "marker",
+            thresholds: thresholds,
         };
     }
 
