@@ -42,6 +42,7 @@ const routes = [
             bodyClass: "blue-background",
             secured: false,
         },
+        props: true,
     },
     {
         path: "/login/discourse",
