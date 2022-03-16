@@ -9,9 +9,6 @@
       "type": "temporal",
       "axis": {
         "formatType": "time",
-        "format": "%Y-%m-%d",
-        "labelOpacity": 0,
-        "titleOpacity": 0,
         "tickCount": 8,
         "grid": false
       }
@@ -19,15 +16,7 @@
     "y": {
       "field": "value",
       "type": "quantitative",
-      "scale": {
-        "zero": false
-      },
       "axis": {
-        "domain": true,
-        "title": "Value",
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f",
-        "labelColor": "#7f7f7f",
         "labelOpacity": 0,
         "titleOpacity": 0,
         "grid": false
@@ -75,10 +64,6 @@
         "x": {
           "field": "time",
           "type": "temporal"
-        },
-        "y": {
-          "field": "value",
-          "type": "quantitative"
         },
         "url": {
           "field": "img",
