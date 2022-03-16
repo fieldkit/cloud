@@ -25,6 +25,11 @@ export default Vue.extend({
             type: Number
         }
     },
+    mounted () {
+        if(this.value === undefined){
+            this.color = "#ccc";
+        }
+    },
     methods: {
         onClick () {
             this.$emit("marker-click", { id: this.id });
