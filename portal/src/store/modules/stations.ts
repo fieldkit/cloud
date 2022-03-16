@@ -95,12 +95,11 @@ export class DisplayStation {
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
 
-        if(station.configurations.all.length > 0){
-
-            const ordered = _.orderBy(station.configurations.all[0].modules, ['position']);
-            if(ordered[0]){
-                const orderedSen = _.orderBy(ordered[0].sensors, ['order'])[0]
-                this.primarySensor = orderedSen;
+        if (station.configurations.all.length > 0) {
+            const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
+            if (ordered[0]) {
+                const orderedSensor = _.orderBy(ordered[0].sensors, ["order"])[0];
+                this.primarySensor = orderedSensor;
             }
         }
 
@@ -138,7 +137,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null} | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -146,14 +145,14 @@ export class MapFeature {
             coordinates: coordinates,
         };
         let thresholds = null;
-        if(station.primarySensor && station.primarySensor.meta.viz.length > 0){
+        if (station.primarySensor && station.primarySensor.meta.viz.length > 0) {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
         this.properties = {
             id: station.id,
             value: station.latestPrimary,
             icon: "marker",
-            thresholds: thresholds
+            thresholds: thresholds,
         };
     }
 

@@ -38,7 +38,7 @@ export default Vue.extend({
     name: "StationsMap",
     components: {
         Mapbox,
-        ValueMarker
+        ValueMarker,
     },
     data(): {
         mapbox: { token: string; style: string };
@@ -148,25 +148,24 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
-            
             // Marker color scale
             const appendColor = (features) => {
-                return features.map( (d) => { 
-                    if(d.properties.thresholds){
-                        const markerScale = d3.scaleThreshold()
-                            .domain(d.properties.thresholds.levels.map( d => d.value ))
-                            .range(d.properties.thresholds.levels.map( d => d.color ));
+                return features.map((d) => {
+                    if (d.properties.thresholds) {
+                        const markerScale = d3
+                            .scaleThreshold()
+                            .domain(d.properties.thresholds.levels.map((d) => d.value))
+                            .range(d.properties.thresholds.levels.map((d) => d.color));
 
-                            d.properties.color = markerScale(d.properties.value);
-                    }
-                    else{
+                        d.properties.color = markerScale(d.properties.value);
+                    } else {
                         //default color
                         d.properties.color = "#00CCFF";
                     }
-                    
-                    return d 
-                })
-            }
+
+                    return d;
+                });
+            };
 
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
@@ -190,7 +189,7 @@ export default Vue.extend({
                     filter: ["==", "$type", "Polygon"],
                 });
 
-                if(!this.mapped.isSingleType){
+                if (!this.mapped.isSingleType) {
                     map.addLayer({
                         id: "station-markers",
                         type: "symbol",
@@ -223,23 +222,19 @@ export default Vue.extend({
             }
 
             //Generate custom map markers
-            const valueMarker = Vue.extend(ValueMarker)
+            const valueMarker = Vue.extend(ValueMarker);
 
             for (const feature of this.mapped.features) {
-                
                 const instance = new valueMarker({
-                    propsData: { color: feature.properties.color,
-                                value: feature.properties.value,
-                                id: feature.properties.id },
-                })
-                instance.$mount()
+                    propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },
+                });
+                instance.$mount();
                 instance.$on("marker-click", (evt) => {
                     this.$emit("show-summary", { id: evt.id });
-                })
+                });
 
                 new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
             }
-
         },
     },
 });
@@ -260,5 +255,4 @@ export default Vue.extend({
     height: 10px;
     width: 10px;
 }
-
 </style>
