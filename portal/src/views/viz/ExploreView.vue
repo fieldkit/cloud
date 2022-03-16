@@ -1,6 +1,6 @@
 <template>
     <ExploreWorkspace
-        v-if="token && visibleBookmark"
+        v-if="visibleBookmark"
         :token="token"
         :bookmark="visibleBookmark"
         :exportsVisible="exportsVisible"
