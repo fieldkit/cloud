@@ -136,7 +136,7 @@
             </div>
         </div>
 
-        <Comments :parentData="displayProject.id" :user="user" v-if="user"></Comments>
+        <Comments :parentData="displayProject.id" :user="user"></Comments>
     </div>
 </template>
 

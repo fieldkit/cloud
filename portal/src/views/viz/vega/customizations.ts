@@ -22,30 +22,58 @@ export function applySensorMetaConfiguration(spec, series) {
         if (s.vizInfo.viz.length > 0) {
             const vizConfig = s.vizInfo.viz[0];
             const thresholds = vizConfig.thresholds;
+
+            console.log("viz:thresholds", thresholds);
+
             if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
                 const levels = thresholds.levels;
                 const thresholdLayers = levels
-                    .map((d, i) => {
+                    .map((level, i) => {
+                        if (level.label) {
+                            return {
+                                transform: [
+                                    {
+                                        calculate: "datum.value <= " + level.value + " ? datum.value : null",
+                                        as: "layerValue" + i,
+                                    },
+                                    {
+                                        calculate:
+                                            "datum.layerValue" + i + " <= " + level.value + " ? '" + getString(level.label) + "' : null",
+                                        as: getString(thresholds.label),
+                                    },
+                                ],
+                                encoding: {
+                                    y: { field: "layerValue" + i },
+                                    stroke: {
+                                        field: getString(thresholds.label),
+                                        legend: {
+                                            orient: "top",
+                                        },
+                                        scale: {
+                                            domain: levels.filter((l) => l.label).map((d) => getString(d.label)),
+                                            range: levels.map((d) => d.color),
+                                        },
+                                    },
+                                },
+                                mark: {
+                                    type: "line",
+                                    interpolate: "monotone",
+                                    tension: 1,
+                                },
+                            };
+                        }
                         return {
                             transform: [
                                 {
-                                    calculate: "datum.value <= " + d.value + " ? datum.value : null",
+                                    calculate: "datum.value <= " + level.value + " ? datum.value : null",
                                     as: "layerValue" + i,
-                                },
-                                {
-                                    calculate: "datum.layerValue" + i + " <= " + d.value + " ? '" + getString(d.label) + "' : null",
-                                    as: getString(thresholds.label),
                                 },
                             ],
                             encoding: {
                                 y: { field: "layerValue" + i },
                                 stroke: {
-                                    field: getString(thresholds.label),
-                                    legend: {
-                                        orient: "top",
-                                    },
                                     scale: {
-                                        domain: levels.map((d) => getString(d.label)),
+                                        domain: levels.filter((l) => l.label).map((d) => getString(d.label)),
                                         range: levels.map((d) => d.color),
                                     },
                                 },
@@ -69,9 +97,16 @@ export function applySensorMetaConfiguration(spec, series) {
         }
 
         const constrained = s.vizInfo.constrainedRanges;
-        if (s.ds.constrainDataAxis && constrained.length > 0) {
+        if (constrained.length > 0) {
             const range = constrained[0];
-            spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
+            if (s.ds.shouldConstrainBy([range.minimum, range.maximum])) {
+                console.log("viz:constrained", range, s.ds.graphing.dataRange);
+                spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
+            } else {
+                console.log(`viz:constrain-skip`);
+            }
+        } else {
+            console.log(`viz:constrain-none`);
         }
     }
 }

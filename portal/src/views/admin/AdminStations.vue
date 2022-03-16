@@ -127,7 +127,7 @@ import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import FKApi, { Station, SimpleUser, EssentialStation } from "@/api/api";
-import { BookmarkFactory } from "@/views/viz/viz";
+import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import TransferStation from "./TransferStation.vue";
 
 export default Vue.extend({
@@ -244,7 +244,7 @@ export default Vue.extend({
         },
         async onExplore(station: EssentialStation): Promise<void> {
             const bm = BookmarkFactory.forStation(station.id);
-            await this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
+            await this.$router.push({ name: "exploreBookmark", query: { bookmark: serializeBookmark(bm) } });
         },
     },
 });

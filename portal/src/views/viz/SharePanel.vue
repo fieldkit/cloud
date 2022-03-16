@@ -2,13 +2,12 @@
     <div :class="'share-panel ' + containerClass">
         <div class="heading">
             <div class="title">Share</div>
-            <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
-            </div>
+            <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
             <a class="twitter-share-button" :href="twitterUrl" target="blank">
-                <div class="button">Twitter</div>
+                <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
+                Twitter
             </a>
         </div>
     </div>
@@ -19,7 +18,14 @@ import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
+import { serializeBookmark } from "./viz";
+
+function getRelativeUrl(href: string): string {
+    const link = document.createElement("a");
+    link.href = href;
+    return link.href;
+}
 
 export default Vue.extend({
     name: "SharePanel",
@@ -27,6 +33,10 @@ export default Vue.extend({
         ...CommonComponents,
     },
     props: {
+        token: {
+            type: String,
+            required: true,
+        },
         bookmark: {
             type: Object,
             required: true,
@@ -44,10 +54,13 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
-            return "https://twitter.com/intent/tweet" + "?" + qs.toString();
+            qs.append("text", "Check out this data on FieldKit!");
+            return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
-            return "https://portal.fkdev.org/dashboard/explore/" + JSON.stringify(this.bookmark);
+            const qs = new URLSearchParams();
+            qs.append("v", this.token);
+            return getRelativeUrl(`/viz?${qs.toString()}`);
         },
     },
     methods: {
@@ -65,6 +78,7 @@ export default Vue.extend({
 .share-panel .heading {
     padding: 1em;
     display: flex;
+    align-items: center;
 }
 .share-panel .heading .title {
     font-size: 20px;
@@ -78,10 +92,20 @@ export default Vue.extend({
 .share-options {
     padding: 20px;
 
-    .button {
+    .twitter-share-button {
+        padding: 10px 10px 10px 0px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        img {
+            padding: 5px 10px 5px 5px;
+        }
+    }
+
+    .link {
         font-size: 12px;
         padding: 10px;
-        background-color: #ffffff;
         border: 1px solid rgb(215, 220, 225);
         border-radius: 4px;
         cursor: pointer;

@@ -2029,6 +2029,14 @@ func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *Statio
 	for i, val := range v.Sensors {
 		res.Sensors[i] = unmarshalStationSensorResponseBodyToStationviewsStationSensorView(val)
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -2049,6 +2057,14 @@ func unmarshalStationSensorResponseBodyToStationviewsStationSensorView(v *Statio
 	res.Ranges = make([]*stationviews.SensorRangeView, len(v.Ranges))
 	for i, val := range v.Ranges {
 		res.Ranges[i] = unmarshalSensorRangeResponseBodyToStationviewsSensorRangeView(val)
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
 	}
 
 	return res

@@ -250,6 +250,7 @@ type StationModule struct {
 	Internal     bool
 	FullKey      string
 	Sensors      []*StationSensor
+	Meta         map[string]interface{}
 }
 
 type StationSensor struct {
@@ -259,6 +260,7 @@ type StationSensor struct {
 	Key           string
 	FullKey       string
 	Ranges        []*SensorRange
+	Meta          map[string]interface{}
 }
 
 type SensorReading struct {
@@ -830,6 +832,14 @@ func transformStationviewsStationModuleViewToStationModule(v *stationviews.Stati
 			res.Sensors[i] = transformStationviewsStationSensorViewToStationSensor(val)
 		}
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -850,6 +860,14 @@ func transformStationviewsStationSensorViewToStationSensor(v *stationviews.Stati
 		res.Ranges = make([]*SensorRange, len(v.Ranges))
 		for i, val := range v.Ranges {
 			res.Ranges[i] = transformStationviewsSensorRangeViewToSensorRange(val)
+		}
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
 		}
 	}
 
@@ -994,6 +1012,14 @@ func transformStationModuleToStationviewsStationModuleView(v *StationModule) *st
 			res.Sensors[i] = transformStationSensorToStationviewsStationSensorView(val)
 		}
 	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
+		}
+	}
 
 	return res
 }
@@ -1014,6 +1040,14 @@ func transformStationSensorToStationviewsStationSensorView(v *StationSensor) *st
 		res.Ranges = make([]*stationviews.SensorRangeView, len(v.Ranges))
 		for i, val := range v.Ranges {
 			res.Ranges[i] = transformSensorRangeToStationviewsSensorRangeView(val)
+		}
+	}
+	if v.Meta != nil {
+		res.Meta = make(map[string]interface{}, len(v.Meta))
+		for key, val := range v.Meta {
+			tk := key
+			tv := val
+			res.Meta[tk] = tv
 		}
 	}
 

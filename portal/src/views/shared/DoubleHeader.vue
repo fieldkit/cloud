@@ -1,7 +1,7 @@
 <template>
     <div class="double-header">
         <div class="heading">
-            <div class="back" v-on:click="onBack" v-if="backTitle && backRoute">
+            <div class="back" v-on:click="onBack" v-if="backTitle">
                 <span class="small-arrow">&lt;</span>
                 {{ backTitle }}
             </div>
@@ -46,8 +46,12 @@ export default Vue.extend({
         },
     },
     methods: {
-        onBack() {
-            this.$router.push({ name: this.backRoute, params: this.backRouteParams });
+        async onBack() {
+            if (this.backRoute) {
+                await this.$router.push({ name: this.backRoute, params: this.backRouteParams });
+            } else {
+                this.$emit("back");
+            }
         },
     },
 });
@@ -56,6 +60,9 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 
+.actions {
+    display: flex;
+}
 .double-header {
     display: flex;
     text-align: left;
@@ -69,8 +76,6 @@ export default Vue.extend({
         flex-basis: 100%;
         margin: 15px 0;
     }
-}
-.double-header > div {
 }
 .back {
     font-size: 14px;

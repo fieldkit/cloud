@@ -11,6 +11,9 @@
             v-on:mouseleave="onAccountHover($event)"
         >
             <div v-if="user" class="header-avatar">
+                <i class="badge" v-if="numberOfUnseenNotifications > 0">
+                    <span>{{ numberOfUnseenNotifications }}</span>
+                </i>
                 <UserPhoto v-if="user" :user="user" />
                 <span v-if="isAccountHovered" class="triangle"></span>
             </div>
@@ -23,7 +26,7 @@
 
             <div v-if="user" class="notifications-container" v-bind:class="{ active: isAccountHovered && !hiding }">
                 <header class="notifications-header">
-                    <span class="notifications-header-text">{{ $t("layout.header.myAccount") }}</span>
+                    <span class="notifications-header-text">{{ $t("layout.header.notifications") }}</span>
                     <div class="flex">
                         <router-link v-if="user && user.admin" :to="{ name: 'adminMain' }">
                             {{ $t("layout.header.admin") }}
@@ -37,13 +40,19 @@
                     </div>
                 </header>
 
-                <template v-if="false && numberOfUnseenNotifications > 0">
+                <template v-if="numberOfUnseenNotifications > 0">
                     <NotificationsList v-on:notification-click="notificationNavigate"></NotificationsList>
 
                     <footer class="notifications-footer">
-                        <button>{{ $t("notifications.viewAllButton") }}</button>
+                        <button v-on:click="viewAll()">{{ $t("notifications.viewAllButton") }}</button>
                         <button v-on:click="markAllSeen()">{{ $t("notifications.dismissAllButton") }}</button>
                     </footer>
+                </template>
+                <template v-if="numberOfUnseenNotifications === 0">
+                    <div class="no-notifications">
+                        <span>{{ $t("layout.header.noNotifications") }}</span>
+                        <img alt="Image" src="@/assets/no-notifications.png" />
+                    </div>
                 </template>
             </div>
         </div>
@@ -59,6 +68,7 @@ import CommonComponents from "@/views/shared";
 import NotificationsList from "@/views/notifications/NotificationsList.vue";
 import { GlobalState } from "@/store/modules/global";
 import Logo from "@/views/shared/Logo.vue";
+import { Notification } from "@/store/modules/notifications";
 
 export default Vue.extend({
     name: "HeaderBar",
@@ -114,9 +124,32 @@ export default Vue.extend({
             this.hiding = true;
             await this.$store.dispatch(new MarkNotificationsSeen([]));
         },
-        notificationNavigate(ev: Event, notification: Notification): Promise<void> {
-            console.log("notification", notification);
-            return Promise.resolve();
+        viewAll() {
+            return this.$router.push({ name: "notifications" });
+        },
+        notificationNavigate(notification: Notification) {
+            if (notification.projectId) {
+                return this.$router
+                    .push({
+                        name: "viewProject",
+                        params: { id: notification.projectId },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
+            }
+            if (notification.bookmark) {
+                return this.$router
+                    .push({
+                        name: "exploreBookmark",
+                        params: { bookmark: notification.bookmark },
+                        hash: `#comment-id-${notification.postId}`,
+                    })
+                    .catch((err) => {
+                        return;
+                    });
+            }
         },
     },
 });
@@ -301,10 +334,8 @@ button {
     &-header {
         @include flex(center, space-between);
         height: 50px;
-        /*
         border-bottom: solid 1px #d8dce0;
         margin-bottom: 15px;
-        */
         letter-spacing: 0.1px;
         padding: 0 13px;
 
@@ -333,7 +364,7 @@ button {
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         border: solid 1px #e9e9e9;
-        /*height: 80vh;*/
+        max-height: 80vh;
         flex-direction: column;
         width: 320px;
         z-index: -1;
@@ -371,7 +402,7 @@ button {
 
         > ul {
             overflow-y: auto;
-            padding: 10px;
+            padding: 0 10px;
         }
     }
 }
@@ -389,6 +420,15 @@ button {
 
     @include bp-down($xs) {
         font-size: 26px;
+    }
+}
+
+.no-notifications {
+    text-align: center;
+    padding: 0 13px 13px;
+
+    img {
+        width: 100%;
     }
 }
 </style>

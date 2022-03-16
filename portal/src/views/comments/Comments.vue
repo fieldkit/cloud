@@ -3,8 +3,22 @@
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
         <div class="new-comment">
-            <UserPhoto v-if="user" :user="user"></UserPhoto>
-            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+            <UserPhoto :user="user"></UserPhoto>
+            <template v-if="user">
+                <div class="new-comment-wrap">
+                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                </div>
+            </template>
+            <template v-else>
+                <p class="need-login-msg">
+                    {{ $tc("comments.loginToComment.part1") }}
+                    <router-link :to="{ name: 'login' }" class="link">{{ $tc("comments.loginToComment.part2") }}</router-link>
+                    {{ $tc("comments.loginToComment.part3") }}
+                </p>
+                <router-link :to="{ name: 'login', query: { after: $route.path } }" class="button-submit">
+                    {{ $t("login.loginButton") }}
+                </router-link>
+            </template>
         </div>
 
         <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
@@ -17,7 +31,13 @@
                 <header v-if="viewType === 'data'">Notes & Comments</header>
             </div>
             <transition-group name="fade">
-                <div class="comment comment-first-level" v-for="post in posts" v-bind:key="post.id">
+                <div
+                    class="comment comment-first-level"
+                    v-for="post in posts"
+                    v-bind:key="post.id"
+                    v-bind:id="'comment-id-' + post.id"
+                    :ref="post.id"
+                >
                     <div class="comment-main">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column-post">
@@ -26,7 +46,7 @@
                                     {{ post.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user.id === post.author.id || user.admin"
+                                    v-if="user && (user.id === post.author.id || user.admin)"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
@@ -37,7 +57,13 @@
                     </div>
                     <div class="column">
                         <transition-group name="fade" class="comment-replies">
-                            <div class="comment" v-for="reply in post.replies" v-bind:key="reply.id">
+                            <div
+                                class="comment"
+                                v-for="reply in post.replies"
+                                v-bind:key="reply.id"
+                                v-bind:id="'comment-id-' + reply.id"
+                                :ref="reply.id"
+                            >
                                 <div class="comment-main">
                                     <UserPhoto :user="reply.author"></UserPhoto>
                                     <div class="column-reply">
@@ -64,12 +90,19 @@
 
                         <transition name="fade">
                             <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
-                                <UserPhoto :user="user"></UserPhoto>
-                                <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
+                                <div class="new-comment-wrap">
+                                    <UserPhoto :user="user"></UserPhoto>
+                                    <Tiptap
+                                        v-model="newReply.body"
+                                        placeholder="Reply to comment"
+                                        @save="save(newReply)"
+                                        saveLabel="Post"
+                                    />
+                                </div>
                             </div>
                         </transition>
 
-                        <div class="actions">
+                        <div v-if="user" class="actions">
                             <button @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
                                 Reply
@@ -107,7 +140,7 @@ export default Vue.extend({
     props: {
         user: {
             type: Object as PropType<CurrentUser>,
-            required: true,
+            required: false,
         },
         parentData: {
             type: [Number, Object],
@@ -244,8 +277,10 @@ export default Vue.extend({
                             );
                         });
                     });
+
+                    this.highlightComment();
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
                 });
         },
@@ -314,11 +349,26 @@ export default Vue.extend({
                 },
             ];
         },
+        highlightComment() {
+            this.$nextTick(() => {
+                if (location.hash) {
+                    const el = document.querySelector(location.hash);
+
+                    if (el) {
+                        el.scrollIntoView({ behavior: "smooth" });
+                        el.classList.add("highlight");
+                        setTimeout(() => {
+                            el.classList.remove("highlight");
+                        }, 5000);
+                    }
+                }
+            });
+        },
     },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../../scss/global";
 
 button {
@@ -401,8 +451,8 @@ header {
     }
 }
 
-.new-comment {
-    @include flex(center);
+::v-deep .new-comment {
+    @include flex(flex-end);
     padding: 22px 0;
     position: relative;
 
@@ -415,14 +465,6 @@ header {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
             padding: 18px 23px 17px 15px;
-
-            .new-comment-submit {
-                right: 33px;
-
-                @include bp-down($sm) {
-                    right: 25px;
-                }
-            }
         }
     }
 
@@ -433,7 +475,7 @@ header {
     }
 
     img {
-        margin-top: 0;
+        margin-top: 0 !important;
         width: 30px;
         height: 30px;
     }
@@ -450,56 +492,11 @@ header {
         }
     }
 
-    &-input {
-        width: 100%;
+    &-wrap {
         display: flex;
-        border-radius: 2px;
-        border: solid 1px $color-border;
-
-        ::v-deep textarea {
-            margin: 0;
-            padding: 14px 60px 14px 13px;
-            outline: none;
-            width: 100%;
-            font-weight: 500;
-
-            &::placeholder {
-                color: #cccdcf;
-            }
-
-            @include bp-down($xs) {
-                padding: 7px 40px 7px 7px;
-            }
-        }
-    }
-
-    &-submit {
-        @include position(absolute, null 10px 35px null);
-        @include flex(center);
-        padding: 0 10px;
-        font-weight: 900;
-        flex-shrink: 0;
-
-        @include bp-down($sm) {
-            bottom: 25px;
-        }
-
-        .data-view & {
-            right: 0;
-            bottom: 30px;
-        }
-
-        .reply & {
-            right: 12px;
-
-            @include bp-down($sm) {
-                right: 7px;
-            }
-        }
-
-        .reply & {
-            bottom: 5px;
-        }
+        width: 100%;
+        position: relative;
+        background-color: #fff;
     }
 }
 
@@ -533,16 +530,6 @@ header {
         max-width: 550px;
         min-height: unset;
     }
-
-    ::v-deep textarea {
-        border: 0;
-        margin: 0;
-        padding: 7px 45px 0 7px;
-
-        .reply & {
-            padding-right: 60px;
-        }
-    }
 }
 
 .comment {
@@ -568,10 +555,8 @@ header {
         }
     }
 
-    &.highlight {
-        opacity: 0.1;
+    &.highlight > div {
         background-color: #a0dbe1;
-        @include position(absolute, 0 null null 0);
     }
 }
 
@@ -647,12 +632,6 @@ header {
     margin-bottom: 10px;
 }
 
-::v-deep textarea {
-    resize: none;
-    border: 0 !important;
-    max-height: 75vh;
-}
-
 .column-reply,
 .column-post {
     position: relative;
@@ -663,5 +642,20 @@ header {
 
 .post-header {
     display: flex;
+}
+
+.need-login-msg {
+    font-size: 16px;
+    margin-left: 8px;
+
+    * {
+        font-size: 16px;
+    }
+}
+
+.button-submit {
+    width: auto;
+    margin-left: auto;
+    padding: 0 40px;
 }
 </style>

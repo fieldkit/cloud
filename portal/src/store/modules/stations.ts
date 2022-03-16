@@ -18,7 +18,10 @@ import {
     Activity,
     Configurations,
     Photos,
+    VizThresholds,
 } from "@/api";
+
+import { VizConfig } from "@/views/viz/viz";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
@@ -36,11 +39,19 @@ export class DisplaySensor {
     name: string;
     unitOfMeasure: string;
     reading: number | null;
+    time: number | null;
+    meta: {
+        viz: VizConfig[];
+    };
 
     constructor(sensor: ModuleSensor) {
         this.name = sensor.name;
+        this.meta = sensor.meta;
         this.unitOfMeasure = sensor.unitOfMeasure;
-        this.reading = sensor.reading?.last || null;
+        if (sensor.reading) {
+            this.reading = sensor.reading.last;
+            this.time = sensor.reading.time;
+        }
     }
 }
 
@@ -69,6 +80,8 @@ export class DisplayStation {
     public readonly placeNameNative: string | null;
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
+    public readonly latestPrimary: number | null;
+    public readonly primarySensor: ModuleSensor | null;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -82,10 +95,25 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
+
+        if (station.configurations.all.length > 0) {
+            const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
+            if (ordered[0]) {
+                const orderedSensor = _.orderBy(ordered[0].sensors, ["order"])[0];
+                this.primarySensor = orderedSensor;
+            }
+        }
+
         this.modules =
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
+
+        const prioritizedSensors = _.flatten(this.modules.map((m) => m.sensors));
+        if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
+            this.latestPrimary = prioritizedSensors[0].reading;
+        }
+
         if (station.location) {
             if (station.location.precise) {
                 this.location = new Location(station.location.precise[1], station.location.precise[0]);
@@ -110,16 +138,22 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number } | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
             type: type,
             coordinates: coordinates,
         };
+        let thresholds: VizThresholds | null = null;
+        if (station.primarySensor && station.primarySensor.meta && station.primarySensor.meta.viz.length > 0) {
+            thresholds = station.primarySensor.meta.viz[0].thresholds;
+        }
         this.properties = {
             id: station.id,
+            value: station.latestPrimary,
             icon: "marker",
+            thresholds: thresholds,
         };
     }
 
@@ -155,6 +189,19 @@ export class MappedStations {
         public readonly features: MapFeature[] = [],
         public readonly bounds: BoundingRectangle | null = null
     ) {}
+
+    // Test if all displayed map sensors are of the same type
+    public get isSingleType(): boolean {
+        const moduleNames = this.stations
+            .filter((station) => station.configurations.all.length > 0)
+            .map((station) => {
+                return station.configurations.all[0].modules.map((mod) => {
+                    return mod.name;
+                });
+            });
+
+        return _.uniq(_.flatten(moduleNames)).length === 1;
+    }
 
     public get valid(): boolean {
         return this.bounds != null;

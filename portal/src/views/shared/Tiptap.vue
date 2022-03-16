@@ -6,26 +6,6 @@
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
         </div>
-        <div
-            v-if="characters && editor"
-            :class="{ 'character-count': true, 'character-count--warning': editor.getCharacterCount() === limit }"
-        >
-            <svg height="20" width="20" viewBox="0 0 20 20" class="character-count__graph">
-                <circle r="10" cx="10" cy="10" fill="#e9ecef" />
-                <circle
-                    r="5"
-                    cx="10"
-                    cy="10"
-                    fill="transparent"
-                    stroke="currentColor"
-                    stroke-width="10"
-                    :stroke-dasharray="`calc(${percentage} * 31.4 / 100) 31.4`"
-                    transform="rotate(-90) translate(-20)"
-                />
-                <circle r="6" cx="10" cy="10" fill="white" />
-            </svg>
-            <div class="character-count__text">{{ editor.getCharacterCount() }}/{{ limit }} characters</div>
-        </div>
     </div>
 </template>
 
@@ -37,7 +17,6 @@ import { Editor, JSONContent, EditorContent, VueRenderer, Extension } from "@tip
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-import CharacterCount from "@tiptap/extension-character-count";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
@@ -72,11 +51,9 @@ export default Vue.extend({
     },
     data(): {
         editor: Editor | null;
-        limit: number;
     } {
         return {
             editor: null,
-            limit: 280,
         };
     },
     watch: {
@@ -92,12 +69,6 @@ export default Vue.extend({
         },
     },
     computed: {
-        percentage(): number {
-            if (this.editor) {
-                return Math.round((100 / this.limit) * this.editor.getCharacterCount());
-            }
-            return 0;
-        },
         empty(): boolean {
             return this.editor == null || this.editor.getCharacterCount() == 0;
         },
@@ -128,15 +99,10 @@ export default Vue.extend({
 
         function asContent(v: unknown): JSONContent | null {
             if (_.isString(v)) {
-                try {
-                    if (v.length == 0) {
-                        return null;
-                    }
-                    return JSON.parse(v);
-                } catch (error) {
-                    console.log(`malformed: ${v}`);
+                if (v.length == 0) {
                     return null;
                 }
+                return JSON.parse(v);
             }
             return v as JSONContent;
         }
@@ -150,9 +116,6 @@ export default Vue.extend({
                 Text,
                 Placeholder,
                 ModifyEnter,
-                CharacterCount.configure({
-                    limit: this.limit,
-                }),
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
@@ -233,7 +196,7 @@ export default Vue.extend({
             console.log("on-change", args);
         },
         onSave() {
-            if (!this.editor.isEmpty) {
+            if (this.editor && !this.editor.isEmpty) {
                 this.$emit("save");
             }
         },
@@ -241,13 +204,22 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
+@import "../../scss/global";
+
 .tiptap-container {
     width: 100%;
 }
 
 .tiptap-editing {
-    border: 1px solid #bfbfbf;
-    padding: 0.3em 1.4em 0.3em 0.8em;
+    border-radius: 2px;
+    border: solid 1px #d8dce0;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 45px;
+
+    @include bp-down($sm) {
+        max-height: 60vh;
+    }
 }
 
 .tiptap-reading {
@@ -276,6 +248,10 @@ export default Vue.extend({
     h5,
     h6 {
         line-height: 1.1;
+    }
+
+    p {
+        word-break: break-all;
     }
 }
 
@@ -317,14 +293,31 @@ export default Vue.extend({
 .tiptap-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
+    padding: 0 13px 0 13px;
 
     .tiptap-main {
         width: 100%;
     }
 
     .tiptap-side {
+        flex-shrink: 0;
+        padding: 12px 0;
+        position: absolute;
+        bottom: 2px;
+        right: 25px;
+
+        @include bp-down($sm) {
+            right: 10px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 0;
+            font-weight: 900;
+            font-size: 14px;
+        }
     }
 }
 </style>

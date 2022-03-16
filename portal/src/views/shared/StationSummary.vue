@@ -73,7 +73,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import { BookmarkFactory } from "@/views/viz/viz";
+import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
 import * as utils from "@/utilities";
 
 export default Vue.extend({
@@ -99,14 +99,23 @@ export default Vue.extend({
             type: Boolean,
             default: true,
         },
+        exploreContext: {
+            type: Object,
+            default: () => {
+                return new ExploreContext();
+            },
+        },
     },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
         },
         onClickExplore() {
-            const bm = BookmarkFactory.forStation(this.station.id);
-            return this.$router.push({ name: "exploreBookmark", params: { bookmark: JSON.stringify(bm) } });
+            const bm = BookmarkFactory.forStation(this.station.id, this.exploreContext);
+            return this.$router.push({
+                name: "exploreBookmark",
+                query: { bookmark: serializeBookmark(bm) },
+            });
         },
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));

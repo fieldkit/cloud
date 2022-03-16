@@ -18,6 +18,7 @@ import {
     DataSetSeries,
     SeriesData,
     QueriedData,
+    ExploreContext,
 } from "./common";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
@@ -163,7 +164,12 @@ export class Scrubbers {
 export class Bookmark {
     static Version = 1;
 
-    constructor(public readonly v: number, public readonly g: GroupBookmark[], public readonly s: number[] = []) {}
+    constructor(
+        public readonly v: number,
+        public readonly g: GroupBookmark[],
+        public readonly s: number[] = [],
+        public readonly p: number[] = []
+    ) {}
 
     private get allVizes(): VizBookmark[] {
         return _.flatten(_.flatten(this.g.map((group) => group.map((vizes) => vizes))));
@@ -205,13 +211,15 @@ type LegacyGroupBookmark = LegacyVizBookmark[][];
 type PossibleBookmarks = {
     v: number;
     s: number[];
+    p: number[] | undefined;
     g: LegacyGroupBookmark[] | GroupBookmark[];
 };
 
-function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: GroupBookmark[] } {
+function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: GroupBookmark[]; p: number[] } {
     return {
         v: raw.v,
         s: raw.s,
+        p: raw.p || [],
         g: raw.g.map((g1) =>
             g1.map((g2) =>
                 g2.map((v) => {
@@ -601,7 +609,7 @@ export class Querier {
                     .sensorData(queryParams)
                     .then((sdr: SensorDataResponse) => {
                         const queried = new QueriedData(key, params.when, sdr);
-                        const filtered = queried.removeDuplicates();
+                        const filtered = queried.removeMalformed().removeDuplicates();
                         this.data[key] = filtered;
                         return filtered;
                     })
@@ -634,7 +642,7 @@ export class Workspace implements VizInfoFactory {
         return this.stationIds;
     }
 
-    constructor(private readonly meta: SensorsResponse, private groups: Group[] = []) {
+    constructor(private readonly meta: SensorsResponse, private groups: Group[] = [], public readonly projects: number[] = []) {
         this.refreshStationIds();
     }
 
@@ -935,7 +943,9 @@ export class Workspace implements VizInfoFactory {
     public bookmark(): Bookmark {
         return new Bookmark(
             Bookmark.Version,
-            this.groups.map((group) => group.bookmark())
+            this.groups.map((group) => group.bookmark()),
+            this.allStationIds,
+            this.projects
         );
     }
 
@@ -945,22 +955,20 @@ export class Workspace implements VizInfoFactory {
         }
         return new Workspace(
             meta,
-            bm.g.map((gm) => Group.fromBookmark(gm))
+            bm.g.map((gm) => Group.fromBookmark(gm)),
+            bm.p
         );
     }
 
     public async updateFromBookmark(bm: Bookmark): Promise<void> {
         if (Bookmark.sameAs(this.bookmark(), bm)) {
+            console.log(`viz: update-from-bookmark:same`, bm);
             return;
         }
+        console.log(`viz: update-from-bookmark`, bm);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;
-    }
-
-    private eventually(callback: (ws: Workspace) => Promise<any>) {
-        callback(this);
-        return Promise.resolve(this);
     }
 
     public with(callback: (ws: Workspace) => Workspace) {
@@ -970,7 +978,10 @@ export class Workspace implements VizInfoFactory {
 }
 
 export class BookmarkFactory {
-    public static forStation(stationId: number): Bookmark {
-        return new Bookmark(Bookmark.Version, [], [stationId]);
+    public static forStation(stationId: number, context: ExploreContext | null = null): Bookmark {
+        if (context && context.project) {
+            return new Bookmark(Bookmark.Version, [], [stationId], [context.project]);
+        }
+        return new Bookmark(Bookmark.Version, [], [stationId], []);
     }
 }

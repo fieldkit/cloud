@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -288,6 +289,290 @@ func DecodeDataResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("sensor", "data", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildBookmarkRequest instantiates a HTTP request object with method and path
+// set to call the "sensor" service "bookmark" endpoint
+func (c *Client) BuildBookmarkRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: BookmarkSensorPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "bookmark", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeBookmarkRequest returns an encoder for requests sent to the sensor
+// bookmark server.
+func EncodeBookmarkRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*sensor.BookmarkPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("sensor", "bookmark", "*sensor.BookmarkPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		values.Add("bookmark", p.Bookmark)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeBookmarkResponse returns a decoder for responses returned by the
+// sensor bookmark endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeBookmarkResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeBookmarkResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body BookmarkResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
+			}
+			p := NewBookmarkSavedBookmarkOK(&body)
+			view := "default"
+			vres := &sensorviews.SavedBookmark{Projected: p, View: view}
+			if err = sensorviews.ValidateSavedBookmark(vres); err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
+			}
+			res := sensor.NewSavedBookmark(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body BookmarkUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
+			}
+			err = ValidateBookmarkUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
+			}
+			return nil, NewBookmarkUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body BookmarkForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
+			}
+			err = ValidateBookmarkForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
+			}
+			return nil, NewBookmarkForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body BookmarkNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
+			}
+			err = ValidateBookmarkNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
+			}
+			return nil, NewBookmarkNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body BookmarkBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
+			}
+			err = ValidateBookmarkBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
+			}
+			return nil, NewBookmarkBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "bookmark", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildResolveRequest instantiates a HTTP request object with method and path
+// set to call the "sensor" service "resolve" endpoint
+func (c *Client) BuildResolveRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ResolveSensorPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "resolve", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeResolveRequest returns an encoder for requests sent to the sensor
+// resolve server.
+func EncodeResolveRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*sensor.ResolvePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("sensor", "resolve", "*sensor.ResolvePayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		values.Add("v", p.V)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeResolveResponse returns a decoder for responses returned by the sensor
+// resolve endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeResolveResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeResolveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ResolveResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
+			}
+			p := NewResolveSavedBookmarkOK(&body)
+			view := "default"
+			vres := &sensorviews.SavedBookmark{Projected: p, View: view}
+			if err = sensorviews.ValidateSavedBookmark(vres); err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
+			}
+			res := sensor.NewSavedBookmark(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ResolveUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
+			}
+			err = ValidateResolveUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
+			}
+			return nil, NewResolveUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ResolveForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
+			}
+			err = ValidateResolveForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
+			}
+			return nil, NewResolveForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ResolveNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
+			}
+			err = ValidateResolveNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
+			}
+			return nil, NewResolveNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ResolveBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
+			}
+			err = ValidateResolveBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
+			}
+			return nil, NewResolveBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "resolve", resp.StatusCode, string(body))
 		}
 	}
 }

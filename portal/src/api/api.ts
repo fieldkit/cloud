@@ -7,7 +7,7 @@ import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
-import { SensorsResponse } from "@/views/viz/api";
+import { SensorsResponse, VizConfig } from "@/views/viz/api";
 import { promiseAfter } from "@/utilities";
 
 export interface PortalDeployStatus {
@@ -88,6 +88,17 @@ export class MissingTokenError extends TokenError {
 
     public static isInstance(err: Error): boolean {
         return err.name === "MissingTokenError";
+    }
+}
+
+export class ForbiddenError extends ApiError {
+    constructor(public readonly status: number) {
+        super("403 status");
+        this.name = "ForbiddenError";
+    }
+
+    public static isInstance(err: Error): boolean {
+        return err.name === "ForbiddenError";
     }
 }
 
@@ -257,6 +268,9 @@ export interface ModuleSensor {
     key: string;
     ranges: null;
     reading: SensorReading | null;
+    meta: {
+        viz: VizConfig[];
+    };
 }
 
 export interface StationModule {
@@ -342,6 +356,11 @@ export interface InvokeParams {
     blob?: boolean | null;
 }
 
+export interface SavedBookmark {
+    url: string;
+    bookmark: string;
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
@@ -402,6 +421,10 @@ class FKApi {
 
                     console.log("api: refresh failed");
                     return Promise.reject(new TokenError("unauthorized"));
+                }
+
+                if (response.status === 403) {
+                    return Promise.reject(new ForbiddenError(403));
                 }
 
                 console.log("api: error", error.response.status, error.response.data);
@@ -1274,8 +1297,13 @@ class FKApi {
                 replies: this.parseBodies(post.replies),
             });
         } catch (error) {
-            console.log("comments-malformed", post);
-            return post;
+            return _.extend(post, {
+                body: {
+                    type: "doc",
+                    content: [{ type: "paragraph", content: [{ type: "text", text: post.body }] }],
+                },
+                replies: this.parseBodies(post.replies),
+            });
         }
     }
 
@@ -1295,7 +1323,7 @@ class FKApi {
         }
 
         const returned = await this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: apiURL,
         });
@@ -1349,6 +1377,15 @@ class FKApi {
         console.log("edit", returned);
 
         return returned;
+    }
+
+    public async seenNotifications(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/notifications/seen",
+            data: { ids: payload.ids },
+        });
     }
 
     private socket: WebSocket | null = null;
@@ -1409,6 +1446,26 @@ class FKApi {
         return;
     }
 	*/
+
+    public async saveBookmark(bookmark: string): Promise<SavedBookmark> {
+        const qp = new URLSearchParams();
+        qp.append("bookmark", bookmark);
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "POST",
+            url: this.baseUrl + `/bookmarks/save?${qp.toString()}`,
+        });
+    }
+
+    public async resolveBookmark(token: string): Promise<SavedBookmark> {
+        const qp = new URLSearchParams();
+        qp.append("v", token);
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + `/bookmarks/resolve?${qp.toString()}`,
+        });
+    }
 }
 
 export default FKApi;

@@ -769,7 +769,7 @@ func NewDeleteMessageBadRequestResponseBody(res *goa.ServiceError) *DeleteMessag
 }
 
 // NewProjectPayload builds a discussion service project endpoint payload.
-func NewProjectPayload(projectID int32, auth string) *discussion.ProjectPayload {
+func NewProjectPayload(projectID int32, auth *string) *discussion.ProjectPayload {
 	v := &discussion.ProjectPayload{}
 	v.ProjectID = projectID
 	v.Auth = auth

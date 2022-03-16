@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -156,6 +157,8 @@ func TestIngestionRepositoryQueryByStationID(t *testing.T) {
 }
 
 func TestNotificationRepositoryAdd(t *testing.T) {
+	ctx := context.Background()
+
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
@@ -167,11 +170,28 @@ func TestNotificationRepositoryAdd(t *testing.T) {
 	r := repositories.NewNotificationRepository(e.DB)
 	assert.NoError(err)
 
+	stationIDs := []int64{}
+	post := &data.DiscussionPost{
+		UserID:     user.ID,
+		ThreadID:   nil,
+		ProjectID:  nil,
+		StationIDs: stationIDs,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Body:       "Hello",
+		Context:    nil,
+	}
+
+	dr := repositories.NewDiscussionRepository(e.DB)
+	post, err = dr.AddPost(ctx, post)
+	assert.NoError(err)
+
 	sf, err := r.AddNotification(e.Ctx, &data.Notification{
 		UserID:    user.ID,
 		CreatedAt: time.Now(),
 		Kind:      "mention",
 		Seen:      false,
+		PostID:    &post.ID,
 	})
 	assert.NoError(err)
 	assert.NotNil(sf)

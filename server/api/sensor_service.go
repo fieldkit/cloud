@@ -9,9 +9,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/conservify/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
 
@@ -260,6 +259,38 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 
 	return &sensor.MetaResult{
 		Object: data,
+	}, nil
+}
+
+func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
+	repository := repositories.NewBookmarkRepository(c.options.Database)
+
+	saved, err := repository.AddNew(ctx, nil, payload.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sensor.SavedBookmark{
+		URL:      fmt.Sprintf("/viz?v=%s", saved.Token),
+		Token:    saved.Token,
+		Bookmark: payload.Bookmark,
+	}, nil
+}
+
+func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+	repository := repositories.NewBookmarkRepository(c.options.Database)
+
+	resolved, err := repository.Resolve(ctx, payload.V)
+	if err != nil {
+		return nil, err
+	}
+	if resolved == nil {
+		return nil, sensor.MakeNotFound(errors.New("not found"))
+	}
+
+	return &sensor.SavedBookmark{
+		URL:      fmt.Sprintf("/viz?v=%s", resolved.Token),
+		Bookmark: resolved.Bookmark,
 	}, nil
 }
 
