@@ -2,25 +2,15 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "description": "Vega-Lite spec for FieldKit time series charts.",
   "width": "container",
-  "params": [],
   "encoding": {
     "x": {
       "field": "time",
       "type": "temporal",
       "axis": {
-        "domain": true,
-        "tickMinStep": 1,
-        "tickOpacity": 0,
-        "title": "Time",
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f",
         "formatType": "time",
-        "format": "%-m/%-d/%Y",
-        "labelColor": "#7f7f7f",
-        "labelOverlap": "parity",
-        "labelFlush": true,
-        "labelBound": true,
         "tickCount": 8,
+        "labelPadding": -24,
+        "tickSize": 30,
         "gridDash": [
           2,
           2
@@ -38,23 +28,15 @@
         "y": {
           "field": "value",
           "type": "quantitative",
-          "scale": {
-            "zero": false
-          },
           "axis": {
             "gridDash": [
               2,
               2
-            ],
-            "tickDash": [
-              2,
-              2
-            ],
-            "tickOpacity": 0,
-            "title": "Value",
-            "titleFontWeight": 400,
-            "titleColor": "#7f7f7f",
-            "labelColor": "#7f7f7f"
+            ]
+          },
+          "title": "VALUE",
+          "scale": {
+            "zero": false
           }
         }
       },
@@ -76,8 +58,8 @@
               4,
               4
             ],
-            "interpolate": "monotone",
-            "tension": 1
+            "interpolate": "cardinal",
+            "tension": 0.9
           }
         },
         {
@@ -137,8 +119,8 @@
               ]
             },
             "strokeWidth": 2,
-            "interpolate": "monotone",
-            "tension": 1
+            "interpolate": "cardinal",
+            "tension": 0.9
           }
         },
         {
@@ -201,7 +183,7 @@
             "field": "time",
             "type": "temporal",
             "formatType": "time",
-            "format": "%-m/%-d/%Y %H:%m"
+            "format": "%Y/%m/%d %H:%m"
           }
         ]
       },

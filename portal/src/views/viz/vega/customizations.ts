@@ -29,6 +29,7 @@ export function applySensorMetaConfiguration(spec, series) {
                 const levels = thresholds.levels;
                 const thresholdLayers = levels
                     .map((level, i) => {
+                        const strokeWidth = 2 + (levels.length - i) / levels.length;
                         if (level.label) {
                             return {
                                 transform: [
@@ -57,8 +58,10 @@ export function applySensorMetaConfiguration(spec, series) {
                                 },
                                 mark: {
                                     type: "line",
-                                    interpolate: "monotone",
-                                    tension: 1,
+                                    interpolate: "cardinal",
+                                    tension: 0.9,
+                                    strokeCap: "round",
+                                    strokeWidth: strokeWidth,
                                 },
                             };
                         }
@@ -80,14 +83,18 @@ export function applySensorMetaConfiguration(spec, series) {
                             },
                             mark: {
                                 type: "line",
-                                interpolate: "monotone",
-                                tension: 1,
+                                interpolate: "cardinal",
+                                tension: 0.9,
+                                strokeCap: "round",
+                                strokeWidth: strokeWidth,
                             },
                         };
                     })
                     .reverse();
 
-                spec.layer[i].layer = thresholdLayers;
+                spec.layer[i].layer[1].layer = thresholdLayers;
+
+                spec.layer[i].layer.splice(2, 1);
             }
         }
 

@@ -9,22 +9,14 @@
       },
       "field": "value",
       "axis": {
-        "title": "Value",
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f",
-        "tickOpacity": 0,
         "grid": false
-      }
+      },
+      "title": "VALUE"
     },
     "y": {
       "aggregate": "count",
       "axis": {
-        "domain": true,
-        "grid": false,
-        "tickOpacity": 1,
-        "title": "Number of Records",
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f"
+        "grid": false
       }
     },
     "color": {
