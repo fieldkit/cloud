@@ -192,6 +192,12 @@ export default Vue.extend({
 .project-container {
     margin-top: -10px;
     width: 100%;
+    height: 100%;
     margin: 0;
+}
+#station-summary {
+    position: fixed;
+    left: 100px;
+    right: 100px;
 }
 </style>
