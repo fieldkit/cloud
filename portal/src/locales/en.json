@@ -267,7 +267,10 @@
         "resetLink": "Reset password",
         "loginButton": "Log In",
         "loginFailed": "Unfortunately we were unable to log you in. Please check your credentials and try again.",
-        "createAccountLink": "Create an account"
+        "createAccountLink": "Create an account",
+        "loginError": "You need to Log in in order to view this page",
+        "privateProject": "This project is private",
+        "privateStation": "This station belongs to a private project"
     },
     "createAccount": {
         "form": {
@@ -328,6 +331,13 @@
             "comment": "Comment",
             "reply": "Reply",
             "mention": "Mention"
+        }
+    },
+    "comments": {
+        "loginToComment": {
+            "part1": "You need to",
+            "part2": "Log in",
+            "part3": "in order to leave comments"
         }
     }
 }

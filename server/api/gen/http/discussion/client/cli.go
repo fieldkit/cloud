@@ -29,9 +29,11 @@ func BuildProjectPayload(discussionProjectProjectID string, discussionProjectAut
 			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = discussionProjectAuth
+		if discussionProjectAuth != "" {
+			auth = &discussionProjectAuth
+		}
 	}
 	v := &discussion.ProjectPayload{}
 	v.ProjectID = projectID
@@ -96,7 +98,7 @@ func BuildUpdateMessagePayload(discussionUpdateMessageBody string, discussionUpd
 	{
 		err = json.Unmarshal([]byte(discussionUpdateMessageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Est vel ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Distinctio tempore occaecati eos sunt aut adipisci.\"\n   }'")
 		}
 	}
 	var postID int64

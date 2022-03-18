@@ -9,8 +9,9 @@ import (
 )
 
 type Mention struct {
-	UserID int32 `json:"user_id"`
-	PostID int64 `json:"post_id"`
+	UserID   int32 `json:"user_id"`
+	PostID   int64 `json:"post_id"`
+	AuthorID int32 `json:"author_id"`
 }
 
 func findTipTapMentions(ctx context.Context, value interface{}) []int32 {
@@ -38,7 +39,7 @@ func findTipTapMentions(ctx context.Context, value interface{}) []int32 {
 	return ids
 }
 
-func DiscoverMentions(ctx context.Context, postID int64, body string) ([]*Mention, error) {
+func DiscoverMentions(ctx context.Context, postID int64, body string, authorID int32) ([]*Mention, error) {
 	log := Logger(ctx).Sugar()
 
 	var tiptap interface{}
@@ -55,8 +56,9 @@ func DiscoverMentions(ctx context.Context, postID int64, body string) ([]*Mentio
 
 	for _, id := range ids {
 		mentions = append(mentions, &Mention{
-			UserID: id,
-			PostID: postID,
+			UserID:   id,
+			PostID:   postID,
+			AuthorID: authorID,
 		})
 	}
 
@@ -64,9 +66,11 @@ func DiscoverMentions(ctx context.Context, postID int64, body string) ([]*Mentio
 }
 
 func NotifyMentions(mentions []*Mention) []*data.Notification {
-	notifications := make([]*data.Notification, len(mentions))
-	for i, mention := range mentions {
-		notifications[i] = data.NewMentionNotification(mention.UserID, mention.PostID)
+	notifications := make([]*data.Notification, 0)
+	for _, mention := range mentions {
+		if mention.UserID != mention.AuthorID {
+			notifications = append(notifications, data.NewMentionNotification(mention.UserID, mention.PostID))
+		}
 	}
 	return notifications
 }

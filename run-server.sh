@@ -15,4 +15,6 @@ set -xe
 
 make setup server
 
+mkdir -p .fs
+
 build/server "$@"

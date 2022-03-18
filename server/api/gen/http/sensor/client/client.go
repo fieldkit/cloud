@@ -23,6 +23,14 @@ type Client struct {
 	// Data Doer is the HTTP client used to make requests to the data endpoint.
 	DataDoer goahttp.Doer
 
+	// Bookmark Doer is the HTTP client used to make requests to the bookmark
+	// endpoint.
+	BookmarkDoer goahttp.Doer
+
+	// Resolve Doer is the HTTP client used to make requests to the resolve
+	// endpoint.
+	ResolveDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -48,6 +56,8 @@ func NewClient(
 	return &Client{
 		MetaDoer:            doer,
 		DataDoer:            doer,
+		BookmarkDoer:        doer,
+		ResolveDoer:         doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -95,6 +105,54 @@ func (c *Client) Data() goa.Endpoint {
 		resp, err := c.DataDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("sensor", "data", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Bookmark returns an endpoint that makes HTTP requests to the sensor service
+// bookmark server.
+func (c *Client) Bookmark() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeBookmarkRequest(c.encoder)
+		decodeResponse = DecodeBookmarkResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildBookmarkRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.BookmarkDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "bookmark", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Resolve returns an endpoint that makes HTTP requests to the sensor service
+// resolve server.
+func (c *Client) Resolve() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeResolveRequest(c.encoder)
+		decodeResponse = DecodeResolveResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildResolveRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ResolveDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "resolve", err)
 		}
 		return decodeResponse(resp)
 	}

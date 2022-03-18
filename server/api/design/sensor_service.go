@@ -64,5 +64,68 @@ var _ = Service("sensor", func() {
 		})
 	})
 
+	Method("bookmark", func() {
+		Security(JWTAuth, func() {
+			// Optional
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("bookmark", String)
+			Required("bookmark")
+		})
+
+		Result(SavedBookmark)
+
+		HTTP(func() {
+			POST("bookmarks/save")
+
+			Params(func() {
+				Param("bookmark")
+			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("resolve", func() {
+		Security(JWTAuth, func() {
+			// Optional
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("v", String)
+			Required("v")
+		})
+
+		Result(SavedBookmark)
+
+		HTTP(func() {
+			GET("bookmarks/resolve")
+
+			Params(func() {
+				Param("v")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
+})
+
+var SavedBookmark = ResultType("application/vnd.app.bookmark", func() {
+	TypeName("SavedBookmark")
+	Attributes(func() {
+		Attribute("url", String)
+		Attribute("bookmark", String)
+		Attribute("token", String)
+		Required("url", "bookmark", "token")
+	})
+	View("default", func() {
+		Attribute("url")
+		Attribute("bookmark")
+		Attribute("token")
+	})
 })

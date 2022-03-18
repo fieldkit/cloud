@@ -1162,6 +1162,7 @@ type StationModuleResponseBody struct {
 	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
 	FullKey      *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -1172,6 +1173,7 @@ type StationSensorResponseBody struct {
 	Key           *string                    `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
 	FullKey       *string                    `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges,omitempty" json:"ranges,omitempty" xml:"ranges,omitempty"`
+	Meta          map[string]interface{}     `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
@@ -3875,8 +3877,8 @@ func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (e
 	return
 }
 
-// ValidateStationJobResponseBody runs the validations defined on StationJob
-// ResponseBody
+// ValidateStationJobResponseBody runs the validations defined on
+// StationJobResponseBody
 func ValidateStationJobResponseBody(body *StationJobResponseBody) (err error) {
 	if body.StartedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("startedAt", "body"))

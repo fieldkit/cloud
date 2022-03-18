@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"image"
@@ -176,7 +177,13 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		preciseLocation = p.UserID() == sf.Owner.ID
 	}
 
-	return transformStationFull(c.options.signer, p, sf, preciseLocation, false)
+	mmr := repositories.NewModuleMetaRepository(c.options.Database)
+	mm, err := mmr.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return transformStationFull(c.options.signer, p, sf, preciseLocation, false, mm)
 }
 
 func (c *StationService) Transfer(ctx context.Context, payload *station.TransferPayload) (err error) {
@@ -288,7 +295,13 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false)
+	mmr := repositories.NewModuleMetaRepository(c.options.Database)
+	mm, err := mmr.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false, mm)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +350,13 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false)
+	mmr := repositories.NewModuleMetaRepository(c.options.Database)
+	mm, err := mmr.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false, mm)
 	if err != nil {
 		return nil, err
 	}
@@ -673,13 +692,18 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	}
 }
 
-func transformConfigurations(from *data.StationFull, transformAll bool) (to []*station.StationConfiguration) {
+func transformConfigurations(from *data.StationFull, transformAll bool, mm []*repositories.ModuleMeta) (to []*station.StationConfiguration, err error) {
 	to = make([]*station.StationConfiguration, 0)
 	for _, v := range from.Configurations {
+		modules, err := transformModules(from, v.ID, mm)
+		if err != nil {
+			return nil, err
+		}
+
 		to = append(to, &station.StationConfiguration{
 			ID:      v.ID,
 			Time:    v.UpdatedAt.Unix() * 1000,
-			Modules: transformModules(from, v.ID),
+			Modules: modules,
 		})
 
 		if !transformAll {
@@ -689,7 +713,22 @@ func transformConfigurations(from *data.StationFull, transformAll bool) (to []*s
 	return
 }
 
-func transformModules(from *data.StationFull, configurationID int64) (to []*station.StationModule) {
+func convertToTypedMap(obj interface{}) (map[string]interface{}, error) {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]interface{})
+	err = json.Unmarshal(data, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+func transformModules(from *data.StationFull, configurationID int64, mm []*repositories.ModuleMeta) (to []*station.StationModule, err error) {
 	to = make([]*station.StationModule, 0)
 	for _, v := range from.Modules {
 		if v.ConfigurationID != configurationID {
@@ -703,19 +742,42 @@ func transformModules(from *data.StationFull, configurationID int64) (to []*stat
 			}
 		}
 
+		var serializedModuleMeta map[string]interface{}
+
 		sensorsWm := make([]*station.StationSensor, 0)
 		translatedName := translateModuleName(v.Name, sensors)
 		moduleKey := translateModuleKey(translatedName)
 
 		for _, s := range sensors {
 			key := strcase.ToLowerCamel(s.Name)
+			fullKey := moduleKey + "." + key
+
+			var serializedSensorMeta map[string]interface{}
+
+			sensorMeta := repositories.FindSensorByFullKey(mm, fullKey)
+			if sensorMeta != nil {
+				converted, err := convertToTypedMap(sensorMeta.Sensor)
+				if err != nil {
+					return nil, err
+				}
+				serializedSensorMeta = converted
+
+				if serializedModuleMeta == nil {
+					converted, err = convertToTypedMap(sensorMeta.Module)
+					if err != nil {
+						return nil, err
+					}
+					serializedModuleMeta = converted
+				}
+			}
 
 			sensorsWm = append(sensorsWm, &station.StationSensor{
 				Key:           key,
-				FullKey:       moduleKey + "." + key,
+				FullKey:       fullKey,
 				Name:          s.Name,
 				UnitOfMeasure: s.UnitOfMeasure,
 				Reading:       transformReading(s),
+				Meta:          serializedSensorMeta,
 			})
 		}
 
@@ -729,6 +791,7 @@ func transformModules(from *data.StationFull, configurationID int64) (to []*stat
 			Position:   int32(v.Position),
 			Flags:      int32(v.Flags),
 			Internal:   v.Flags > 0 || v.Position == 255,
+			Meta:       serializedModuleMeta,
 			Sensors:    sensorsWm,
 		})
 
@@ -793,7 +856,7 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool) (*station.StationFull, error) {
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta) (*station.StationFull, error) {
 	readOnly := true
 	if p != nil {
 		sp, err := p.ForStation(sf.Station)
@@ -804,7 +867,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		readOnly = sp.IsReadOnly()
 	}
 
-	configurations := transformConfigurations(sf, transformAllConfigurations)
+	configurations, err := transformConfigurations(sf, transformAllConfigurations, mm)
+	if err != nil {
+		return nil, err
+	}
 
 	dataSummary := transformDataSummary(sf.DataSummary)
 
@@ -876,11 +942,11 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations)
+		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations, mm)
 		if err != nil {
 			return nil, err
 		}

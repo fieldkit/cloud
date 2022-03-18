@@ -191,6 +191,7 @@ type StationModuleResponseBody struct {
 	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
 	FullKey      string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -201,6 +202,7 @@ type StationSensorResponseBody struct {
 	Key           string                     `form:"key" json:"key" xml:"key"`
 	FullKey       string                     `form:"fullKey" json:"fullKey" xml:"fullKey"`
 	Ranges        []*SensorRangeResponseBody `form:"ranges" json:"ranges" xml:"ranges"`
+	Meta          map[string]interface{}     `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // SensorReadingResponseBody is used to define fields on response body types.
@@ -229,11 +231,11 @@ func NewDeviceLayoutResponseBody(res *informationviews.DeviceLayoutResponseView)
 		body.Sensors = make(map[string][]*StationSensorResponseBody, len(res.Sensors))
 		for key, val := range res.Sensors {
 			tk := key
-			tv := make([]*StationSensorResponseBody, len(val))
+			tvb := make([]*StationSensorResponseBody, len(val))
 			for i, val := range val {
-				tv[i] = marshalInformationviewsStationSensorViewToStationSensorResponseBody(val)
+				tvb[i] = marshalInformationviewsStationSensorViewToStationSensorResponseBody(val)
 			}
-			body.Sensors[tk] = tv
+			body.Sensors[tk] = tvb
 		}
 	}
 	return body

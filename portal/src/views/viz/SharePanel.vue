@@ -2,9 +2,7 @@
     <div :class="'share-panel ' + containerClass">
         <div class="heading">
             <div class="title">Share</div>
-            <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="../../assets/close.png" />
-            </div>
+            <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
             <a class="twitter-share-button" :href="twitterUrl" target="blank">
@@ -23,12 +21,22 @@ import CommonComponents from "@/views/shared";
 import { mapState } from "vuex";
 import { serializeBookmark } from "./viz";
 
+function getRelativeUrl(href: string): string {
+    const link = document.createElement("a");
+    link.href = href;
+    return link.href;
+}
+
 export default Vue.extend({
     name: "SharePanel",
     components: {
         ...CommonComponents,
     },
     props: {
+        token: {
+            type: String,
+            required: true,
+        },
         bookmark: {
             type: Object,
             required: true,
@@ -46,12 +54,13 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
+            qs.append("text", "Check out this data on FieldKit!");
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
             const qs = new URLSearchParams();
-            qs.append("bookmark", serializeBookmark(this.bookmark));
-            return `https://portal.fkdev.org/dashboard/explore?${qs.toString()}`;
+            qs.append("v", this.token);
+            return getRelativeUrl(`/viz?${qs.toString()}`);
         },
     },
     methods: {
@@ -69,6 +78,7 @@ export default Vue.extend({
 .share-panel .heading {
     padding: 1em;
     display: flex;
+    align-items: center;
 }
 .share-panel .heading .title {
     font-size: 20px;

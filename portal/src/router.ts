@@ -28,7 +28,7 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
-import { deserializeBookmark } from "./views/viz/viz";
+import { Bookmark, deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
@@ -43,6 +43,7 @@ const routes = [
             bodyClass: "blue-background",
             secured: false,
         },
+        props: true,
     },
     {
         path: "/login/discourse",
@@ -321,6 +322,20 @@ const routes = [
         meta: {},
     },
     {
+        path: "/viz",
+        name: "exploreShortBookmark",
+        component: ExploreView,
+        props: (route) => {
+            if (route.query.v) {
+                return {
+                    token: route.query.v,
+                };
+            }
+            return {};
+        },
+        meta: {},
+    },
+    {
         path: "/dashboard/explore/:bookmark",
         name: "exportBookmarkOld",
         component: ExploreView,
@@ -332,12 +347,12 @@ const routes = [
         meta: {},
     },
     {
-        path: "/dashboard/export",
-        name: "exportBookmark",
+        path: "/viz/export",
+        name: "exportWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 exportsVisible: true,
             };
         },
@@ -347,12 +362,12 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/share",
-        name: "shareBookmark",
+        path: "/viz/share",
+        name: "shareWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 shareVisible: true,
             };
         },

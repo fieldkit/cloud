@@ -609,7 +609,7 @@ export class Querier {
                     .sensorData(queryParams)
                     .then((sdr: SensorDataResponse) => {
                         const queried = new QueriedData(key, params.when, sdr);
-                        const filtered = queried.removeDuplicates();
+                        const filtered = queried.removeMalformed().removeDuplicates();
                         this.data[key] = filtered;
                         return filtered;
                     })
@@ -962,16 +962,13 @@ export class Workspace implements VizInfoFactory {
 
     public async updateFromBookmark(bm: Bookmark): Promise<void> {
         if (Bookmark.sameAs(this.bookmark(), bm)) {
+            console.log(`viz: update-from-bookmark:same`, bm);
             return;
         }
+        console.log(`viz: update-from-bookmark`, bm);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;
-    }
-
-    private eventually(callback: (ws: Workspace) => Promise<any>) {
-        callback(this);
-        return Promise.resolve(this);
     }
 
     public with(callback: (ws: Workspace) => Workspace) {

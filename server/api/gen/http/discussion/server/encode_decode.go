@@ -38,7 +38,7 @@ func DecodeProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			projectID int32
-			auth      string
+			auth      *string
 			err       error
 
 			params = mux.Vars(r)
@@ -51,18 +51,20 @@ func DecodeProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 			}
 			projectID = int32(v)
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewProjectPayload(projectID, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil

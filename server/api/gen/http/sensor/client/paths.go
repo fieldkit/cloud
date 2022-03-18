@@ -16,3 +16,13 @@ func MetaSensorPath() string {
 func DataSensorPath() string {
 	return "/sensors/data"
 }
+
+// BookmarkSensorPath returns the URL path to the sensor service bookmark HTTP endpoint.
+func BookmarkSensorPath() string {
+	return "/bookmarks/save"
+}
+
+// ResolveSensorPath returns the URL path to the sensor service resolve HTTP endpoint.
+func ResolveSensorPath() string {
+	return "/bookmarks/resolve"
+}
