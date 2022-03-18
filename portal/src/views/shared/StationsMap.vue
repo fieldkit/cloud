@@ -70,7 +70,7 @@ export default Vue.extend({
             if (this.value) {
                 return this.value.lngLat();
             }
-            //fixme: issue here relating to mapBounds.lngLat not returning correct bounds
+
             return this.mapBounds ? this.mapBounds.lngLat() : this.mapped.boundsLngLat();
         },
     },
@@ -110,8 +110,10 @@ export default Vue.extend({
                     }
                 });
             }
-
+            // MapBox requires a resize call to force map size to container
             setTimeout(() => {
+                //console.log("RESIZE", this.$refs.infoBox.clientHeight)
+
                 map.resize();
 
                 this.ready = true;
@@ -202,8 +204,11 @@ export default Vue.extend({
     width: inherit;
 }
 .project-container #map {
-    height: inherit;
+    height: 100%;
     position: inherit;
     width: inherit;
+}
+.stations-map {
+    height: 1000px;
 }
 </style>

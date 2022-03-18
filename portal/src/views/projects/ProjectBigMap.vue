@@ -1,26 +1,31 @@
 <template>
     <div class="project-public project-container" v-if="project">
-
         <div class="project-detail-card">
             <div class="photo-container">
-                <ProjectPhoto :project="project" :image-size="150"/>
+                <ProjectPhoto :project="project" :image-size="150" />
             </div>
             <div class="detail-container">
                 <h3 class="detail-title">{{ project.name }}</h3>
                 <div class="detail-description">{{ project.description }}</div>
                 <router-link :to="{ name: 'viewProject' }" class="link">Project Dashboard ></router-link>
-            </div> 
+            </div>
         </div>
 
         <StationsMap
             @show-summary="showSummary"
             :mapped="mappedProject"
-            :layoutChanges="layoutChanges   "
+            :layoutChanges="layoutChanges"
             :showStations="project.showStations"
             :mapBounds="mapBounds"
         />
-
-
+        <StationSummary
+            v-if="activeStation"
+            :station="activeStation"
+            :readings="false"
+            :exploreContext="exploreContext"
+            @close="onCloseSummary"
+            v-bind:key="activeStation.id"
+        />
     </div>
 </template>
 
@@ -30,28 +35,25 @@ import { mapGetters } from "vuex";
 import * as utils from "../../utilities";
 import { ProjectModule, DisplayStation, Project, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
 import StationsMap from "../shared/StationsMap.vue";
+import StationSummary from "@/views/shared/StationSummary.vue";
 import CommonComponents from "@/views/shared";
-import { twitterCardMeta } from "@/social";
+
+import { ExploreContext } from "@/views/viz/common";
 
 export default Vue.extend({
     name: "ProjectBigMap",
     components: {
         ...CommonComponents,
         StationsMap,
+        StationSummary,
     },
     data(): {
         layoutChanges: number;
+        activeStationId: number | null;
     } {
         return {
             layoutChanges: 0,
-        };
-    },
-    metaInfo() {
-        return {
-            meta: twitterCardMeta(this.displayProject),
-            afterNavigation() {
-                console.log("hello: after-navigation");
-            },
+            activeStationId: null,
         };
     },
     props: {
@@ -78,6 +80,12 @@ export default Vue.extend({
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.project.id].mapped;
         },
+        activeStation(): DisplayStation | null {
+            if (this.activeStationId) {
+                return this.$getters.stationsById[this.activeStationId];
+            }
+            return null;
+        },
         projectModules(): { name: string; url: string }[] {
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
@@ -93,21 +101,20 @@ export default Vue.extend({
 
             return MappedStations.defaultBounds();
         },
-    },
-    mounted () {
-        //console.log("IMAGE SIZE", this.imageSize)
+        exploreContext(): ExploreContext {
+            return new ExploreContext(this.project.id);
+        },
     },
     methods: {
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getTeamHeading(): string {
-            // TODO i18n
-            const members = this.displayProject.users.length == 1 ? "member" : "members";
-            return "Project Team (" + this.displayProject.users.length + " " + members + ")";
+        showSummary(station: DisplayStation): void {
+            console.log("showSummay", station);
+            this.activeStationId = station.id;
         },
-        showSummary() {
-            console.log("SHOW SUMMARY");
+        onCloseSummary(): void {
+            this.activeStationId = null;
         },
     },
 });
@@ -132,13 +139,19 @@ export default Vue.extend({
     background-color: #ffffff;
 
     @include bp-down($sm) {
-        flex: 0 0 calc(50% - 18px);
+        width: 100%;
+        position: fixed;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        bottom: 0px;
+        text-align: center;
+        padding-bottom: 10px;
+        top: auto;
+        right: auto;
+        align-items: center;
+        justify-content: center;
     }
 
-    @include bp-down($xs) {
-        flex: 0 0 100%;
-        margin: 0 0 10px;
-    }
     .link {
         color: $color-fieldkit-primary;
         font-size: 12px;
@@ -150,50 +163,12 @@ export default Vue.extend({
     margin-top: 15px;
     margin-bottom: 5px;
 }
-.detail-containiner {
-    width: 240px;
+.detail-container {
+    width: 75%;
 }
 .detail-description {
     font-family: $font-family-light;
     font-size: 14px;
-}
-.photo-container{
-    width: 95px;
-}
-
-.project-public {
-    display: flex;
-    flex-direction: column;
-
-    @include bp-down($sm) {
-        padding-bottom: 20px;
-    }
-}
-.header {
-    display: flex;
-    flex-direction: row;
-}
-.header .left {
-    margin-right: auto;
-    display: flex;
-    flex-direction: column;
-}
-.header .right {
-    margin-left: auto;
-}
-.header .project-name {
-    font-size: 24px;
-    font-family: var(--font-family-bold);
-    margin: 0 15px 0 0;
-    display: inline-block;
-}
-.header .project-dashboard {
-    font-size: 20px;
-    font-family: var(--font-family-bold);
-    margin: 0 15px 0 0;
-    display: inline-block;
-    margin-top: 10px;
-    margin-bottom: 20px;
 }
 
 .details {
@@ -201,107 +176,22 @@ export default Vue.extend({
     border-radius: 2px;
     border: solid 1px var(--color-border);
     background-color: white;
-
-    @include bp-down($sm) {
-        flex-wrap: wrap;
-    }
-}
-
-.details .project-detail {
-    font-family: $font-family-light;
-    margin-bottom: 9px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
 }
 
 .photo-container {
     width: 75px;
     height: 75px;
     margin: 10px;
+    float: left;
 
-    @include bp-down($xs) {
-        width: 100%;
+    @include bp-down($sm) {
+        display: none;
     }
-}
-
-::v-deep .project-image {
-    width: 100%;
-    height: auto;
 }
 
 .project-container {
     margin-top: -10px;
-    width: 100% !important;
+    width: 100%;
     margin: 0;
-
-    @include bp-down($sm) {
-        margin-top: -28px;
-    }
 }
-
-.recent-activity {
-    border-radius: 2px;
-    border: solid 1px var(--color-border);
-    background-color: #ffffff;
-    padding: 17px 23px;
-    flex: 1;
-
-    @include bp-down($sm) {
-        padding: 19px 10px;
-    }
-
-    h1 {
-        margin: 0 0 23px;
-        font-size: 20px;
-        font-weight: 500;
-
-        @include bp-down($sm) {
-            font-size: 18px;
-        }
-    }
-
-    h2 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 500;
-
-        + span {
-            margin-left: auto;
-            padding-left: 10px;
-            font-weight: 300;
-            font-size: 14px;
-            color: #6a6d71;
-        }
-    }
-
-    li {
-        @include flex(flex-start);
-        font-size: 16px;
-        margin-bottom: 30px;
-
-        > div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            line-height: 1.3;
-
-            > div {
-                display: flex;
-            }
-        }
-
-        img {
-            margin-right: 16px;
-            margin-top: 2px;
-        }
-
-        p {
-            margin-top: 5px;
-            font-size: 14px;
-        }
-    }
-}
-
-
-
 </style>
