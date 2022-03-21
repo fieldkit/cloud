@@ -21,9 +21,10 @@
             </template>
         </div>
 
-        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="posts.length === 0">There are no comments yet.</div>
+        <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
+        <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -149,6 +150,7 @@ export default Vue.extend({
     },
     data(): {
         posts: Comment[];
+        isLoading: boolean;
         placeholder: string | null;
         viewType: string;
         newComment: {
@@ -166,6 +168,7 @@ export default Vue.extend({
     } {
         return {
             posts: [],
+            isLoading: false,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -248,7 +251,8 @@ export default Vue.extend({
                         }
                     }
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.log("Radoi e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -264,6 +268,7 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            this.isLoading = true;
             await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
@@ -280,8 +285,12 @@ export default Vue.extend({
 
                     this.highlightComment();
                 })
-                .catch((e) => {
+                .catch(() => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
+                })
+                .finally(() => {
+                    console.log("RADOI FINALLY");
+                    this.isLoading = false;
                 });
         },
         viewDataClick(post: Comment) {
@@ -657,5 +666,9 @@ header {
     width: auto;
     margin-left: auto;
     padding: 0 40px;
+}
+
+.no-comments {
+    margin-top: 20px;
 }
 </style>

@@ -90,12 +90,11 @@ var _ = Service("discussion", func() {
 
 	Method("data", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("bookmark", String)
 			Required("bookmark")
 		})

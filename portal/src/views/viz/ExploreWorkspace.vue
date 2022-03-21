@@ -32,7 +32,7 @@
 
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user && bookmark"></Comments>
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark"></Comments>
             </div>
         </div>
     </StandardLayout>

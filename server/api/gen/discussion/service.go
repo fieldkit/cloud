@@ -58,7 +58,7 @@ type Discussion struct {
 
 // DataPayload is the payload type of the discussion service data method.
 type DataPayload struct {
-	Auth     string
+	Auth     *string
 	Bookmark string
 }
 
