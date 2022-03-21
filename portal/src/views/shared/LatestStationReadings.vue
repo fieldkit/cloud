@@ -87,8 +87,7 @@ export default Vue.extend({
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {
-                              //console.log("radoi mapping", module);
-
+                                //console.log("radoi mapping", module);
 
                                 return module.sensors.map((sensor) => [sensor.fullKey, module]);
                             })
@@ -116,6 +115,8 @@ export default Vue.extend({
                         .keyBy((s) => s.fullKey)
                         .value();
 
+                    console.log("Radoi sensors by key", sensorsByKey);
+
                     const readings = _(keysToValue)
                         .map((value, key) => {
                             const sensor = sensorsByKey[key];
@@ -127,7 +128,7 @@ export default Vue.extend({
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
                             //  console.log(`sensor:`, sensor);
-                            console.log("radoi sensor module", sensorModule);
+                            //  console.log("radoi sensor module", sensorModule);
 
                             return new SensorReading(
                                 key,
@@ -150,6 +151,8 @@ export default Vue.extend({
                 .then((sensors) => {
                     console.log(`sensors`, sensors);
                     this.sensors = sensors;
+                    console.log("radoi sensors", sensors);
+                    // filter by key here
                     this.loading = false;
                     this.$emit("layoutChange");
                     return this.sensors;

@@ -198,7 +198,8 @@
         "modules": "Modules:",
         "nativeLand": "Native Land:",
         "latitude": "Latitude",
-        "longitude": "Longitude"
+        "longitude": "Longitude",
+        "viewAllPhotos": "View all photos"
     },
     "user": {
         "profile": {
@@ -344,5 +345,9 @@
             "part2": "Log in",
             "part3": "in order to leave comments"
         }
+    },
+    "notes": {
+        "failed": "Oops, there was a problem saving your changes.",
+        "success": "Saved."
     }
 }

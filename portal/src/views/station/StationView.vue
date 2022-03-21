@@ -8,7 +8,7 @@
                 backRoute="viewProject"
                 :backRouteParams="{ id: station.id }"
             />
-            <section class="flex section-station">
+            <section class="section-station">
                 <div class="container-box">
                     <div class="flex flex-al-center">
                         <StationPhoto :station="station" />
@@ -69,10 +69,15 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <!--                    <div class="photo-container" v-for="photo in station.photos" v-bind:key="photo.key">
-                        <AuthenticatedPhoto :url="photo.url" />
-                    </div>-->
+                <div v-if="notes.media" class="station-photos">
+                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                        <!-- somehow using v-for like so needs the next v-if -->
+                        <AuthenticatedPhoto v-if="notes.media[index]" :url="notes.media[index].url" />
+                        <i v-else class="photo icon icon-image-placeholder"></i>
+                    </div>
+                    <router-link v-if="notes.media.length > 4" :to="{ name: 'test' }" class="station-photos-nav">
+                        {{ $t("station.viewAllPhotos") }}
+                    </router-link>
                 </div>
             </section>
 
@@ -86,13 +91,11 @@
                             @click="selectedModule = module"
                         >
                             <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <span>{{ module.name }}</span>
+                            <span>{{ $t(getModuleName(module)) }}</span>
                         </li>
                     </ul>
                     <div class="station-readings-values">
-                        <header>
-                            {{ selectedModule.name }}
-                        </header>
+                        <!--                        <header>{{ getModuleName(selectedModule) }}</header>-->
                         <LatestStationReadings :id="station.id" :moduleKey="selectedModule.name" />
                     </div>
                 </div>
@@ -104,7 +107,12 @@
                 </div>
             </section>
 
-            <section v-if="notes.notes" class="container-box">
+            <section v-if="notes && notes.notes" class="container-box">
+                <div class="notifications">
+                    <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
+
+                    <div v-if="notesState.success" class="notification success">{{ $tc("notes.success") }}</div>
+                </div>
                 <NotesForm
                     v-bind:key="station.id"
                     :station="station"
@@ -124,13 +132,14 @@ import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
-// import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
+import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
 import { ActionTypes, DisplayStation, MappedStations, ModuleSensor, ProjectModule } from "@/store";
 import * as utils from "@/utilities";
 import StationMap from "@/views/station/StationMap.vue";
-import { mergeNotes, Notes, PortalStationNotesReply } from "@/views/notes/model";
+import { mergeNotes, NoteMedia, Notes, PortalStationNotesReply } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import { serializePromiseChain } from "@/utilities";
+import { convertOldFirmwareResponse } from "@/utilities";
 
 export default Vue.extend({
     name: "StationView",
@@ -141,7 +150,7 @@ export default Vue.extend({
         LatestStationReadings,
         // StationMap,
         NotesForm,
-        //    AuthenticatedPhoto,
+        AuthenticatedPhoto,
     },
     mounted() {
         // this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.id });
@@ -152,10 +161,8 @@ export default Vue.extend({
                 this.station = new DisplayStation(station);
                 this.selectedModule = this.station.modules[0];
 
-
-
                 console.log("radoi station", this.station);
-                console.log("radoi module", this.selectedModule);
+                //    console.log("radoi module", this.selectedModule);
 
                 //   console.log("gettinggg radoi station notes by id", this.station.id);
                 // get notes & media
@@ -165,7 +172,7 @@ export default Vue.extend({
                         //        console.log("Radoi notes", notes);
                         this.notes = notes;
 
-                        //       console.log("GOT NOTES", this.notes);
+                        console.log("GOT NOTES", this.notes);
                     })
                     .catch((e) => {
                         console.log("Radoi e notes", e);
@@ -176,19 +183,30 @@ export default Vue.extend({
             });
     },
     data(): {
-        station: any;
+        station: DisplayStation | null;
         notes: { [stationId: number]: PortalStationNotesReply };
-        dirtyNotes: boolean;
+        notesState: {
+            dirty: boolean;
+            success: boolean;
+            failed: boolean;
+        };
         selectedModule: ModuleSensor | null;
     } {
         return {
             station: null,
             notes: {},
-            dirtyNotes: false,
+            notesState: {
+                dirty: false,
+                success: false,
+                failed: false,
+            },
             selectedModule: null,
         };
     },
     computed: {
+        photos(this: any) {
+            return NoteMedia.onlyPhotos(this.notes.media);
+        },
         headerSubtitle() {
             let subtitle;
             if (this.station && this.station.deployedAt && this.$options.filters?.prettyDate) {
@@ -236,6 +254,16 @@ export default Vue.extend({
             return returnValue;
         },
     },
+    beforeRouteUpdate(to: never, from: never, next: any) {
+        if (this.confirmLeave()) {
+            next();
+        }
+    },
+    beforeRouteLeave(to: never, from: never, next: any) {
+        if (this.confirmLeave()) {
+            next();
+        }
+    },
     methods: {
         getBatteryIcon(): string {
             if (!this.station || !this.station.battery) {
@@ -247,31 +275,42 @@ export default Vue.extend({
             return this.$loadAsset(utils.getModuleImg(module));
         },
         async saveForm(formNotes: Notes): Promise<void> {
-            this.success = false;
-            this.failed = false;
+            this.notesState.success = false;
+            this.notesState.failed = false;
 
             await serializePromiseChain(formNotes.addedPhotos, (photo) => {
                 return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then((media) => {
-                    console.log(media);
                     return [];
                 });
             }).then(() => {
                 const payload = mergeNotes(this.notes[this.station.id], formNotes);
                 return this.$services.api.patchStationNotes(this.station.id, payload).then(
                     (updated) => {
-                        this.dirtyNotes = false;
-                        this.success = true;
-                        console.log("success", updated);
+                        this.notesState.dirty = false;
+                        this.notesState.success = true;
                     },
                     () => {
-                        this.failed = true;
-                        console.log("failed");
+                        this.notesState.failed = true;
                     }
                 );
             });
         },
         onChange(): void {
-            this.dirtyNotes = true;
+            this.notesState.dirty = true;
+        },
+        confirmLeave(): boolean {
+            if (this.notesState.dirty) {
+                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
+                    this.notesState.dirty = false;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        },
+        getModuleName(module) {
+            return module.name.replace("modules.", "fk.");
         },
     },
 });
@@ -280,6 +319,10 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 @import "../../scss/layout";
+
+* {
+    box-sizing: border-box;
+}
 
 .container-box {
     border: 1px solid var(--color-border);
@@ -292,9 +335,11 @@ export default Vue.extend({
 .section {
     &-station {
         margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
 
         > div {
-            flex-basis: calc(50% - 10px);
+            flex: 0 0 calc(50% - 10px);
         }
 
         ::v-deep .station-photo {
@@ -303,6 +348,19 @@ export default Vue.extend({
             width: 90px;
             height: 90px;
             border-radius: 5px;
+        }
+
+        .photo-container {
+            flex: 0 0 calc(50% - 5px);
+            margin-bottom: 10px;
+            height: calc(50% - 5px);
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 2px;
+            }
         }
     }
     &-readings {
@@ -368,6 +426,7 @@ export default Vue.extend({
     &-readings {
         font-size: 16px;
         display: flex;
+        min-height: 130px;
 
         &-values {
             padding: 27px 20px 10px 30px;
@@ -435,6 +494,28 @@ export default Vue.extend({
             padding-bottom: 15px;
             border-bottom: 1px solid var(--color-border);
             margin-bottom: 20px;
+        }
+    }
+
+    &-photos {
+        @include flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        position: relative;
+
+        &-nav {
+            height: 28px;
+            padding: 5px 20px;
+            border-radius: 3px;
+            border: solid 1px #cccdcf;
+            background-color: #fff;
+            font-size: 14px;
+            font-weight: 900;
+            @include position(absolute, null 20px 20px null);
+        }
+
+        .photo {
+            flex: 0 0 calc(50% - 5px);
         }
     }
 }
