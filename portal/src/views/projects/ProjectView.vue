@@ -1,18 +1,13 @@
 <template>
-    <StandardLayout 
-        :viewingProjects="true"
-        :viewingProject="displayProject"
-        :disableScrolling="activityVisible"
-        :sidebarNarrow="bigMap">
-
-        <div class="container-wrap" :class="{'big-map': bigMap}">
+    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible" :sidebarNarrow="bigMap">
+        <div class="container-wrap" :class="{ 'big-map': bigMap }">
             <template v-if="displayProject">
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
                     :backTitle="isAdministrator ? $t('layout.backProjects') : $t('layout.backProjectDashboard')"
                     backRoute="projects"
-                    v-if="displayProject  && !bigMap"
+                    v-if="displayProject && !bigMap"
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <i class="icon icon-notification"></i>
@@ -69,7 +64,7 @@ export default Vue.extend({
         ProjectPublic,
         ProjectAdmin,
         ProjectActivity,
-        ProjectBigMap
+        ProjectBigMap,
     },
     props: {
         id: {

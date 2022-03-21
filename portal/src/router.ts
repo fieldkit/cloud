@@ -203,7 +203,7 @@ const routes = [
             return {
                 id: Number(route.params.id),
                 forcePublic: false,
-                bigMap: true
+                bigMap: true,
             };
         },
         meta: {

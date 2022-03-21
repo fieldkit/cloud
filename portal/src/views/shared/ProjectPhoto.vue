@@ -15,8 +15,8 @@ export default Vue.extend({
         },
         imageSize: {
             type: Number,
-            default: 800
-        }
+            default: 800,
+        },
     },
     data(): { photo: unknown } {
         return {
