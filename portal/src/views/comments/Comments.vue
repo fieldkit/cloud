@@ -252,7 +252,6 @@ export default Vue.extend({
                     }
                 })
                 .catch((e) => {
-                    console.log("Radoi e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -289,7 +288,6 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.getComments;
                 })
                 .finally(() => {
-                    console.log("RADOI FINALLY");
                     this.isLoading = false;
                 });
         },
