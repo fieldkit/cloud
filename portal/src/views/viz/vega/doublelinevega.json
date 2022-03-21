@@ -1,0 +1,394 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "A basic line chart example.",
+  "autosize": {
+    "type": "fit",
+    "contains": "padding"
+  },
+  "padding": 5,
+  "config": {
+    "axis": {
+      "labelFont": "Avenir Light",
+      "labelFontSize": 12,
+      "labelColor": "#6a6d71",
+      "titleFont": "Avenir Light",
+      "titleFontSize": 14,
+      "titlePadding": 20,
+      "tickSize": 10,
+      "tickOpacity": 0,
+      "domain": false,
+      "grid": true,
+      "gridDash": [
+        2,
+        2
+      ]
+    }
+  },
+  "signals": [
+    {
+      "name": "width",
+      "init": "containerSize()[0]",
+      "on": [
+        {
+          "events": "window:resize",
+          "update": "containerSize()[0]"
+        }
+      ]
+    },
+    {
+      "name": "height",
+      "init": "containerSize()[1]",
+      "on": [
+        {
+          "events": "window:resize",
+          "update": "containerSize()[1]"
+        }
+      ]
+    },
+    {
+      "name": "hover",
+      "value": {
+        "name": "LEFT"
+      },
+      "on": [
+        {
+          "events": "symbol:mouseover",
+          "update": "datum"
+        }
+      ]
+    }
+  ],
+  "data": [
+    {
+      "name": "table1",
+      "values": []
+    },
+    {
+      "name": "table2",
+      "values": []
+    },
+    {
+      "name": "table1Valid",
+      "source": "table1",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "isValid(datum.value)"
+        }
+      ]
+    },
+    {
+      "name": "table2Valid",
+      "source": "table2",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "isValid(datum.value)"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "time",
+      "range": "width",
+      "domain": {
+        "data": "table1",
+        "field": "time"
+      }
+    },
+    {
+      "name": "y",
+      "type": "linear",
+      "range": "height",
+      "nice": true,
+      "zero": true,
+      "domain": {
+        "data": "table1",
+        "field": "value"
+      }
+    },
+    {
+      "name": "x2",
+      "type": "time",
+      "range": "width",
+      "domain": {
+        "data": "table2",
+        "field": "time"
+      }
+    },
+    {
+      "name": "y2",
+      "type": "linear",
+      "range": "height",
+      "nice": true,
+      "zero": true,
+      "domain": {
+        "data": "table2",
+        "field": "value"
+      }
+    }
+  ],
+  "legends": [
+    {
+      "stroke": "colorLeft",
+      "orient": "top",
+      "direction": "horizontal",
+      "labelOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.1"
+      },
+      "symbolOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.1"
+      },
+      "symbolType": "stroke",
+      "title": "LEFT",
+      "titleOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.1"
+      }
+    },
+    {
+      "stroke": "colorRight",
+      "orient": "top",
+      "direction": "horizontal",
+      "labelOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
+      },
+      "symbolOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
+      },
+      "symbolType": "stroke",
+      "title": "RIGHT",
+      "titleOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
+      }
+    }
+  ],
+  "axes": [
+    {
+      "orient": "bottom",
+      "scale": "x",
+      "tickCount": 8,
+      "labelPadding": -24,
+      "tickSize": 30,
+      "tickDash": [
+        2,
+        2
+      ]
+    },
+    {
+      "orient": "left",
+      "scale": "y",
+      "tickCount": 5,
+      "titleOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.2"
+      },
+      "gridOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.2"
+      },
+      "labelOpacity": {
+        "signal": "hover.name == 'LEFT' ? 1 : 0.2"
+      }
+    },
+    {
+      "orient": "right",
+      "scale": "y2",
+      "tickCount": 5,
+      "titleOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.2"
+      },
+      "gridOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.2"
+      },
+      "labelOpacity": {
+        "signal": "hover.name == 'RIGHT' ? 1 : 0.2"
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "group",
+      "marks": [
+        {
+          "type": "line",
+          "from": {
+            "data": "table1Valid"
+          },
+          "encode": {
+            "enter": {
+              "interpolate": {
+                "value": "cardinal"
+              },
+              "tension": {
+                "value": 0.9
+              },
+              "x": {
+                "scale": "x",
+                "field": "time"
+              },
+              "y": {
+                "scale": "y",
+                "field": "value"
+              },
+              "stroke": {
+                "value": "#cccccc"
+              },
+              "strokeWidth": {
+                "value": 1
+              },
+              "strokeDash": {
+                "value": [
+                  4,
+                  4
+                ]
+              }
+            },
+            "update": {
+              "strokeOpacity": {
+                "signal": "hover.name == 'LEFT' ? 1 : 0.3"
+              }
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "from": {
+            "data": "table1"
+          },
+          "encode": {
+            "enter": {
+              "x": {
+                "scale": "x",
+                "field": "time"
+              },
+              "y": {
+                "scale": "y",
+                "field": "value"
+              },
+              "stroke": {
+                "value": null
+              },
+              "strokeWidth": {
+                "value": 2
+              },
+              "size": {
+                "value": 100
+              },
+              "tooltip": {
+                "signal": "{title: 'LEFT', 'Value': join([round(datum.value*10)/10, '%'], ' '), 'time': timeFormat(datum.time, '%Y-%m-%d %H:%m')}"
+              },
+              "fill": {
+                "value": "blue"
+              },
+              "fillOpacity": {
+                "value": 0
+              }
+            },
+            "hover": {
+              "fillOpacity": {
+                "value": 0.5
+              }
+            },
+            "update": {
+              "fillOpacity": {
+                "value": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "marks": [
+        {
+          "type": "line",
+          "from": {
+            "data": "table2Valid"
+          },
+          "encode": {
+            "enter": {
+              "interpolate": {
+                "value": "cardinal"
+              },
+              "tension": {
+                "value": 0.9
+              },
+              "x": {
+                "scale": "x2",
+                "field": "time"
+              },
+              "y": {
+                "scale": "y2",
+                "field": "value"
+              },
+              "stroke": {
+                "value": "#cccccc"
+              },
+              "strokeWidth": {
+                "value": 1
+              },
+              "strokeDash": {
+                "value": [
+                  4,
+                  4
+                ]
+              }
+            },
+            "update": {
+              "strokeOpacity": {
+                "signal": "hover.name == 'RIGHT' ? 1 : 0.3"
+              }
+            }
+          }
+        },
+        {
+          "type": "symbol",
+          "from": {
+            "data": "table2"
+          },
+          "encode": {
+            "enter": {
+              "x": {
+                "scale": "x",
+                "field": "time"
+              },
+              "y": {
+                "scale": "y2",
+                "field": "value"
+              },
+              "stroke": {
+                "value": null
+              },
+              "strokeWidth": {
+                "value": 2
+              },
+              "size": {
+                "value": 100
+              },
+              "tooltip": {
+                "signal": "{title: 'RIGHT', 'Value': join([round(datum.value*10)/10, '°F'], ' '), 'time': timeFormat(datum.time, '%Y-%m-%d %H:%m')}"
+              },
+              "fill": {
+                "value": "red"
+              },
+              "fillOpacity": {
+                "value": 0
+              }
+            },
+            "hover": {
+              "fillOpacity": {
+                "value": 0.5
+              }
+            },
+            "update": {
+              "fillOpacity": {
+                "value": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

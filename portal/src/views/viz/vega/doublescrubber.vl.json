@@ -1,0 +1,91 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Vega-Lite spec for FieldKit scrubber.",
+  "width": "container",
+  "encoding": {
+    "x": {
+      "field": "time",
+      "type": "temporal",
+      "axis": {
+        "formatType": "time",
+        "tickCount": 8,
+        "grid": false
+      }
+    }
+  },
+  "layer": [
+    {
+      "params": [
+        {
+          "name": "brush",
+          "select": { "type": "interval", "encodings": ["x"] }
+        }
+      ],
+      "mark": { "type": "line", "color": "#DCDEDF", "opacity": 0}
+    },
+    {
+      "transform": [
+        {
+          "joinaggregate": [
+            {
+              "op": "min",
+              "field": "value",
+              "as": "minValue"
+            }
+          ]
+        }
+      ],
+      "mark": { "type": "area", "color": "#52b5e4" },
+      "encoding": {
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "titleOpacity": 0,
+            "labelOpacity": 0,
+            "grid": false
+          }
+        },
+        "y2": {
+          "field": "minValue"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "joinaggregate": [
+            {
+              "op": "min",
+              "field": "value",
+              "as": "minValue"
+            }
+          ]
+        }
+      ],
+      "mark": { "type": "area", "color": "#52b5e4" },
+      "encoding": {
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "titleOpacity": 0,
+            "labelOpacity": 0,
+            "grid": false
+          }
+        },
+        "y2": {
+          "field": "minValue"
+        }
+      }
+    },
+    {
+      "mark": { "type": "image", "width": 30, "height": 30 },
+      "encoding": {
+        "x": { "field": "time", "type": "temporal" },
+        "url": { "field": "img", "type": "nominal" }
+      }
+    }
+  ],
+  "resolve": { "scale": { "x": "shared", "y": "independent" } }
+}

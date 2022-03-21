@@ -5,7 +5,9 @@
 <script>
 import _ from "lodash";
 import { default as vegaEmbed } from "vega-embed";
+import * as vegaLite from "vega-lite";
 
+import newDoubleLineSpec from "./doublelinevega.json";
 import doubleLineSpec from "./doubleLine.v1.json";
 import chartConfig from "./chartConfig.json";
 
@@ -20,6 +22,11 @@ export default {
             type: Array,
             required: true,
         },
+    },
+    data() {
+        return {
+            testing: true,
+        };
     },
     mounted: function() {
         console.log("vega-mounted");
@@ -37,14 +44,24 @@ export default {
     },
     methods: {
         async refresh() {
-            const spec = _.cloneDeep(doubleLineSpec);
-            spec.config = chartConfig;
-            spec.layer[0].data = { name: "table0", values: this.series[0].data };
-            spec.layer[0].encoding.y.title = this.series[0].vizInfo.label;
-            spec.layer[1].data = { name: "table1", values: this.series[1].data };
-            spec.layer[1].encoding.y.title = this.series[1].vizInfo.label;
-            spec.width = "container";
-            spec.height = "container";
+            const spec = _.cloneDeep(this.testing ? newDoubleLineSpec : doubleLineSpec);
+
+            if (this.testing) {
+                // spec.width = "container";
+                // spec.height = "container";
+            } else {
+                // const compiled = vegaLite.compile(spec);
+                // console.log("COMPILED", compiled);
+                // console.log("COMPILED", JSON.stringify(compiled.spec));
+
+                spec.width = "container";
+                spec.height = "container";
+                spec.config = chartConfig;
+                spec.layer[0].data = { name: "table0", values: this.series[0].data };
+                spec.layer[0].encoding.y.title = this.series[0].vizInfo.label;
+                spec.layer[1].data = { name: "table1", values: this.series[1].data };
+                spec.layer[1].encoding.y.title = this.series[1].vizInfo.label;
+            }
 
             applySensorMetaConfiguration(spec, this.series);
 
