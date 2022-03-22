@@ -155,6 +155,7 @@ export default Vue.extend({
     .link {
         color: $color-fieldkit-primary;
         font-size: 12px;
+        padding-bottom: 10px;
     }
 }
 .detail-title {
@@ -165,10 +166,17 @@ export default Vue.extend({
 }
 .detail-container {
     width: 75%;
+    margin-bottom: 5px;
 }
 .detail-description {
     font-family: $font-family-light;
     font-size: 14px;
+    max-height: 35px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 35px;
+    overflow: hidden;
 }
 
 .details {
@@ -195,9 +203,9 @@ export default Vue.extend({
     height: 100%;
     margin: 0;
 }
-#station-summary {
-    position: fixed;
-    left: 100px;
-    right: 100px;
+::v-deep .station-hover-summary {
+    width: 359px;
+    top: 122px;
+    left: 300px;
 }
 </style>
