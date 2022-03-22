@@ -72,15 +72,33 @@ export default {
             }).then((view) => {
                 this.vegaView = view;
                 let scrubbed = [];
-                view.view.addSignalListener("brush", (_, value) => {
+                view.view.addSignalListener("unit", (_, value) => {
+                    console.log("vega:state(unit)", value, this.vegaView.view.getState());
+                });
+                view.view.addSignalListener("brush2_x", (_, value) => {
+                    // console.log("vega:state(brush2_x)", value);
+                });
+                view.view.addSignalListener("brush2_tuple", (_, value) => {
+                    // console.log("vega:state(brush2_tuple)", value);
+                });
+                view.view.addSignalListener("brush2_time", (_, value) => {
+                    // console.log("vega:state(brush2_time)", value);
+                });
+                view.view.addSignalListener("hover", (_, value) => {
+                    console.log("vega:state(hover)", value);
+                });
+                view.view.addSignalListener("brush2", (_, value) => {
                     scrubbed = value.time;
+                    console.log("vega:state(brush2)", value, this.vegaView.view.getState());
                 });
                 this.vegaView.view.addEventListener("mouseup", () => {
                     console.log("vega-line-brush", scrubbed);
-                    if (scrubbed.length == 2) {
+                    if (scrubbed && scrubbed.length == 2) {
                         this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                     }
                 });
+
+                console.log("vega:state", this.vegaView.view.getState());
             });
         },
         // From https://vega.github.io/vega/docs/api/view/#view_toImageURL

@@ -56,9 +56,225 @@
           "update": "datum"
         }
       ]
+    },
+    {
+      "name": "unit",
+      "value": {},
+      "on": [
+        {
+          "events": "mousemove",
+          "update": "isTuple(group()) ? group() : unit"
+        }
+      ]
+    },
+    {
+      "name": "brush2",
+      "update": "vlSelectionResolve(\"brush2_store\", \"union\")"
+    },
+    {
+      "name": "brush2_x",
+      "value": [],
+      "on": [
+        {
+          "events": {
+            "source": "view",
+            "type": "mousedown",
+            "filter": [
+              "!event.item || event.item.mark.name !== \"brush2_brush\""
+            ]
+          },
+          "update": "[x(unit), x(unit)]"
+        },
+        {
+          "events": {
+            "source": "window",
+            "type": "mousemove",
+            "consume": true,
+            "between": [
+              {
+                "source": "view",
+                "type": "mousedown",
+                "filter": [
+                  "!event.item || event.item.mark.name !== \"brush2_brush\""
+                ]
+              },
+              {
+                "source": "window",
+                "type": "mouseup"
+              }
+            ]
+          },
+          "update": "[brush2_x[0], clamp(x(unit), 0, width)]"
+        },
+        {
+          "events": {
+            "signal": "brush2_scale_trigger"
+          },
+          "update": "[scale(\"x\", brush2_time[0]), scale(\"x\", brush2_time[1])]"
+        },
+        {
+          "events": [
+            {
+              "source": "view",
+              "type": "dblclick"
+            }
+          ],
+          "update": "[0, 0]"
+        },
+        {
+          "events": {
+            "signal": "brush2_translate_delta"
+          },
+          "update": "clampRange(panLinear(brush2_translate_anchor.extent_x, brush2_translate_delta.x / span(brush2_translate_anchor.extent_x)), 0, width)"
+        },
+        {
+          "events": {
+            "signal": "brush2_zoom_delta"
+          },
+          "update": "clampRange(zoomLinear(brush2_x, brush2_zoom_anchor.x, brush2_zoom_delta), 0, width)"
+        }
+      ]
+    },
+    {
+      "name": "brush2_time",
+      "on": [
+        {
+          "events": {
+            "signal": "brush2_x"
+          },
+          "update": "brush2_x[0] === brush2_x[1] ? null : invert(\"x\", brush2_x)"
+        }
+      ]
+    },
+    {
+      "name": "brush2_scale_trigger",
+      "value": {},
+      "on": [
+        {
+          "events": [
+            {
+              "scale": "x"
+            }
+          ],
+          "update": "(!isArray(brush2_time) || (+invert(\"x\", brush2_x)[0] === +brush2_time[0] && +invert(\"x\", brush2_x)[1] === +brush2_time[1])) ? brush2_scale_trigger : {}"
+        }
+      ]
+    },
+    {
+      "name": "brush2_tuple",
+      "on": [
+        {
+          "events": [
+            {
+              "signal": "brush2_time"
+            }
+          ],
+          "update": "brush2_time ? {fields: brush2_tuple_fields, values: [brush2_time]} : null"
+        }
+      ]
+    },
+    {
+      "name": "brush2_tuple_fields",
+      "value": [
+        {
+          "field": "time",
+          "channel": "x",
+          "type": "R"
+        }
+      ]
+    },
+    {
+      "name": "brush2_translate_anchor",
+      "value": {},
+      "on": [
+        {
+          "events": [
+            {
+              "source": "view",
+              "type": "mousedown",
+              "markname": "brush2_brush"
+            }
+          ],
+          "update": "{x: x(unit), y: y(unit), extent_x: slice(brush2_x)}"
+        }
+      ]
+    },
+    {
+      "name": "brush2_translate_delta",
+      "value": {},
+      "on": [
+        {
+          "events": [
+            {
+              "source": "window",
+              "type": "mousemove",
+              "consume": true,
+              "between": [
+                {
+                  "source": "view",
+                  "type": "mousedown",
+                  "markname": "brush2_brush"
+                },
+                {
+                  "source": "window",
+                  "type": "mouseup"
+                }
+              ]
+            }
+          ],
+          "update": "{x: brush2_translate_anchor.x - x(unit), y: brush2_translate_anchor.y - y(unit)}"
+        }
+      ]
+    },
+    {
+      "name": "brush2_zoom_anchor",
+      "on": [
+        {
+          "events": [
+            {
+              "source": "view",
+              "type": "wheel",
+              "consume": true,
+              "markname": "brush2_brush"
+            }
+          ],
+          "update": "{x: x(unit), y: y(unit)}"
+        }
+      ]
+    },
+    {
+      "name": "brush2_zoom_delta",
+      "on": [
+        {
+          "events": [
+            {
+              "source": "view",
+              "type": "wheel",
+              "consume": true,
+              "markname": "brush2_brush"
+            }
+          ],
+          "force": true,
+          "update": "pow(1.001, event.deltaY * pow(16, event.deltaMode))"
+        }
+      ]
+    },
+    {
+      "name": "brush2_modify",
+      "on": [
+        {
+          "events": {
+            "signal": "brush2_tuple"
+          },
+          "update": "modify(\"brush2_store\", brush2_tuple, true)"
+        }
+      ]
     }
   ],
   "data": [
+    {
+      "name": "brush2_store"
+    },
     {
       "name": "table1",
       "values": []
@@ -132,33 +348,33 @@
   ],
   "legends": [
     {
+      "title": "LEFT",
       "stroke": "colorLeft",
       "orient": "top",
       "direction": "horizontal",
+      "symbolType": "stroke",
       "labelOpacity": {
         "signal": "hover.name == 'LEFT' ? 1 : 0.1"
       },
       "symbolOpacity": {
         "signal": "hover.name == 'LEFT' ? 1 : 0.1"
       },
-      "symbolType": "stroke",
-      "title": "LEFT",
       "titleOpacity": {
         "signal": "hover.name == 'LEFT' ? 1 : 0.1"
       }
     },
     {
+      "title": "RIGHT",
       "stroke": "colorRight",
       "orient": "top",
       "direction": "horizontal",
+      "symbolType": "stroke",
       "labelOpacity": {
         "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
       },
       "symbolOpacity": {
         "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
       },
-      "symbolType": "stroke",
-      "title": "RIGHT",
       "titleOpacity": {
         "signal": "hover.name == 'RIGHT' ? 1 : 0.1"
       }
@@ -206,6 +422,122 @@
     }
   ],
   "marks": [
+    {
+      "name": "brush1_brush_bg",
+      "type": "rect",
+      "clip": true,
+      "encode": {
+        "enter": {
+          "fill": {
+            "value": "#333"
+          },
+          "fillOpacity": {
+            "value": 0.125
+          }
+        },
+        "update": {
+          "x": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "signal": "brush2_x[0]"
+            },
+            {
+              "value": 0
+            }
+          ],
+          "y": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "value": 0
+            },
+            {
+              "value": 0
+            }
+          ],
+          "x2": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "signal": "brush2_x[1]"
+            },
+            {
+              "value": 0
+            }
+          ],
+          "y2": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "field": {
+                "group": "height"
+              }
+            },
+            {
+              "value": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "brush2_brush",
+      "type": "rect",
+      "clip": true,
+      "encode": {
+        "enter": {
+          "fill": {
+            "value": "transparent"
+          }
+        },
+        "update": {
+          "x": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "signal": "brush2_x[0]"
+            },
+            {
+              "value": 0
+            }
+          ],
+          "y": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "value": 0
+            },
+            {
+              "value": 0
+            }
+          ],
+          "x2": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "signal": "brush2_x[1]"
+            },
+            {
+              "value": 0
+            }
+          ],
+          "y2": [
+            {
+              "test": "data(\"brush2_store\").length",
+              "field": {
+                "group": "height"
+              }
+            },
+            {
+              "value": 0
+            }
+          ],
+          "stroke": [
+            {
+              "test": "brush2_x[0] !== brush2_x[1]",
+              "value": "white"
+            },
+            {
+              "value": null
+            }
+          ]
+        }
+      }
+    },
     {
       "type": "group",
       "marks": [
@@ -350,7 +682,7 @@
           "encode": {
             "enter": {
               "x": {
-                "scale": "x",
+                "scale": "x2",
                 "field": "time"
               },
               "y": {
