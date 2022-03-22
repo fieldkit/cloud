@@ -17,8 +17,14 @@
                         </div>
                     </template>
                     <template v-slot:default>
-                        <div class="button" @click="openShare">Share</div>
-                        <div class="button" @click="openExports">Export</div>
+                        <div class="button-submit" @click="openShare">
+                            <i class="icon icon-share"></i>
+                            Share
+                        </div>
+                        <div class="button-submit" @click="openExports">
+                            <i class="icon icon-export"></i>
+                            Export
+                        </div>
                     </template>
                 </DoubleHeader>
             </div>
