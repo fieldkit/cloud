@@ -2,7 +2,7 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <div class="new-comment">
+        <div class="new-comment" :class="{ 'align-center': !user }">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
@@ -73,7 +73,7 @@
                                                 {{ reply.author.name }}
                                             </span>
                                             <ListItemOptions
-                                                v-if="user.id === reply.author.id || user.admin"
+                                                v-if="user && (user.id === reply.author.id || user.admin)"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
                                                 :options="getCommentOptions(reply)"
                                             />
@@ -481,6 +481,10 @@ header {
         width: 100%;
     }
 
+    &.align-center {
+        align-items: center;
+    }
+
     img {
         margin-top: 0 !important;
         width: 30px;
@@ -654,6 +658,11 @@ header {
 .need-login-msg {
     font-size: 16px;
     margin-left: 8px;
+    margin-right: 10px;
+
+    @include bp-down($xs) {
+        margin-left: 0;
+    }
 
     * {
         font-size: 16px;
