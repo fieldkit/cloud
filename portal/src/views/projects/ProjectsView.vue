@@ -6,7 +6,7 @@
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <i class="icon icon-plus-round"> </i>
+                        <i class="icon icon-plus-round"></i>
                         <span>{{ $t("projects.add") }}</span>
                     </div>
                 </div>

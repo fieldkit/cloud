@@ -2,7 +2,7 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <div class="new-comment">
+        <div class="new-comment" :class="{ 'align-center': !user }">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
@@ -21,9 +21,10 @@
             </template>
         </div>
 
-        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="posts.length === 0">There are no comments yet.</div>
+        <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
+        <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -72,7 +73,7 @@
                                                 {{ reply.author.name }}
                                             </span>
                                             <ListItemOptions
-                                                v-if="user.id === reply.author.id || user.admin"
+                                                v-if="user && (user.id === reply.author.id || user.admin)"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
                                                 :options="getCommentOptions(reply)"
                                             />
@@ -149,6 +150,7 @@ export default Vue.extend({
     },
     data(): {
         posts: Comment[];
+        isLoading: boolean;
         placeholder: string | null;
         viewType: string;
         newComment: {
@@ -166,6 +168,7 @@ export default Vue.extend({
     } {
         return {
             posts: [],
+            isLoading: false,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -248,7 +251,7 @@ export default Vue.extend({
                         }
                     }
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -264,6 +267,7 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            this.isLoading = true;
             await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
@@ -280,8 +284,11 @@ export default Vue.extend({
 
                     this.highlightComment();
                 })
-                .catch((e) => {
+                .catch(() => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
         viewDataClick(post: Comment) {
@@ -474,6 +481,10 @@ header {
         width: 100%;
     }
 
+    &.align-center {
+        align-items: center;
+    }
+
     img {
         margin-top: 0 !important;
         width: 30px;
@@ -647,6 +658,11 @@ header {
 .need-login-msg {
     font-size: 16px;
     margin-left: 8px;
+    margin-right: 10px;
+
+    @include bp-down($xs) {
+        margin-left: 0;
+    }
 
     * {
         font-size: 16px;
@@ -657,5 +673,9 @@ header {
     width: auto;
     margin-left: auto;
     padding: 0 40px;
+}
+
+.no-comments {
+    margin-top: 20px;
 }
 </style>

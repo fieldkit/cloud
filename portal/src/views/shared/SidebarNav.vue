@@ -106,8 +106,8 @@ export default Vue.extend({
         });
 
         resizeObserver.observe(document.querySelector("body"));
-        
-        if(this.narrow){
+
+        if (this.narrow) {
             this.toggleSidebar();
         }
     },
@@ -126,19 +126,19 @@ export default Vue.extend({
             narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
         };
     },
-    watch:{
-        $route (to, from){
-            if(to.name === "viewProjectBigMap"){
+    watch: {
+        $route(to, from) {
+            if (to.name === "viewProjectBigMap") {
                 this.narrow = true;
                 this.toggleSidebar();
             }
-            if(from.name === "viewProjectBigMap"){
+            if (from.name === "viewProjectBigMap") {
                 this.narrow = false;
                 this.closeMenuOnMobile();
                 this.toggleSidebar();
             }
-        }
-    } ,
+        },
+    },
     methods: {
         showStation(station: unknown): void {
             this.$emit("show-station", station);

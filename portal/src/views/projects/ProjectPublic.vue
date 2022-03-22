@@ -362,7 +362,8 @@ export default Vue.extend({
     width: 23px;
     flex-shrink: 0;
 
-    body.floodnet & {}
+    body.floodnet & {
+    }
 }
 
 .right-actions {
