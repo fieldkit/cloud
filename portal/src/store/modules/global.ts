@@ -5,6 +5,7 @@ import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
+import { AnnotationsState } from "./annotations";
 
 export interface RouteState {
     name: string | null;
@@ -26,6 +27,7 @@ export interface GlobalState {
     readonly exporting: ExportingState;
     readonly layout: LayoutState;
     readonly notifications: NotificationsState;
+    readonly annotations: AnnotationsState;
 }
 
 export interface GlobalGetters {

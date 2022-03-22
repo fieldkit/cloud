@@ -9,6 +9,7 @@ import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
 import { notifications } from "./modules/notifications";
+import { annotations } from "./modules/annotations";
 import { Services } from "@/api";
 
 export * from "@/api";
@@ -67,6 +68,7 @@ export default function(services: Services) {
             clock: clock(services),
             exporting: exporting(services),
             notifications: notifications(services),
+            annotations: annotations(services),
             user: user(services),
             stations: stations(services),
             map: map(services),

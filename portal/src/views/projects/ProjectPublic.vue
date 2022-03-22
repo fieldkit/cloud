@@ -135,7 +135,9 @@
                 </ul>
             </div>
         </div>
-
+        <section-panel title="Latest Events">
+            <latest-events/>
+        </section-panel>
         <Comments :parentData="displayProject.id" :user="user"></Comments>
     </div>
 </template>
@@ -150,14 +152,18 @@ import CommonComponents from "@/views/shared";
 import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
 import { twitterCardMeta } from "@/social";
+import LatestEvents from "../shared/LatestEvents.vue";
+import SectionPanel from "../shared/SectionPanel.vue";
 
 export default Vue.extend({
     name: "ProjectPublic",
     components: {
+        SectionPanel,
         Comments,
         ...CommonComponents,
         ProjectStations,
         FollowControl,
+        LatestEvents
     },
     data: () => {
         return {};
