@@ -19,7 +19,7 @@ export default Vue.extend({
     props: {
         value: {
             type: String,
-            required: true,
+            default: null,
         },
         format: {
             type: String,

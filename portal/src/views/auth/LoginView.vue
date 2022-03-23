@@ -92,8 +92,9 @@ export default Vue.extend({
         },
         async leaveAfterAuth(): Promise<void> {
             const after = this.forwardAfterQuery;
+            const params = JSON.parse(this.$route.query.params as string);
             if (after.after) {
-                await this.$router.push(after.after).catch((e) => {
+                await this.$router.push({ path: after.after, query: params }).catch((e) => {
                     console.log(e);
                 });
             } else {
