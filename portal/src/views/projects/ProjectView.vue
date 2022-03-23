@@ -1,6 +1,6 @@
 <template>
-    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible" :sidebarNarrow="bigMap">
-        <div class="container-wrap" :class="{ 'big-map': bigMap }">
+    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
+        <div class="container-wrap">
             <template v-if="displayProject">
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
@@ -31,12 +31,6 @@
                     :displayProject="displayProject"
                     :userStations="stations"
                 />
-                <ProjectBigMap
-                    v-if="!isAdministrator && displayProject && bigMap"
-                    :user="user"
-                    :displayProject="displayProject"
-                    :userStations="stations"
-                />
             </template>
         </div>
     </StandardLayout>
@@ -49,9 +43,6 @@ import StandardLayout from "../StandardLayout.vue";
 import ProjectPublic from "./ProjectPublic.vue";
 import ProjectAdmin from "./ProjectAdmin.vue";
 import ProjectActivity from "./ProjectActivity.vue";
-
-import ProjectBigMap from "./ProjectBigMap.vue";
-
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
@@ -64,7 +55,6 @@ export default Vue.extend({
         ProjectPublic,
         ProjectAdmin,
         ProjectActivity,
-        ProjectBigMap,
     },
     props: {
         id: {
