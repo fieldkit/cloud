@@ -10,12 +10,17 @@
                 </div>
             </template>
             <template v-else>
-                <p class="need-login-msg">
+                <p class="need-login-msg" @click="test()">
                     {{ $tc("comments.loginToComment.part1") }}
-                    <router-link :to="{ name: 'login' }" class="link">{{ $tc("comments.loginToComment.part2") }}</router-link>
+                    <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                        {{ $tc("comments.loginToComment.part2") }}
+                    </router-link>
                     {{ $tc("comments.loginToComment.part3") }}
                 </p>
-                <router-link :to="{ name: 'login', query: { after: $route.path } }" class="button-submit">
+                <router-link
+                    :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                    class="button-submit"
+                >
                     {{ $t("login.loginButton") }}
                 </router-link>
             </template>
@@ -370,6 +375,9 @@ export default Vue.extend({
                     }
                 }
             });
+        },
+        test() {
+            console.log("radoi", this.$route);
         },
     },
 });
