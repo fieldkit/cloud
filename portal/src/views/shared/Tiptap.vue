@@ -1,10 +1,15 @@
 <template>
     <div :class="'tiptap-container' + (readonly ? ' tiptap-reading' : ' tiptap-editing')">
         <div class="tiptap-row">
-            <div ref="contentContainer" class="tiptap-main truncated">
+            <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
-                <button v-if="seeMore" class="see-more" @click="toggleSeeMore(true)">See more</button>
-                <button v-if="seeLess" class="see-more" @click="toggleSeeMore(false)">See less</button>
+                <div v-if="seeMore" class="see-more">
+                    ...
+                    <button @click="toggleSeeMore(true)">See more</button>
+                </div>
+                <div v-if="seeLess" class="see-more">
+                    <button @click="toggleSeeMore(false)">See less</button>
+                </div>
             </div>
             <div class="tiptap-side" v-if="!readonly && !empty">
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
@@ -248,7 +253,7 @@ export default Vue.extend({
     border: solid 1px #d8dce0;
     max-height: 70vh;
     overflow-y: auto;
-    padding-right: 45px;
+    padding-right: 65px;
 
     @include bp-down($sm) {
         max-height: 60vh;
@@ -361,14 +366,19 @@ export default Vue.extend({
 }
 
 .see-more {
-    cursor: pointer;
     position: absolute;
-    right: 10px;
-    bottom: -33px;
-    color: var(--color-primary);
-    background-color: transparent;
-    border: 0;
-    font-family: var(--font-family-bold);
+    right: 15px;
+    bottom: 0;
     z-index: $z-index-top;
+    background: linear-gradient(to right, rgba(1, 1, 1, 0) 10%, #fff);
+
+    button {
+        cursor: pointer;
+        color: var(--color-primary);
+        background-color: transparent;
+        border: 0;
+        font-family: var(--font-family-bold);
+        white-space: nowrap;
+    }
 }
 </style>
