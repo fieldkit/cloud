@@ -71,6 +71,9 @@ export default {
     },
     methods: {
         brush(times) {
+            if (!this.vegaView) {
+                return;
+            }
             const x = times.map((v) => this.vegaView.view.scale("x")(v));
             this.vegaView.view
                 .signal("brush_x", x)
