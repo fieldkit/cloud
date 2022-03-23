@@ -1,42 +1,48 @@
 <template>
-    <div class="project-public project-container" v-if="project">
-        <div class="project-detail-card">
-            <div class="photo-container">
-                <ProjectPhoto :project="project" :image-size="150" />
+    <StandardLayout @sidebar-toggle="layoutChanges++" :sidebarNarrow="true">
+        <div class="project-public project-container" v-if="displayProject">
+            <div class="project-detail-card">
+                <div class="photo-container">
+                    <ProjectPhoto :project="project" :image-size="150" />
+                </div>
+                <div class="detail-container">
+                    <h3 class="detail-title">{{ project.name }}</h3>
+                    <div class="detail-description">{{ project.description }}</div>
+                    <router-link :to="{ name: 'viewProject' }" class="link">Project Dashboard ></router-link>
+                </div>
             </div>
-            <div class="detail-container">
-                <h3 class="detail-title">{{ project.name }}</h3>
-                <div class="detail-description">{{ project.description }}</div>
-                <router-link :to="{ name: 'viewProject' }" class="link">Project Dashboard ></router-link>
+            <div class="container-map">
+                <StationsMap
+                    @show-summary="showSummary"
+                    :mapped="mappedProject"
+                    :layoutChanges="layoutChanges"
+                    :showStations="project.showStations"
+                    :mapBounds="mapBounds"
+                />
             </div>
+            <StationSummary
+                v-if="activeStation"
+                :station="activeStation"
+                :readings="false"
+                :exploreContext="exploreContext"
+                @close="onCloseSummary"
+                v-bind:key="activeStation.id"
+            />
         </div>
-
-        <StationsMap
-            @show-summary="showSummary"
-            :mapped="mappedProject"
-            :layoutChanges="layoutChanges"
-            :showStations="project.showStations"
-            :mapBounds="mapBounds"
-        />
-        <StationSummary
-            v-if="activeStation"
-            :station="activeStation"
-            :readings="false"
-            :exploreContext="exploreContext"
-            @close="onCloseSummary"
-            v-bind:key="activeStation.id"
-        />
-    </div>
+    </StandardLayout>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
+import { GlobalState } from "@/store/modules/global";
+import * as ActionTypes from "@/store/actions";
 import * as utils from "../../utilities";
 import { ProjectModule, DisplayStation, Project, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
 import StationsMap from "../shared/StationsMap.vue";
 import StationSummary from "@/views/shared/StationSummary.vue";
 import CommonComponents from "@/views/shared";
+import StandardLayout from "../StandardLayout.vue";
 
 import { ExploreContext } from "@/views/viz/common";
 
@@ -46,6 +52,7 @@ export default Vue.extend({
         ...CommonComponents,
         StationsMap,
         StationSummary,
+        StandardLayout,
     },
     data(): {
         layoutChanges: number;
@@ -57,28 +64,31 @@ export default Vue.extend({
         };
     },
     props: {
-        user: {
+        id: {
             required: true,
+            type: Number,
         },
-        userStations: {
-            type: Array as PropType<DisplayStation[]>,
-            required: true,
-        },
-        displayProject: {
-            type: Object as PropType<DisplayProject>,
-            required: true,
-        },
+    },
+    mounted() {
+        console.log(this.$getters.projectsById);
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapState({
+            user: (s: GlobalState) => s.user.user,
+            userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
+            displayProject() {
+                return this.$getters.projectsById[this.id];
+            },
+        }),
         project(): Project {
             return this.displayProject.project;
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.displayProject.id].stations;
+            return this.$getters.projectsById[this.id].stations;
         },
         mappedProject(): MappedStations | null {
-            return this.$getters.projectsById[this.project.id].mapped;
+            return this.$getters.projectsById[this.id].mapped;
         },
         activeStation(): DisplayStation | null {
             if (this.activeStationId) {
@@ -104,6 +114,20 @@ export default Vue.extend({
         exploreContext(): ExploreContext {
             return new ExploreContext(this.project.id);
         },
+    },
+    watch: {
+        id(): Promise<any> {
+            if (this.id) {
+                return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+            }
+            return Promise.resolve();
+        },
+    },
+    beforeMount(): Promise<any> {
+        if (this.id) {
+            return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+        }
+        return Promise.resolve();
     },
     methods: {
         getModuleImg(module: ProjectModule): string {
@@ -137,6 +161,7 @@ export default Vue.extend({
     right: 28px;
     box-sizing: border-box;
     background-color: #ffffff;
+    text-align: left;
 
     @include bp-down($sm) {
         width: 100%;
@@ -155,6 +180,7 @@ export default Vue.extend({
     .link {
         color: $color-fieldkit-primary;
         font-size: 12px;
+        padding-bottom: 10px;
     }
 }
 .detail-title {
@@ -165,10 +191,17 @@ export default Vue.extend({
 }
 .detail-container {
     width: 75%;
+    margin-bottom: 5px;
 }
 .detail-description {
     font-family: $font-family-light;
     font-size: 14px;
+    max-height: 35px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    max-height: 35px;
+    overflow: hidden;
 }
 
 .details {
@@ -188,16 +221,21 @@ export default Vue.extend({
         display: none;
     }
 }
-
-.project-container {
-    margin-top: -10px;
+.container-map {
     width: 100%;
-    height: 100%;
-    margin: 0;
+    height: calc(100% - 33px);
+    margin-top: 0;
+    @include position(absolute, 66px null null 0);
+
+    @include bp-down($sm) {
+        top: 54px;
+        height: calc(100% - 54px);
+    }
 }
-#station-summary {
-    position: fixed;
-    left: 100px;
-    right: 100px;
+
+::v-deep .station-hover-summary {
+    width: 359px;
+    top: 122px;
+    left: 300px;
 }
 </style>

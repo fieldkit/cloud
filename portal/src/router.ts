@@ -198,7 +198,7 @@ const routes = [
     {
         path: "/dashboard/projects/:id/map",
         name: "viewProjectBigMap",
-        component: ProjectView,
+        component: ProjectBigMap,
         props: (route) => {
             return {
                 id: Number(route.params.id),
