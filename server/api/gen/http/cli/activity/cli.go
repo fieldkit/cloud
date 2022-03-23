@@ -132,7 +132,7 @@ func ParseEndpoint(
 
 		discussionDataFlags        = flag.NewFlagSet("data", flag.ExitOnError)
 		discussionDataBookmarkFlag = discussionDataFlags.String("bookmark", "REQUIRED", "")
-		discussionDataAuthFlag     = discussionDataFlags.String("auth", "REQUIRED", "")
+		discussionDataAuthFlag     = discussionDataFlags.String("auth", "", "")
 
 		discussionPostMessageFlags    = flag.NewFlagSet("post- message", flag.ExitOnError)
 		discussionPostMessageBodyFlag = discussionPostMessageFlags.String("body", "REQUIRED", "")

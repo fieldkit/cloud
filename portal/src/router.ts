@@ -14,6 +14,7 @@ import ProjectsView from "./views/projects/ProjectsView.vue";
 import ProjectEditView from "./views/projects/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/projects/ProjectUpdateEditView.vue";
 import ProjectView from "./views/projects/ProjectView.vue";
+import ProjectBigMap from "./views/projects/ProjectBigMap.vue";
 
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
@@ -191,6 +192,22 @@ const routes = [
             };
         },
         meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/projects/:id/map",
+        name: "viewProjectBigMap",
+        component: ProjectBigMap,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+                bigMap: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
             secured: true,
         },
     },

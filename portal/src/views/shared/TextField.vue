@@ -38,6 +38,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/float-label';
-
+@import "../../scss/float-label";
 </style>

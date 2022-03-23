@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../scss/mixins';
+@import "../../scss/mixins";
 .project-thumbnails {
     display: flex;
     flex-wrap: wrap;

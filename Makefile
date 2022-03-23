@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 30
+VERSION_PATCH = 31
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -59,8 +59,8 @@ cycle-checks:
 
 jstests: portal/node_modules
 	cd portal && $(JSPKG) install
-	cd portal && vue-cli-service build
-	cd portal && vue-cli-service test:unit
+	cd portal && node_modules/.bin/vue-cli-service build
+	cd portal && node_modules/.bin/vue-cli-service test:unit
 
 gotests:
 	cd server && go test -p 1 -coverprofile=coverage.data ./...

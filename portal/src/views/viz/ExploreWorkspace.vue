@@ -17,7 +17,14 @@
                         </div>
                     </template>
                     <template v-slot:default>
-                        <div class="button" @click="openExports">Export</div>
+                        <div class="button-submit" @click="openShare">
+                            <i class="icon icon-share"></i>
+                            Share
+                        </div>
+                        <div class="button-submit" @click="openExports">
+                            <i class="icon icon-export"></i>
+                            Export
+                        </div>
                     </template>
                 </DoubleHeader>
             </div>
@@ -31,7 +38,7 @@
 
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="user && bookmark"></Comments>
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -576,5 +583,13 @@ export default Vue.extend({
 .one {
     display: flex;
     flex-direction: row;
+}
+
+.button-submit {
+    padding: 0 28px;
+
+    &:nth-child(n + 1) {
+        margin-left: 20px;
+    }
 }
 </style>
