@@ -376,9 +376,6 @@ export default Vue.extend({
                 }
             });
         },
-        test() {
-            console.log("radoi", this.$route);
-        },
     },
 });
 </script>
