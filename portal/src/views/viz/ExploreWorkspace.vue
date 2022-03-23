@@ -584,4 +584,12 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
 }
+
+.button-submit {
+    padding: 0 28px;
+
+    &:nth-child(n + 1) {
+        margin-left: 20px;
+    }
+}
 </style>

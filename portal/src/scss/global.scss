@@ -159,4 +159,9 @@
     letter-spacing: 0.1px;
     padding: 0 13px;
     @include flex(center, center);
+
+    .icon {
+        font-size: 15px;
+        margin-right: 10px;
+    }
 }
