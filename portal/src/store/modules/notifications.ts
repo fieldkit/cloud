@@ -40,12 +40,8 @@ const actions = (services: Services) => {
     return {
         [ActionTypes.INITIALIZE]: async ({ commit }: ActionParameters) => {
             const send = await services.api.listenForNotifications(
-                async (message: { error?: unknown }) => {
-                    if (message.error) {
-                        console.log("error", message.error);
-                    } else {
-                        commit(NOTIFIED, message as Notification);
-                    }
+                async (message: Notification) => {
+                    commit(NOTIFIED, message);
                     return await Promise.resolve();
                 },
                 async (connected) => {
