@@ -71,6 +71,7 @@ export interface DataRow {
     moduleId: number;
     location: [number, number] | null;
     value: number;
+    name: string | undefined;
 }
 
 export interface SensorDataResponse {

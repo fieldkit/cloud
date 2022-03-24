@@ -5,6 +5,7 @@ import { TimeRange, Margins, ChartLayout } from "./common";
 import { QueriedData, Scrubbers, TimeZoom } from "./viz";
 
 import Scrubber from "./vega/Scrubber.vue";
+import DoubleScrubber from "./vega/DoubleScrubber.vue";
 
 export const VegaScrubber = Vue.extend({
     name: "VegaScrubber",
@@ -28,34 +29,33 @@ export const VegaScrubber = Vue.extend({
             return this.scrubbers.visible.toArray();
         },
     },
+    /*
     watch: {
-        visible(newValue, oldValue) {
-            // console.log("scrubber graphing (visible)");
-            this.refresh();
+        async visible(newValue, oldValue) {
+            await this.refresh();
         },
-        data(newValue, oldValue) {
-            // console.log("scrubber graphing (data)");
-            this.refresh();
+        async data(newValue, oldValue) {
+            await this.refresh();
         },
     },
-    mounted() {
-        // console.log("scrubber mounted");
-        this.refresh();
+    async mounted() {
+        await this.refresh();
     },
-    updated() {
-        // console.log("scrubber updated");
-    },
+    */
     methods: {
         raiseTimeZoomed(zoom: TimeZoom) {
             return this.$emit("viz-time-zoomed", zoom);
         },
-        refresh() {
-            // console.log("scrubber refresh", this.scrubbers);
+        /*
+        async refresh(): Promise<void> {
+            return Promise.resolve();
         },
+        */
     },
     template: `
         <div class="viz scrubber" v-if="data && data[0].data">
-            <Scrubber :data="data[0]" :visible="visible" @time-zoomed="raiseTimeZoomed" />
+            <Scrubber :data="data[0]" :visible="visible" @time-zoomed="raiseTimeZoomed" v-if="data.length == 1" />
+            <DoubleScrubber :data="data" :visible="visible" @time-zoomed="raiseTimeZoomed" v-if="data.length == 2" />
         </div>
     `,
 });

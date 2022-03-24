@@ -298,6 +298,11 @@ export class Graph extends Viz {
     }
 
     public get visibleTimeRange(): TimeRange {
+        if (this.visible.isExtreme()) {
+            if (this.all) {
+                return new TimeRange(this.all.timeRange[0], this.all.timeRange[1]);
+            }
+        }
         return this.visible;
     }
 

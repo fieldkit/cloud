@@ -43,13 +43,7 @@
       "field": "bin_time",
       "type": "temporal",
       "axis": {
-        "title": "Time",
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f",
-        "labelColor": "#7f7f7f",
         "formatType": "time",
-        "format": "%-m/%-d/%Y",
-        "tickOpacity": 0,
         "tickCount": 8,
         "grid": false,
         "domain": true,
@@ -63,23 +57,16 @@
     },
     "y": {
       "field": "minimum",
-      "title": "Minimum",
       "type": "quantitative",
       "scale": {
         "zero": false
       },
       "axis": {
-        "grid": false,
-        "domain": true,
-        "tickOpacity": 1,
-        "titleFontWeight": 400,
-        "titleColor": "#7f7f7f",
-        "labelColor": "#7f7f7f"
+        "grid": false
       }
     },
     "y2": {
-      "field": "maximum",
-      "title": "Maximum"
+      "field": "maximum"
     },
     "tooltip": [
       {
