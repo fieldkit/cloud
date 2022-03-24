@@ -1,12 +1,10 @@
 <template>
     <div>
-        <button v-on:click="downloadChart('png')" v-if="false">Download chart png</button>
-        <button v-on:click="downloadChart('svg')" v-if="false">Download chart svg</button>
         <div class="viz linechart"></div>
     </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
@@ -15,68 +13,63 @@ import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
-export default {
+export default Vue.extend({
     name: "LineChart",
     props: {
         series: {
-            type: Array, // Function as PropType<() => SeriesData>,
+            type: Array as PropType<SeriesData[]>,
             required: true,
         },
     },
-    data()/*: {
-        vegaView: unknown | undefined;
-    }*/ {
+    data(): {
+        vega: unknown | undefined;
+    } {
         return {
-            vegaView: undefined,
+            vega: undefined,
         };
     },
-    mounted()/*: void*/ {
+    mounted(): void {
         console.log("vega-mounted");
         this.refresh();
     },
     watch: {
-        label()/*: void*/ {
+        label(): void {
             console.log("vega-watch-label");
             this.refresh();
         },
-        data()/*: void*/ {
+        data(): void {
             console.log("vega-watch-data");
             this.refresh();
         },
     },
     methods: {
-        async refresh()/*: Promise<void>*/ {
+        async refresh(): Promise<void> {
             const factory = new TimeSeriesSpecFactory(this.series);
 
             const spec = factory.create();
 
-            await vegaEmbed(this.$el, spec, {
+            const vegaInfo = await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },
-            }).then((view) => {
-                this.vegaView = view;
-                let scrubbed = [];
-                view.view.addSignalListener("unit", (_, value) => {
-                    console.log("vega:state(unit)", value, this.vegaView.view.getState());
-                });
-                view.view.addSignalListener("hover", (_, value) => {
-                    console.log("vega:state(hover)", value);
-                });
-                view.view.addSignalListener("brush", (_, value) => {
-                    scrubbed = value.time;
-                    console.log("vega:state(brush)", value, this.vegaView.view.getState());
-                });
-                this.vegaView.view.addEventListener("mouseup", () => {
-                    console.log("vega-line-brush", scrubbed);
-                    if (scrubbed.length == 2) {
-                        this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
-                    }
-                });
             });
+
+            this.vega = vegaInfo;
+
+            let scrubbed = [];
+            vegaInfo.view.addSignalListener("brush", (_, value) => {
+                scrubbed = value.time;
+            });
+            vegaInfo.view.addEventListener("mouseup", () => {
+                if (scrubbed.length == 2) {
+                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                }
+            });
+
+            console.log("vega:ready", vegaInfo.view.getState());
         },
-        // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
-        async downloadChart(fileFormat/*: string*/)/*: Promise<void>*/ {
+        async downloadChart(fileFormat: string): Promise<void> {
+            // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
             await this.vegaView.view
                 .toImageURL(fileFormat, 2)
                 .then(function(url) {
@@ -91,7 +84,7 @@ export default {
                 });
         },
     },
-};
+});
 </script>
 
 <style scoped>
