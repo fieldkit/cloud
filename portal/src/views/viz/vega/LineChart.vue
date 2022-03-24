@@ -10,12 +10,10 @@
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
-import lineSpec from "./line.v1.json";
-import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
-import { applySensorMetaConfiguration } from "./customizations"
+import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
 export default {
     name: "LineChart",
@@ -48,14 +46,9 @@ export default {
     },
     methods: {
         async refresh()/*: Promise<void>*/ {
-            const spec = _.cloneDeep(lineSpec);
-            spec.config = chartConfig;
-            spec.data = { name: "table", values: this.series[0].data };
-            spec.layer[0].encoding.y.axis.title = this.series[0].vizInfo.label;
-            spec.width = "container";
-            spec.height = "container";
+            const factory = new TimeSeriesSpecFactory(this.series);
 
-            applySensorMetaConfiguration(spec, this.series);
+            const spec = factory.create();
 
             await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
@@ -64,8 +57,15 @@ export default {
             }).then((view) => {
                 this.vegaView = view;
                 let scrubbed = [];
+                view.view.addSignalListener("unit", (_, value) => {
+                    console.log("vega:state(unit)", value, this.vegaView.view.getState());
+                });
+                view.view.addSignalListener("hover", (_, value) => {
+                    console.log("vega:state(hover)", value);
+                });
                 view.view.addSignalListener("brush", (_, value) => {
                     scrubbed = value.time;
+                    console.log("vega:state(brush)", value, this.vegaView.view.getState());
                 });
                 this.vegaView.view.addEventListener("mouseup", () => {
                     console.log("vega-line-brush", scrubbed);
