@@ -35,9 +35,15 @@ default: setup binaries jstests gotests charting-shared
 
 setup: portal/src/secrets.ts
 
-charting-shared: charting/customizations.ts charting/api.ts charting/common.ts
+charting/vega:
+	mkdir -p charting/vega
 
-charting/customizations.ts: portal/src/views/viz/vega/customizations.ts
+charting-shared: charting/vega charting/api.ts charting/common.ts charting/vega/customizations.ts charting/vega/TimeSeriesSpecFactory.ts
+
+charting/vega/customizations.ts: portal/src/views/viz/vega/customizations.ts
+	cp $^ $@
+
+charting/vega/TimeSeriesSpecFactory.ts: portal/src/views/viz/vega/TimeSeriesSpecFactory.ts
 	cp $^ $@
 
 charting/api.ts: portal/src/views/viz/api.ts
