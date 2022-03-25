@@ -69,36 +69,39 @@ export default {
 
             this.pickRange(this.visible);
         },
-        brush(times) {
-            if (!this.vega) {
+        async brush(times: number[]): Promise<void> {
+            if (!this.vega || !this.series[0].queried) {
+                console.log("viz: vega:scrubber:brush-ignore");
                 return;
             }
             const x = times.map((v) => this.vega.view.scale("x")(v));
-            this.vega.view
-                .signal("brush_x", x)
-                .signal("brush_tuple", {
-                    unit: "layer_0",
-                    fields: [
-                        {
-                            field: "time",
-                            channel: "x",
-                            type: "R",
-                        },
-                    ],
-                    values: times,
-                })
-                .runAsync();
+            console.log("viz: vega:scrubber:brush", times, x);
+            try {
+                await this.vega.view
+                    .signal("brush_x", x)
+                    .signal("brush_tuple", {
+                        fields: [
+                            {
+                                field: "time",
+                                channel: "x",
+                                type: "R",
+                            },
+                        ],
+                        values: times,
+                    })
+                    .runAsync();
+            } catch (error) {
+                console.log("viz: error", error);
+            }
         },
-        pickRange(timeRange) {
+        async pickRange(timeRange): Promise<void> {
             const first = this.series[0];
             if (first.ds) {
                 const maximum = first.queried.timeRange;
                 if (_.isEqual(maximum, timeRange)) {
-                    console.log("viz: vega:scrubber:pick:empty", maximum, timeRange);
-                    this.brush([]);
+                    await this.brush([]);
                 } else {
-                    console.log("viz: vega:scrubber:pick:range", maximum, timeRange);
-                    this.brush(timeRange);
+                    await this.brush(timeRange);
                 }
             }
         },

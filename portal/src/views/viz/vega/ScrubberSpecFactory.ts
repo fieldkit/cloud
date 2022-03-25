@@ -85,6 +85,7 @@ export class ScrubberSpecFactory {
                         color: "#52b5e4",
                     },
                 },
+                /*
                 {
                     mark: {
                         type: "image",
@@ -105,6 +106,7 @@ export class ScrubberSpecFactory {
                         values: [], // Annotations
                     },
                 },
+                */
             ],
             resolve: {
                 axis: {
