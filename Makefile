@@ -31,12 +31,20 @@ WORKING_DIRECTORY ?= $(shell pwd)
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 DOCKER_TAG ?= main
 
-default: setup binaries jstests gotests charting-shared
+default: setup binaries jstests gotests charting-tests
 
 setup: portal/src/secrets.ts
 
 charting/vega:
 	mkdir -p charting/vega
+
+charting/node_modules:
+	cd charting && $(JSPKG) install
+
+charting-setup: charting-shared charting/node_modules
+
+charting-tests: charting-setup
+	cd charting && tsc --esModuleInterop -t es5 server.ts
 
 charting-shared: charting/vega charting/api.ts charting/common.ts charting/vega/customizations.ts charting/vega/SpecFactory.ts charting/vega/TimeSeriesSpecFactory.ts charting/vega/HistogramSpecFactory.ts charting/vega/RangeSpecFactory.ts
 
@@ -169,7 +177,7 @@ run-server: server
 migrate-up:
 	cd migrations && PGURL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
 
-ci: setup binaries jstests
+ci: setup binaries jstests charting-setup
 
 ci-db-tests:
 	rm -rf active-schema
