@@ -19,7 +19,7 @@ import {
 } from "./common";
 import { applySensorMetaConfiguration } from "./vega/customizations";
 
-import { ChartSettings } from "./SpecFactory";
+import { ChartSettings } from "./vega/SpecFactory";
 import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
 import { HistogramSpecFactory } from "./vega/HistogramSpecFactory";
 import { RangeSpecFactory } from "./vega/RangeSpecFactory";
@@ -98,7 +98,7 @@ class HistogramChart extends Chart {
     const factory = new HistogramSpecFactory(allSeries, this.settings);
     const spec = factory.create();
     applySensorMetaConfiguration(spec, allSeries);
-    return [vegaLite.compile(spec).spec];
+    return [vegaLite.compile(spec as any).spec];
   }
 }
 
