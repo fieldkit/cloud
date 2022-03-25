@@ -46,13 +46,6 @@ export default {
 
             const spec = factory.create();
 
-            // Some styling overrides. The height of the scrubber can be set with scrubberSpec.height
-            // scrubberSpec.config.axisX.tickSize = 20;
-            // scrubberSpec.config.view = { fill: "#f4f5f7", stroke: "transparent" };
-            // scrubberSpec.data = { values: this.data.data };
-            // scrubberSpec.layer[2].data = { values: [] };
-            // scrubberSpec.width = "container";
-
             const vegaInfo = await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
                 actions: { source: false, editor: false, compiled: false },
@@ -64,8 +57,8 @@ export default {
             vegaInfo.view.addSignalListener("brush", (_, value) => {
                 if (value.time) {
                     scrubbed = value.time;
-                } else {
-                    scrubbed = this.data.timeRange;
+                } else if (this.series[0].data) {
+                    scrubbed = this.series[0].data.timeRange;
                 }
             });
             vegaInfo.view.addEventListener("mouseup", () => {
@@ -98,15 +91,17 @@ export default {
                 .runAsync();
         },
         pickRange(timeRange) {
-            /*
-            if (_.isEqual(timeRange, this.data.timeRange)) {
-                console.log("vega-scrubber:pick:ignore", timeRange, this.data.timeRange);
-                this.brush([]);
-            } else {
-                console.log("vega-scrubber:pick", timeRange, this.data.timeRange);
-                this.brush(timeRange);
+            const first = this.series[0];
+            if (first.ds) {
+                const maximum = first.queried.timeRange;
+                if (_.isEqual(maximum, timeRange)) {
+                    console.log("vega-scrubber:pick:empty", maximum, timeRange);
+                    this.brush([]);
+                } else {
+                    console.log("vega-scrubber:pick:range", maximum, timeRange);
+                    this.brush(timeRange);
+                }
             }
-            */
         },
     },
 };

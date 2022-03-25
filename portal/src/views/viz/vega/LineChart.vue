@@ -30,12 +30,10 @@ export default Vue.extend({
         };
     },
     async mounted(): Promise<void> {
-        console.log("vega-mounted");
         await this.refresh();
     },
     watch: {
         async series(): Promise<void> {
-            console.log("vega-watch-series");
             await this.refresh();
         },
     },
@@ -63,7 +61,7 @@ export default Vue.extend({
                 }
             });
 
-            console.log("vega:ready", vegaInfo.view.getState());
+            console.log("viz: vega:ready", vegaInfo.view.getState());
         },
         async downloadChart(fileFormat: string): Promise<void> {
             // From https://vega.github.io/vega/docs/api/view/#view_toImageURL

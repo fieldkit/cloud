@@ -227,11 +227,11 @@ function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: G
                         const stations = v[0];
                         const sensors = v[1];
                         const fixed = _.concat([[[stations[0], sensors[0]]]], _.drop(v, 2));
-                        console.log("viz-migrate:b", v);
-                        console.log("viz-migrate:a", fixed);
+                        console.log("viz: migrate:b", v);
+                        console.log("viz: migrate:a", fixed);
                         return fixed;
                     }
-                    console.log("viz-migrate", v);
+                    console.log("viz: migrate", v);
                     return v;
                 })
             )
@@ -593,7 +593,7 @@ export class Querier {
         const queryParams = params.queryParams();
         const key = queryParams.toString();
 
-        console.log(`vis: query-data`, key);
+        console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
             vq.howBusy(1);

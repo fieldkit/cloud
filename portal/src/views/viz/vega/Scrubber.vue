@@ -36,7 +36,6 @@ export default {
             await this.refresh();
         },
         async visible() {
-            console.log("vega-scrubber:visible", this.data, this.visible);
             this.pickRange(this.visible);
         },
     },
@@ -62,7 +61,7 @@ export default {
                 }
             });
             vegaInfo.view.addEventListener("mouseup", () => {
-                console.log("vega-scrubber-brush", scrubbed);
+                console.log("viz: vega:scrubber-brush", scrubbed);
                 if (scrubbed.length == 2) {
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
@@ -95,10 +94,10 @@ export default {
             if (first.ds) {
                 const maximum = first.queried.timeRange;
                 if (_.isEqual(maximum, timeRange)) {
-                    console.log("vega-scrubber:pick:empty", maximum, timeRange);
+                    console.log("viz: vega:scrubber:pick:empty", maximum, timeRange);
                     this.brush([]);
                 } else {
-                    console.log("vega-scrubber:pick:range", maximum, timeRange);
+                    console.log("viz: vega:scrubber:pick:range", maximum, timeRange);
                     this.brush(timeRange);
                 }
             }

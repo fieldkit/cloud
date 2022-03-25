@@ -26,12 +26,10 @@ export default Vue.extend({
         };
     },
     async mounted(): Promise<void> {
-        console.log("vega-mounted");
         await this.refresh();
     },
     watch: {
         async series(): Promise<void> {
-            console.log("vega-watch-series");
             await this.refresh();
         },
     },
@@ -40,12 +38,6 @@ export default Vue.extend({
             const factory = new HistogramSpecFactory(this.series, ChartSettings.Container);
 
             const spec = factory.create();
-
-            // histogramSpec.config = chartConfig;
-            // histogramSpec.data = { name: "table", values: this.data.data };
-            // histogramSpec.encoding.x.axis.title = this.label;
-            // histogramSpec.width = "container";
-            // histogramSpec.height = "container";
 
             const vegaInfo = await vegaEmbed(".histogram", spec, {
                 renderer: "svg",

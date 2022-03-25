@@ -31,7 +31,7 @@ export const VegaScrubber = Vue.extend({
                 const vizInfo = this.workspace.vizInfo(graph, graphDataSets[0]);
                 return new SeriesData(scrubber.data.key, graphDataSets[0], scrubber.data, vizInfo);
             });
-            console.log("viz:scrubber:all", all);
+            console.log("viz: scrubber:all", all);
             return all;
         },
         visible(): number[] {

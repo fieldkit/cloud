@@ -26,12 +26,10 @@ export default Vue.extend({
         };
     },
     async mounted(): Promise<void> {
-        console.log("vega-mounted");
         await this.refresh();
     },
     watch: {
         async series(): Promise<void> {
-            console.log("vega-watch-series");
             await this.refresh();
         },
     },
