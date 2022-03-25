@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -43,7 +44,7 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, w http.ResponseWrit
 	meta["twitter:title"] = payload.title
 	meta["twitter:description"] = payload.description
 	meta["twitter:image:alt"] = payload.description
-	meta["twitter:image"] = payload.photoUrl
+	meta["twitter:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, 800*2, 418*2)
 
 	if err := serveMeta(w, req, meta); err != nil {
 		return err
