@@ -3,7 +3,7 @@ import Vue from "vue";
 
 import { Graph, Workspace, FastTime, TimeZoom, SeriesData } from "./viz";
 
-import HistogramChart from "./vega/Histogram.vue";
+import HistogramChart from "./vega/HistogramChart.vue";
 
 export const VegaHistogram = Vue.extend({
     name: "VegaHistogram",
