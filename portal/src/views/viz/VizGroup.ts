@@ -86,7 +86,7 @@ export const VizGroup = Vue.extend({
                 </component>
             </div>
             <div v-if="group.scrubbers && !group.scrubbers.empty">
-                <Scrubber :scrubbers="group.scrubbers" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+                <Scrubber :scrubbers="group.scrubbers" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
             </div>
         </div>
 	`,

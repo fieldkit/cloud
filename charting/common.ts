@@ -280,7 +280,7 @@ export class SeriesData {
     constructor(
         public readonly key: string,
         public readonly ds: DataSetSeries,
-        public readonly data: DataRow[],
+        public readonly queried: QueriedData,
         public readonly vizInfo: VizInfo
     ) {}
 }

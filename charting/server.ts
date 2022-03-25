@@ -18,10 +18,11 @@ import {
   DataSetSeries,
 } from "./common";
 import { applySensorMetaConfiguration } from "./vega/customizations";
-import {
-  ChartSettings,
-  TimeSeriesSpecFactory,
-} from "./vega/TimeSeriesSpecFactory";
+
+import { ChartSettings } from "./SpecFactory";
+import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
+import { HistogramSpecFactory } from "./vega/HistogramSpecFactory";
+import { RangeSpecFactory } from "./vega/RangeSpecFactory";
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
 const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
@@ -85,8 +86,8 @@ class TimeSeriesChart extends Chart {
 
 class RangeChart extends Chart {
   finalize(allSeries): any[] {
-    const spec = _.cloneDeep(rangeSpec) as any;
-    spec.config = chartConfig;
+    const factory = new RangeSpecFactory(allSeries, this.settings);
+    const spec = factory.create();
     applySensorMetaConfiguration(spec, allSeries);
     return [vegaLite.compile(spec).spec];
   }
@@ -94,8 +95,8 @@ class RangeChart extends Chart {
 
 class HistogramChart extends Chart {
   finalize(allSeries): any[] {
-    const spec = _.cloneDeep(histogramSpec) as any;
-    spec.config = chartConfig;
+    const factory = new HistogramSpecFactory(allSeries, this.settings);
+    const spec = factory.create();
     applySensorMetaConfiguration(spec, allSeries);
     return [vegaLite.compile(spec).spec];
   }

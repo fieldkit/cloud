@@ -11,6 +11,7 @@ import { default as vegaEmbed } from "vega-embed";
 
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
+import { ChartSettings } from "./SpecFactory";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
 export default Vue.extend({
@@ -28,23 +29,19 @@ export default Vue.extend({
             vega: undefined,
         };
     },
-    mounted(): void {
+    async mounted(): Promise<void> {
         console.log("vega-mounted");
-        this.refresh();
+        await this.refresh();
     },
     watch: {
-        label(): void {
-            console.log("vega-watch-label");
-            this.refresh();
-        },
-        data(): void {
-            console.log("vega-watch-data");
-            this.refresh();
+        async series(): Promise<void> {
+            console.log("vega-watch-series");
+            await this.refresh();
         },
     },
     methods: {
         async refresh(): Promise<void> {
-            const factory = new TimeSeriesSpecFactory(this.series);
+            const factory = new TimeSeriesSpecFactory(this.series, ChartSettings.Auto);
 
             const spec = factory.create();
 
@@ -70,7 +67,7 @@ export default Vue.extend({
         },
         async downloadChart(fileFormat: string): Promise<void> {
             // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
-            await this.vegaView.view
+            await this.vega.view
                 .toImageURL(fileFormat, 2)
                 .then(function(url) {
                     const link = document.createElement("a");

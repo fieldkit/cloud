@@ -1,12 +1,5 @@
 import _ from "lodash";
-import { getString, getSeriesThresholds } from "./customizations";
-import { SeriesData } from "../common";
-
-type MapFunction<T> = (series: SeriesData, i: number) => T;
-
-export class ChartSettings {
-    constructor(public readonly w: number, public readonly h: number) {}
-}
+import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
@@ -51,14 +44,14 @@ export class TimeSeriesSpecFactory {
                           })
                         : null;
 
-                    series.data.forEach((item) => {
+                    series.queried.data.forEach((item) => {
                         item.name = hoverName;
                     });
 
                     return [
                         {
                             name: makeDataName(i),
-                            values: series.data,
+                            values: series.queried.data,
                             transform: transforms,
                         },
                         {
@@ -743,49 +736,33 @@ export class TimeSeriesSpecFactory {
             console.log("viz:marks", marks);
         }
 
-        const fixedSize = {
-            width: this.settings.w,
-            height: this.settings.h,
-            autosize: "pad",
-        };
-        const containerSize = {
-            autosize: {
-                type: "fit",
-                contains: "padding",
-            },
-        };
-        const sizing = this.settings.w > 0 ? fixedSize : containerSize;
-
-        return _.extend(
-            {
-                $schema: "https://vega.github.io/schema/vega/v5.json",
-                description: "FK Time Series",
-                padding: 5,
-                config: {
-                    background: "white",
-                    axis: {
-                        labelFont: "Avenir Light",
-                        labelFontSize: 12,
-                        labelColor: "#6a6d71",
-                        titleFont: "Avenir Light",
-                        titleFontSize: 14,
-                        titlePadding: 20,
-                        tickSize: 10,
-                        tickOpacity: 0,
-                        domain: false,
-                        grid: true,
-                        gridDash: [2, 2],
-                    },
+        return this.settings.apply({
+            $schema: "https://vega.github.io/schema/vega/v5.json",
+            description: "FK Time Series",
+            padding: 5,
+            config: {
+                background: "white",
+                axis: {
+                    labelFont: "Avenir Light",
+                    labelFontSize: 12,
+                    labelColor: "#6a6d71",
+                    titleFont: "Avenir Light",
+                    titleFontSize: 14,
+                    titlePadding: 20,
+                    tickSize: 10,
+                    tickOpacity: 0,
+                    domain: false,
+                    grid: true,
+                    gridDash: [2, 2],
                 },
-                signals: signals,
-                data: data,
-                scales: scales,
-                legends: legends,
-                axes: axes,
-                marks: marks,
             },
-            sizing
-        );
+            signals: signals,
+            data: data,
+            scales: scales,
+            legends: legends,
+            axes: axes,
+            marks: marks,
+        });
     }
 
     private defaultStroke() {

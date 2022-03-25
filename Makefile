@@ -38,12 +38,21 @@ setup: portal/src/secrets.ts
 charting/vega:
 	mkdir -p charting/vega
 
-charting-shared: charting/vega charting/api.ts charting/common.ts charting/vega/customizations.ts charting/vega/TimeSeriesSpecFactory.ts
+charting-shared: charting/vega charting/api.ts charting/common.ts charting/vega/customizations.ts charting/vega/SpecFactory.ts charting/vega/TimeSeriesSpecFactory.ts charting/vega/HistogramSpecFactory.ts charting/vega/RangeSpecFactory.ts
 
 charting/vega/customizations.ts: portal/src/views/viz/vega/customizations.ts
 	cp $^ $@
 
+charting/vega/SpecFactory.ts: portal/src/views/viz/vega/SpecFactory.ts
+	cp $^ $@
+
 charting/vega/TimeSeriesSpecFactory.ts: portal/src/views/viz/vega/TimeSeriesSpecFactory.ts
+	cp $^ $@
+
+charting/vega/HistogramSpecFactory.ts: portal/src/views/viz/vega/HistogramSpecFactory.ts
+	cp $^ $@
+
+charting/vega/RangeSpecFactory.ts: portal/src/views/viz/vega/RangeSpecFactory.ts
 	cp $^ $@
 
 charting/api.ts: portal/src/views/viz/api.ts

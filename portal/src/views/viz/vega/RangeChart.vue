@@ -2,55 +2,55 @@
     <div class="viz rangechart"></div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
-import rangeSpec from "./range.v1.json";
-import chartConfig from "./chartConfig.json";
 
-export default {
+import { SeriesData } from "../viz";
+import { ChartSettings } from "./SpecFactory";
+import { RangeSpecFactory } from "./RangeSpecFactory";
+
+export default Vue.extend({
     name: "RangeChart",
     props: {
-        data: {
-            type: Object,
-            required: true,
-        },
-        label: {
-            type: String,
+        series: {
+            type: Array as PropType<SeriesData[]>,
             required: true,
         },
     },
-    mounted: function() {
+    data(): {
+        vega: unknown | undefined;
+    } {
+        return {
+            vega: undefined,
+        };
+    },
+    async mounted(): Promise<void> {
         console.log("vega-mounted");
-        this.refresh();
+        await this.refresh();
     },
     watch: {
-        label() {
-            console.log("vega-watch-label");
-            this.refresh();
-        },
-        data() {
-            console.log("vega-watch-data");
-            this.refresh();
+        async series(): Promise<void> {
+            console.log("vega-watch-series");
+            await this.refresh();
         },
     },
     methods: {
         async refresh() {
-            rangeSpec.config = chartConfig;
-            rangeSpec.data = { name: "table", values: this.data.data };
-            rangeSpec.encoding.y.axis.title = this.label;
-            rangeSpec.width = "container";
-            rangeSpec.height = "container";
+            const factory = new RangeSpecFactory(this.series, ChartSettings.Container);
 
-            const vegaView = await vegaEmbed(".rangechart", rangeSpec, {
+            const spec = factory.create();
+
+            const vegaInfo = await vegaEmbed(".rangechart", spec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },
             });
 
-            this.vegaView = vegaView;
+            this.vega = vegaInfo;
         },
     },
-};
+});
 </script>
 
 <style scoped>

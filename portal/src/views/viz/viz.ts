@@ -146,7 +146,7 @@ class InfoQuery {
 }
 
 export class Scrubber {
-    constructor(public readonly index: number, public readonly data: QueriedData) {}
+    constructor(public readonly index: number, public readonly data: QueriedData, public readonly viz: Viz) {}
 }
 
 export class Scrubbers {
@@ -293,7 +293,7 @@ export class Graph extends Viz {
         return this.loadedDataSets.map((ds) => {
             if (!ds.graphing) throw new Error(`viz: No data`);
             const vizInfo = vizInfoFactory.vizInfo(this, ds);
-            return new SeriesData(ds.graphing.key, ds, ds.graphing.data, vizInfo);
+            return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
         });
     }
 
@@ -530,7 +530,7 @@ export class Group {
             .map((r) => {
                 const all = r.graph.all;
                 if (!all) throw new Error(`no viz data on Graph`);
-                return new Scrubber(r.index, all);
+                return new Scrubber(r.index, all, r.graph);
             });
 
         return new Scrubbers(this.id, this.visible_, children);
