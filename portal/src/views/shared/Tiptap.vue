@@ -224,7 +224,7 @@ export default Vue.extend({
 
 .tiptap-reading {
     border: 1px solid transparent;
-    /*padding: 0.3em 1.4em 0.3em 0.8em;*/
+    padding: 0.3em 1.4em 0.3em 0em;
 
     p {
         margin: 0em;
@@ -295,7 +295,6 @@ export default Vue.extend({
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
-    padding: 0 13px 0 13px;
 
     .tiptap-main {
         width: 100%;
