@@ -6,10 +6,6 @@ import axios from "axios";
 
 const app = express();
 
-import chartConfig from "./vega/chartConfig.json";
-import histogramSpec from "./vega/histogram.v1.json";
-import rangeSpec from "./vega/range.v1.json";
-
 import {
   TimeRange,
   QueriedData,
@@ -26,8 +22,6 @@ import { RangeSpecFactory } from "./vega/RangeSpecFactory";
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
 const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
-
-type VegaSpec = any;
 
 class Chart {
   constructor(public readonly settings: ChartSettings) {}
@@ -48,17 +42,6 @@ class Chart {
         sensor.viz || [],
         sensor.ranges
       );
-
-      const make = () => {
-        if (sensor.unit_of_measure) {
-          return `${name} (${sensor.unit_of_measure})`;
-        }
-        return `${name}`;
-      };
-
-      // this.sensor(index, make(), sensor.unit_of_measure);
-
-      // this.data(index, data);
 
       return new SeriesData(
         data.key,
