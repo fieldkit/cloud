@@ -37,6 +37,7 @@ export class ScrubberSpecFactory {
             },
             encoding: {
                 x: {
+                    title: "Time",
                     field: "time",
                     type: "temporal",
                     axis: {
