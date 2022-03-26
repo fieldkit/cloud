@@ -11,7 +11,7 @@ export class TimeSeriesSpecFactory {
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
-        const getScales = (i: number) => {
+        const makeScales = (i: number) => {
             if (i == 0) {
                 return {
                     x: "x",
@@ -23,6 +23,23 @@ export class TimeSeriesSpecFactory {
                     y: "y2",
                 };
             }
+        };
+
+        const makeDomain = (series) => {
+            const constrained = series.vizInfo.constrainedRanges;
+            if (series.ds.graphing && constrained.length > 0) {
+                const range = constrained[0];
+                if (series.ds.shouldConstrainBy([range.minimum, range.maximum])) {
+                    const d = [range.minimum, range.maximum];
+                    console.log("viz:constrained", series.ds.graphing.dataRange, d);
+                    return d;
+                } else {
+                    console.log(`viz:constrain-skip`);
+                }
+            } else {
+                console.log(`viz:constrain-none`);
+            }
+            return undefined;
         };
 
         const data = [
@@ -109,11 +126,13 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.2`;
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
+
                     return {
                         title: series.vizInfo.label,
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
                         tickCount: 5,
+                        domain: makeDomain(series),
                         titleOpacity: {
                             signal: hoverCheck,
                         },
@@ -130,9 +149,11 @@ export class TimeSeriesSpecFactory {
 
         const scales = _.flatten(
             mapSeries((series, i) => {
+                const domain = makeDomain(series);
+
                 return [
                     {
-                        name: getScales(i).x,
+                        name: makeScales(i).x,
                         type: "time",
                         range: "width",
                         domain: {
@@ -141,15 +162,17 @@ export class TimeSeriesSpecFactory {
                         },
                     },
                     {
-                        name: getScales(i).y,
+                        name: makeScales(i).y,
                         type: "linear",
                         range: "height",
                         nice: true,
                         zero: true,
-                        domain: {
-                            data: makeDataName(i),
-                            field: "value",
-                        },
+                        domain: domain
+                            ? domain
+                            : {
+                                  data: makeDataName(i),
+                                  field: "value",
+                              },
                     },
                 ];
             })
@@ -297,7 +320,7 @@ export class TimeSeriesSpecFactory {
                 mapSeries((series, i) => {
                     const hoverName = makeHoverName(i);
                     const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.3`;
-                    const scales = getScales(i);
+                    const scales = makeScales(i);
                     const title = series.vizInfo.label;
                     const suffix = series.vizInfo.unitOfMeasure || "";
                     const thresholds = getSeriesThresholds(series);

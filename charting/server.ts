@@ -13,7 +13,6 @@ import {
   SeriesData,
   DataSetSeries,
 } from "./common";
-import { applySensorMetaConfiguration } from "./vega/customizations";
 
 import { ChartSettings } from "./vega/SpecFactory";
 import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
@@ -71,7 +70,6 @@ class RangeChart extends Chart {
   finalize(allSeries): any[] {
     const factory = new RangeSpecFactory(allSeries, this.settings);
     const spec = factory.create();
-    applySensorMetaConfiguration(spec, allSeries);
     return [vegaLite.compile(spec).spec];
   }
 }
@@ -80,7 +78,6 @@ class HistogramChart extends Chart {
   finalize(allSeries): any[] {
     const factory = new HistogramSpecFactory(allSeries, this.settings);
     const spec = factory.create();
-    applySensorMetaConfiguration(spec, allSeries);
     return [vegaLite.compile(spec as any).spec];
   }
 }
