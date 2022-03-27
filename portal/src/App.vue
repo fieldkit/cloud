@@ -87,12 +87,9 @@ body {
     margin: 0;
     padding: 0;
     flex-shrink: 0;
-
-    * {
-        color: var(--color-dark);
-        font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-    }
+    color: var(--color-dark);
+    font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
 
     &.floodnet {
         --color-primary: #{$color-floodnet-primary};
@@ -106,11 +103,6 @@ body {
         // v-calendar overwrite
         --blue-600: #{$color-floodnet-primary};
         --blue-200: #{lighten($color-floodnet-primary, 11%)};
-
-        * {
-            color: var(--color-dark);
-            font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
-        }
     }
 }
 
