@@ -112,7 +112,7 @@ export class ScrubberSpecFactory {
             resolve: {
                 axis: {
                     x: "shared",
-                    y: "shared",
+                    y: this.allSeries.length > 1 ? "independent" : "shared",
                 },
             },
         };
