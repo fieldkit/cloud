@@ -246,6 +246,7 @@ export default Vue.extend({
 .tiptap-container {
     width: 100%;
     padding-right: 65px;
+    text-align: justify;
 }
 
 .tiptap-editing {
@@ -254,6 +255,7 @@ export default Vue.extend({
     max-height: 70vh;
     overflow-y: auto;
     padding-left: 10px;
+    padding-right: 80px;
 
     @include bp-down($sm) {
         max-height: 60vh;
