@@ -16,7 +16,8 @@ export class ScrubberSpecFactory {
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
-                    labelColor: "#6a6d71",
+                    labelColor: "#2c3e50",
+                    titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
                     titlePadding: 20,
