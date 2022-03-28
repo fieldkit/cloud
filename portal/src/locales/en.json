@@ -339,5 +339,7 @@
             "part2": "Log in",
             "part3": "in order to leave comments"
         }
-    }
+    },
+    "seeMore": "See more",
+    "seeLess": "See less"
 }

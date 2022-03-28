@@ -1,7 +1,15 @@
 <template>
     <div :class="'tiptap-container' + (readonly ? ' tiptap-reading' : ' tiptap-editing')">
         <div class="tiptap-row">
-            <div class="tiptap-main"><editor-content :editor="editor" /></div>
+            <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
+                <editor-content :editor="editor" />
+                <div v-if="seeMore" class="see-more">
+                    <button @click="toggleSeeMore(true)">{{ $t("seeMore") }}</button>
+                </div>
+                <div v-if="seeLess" class="see-more">
+                    <button @click="toggleSeeMore(false)">{{ $t("seeLess") }}</button>
+                </div>
+            </div>
             <div class="tiptap-side" v-if="!readonly && !empty">
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
@@ -51,9 +59,13 @@ export default Vue.extend({
     },
     data(): {
         editor: Editor | null;
+        seeMore: boolean;
+        seeLess: boolean;
     } {
         return {
             editor: null,
+            seeMore: false,
+            seeLess: false,
         };
     },
     watch: {
@@ -185,6 +197,10 @@ export default Vue.extend({
                 console.log("editor-focus");
             },
         });
+
+        setTimeout(() => {
+            this.truncate();
+        });
     },
     beforeDestroy() {
         if (this.editor) {
@@ -200,6 +216,27 @@ export default Vue.extend({
                 this.$emit("save");
             }
         },
+        truncate() {
+            if (!this.readonly) {
+                return false;
+            }
+
+            const contentContainerEl = this.$refs.contentContainer as HTMLElement;
+
+            if (contentContainerEl.offsetHeight < contentContainerEl.scrollHeight) {
+                this.seeMore = true;
+                contentContainerEl.classList.add("truncated");
+            } else {
+                this.seeMore = false;
+                contentContainerEl.classList.remove("truncated");
+            }
+        },
+        toggleSeeMore(show: boolean) {
+            const contentContainerEl = this.$refs.contentContainer as HTMLElement;
+            contentContainerEl.classList.toggle("truncated");
+            this.seeMore = !show;
+            this.seeLess = show;
+        },
     },
 });
 </script>
@@ -208,6 +245,7 @@ export default Vue.extend({
 
 .tiptap-container {
     width: 100%;
+    padding-right: 65px;
 }
 
 .tiptap-editing {
@@ -215,7 +253,7 @@ export default Vue.extend({
     border: solid 1px #d8dce0;
     max-height: 70vh;
     overflow-y: auto;
-    padding-right: 45px;
+    padding-left: 10px;
 
     @include bp-down($sm) {
         max-height: 60vh;
@@ -298,6 +336,13 @@ export default Vue.extend({
 
     .tiptap-main {
         width: 100%;
+
+        &.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 8;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     }
 
     .tiptap-side {
@@ -317,6 +362,29 @@ export default Vue.extend({
             font-weight: 900;
             font-size: 14px;
         }
+    }
+}
+
+.see-more {
+    position: absolute;
+    right: -6px;
+    bottom: 1px;
+    z-index: $z-index-top;
+    background: linear-gradient(to right, rgba(1, 1, 1, 0) 10%, #fff);
+
+    .body.floodnet & {
+        bottom: 0;
+    }
+
+    button {
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--color-primary);
+        background-color: transparent;
+        border: 0;
+        font-family: var(--font-family-bold);
+        white-space: nowrap;
     }
 }
 </style>
