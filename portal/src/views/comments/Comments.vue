@@ -616,7 +616,7 @@ header {
     button {
         font-weight: 500;
         margin-right: 20px;
-        @include flex(flex-start);
+        @include flex(center);
     }
 
     .icon {
@@ -627,6 +627,10 @@ header {
     .icon-view-data {
         font-size: 14px;
         margin-right: 6px;
+    }
+
+    .icon-reply {
+        margin-top: -2px;
     }
 }
 
