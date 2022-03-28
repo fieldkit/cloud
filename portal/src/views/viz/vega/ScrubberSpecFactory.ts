@@ -20,7 +20,7 @@ export class ScrubberSpecFactory {
                     titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
-                    titlePadding: 20,
+                    titlePadding: 10,
                     tickSize: 10,
                     tickOpacity: 0,
                 },
@@ -43,6 +43,8 @@ export class ScrubberSpecFactory {
                     type: "temporal",
                     axis: {
                         formatType: "time",
+                        labelPadding: -14,
+                        titlePadding: 5,
                         tickCount: 8,
                         grid: false,
                     },

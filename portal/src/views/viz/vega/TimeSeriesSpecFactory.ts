@@ -134,6 +134,7 @@ export class TimeSeriesSpecFactory {
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
                         tickCount: 5,
+                        titlePadding: 10,
                         domain: makeDomain(series),
                         titleOpacity: {
                             signal: hoverCheck,

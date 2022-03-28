@@ -91,6 +91,8 @@ export class TimeSeriesSpecFactory {
                 const hoverName = makeHoverName(i);
                 const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.1`;
                 return {
+                    titleColor: "#2c3e50",
+                    labelColor: "#2c3e50",
                     title: series.vizInfo.label,
                     stroke: makeStrokeName(i),
                     orient: "top",
@@ -132,6 +134,7 @@ export class TimeSeriesSpecFactory {
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
                         tickCount: 5,
+                        titlePadding: 10,
                         domain: makeDomain(series),
                         titleOpacity: {
                             signal: hoverCheck,
@@ -768,7 +771,8 @@ export class TimeSeriesSpecFactory {
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
-                    labelColor: "#6a6d71",
+                    labelColor: "#2c3e50",
+                    titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
                     titlePadding: 20,
