@@ -4,11 +4,10 @@
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
                 <div v-if="seeMore" class="see-more">
-                    ...
-                    <button @click="toggleSeeMore(true)">See more</button>
+                    <button @click="toggleSeeMore(true)">{{ $t("seeMore") }}</button>
                 </div>
                 <div v-if="seeLess" class="see-more">
-                    <button @click="toggleSeeMore(false)">See less</button>
+                    <button @click="toggleSeeMore(false)">{{ $t("seeLess") }}</button>
                 </div>
             </div>
             <div class="tiptap-side" v-if="!readonly && !empty">
@@ -246,6 +245,7 @@ export default Vue.extend({
 
 .tiptap-container {
     width: 100%;
+    padding-right: 65px;
 }
 
 .tiptap-editing {
@@ -253,7 +253,7 @@ export default Vue.extend({
     border: solid 1px #d8dce0;
     max-height: 70vh;
     overflow-y: auto;
-    padding-right: 65px;
+    padding-left: 10px;
 
     @include bp-down($sm) {
         max-height: 60vh;
@@ -332,14 +332,13 @@ export default Vue.extend({
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
-    padding: 0 13px 0 13px;
 
     .tiptap-main {
         width: 100%;
 
         &.truncated {
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 8;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -367,12 +366,18 @@ export default Vue.extend({
 
 .see-more {
     position: absolute;
-    right: 15px;
-    bottom: 0;
+    right: -6px;
+    bottom: 1px;
     z-index: $z-index-top;
     background: linear-gradient(to right, rgba(1, 1, 1, 0) 10%, #fff);
 
+    .body.floodnet & {
+        bottom: 0;
+    }
+
     button {
+        font-size: 14px;
+        line-height: 1;
         cursor: pointer;
         color: var(--color-primary);
         background-color: transparent;
