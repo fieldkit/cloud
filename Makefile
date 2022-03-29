@@ -35,9 +35,6 @@ default: setup binaries jstests gotests charting-tests
 
 setup: portal/src/secrets.ts
 
-charting/vega:
-	mkdir -p charting/vega
-
 charting/node_modules:
 	cd charting && $(JSPKG) install
 
