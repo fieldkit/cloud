@@ -98,6 +98,7 @@ export class TimeSeriesSpecFactory {
                     orient: "top",
                     direction: "horizontal",
                     symbolType: "stroke",
+                    padding: 10,
                     labelOpacity: {
                         signal: hoverCheck,
                     },
