@@ -3,6 +3,7 @@ import Vue from "vue";
 
 import { Workspace, Group, Viz, HasSensorParams, FastTime, ChartType, TimeZoom, GeoZoom, Bookmark } from "./viz";
 import { VizGroup } from "./VizGroup";
+import {ForbiddenError} from "@/api";
 
 export const VizWorkspace = Vue.extend({
     components: {
@@ -21,8 +22,8 @@ export const VizWorkspace = Vue.extend({
         if (this.workspace.allStationIds.length == 1) {
             console.log(`viz: include-associated(1)`, this.workspace.allStationIds.length);
             const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]).catch(async (e) => {
-                if (e.name === "ForbiddenError") {
-                    await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
+                if (ForbiddenError.isInstance(e)) {
+                    await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) }, query: { after: this.$route.path }  });
                 }
             });
             if (associated) {

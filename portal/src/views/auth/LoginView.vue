@@ -120,11 +120,12 @@ export default Vue.extend({
         width: 460px;
         background-color: #f4f5f7;
         box-sizing: border-box;
-        padding: 10px 15px;
+        padding: 15px 15px;
         max-width: calc(100vw - 20px);
         align-items: center;
         justify-content: center;
         margin-bottom: 80px;
+        line-height: 1.5;
 
         > img {
             margin-right: 10px;

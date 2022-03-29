@@ -46,6 +46,7 @@ import ProjectActivity from "./ProjectActivity.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
+import {AuthenticationRequiredError, ForbiddenError} from "@/api";
 
 export default Vue.extend({
     name: "ProjectView",
@@ -104,8 +105,8 @@ export default Vue.extend({
     },
     beforeMount() {
         return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id }).catch((e) => {
-            if (e.name === "ForbiddenError") {
-                return this.$router.push({ name: "login", params: { errorMessage: this.$t("login.privateProject") } });
+            if (ForbiddenError.isInstance(e)) {
+                return this.$router.push({ name: "login", params: { errorMessage: this.$t("login.privateProject") }, query: { after: this.$route.path }  });
             }
         });
     },
