@@ -61,6 +61,7 @@ type Config struct {
 	EmailOverride         string   `split_words:"true" default:""`
 	Archiver              string   `split_words:"true" default:"default" required:"true"`
 	PortalRoot            string   `split_words:"true"`
+	WellKnownRoot         string   `split_words:"true"`
 	Domain                string   `split_words:"true" default:"fklocal.org:8080" required:"true"`
 	HttpScheme            string   `split_words:"true" default:"https"`
 	ApiDomain             string   `split_words:"true" default:""`
@@ -337,7 +338,7 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
-	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain, "portal_root", config.PortalRoot).
+	log.With("api_domain", config.ApiDomain, "api", config.ApiHost, "portal_domain", config.PortalDomain).
 		With("media_buckets", config.MediaBuckets, "streams_buckets", config.StreamsBuckets).
 		With("email_override", config.EmailOverride).
 		Infow("config")
@@ -359,19 +360,26 @@ func main() {
 	defer theApi.Close()
 
 	notFoundHandler := http.NotFoundHandler()
+	wellKnownServer := http.NotFoundHandler()
 
 	portalServer := notFoundHandler
 	if config.PortalRoot != "" {
-		singlePageApplication, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
+		log.Infow("config:static", "portal_root", config.PortalRoot)
+
+		spa, err := singlepage.NewSinglePageApplication(singlepage.SinglePageApplicationOptions{
 			Root: config.PortalRoot,
 		})
 		if err != nil {
 			panic(err)
 		}
 
-		portalServer = singlePageApplication
-	} else {
-		log.Infow("portal spa disabled")
+		portalServer = spa
+	}
+
+	if config.WellKnownRoot != "" {
+		log.Infow("config:static", "well_known_root", config.WellKnownRoot)
+
+		wellKnownServer = http.StripPrefix("/.well-known/", http.FileServer(http.Dir(config.WellKnownRoot)))
 	}
 
 	_, err = api.AuthorizationHeaderMiddleware(config.SessionKey)
@@ -391,6 +399,7 @@ func main() {
 	rootRouter := mux.NewRouter()
 	rootRouter.Handle("/status", statusFinal)
 	rootRouter.Handle("/robots.txt", robotsFinal)
+	rootRouter.PathPrefix("/.well-known").Handler(wellKnownServer)
 
 	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost)
 	twitterHandlerFactory.Register(rootRouter)
