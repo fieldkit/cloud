@@ -45,7 +45,7 @@ class Chart {
       return new SeriesData(
         data.key,
         new DataSetSeries(vizSensor, data),
-        data.data,
+        data,
         vizInfo
       );
     });
