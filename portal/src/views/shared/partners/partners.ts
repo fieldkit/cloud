@@ -1,8 +1,3 @@
-interface Route {
-    name: string;
-    params: { id: number };
-}
-
 export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
