@@ -393,8 +393,6 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 }
 
 func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (summaries map[string]*AggregateSummary, name string, err error) {
-	log := Logger(ctx).Sugar()
-
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
@@ -404,41 +402,43 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	}
 
 	for _, name := range handlers.AggregateNames {
-		summary := &AggregateSummary{}
+		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
 
-		if qp.Complete {
-			interval := handlers.AggregateIntervals[name]
-			duration := qp.End.Sub(qp.Start)
-			maximumRecords := int64(duration.Seconds()) / int64(interval)
-
-			summary.Start = data.NumericWireTimePtr(&qp.Start)
-			summary.End = data.NumericWireTimePtr(&qp.End)
-			summary.NumberRecords = maximumRecords
-
-			log.Infow("aggregate", "maximum", maximumRecords, "records", summary.NumberRecords, "duration", duration)
-		} else {
-			table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
-
-			query, args, err := sqlx.In(fmt.Sprintf(`
+		query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT
 			MIN(time) AS start,
 			MAX(time) AS end,
 			COUNT(*) AS number_records
-			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?);
 			`, table), qp.Start, qp.End, qp.Stations, moduleIds, sensorIds)
-			if err != nil {
-				return nil, "", err
-			}
+		if err != nil {
+			return nil, "", err
+		}
 
-			if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
-				return nil, "", err
+		summary := &AggregateSummary{}
+		if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
+			return nil, "", err
+		}
+
+		// Queried records depends on if we're doing a complete query,
+		// filling in missing samples.
+		queriedRecords := summary.NumberRecords
+
+		if qp.Complete {
+			if summary.Start != nil && summary.End != nil {
+				interval := handlers.AggregateIntervals[name]
+				duration := summary.End.Time().Sub(summary.Start.Time())
+				queriedRecords = int64(duration.Seconds()) / int64(interval)
+
+				log := Logger(ctx).Sugar()
+				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords, "duration", duration)
 			}
 		}
 
 		summaries[name] = summary
 
 		if qp.Resolution > 0 {
-			if summary.NumberRecords < int64(qp.Resolution) {
+			if queriedRecords < int64(qp.Resolution) {
 				selectedAggregateName = name
 			}
 		}
