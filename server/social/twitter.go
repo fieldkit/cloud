@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 
@@ -36,17 +37,34 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	return nil
 }
 
-func (s *TwitterSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
 	meta := make(map[string]string)
+
+	w := 800
+	h := 400
+
+	if str := req.URL.Query().Get("w"); str != "" {
+		v, err := strconv.Atoi(str)
+		if err == nil {
+			w = v
+		}
+	}
+
+	if str := req.URL.Query().Get("h"); str != "" {
+		v, err := strconv.Atoi(str)
+		if err == nil {
+			h = v
+		}
+	}
 
 	meta["twitter:card"] = "summary_large_image"
 	meta["twitter:site"] = "@FieldKitOrg"
 	meta["twitter:title"] = payload.title
 	meta["twitter:description"] = payload.description
 	meta["twitter:image:alt"] = payload.description
-	meta["twitter:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, 800*2, 418*2)
+	meta["twitter:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, w, h)
 
-	if err := serveMeta(w, req, meta); err != nil {
+	if err := serveMeta(rw, req, meta); err != nil {
 		return err
 	}
 
