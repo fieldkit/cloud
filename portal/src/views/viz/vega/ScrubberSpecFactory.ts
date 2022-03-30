@@ -23,8 +23,10 @@ export class ScrubberSpecFactory {
                     titlePadding: 10,
                     tickSize: 10,
                     tickOpacity: 0,
+                    domain: false,
                 },
                 axisX: {
+                    title: null,
                     tickSize: 20,
                 },
                 view: {
