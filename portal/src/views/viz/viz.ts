@@ -562,10 +562,10 @@ export class Querier {
         console.log(`vis: query-info`, key);
 
         if (this.info[key]) {
-            iq.howBusy(1);
+            // iq.howBusy(1);
 
             return promiseAfter(1).then(() => {
-                iq.howBusy(-1);
+                // iq.howBusy(-1);
                 return this.info[key];
             });
         }
@@ -597,11 +597,11 @@ export class Querier {
         console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
-            vq.howBusy(1);
+            // vq.howBusy(1);
 
             return promiseAfter(1).then(() => {
                 vq.resolve(this.data[key]);
-                vq.howBusy(-1);
+                // vq.howBusy(-1);
                 return this.data[key];
             });
         }
@@ -977,7 +977,7 @@ export class Workspace implements VizInfoFactory {
         }
 
         console.log(`viz: update-from-bookmark`, bm);
-        await this.addStationIds(bm.s, false);
+        await this.addStationIds(bm.s);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;

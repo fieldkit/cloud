@@ -162,10 +162,11 @@ export default Vue.extend({
             return this.workspace.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
-            console.log("viz: bookmark-change", bookmark);
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
+                console.log("viz: bookmark-no-change", bookmark);
                 return Promise.resolve(this.workspace);
             }
+            console.log("viz: bookmark-change", bookmark);
             await this.openBookmark(bookmark);
         },
         async openBookmark(bookmark: Bookmark): Promise<void> {
