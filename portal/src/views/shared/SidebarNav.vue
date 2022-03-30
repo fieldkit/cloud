@@ -68,8 +68,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
-import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
+import { StationOrSensor, interpolatePartner, isCustomisationEnabled } from "./partners";
 
 export default Vue.extend({
     name: "SidebarNav",

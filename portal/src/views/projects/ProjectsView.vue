@@ -29,7 +29,7 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
-import { getPartnerForcedLandingPage } from "@/views/shared/PartnerCustomisationHelper";
+import { getPartnerForcedLandingPage } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectsView",

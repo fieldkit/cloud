@@ -8,8 +8,7 @@
 import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
-import { FKPartnersEnum } from "@/views/shared/PartnerCustomisationHelper";
-import { isCustomisationEnabledFor } from "@/views/shared/PartnerCustomisationHelper";
+import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
 
 export default Vue.extend({
     async beforeMount(): Promise<void> {
@@ -20,14 +19,19 @@ export default Vue.extend({
             console.log("initialize error", err, err.stack);
         }
     },
-    mounted() {
+    mounted(): void {
         this.setCustomFavicon();
         this.setCustomPageTitle();
     },
-    beforeUpdate() {
+    computed: {
+        partnerCustomization(): PartnerCustomization | null {
+            return getPartnerCustomization();
+        },
+    },
+    beforeUpdate(): void {
         this.applyCustomClasses();
     },
-    errorCaptured(err, vm, info): boolean {
+    errorCaptured(err): boolean {
         console.log("vuejs:error-captured", JSON.stringify(err));
         if (AuthenticationRequiredError.isInstance(err)) {
             this.$router.push({ name: "login", query: { after: this.$route.path } });
@@ -37,20 +41,19 @@ export default Vue.extend({
     },
     methods: {
         applyCustomClasses(): void {
-            if (window.location.hostname.indexOf("floodnet.") === 0) {
-                document.body.classList.add(FKPartnersEnum.floodnet);
+            if (this.partnerCustomization != null) {
+                document.body.classList.add(this.partnerCustomization.class);
             }
         },
         setCustomFavicon(): void {
             const faviconEl = document.getElementById("favicon") as HTMLAnchorElement;
-
-            if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
-                faviconEl.href = window.location.origin + "/favicon-floodnet.ico";
+            if (this.partnerCustomization != null) {
+                faviconEl.href = window.location.origin + this.partnerCustomization.icon;
             }
         },
         setCustomPageTitle(): void {
-            if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
-                document.title = "Data Dashboard - Floodnet";
+            if (this.partnerCustomization != null) {
+                document.title = this.partnerCustomization.title;
             }
         },
     },

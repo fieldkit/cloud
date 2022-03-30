@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { interpolatePartner } from "./PartnerCustomisationHelper";
+import { interpolatePartner } from "./partners";
 
 export default Vue.extend({
     name: "Logo",
@@ -20,6 +20,4 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

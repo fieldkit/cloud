@@ -3,8 +3,7 @@
 </template>
 <script>
 import Vue from "@/store/strong-vue";
-import { FKPartnersEnum } from "@/views/shared/PartnerCustomisationHelper";
-import { isCustomisationEnabledFor } from "./PartnerCustomisationHelper";
+import { getPartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "Zoho",
@@ -13,7 +12,7 @@ export default Vue.extend({
             console.log("zoho:disabled");
             return;
         }
-        if (isCustomisationEnabledFor(FKPartnersEnum.floodnet)) {
+        if (getPartnerCustomization() != null) {
             console.log("zoho:disabled");
             return;
         }
