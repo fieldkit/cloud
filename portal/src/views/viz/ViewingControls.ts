@@ -240,10 +240,10 @@ export const ViewingControls = Vue.extend({
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
-                const rangeViz = this.viz.visible;
+                const rangeViz = this.viz.visibleTimeRange;
                 const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                    console.log("viz: raising viz-time-zoomed");
+                    console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("viz: swallowing viz-time-zoomed");

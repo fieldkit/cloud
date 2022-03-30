@@ -263,6 +263,7 @@ export class NewParams implements HasSensorParams {
 export class Graph extends Viz {
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
+    public queried: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
@@ -776,9 +777,13 @@ export class Workspace implements VizInfoFactory {
     }
 
     public async addStationIds(ids: number[]): Promise<Workspace> {
+        if (_.difference(ids, this.stationIds).length == 0) {
+            console.log("viz: workspace-add-station-ids(ignored)", ids);
+            return this;
+        }
         this.stationIds = [...this.stationIds, ...ids];
         console.log("viz: workspace-add-station-ids", this.stationIds);
-        return this.query();
+        return this;
     }
 
     private findGroup(viz: Viz): Group {
@@ -970,7 +975,9 @@ export class Workspace implements VizInfoFactory {
             console.log(`viz: update-from-bookmark:same`, bm);
             return;
         }
+
         console.log(`viz: update-from-bookmark`, bm);
+        await this.addStationIds(bm.s, false);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;
