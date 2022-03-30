@@ -24,11 +24,12 @@
     </StandardLayout>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
+import { getPartnerForcedLandingPage } from "@/views/shared/PartnerCustomisationHelper";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -48,11 +49,14 @@ export default Vue.extend({
             publicProjects: (s) => Object.values(s.stations.community.projects),
         }),
     },
-    mounted() {
+    async mounted(): Promise<void> {
+        const forcedLandingPage = getPartnerForcedLandingPage();
+        if (forcedLandingPage != null) {
+            await this.$router.push(forcedLandingPage);
+            return;
+        }
         if (this.isAuthenticated) {
-            return this.$services.api.getInvitesByUser().then((invites) => {
-                this.invites = invites;
-            });
+            this.invites = await this.$services.api.getInvitesByUser();
         }
     },
     methods: {
