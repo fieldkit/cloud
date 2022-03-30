@@ -8,7 +8,7 @@
                 <div class="detail-container">
                     <h3 class="detail-title">{{ project.name }}</h3>
                     <div class="detail-description">{{ project.description }}</div>
-                    <router-link :to="{ name: 'viewProject' }" class="link">Project Dashboard ></router-link>
+                    <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
                 </div>
             </div>
             <div class="container-map">
