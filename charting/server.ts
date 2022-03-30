@@ -11,13 +11,22 @@ import {
   QueriedData,
   VizInfo,
   SeriesData,
+  VizSensor,
   DataSetSeries,
 } from "./common";
+
+import { ModuleSensorMeta } from "./api";
 
 import { ChartSettings } from "./vega/SpecFactory";
 import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
 import { HistogramSpecFactory } from "./vega/HistogramSpecFactory";
 import { RangeSpecFactory } from "./vega/RangeSpecFactory";
+
+interface ResponseRow {
+  vizSensor: VizSensor;
+  sensor: ModuleSensorMeta;
+  station: { name: string; location: [number, number] | null };
+}
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
 const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
@@ -26,7 +35,7 @@ class Chart {
   constructor(public readonly settings: ChartSettings) {}
 
   prepare(metaResponses, dataResponses) {
-    const allSeries = metaResponses.map((row, index) => {
+    const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
       const { vizSensor, sensor, station } = row;
       const name = sensor.strings["en-us"]["label"] || "Unknown";
       const data = dataResponses[index];

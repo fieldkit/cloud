@@ -157,7 +157,7 @@ export class VizInfo {
     constructor(
         public readonly key: string,
         public readonly colorScale: ColorScale,
-        public readonly station: { name: string; location: [number, number] },
+        public readonly station: { name: string; location: [number, number] | null },
         public readonly unitOfMeasure: string,
         public readonly firmwareKey: string,
         public readonly name: string,
