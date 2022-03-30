@@ -55,17 +55,17 @@ func matchUserAgent(partial string) mux.MatcherFunc {
 	}
 }
 
-const metaOnlyTemplate = `
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		{{- range $key, $value := .Metas }}
-		<meta name="{{ $key }}" content="{{ $value }}" />
-		{{- end -}}
-	</head>
-	<body>
-	</body>
+const metaOnlyTemplate = `<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {{- range $key, $value := .Metas }}
+        <meta name="{{ $key }}" content="{{ $value }}" />
+        {{- end }}
+    </head>
+    <body>Intentionally left blank.</body>
 </html>`
 
 func serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {

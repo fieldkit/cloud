@@ -9,7 +9,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { TranslateResult } from "vue-i18n";
-import { isCustomisationEnabled } from "../PartnerCustomisationHelper";
+import { isCustomisationEnabled } from "./partners";
 
 // Keeping this logic in this file.
 export function callStationsStations() {

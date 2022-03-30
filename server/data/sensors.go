@@ -14,6 +14,14 @@ type Sensor struct {
 
 type NumericWireTime time.Time
 
+func NumericWireTimePtr(t *time.Time) *NumericWireTime {
+	if t == nil {
+		return nil
+	}
+	nwt := NumericWireTime(*t)
+	return &nwt
+}
+
 func (nw *NumericWireTime) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("%v", time.Time(*nw).Unix()*1000)), nil
 }

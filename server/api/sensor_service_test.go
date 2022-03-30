@@ -94,7 +94,8 @@ func TestGetSensorsData(t *testing.T) {
 	{
 		"summaries": "<<PRESENCE>>",
 		"aggregate": "<<PRESENCE>>",
-		"data": "<<PRESENCE>>"
+		"data": "<<PRESENCE>>",
+		"outer": "<<PRESENCE>>"
 	}`)
 }
 

@@ -92,7 +92,12 @@ export default Vue.extend({
         },
         async leaveAfterAuth(): Promise<void> {
             const after = this.forwardAfterQuery;
-            const params = JSON.parse(this.$route.query.params as string);
+            let params;
+
+            if (this.$route.query.params) {
+                params = JSON.parse(this.$route.query.params as string);
+            }
+
             if (after.after) {
                 await this.$router.push({ path: after.after, query: params }).catch((e) => {
                     console.log(e);
@@ -115,11 +120,12 @@ export default Vue.extend({
         width: 460px;
         background-color: #f4f5f7;
         box-sizing: border-box;
-        padding: 10px 15px;
+        padding: 15px 15px;
         max-width: calc(100vw - 20px);
         align-items: center;
         justify-content: center;
         margin-bottom: 80px;
+        line-height: 1.5;
 
         > img {
             margin-right: 10px;

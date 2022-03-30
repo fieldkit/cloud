@@ -52,7 +52,7 @@
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { DisplayProject } from "@/store";
-import { isCustomisationEnabled } from "@/views/shared/PartnerCustomisationHelper";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectActivity",

@@ -24,7 +24,7 @@
     </StandardLayout>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
@@ -48,11 +48,9 @@ export default Vue.extend({
             publicProjects: (s) => Object.values(s.stations.community.projects),
         }),
     },
-    mounted() {
+    async mounted(): Promise<void> {
         if (this.isAuthenticated) {
-            return this.$services.api.getInvitesByUser().then((invites) => {
-                this.invites = invites;
-            });
+            this.invites = await this.$services.api.getInvitesByUser();
         }
     },
     methods: {

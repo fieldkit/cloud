@@ -2,7 +2,9 @@ package social
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 
@@ -27,6 +29,13 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	meta["twitter:description"] = payload.project.Description
 	meta["twitter:image:alt"] = payload.project.Description
 	meta["twitter:image"] = payload.photoUrl
+	meta["twitter:url"] = req.URL.String()
+
+	meta["og:url"] = meta["twitter:url"]
+	meta["og:title"] = meta["twitter:title"]
+	meta["og:description"] = meta["twitter:description"]
+	meta["og:image"] = meta["twitter:image"]
+	meta["og:image:alt"] = meta["twitter:image:alt"]
 
 	if err := serveMeta(w, req, meta); err != nil {
 		return err
@@ -35,17 +44,40 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	return nil
 }
 
-func (s *TwitterSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+func parseDimensionParam(req *http.Request, name string, d int) int {
+	if str := req.URL.Query().Get(name); str != "" {
+		v, err := strconv.Atoi(str)
+		if err == nil {
+			return v
+		}
+	}
+	return d
+}
+
+func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
 	meta := make(map[string]string)
+
+	w := parseDimensionParam(req, "w", 800)
+	h := parseDimensionParam(req, "w", 400)
 
 	meta["twitter:card"] = "summary_large_image"
 	meta["twitter:site"] = "@FieldKitOrg"
 	meta["twitter:title"] = payload.title
+	meta["twitter:domain"] = ""
 	meta["twitter:description"] = payload.description
 	meta["twitter:image:alt"] = payload.description
-	meta["twitter:image"] = payload.photoUrl
+	meta["twitter:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, w, h)
+	meta["twitter:url"] = req.URL.String()
 
-	if err := serveMeta(w, req, meta); err != nil {
+	meta["og:url"] = meta["twitter:url"]
+	meta["og:title"] = meta["twitter:title"]
+	meta["og:description"] = meta["twitter:description"]
+	meta["og:image"] = meta["twitter:image"]
+	meta["og:image:alt"] = meta["twitter:image:alt"]
+	meta["og:image:width"] = fmt.Sprintf("%d", w)
+	meta["og:image:height"] = fmt.Sprintf("%d", h)
+
+	if err := serveMeta(rw, req, meta); err != nil {
 		return err
 	}
 

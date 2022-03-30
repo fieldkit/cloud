@@ -1,11 +1,9 @@
 import _ from "lodash";
 import Vue from "vue";
-import i18n from "@/i18n";
 
-import { TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace, FastTime, TimeZoom } from "./viz";
+import { Graph, Workspace, FastTime, TimeZoom, SeriesData } from "./viz";
 
-import HistogramChart from "./vega/Histogram.vue";
+import HistogramChart from "./vega/HistogramChart.vue";
 
 export const VegaHistogram = Vue.extend({
     name: "VegaHistogram",
@@ -26,32 +24,32 @@ export const VegaHistogram = Vue.extend({
         },
     },
     computed: {
-        data(): QueriedData | null {
-            if (this.viz.dataSets.length > 0) {
-                return this.viz.dataSets[0].graphing;
-            }
-            return null;
+        allSeries(): SeriesData[] | null {
+            return this.viz.loadedDataSets.map((ds) => {
+                if (!ds.graphing) throw new Error(`viz: No data`);
+                const vizInfo = this.workspace.vizInfo(this.viz, ds);
+                return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
+            });
         },
-        label(): string {
-            const vizInfo = this.workspace.vizInfo(this.viz);
-            if (vizInfo.unitOfMeasure) {
-                return i18n.tc(vizInfo.firmwareKey) + " (" + _.capitalize(vizInfo.unitOfMeasure) + ")";
+        key(): string {
+            if (this.allSeries) {
+                return this.allSeries.map((s) => s.key).join(":");
             }
-            return i18n.tc(vizInfo.firmwareKey);
+            return "";
         },
     },
     methods: {
-        onDouble() {
-            return this.raiseTimeZoomed(new TimeZoom(FastTime.All, null));
+        onDouble(): void {
+            this.raiseTimeZoomed(new TimeZoom(FastTime.All, null));
         },
-        raiseTimeZoomed(newTimes: TimeZoom) {
-            return this.$emit("viz-time-zoomed", newTimes);
+        raiseTimeZoomed(newTimes: TimeZoom): void {
+            this.$emit("viz-time-zoomed", newTimes);
         },
     },
     template: `
         <div class="viz">
-            <div class="chart" @dblclick="onDouble" v-if="data">
-                <HistogramChart :data="{ data: data.data }" :label="label" v-bind:key="data.key" />
+            <div class="chart" @dblclick="onDouble">
+                <HistogramChart :series="allSeries" v-bind:key="key" />
             </div>
         </div>
     `,

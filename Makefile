@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 32
+VERSION_PATCH = 33
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -31,20 +31,17 @@ WORKING_DIRECTORY ?= $(shell pwd)
 SERVER_SOURCES = $(shell find server -type f -name '*.go')
 DOCKER_TAG ?= main
 
-default: setup binaries jstests gotests charting-shared
+default: setup binaries jstests gotests charting-tests
 
 setup: portal/src/secrets.ts
 
-charting-shared: charting/customizations.ts charting/api.ts charting/common.ts
+charting/node_modules:
+	cd charting && $(JSPKG) install
 
-charting/customizations.ts: portal/src/views/viz/vega/customizations.ts
-	cp $^ $@
+charting-setup: charting/node_modules
 
-charting/api.ts: portal/src/views/viz/api.ts
-	cp $^ $@
-
-charting/common.ts: portal/src/views/viz/common.ts
-	cp $^ $@
+charting-tests: charting-setup
+	cd charting && tsc --esModuleInterop -t es5 server.ts
 
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
@@ -154,7 +151,7 @@ run-server: server
 migrate-up:
 	cd migrations && PGURL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
 
-ci: setup binaries jstests
+ci: setup binaries jstests charting-setup
 
 ci-db-tests:
 	rm -rf active-schema

@@ -15,7 +15,7 @@ timestamps {
 
 			stage ('dbcopy') {
 				sh "rm -rf *.bz2"
-				sh "docker run --rm postgres pg_dump -T 'fieldkit.aggregated_old_*' '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
+				sh "docker run --log-driver none --rm postgres pg_dump -T 'fieldkit.aggregated_old_*' '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
 			}
 
 			stage ('archive') {
@@ -25,7 +25,7 @@ timestamps {
 			notifySuccess()
 		}
 		catch (Exception e) {
-			notifyFailure()
+			notifyFailure(e)
 			throw e
 		}
 	}

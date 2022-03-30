@@ -8,7 +8,7 @@
                 <div class="detail-container">
                     <h3 class="detail-title">{{ project.name }}</h3>
                     <div class="detail-description">{{ project.description }}</div>
-                    <router-link :to="{ name: 'viewProject' }" class="link">Project Dashboard ></router-link>
+                    <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
                 </div>
             </div>
             <div class="container-map">
@@ -33,12 +33,12 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 import * as ActionTypes from "@/store/actions";
 import * as utils from "../../utilities";
-import { ProjectModule, DisplayStation, Project, DisplayProject, MappedStations, BoundingRectangle } from "@/store";
+import { ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
 import StationsMap from "../shared/StationsMap.vue";
 import StationSummary from "@/views/shared/StationSummary.vue";
 import CommonComponents from "@/views/shared";
@@ -68,9 +68,6 @@ export default Vue.extend({
             required: true,
             type: Number,
         },
-    },
-    mounted() {
-        console.log(this.$getters.projectsById);
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),

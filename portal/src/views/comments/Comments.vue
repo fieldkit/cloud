@@ -465,6 +465,7 @@ header {
 
 ::v-deep .new-comment {
     @include flex(flex-end);
+    flex-wrap: wrap;
     padding: 22px 0;
     position: relative;
 
@@ -496,6 +497,10 @@ header {
         height: 30px;
     }
 
+    .button-submit {
+        margin-left: auto;
+    }
+
     &:not(.reply) {
         img {
             width: 46px;
@@ -513,6 +518,7 @@ header {
         width: 100%;
         position: relative;
         background-color: #fff;
+        flex: 0 0 calc(100% - 65px);
     }
 }
 
@@ -616,7 +622,7 @@ header {
     button {
         font-weight: 500;
         margin-right: 20px;
-        @include flex(flex-start);
+        @include flex(center);
     }
 
     .icon {
@@ -627,6 +633,10 @@ header {
     .icon-view-data {
         font-size: 14px;
         margin-right: 6px;
+    }
+
+    .icon-reply {
+        margin-top: -2px;
     }
 }
 
@@ -667,6 +677,7 @@ header {
 
     @include bp-down($xs) {
         margin-left: 0;
+        flex: 0 0 calc(100% - 65px);
     }
 
     * {
