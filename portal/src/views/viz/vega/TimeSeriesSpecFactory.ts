@@ -488,33 +488,27 @@ export class TimeSeriesSpecFactory {
             )
         );
 
-        const sizeDimensionSignals =
-            this.settings.w == 0
-                ? [
-                      {
-                          name: "width",
-                          init: "containerSize()[0]",
-                          on: [
-                              {
-                                  events: "window:resize",
-                                  update: "containerSize()[0]",
-                              },
-                          ],
-                      },
-                      {
-                          name: "height",
-                          init: "containerSize()[1]",
-                          on: [
-                              {
-                                  events: "window:resize",
-                                  update: "containerSize()[1]",
-                              },
-                          ],
-                      },
-                  ]
-                : [];
-
-        const signals = [
+        const interactiveSignals = [
+            {
+                name: "width",
+                init: "containerSize()[0]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[0]",
+                    },
+                ],
+            },
+            {
+                name: "height",
+                init: "containerSize()[1]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[1]",
+                    },
+                ],
+            },
             {
                 name: "hover",
                 value: {
@@ -740,7 +734,20 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const allSignals = [...sizeDimensionSignals, ...signals];
+        const staticSignals = [
+            {
+                name: "hover",
+                value: {
+                    name: makeHoverName(0),
+                },
+            },
+            {
+                name: "brush_x",
+                value: [],
+            },
+        ];
+
+        const allSignals = this.settings.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],
@@ -755,12 +762,12 @@ export class TimeSeriesSpecFactory {
 
     private buildSpec(signals: never[], data: never[], scales: never[], axes: never[], legends: never[], marks: never[], verbose = false) {
         if (verbose) {
-            console.log("viz:signals", signals);
-            console.log("viz:data", data);
-            console.log("viz:scales", scales);
-            console.log("viz:axes", axes);
-            console.log("viz:legends", legends);
-            console.log("viz:marks", marks);
+            console.log("viz: signals", signals);
+            console.log("viz: data", data);
+            console.log("viz: scales", scales);
+            console.log("viz: axes", axes);
+            console.log("viz: legends", legends);
+            console.log("viz: marks", marks);
         }
 
         return this.settings.apply({
