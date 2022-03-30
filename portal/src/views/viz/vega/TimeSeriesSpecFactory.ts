@@ -137,6 +137,7 @@ export class TimeSeriesSpecFactory {
                         tickCount: 5,
                         titlePadding: 10,
                         domain: makeDomain(series),
+                        domainOpacity: 0,
                         titleOpacity: {
                             signal: hoverCheck,
                         },
