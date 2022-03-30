@@ -157,7 +157,7 @@ export class VizInfo {
     constructor(
         public readonly key: string,
         public readonly colorScale: ColorScale,
-        public readonly station: { name: string; location: [number, number] },
+        public readonly station: { name: string; location: [number, number] | null },
         public readonly unitOfMeasure: string,
         public readonly firmwareKey: string,
         public readonly name: string,
@@ -234,7 +234,7 @@ export class QueriedData {
             aggregate: this.sdr.aggregate,
             data: this.sdr.data.filter((d) => d.sensorId),
         };
-        console.log(`viz:malformed`, this.sdr.data.length, filtered.data.length);
+        console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 
@@ -244,7 +244,7 @@ export class QueriedData {
             aggregate: this.sdr.aggregate,
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
-        console.log(`viz:duplicates`, this.sdr.data.length, filtered.data.length);
+        console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 }
@@ -269,7 +269,7 @@ export class DataSetSeries {
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
-            console.log(`viz:constrain:nope`, this.graphing.dataRange[1], range[1]);
+            console.log(`viz: constrain:nope`, this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;
@@ -280,7 +280,7 @@ export class SeriesData {
     constructor(
         public readonly key: string,
         public readonly ds: DataSetSeries,
-        public readonly data: DataRow[],
+        public readonly queried: QueriedData,
         public readonly vizInfo: VizInfo
     ) {}
 }

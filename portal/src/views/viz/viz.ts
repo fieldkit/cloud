@@ -146,7 +146,7 @@ class InfoQuery {
 }
 
 export class Scrubber {
-    constructor(public readonly index: number, public readonly data: QueriedData) {}
+    constructor(public readonly index: number, public readonly data: QueriedData, public readonly viz: Viz) {}
 }
 
 export class Scrubbers {
@@ -227,11 +227,11 @@ function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: G
                         const stations = v[0];
                         const sensors = v[1];
                         const fixed = _.concat([[[stations[0], sensors[0]]]], _.drop(v, 2));
-                        console.log("viz-migrate:b", v);
-                        console.log("viz-migrate:a", fixed);
+                        console.log("viz: migrate:b", v);
+                        console.log("viz: migrate:a", fixed);
                         return fixed;
                     }
-                    console.log("viz-migrate", v);
+                    console.log("viz: migrate", v);
                     return v;
                 })
             )
@@ -293,11 +293,16 @@ export class Graph extends Viz {
         return this.loadedDataSets.map((ds) => {
             if (!ds.graphing) throw new Error(`viz: No data`);
             const vizInfo = vizInfoFactory.vizInfo(this, ds);
-            return new SeriesData(ds.graphing.key, ds, ds.graphing.data, vizInfo);
+            return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
         });
     }
 
     public get visibleTimeRange(): TimeRange {
+        if (this.visible.isExtreme()) {
+            if (this.all) {
+                return new TimeRange(this.all.timeRange[0], this.all.timeRange[1]);
+            }
+        }
         return this.visible;
     }
 
@@ -525,7 +530,7 @@ export class Group {
             .map((r) => {
                 const all = r.graph.all;
                 if (!all) throw new Error(`no viz data on Graph`);
-                return new Scrubber(r.index, all);
+                return new Scrubber(r.index, all, r.graph);
             });
 
         return new Scrubbers(this.id, this.visible_, children);
@@ -588,7 +593,7 @@ export class Querier {
         const queryParams = params.queryParams();
         const key = queryParams.toString();
 
-        console.log(`vis: query-data`, key);
+        console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
             vq.howBusy(1);

@@ -5,12 +5,12 @@ timestamps {
         try {
             stage ('build') {
                 withEnv(["PATH+GOLANG=${tool 'golang-amd64'}/bin"]) {
-			sh "WORKING_DIRECTORY=/svr0/jenkins/workspace/fk/fkdev-portal-deploy DOCKER_TAG=master make aws-image"
+                    sh "WORKING_DIRECTORY=/svr0/jenkins/workspace/fk/fkdev-portal-deploy DOCKER_TAG=master make aws-image"
                 }
             }
         }
         catch (Exception e) {
-            notifyFailure()
+            notifyFailure(e)
             throw e
         }
     }

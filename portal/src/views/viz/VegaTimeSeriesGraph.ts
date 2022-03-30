@@ -1,19 +1,14 @@
 import _ from "lodash";
 import Vue from "vue";
-import i18n from "@/i18n";
 
-import { DataRow, SensorRange } from "./api";
-import { TimeRange, Margins, ChartLayout } from "./common";
-import { Graph, QueriedData, Workspace, FastTime, TimeZoom, VizInfo, SeriesData } from "./viz";
+import { Graph, Workspace, FastTime, TimeZoom, VizInfo, SeriesData } from "./viz";
 
 import LineChart from "./vega/LineChart.vue";
-import DoubleLineChart from "./vega/DoubleLineChart.vue";
 
 export const VegaTimeSeriesGraph = Vue.extend({
     name: "VegaTimeSeriesGraph",
     components: {
         LineChart,
-        DoubleLineChart,
     },
     data() {
         return {};
@@ -30,28 +25,32 @@ export const VegaTimeSeriesGraph = Vue.extend({
     },
     computed: {
         allSeries(): SeriesData[] | null {
+            // TODO Version on viz.ts Graph?
             return this.viz.loadedDataSets.map((ds) => {
                 if (!ds.graphing) throw new Error(`viz: No data`);
                 const vizInfo = this.workspace.vizInfo(this.viz, ds);
-                return new SeriesData(ds.graphing.key, ds, ds.graphing.data, vizInfo);
+                return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
             });
+        },
+        key(): string {
+            if (this.allSeries) {
+                return this.allSeries.map((s) => s.key).join(":");
+            }
+            return "";
         },
     },
     methods: {
-        onDouble() {
-            return this.raiseTimeZoomed(new TimeZoom(FastTime.All, null));
+        onDouble(): void {
+            this.raiseTimeZoomed(new TimeZoom(FastTime.All, null));
         },
-        raiseTimeZoomed(newTimes: TimeZoom) {
-            return this.$emit("viz-time-zoomed", newTimes);
+        raiseTimeZoomed(newTimes: TimeZoom): void {
+            this.$emit("viz-time-zoomed", newTimes);
         },
     },
     template: `
         <div class="viz time-series-graph">
-            <div class="chart" @dblclick="onDouble" v-if="allSeries.length == 2">
-                <DoubleLineChart :series="allSeries" v-bind:key="allSeries[0].key + allSeries[1].key" @time-zoomed="raiseTimeZoomed" />
-            </div>
-            <div class="chart" @dblclick="onDouble" v-if="allSeries.length == 1">
-                <LineChart :series="allSeries" v-bind:key="allSeries[0].key" @time-zoomed="raiseTimeZoomed" />
+            <div class="chart" @dblclick="onDouble">
+                <LineChart :series="allSeries" v-bind:key="key" @time-zoomed="raiseTimeZoomed" />
             </div>
         </div>
     `,

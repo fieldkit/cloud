@@ -9,6 +9,7 @@ import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
 import { promiseAfter } from "@/utilities";
+import Backoff from "backoff";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -603,6 +604,9 @@ class FKApi {
         try {
             if (response.status == 204) {
                 this.token.setToken(response.headers.authorization);
+                if (this.wsBackoff != null) {
+                    this.wsBackoff.reset();
+                }
                 return Promise.resolve(response.headers.authorization);
             } else {
                 throw new ApiError("login failed");
@@ -1400,52 +1404,62 @@ class FKApi {
     }
 
     private async establish(callback: (message: unknown) => Promise<void>, status: (connected: boolean) => Promise<void>) {
-        while (this.listening) {
-            if (this.token.authenticated() && !this.socket) {
-                const wsBase = this.baseUrl.replace("https", "wss").replace("http", "ws");
-                this.socket = new WebSocket(wsBase + "/notifications");
+        if (this.token.authenticated() && !this.socket) {
+            const wsBase = this.baseUrl.replace("https", "wss").replace("http", "ws");
+            this.socket = new WebSocket(wsBase + "/notifications");
 
-                this.socket.addEventListener("open", () => {
-                    console.log("ws: connected");
-                    if (!this.socket) throw new Error("disconnected");
-                    const token = this.token.getHeader();
-                    this.socket.send(JSON.stringify({ token: token }));
-                });
+            this.socket.addEventListener("open", () => {
+                console.log("ws:connected");
+                if (!this.socket) throw new Error("disconnected");
+                const token = this.token.getHeader();
+                this.socket.send(JSON.stringify({ token: token }));
+            });
 
-                this.socket.addEventListener("message", (event) => {
-                    const message = JSON.parse(event.data);
+            this.socket.addEventListener("message", (event) => {
+                const message = JSON.parse(event.data);
+                if (message.error) {
+                    console.log("ws:error", message.error);
+                } else {
+                    console.log("ws:message", message);
                     void callback(message);
-                });
+                    this.wsBackoff.reset();
+                }
+            });
 
-                this.socket.addEventListener("close", async () => {
-                    console.log("ws: closed");
-                    void status(false);
-                    this.socket = null;
-                });
-            } else {
-                await promiseAfter(1000);
-            }
+            this.socket.addEventListener("close", async () => {
+                console.log("ws:closed");
+                void status(false);
+                this.socket = null;
+
+                this.wsBackoff.backoff();
+            });
         }
     }
 
-    private listening = false;
+    private wsBackoff: Backoff | null = null;
 
     public async listenForNotifications(
         callback: (message: unknown) => Promise<void>,
         status: (connected: boolean) => Promise<void>
     ): Promise<SendFunction> {
-        if (!this.listening) {
-            this.listening = true;
-            void this.establish(callback, status);
+        if (this.wsBackoff == null) {
+            this.wsBackoff = Backoff.fibonacci({
+                randomisationFactor: 0,
+                initialDelay: 1000,
+                maxDelay: 1000 * 60,
+            });
+
+            this.wsBackoff.on("ready", async (number: number, delay: number) => {
+                console.log("ws:ready", number, delay);
+
+                await this.establish(callback, status);
+            });
+
+            this.wsBackoff.backoff();
         }
+
         return this.send.bind(this);
     }
-
-    /*
-    public async markNotificationsRead(ids: number[]): Promise<void> {
-        return;
-    }
-	*/
 
     public async saveBookmark(bookmark: string): Promise<SavedBookmark> {
         const qp = new URLSearchParams();

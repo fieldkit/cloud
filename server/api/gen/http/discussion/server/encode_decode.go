@@ -153,25 +153,27 @@ func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			bookmark string
-			auth     string
+			auth     *string
 			err      error
 		)
 		bookmark = r.URL.Query().Get("bookmark")
 		if bookmark == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("bookmark", "query string"))
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewDataPayload(bookmark, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil

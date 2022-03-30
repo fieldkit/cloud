@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -303,7 +304,97 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int
 	return moduleIds, sensorIds, nil
 }
 
+type DataRow struct {
+	Time      data.NumericWireTime `db:"time" json:"time"`
+	ID        *int64               `db:"id" json:"-"`
+	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
+	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
+	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
+	Location  *data.Location       `db:"location" json:"location,omitempty"`
+	Value     *float64             `db:"value" json:"value,omitempty"`
+	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
+}
+
+func scanRow(queried *sqlx.Rows, row *DataRow) error {
+	if err := queried.StructScan(row); err != nil {
+		return fmt.Errorf("error scanning row: %v", err)
+	}
+
+	if row.Value != nil && math.IsNaN(*row.Value) {
+		row.Value = nil
+	}
+
+	return nil
+}
+
+func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQueryParams) (rr []*DataRow, err error) {
+	moduleIds, sensorIds, err := dq.getIds(ctx, aqp.Sensors)
+	if err != nil {
+		return nil, err
+	}
+
+	aggregate := "fieldkit.aggregated_10s"
+	query, args, err := sqlx.In(fmt.Sprintf(`
+			(SELECT
+				id,   
+				time,                                               
+				station_id,                                                                                                                              
+				sensor_id,                                          
+				ST_AsBinary(location) AS location,
+				value,                                              
+				-1 AS time_group
+			FROM %s WHERE time <= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			LIMIT 1)
+			UNION
+			(SELECT
+				id,   
+				time,                                               
+				station_id,                                                                                                                              
+				sensor_id,                                          
+				ST_AsBinary(location) AS location,
+				value,                                              
+				1 AS time_group
+			FROM %s WHERE time >= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			LIMIT 1)
+	`, aggregate, aggregate), aqp.Start, aqp.Stations, moduleIds, sensorIds, aqp.End, aqp.Stations, moduleIds, sensorIds)
+	if err != nil {
+		return nil, err
+	}
+
+	queried, err := dq.db.QueryxContext(ctx, dq.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer queried.Close()
+
+	rows := make([]*DataRow, 2)
+	index := 0
+
+	for queried.Next() {
+		row := &DataRow{}
+		if err = scanRow(queried, row); err != nil {
+			return nil, err
+		}
+
+		if index >= 2 {
+			return nil, errors.New("unexpected number of outer rows")
+		}
+		rows[index] = row
+		index += 1
+	}
+
+	if index == 1 && *rows[0].TimeGroup > 0 {
+		rows[1] = rows[0]
+		rows[1] = nil
+	}
+
+	return rows, nil
+}
+
 func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (summaries map[string]*AggregateSummary, name string, err error) {
+	log := Logger(ctx).Sugar()
+
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
@@ -313,43 +404,41 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	}
 
 	for _, name := range handlers.AggregateNames {
-		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
+		summary := &AggregateSummary{}
 
-		query, args, err := sqlx.In(fmt.Sprintf(`
+		if qp.Complete {
+			interval := handlers.AggregateIntervals[name]
+			duration := qp.End.Sub(qp.Start)
+			maximumRecords := int64(duration.Seconds()) / int64(interval)
+
+			summary.Start = data.NumericWireTimePtr(&qp.Start)
+			summary.End = data.NumericWireTimePtr(&qp.End)
+			summary.NumberRecords = maximumRecords
+
+			log.Infow("aggregate", "maximum", maximumRecords, "records", summary.NumberRecords, "duration", duration)
+		} else {
+			table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
+
+			query, args, err := sqlx.In(fmt.Sprintf(`
 			SELECT
 			MIN(time) AS start,
 			MAX(time) AS end,
 			COUNT(*) AS number_records
-			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?);
+			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
 			`, table), qp.Start, qp.End, qp.Stations, moduleIds, sensorIds)
-		if err != nil {
-			return nil, "", err
-		}
+			if err != nil {
+				return nil, "", err
+			}
 
-		summary := &AggregateSummary{}
-		if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
-			return nil, "", err
-		}
-
-		// Queried records depends on if we're doing a complete query,
-		// filling in missing samples.
-		queriedRecords := summary.NumberRecords
-
-		if qp.Complete {
-			if summary.Start != nil && summary.End != nil {
-				interval := handlers.AggregateIntervals[name]
-				duration := summary.End.Time().Sub(summary.Start.Time())
-				queriedRecords = int64(duration.Seconds()) / int64(interval)
-
-				log := Logger(ctx).Sugar()
-				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords, "duration", duration)
+			if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
+				return nil, "", err
 			}
 		}
 
 		summaries[name] = summary
 
 		if qp.Resolution > 0 {
-			if queriedRecords < int64(qp.Resolution) {
+			if summary.NumberRecords < int64(qp.Resolution) {
 				selectedAggregateName = name
 			}
 		}

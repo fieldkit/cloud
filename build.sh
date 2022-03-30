@@ -81,4 +81,6 @@ docker build -t conservify/fk-cloud:$DOCKER_TAG build
 
 cp build/static.env charting
 
-docker build -t conservify/fk-charting:$DOCKER_TAG charting
+cd charting 
+tar -czh --exclude='./node_modules' . | docker build -t conservify/fk-charting:$DOCKER_TAG -
+cd ..

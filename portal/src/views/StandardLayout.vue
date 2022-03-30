@@ -9,6 +9,7 @@
                 :isAuthenticated="isAuthenticated"
                 :stations="stations"
                 :projects="userProjects"
+                :narrow="sidebarNarrow"
                 @show-station="showStation"
                 @sidebar-toggle="onSidebarToggle"
             />
@@ -63,6 +64,10 @@ export default Vue.extend({
             type: Boolean,
             default: false,
         },
+        sidebarNarrow: {
+            type: Boolean,
+            default: false
+        }
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),

@@ -13,6 +13,10 @@ export default Vue.extend({
             type: Object,
             required: true,
         },
+        imageSize: {
+            type: Number,
+            default: 800,
+        },
     },
     data(): { photo: unknown } {
         return {
@@ -35,7 +39,7 @@ export default Vue.extend({
     methods: {
         async refresh(): Promise<void> {
             if (this.project.photo) {
-                this.photo = await this.$services.api.loadMedia(this.project.photo, { size: 800 }).catch((e) => {
+                this.photo = await this.$services.api.loadMedia(this.project.photo, { size: this.imageSize }).catch((e) => {
                     this.photo = null;
                 });
             } else {

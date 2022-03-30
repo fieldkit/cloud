@@ -49,9 +49,11 @@ func BuildDataPayload(discussionDataBookmark string, discussionDataAuth string) 
 	{
 		bookmark = discussionDataBookmark
 	}
-	var auth string
+	var auth *string
 	{
-		auth = discussionDataAuth
+		if discussionDataAuth != "" {
+			auth = &discussionDataAuth
+		}
 	}
 	v := &discussion.DataPayload{}
 	v.Bookmark = bookmark

@@ -1,8 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { TimeRange, Margins, ChartLayout } from "./common";
-import { QueriedData, Scrubbers, TimeZoom } from "./viz";
+import { Workspace, QueriedData, Scrubbers, TimeZoom, SeriesData, Graph } from "./viz";
 
 import Scrubber from "./vega/Scrubber.vue";
 
@@ -16,10 +15,25 @@ export const VegaScrubber = Vue.extend({
             type: Scrubbers,
             required: true,
         },
+        workspace: {
+            type: Workspace,
+            required: true,
+        },
     },
     computed: {
-        data(): QueriedData[] {
-            return this.scrubbers.rows.map((s) => s.data);
+        allSeries(): SeriesData[] | null {
+            const all = _.flatten(
+                this.scrubbers.rows.map((scrubber) => {
+                    if (!scrubber.data) throw new Error(`viz: No data`);
+                    const graph = scrubber.viz as Graph;
+                    return graph.loadedDataSets.map((ds) => {
+                        const vizInfo = this.workspace.vizInfo(graph, ds);
+                        return new SeriesData(scrubber.data.key, ds, scrubber.data, vizInfo);
+                    });
+                })
+            );
+            console.log("viz: scrubber:all", all);
+            return all;
         },
         visible(): number[] {
             if (this.scrubbers.visible.isExtreme()) {
@@ -28,34 +42,14 @@ export const VegaScrubber = Vue.extend({
             return this.scrubbers.visible.toArray();
         },
     },
-    watch: {
-        visible(newValue, oldValue) {
-            // console.log("scrubber graphing (visible)");
-            this.refresh();
-        },
-        data(newValue, oldValue) {
-            // console.log("scrubber graphing (data)");
-            this.refresh();
-        },
-    },
-    mounted() {
-        // console.log("scrubber mounted");
-        this.refresh();
-    },
-    updated() {
-        // console.log("scrubber updated");
-    },
     methods: {
-        raiseTimeZoomed(zoom: TimeZoom) {
-            return this.$emit("viz-time-zoomed", zoom);
-        },
-        refresh() {
-            // console.log("scrubber refresh", this.scrubbers);
+        raiseTimeZoomed(zoom: TimeZoom): void {
+            this.$emit("viz-time-zoomed", zoom);
         },
     },
     template: `
-        <div class="viz scrubber" v-if="data && data[0].data">
-            <Scrubber :data="data[0]" :visible="visible" @time-zoomed="raiseTimeZoomed" />
+        <div class="viz scrubber">
+            <Scrubber :series="allSeries" :visible="visible" @time-zoomed="raiseTimeZoomed" v-if="allSeries.length > 0" />
         </div>
     `,
 });

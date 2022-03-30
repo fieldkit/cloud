@@ -6,31 +6,36 @@ import axios from "axios";
 
 const app = express();
 
-import chartConfig from "./vega/chartConfig.json";
-import lineSpec from "./vega/line.v1.json";
-import histogramSpec from "./vega/histogram.v1.json";
-import rangeSpec from "./vega/range.v1.json";
-import doubleLineSpec from "./vega/doubleLine.v1.json";
-
 import {
   TimeRange,
   QueriedData,
   VizInfo,
   SeriesData,
+  VizSensor,
   DataSetSeries,
 } from "./common";
-import { applySensorMetaConfiguration } from "./customizations";
+
+import { ModuleSensorMeta } from "./api";
+
+import { ChartSettings } from "./vega/SpecFactory";
+import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
+import { HistogramSpecFactory } from "./vega/HistogramSpecFactory";
+import { RangeSpecFactory } from "./vega/RangeSpecFactory";
+
+interface ResponseRow {
+  vizSensor: VizSensor;
+  sensor: ModuleSensorMeta;
+  station: { name: string; location: [number, number] | null };
+}
 
 const port = Number(process.env.FIELDKIT_PORT || 8081);
 const baseUrl = process.env.FIELDKIT_BASE_URL || `http://127.0.0.1:8080`;
 
-type VegaSpec = any;
-
 class Chart {
-  spec: VegaSpec;
+  constructor(public readonly settings: ChartSettings) {}
 
   prepare(metaResponses, dataResponses) {
-    const series = metaResponses.map((row, index) => {
+    const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
       const { vizSensor, sensor, station } = row;
       const name = sensor.strings["en-us"]["label"] || "Unknown";
       const data = dataResponses[index];
@@ -46,101 +51,43 @@ class Chart {
         sensor.ranges
       );
 
-      const make = () => {
-        if (sensor.unit_of_measure) {
-          return `${name} (${sensor.unit_of_measure})`;
-        }
-        return `${name}`;
-      };
-
-      this.sensor(index, make(), sensor.unit_of_measure);
-
-      this.data(index, data);
-
       return new SeriesData(
         data.key,
         new DataSetSeries(vizSensor, data),
-        data.data,
+        data,
         vizInfo
       );
     });
 
-    applySensorMetaConfiguration(this.spec, series);
+    return this.finalize(allSeries);
+  }
 
+  finalize(allSeries): unknown[] {
     return [];
-  }
-
-  sensor(index, label, units) {
-    throw new Error("charting: NOT IMPLEMENTED");
-  }
-
-  data(index, data) {
-    throw new Error("charting: NOT IMPLEMENTED");
   }
 }
 
 class TimeSeriesChart extends Chart {
-  double: boolean;
-
-  constructor(viz) {
-    super();
-    this.double = viz[0].length > 1;
-    if (this.double) {
-      this.spec = _.cloneDeep(doubleLineSpec);
-    } else {
-      this.spec = _.cloneDeep(lineSpec);
-    }
-  }
-
-  sensor(index, label, units) {
-    if (this.double) {
-      this.spec.layer[index].encoding.y.title = label;
-    } else {
-      if (index == 0) {
-        this.spec.layer[0].encoding.y.axis.title = label;
-      }
-    }
-  }
-
-  data(index, data) {
-    if (this.double) {
-      this.spec.layer[index].data = {
-        name: `table_${index}`,
-        values: data.data,
-      };
-    } else {
-      this.spec.data = { name: `table`, values: data.data };
-    }
+  finalize(allSeries): any[] {
+    const factory = new TimeSeriesSpecFactory(allSeries, this.settings);
+    const spec = factory.create();
+    return [spec];
   }
 }
 
 class RangeChart extends Chart {
-  constructor(viz) {
-    super();
-    this.spec = _.cloneDeep(rangeSpec);
-  }
-
-  sensor(index, label, units) {
-    this.spec.encoding.y.axis.title = label;
-  }
-
-  data(index, data) {
-    this.spec.data = { name: "table", values: data.data };
+  finalize(allSeries): any[] {
+    const factory = new RangeSpecFactory(allSeries, this.settings);
+    const spec = factory.create();
+    return [vegaLite.compile(spec).spec];
   }
 }
 
 class HistogramChart extends Chart {
-  constructor(viz) {
-    super();
-    this.spec = _.cloneDeep(histogramSpec);
-  }
-
-  sensor(index, label, units) {
-    this.spec.encoding.x.axis.title = label;
-  }
-
-  data(index, data) {
-    this.spec.data = { name: "table", values: data.data };
+  finalize(allSeries): any[] {
+    const factory = new HistogramSpecFactory(allSeries, this.settings);
+    const spec = factory.create();
+    return [vegaLite.compile(spec as any).spec];
   }
 }
 
@@ -182,7 +129,7 @@ app.get("/charting/rendered", async (req, res, next) => {
   // TODO Authorization header
 
   try {
-    console.log(`charting:query`);
+    console.log(`charting: query`);
 
     if (!req.query.bookmark) {
       res.status(400).send("bad request");
@@ -190,33 +137,28 @@ app.get("/charting/rendered", async (req, res, next) => {
     }
 
     const bookmark = JSON.parse(queryArgument(req.query.bookmark));
-    const w = req.query.w || 800;
-    const h = req.query.h || 418;
+    const w = Number(req.query.w || 800 * 2);
+    const h = Number(req.query.h || 418 * 2);
+    const settings = new ChartSettings(w, h);
 
-    console.log(`charting:bookmark`, JSON.stringify(bookmark));
+    console.log(`charting: bookmark`, JSON.stringify(bookmark));
 
-    const specs: VegaSpec[] = [];
     const charts: Chart[] = [];
 
     const allQueries: KeyedHandler[] = _.flattenDeep(
       bookmark.g.map((g1) => {
         return g1.map((g2) => {
           return g2.map((viz) => {
-            console.log(`charting:viz`, JSON.stringify(viz));
+            console.log(`charting: viz`, JSON.stringify(viz));
 
             const chartTypeBookmark = viz[3];
 
             const chartCtor = chartCtors[chartTypeBookmark];
             if (!chartCtor) throw new Error("charting: Unknown chart type");
 
-            const chart = new chartCtor(viz);
+            const chart = new chartCtor(settings);
             const chartIndex = charts.length;
 
-            const spec = chart.spec;
-            spec.config = chartConfig;
-            spec.width = w;
-            spec.height = h;
-            specs.push(spec);
             charts.push(chart);
 
             return viz[0].map((vizSensor, index) => {
@@ -269,7 +211,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                     const sensor = byKey[0];
 
                     console.log(
-                      `charting:handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
+                      `charting: handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
                     );
 
                     const station = {
@@ -289,7 +231,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                   key: dataParams.toString(),
                   url: `${baseUrl}/sensors/data?${dataParams.toString()}`,
                   handle: (key, data) => {
-                    console.log(`charting:handle-data(${key})`);
+                    console.log(`charting: handle-data(${key})`);
                     return new QueriedData(
                       key,
                       new TimeRange(when[0], when[1]),
@@ -309,7 +251,7 @@ app.get("/charting/rendered", async (req, res, next) => {
       .value();
 
     const uniqueQueries = _.uniqBy(allQueries, (q) => q.key);
-    console.log(`charting:data-queries`, uniqueQueries.length);
+    console.log(`charting: data-queries`, uniqueQueries.length);
 
     const responses = await Promise.all(
       uniqueQueries.map((axiosQuery) =>
@@ -337,36 +279,33 @@ app.get("/charting/rendered", async (req, res, next) => {
       })
       .value();
 
-    console.log(`charting:data-queries-done`, byChartIndex);
+    const specs = _.flatten(_.values(byChartIndex));
+    if (specs.length == 0) throw new Error(`viz: No charts`);
 
-    const vegaSpec = vegaLite.compile(specs[0]);
-    const parsedSpec = vega.parse(vegaSpec.spec);
+    const parsedSpec = vega.parse(specs[0]);
     const view = new vega.View(parsedSpec, {
       logger: vega.logger(vega.Debug, "error"),
       renderer: "none",
     }).finalize();
 
     const canvas = await view.toCanvas();
-    const stream = (canvas as any).createPNGStream();
-
-    console.log("charting:stream");
 
     (canvas as any).toBuffer((err, buffer) => {
       if (err) {
-        console.log("charting:error", err);
+        console.log("charting: error", err);
         return;
       }
 
-      console.log("charting:buffer", buffer.length);
+      console.log("charting: buffer", buffer.length);
 
       res.setHeader("Content-Type", "image/png");
 
       res.end(buffer);
 
-      console.log("charting:done");
+      console.log("charting: done");
     });
   } catch (error) {
-    console.log(`charting:error`, error.message);
+    console.log(`charting: error`, error.message);
     next(error);
   }
 });

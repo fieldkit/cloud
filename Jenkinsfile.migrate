@@ -17,6 +17,7 @@ timestamps {
 			}
         }
         catch (Exception e) {
+            notifyFailure(e)
             throw e
         }
     }
