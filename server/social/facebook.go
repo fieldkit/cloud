@@ -40,6 +40,7 @@ func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWri
 
 	size := 1080
 
+	meta["og:url"] = req.URL.String()
 	meta["og:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, size, size)
 	meta["og:image:alt"] = payload.description
 	meta["og:title"] = payload.title
