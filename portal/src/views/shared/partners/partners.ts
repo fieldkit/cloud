@@ -12,7 +12,8 @@ export interface PartnerCustomization {
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
-    if (window.location.hostname.indexOf("floodnet.") === 0) {
+    // dataviz.floodnet.nyc, floodnet.fieldkit.org
+    if (window.location.hostname.indexOf("floodnet.") >= 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
