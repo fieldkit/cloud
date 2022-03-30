@@ -129,7 +129,7 @@ app.get("/charting/rendered", async (req, res, next) => {
   // TODO Authorization header
 
   try {
-    console.log(`charting:query`);
+    console.log(`charting: query`);
 
     if (!req.query.bookmark) {
       res.status(400).send("bad request");
@@ -141,7 +141,7 @@ app.get("/charting/rendered", async (req, res, next) => {
     const h = Number(req.query.h || 418 * 2);
     const settings = new ChartSettings(w, h);
 
-    console.log(`charting:bookmark`, JSON.stringify(bookmark));
+    console.log(`charting: bookmark`, JSON.stringify(bookmark));
 
     const charts: Chart[] = [];
 
@@ -149,7 +149,7 @@ app.get("/charting/rendered", async (req, res, next) => {
       bookmark.g.map((g1) => {
         return g1.map((g2) => {
           return g2.map((viz) => {
-            console.log(`charting:viz`, JSON.stringify(viz));
+            console.log(`charting: viz`, JSON.stringify(viz));
 
             const chartTypeBookmark = viz[3];
 
@@ -211,7 +211,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                     const sensor = byKey[0];
 
                     console.log(
-                      `charting:handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
+                      `charting: handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
                     );
 
                     const station = {
@@ -231,7 +231,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                   key: dataParams.toString(),
                   url: `${baseUrl}/sensors/data?${dataParams.toString()}`,
                   handle: (key, data) => {
-                    console.log(`charting:handle-data(${key})`);
+                    console.log(`charting: handle-data(${key})`);
                     return new QueriedData(
                       key,
                       new TimeRange(when[0], when[1]),
@@ -251,7 +251,7 @@ app.get("/charting/rendered", async (req, res, next) => {
       .value();
 
     const uniqueQueries = _.uniqBy(allQueries, (q) => q.key);
-    console.log(`charting:data-queries`, uniqueQueries.length);
+    console.log(`charting: data-queries`, uniqueQueries.length);
 
     const responses = await Promise.all(
       uniqueQueries.map((axiosQuery) =>
@@ -279,8 +279,6 @@ app.get("/charting/rendered", async (req, res, next) => {
       })
       .value();
 
-    console.log(`charting:data-queries-done`, byChartIndex);
-
     const specs = _.flatten(_.values(byChartIndex));
     if (specs.length == 0) throw new Error(`viz: No charts`);
 
@@ -294,20 +292,20 @@ app.get("/charting/rendered", async (req, res, next) => {
 
     (canvas as any).toBuffer((err, buffer) => {
       if (err) {
-        console.log("charting:error", err);
+        console.log("charting: error", err);
         return;
       }
 
-      console.log("charting:buffer", buffer.length);
+      console.log("charting: buffer", buffer.length);
 
       res.setHeader("Content-Type", "image/png");
 
       res.end(buffer);
 
-      console.log("charting:done");
+      console.log("charting: done");
     });
   } catch (error) {
-    console.log(`charting:error`, error.message);
+    console.log(`charting: error`, error.message);
     next(error);
   }
 });

@@ -31,13 +31,13 @@ export class TimeSeriesSpecFactory {
                 const range = constrained[0];
                 if (series.ds.shouldConstrainBy([range.minimum, range.maximum])) {
                     const d = [range.minimum, range.maximum];
-                    console.log("viz:constrained", series.ds.graphing.dataRange, d);
+                    console.log("viz: constrained", series.ds.graphing.dataRange, d);
                     return d;
                 } else {
-                    console.log(`viz:constrain-skip`);
+                    console.log(`viz: constrain-skip`);
                 }
             } else {
-                console.log(`viz:constrain-none`);
+                console.log(`viz: constrain-none`);
             }
             return undefined;
         };
