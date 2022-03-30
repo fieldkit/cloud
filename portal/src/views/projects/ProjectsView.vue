@@ -29,7 +29,6 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
 import ProjectThumbnails from "./ProjectThumbnails";
-import { getPartnerForcedLandingPage } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -50,11 +49,6 @@ export default Vue.extend({
         }),
     },
     async mounted(): Promise<void> {
-        const forcedLandingPage = getPartnerForcedLandingPage();
-        if (forcedLandingPage != null) {
-            await this.$router.push(forcedLandingPage);
-            return;
-        }
         if (this.isAuthenticated) {
             this.invites = await this.$services.api.getInvitesByUser();
         }

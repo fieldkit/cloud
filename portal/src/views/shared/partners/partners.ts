@@ -7,8 +7,8 @@ export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
     icon: string;
+    projectId: number;
     interpolate: (base: string) => string;
-    forcedLandingPage: Route | null;
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -18,21 +18,13 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
             icon: "/favicon-floodnet.ico",
+            projectId: 174,
             interpolate: (baseString: string) => {
                 return baseString + "floodnet";
-            },
-            forcedLandingPage: {
-                name: "viewProjectBigMap",
-                params: { id: 174 },
             },
         };
     }
     return null;
-}
-
-export function getPartnerForcedLandingPage(): Route | null {
-    const partnerCustomization = getPartnerCustomization();
-    return partnerCustomization?.forcedLandingPage || null;
 }
 
 export function isCustomisationEnabled(): boolean {

@@ -28,11 +28,47 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
-import { Bookmark, deserializeBookmark } from "./views/viz/viz";
+import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
+import { getPartnerCustomization } from "@/views/shared/partners";
+
 Vue.use(Router);
+
+function makeDefaultRouteForProject(projectId: number) {
+    return {
+        path: "/",
+        name: "root",
+        component: ProjectBigMap,
+        props: (route) => {
+            return {
+                id: projectId,
+                forcePublic: false,
+                bigMap: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    };
+}
+
+function getRoot() {
+    const partnerCustomization = getPartnerCustomization();
+    if (partnerCustomization == null) {
+        return {
+            path: "/",
+            name: "root",
+            component: ProjectsView,
+            meta: {
+                secured: true,
+            },
+        };
+    }
+    return makeDefaultRouteForProject(partnerCustomization.projectId);
+}
 
 const routes = [
     {
@@ -428,14 +464,6 @@ const routes = [
         },
     },
     {
-        path: "/",
-        name: "root",
-        component: ProjectsView,
-        meta: {
-            secured: true,
-        },
-    },
-    {
         path: "/notifications",
         name: "notifications",
         component: NotificationsView,
@@ -491,6 +519,7 @@ const routes = [
             secured: true,
         },
     },
+    getRoot(),
 ];
 
 export default function routerFactory(store) {
