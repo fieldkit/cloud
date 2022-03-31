@@ -31,7 +31,7 @@ class Chart {
         const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
             const { vizSensor, sensor, station } = row;
             const name = sensor.strings["en-us"]["label"] || "Unknown";
-            const data = dataResponses[index];
+            const data = dataResponses[index][0];
             const scale = [];
             const vizInfo = new VizInfo(data.key, scale, station, sensor.unitOfMeasure, data.key, name, sensor.viz || [], sensor.ranges);
 
@@ -239,7 +239,7 @@ app.get("/charting/rendered", async (req, res, next) => {
             .mapValues((r) => r.map((c) => c.handled))
             .mapValues((r, k) => {
                 const chart = charts[k];
-                return chart.prepare(r[0], r[1]);
+                return chart.prepare(r[0], r.slice(1));
             })
             .value();
 
