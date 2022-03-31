@@ -28,11 +28,12 @@ export const VegaScrubber = Vue.extend({
                     const graph = scrubber.viz as Graph;
                     return graph.loadedDataSets.map((ds) => {
                         const vizInfo = this.workspace.vizInfo(graph, ds);
-                        return new SeriesData(scrubber.data.key, ds, scrubber.data, vizInfo);
+                        if (ds.graphing == null) throw new Error("viz: Expected loaded data set");
+                        return new SeriesData(scrubber.data.key, ds, ds.graphing, vizInfo);
                     });
                 })
             );
-            console.log("viz: scrubber:all", all);
+            console.log("viz: scrubber:all", all, this.scrubbers);
             return all;
         },
         visible(): number[] {

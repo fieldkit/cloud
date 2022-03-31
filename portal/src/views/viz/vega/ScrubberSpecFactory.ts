@@ -6,6 +6,8 @@ export class ScrubberSpecFactory {
 
     create() {
         const first = this.allSeries[0];
+        const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
+        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
 
         return {
             $schema: "https://vega.github.io/schema/vega-lite/v5.json",
@@ -43,6 +45,9 @@ export class ScrubberSpecFactory {
                     title: "Time",
                     field: "time",
                     type: "temporal",
+                    scale: {
+                        domain: timeRangeAll,
+                    },
                     axis: {
                         formatType: "time",
                         labelPadding: -14,

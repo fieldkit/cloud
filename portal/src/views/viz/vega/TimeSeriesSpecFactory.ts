@@ -49,16 +49,26 @@ export class TimeSeriesSpecFactory {
         // use the same axis domain for both, and pick one that covers both.
         const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
         const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
-        const domainsAll = this.allSeries.map(makeSeriesDomain);
-        const dataRangeAll = [_.min(domainsAll.map((dr: number[]) => dr[0])), _.max(domainsAll.map((dr: number[]) => dr[1]))];
+        const yDomainsAll = this.allSeries.map(makeSeriesDomain);
+        const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
-        const makeDomain = _.memoize((series) => {
+        const makeDomainY = _.memoize((series) => {
             if (sameSensors) {
                 console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
             return makeSeriesDomain(series);
         });
+
+        const makeDomainX = () => {
+            if (this.allSeries.length > 1) {
+                const xDomainsAll = this.allSeries.map((series) => series.queried.timeRange);
+                const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+                console.log("viz: domain", xDomainsAll, timeRangeAll);
+                return timeRangeAll;
+            }
+            return undefined;
+        };
 
         const data = [
             {
@@ -134,6 +144,7 @@ export class TimeSeriesSpecFactory {
             {
                 orient: "bottom",
                 scale: "x",
+                domain: makeDomainX(),
                 tickCount: 8,
                 labelPadding: -24,
                 tickSize: 30,
@@ -152,7 +163,7 @@ export class TimeSeriesSpecFactory {
                         title: series.vizInfo.label,
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
-                        domain: makeDomain(series),
+                        domain: makeDomainY(series),
                         tickCount: 5,
                         titlePadding: 10,
                         domainOpacity: 0,
@@ -172,17 +183,20 @@ export class TimeSeriesSpecFactory {
 
         const scales = _.flatten(
             mapSeries((series, i) => {
-                const domain = makeDomain(series);
+                const yDomain = makeDomainY(series);
+                const xDomain = makeDomainX();
 
                 return [
                     {
                         name: makeScales(i).x,
                         type: "time",
                         range: "width",
-                        domain: {
-                            data: makeDataName(i),
-                            field: "time",
-                        },
+                        domain: xDomain
+                            ? xDomain
+                            : {
+                                  data: makeDataName(i),
+                                  field: "time",
+                              },
                     },
                     {
                         name: makeScales(i).y,
@@ -190,8 +204,8 @@ export class TimeSeriesSpecFactory {
                         range: "height",
                         nice: true,
                         zero: true,
-                        domain: domain
-                            ? domain
+                        domain: yDomain
+                            ? yDomain
                             : {
                                   data: makeDataName(i),
                                   field: "value",
