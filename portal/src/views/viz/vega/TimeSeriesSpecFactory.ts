@@ -25,7 +25,10 @@ export class TimeSeriesSpecFactory {
             }
         };
 
-        const makeDomain = (series) => {
+        // This returns the domain for a single series. Primarily responsible
+        // for constraining the axis domains to whatever minimums have been
+        // configured for that sensor.
+        const makeSeriesDomain = (series) => {
             const constrained = series.vizInfo.constrainedRanges;
             if (series.ds.graphing && constrained.length > 0) {
                 const range = constrained[0];
@@ -39,8 +42,23 @@ export class TimeSeriesSpecFactory {
             } else {
                 console.log(`viz: constrain-none`);
             }
-            return undefined;
+            return series.queried.dataRange;
         };
+
+        // Are the sensors being charted the same? If they are then we should
+        // use the same axis domain for both, and pick one that covers both.
+        const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
+        const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
+        const domainsAll = this.allSeries.map(makeSeriesDomain);
+        const dataRangeAll = [_.min(domainsAll.map((dr: number[]) => dr[0])), _.max(domainsAll.map((dr: number[]) => dr[1]))];
+
+        const makeDomain = _.memoize((series) => {
+            if (sameSensors) {
+                console.log("viz: identical-y", dataRangeAll);
+                return dataRangeAll;
+            }
+            return makeSeriesDomain(series);
+        });
 
         const data = [
             {
@@ -134,9 +152,9 @@ export class TimeSeriesSpecFactory {
                         title: series.vizInfo.label,
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
+                        domain: makeDomain(series),
                         tickCount: 5,
                         titlePadding: 10,
-                        domain: makeDomain(series),
                         domainOpacity: 0,
                         titleOpacity: {
                             signal: hoverCheck,
@@ -586,8 +604,7 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "brush_translate_delta",
                         },
-                        update:
-                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                        update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                     },
                     {
                         events: {
@@ -618,8 +635,7 @@ export class TimeSeriesSpecFactory {
                                 scale: "x",
                             },
                         ],
-                        update:
-                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        update: '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },
