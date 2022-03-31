@@ -2,6 +2,9 @@ export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
     icon: string;
+    sharing: {
+        template: string;
+    };
     projectId: number;
     interpolate: (base: string) => string;
 }
@@ -13,6 +16,9 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
             icon: "/favicon-floodnet.ico",
+            sharing: {
+                template: `Checkout this data on FloodNet!`, // TODO i18n
+            },
             projectId: 174,
             interpolate: (baseString: string) => {
                 return baseString + "floodnet";

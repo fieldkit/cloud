@@ -17,9 +17,8 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-
+import { getPartnerCustomization } from "@/views/shared/partners";
 import { mapState } from "vuex";
-import { serializeBookmark } from "./viz";
 
 function getRelativeUrl(href: string): string {
     const link = document.createElement("a");
@@ -54,7 +53,13 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
-            qs.append("text", "Check out this data on FieldKit!");
+            // TODO We should probably have a "non-partner" customization.
+            const partnerCustomization = getPartnerCustomization();
+            if (partnerCustomization != null) {
+                qs.append("text", partnerCustomization.sharing.template);
+            } else {
+                qs.append("text", "Check out this data on FieldKit!");
+            }
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
