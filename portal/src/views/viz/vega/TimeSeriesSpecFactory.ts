@@ -5,12 +5,12 @@ export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
 
     create() {
+        const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
-        const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeScales = (i: number) => {
             if (i == 0) {
                 return {
@@ -23,6 +23,42 @@ export class TimeSeriesSpecFactory {
                     y: "y2",
                 };
             }
+        };
+
+        const solidColors = true;
+
+        const makeSeriesThresholds = (series: SeriesData) => {
+            if (solidColors) {
+                return undefined;
+            }
+            return getSeriesThresholds(series);
+        };
+
+        const makeStroke = (i: number) => {
+            if (solidColors) {
+                // No idea why I can't get this to work with just a fixed color.
+                const colors = ["#f47a1f", "#377b2b"];
+                return {
+                    value: {
+                        x1: 1,
+                        y1: 1,
+                        x2: 1,
+                        y2: 0,
+                        gradient: "linear",
+                        stops: [
+                            {
+                                offset: 0,
+                                color: colors[i],
+                            },
+                            {
+                                offset: 1,
+                                color: colors[i],
+                            },
+                        ],
+                    },
+                };
+            }
+            return this.defaultStroke();
         };
 
         // This returns the domain for a single series. Primarily responsible
@@ -60,14 +96,13 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series);
         });
 
+        const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
+        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+
         const makeDomainX = () => {
-            if (this.allSeries.length > 1) {
-                const xDomainsAll = this.allSeries.map((series) => series.queried.timeRange);
-                const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
-                console.log("viz: domain", xDomainsAll, timeRangeAll);
-                return timeRangeAll;
-            }
-            return undefined;
+            // I can't think of a good reason to just always specify this.
+            return timeRangeAll;
         };
 
         const data = [
@@ -77,8 +112,8 @@ export class TimeSeriesSpecFactory {
         ].concat(
             _.flatten(
                 mapSeries((series, i) => {
-                    const thresholds = getSeriesThresholds(series);
                     const hoverName = makeHoverName(i);
+                    const thresholds = makeSeriesThresholds(series);
                     const transforms = thresholds
                         ? thresholds.levels.map((level, l: number) => {
                               return {
@@ -89,14 +124,13 @@ export class TimeSeriesSpecFactory {
                           })
                         : null;
 
-                    series.queried.data.forEach((item) => {
-                        item.name = hoverName;
-                    });
+                    const name = { name: hoverName };
+                    const data = series.queried.data.map((datum) => _.extend(datum, name));
 
                     return [
                         {
                             name: makeDataName(i),
-                            values: series.queried.data,
+                            values: data,
                             transform: transforms,
                         },
                         {
@@ -352,174 +386,223 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const marks = brushMarks.concat(
-            _.flatten(
-                mapSeries((series, i) => {
-                    const hoverName = makeHoverName(i);
-                    const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.3`;
-                    const scales = makeScales(i);
-                    const title = series.vizInfo.label;
-                    const suffix = series.vizInfo.unitOfMeasure || "";
-                    const thresholds = getSeriesThresholds(series);
+        const seriesMarks = _.flatten(
+            mapSeries((series, i) => {
+                const hoverName = makeHoverName(i);
+                const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.3`;
+                const scales = makeScales(i);
+                const title = series.vizInfo.label;
+                const suffix = series.vizInfo.unitOfMeasure || "";
+                const thresholds = makeSeriesThresholds(series);
 
-                    const firstLineMark = {
-                        type: "line",
-                        from: {
-                            data: makeValidDataName(i),
-                        },
-                        encode: {
-                            enter: {
-                                interpolate: {
-                                    value: "cardinal",
-                                },
-                                tension: {
-                                    value: 0.9,
-                                },
-                                x: {
-                                    scale: scales.x,
-                                    field: "time",
-                                },
-                                y: {
-                                    scale: scales.y,
-                                    field: "value",
-                                },
-                                stroke: {
-                                    value: "#cccccc",
-                                },
-                                strokeWidth: {
-                                    value: 1,
-                                },
-                                strokeDash: {
-                                    value: [4, 4],
-                                },
+                const firstLineMark = {
+                    type: "line",
+                    from: {
+                        data: makeValidDataName(i),
+                    },
+                    encode: {
+                        enter: {
+                            interpolate: {
+                                value: "cardinal",
                             },
-                            update: {
-                                strokeOpacity: {
-                                    signal: hoverCheck,
-                                },
+                            tension: {
+                                value: 0.9,
+                            },
+                            x: {
+                                scale: scales.x,
+                                field: "time",
+                            },
+                            y: {
+                                scale: scales.y,
+                                field: "value",
+                            },
+                            stroke: {
+                                value: "#cccccc",
+                            },
+                            strokeWidth: {
+                                value: 1,
+                            },
+                            strokeDash: {
+                                value: [4, 4],
                             },
                         },
-                    };
-
-                    const symbolMark = {
-                        type: "symbol",
-                        from: {
-                            data: makeDataName(i),
+                        update: {
+                            strokeOpacity: {
+                                signal: hoverCheck,
+                            },
                         },
-                        encode: {
-                            enter: {
-                                x: {
-                                    scale: scales.x,
-                                    field: "time",
-                                },
-                                y: {
-                                    scale: scales.y,
-                                    field: "value",
-                                },
-                                stroke: {
-                                    value: null,
-                                },
-                                strokeWidth: {
-                                    value: 2,
-                                },
-                                size: {
-                                    value: 100,
-                                },
-                                tooltip: {
-                                    signal: `{
+                    },
+                };
+
+                const symbolMark = {
+                    type: "symbol",
+                    from: {
+                        data: makeDataName(i),
+                    },
+                    encode: {
+                        enter: {
+                            x: {
+                                scale: scales.x,
+                                field: "time",
+                            },
+                            y: {
+                                scale: scales.y,
+                                field: "value",
+                            },
+                            stroke: {
+                                value: null,
+                            },
+                            strokeWidth: {
+                                value: 2,
+                            },
+                            size: {
+                                value: 100,
+                            },
+                            tooltip: {
+                                signal: `{
                                         title: '${title}',
                                         Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
                                         time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
                                     }`,
-                                },
-                                fill: {
-                                    value: "blue",
-                                },
-                                fillOpacity: {
-                                    value: 0,
-                                },
                             },
-                            hover: {
-                                fillOpacity: {
-                                    value: 0.5,
+                            fill: {
+                                value: "blue",
+                            },
+                            fillOpacity: {
+                                value: 0,
+                            },
+                        },
+                        hover: {
+                            fillOpacity: {
+                                value: 0.5,
+                            },
+                        },
+                        update: {
+                            fillOpacity: {
+                                value: 0,
+                            },
+                        },
+                    },
+                };
+
+                if (thresholds) {
+                    const thresholdsMarks = thresholds.levels
+                        .map((level, l: number) => {
+                            const alias = makeThresholdLevelAlias(i, l);
+                            const strokeWidth = 2 + (thresholds.levels.length - l) / thresholds.levels.length;
+
+                            return {
+                                type: "line",
+                                from: { data: makeDataName(i) },
+                                encode: {
+                                    enter: {
+                                        interpolate: { value: "cardinal" },
+                                        tension: { value: 0.9 },
+                                        strokeCap: { value: "round" },
+                                        x: { scale: scales.x, field: "time" },
+                                        y: { scale: scales.y, field: alias },
+                                        stroke: { value: level.color },
+                                        strokeWidth: { value: strokeWidth },
+                                        defined: { signal: `isValid(datum.${alias})` },
+                                    },
+                                    update: {
+                                        strokeOpacity: {
+                                            signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
+                                        },
+                                    },
                                 },
+                            };
+                        })
+                        .reverse();
+
+                    return [
+                        {
+                            type: "group",
+                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                        },
+                    ];
+                } else {
+                    const lineMark = {
+                        type: "line",
+                        from: { data: makeDataName(i) },
+                        encode: {
+                            enter: {
+                                interpolate: { value: "cardinal" },
+                                tension: { value: 0.9 },
+                                strokeCap: { value: "round" },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
+                                stroke: makeStroke(i),
+                                strokeWidth: { value: 2 },
+                                defined: { signal: "isValid(datum.value)" },
                             },
                             update: {
-                                fillOpacity: {
-                                    value: 0,
+                                strokeOpacity: {
+                                    signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
                                 },
                             },
                         },
                     };
-
-                    if (thresholds) {
-                        const thresholdsMarks = thresholds.levels
-                            .map((level, l: number) => {
-                                const alias = makeThresholdLevelAlias(i, l);
-                                const strokeWidth = 2 + (thresholds.levels.length - l) / thresholds.levels.length;
-
-                                return {
-                                    type: "line",
-                                    from: { data: makeDataName(i) },
-                                    encode: {
-                                        enter: {
-                                            interpolate: { value: "cardinal" },
-                                            tension: { value: 0.9 },
-                                            strokeCap: { value: "round" },
-                                            x: { scale: scales.x, field: "time" },
-                                            y: { scale: scales.y, field: alias },
-                                            stroke: { value: level.color },
-                                            strokeWidth: { value: strokeWidth },
-                                            defined: { signal: `isValid(datum.${alias})` },
-                                        },
-                                        update: {
-                                            strokeOpacity: {
-                                                signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
-                                            },
-                                        },
-                                    },
-                                };
-                            })
-                            .reverse();
-
-                        return [
-                            {
-                                type: "group",
-                                marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
-                            },
-                        ];
-                    } else {
-                        const lineMark = {
-                            type: "line",
-                            from: { data: makeDataName(i) },
-                            encode: {
-                                enter: {
-                                    interpolate: { value: "cardinal" },
-                                    tension: { value: 0.9 },
-                                    strokeCap: { value: "round" },
-                                    x: { scale: scales.x, field: "time" },
-                                    y: { scale: scales.y, field: "value" },
-                                    stroke: this.defaultStroke(),
-                                    strokeWidth: { value: 2 },
-                                    defined: { signal: "isValid(datum.value)" },
-                                },
-                                update: {
-                                    strokeOpacity: {
-                                        signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
-                                    },
-                                },
-                            },
-                        };
-                        return [
-                            {
-                                type: "group",
-                                marks: [firstLineMark, lineMark, symbolMark],
-                            },
-                        ];
-                    }
-                })
-            )
+                    return [
+                        {
+                            type: "group",
+                            marks: [firstLineMark, lineMark, symbolMark],
+                        },
+                    ];
+                }
+            })
         );
+
+        // TODO Unique by thresholds and perhaps y value?
+        const ruleMarks = _.flatten(
+            mapSeries((series, i) => {
+                const scales = makeScales(i);
+                const thresholds = getSeriesThresholds(series);
+                if (thresholds) {
+                    return thresholds.levels
+                        .filter((level) => level.label != null)
+                        .map((level) => {
+                            return {
+                                type: "rule",
+                                from: { data: makeDataName(i) },
+                                encode: {
+                                    enter: {
+                                        x: {
+                                            scale: scales.x,
+                                            value: timeRangeAll[0],
+                                        },
+                                        x2: {
+                                            scale: scales.x,
+                                            value: timeRangeAll[1],
+                                        },
+                                        y: {
+                                            scale: scales.y,
+                                            value: level.value,
+                                        },
+                                        y2: {
+                                            scale: scales.y,
+                                            value: level.value,
+                                        },
+                                        stroke: { value: level.color },
+                                        strokeDash: { value: [4, 4] },
+                                        opacity: { value: 0.1 },
+                                        strokeOpacity: { value: 0.1 },
+                                        strokeWidth: {
+                                            value: 1,
+                                        },
+                                    },
+                                },
+                            };
+                        });
+                }
+
+                return [];
+            })
+        );
+
+        console.log("viz: rules", ruleMarks);
+
+        const marks = [...brushMarks, ...ruleMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
