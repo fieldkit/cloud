@@ -19,26 +19,23 @@ export const VizWorkspace = Vue.extend({
         return {};
     },
     async beforeMount(): Promise<void> {
-        if (this.workspace.allStationIds.length == 1) {
-            console.log(`viz: include-associated(1)`, this.workspace.allStationIds.length);
-            const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]).catch(async (e) => {
-                if (ForbiddenError.isInstance(e)) {
-                    await this.$router.push({
-                        name: "login",
-                        params: { errorMessage: String(this.$t("login.privateStation")) },
-                        query: { after: this.$route.path },
-                    });
-                }
-            });
-            if (associated) {
-                const ids = associated.stations.map((s) => s.id);
-                console.log(`viz: include-associated(1)`, associated);
-                await this.workspace.addStationIds(ids);
-                await this.workspace.query();
+        console.log(`viz: include-associated(1)`, this.workspace.allStationIds.length);
+        const associated = await this.$services.api.getAssociatedStations(this.workspace.allStationIds[0]).catch(async (e) => {
+            if (ForbiddenError.isInstance(e)) {
+                await this.$router.push({
+                    name: "login",
+                    params: { errorMessage: String(this.$t("login.privateStation")) },
+                    query: { after: this.$route.path },
+                });
             }
+        });
+        if (associated) {
+            const ids = associated.stations.map((s) => s.id);
+            console.log(`viz: include-associated(1)`, associated);
+            await this.workspace.addStationIds(ids);
         }
 
-        return this.workspace.query();
+        return await this.workspace.query();
     },
     methods: {
         signal(ws: Workspace): Workspace {
