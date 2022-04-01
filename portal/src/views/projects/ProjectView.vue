@@ -5,7 +5,7 @@
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
-                    :backTitle="isAdministrator ? $t('layout.backProjects') : $t('layout.backProjectDashboard')"
+                    :backTitle="getBackTitle()"
                     backRoute="projects"
                     v-if="displayProject && !bigMap"
                 >
@@ -46,7 +46,8 @@ import ProjectActivity from "./ProjectActivity.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
-import {AuthenticationRequiredError, ForbiddenError} from "@/api";
+import { AuthenticationRequiredError, ForbiddenError } from "@/api";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectView",
@@ -106,7 +107,11 @@ export default Vue.extend({
     beforeMount() {
         return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id }).catch((e) => {
             if (ForbiddenError.isInstance(e)) {
-                return this.$router.push({ name: "login", params: { errorMessage: this.$t("login.privateProject") }, query: { after: this.$route.path }  });
+                return this.$router.push({
+                    name: "login",
+                    params: { errorMessage: this.$t("login.privateProject") },
+                    query: { after: this.$route.path },
+                });
             }
         });
     },
@@ -130,6 +135,20 @@ export default Vue.extend({
         },
         closeActivity(this: any) {
             return this.$router.push({ name: "viewProject", params: { id: this.id } });
+        },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
+        getBackTitle(): string {
+            if (isCustomisationEnabled()) {
+                return null;
+            }
+
+            if (this.isAdministrator) {
+                return this.$t("layout.backProjects");
+            }
+
+            return this.$t("layout.backProjectDashboard");
         },
     },
 });
