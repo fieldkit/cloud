@@ -260,11 +260,14 @@ export default Vue.extend({
     @include bp-down($sm) {
         max-height: 60vh;
     }
+
+    @include bp-down($xs) {
+        padding-right: 60px;
+    }
 }
 
 .tiptap-reading {
     border: 1px solid transparent;
-    padding: 0.3em 1.4em 0.3em 0em;
 
     p {
         margin: 0em;
