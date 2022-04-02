@@ -572,13 +572,17 @@ export default Vue.extend({
 
 .brush_brush_bg path {
     body.floodnet & {
-        fill: var(--color-border);
+        fill: var(--color-primary);
         fill-opacity: 1;
     }
 }
 
 .layer_1_marks path {
     fill: var(--color-primary);
+
+    body.floodnet & {
+        fill: #3f5d62;
+    }
 }
 
 .one {
