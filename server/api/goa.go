@@ -79,6 +79,9 @@ import (
 	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
 	discServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discussion/server"
 
+	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/data_events/server"
+
 	discourseService "github.com/fieldkit/cloud/server/api/gen/discourse"
 	discourseServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discourse/server"
 
@@ -147,6 +150,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discSvc := NewDiscussionService(ctx, options)
 	discEndpoints := discService.NewEndpoints(discSvc)
 
+	eventsSvc := NewEventsService(ctx, options)
+	eventsEndpoints := eventsService.NewEndpoints(eventsSvc)
+
 	discourseSvc := NewDiscourseService(ctx, options)
 	discourseEndpoints := discourseService.NewEndpoints(discourseSvc)
 
@@ -187,6 +193,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		csvEndpoints.Use(mw)
 		exportEndpoints.Use(mw)
 		discEndpoints.Use(mw)
+		eventsEndpoints.Use(mw)
 		discourseEndpoints.Use(mw)
 		oidcEndpoints.Use(mw)
 		ttnEndpoints.Use(mw)
@@ -230,6 +237,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServer := csvServiceSvr.New(csvEndpoints, mux, dec, enc, eh, nil)
 	exportServer := exportServiceSvr.New(exportEndpoints, mux, dec, enc, eh, nil)
 	discServer := discServiceSvr.New(discEndpoints, mux, dec, enc, eh, nil)
+	eventsServer := eventsServiceSvr.New(eventsEndpoints, mux, dec, enc, eh, nil)
 	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
@@ -278,6 +286,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvServiceSvr.Mount(mux, csvServer)
 	exportServiceSvr.Mount(mux, exportServer)
 	discServiceSvr.Mount(mux, discServer)
+	eventsServiceSvr.Mount(mux, eventsServer)
 	discourseServiceSvr.Mount(mux, discourseServer)
 	oidcServiceSvr.Mount(mux, oidcServer)
 	ttnServiceSvr.Mount(mux, ttnServer)
@@ -337,6 +346,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range discServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range eventsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range discourseServer.Mounts {
