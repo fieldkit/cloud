@@ -66,6 +66,9 @@ export default Vue.extend({
         async id(): Promise<void> {
             await this.refresh();
         },
+        async moduleKey(): Promise<void> {
+            await this.refresh();
+        },
     },
     async beforeMount(): Promise<void> {
         await this.refresh();
@@ -83,12 +86,9 @@ export default Vue.extend({
 
             return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
-                    console.log("DATA radoi length", meta);
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {
-                                //console.log("radoi mapping", module);
-
                                 return module.sensors.map((sensor) => [sensor.fullKey, module]);
                             })
                         )
@@ -115,8 +115,6 @@ export default Vue.extend({
                         .keyBy((s) => s.fullKey)
                         .value();
 
-                    console.log("Radoi sensors by key", sensorsByKey);
-
                     const readings = _(keysToValue)
                         .map((value, key) => {
                             const sensor = sensorsByKey[key];
@@ -127,8 +125,6 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            //  console.log(`sensor:`, sensor);
-                            //  console.log("radoi sensor module", sensorModule);
 
                             return new SensorReading(
                                 key,
@@ -150,9 +146,11 @@ export default Vue.extend({
                 })
                 .then((sensors) => {
                     console.log(`sensors`, sensors);
-                    this.sensors = sensors;
-                    console.log("radoi sensors", sensors);
-                    // filter by key here
+                    if (this.moduleKey) {
+                        this.sensors = sensors.filter((sensor) => sensor.sensorModule.key === this.moduleKey);
+                    } else {
+                        this.sensors = sensors;
+                    }
                     this.loading = false;
                     this.$emit("layoutChange");
                     return this.sensors;

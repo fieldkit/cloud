@@ -95,8 +95,8 @@
                         </li>
                     </ul>
                     <div class="station-readings-values">
-                        <!--                        <header>{{ getModuleName(selectedModule) }}</header>-->
-                        <LatestStationReadings :id="station.id" :moduleKey="selectedModule.name" />
+                        <header>{{ $t(getModuleName(selectedModule)) }}</header>
+                        <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
                     </div>
                 </div>
             </section>
@@ -160,6 +160,12 @@ export default Vue.extend({
             .then((station) => {
                 this.station = new DisplayStation(station);
                 this.selectedModule = this.station.modules[0];
+
+                console.log("radoi sel module", this.selectedModule);
+
+                //selmodule.name = modules.water.ph
+
+                //sensor.sensorModule.key = fk.water.ph
 
                 console.log("radoi station", this.station);
                 //    console.log("radoi module", this.selectedModule);
@@ -484,7 +490,7 @@ export default Vue.extend({
                 flex: 0 0 calc(50% - 10px);
             }
 
-            @include bp-down($sm) {
+            @media screen and (max-width: 600px) {
                 flex: 0 0 100%;
             }
         }
