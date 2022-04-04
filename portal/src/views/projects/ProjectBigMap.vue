@@ -6,7 +6,7 @@
                     <ProjectPhoto :project="project" :image-size="150" />
                 </div>
                 <div class="detail-container">
-                    <h3 class="detail-title">{{ project.name }}</h3>
+                    <p class="detail-title">{{ project.name }}</p>
                     <div class="detail-description">{{ project.description }}</div>
                     <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
                 </div>
@@ -177,7 +177,8 @@ export default Vue.extend({
     .link {
         color: $color-fieldkit-primary;
         font-size: 12px;
-        padding-bottom: 10px;
+        padding-bottom: 15px;
+        margin-bottom: 10pxs;
     }
 }
 .detail-title {
@@ -185,10 +186,15 @@ export default Vue.extend({
     font-size: 18px;
     margin-top: 15px;
     margin-bottom: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space:nowrap;
+    max-height: 1em;
+    width: 240px;
 }
 .detail-container {
     width: 75%;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .detail-description {
     font-family: $font-family-light;
@@ -199,6 +205,8 @@ export default Vue.extend({
     -webkit-box-orient: vertical;
     max-height: 35px;
     overflow: hidden;
+    margin-bottom: 10px;
+    margin-right: 10px;
 }
 
 .details {
