@@ -20,7 +20,7 @@ type TwitterContext struct {
 type TwitterSchema struct {
 }
 
-func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error {
+func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error) {
 	meta := make(map[string]string)
 
 	meta["twitter:card"] = "summary_large_image"
@@ -37,11 +37,7 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	meta["og:image"] = meta["twitter:image"]
 	meta["og:image:alt"] = meta["twitter:image:alt"]
 
-	if err := serveMeta(w, req, meta); err != nil {
-		return err
-	}
-
-	return nil
+	return meta, nil
 }
 
 func parseDimensionParam(req *http.Request, name string, d int) int {
@@ -54,7 +50,7 @@ func parseDimensionParam(req *http.Request, name string, d int) int {
 	return d
 }
 
-func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error) {
 	meta := make(map[string]string)
 
 	w := parseDimensionParam(req, "w", 800)
@@ -77,11 +73,7 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	meta["og:image:width"] = fmt.Sprintf("%d", w)
 	meta["og:image:height"] = fmt.Sprintf("%d", h)
 
-	if err := serveMeta(rw, req, meta); err != nil {
-		return err
-	}
-
-	return nil
+	return meta, nil
 }
 
 func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext) {

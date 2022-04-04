@@ -19,7 +19,7 @@ type FacebookContext struct {
 type FacebookSchema struct {
 }
 
-func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error {
+func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error) {
 	meta := make(map[string]string)
 
 	meta["og:url"] = req.URL.String()
@@ -28,14 +28,10 @@ func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWrite
 	meta["og:image"] = payload.photoUrl
 	meta["og:image:alt"] = payload.project.Description
 
-	if err := serveMeta(w, req, meta); err != nil {
-		return err
-	}
-
-	return nil
+	return meta, nil
 }
 
-func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error {
+func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error) {
 	meta := make(map[string]string)
 
 	size := 1080
@@ -48,11 +44,7 @@ func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWri
 	meta["og:image:width"] = fmt.Sprintf("%d", size)
 	meta["og:image:height"] = meta["og:image:width"]
 
-	if err := serveMeta(w, req, meta); err != nil {
-		return err
-	}
-
-	return nil
+	return meta, nil
 }
 
 func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string) (fb *FacebookContext) {

@@ -7,6 +7,8 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -20,15 +22,16 @@ import (
 )
 
 type MetaSchema interface {
-	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error
-	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error
+	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error)
+	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error)
 }
 
 type SocialContext struct {
 	db                *sqlxcache.DB
 	projectRepository *repositories.ProjectRepository
-	baseApiUrl        string
 	schema            MetaSchema
+	baseApiUrl        string
+	rootPath          string
 }
 
 type SharedProjectPayload struct {
@@ -68,7 +71,14 @@ const metaOnlyTemplate = `<!DOCTYPE html>
     <body>Intentionally left blank.</body>
 </html>`
 
-func serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
+func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
+	original, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
+	if err != nil {
+		return err
+	}
+
+	_ = original
+
 	t, err := template.New("social-meta").Parse(metaOnlyTemplate)
 	if err != nil {
 		return err
@@ -129,9 +139,16 @@ func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request)
 		photoUrl: photoUrl,
 	}
 
-	err = sc.schema.SharedProject(ctx, w, req, sharedPayload)
+	meta, err := sc.schema.SharedProject(ctx, w, req, sharedPayload)
 	if err != nil {
 		log.Errorw("error", "project_id", projectId)
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	err = sc.serveMeta(w, req, meta)
+	if err != nil {
+		log.Errorw("error")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -261,7 +278,14 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 		bookmark:    parsed,
 	}
 
-	err = sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
+	meta, err := sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
+	if err != nil {
+		log.Errorw("error")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	err = sc.serveMeta(w, req, meta)
 	if err != nil {
 		log.Errorw("error")
 		w.WriteHeader(http.StatusForbidden)
