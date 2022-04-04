@@ -151,7 +151,7 @@ export default Vue.extend({
     padding: 1px;
     border-radius: 3px;
     position: relative;
-    z-index: 50;
+    z-index: $z-index-top;
     width: 349px;
     position: absolute;
     top: 95px;
