@@ -20,10 +20,12 @@ import (
 
 // Server lists the sensor service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Meta   http.Handler
-	Data   http.Handler
-	CORS   http.Handler
+	Mounts   []*MountPoint
+	Meta     http.Handler
+	Data     http.Handler
+	Bookmark http.Handler
+	Resolve  http.Handler
+	CORS     http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -61,12 +63,18 @@ func New(
 		Mounts: []*MountPoint{
 			{"Meta", "GET", "/sensors"},
 			{"Data", "GET", "/sensors/data"},
+			{"Bookmark", "POST", "/bookmarks/save"},
+			{"Resolve", "GET", "/bookmarks/resolve"},
 			{"CORS", "OPTIONS", "/sensors"},
 			{"CORS", "OPTIONS", "/sensors/data"},
+			{"CORS", "OPTIONS", "/bookmarks/save"},
+			{"CORS", "OPTIONS", "/bookmarks/resolve"},
 		},
-		Meta: NewMetaHandler(e.Meta, mux, decoder, encoder, errhandler, formatter),
-		Data: NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
-		CORS: NewCORSHandler(),
+		Meta:     NewMetaHandler(e.Meta, mux, decoder, encoder, errhandler, formatter),
+		Data:     NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
+		Bookmark: NewBookmarkHandler(e.Bookmark, mux, decoder, encoder, errhandler, formatter),
+		Resolve:  NewResolveHandler(e.Resolve, mux, decoder, encoder, errhandler, formatter),
+		CORS:     NewCORSHandler(),
 	}
 }
 
@@ -77,6 +85,8 @@ func (s *Server) Service() string { return "sensor" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Meta = m(s.Meta)
 	s.Data = m(s.Data)
+	s.Bookmark = m(s.Bookmark)
+	s.Resolve = m(s.Resolve)
 	s.CORS = m(s.CORS)
 }
 
@@ -84,6 +94,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountMetaHandler(mux, h.Meta)
 	MountDataHandler(mux, h.Data)
+	MountBookmarkHandler(mux, h.Bookmark)
+	MountResolveHandler(mux, h.Resolve)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -182,6 +194,108 @@ func NewDataHandler(
 	})
 }
 
+// MountBookmarkHandler configures the mux to serve the "sensor" service
+// "bookmark" endpoint.
+func MountBookmarkHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/bookmarks/save", f)
+}
+
+// NewBookmarkHandler creates a HTTP handler which loads the HTTP request and
+// calls the "sensor" service "bookmark" endpoint.
+func NewBookmarkHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeBookmarkRequest(mux, decoder)
+		encodeResponse = EncodeBookmarkResponse(encoder)
+		encodeError    = EncodeBookmarkError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "bookmark")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountResolveHandler configures the mux to serve the "sensor" service
+// "resolve" endpoint.
+func MountResolveHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/bookmarks/resolve", f)
+}
+
+// NewResolveHandler creates a HTTP handler which loads the HTTP request and
+// calls the "sensor" service "resolve" endpoint.
+func NewResolveHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeResolveRequest(mux, decoder)
+		encodeResponse = EncodeResolveResponse(encoder)
+		encodeError    = EncodeResolveError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "resolve")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service sensor.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -194,6 +308,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	}
 	mux.Handle("OPTIONS", "/sensors", f)
 	mux.Handle("OPTIONS", "/sensors/data", f)
+	mux.Handle("OPTIONS", "/bookmarks/save", f)
+	mux.Handle("OPTIONS", "/bookmarks/resolve", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.
@@ -256,6 +372,19 @@ func handleSensorOrigin(h http.Handler) http.Handler {
 			return
 		}
 		if cors.MatchOrigin(origin, "https://*.fkdev.org") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "https://dataviz.floodnet.nyc") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")

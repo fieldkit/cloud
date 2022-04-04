@@ -254,7 +254,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	}
 
 	configurer := notificationsServiceSvr.NewConnConfigurer(func(conn *websocket.Conn, cancel context.CancelFunc) *websocket.Conn {
-		Logger(ctx).Sugar().Infow("configure-new-connection")
+		Logger(ctx).Sugar().Infow("configure-new-connection", "verbose_ws", true)
 		return conn
 	})
 
@@ -438,7 +438,7 @@ func VerifyToken(ctx context.Context, a common.AuthAttempt) (jwt.MapClaims, int3
 	if err != nil {
 		// Authentication is optional if required scopes is empty.
 		if len(a.Scheme.RequiredScopes) == 0 {
-			log.Infow("verify-token: no scope")
+			log.Infow("verify-token: no scope", "verbose_auth", true)
 			return nil, 0, nil
 		}
 		log.Infow("verify-token: fail", "error", err)
@@ -470,7 +470,7 @@ func VerifyToken(ctx context.Context, a common.AuthAttempt) (jwt.MapClaims, int3
 
 	userID := int32(claims["sub"].(float64))
 
-	log.Infow("verify-token: success, auth")
+	log.Infow("verify-token: success, auth", "verbose_auth", true)
 	return claims, userID, nil
 }
 

@@ -146,7 +146,7 @@ class InfoQuery {
 }
 
 export class Scrubber {
-    constructor(public readonly index: number, public readonly data: QueriedData) {}
+    constructor(public readonly index: number, public readonly data: QueriedData, public readonly viz: Viz) {}
 }
 
 export class Scrubbers {
@@ -227,11 +227,11 @@ function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: G
                         const stations = v[0];
                         const sensors = v[1];
                         const fixed = _.concat([[[stations[0], sensors[0]]]], _.drop(v, 2));
-                        console.log("viz-migrate:b", v);
-                        console.log("viz-migrate:a", fixed);
+                        console.log("viz: migrate:b", v);
+                        console.log("viz: migrate:a", fixed);
                         return fixed;
                     }
-                    console.log("viz-migrate", v);
+                    console.log("viz: migrate", v);
                     return v;
                 })
             )
@@ -263,6 +263,7 @@ export class NewParams implements HasSensorParams {
 export class Graph extends Viz {
     public all: QueriedData | null = null;
     public visible: TimeRange = TimeRange.eternity;
+    public queried: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
@@ -293,11 +294,16 @@ export class Graph extends Viz {
         return this.loadedDataSets.map((ds) => {
             if (!ds.graphing) throw new Error(`viz: No data`);
             const vizInfo = vizInfoFactory.vizInfo(this, ds);
-            return new SeriesData(ds.graphing.key, ds, ds.graphing.data, vizInfo);
+            return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
         });
     }
 
     public get visibleTimeRange(): TimeRange {
+        if (this.visible.isExtreme()) {
+            if (this.all) {
+                return new TimeRange(this.all.timeRange[0], this.all.timeRange[1]);
+            }
+        }
         return this.visible;
     }
 
@@ -525,7 +531,7 @@ export class Group {
             .map((r) => {
                 const all = r.graph.all;
                 if (!all) throw new Error(`no viz data on Graph`);
-                return new Scrubber(r.index, all);
+                return new Scrubber(r.index, all, r.graph);
             });
 
         return new Scrubbers(this.id, this.visible_, children);
@@ -556,10 +562,10 @@ export class Querier {
         console.log(`vis: query-info`, key);
 
         if (this.info[key]) {
-            iq.howBusy(1);
+            // iq.howBusy(1);
 
             return promiseAfter(1).then(() => {
-                iq.howBusy(-1);
+                // iq.howBusy(-1);
                 return this.info[key];
             });
         }
@@ -588,14 +594,14 @@ export class Querier {
         const queryParams = params.queryParams();
         const key = queryParams.toString();
 
-        console.log(`vis: query-data`, key);
+        console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
-            vq.howBusy(1);
+            // vq.howBusy(1);
 
             return promiseAfter(1).then(() => {
                 vq.resolve(this.data[key]);
-                vq.howBusy(-1);
+                // vq.howBusy(-1);
                 return this.data[key];
             });
         }
@@ -609,7 +615,7 @@ export class Querier {
                     .sensorData(queryParams)
                     .then((sdr: SensorDataResponse) => {
                         const queried = new QueriedData(key, params.when, sdr);
-                        const filtered = queried.removeDuplicates();
+                        const filtered = queried./*removeMalformed().*/ removeDuplicates();
                         this.data[key] = filtered;
                         return filtered;
                     })
@@ -771,9 +777,13 @@ export class Workspace implements VizInfoFactory {
     }
 
     public async addStationIds(ids: number[]): Promise<Workspace> {
+        if (_.difference(ids, this.stationIds).length == 0) {
+            console.log("viz: workspace-add-station-ids(ignored)", ids);
+            return this;
+        }
         this.stationIds = [...this.stationIds, ...ids];
         console.log("viz: workspace-add-station-ids", this.stationIds);
-        return this.query();
+        return this;
     }
 
     private findGroup(viz: Viz): Group {
@@ -962,16 +972,15 @@ export class Workspace implements VizInfoFactory {
 
     public async updateFromBookmark(bm: Bookmark): Promise<void> {
         if (Bookmark.sameAs(this.bookmark(), bm)) {
+            console.log(`viz: update-from-bookmark:same`, bm);
             return;
         }
+
+        console.log(`viz: update-from-bookmark`, bm);
+        await this.addStationIds(bm.s);
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
         await this.query();
         return;
-    }
-
-    private eventually(callback: (ws: Workspace) => Promise<any>) {
-        callback(this);
-        return Promise.resolve(this);
     }
 
     public with(callback: (ws: Workspace) => Workspace) {

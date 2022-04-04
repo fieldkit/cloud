@@ -214,19 +214,19 @@ export const ViewingControls = Vue.extend({
     },
     methods: {
         raiseCompare(): void {
-            console.log("raising viz-compare");
+            console.log("viz: raising viz-compare");
             this.$emit("viz-compare");
         },
         raiseRemove(): void {
-            console.log("raising viz-remove");
+            console.log("viz: raising viz-remove");
             this.$emit("viz-remove");
         },
         raiseFastTime(ev: never, fast: FastTime): void {
-            console.log("raising viz-time-zoomed");
+            console.log("viz: raising viz-time-zoomed");
             this.$emit("viz-time-zoomed", new TimeZoom(fast, null));
         },
         raiseChangeChartType(option: { id: ChartType }): void {
-            console.log("raising viz-change-chart", option.id);
+            console.log("viz: raising viz-change-chart", option.id);
             vueTickHack(() => {
                 this.$emit("viz-change-chart", Number(option.id));
             });
@@ -240,13 +240,13 @@ export const ViewingControls = Vue.extend({
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
-                const rangeViz = this.viz.visible;
+                const rangeViz = this.viz.visibleTimeRange;
                 const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                    console.log("raising viz-time-zoomed");
+                    console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
-                    console.log("swallowing viz-time-zoomed");
+                    console.log("viz: swallowing viz-time-zoomed");
                 }
             }
         },

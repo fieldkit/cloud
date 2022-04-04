@@ -2,26 +2,34 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <div class="new-comment">
+        <div class="new-comment" :class="{ 'align-center': !user }">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
-                <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                <div class="new-comment-wrap">
+                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                </div>
             </template>
             <template v-else>
-                <p class="need-login-msg">
+                <p class="need-login-msg" @click="test()">
                     {{ $tc("comments.loginToComment.part1") }}
-                    <router-link :to="{ name: 'login' }" class="link">{{ $tc("comments.loginToComment.part2") }}</router-link>
+                    <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                        {{ $tc("comments.loginToComment.part2") }}
+                    </router-link>
                     {{ $tc("comments.loginToComment.part3") }}
                 </p>
-                <router-link :to="{ name: 'login', query: { after: $route.path } }" class="button-submit">
+                <router-link
+                    :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                    class="button-submit"
+                >
                     {{ $t("login.loginButton") }}
                 </router-link>
             </template>
         </div>
 
-        <div v-if="!errorMessage" class="error">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="posts.length === 0">There are no comments yet.</div>
+        <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
+        <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
@@ -70,7 +78,7 @@
                                                 {{ reply.author.name }}
                                             </span>
                                             <ListItemOptions
-                                                v-if="user.id === reply.author.id || user.admin"
+                                                v-if="user && (user.id === reply.author.id || user.admin)"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
                                                 :options="getCommentOptions(reply)"
                                             />
@@ -88,8 +96,15 @@
 
                         <transition name="fade">
                             <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
-                                <UserPhoto :user="user"></UserPhoto>
-                                <Tiptap v-model="newReply.body" placeholder="Reply to comment" @save="save(newReply)" saveLabel="Post" />
+                                <div class="new-comment-wrap">
+                                    <UserPhoto :user="user"></UserPhoto>
+                                    <Tiptap
+                                        v-model="newReply.body"
+                                        placeholder="Reply to comment"
+                                        @save="save(newReply)"
+                                        saveLabel="Post"
+                                    />
+                                </div>
                             </div>
                         </transition>
 
@@ -140,6 +155,7 @@ export default Vue.extend({
     },
     data(): {
         posts: Comment[];
+        isLoading: boolean;
         placeholder: string | null;
         viewType: string;
         newComment: {
@@ -157,6 +173,7 @@ export default Vue.extend({
     } {
         return {
             posts: [],
+            isLoading: false,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -239,7 +256,7 @@ export default Vue.extend({
                         }
                     }
                 })
-                .catch(() => {
+                .catch((e) => {
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -255,6 +272,7 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            this.isLoading = true;
             await this.$services.api
                 .getComments(this.parentData)
                 .then((data) => {
@@ -271,8 +289,11 @@ export default Vue.extend({
 
                     this.highlightComment();
                 })
-                .catch((e) => {
+                .catch(() => {
                     this.errorMessage = CommentsErrorsEnum.getComments;
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
         viewDataClick(post: Comment) {
@@ -443,7 +464,8 @@ header {
 }
 
 ::v-deep .new-comment {
-    @include flex(center);
+    @include flex(flex-end);
+    flex-wrap: wrap;
     padding: 22px 0;
     position: relative;
 
@@ -465,10 +487,18 @@ header {
         width: 100%;
     }
 
+    &.align-center {
+        align-items: center;
+    }
+
     img {
-        margin-top: 0!important;
+        margin-top: 0 !important;
         width: 30px;
         height: 30px;
+    }
+
+    .button-submit {
+        margin-left: auto;
     }
 
     &:not(.reply) {
@@ -483,27 +513,12 @@ header {
         }
     }
 
-    &-input {
-        width: 100%;
+    &-wrap {
         display: flex;
-        border-radius: 2px;
-        border: solid 1px $color-border;
-
-        ::v-deep textarea {
-            margin: 0;
-            padding: 14px 60px 14px 13px;
-            outline: none;
-            width: 100%;
-            font-weight: 500;
-
-            &::placeholder {
-                color: #cccdcf;
-            }
-
-            @include bp-down($xs) {
-                padding: 7px 40px 7px 7px;
-            }
-        }
+        width: 100%;
+        position: relative;
+        background-color: #fff;
+        flex: 0 0 calc(100% - 65px);
     }
 }
 
@@ -536,16 +551,6 @@ header {
         border: none;
         max-width: 550px;
         min-height: unset;
-    }
-
-    ::v-deep textarea {
-        border: 0;
-        margin: 0;
-        padding: 7px 45px 0 7px;
-
-        .reply & {
-            padding-right: 60px;
-        }
     }
 }
 
@@ -617,7 +622,7 @@ header {
     button {
         font-weight: 500;
         margin-right: 20px;
-        @include flex(flex-start);
+        @include flex(center);
     }
 
     .icon {
@@ -628,6 +633,10 @@ header {
     .icon-view-data {
         font-size: 14px;
         margin-right: 6px;
+    }
+
+    .icon-reply {
+        margin-top: -2px;
     }
 }
 
@@ -649,12 +658,6 @@ header {
     margin-bottom: 10px;
 }
 
-::v-deep textarea {
-    resize: none;
-    border: 0 !important;
-    max-height: 75vh;
-}
-
 .column-reply,
 .column-post {
     position: relative;
@@ -670,6 +673,12 @@ header {
 .need-login-msg {
     font-size: 16px;
     margin-left: 8px;
+    margin-right: 10px;
+
+    @include bp-down($xs) {
+        margin-left: 0;
+        flex: 0 0 calc(100% - 65px);
+    }
 
     * {
         font-size: 16px;
@@ -680,5 +689,9 @@ header {
     width: auto;
     margin-left: auto;
     padding: 0 40px;
+}
+
+.no-comments {
+    margin-top: 20px;
 }
 </style>

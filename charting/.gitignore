@@ -1,1 +1,5 @@
 static.env
+api.js
+common.js
+server.js
+vega/*.js

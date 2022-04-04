@@ -17,9 +17,14 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-
+import { getPartnerCustomization } from "@/views/shared/partners";
 import { mapState } from "vuex";
-import { serializeBookmark } from "./viz";
+
+function getRelativeUrl(href: string): string {
+    const link = document.createElement("a");
+    link.href = href;
+    return link.href;
+}
 
 export default Vue.extend({
     name: "SharePanel",
@@ -27,6 +32,10 @@ export default Vue.extend({
         ...CommonComponents,
     },
     props: {
+        token: {
+            type: String,
+            required: true,
+        },
         bookmark: {
             type: Object,
             required: true,
@@ -44,13 +53,19 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
-            qs.append("text", "Check out this data on FieldKit!");
+            // TODO We should probably have a "non-partner" customization.
+            const partnerCustomization = getPartnerCustomization();
+            if (partnerCustomization != null) {
+                qs.append("text", partnerCustomization.sharing.template);
+            } else {
+                qs.append("text", "Check out this data on FieldKit!");
+            }
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
         vizUrl(): string {
             const qs = new URLSearchParams();
-            qs.append("bookmark", serializeBookmark(this.bookmark));
-            return `https://portal.fkdev.org/dashboard/explore?${qs.toString()}`;
+            qs.append("v", this.token);
+            return getRelativeUrl(`/viz?${qs.toString()}`);
         },
     },
     methods: {

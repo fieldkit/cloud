@@ -11,70 +11,35 @@ expressionFunction("fkHumanReadable", (datum, suffix) => {
     return `${datum.toFixed(3)}`;
 });
 
-function getString(d) {
-    return d["enUS"] || d["en-US"]; // HACK Portal compatibility.
+type VizStrings = { [index: string]: string };
+
+interface ThresholdLevel {
+    label: VizStrings | null;
+    value: number | null;
+    offset: number | null;
+    color: string;
 }
 
-export function applySensorMetaConfiguration(spec, series) {
-    for (let i = 0; i < series.length; ++i) {
-        const s = series[i];
+interface Thresholds {
+    label: VizStrings | null;
+    levels: ThresholdLevel[];
+}
 
-        if (s.vizInfo.viz.length > 0) {
-            const vizConfig = s.vizInfo.viz[0];
-            const thresholds = vizConfig.thresholds;
-            if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
-                const levels = thresholds.levels;
-                const thresholdLayers = levels
-                    .map((d, i) => {
-                        return {
-                            transform: [
-                                {
-                                    calculate: "datum.value <= " + d.value + " ? datum.value : null",
-                                    as: "layerValue" + i,
-                                },
-                                {
-                                    calculate: "datum.layerValue" + i + " <= " + d.value + " ? '" + getString(d.label) + "' : null",
-                                    as: getString(thresholds.label),
-                                },
-                            ],
-                            encoding: {
-                                y: { field: "layerValue" + i },
-                                stroke: {
-                                    field: getString(thresholds.label),
-                                    legend: {
-                                        orient: "top",
-                                    },
-                                    scale: {
-                                        domain: levels.map((d) => getString(d.label)),
-                                        range: levels.map((d) => d.color),
-                                    },
-                                },
-                            },
-                            mark: {
-                                type: "line",
-                                interpolate: "monotone",
-                                tension: 1,
-                            },
-                        };
-                    })
-                    .reverse();
+export function getString(d: VizStrings | null): string | null {
+    if (d) {
+        return d["enUS"] || d["en-US"]; // HACK Portal compatibility.
+    }
+    return null;
+}
 
-                spec.layer[i].layer = thresholdLayers;
-            }
-        }
-
-        if (series.length == 1) {
-            const suffix = s.vizInfo.unitOfMeasure;
-            spec.layer[1].encoding.tooltip[0].format = suffix;
-        }
-
-        const constrained = s.vizInfo.constrainedRanges;
-        if (constrained.length > 0) {
-            const range = constrained[0];
-            if (s.ds.shouldConstrainBy([range.minimum, range.maximum])) {
-                console.log("viz:constrained", range, s.ds.graphing.dataRange);
-                spec.layer[i].encoding.y.scale.domain = [range.minimum, range.maximum];
-            }
+export function getSeriesThresholds(series): Thresholds | null {
+    if (series.vizInfo.viz.length > 0) {
+        const vizConfig = series.vizInfo.viz[0];
+        const thresholds = vizConfig.thresholds;
+        if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
+            return thresholds;
         }
     }
+
+    return null;
 }

@@ -1,8 +1,8 @@
 <template>
     <div class="marker-container" @click="onClick">
-        <span class="value-label">{{ (value !== undefined) ? value : "?" | prettyNum }}</span>
+        <span class="value-label">{{ value !== undefined ? value : "&ndash;" | prettyNum }}</span>
         <svg viewBox="0 0 36 36">
-            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="color"/>
+            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="color" />
         </svg>
     </div>
 </template>
@@ -19,28 +19,31 @@ export default Vue.extend({
             default: "#ccc",
         },
         value: {
-            type: Number
+            type: Number,
         },
         id: {
-            type: Number
+            type: Number,
+        },
+    },
+    mounted() {
+        if (this.value === undefined) {
+            this.color = "#ccc";
         }
     },
     methods: {
-        onClick () {
+        onClick() {
             this.$emit("marker-click", { id: this.id });
-        }
+        },
     },
     filters: {
-        prettyNum: function (value) {
-            if(!isNaN(value)){
-                if(value % 1 === 0){
+        prettyNum: function(value) {
+            if (!isNaN(value)) {
+                if (value % 1 === 0) {
                     return value;
-                }
-                else return d3.format(".2s")(value);
-            }
-            else return value;
-        }
-}
+                } else return d3.format(".2s")(value);
+            } else return value;
+        },
+    },
 });
 </script>
 
@@ -57,7 +60,6 @@ export default Vue.extend({
     text-align: center;
     color: white;
     font-weight: bold;
-
 }
 .marker-container {
     width: 32px;

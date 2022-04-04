@@ -33,26 +33,26 @@ func NewDiscussionService(ctx context.Context, options *ControllerOptions) *Disc
 
 func (c *DiscussionService) Project(ctx context.Context, payload *discService.ProjectPayload) (*discService.Discussion, error) {
 
-    log := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
-    getting := &data.Project{}
-    if err := c.options.Database.GetContext(ctx, getting, `
+	getting := &data.Project{}
+	if err := c.options.Database.GetContext(ctx, getting, `
         SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
         `, payload.ProjectID); err != nil {
 
-        return nil, err
-    }
+		return nil, err
+	}
 
-    log.Infow("checking", "privacy", getting.Privacy)
+	log.Infow("checking", "privacy", getting.Privacy)
 
-    p, err := NewPermissions(ctx, c.options).ForProject(getting)
-    if err != nil {
-        return nil, err
-    }
+	p, err := NewPermissions(ctx, c.options).ForProject(getting)
+	if err != nil {
+		return nil, err
+	}
 
-    if err := p.CanView(); err != nil {
-        return nil, err
-    }
+	if err := p.CanView(); err != nil {
+		return nil, err
+	}
 
 	_ = p
 
@@ -261,10 +261,12 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 		if err != nil {
 			return err
 		}
-		notifications = append(notifications, data.NewReplyNotification(replying.UserID, post.ID))
+		if replying.UserID != post.UserID {
+			notifications = append(notifications, data.NewReplyNotification(replying.UserID, post.ID))
+		}
 	}
 
-	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body)
+	mentions, err := backend.DiscoverMentions(ctx, post.ID, post.Body, post.UserID)
 	if err != nil {
 		return err
 	}
@@ -273,15 +275,17 @@ func (c *DiscussionService) notifyMentionsAndReplies(ctx context.Context, post *
 		notifications = append(notifications, backend.NotifyMentions(mentions)...)
 	}
 
-	nr := repositories.NewNotificationRepository(c.db)
-	for _, notif := range notifications {
-		if saved, err := nr.AddNotification(ctx, notif); err != nil {
-			return err
-		} else {
-			message := data.PostNotificationToMap(saved, post, user)
-			log.Infow("notification", "notification", message)
-			if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
-				log.Errorw("notification", "error", err)
+	if len(notifications) > 0 {
+		nr := repositories.NewNotificationRepository(c.db)
+		for _, notif := range notifications {
+			if saved, err := nr.AddNotification(ctx, notif); err != nil {
+				return err
+			} else {
+				message := data.PostNotificationToMap(saved, post, user)
+				log.Infow("notification", "notification", message)
+				if err := c.options.subscriptions.Publish(ctx, notif.UserID, []map[string]interface{}{message}); err != nil {
+					log.Errorw("notification", "error", err)
+				}
 			}
 		}
 	}

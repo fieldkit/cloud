@@ -75,7 +75,7 @@
                         <AuthenticatedPhoto v-if="notes.media[index]" :url="notes.media[index].url" />
                         <i v-else class="photo icon icon-image-placeholder"></i>
                     </div>
-                    <router-link v-if="notes.media.length > 4" :to="{ name: 'test' }" class="station-photos-nav">
+                    <router-link :to="{ name: 'test' }" class="station-photos-nav">
                         {{ $t("station.viewAllPhotos") }}
                     </router-link>
                 </div>

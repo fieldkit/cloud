@@ -1,26 +1,23 @@
 <template>
     <div>
-        <button v-on:click="pickRange([1629956332434, 1630344275971])" v-if="false">
-            Pick date range
-        </button>
         <div class="viz scrubber"></div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import _ from "lodash";
+import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
-import scrubberSpec from "./scrubber.v1.json";
-import chartConfig from "./chartConfig.json";
 
 import { TimeRange } from "../common";
-import { TimeZoom } from "../viz";
+import { TimeZoom, SeriesData } from "../viz";
+import { ScrubberSpecFactory } from "./ScrubberSpecFactory";
 
 export default {
     name: "Scrubber",
     props: {
-        data: {
-            type: Object,
+        series: {
+            type: Array as PropType<SeriesData[]>,
             required: true,
         },
         visible: {
@@ -28,70 +25,85 @@ export default {
             required: true,
         },
     },
-    data() {
-        return { vegaView: null };
+    data(): { vega: unknown | null } {
+        return { vega: null };
+    },
+    async mounted(): Promise<void> {
+        await this.refresh();
     },
     watch: {
-        visible() {
-            console.log("vega-scrubber:visible", this.data, this.visible);
+        async series(): Promise<void> {
+            await this.refresh();
+        },
+        async visible() {
             this.pickRange(this.visible);
         },
     },
-    async mounted() {
-        scrubberSpec.config = JSON.parse(JSON.stringify(chartConfig));
-        // Some styling overrides. The height of the scrubber can be set with scrubberSpec.height
-        scrubberSpec.config.axisX.tickSize = 20;
-        //  scrubberSpec.config.layer[0].mark.colour = "#000000";
-        scrubberSpec.config.view = { fill: "#f4f5f7", stroke: "transparent" };
-        scrubberSpec.data = { values: this.data.data };
-        scrubberSpec.layer[2].data = { values: [] };
-        scrubberSpec.width = "container";
+    methods: {
+        async refresh(): Promise<void> {
+            const factory = new ScrubberSpecFactory(this.series);
 
-        console.log("vega-scrubber", this.data, this.visible);
+            const spec = factory.create();
 
-        await vegaEmbed(this.$el, scrubberSpec, {
-            renderer: "svg",
-            actions: { source: false, editor: false, compiled: false },
-        }).then((view) => {
-            this.vegaView = view;
+            const vegaInfo = await vegaEmbed(this.$el, spec, {
+                renderer: "svg",
+                actions: { source: false, editor: false, compiled: false },
+            });
+
+            this.vega = vegaInfo;
+
             let scrubbed = [];
-            this.vegaView.view.addSignalListener("brush", (_, value) => {
+            vegaInfo.view.addSignalListener("brush", (_, value) => {
                 if (value.time) {
                     scrubbed = value.time;
-                } else {
-                    scrubbed = this.data.timeRange;
+                } else if (this.series[0].data) {
+                    scrubbed = this.series[0].data.timeRange;
                 }
             });
-            this.vegaView.view.addEventListener("mouseup", () => {
-                console.log("vega-scrubber-brush", scrubbed);
+            vegaInfo.view.addEventListener("mouseup", () => {
+                console.log("viz: vega:scrubber-brush", scrubbed);
                 if (scrubbed.length == 2) {
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
-        });
 
-        this.pickRange(this.visible);
-    },
-    methods: {
-        pickRange(timeRange) {
-            console.log("vega-scrubber:pick", timeRange, this.data.timeRange);
-            if (_.isEqual(timeRange, this.data.timeRange)) {
+            this.pickRange(this.visible);
+        },
+        async brush(times: number[]): Promise<void> {
+            if (!this.vega || !this.series[0].queried) {
+                console.log("viz: vega:scrubber:brush-ignore");
                 return;
             }
-            this.vegaView.view
-                .signal("brush_x", [this.vegaView.view.scale("x")(timeRange[0]), this.vegaView.view.scale("x")(timeRange[1])])
-                .signal("brush_tuple", {
-                    unit: "layer_0",
-                    fields: [
-                        {
-                            field: "time",
-                            channel: "x",
-                            type: "R",
-                        },
-                    ],
-                    values: [timeRange],
-                })
-                .runAsync();
+            const x = times.map((v) => this.vega.view.scale("x")(v));
+            console.log("viz: vega:scrubber:brush", times, x);
+            try {
+                await this.vega.view
+                    .signal("brush_x", x)
+                    .signal("brush_tuple", {
+                        fields: [
+                            {
+                                field: "time",
+                                channel: "x",
+                                type: "R",
+                            },
+                        ],
+                        values: times,
+                    })
+                    .runAsync();
+            } catch (error) {
+                console.log("viz: error", error);
+            }
+        },
+        async pickRange(timeRange): Promise<void> {
+            const first = this.series[0];
+            if (first.ds) {
+                const maximum = first.queried.timeRange;
+                if (_.isEqual(maximum, timeRange)) {
+                    await this.brush([]);
+                } else {
+                    await this.brush(timeRange);
+                }
+            }
         },
     },
 };

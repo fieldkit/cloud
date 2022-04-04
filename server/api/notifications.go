@@ -45,7 +45,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 	for done := false; !done; {
 		select {
 		case outgoing := <-listener.published:
-			if outgoing != nil && len(outgoing) > 0 {
+			if len(outgoing) > 0 {
 				log.Infow("ws:incoming", "message", outgoing)
 				for _, value := range outgoing {
 					if err := stream.Send(value); err != nil {
@@ -55,7 +55,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 			}
 		case err := <-listener.errors:
 			if ce, ok := err.(*websocket.CloseError); ok {
-				log.Infow("ws:closed", "close-code", ce.Code)
+				log.Infow("ws:closed", "close-code", ce.Code, "verbose_ws", true)
 				return nil
 			}
 
@@ -84,7 +84,7 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 		}
 	}
 
-	log.Infow("ws:closing")
+	log.Infow("ws:closing", "verbose_ws", true)
 
 	err := stream.Close()
 	if err != nil {

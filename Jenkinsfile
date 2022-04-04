@@ -61,7 +61,7 @@ timestamps {
 			notifySuccess()
 		}
 		catch (Exception e) {
-			notifyFailure()
+			notifyFailure(e)
 			throw e;
 		}
     }

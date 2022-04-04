@@ -3877,8 +3877,8 @@ func ValidateEssentialStationResponseBody(body *EssentialStationResponseBody) (e
 	return
 }
 
-// ValidateStationJobResponseBody runs the validations defined on StationJob
-// ResponseBody
+// ValidateStationJobResponseBody runs the validations defined on
+// StationJobResponseBody
 func ValidateStationJobResponseBody(body *StationJobResponseBody) (err error) {
 	if body.StartedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("startedAt", "body"))

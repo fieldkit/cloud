@@ -14,6 +14,7 @@ import ProjectsView from "./views/projects/ProjectsView.vue";
 import ProjectEditView from "./views/projects/ProjectEditView.vue";
 import ProjectUpdateEditView from "./views/projects/ProjectUpdateEditView.vue";
 import ProjectView from "./views/projects/ProjectView.vue";
+import ProjectBigMap from "./views/projects/ProjectBigMap.vue";
 
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
@@ -33,7 +34,43 @@ import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
+import { getPartnerCustomization } from "@/views/shared/partners";
+
 Vue.use(Router);
+
+function makeDefaultRouteForProject(projectId: number) {
+    return {
+        path: "/",
+        name: "root",
+        component: ProjectBigMap,
+        props: (route) => {
+            return {
+                id: projectId,
+                forcePublic: false,
+                bigMap: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    };
+}
+
+function getRoot() {
+    const partnerCustomization = getPartnerCustomization();
+    if (partnerCustomization == null) {
+        return {
+            path: "/",
+            name: "root",
+            component: ProjectsView,
+            meta: {
+                secured: true,
+            },
+        };
+    }
+    return makeDefaultRouteForProject(partnerCustomization.projectId);
+}
 
 const routes = [
     {
@@ -44,6 +81,7 @@ const routes = [
             bodyClass: "blue-background",
             secured: false,
         },
+        props: true,
     },
     {
         path: "/login/discourse",
@@ -196,6 +234,22 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/projects/:id/map",
+        name: "viewProjectBigMap",
+        component: ProjectBigMap,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+                bigMap: true,
+            };
+        },
+        meta: {
+            bodyClass: "disable-scrolling",
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/project/add",
         name: "addProject",
         component: ProjectEditView,
@@ -320,6 +374,20 @@ const routes = [
         meta: {},
     },
     {
+        path: "/viz",
+        name: "exploreShortBookmark",
+        component: ExploreView,
+        props: (route) => {
+            if (route.query.v) {
+                return {
+                    token: route.query.v,
+                };
+            }
+            return {};
+        },
+        meta: {},
+    },
+    {
         path: "/dashboard/explore/:bookmark",
         name: "exportBookmarkOld",
         component: ExploreView,
@@ -331,12 +399,12 @@ const routes = [
         meta: {},
     },
     {
-        path: "/dashboard/export",
-        name: "exportBookmark",
+        path: "/viz/export",
+        name: "exportWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 exportsVisible: true,
             };
         },
@@ -346,12 +414,12 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/share",
-        name: "shareBookmark",
+        path: "/viz/share",
+        name: "shareWorkspace",
         component: ExploreView,
         props: (route) => {
             return {
-                bookmark: deserializeBookmark(route.query.bookmark),
+                token: route.query.v,
                 shareVisible: true,
             };
         },
@@ -412,14 +480,6 @@ const routes = [
         },
     },
     {
-        path: "/",
-        name: "root",
-        component: ProjectsView,
-        meta: {
-            secured: true,
-        },
-    },
-    {
         path: "/notifications",
         name: "notifications",
         component: NotificationsView,
@@ -475,6 +535,7 @@ const routes = [
             secured: true,
         },
     },
+    getRoot(),
 ];
 
 export default function routerFactory(store) {

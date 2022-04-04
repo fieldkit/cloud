@@ -9,9 +9,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/conservify/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
 
@@ -48,18 +47,7 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 	}
 }
 
-type DataRow struct {
-	Time      data.NumericWireTime `db:"time" json:"time"`
-	ID        *int64               `db:"id" json:"-"`
-	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
-	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
-	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
-	Location  *data.Location       `db:"location" json:"location,omitempty"`
-	Value     *float64             `db:"value" json:"value,omitempty"`
-	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
-}
-
-func scanRow(queried *sqlx.Rows, row *DataRow) error {
+func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	if err := queried.StructScan(row); err != nil {
 		return fmt.Errorf("error scanning row: %v", err)
 	}
@@ -101,10 +89,10 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 
 	defer queried.Close()
 
-	rows := make([]*DataRow, 0)
+	rows := make([]*backend.DataRow, 0)
 
 	for queried.Next() {
-		row := &DataRow{}
+		row := &backend.DataRow{}
 		if err = scanRow(queried, row); err != nil {
 			return nil, err
 		}
@@ -183,7 +171,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, err
 	}
 
-	rows := make([]*DataRow, 0)
+	rows := make([]*backend.DataRow, 0)
 	if aqp.ExpectedRecords > 0 {
 		queried, err := dq.QueryAggregate(ctx, aqp)
 		if err != nil {
@@ -193,7 +181,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		defer queried.Close()
 
 		for queried.Next() {
-			row := &DataRow{}
+			row := &backend.DataRow{}
 			if err = scanRow(queried, row); err != nil {
 				return nil, err
 			}
@@ -204,10 +192,33 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		log.Infow("empty summary")
 	}
 
+	outerRows, err := dq.QueryOuterValues(ctx, aqp)
+	if err != nil {
+		return nil, err
+	}
+
+	if qp.Complete {
+		hackedRows := make([]*backend.DataRow, 0, len(rows)+len(outerRows))
+		if outerRows[0] != nil {
+			outerRows[0].Time = data.NumericWireTime(aqp.Start)
+			hackedRows = append(hackedRows, outerRows[0])
+		}
+		for i := 0; i < len(rows); i += 1 {
+			hackedRows = append(hackedRows, rows[i])
+		}
+		if outerRows[1] != nil {
+			outerRows[1].Time = data.NumericWireTime(aqp.End)
+			hackedRows = append(hackedRows, outerRows[1])
+		}
+
+		rows = hackedRows
+	}
+
 	data := struct {
 		Summaries map[string]*backend.AggregateSummary `json:"summaries"`
 		Aggregate AggregateInfo                        `json:"aggregate"`
 		Data      interface{}                          `json:"data"`
+		Outer     interface{}                          `json:"outer"`
 	}{
 		summaries,
 		AggregateInfo{
@@ -218,6 +229,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 			End:      aqp.End,
 		},
 		rows,
+		outerRows,
 	}
 
 	return &sensor.DataResult{
@@ -260,6 +272,38 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 
 	return &sensor.MetaResult{
 		Object: data,
+	}, nil
+}
+
+func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
+	repository := repositories.NewBookmarkRepository(c.options.Database)
+
+	saved, err := repository.AddNew(ctx, nil, payload.Bookmark)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sensor.SavedBookmark{
+		URL:      fmt.Sprintf("/viz?v=%s", saved.Token),
+		Token:    saved.Token,
+		Bookmark: payload.Bookmark,
+	}, nil
+}
+
+func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+	repository := repositories.NewBookmarkRepository(c.options.Database)
+
+	resolved, err := repository.Resolve(ctx, payload.V)
+	if err != nil {
+		return nil, err
+	}
+	if resolved == nil {
+		return nil, sensor.MakeNotFound(errors.New("not found"))
+	}
+
+	return &sensor.SavedBookmark{
+		URL:      fmt.Sprintf("/viz?v=%s", resolved.Token),
+		Bookmark: resolved.Bookmark,
 	}, nil
 }
 

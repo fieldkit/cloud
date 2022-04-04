@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <router-link :to="{ name: 'projects' }">
+        <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
         <div
@@ -425,10 +425,11 @@ button {
 
 .no-notifications {
     text-align: center;
-    padding: 0 13px 13px;
+    padding: 0 30px 30px;
 
     img {
         width: 100%;
+        margin-top: 15px;
     }
 }
 </style>

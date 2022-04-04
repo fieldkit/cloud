@@ -455,6 +455,19 @@ func handleNotesOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
+		if cors.MatchOrigin(origin, "https://dataviz.floodnet.nyc") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
 		if cors.MatchOrigin(origin, "https://fieldkit.org") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")

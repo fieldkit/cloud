@@ -27,12 +27,12 @@ func NewSubscriptions() (s *Subscriptions) {
 func (s *Subscriptions) Remove(ctx context.Context, userID int32, listener *Listener) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("ws:removing-any", "user_id", userID)
+	log.Infow("ws:removing-any", "verbose_ws", true, "user_id", userID)
 	s.lock.Lock()
 	if listeners, ok := s.listeners[userID]; ok {
 		for i, value := range listeners {
 			if value == listener {
-				log.Infow("ws:removing-listener", "user_id", userID)
+				log.Infow("ws:removing-listener", "verbose_ws", true, "user_id", userID)
 				s.listeners[userID] = append(listeners[:i], listeners[i+1:]...)
 				break
 			}
@@ -73,7 +73,7 @@ func (s *Subscriptions) Publish(ctx context.Context, userID int32, data []map[st
 		return err
 	}
 
-	log.Infow("listeners", "user_id", userID, "total", len(listeners))
+	log.Infow("ws:listeners", "user_id", userID, "total", len(listeners))
 
 	for _, l := range listeners {
 		l.published <- data

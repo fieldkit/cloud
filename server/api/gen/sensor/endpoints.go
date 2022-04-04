@@ -16,8 +16,10 @@ import (
 
 // Endpoints wraps the "sensor" service endpoints.
 type Endpoints struct {
-	Meta goa.Endpoint
-	Data goa.Endpoint
+	Meta     goa.Endpoint
+	Data     goa.Endpoint
+	Bookmark goa.Endpoint
+	Resolve  goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "sensor" service with endpoints.
@@ -25,8 +27,10 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Meta: NewMetaEndpoint(s),
-		Data: NewDataEndpoint(s, a.JWTAuth),
+		Meta:     NewMetaEndpoint(s),
+		Data:     NewDataEndpoint(s, a.JWTAuth),
+		Bookmark: NewBookmarkEndpoint(s, a.JWTAuth),
+		Resolve:  NewResolveEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -34,6 +38,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Meta = m(e.Meta)
 	e.Data = m(e.Data)
+	e.Bookmark = m(e.Bookmark)
+	e.Resolve = m(e.Resolve)
 }
 
 // NewMetaEndpoint returns an endpoint function that calls the method "meta" of
@@ -64,5 +70,61 @@ func NewDataEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return s.Data(ctx, p)
+	}
+}
+
+// NewBookmarkEndpoint returns an endpoint function that calls the method
+// "bookmark" of service "sensor".
+func NewBookmarkEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*BookmarkPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Bookmark(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedSavedBookmark(res, "default")
+		return vres, nil
+	}
+}
+
+// NewResolveEndpoint returns an endpoint function that calls the method
+// "resolve" of service "sensor".
+func NewResolveEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ResolvePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.Resolve(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedSavedBookmark(res, "default")
+		return vres, nil
 	}
 }

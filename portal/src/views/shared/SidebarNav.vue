@@ -10,7 +10,7 @@
         </a>
         <div id="inner-nav">
             <div class="nav-section">
-                <router-link :to="{ name: 'projects' }">
+                <router-link :to="{ name: 'projects' }" v-if="!isPartnerCustomisationEnabled()">
                     <div class="nav-label">
                         <i class="icon icon-projects"></i>
                         <span v-bind:class="{ selected: viewingProjects }">{{ $t("layout.side.projects.title") }}</span>
@@ -55,11 +55,8 @@
             </router-link>
         </div>
 
-        <template v-if="isPartnerCustomisationEnabled()">
-            <div v-if="sidebar.narrow" class="app-logo app-logo--narrow">
-                <i role="img" class="icon icon-logo-narrow-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
-            </div>
-            <div v-else class="app-logo">
+        <template v-if="isPartnerCustomisationEnabled() && !sidebar.narrow">
+            <div class="app-logo">
                 <span>Made by</span>
                 <br />
                 <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
@@ -71,8 +68,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
-import { interpolatePartner, isCustomisationEnabled } from "./PartnerCustomisationHelper";
+import { StationOrSensor, interpolatePartner, isCustomisationEnabled } from "./partners";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -109,6 +105,10 @@ export default Vue.extend({
         });
 
         resizeObserver.observe(document.querySelector("body"));
+
+        if (this.narrow) {
+            this.toggleSidebar();
+        }
     },
     data(): {
         sidebar: {
@@ -125,6 +125,19 @@ export default Vue.extend({
             narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
         };
     },
+    watch: {
+        $route(to, from) {
+            if (to.name === "viewProjectBigMap") {
+                this.narrow = true;
+                this.toggleSidebar();
+            }
+            if (from.name === "viewProjectBigMap") {
+                this.narrow = false;
+                this.closeMenuOnMobile();
+                this.toggleSidebar();
+            }
+        },
+    },
     methods: {
         showStation(station: unknown): void {
             this.$emit("show-station", station);
@@ -137,6 +150,14 @@ export default Vue.extend({
         },
         toggleSidebar(): void {
             this.sidebar.narrow = !this.sidebar.narrow;
+            this.$emit("sidebar-toggle");
+        },
+        openSidebar(): void {
+            this.sidebar.narrow = false;
+            this.$emit("sidebar-toggle");
+        },
+        closeSidebar(): void {
+            this.sidebar.narrow = true;
             this.$emit("sidebar-toggle");
         },
         isPartnerCustomisationEnabled(): boolean {
@@ -340,18 +361,6 @@ export default Vue.extend({
     text-align: left;
     margin: auto 0 15px 45px;
     padding-top: 10px;
-
-    &--narrow {
-        margin: auto auto 7px auto;
-
-        @include bp-down($sm) {
-            display: none;
-        }
-
-        i {
-            font-size: 58px;
-        }
-    }
 
     span {
         font-family: var(--font-family-bold);

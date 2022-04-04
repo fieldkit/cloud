@@ -57,6 +57,12 @@
                 <img v-if="!showStationsPanel" alt="Expand List" src="@/assets/icon-tab-expand.svg" class="toggle-icon" />
             </div>
             <div class="project-stations-map-container">
+                <router-link :to="{ name: 'viewProjectBigMap' }" class="link">
+                    <div class="map-expand">
+                        <img alt="Location" src="@/assets/icon-expand-map.svg" class="icon" />
+                    </div>
+                </router-link>
+
                 <StationsMap
                     @show-summary="showSummary"
                     :mapped="mappedProject"
@@ -431,6 +437,23 @@ export default Vue.extend({
         &:before {
             color: var(--color-dark);
         }
+    }
+}
+.map-expand {
+    background-color: #ffffff;
+    z-index: 50;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: inline-block;
+    height: 38px;
+    border: 1px solid var(--color-border);
+    padding: 1px;
+    border-radius: 3px;
+    box-sizing: border-box;
+
+    img {
+        margin: 10px;
     }
 }
 </style>

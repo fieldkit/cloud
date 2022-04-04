@@ -40,7 +40,7 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import Logo from '@/views/shared/Logo.vue';
+import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
     name: "RecoverAccountView",

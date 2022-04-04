@@ -6,7 +6,7 @@
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
                     <div id="add-project" v-on:click="addProject" v-if="isAuthenticated">
-                        <i class="icon icon-plus-round"> </i>
+                        <i class="icon icon-plus-round"></i>
                         <span>{{ $t("projects.add") }}</span>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
     </StandardLayout>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout";
@@ -48,11 +48,9 @@ export default Vue.extend({
             publicProjects: (s) => Object.values(s.stations.community.projects),
         }),
     },
-    mounted() {
+    async mounted(): Promise<void> {
         if (this.isAuthenticated) {
-            return this.$services.api.getInvitesByUser().then((invites) => {
-                this.invites = invites;
-            });
+            this.invites = await this.$services.api.getInvitesByUser();
         }
     },
     methods: {

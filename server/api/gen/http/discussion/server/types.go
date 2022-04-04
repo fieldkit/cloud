@@ -778,7 +778,7 @@ func NewProjectPayload(projectID int32, auth *string) *discussion.ProjectPayload
 }
 
 // NewDataPayload builds a discussion service data endpoint payload.
-func NewDataPayload(bookmark string, auth string) *discussion.DataPayload {
+func NewDataPayload(bookmark string, auth *string) *discussion.DataPayload {
 	v := &discussion.DataPayload{}
 	v.Bookmark = bookmark
 	v.Auth = auth
