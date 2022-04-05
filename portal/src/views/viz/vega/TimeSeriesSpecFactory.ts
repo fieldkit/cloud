@@ -9,6 +9,7 @@ export class TimeSeriesSpecFactory {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
+        const makeDataVoronoiName = (i: number) => `table${i + 1}Voronoi`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
@@ -575,9 +576,40 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        // console.log("viz: rules", ruleMarks);
+        const testMarks = mapSeries((series, i) => {
+            const name = makeDataVoronoiName(i);
+            const scales = makeScales(i);
+            return {
+                name: name,
+                type: "path",
+                from: {
+                    data: makeValidDataName(i),
+                },
+                encode: {
+                    enter: {
+                        layoutx: { scale: scales.x, field: "time" },
+                        layouty: { scale: scales.y, field: "value" },
+                        fill: { value: "transparent" },
+                        strokeWidth: { value: 0.35 },
+                        stroke: { value: "red" },
+                    },
+                    update: {
+                        layoutx: { scale: scales.x, field: "time" },
+                        layouty: { scale: scales.y, field: "value" },
+                    },
+                },
+                transform: [
+                    {
+                        type: "voronoi",
+                        x: "layoutx",
+                        y: "layouty",
+                        size: [{ signal: "width" }, { signal: "height" }],
+                    },
+                ],
+            };
+        });
 
-        const marks = [...brushMarks, ...ruleMarks, ...seriesMarks];
+        const marks = [...brushMarks, ...ruleMarks, ...testMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
@@ -676,7 +708,8 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "brush_translate_delta",
                         },
-                        update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                        update:
+                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                     },
                     {
                         events: {
@@ -707,7 +740,8 @@ export class TimeSeriesSpecFactory {
                                 scale: "x",
                             },
                         ],
-                        update: '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        update:
+                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },

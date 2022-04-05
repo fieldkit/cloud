@@ -269,7 +269,6 @@ export class DataSetSeries {
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
-            console.log(`viz: constrain:nope`, this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;
