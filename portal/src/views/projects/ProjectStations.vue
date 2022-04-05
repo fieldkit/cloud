@@ -358,6 +358,7 @@ export default Vue.extend({
     flex: 1;
     display: flex;
     flex-direction: column;
+    z-index: $z-index-header;
 
     @include bp-down($xs) {
         flex-basis: 85%;
@@ -440,7 +441,7 @@ export default Vue.extend({
 }
 .map-expand {
     background-color: #ffffff;
-    z-index: 50;
+    z-index: $z-index-top;
     position: absolute;
     right: 10px;
     top: 10px;
