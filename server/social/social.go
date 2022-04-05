@@ -46,11 +46,13 @@ type SocialContext struct {
 	projectRepository *repositories.ProjectRepository
 	schema            MetaSchema
 	baseApiUrl        string
+	basePortalUrl     string
 	rootPath          string
 }
 
 type SharedProjectPayload struct {
 	project  *data.Project
+	url      string
 	photoUrl string
 	width    int
 	height   int
@@ -60,6 +62,7 @@ type SharedWorkspacePayload struct {
 	bookmark    *data.Bookmark
 	title       string
 	description string
+	url         string
 	photoUrl    string
 }
 
@@ -150,6 +153,7 @@ func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request)
 
 	sharedPayload := &SharedProjectPayload{
 		project:  project,
+		url:      fmt.Sprintf("https://%s%s", sc.basePortalUrl, req.URL.String()),
 		photoUrl: photoUrl,
 		width:    size,
 		height:   size,
@@ -288,6 +292,7 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", sc.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
 
 	sharedPayload := &SharedWorkspacePayload{
+		url:         fmt.Sprintf("https://%s%s", sc.basePortalUrl, req.URL.String()),
 		photoUrl:    photoUrl,
 		title:       title,
 		description: description,

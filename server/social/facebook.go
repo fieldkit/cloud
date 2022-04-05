@@ -44,12 +44,13 @@ func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWri
 	return meta, nil
 }
 
-func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string, rootPath string) (fb *FacebookContext) {
+func NewFacebookContext(db *sqlxcache.DB, baseApiUrl, basePortalUrl, rootPath string) (fb *FacebookContext) {
 	return &FacebookContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
 			baseApiUrl:        baseApiUrl,
+			basePortalUrl:     basePortalUrl,
 			rootPath:          rootPath,
 			schema:            &FacebookSchema{},
 		},

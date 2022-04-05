@@ -27,9 +27,9 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	meta = append(meta, NewMetaName("twitter:description", payload.project.Description))
 	meta = append(meta, NewMetaName("twitter:image:alt", payload.project.Description))
 	meta = append(meta, NewMetaName("twitter:image", payload.photoUrl))
-	meta = append(meta, NewMetaName("twitter:url", req.URL.String()))
+	meta = append(meta, NewMetaName("twitter:url", payload.url))
 
-	meta = append(meta, NewMetaProperty("og:url", req.URL.String()))
+	meta = append(meta, NewMetaProperty("og:url", payload.url))
 	meta = append(meta, NewMetaProperty("og:title", payload.project.Name))
 	meta = append(meta, NewMetaProperty("og:description", payload.project.Description))
 	meta = append(meta, NewMetaProperty("og:image", payload.photoUrl))
@@ -64,9 +64,9 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	meta = append(meta, NewMetaName("twitter:title", payload.title))
 	meta = append(meta, NewMetaName("twitter:description", payload.description))
 	meta = append(meta, NewMetaName("twitter:image", photoUrl))
-	meta = append(meta, NewMetaName("twitter:url", req.URL.String()))
+	meta = append(meta, NewMetaName("twitter:url", payload.url))
 
-	meta = append(meta, NewMetaProperty("og:url", req.URL.String()))
+	meta = append(meta, NewMetaProperty("og:url", payload.url))
 	meta = append(meta, NewMetaProperty("og:title", payload.title))
 	meta = append(meta, NewMetaProperty("og:description", payload.description))
 	meta = append(meta, NewMetaProperty("og:image", photoUrl))
@@ -79,12 +79,13 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	return meta, nil
 }
 
-func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string, rootPath string) (tw *TwitterContext) {
+func NewTwitterContext(db *sqlxcache.DB, baseApiUrl, basePortalUrl, rootPath string) (tw *TwitterContext) {
 	return &TwitterContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
 			baseApiUrl:        baseApiUrl,
+			basePortalUrl:     basePortalUrl,
 			rootPath:          rootPath,
 			schema:            &TwitterSchema{},
 		},

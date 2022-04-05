@@ -401,7 +401,7 @@ func main() {
 	rootRouter.Handle("/robots.txt", robotsFinal)
 	rootRouter.PathPrefix("/.well-known").Handler(wellKnownServer)
 
-	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost, config.PortalRoot)
+	twitterHandlerFactory := social.NewTwitterContext(services.Database, config.ApiHost, config.PortalDomain, config.PortalRoot)
 	twitterHandlerFactory.Register(rootRouter)
 
 	localApiOnly := rootRouter.Host("fk-service:8000").Subrouter()
