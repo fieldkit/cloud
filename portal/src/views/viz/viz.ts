@@ -371,9 +371,9 @@ export class Graph extends Viz {
             const sensorRange = this.timeRangeOfAll;
             if (sensorRange == null) throw new Error(`viz: No timeRangeOfAll`);
             const days = fastTime as number;
-            const start = new Date(sensorRange[1]);
+            const start = new Date(sensorRange.start);
             start.setDate(start.getDate() - days);
-            return new TimeRange(start.getTime(), sensorRange[1]);
+            return new TimeRange(start.getTime(), sensorRange.end);
         }
     }
 
