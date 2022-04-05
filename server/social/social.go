@@ -1,6 +1,7 @@
 package social
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -58,18 +59,9 @@ func matchUserAgent(partial string) mux.MatcherFunc {
 	}
 }
 
-const metaOnlyTemplate = `<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {{- range $key, $value := .Metas }}
-        <meta name="{{ $key }}" content="{{ $value }}" />
-        {{- end }}
-    </head>
-    <body>Intentionally left blank.</body>
-</html>`
+const metaOnlyTemplate = `{{- range $key, $value := .Metas }}
+<meta name="{{ $key }}" content="{{ $value }}" />
+{{- end }}`
 
 func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
 	original, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
@@ -92,10 +84,15 @@ func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta
 		Metas: meta,
 	}
 
-	err = t.Execute(w, data)
+	var rendered bytes.Buffer
+	err = t.Execute(&rendered, data)
 	if err != nil {
 		return err
 	}
+
+	replaced := strings.Replace(string(original), "<title>", rendered.String()+"<title>", 1)
+
+	w.Write([]byte(replaced))
 
 	return nil
 }
@@ -141,14 +138,14 @@ func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request)
 
 	meta, err := sc.schema.SharedProject(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error", "project_id", projectId)
+		log.Errorw("error", "error", err, "project_id", projectId)
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
 	err = sc.serveMeta(w, req, meta)
 	if err != nil {
-		log.Errorw("error")
+		log.Errorw("error", "error", err)
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -280,15 +277,27 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 
 	meta, err := sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error")
+		log.Errorw("error", "error", err)
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
 	err = sc.serveMeta(w, req, meta)
 	if err != nil {
-		log.Errorw("error")
+		log.Errorw("error", "error", err)
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
+}
+
+func (sc *SocialContext) Register(r *mux.Router) {
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}", sc.SharedProject)
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", sc.SharedProject)
+	r.HandleFunc("/dashboard/explore/{bookmark}", sc.SharedWorkspace)
+	r.HandleFunc("/dashboard/share/{bookmark}", sc.SharedWorkspace)
+	r.HandleFunc("/dashboard/explore", sc.SharedWorkspace)
+	r.HandleFunc("/dashboard/share", sc.SharedWorkspace)
+	r.HandleFunc("/viz/share", sc.SharedWorkspace)
+	r.HandleFunc("/viz/export", sc.SharedWorkspace)
+	r.HandleFunc("/viz", sc.SharedWorkspace)
 }

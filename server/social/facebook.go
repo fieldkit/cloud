@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -47,17 +45,19 @@ func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWri
 	return meta, nil
 }
 
-func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string) (fb *FacebookContext) {
+func NewFacebookContext(db *sqlxcache.DB, baseApiUrl string, rootPath string) (fb *FacebookContext) {
 	return &FacebookContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
 			baseApiUrl:        baseApiUrl,
+			rootPath:          rootPath,
 			schema:            &FacebookSchema{},
 		},
 	}
 }
 
+/*
 func (fb *FacebookContext) Register(r *mux.Router) {
 	s := r.NewRoute().MatcherFunc(matchUserAgent("facebook")).Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", fb.SharedProject)
@@ -68,3 +68,4 @@ func (fb *FacebookContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/share", fb.SharedWorkspace)
 	s.HandleFunc("/viz", fb.SharedWorkspace)
 }
+*/

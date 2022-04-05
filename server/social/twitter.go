@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
-
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -76,17 +74,19 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	return meta, nil
 }
 
-func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string) (tw *TwitterContext) {
+func NewTwitterContext(db *sqlxcache.DB, baseApiUrl string, rootPath string) (tw *TwitterContext) {
 	return &TwitterContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
 			baseApiUrl:        baseApiUrl,
+			rootPath:          rootPath,
 			schema:            &TwitterSchema{},
 		},
 	}
 }
 
+/*
 func (tw *TwitterContext) Register(r *mux.Router) {
 	s := r.NewRoute().MatcherFunc(matchUserAgent("twitterbot")).Subrouter()
 	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
@@ -97,3 +97,4 @@ func (tw *TwitterContext) Register(r *mux.Router) {
 	s.HandleFunc("/dashboard/share", tw.SharedWorkspace)
 	s.HandleFunc("/viz", tw.SharedWorkspace)
 }
+*/
