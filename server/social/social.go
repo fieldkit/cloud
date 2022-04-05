@@ -38,6 +38,8 @@ type SocialContext struct {
 type SharedProjectPayload struct {
 	project  *data.Project
 	photoUrl string
+	width    int
+	height   int
 }
 
 type SharedWorkspacePayload struct {
@@ -127,13 +129,16 @@ func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request)
 	}
 
 	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/projects/%d/media", sc.baseApiUrl, project.ID)
+	size := 800
+	photoUrl := fmt.Sprintf("%s/projects/%d/media?size=%d", sc.baseApiUrl, project.ID, size)
 
 	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL)
 
 	sharedPayload := &SharedProjectPayload{
 		project:  project,
 		photoUrl: photoUrl,
+		width:    size,
+		height:   size,
 	}
 
 	meta, err := sc.schema.SharedProject(ctx, w, req, sharedPayload)

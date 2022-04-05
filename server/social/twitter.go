@@ -33,7 +33,11 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	meta["og:title"] = meta["twitter:title"]
 	meta["og:description"] = meta["twitter:description"]
 	meta["og:image"] = meta["twitter:image"]
+	meta["og:image:secure_url"] = meta["og:image"]
 	meta["og:image:alt"] = meta["twitter:image:alt"]
+	meta["og:image:width"] = fmt.Sprintf("%d", payload.width)
+	meta["og:image:height"] = fmt.Sprintf("%d", payload.height)
+	meta["og:image:type"] = "image/png"
 
 	return meta, nil
 }
@@ -67,9 +71,11 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	meta["og:title"] = meta["twitter:title"]
 	meta["og:description"] = meta["twitter:description"]
 	meta["og:image"] = meta["twitter:image"]
+	meta["og:image:secure_url"] = meta["twitter:image"]
 	meta["og:image:alt"] = meta["twitter:image:alt"]
 	meta["og:image:width"] = fmt.Sprintf("%d", w)
 	meta["og:image:height"] = fmt.Sprintf("%d", h)
+	meta["og:image:type"] = "image/png"
 
 	return meta, nil
 }
