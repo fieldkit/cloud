@@ -832,7 +832,7 @@ export class Workspace implements VizInfoFactory {
 
         const options = _.map(
             allModules,
-            (sensors, moduleId: ModuleID): StationTreeOption => {
+            (sensors, moduleId: ModuleID): SensorTreeOption => {
                 const moduleKey = keysById[moduleId];
                 const moduleMeta = allModulesByModuleKey[moduleKey];
                 const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
