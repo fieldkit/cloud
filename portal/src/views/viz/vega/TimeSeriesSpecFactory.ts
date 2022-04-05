@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
+import chartStyles from "./chartStyles";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
@@ -32,33 +33,6 @@ export class TimeSeriesSpecFactory {
                 return undefined;
             }
             return getSeriesThresholds(series);
-        };
-
-        const makeStroke = (i: number) => {
-            if (solidColors) {
-                // No idea why I can't get this to work with just a fixed color.
-                const colors = ["#f47a1f", "#377b2b"];
-                return {
-                    value: {
-                        x1: 1,
-                        y1: 1,
-                        x2: 1,
-                        y2: 0,
-                        gradient: "linear",
-                        stops: [
-                            {
-                                offset: 0,
-                                color: colors[i],
-                            },
-                            {
-                                offset: 1,
-                                color: colors[i],
-                            },
-                        ],
-                    },
-                };
-            }
-            return this.defaultStroke();
         };
 
         // This returns the domain for a single series. Primarily responsible
@@ -501,7 +475,6 @@ export class TimeSeriesSpecFactory {
                                         strokeCap: { value: "round" },
                                         x: { scale: scales.x, field: "time" },
                                         y: { scale: scales.y, field: alias },
-                                        stroke: { value: level.color },
                                         strokeWidth: { value: strokeWidth },
                                         defined: { signal: `isValid(datum.${alias})` },
                                     },
@@ -524,6 +497,7 @@ export class TimeSeriesSpecFactory {
                 } else {
                     const lineMark = {
                         type: "line",
+                        style: (i === 0) ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -532,7 +506,6 @@ export class TimeSeriesSpecFactory {
                                 strokeCap: { value: "round" },
                                 x: { scale: scales.x, field: "time" },
                                 y: { scale: scales.y, field: "value" },
-                                stroke: makeStroke(i),
                                 strokeWidth: { value: 2 },
                                 defined: { signal: "isValid(datum.value)" },
                             },
@@ -904,6 +877,7 @@ export class TimeSeriesSpecFactory {
                     grid: true,
                     gridDash: [2, 2],
                 },
+                style: chartStyles
             },
             signals: signals,
             data: data,

@@ -7,6 +7,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { TimeRange, VizSensor } from "./common";
 import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
+import chartStyles from "./vega/chartStyles";
 
 export const SensorSelectionRow = Vue.extend({
     name: "SensorSelectionRow",
@@ -143,9 +144,8 @@ export const SelectionControls = Vue.extend({
             this.$emit("viz-change-sensors", newParams);
         },
         getKeyColor(idx) {
-            // fixme: hardcoded colors match hardcoding in vega; pull from vega
-            const colors = ["#f47a1f", "#377b2b"]
-            return colors[idx];
+            const color = (idx === 0) ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
+            return color;
         }
     },
     template: `
