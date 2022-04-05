@@ -34,6 +34,10 @@ export const SensorSelectionRow = Vue.extend({
             type: Array as PropType<StationTreeOption[]>,
             required: true,
         },
+        keyColor: {
+            type: String,
+            required: true
+        }
     },
     computed: {
         selectedStation(): number | null {
@@ -76,6 +80,7 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
+            <div class="tree-key" :style="{color: keyColor}">&#9632;</div>
             <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
             <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
@@ -137,11 +142,16 @@ export const SelectionControls = Vue.extend({
             this.viz.log("raise viz-change-sensors", newParams);
             this.$emit("viz-change-sensors", newParams);
         },
+        getKeyColor(idx) {
+            // fixme: hardcoded colors match hardcoding in vega; pull from vega
+            const colors = ["#f47a1f", "#377b2b"]
+            return colors[idx];
+        }
     },
     template: `
 		<div class="left half">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
-                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" />
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" :keyColor="getKeyColor(index)"/>
                 <div class="actions" v-if="showAdd || showRemove">
                     <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
                     <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
