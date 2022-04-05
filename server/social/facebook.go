@@ -2,7 +2,6 @@ package social
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/conservify/sqlxcache"
@@ -17,30 +16,30 @@ type FacebookContext struct {
 type FacebookSchema struct {
 }
 
-func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error) {
-	meta := make(map[string]string)
+func (s *FacebookSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error) {
+	meta := make([]*Meta, 0)
 
-	meta["og:url"] = req.URL.String()
-	meta["og:title"] = payload.project.Name
-	meta["og:description"] = payload.project.Description
-	meta["og:image"] = payload.photoUrl
-	meta["og:image:alt"] = payload.project.Description
+	// meta["og:url"] = req.URL.String()
+	// meta["og:title"] = payload.project.Name
+	// meta["og:description"] = payload.project.Description
+	// meta["og:image"] = payload.photoUrl
+	// meta["og:image:alt"] = payload.project.Description
 
 	return meta, nil
 }
 
-func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error) {
-	meta := make(map[string]string)
+func (s *FacebookSchema) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error) {
+	meta := make([]*Meta, 0)
 
-	size := 1080
+	// size := 1080
 
-	meta["og:url"] = req.URL.String()
-	meta["og:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, size, size)
-	meta["og:image:alt"] = payload.description
-	meta["og:title"] = payload.title
-	meta["og:description"] = payload.description
-	meta["og:image:width"] = fmt.Sprintf("%d", size)
-	meta["og:image:height"] = meta["og:image:width"]
+	// meta["og:url"] = req.URL.String()
+	// meta["og:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, size, size)
+	// meta["og:image:alt"] = payload.description
+	// meta["og:title"] = payload.title
+	// meta["og:description"] = payload.description
+	// meta["og:image:width"] = fmt.Sprintf("%d", size)
+	// meta["og:image:height"] = meta["og:image:width"]
 
 	return meta, nil
 }

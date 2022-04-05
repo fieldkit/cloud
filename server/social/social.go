@@ -22,9 +22,23 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type Meta struct {
+	Attribute string
+	Key       string
+	Value     string
+}
+
+func NewMetaName(key, value string) *Meta {
+	return &Meta{Attribute: "name", Key: key, Value: value}
+}
+
+func NewMetaProperty(key, value string) *Meta {
+	return &Meta{Attribute: "property", Key: key, Value: value}
+}
+
 type MetaSchema interface {
-	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error)
-	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error)
+	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error)
+	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error)
 }
 
 type SocialContext struct {
@@ -61,11 +75,11 @@ func matchUserAgent(partial string) mux.MatcherFunc {
 	}
 }
 
-const metaOnlyTemplate = `{{- range $key, $value := .Metas }}
-<meta name="{{ $key }}" content="{{ $value }}" />
+const metaOnlyTemplate = `{{- range $i, $meta := .Metas }}
+<meta {{ $meta.Attribute }}="{{ $meta.Key }}" content="{{ $meta.Value }}" />
 {{- end }}`
 
-func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
+func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta []*Meta) error {
 	original, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
 	if err != nil {
 		return err
@@ -81,7 +95,7 @@ func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta
 	w.WriteHeader(http.StatusOK)
 
 	data := struct {
-		Metas map[string]string
+		Metas []*Meta
 	}{
 		Metas: meta,
 	}
@@ -228,7 +242,7 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 	ranges := make([]string, 0)
 
 	title := ""
-	description := ""
+	description := "FieldKit Chart"
 
 	for _, v := range parsed.Vizes() {
 		log.Infow("viz:parsed", "v", v)

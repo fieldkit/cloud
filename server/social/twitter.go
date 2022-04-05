@@ -18,26 +18,26 @@ type TwitterContext struct {
 type TwitterSchema struct {
 }
 
-func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) (map[string]string, error) {
-	meta := make(map[string]string)
+func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error) {
+	meta := make([]*Meta, 0)
 
-	meta["twitter:card"] = "summary_large_image"
-	meta["twitter:site"] = "@FieldKitOrg"
-	meta["twitter:title"] = payload.project.Name
-	meta["twitter:description"] = payload.project.Description
-	meta["twitter:image:alt"] = payload.project.Description
-	meta["twitter:image"] = payload.photoUrl
-	meta["twitter:url"] = req.URL.String()
+	meta = append(meta, NewMetaName("twitter:card", "summary_large_image"))
+	meta = append(meta, NewMetaName("twitter:site", "@FieldKitOrg"))
+	meta = append(meta, NewMetaName("twitter:title", payload.project.Name))
+	meta = append(meta, NewMetaName("twitter:description", payload.project.Description))
+	meta = append(meta, NewMetaName("twitter:image:alt", payload.project.Description))
+	meta = append(meta, NewMetaName("twitter:image", payload.photoUrl))
+	meta = append(meta, NewMetaName("twitter:url", req.URL.String()))
 
-	meta["og:url"] = meta["twitter:url"]
-	meta["og:title"] = meta["twitter:title"]
-	meta["og:description"] = meta["twitter:description"]
-	meta["og:image"] = meta["twitter:image"]
-	meta["og:image:secure_url"] = meta["og:image"]
-	meta["og:image:alt"] = meta["twitter:image:alt"]
-	meta["og:image:width"] = fmt.Sprintf("%d", payload.width)
-	meta["og:image:height"] = fmt.Sprintf("%d", payload.height)
-	meta["og:image:type"] = "image/png"
+	meta = append(meta, NewMetaProperty("og:url", req.URL.String()))
+	meta = append(meta, NewMetaProperty("og:title", payload.project.Name))
+	meta = append(meta, NewMetaProperty("og:description", payload.project.Description))
+	meta = append(meta, NewMetaProperty("og:image", payload.photoUrl))
+	meta = append(meta, NewMetaProperty("og:image:secure_url", payload.photoUrl))
+	meta = append(meta, NewMetaProperty("og:image:alt", payload.project.Description))
+	meta = append(meta, NewMetaProperty("og:image:width", fmt.Sprintf("%d", payload.width)))
+	meta = append(meta, NewMetaProperty("og:image:height", fmt.Sprintf("%d", payload.height)))
+	meta = append(meta, NewMetaProperty("og:image:type", "image/png"))
 
 	return meta, nil
 }
@@ -52,30 +52,29 @@ func parseDimensionParam(req *http.Request, name string, d int) int {
 	return d
 }
 
-func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) (map[string]string, error) {
-	meta := make(map[string]string)
-
+func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error) {
 	w := parseDimensionParam(req, "w", 800)
 	h := parseDimensionParam(req, "w", 400)
+	photoUrl := fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, w, h)
 
-	meta["twitter:card"] = "summary_large_image"
-	meta["twitter:site"] = "@FieldKitOrg"
-	meta["twitter:title"] = payload.title
-	meta["twitter:domain"] = ""
-	meta["twitter:description"] = payload.description
-	meta["twitter:image:alt"] = payload.description
-	meta["twitter:image"] = fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, w, h)
-	meta["twitter:url"] = req.URL.String()
+	meta := make([]*Meta, 0)
 
-	meta["og:url"] = meta["twitter:url"]
-	meta["og:title"] = meta["twitter:title"]
-	meta["og:description"] = meta["twitter:description"]
-	meta["og:image"] = meta["twitter:image"]
-	meta["og:image:secure_url"] = meta["twitter:image"]
-	meta["og:image:alt"] = meta["twitter:image:alt"]
-	meta["og:image:width"] = fmt.Sprintf("%d", w)
-	meta["og:image:height"] = fmt.Sprintf("%d", h)
-	meta["og:image:type"] = "image/png"
+	meta = append(meta, NewMetaName("twitter:card", "summary_large_image"))
+	meta = append(meta, NewMetaName("twitter:site", "@FieldKitOrg"))
+	meta = append(meta, NewMetaName("twitter:title", payload.title))
+	meta = append(meta, NewMetaName("twitter:description", payload.description))
+	meta = append(meta, NewMetaName("twitter:image", photoUrl))
+	meta = append(meta, NewMetaName("twitter:url", req.URL.String()))
+
+	meta = append(meta, NewMetaProperty("og:url", req.URL.String()))
+	meta = append(meta, NewMetaProperty("og:title", payload.title))
+	meta = append(meta, NewMetaProperty("og:description", payload.description))
+	meta = append(meta, NewMetaProperty("og:image", photoUrl))
+	meta = append(meta, NewMetaProperty("og:image:secure_url", photoUrl))
+	meta = append(meta, NewMetaProperty("og:image:alt", payload.description))
+	meta = append(meta, NewMetaProperty("og:image:width", fmt.Sprintf("%d", w)))
+	meta = append(meta, NewMetaProperty("og:image:height", fmt.Sprintf("%d", h)))
+	meta = append(meta, NewMetaProperty("og:image:type", "image/png"))
 
 	return meta, nil
 }
