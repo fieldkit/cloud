@@ -30,6 +30,7 @@ func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter
 	meta = append(meta, NewMetaName("twitter:url", payload.url))
 
 	meta = append(meta, NewMetaProperty("og:url", payload.url))
+	meta = append(meta, NewMetaProperty("og:type", "website"))
 	meta = append(meta, NewMetaProperty("og:title", payload.project.Name))
 	meta = append(meta, NewMetaProperty("og:description", payload.project.Description))
 	meta = append(meta, NewMetaProperty("og:image", payload.photoUrl))
@@ -67,6 +68,7 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	meta = append(meta, NewMetaName("twitter:url", payload.url))
 
 	meta = append(meta, NewMetaProperty("og:url", payload.url))
+	meta = append(meta, NewMetaProperty("og:type", "website"))
 	meta = append(meta, NewMetaProperty("og:title", payload.title))
 	meta = append(meta, NewMetaProperty("og:description", payload.description))
 	meta = append(meta, NewMetaProperty("og:image", photoUrl))
