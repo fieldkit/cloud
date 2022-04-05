@@ -62,7 +62,7 @@ export interface HasSensorParams {
 }
 
 export class StationTreeOption {
-    constructor(public readonly id: string | number, public readonly label: string) {}
+    constructor(public readonly id: string | number, public readonly label: string, public readonly isDisabled: boolean) {}
 }
 
 export class SensorTreeOption {
@@ -707,9 +707,9 @@ export class Workspace implements VizInfoFactory {
                     return _.map(info.stations, (info, stationId) => {
                         const stationName = info[0].stationName;
                         const stationLocation = info[0].stationLocation;
-                        const sensors = info.map(
-                            (row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt)
-                        );
+                        const sensors = info
+                            .filter((row) => row.moduleId != null)
+                            .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
                         const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
                         this.stations[station.id] = station;
                         console.log("viz: station-meta", { station, info });
@@ -812,7 +812,7 @@ export class Workspace implements VizInfoFactory {
 
     public get stationOptions(): StationTreeOption[] {
         return Object.values(this.stations).map((station) => {
-            return new StationTreeOption(station.id, station.name);
+            return new StationTreeOption(station.id, station.name, station.sensors.length == 0);
         });
     }
 
