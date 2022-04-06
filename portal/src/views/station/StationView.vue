@@ -1,6 +1,6 @@
 <template>
     <StandardLayout v-if="station">
-        <div class="container-wrap notes-view">
+        <div class="container-wrap">
             <DoubleHeader
                 backRoute="viewProject"
                 :title="station.name"
@@ -8,13 +8,6 @@
                 :backTitle="$tc('layout.backProjectDashboard')"
                 :backRouteParams="{ id: station.id }"
             />
-
-            <section v-if="mapped">
-                <div class="container-map">
-                    <!--                    <StationMap :mapped="mapped" v-if="mapped" :showStations="true" />-->
-                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
-                </div>
-            </section>
 
             <section class="section-station">
                 <div class="container-box">
@@ -106,7 +99,13 @@
                 </div>
             </section>
 
-            <section v-if="notes" class="container-box">
+            <section v-if="mapped">
+                <div class="container-map">
+                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
+                </div>
+            </section>
+
+            <section v-if="notes" class="section-notes container-box">
                 <div class="notifications">
                     <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
 
@@ -134,10 +133,9 @@ import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { ActionTypes, BoundingRectangle, DisplayModule, DisplayStation, MappedStations, ModuleSensor, ProjectModule } from "@/store";
+import { ActionTypes, BoundingRectangle, DisplayModule, DisplayStation, MappedStations, ProjectModule } from "@/store";
 import * as utils from "@/utilities";
-import StationMap from "@/views/station/StationMap.vue";
-import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes, PortalStationNotesReply } from "@/views/notes/model";
+import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import { serializePromiseChain } from "@/utilities";
 import StationsMap from "@/views/shared/StationsMap.vue";
@@ -149,7 +147,6 @@ export default Vue.extend({
         DoubleHeader,
         StationPhoto,
         LatestStationReadings,
-        // StationMap,
         StationsMap,
         NotesForm,
         AuthenticatedPhoto,
@@ -178,7 +175,7 @@ export default Vue.extend({
     },
     computed: {
         station(): DisplayStation {
-           // console.log("radoi active station", this.$state.stations.stations[this.$route.params.id]);
+            // console.log("radoi active station", this.$state.stations.stations[this.$route.params.id]);
             return this.$state.stations.stations[this.$route.params.id];
         },
         notes(): PortalStationNotes[] {
@@ -209,7 +206,6 @@ export default Vue.extend({
             return MappedStations.defaultBounds();
         },
         mapped(): MappedStations | null {
-
             if (!this.station.id) {
                 console.log("Radoi mapped null");
                 return null;
@@ -300,16 +296,35 @@ export default Vue.extend({
     background-color: #fff;
     padding: 20px;
     font-size: 14px;
+
+    @include bp-down($xs) {
+        padding: 10px;
+    }
 }
 
 .section {
+    &-notes {
+        @include bp-down($xs) {
+            padding: 0;
+        }
+    }
+
     &-station {
         margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
+        @include bp-down($sm) {
+            flex-wrap: wrap;
+            margin-top: 0;
+        }
+
         > div {
             flex: 0 0 calc(50% - 10px);
+
+            @include bp-down($sm) {
+                flex-basis: 100%;
+            }
         }
 
         ::v-deep .station-photo {
@@ -391,6 +406,14 @@ export default Vue.extend({
 
         &:not(:last-of-type) {
             border-bottom: solid 1px var(--color-border);
+        }
+
+        @include bp-down($sm) {
+            max-width: unset;
+
+            &:last-of-type {
+                padding-bottom: 5px;
+            }
         }
 
         .icon {
@@ -480,15 +503,27 @@ export default Vue.extend({
         justify-content: space-between;
         position: relative;
 
+        @include bp-down($sm) {
+            margin-top: 20px;
+        }
+
         &-nav {
             height: 28px;
-            padding: 5px 20px;
+            padding: 0px 20px;
             border-radius: 3px;
             border: solid 1px #cccdcf;
             background-color: #fff;
             font-size: 14px;
             font-weight: 900;
+            @include flex(center, center);
             @include position(absolute, null 20px 20px null);
+
+            @include bp-down($sm) {
+                position: unset;
+                width: 100%;
+                margin-top: 5px;
+                height: 35px;
+            }
         }
 
         .photo {
@@ -506,38 +541,12 @@ export default Vue.extend({
     height: 404px;
 }
 
-.notes-form {
-    padding: 0;
-
-    ::v-deep {
-        .header {
-            padding-bottom: 15px;
-        }
-        .note-editor {
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding: 15px 20px 5px;
-        }
-    }
-}
-::v-deep .site-notes {
-    margin-top: 30px;
-}
-
 section {
     margin-bottom: 20px;
 }
 
 // copied from NotesView
 
-.notes-view {
-    @include bp-down($md) {
-        max-width: 600px;
-    }
-    @include bp-down($xs) {
-        padding-bottom: 100px;
-    }
-}
 .notes-view .lower {
     display: flex;
     background: white;
