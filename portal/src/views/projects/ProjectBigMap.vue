@@ -11,6 +11,12 @@
                     <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
                 </div>
             </div>
+            <!-- fixme: currently restricted to floodnet project; locale query -->
+            <div class="map-legend" v-if="id === 174 && levels.length > 0">
+                <div class="legend-item" v-for="item, idx in levels" :key="idx">
+                    <span class="legend-dot" :style="{color: item.color}">&#x25CF;</span><span>{{ item.label["enUS"] }}</span>
+                </div>
+            </div>
             <div class="container-map">
                 <StationsMap
                     @show-summary="showSummary"
@@ -57,10 +63,14 @@ export default Vue.extend({
     data(): {
         layoutChanges: number;
         activeStationId: number | null;
+        legendItems: object[];
     } {
         return {
             layoutChanges: 0,
             activeStationId: null,
+            legendItems: [{label: "Major Flooding", color: "red"}, 
+                        {label: "Minor Flooding", color: "blue"}, 
+                        {label: "No Flooding", color: "green"}]
         };
     },
     props: {
@@ -111,6 +121,17 @@ export default Vue.extend({
         exploreContext(): ExploreContext {
             return new ExploreContext(this.project.id);
         },
+        levels(): object[]{
+            let allLevels: object[] = []
+            try{
+                allLevels = this.displayProject.stations[0].configurations.all[0].modules[0].sensors[0].meta.viz[0].thresholds.levels.filter(d => d["label"]);
+            }
+            catch(error){
+                console.log("No thresholds")
+            }
+            
+            return allLevels
+        }
     },
     watch: {
         id(): Promise<any> {
@@ -235,6 +256,39 @@ export default Vue.extend({
     @include bp-down($sm) {
         top: 54px;
         height: calc(100% - 54px);
+    }
+}
+.map-legend {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    padding: 1px;
+    border-radius: 3px;
+    position: relative;
+    z-index: $z-index-top;
+    width: 200px;
+    position: absolute;
+    bottom: 37px;
+    left: 65px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    text-align: left;
+    padding: 15px;
+    font-family: $font-family-fieldkit-bold;
+
+    .legend-item {
+        margin-bottom: .5em;
+    }
+    .legend-item:last-child{
+        margin-bottom: 0px;
+    }
+    .legend-dot {
+        margin-right: 10px;
+        font-size: 1.5em;
+    }
+
+    @include bp-down($sm) {
+        display: none;
     }
 }
 
