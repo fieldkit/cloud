@@ -1,4 +1,4 @@
-FROM golang:1.14
+FROM golang:1.17.8
 ENV CGO_ENABLED=0
 
 COPY . /app

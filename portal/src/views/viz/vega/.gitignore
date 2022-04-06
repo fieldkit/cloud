@@ -3,3 +3,4 @@ HistogramSpecFactory.js
 RangeSpecFactory.js
 SpecFactory.js
 TimeSeriesSpecFactory.js
+chartStyles.js

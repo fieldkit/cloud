@@ -28,8 +28,8 @@ export const VegaScrubber = Vue.extend({
                     const graph = scrubber.viz as Graph;
                     return graph.loadedDataSets.map((ds) => {
                         const vizInfo = this.workspace.vizInfo(graph, ds);
-                        if (ds.graphing == null) throw new Error("viz: Expected loaded data set");
-                        return new SeriesData(scrubber.data.key, ds, ds.graphing, vizInfo);
+                        if (ds.all == null) throw new Error("viz: Expected loaded data set");
+                        return new SeriesData(scrubber.data.key, ds, ds.all, vizInfo);
                     });
                 })
             );

@@ -172,9 +172,21 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
+	pr := repositories.NewProjectRepository(c.options.Database)
+
 	preciseLocation := false
 	if !p.Anonymous() {
-		preciseLocation = p.UserID() == sf.Owner.ID
+		if p.UserID() == sf.Owner.ID {
+			preciseLocation = true
+		} else {
+			relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
+			if err != nil {
+				return nil, err
+			}
+			if row, ok := relationships[payload.ID]; ok {
+				preciseLocation = row.MemberRole >= 0
+			}
+		}
 	}
 
 	mmr := repositories.NewModuleMetaRepository(c.options.Database)
@@ -334,6 +346,7 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 
 	if !p.Anonymous() && !preciseLocation {
 		// NOTE This may already be in Permissions.
+		// NOTE Compare with GET
 		relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
 		if err != nil {
 			return nil, err

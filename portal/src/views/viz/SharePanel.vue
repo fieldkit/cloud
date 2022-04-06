@@ -56,7 +56,7 @@ export default Vue.extend({
             // TODO We should probably have a "non-partner" customization.
             const partnerCustomization = getPartnerCustomization();
             if (partnerCustomization != null) {
-                qs.append("text", partnerCustomization.sharing.template);
+                qs.append("text", partnerCustomization.sharing.viz);
             } else {
                 qs.append("text", "Check out this data on FieldKit!");
             }

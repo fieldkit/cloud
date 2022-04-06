@@ -250,7 +250,7 @@ export class QueriedData {
 }
 
 export class DataSetSeries {
-    constructor(public readonly vizSensor: VizSensor, public graphing: QueriedData | null = null) {}
+    constructor(public readonly vizSensor: VizSensor, public graphing: QueriedData | null = null, public all: QueriedData | null = null) {}
 
     public bookmark(): VizSensor {
         return this.vizSensor;
