@@ -535,7 +535,7 @@ export class TimeSeriesSpecFactory {
                 if (thresholds) {
                     return thresholds.levels
                         .filter((level) => level.label != null)
-                        .filter((level) => level.value >= domain[0] && level.value < domain[1])
+                        .filter((level) => level.value != null && level.value >= domain[0] && level.value < domain[1])
                         .map((level) => {
                             return {
                                 type: "rule",
