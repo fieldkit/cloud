@@ -11,14 +11,14 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
-type TwitterContext struct {
+type CombinedContext struct {
 	SocialContext
 }
 
-type TwitterSchema struct {
+type CombinedSchema struct {
 }
 
-func (s *TwitterSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error) {
+func (s *CombinedSchema) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error) {
 	meta := make([]*Meta, 0)
 
 	meta = append(meta, NewMetaName("twitter:card", "summary_large_image"))
@@ -53,7 +53,7 @@ func parseDimensionParam(req *http.Request, name string, d int) int {
 	return d
 }
 
-func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error) {
+func (s *CombinedSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error) {
 	w := parseDimensionParam(req, "w", 800)
 	h := parseDimensionParam(req, "w", 400)
 	photoUrl := fmt.Sprintf("%s&w=%d&h=%d", payload.photoUrl, w, h)
@@ -81,28 +81,15 @@ func (s *TwitterSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWri
 	return meta, nil
 }
 
-func NewTwitterContext(db *sqlxcache.DB, baseApiUrl, basePortalUrl, rootPath string) (tw *TwitterContext) {
-	return &TwitterContext{
+func NewContext(db *sqlxcache.DB, baseApiUrl, basePortalUrl, rootPath string) (cc *CombinedContext) {
+	return &CombinedContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
 			baseApiUrl:        baseApiUrl,
 			basePortalUrl:     basePortalUrl,
 			rootPath:          rootPath,
-			schema:            &TwitterSchema{},
+			schema:            &CombinedSchema{},
 		},
 	}
 }
-
-/*
-func (tw *TwitterContext) Register(r *mux.Router) {
-	s := r.NewRoute().MatcherFunc(matchUserAgent("twitterbot")).Subrouter()
-	s.HandleFunc("/dashboard/projects/{id:[0-9]+}", tw.SharedProject)
-	s.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", tw.SharedProject)
-	s.HandleFunc("/dashboard/explore/{bookmark}", tw.SharedWorkspace)
-	s.HandleFunc("/dashboard/share/{bookmark}", tw.SharedWorkspace)
-	s.HandleFunc("/dashboard/explore", tw.SharedWorkspace)
-	s.HandleFunc("/dashboard/share", tw.SharedWorkspace)
-	s.HandleFunc("/viz", tw.SharedWorkspace)
-}
-*/
