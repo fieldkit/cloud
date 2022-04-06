@@ -5,10 +5,22 @@
             <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
-            <a class="twitter-share-button" :href="twitterUrl" target="blank">
-                <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
-                Twitter
-            </a>
+            <div>
+                <a class="share-button" :href="twitterUrl" target="blank">
+                    <div>
+                        <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
+                    </div>
+                    Twitter
+                </a>
+            </div>
+            <div>
+                <a class="share-button" :href="facebookUrl" target="blank">
+                    <div>
+                        <img alt="Share on Facebook" src="../../assets/icon-facebook.svg" />
+                    </div>
+                    Facebook
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -62,6 +74,11 @@ export default Vue.extend({
             }
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },
+        facebookUrl(): string {
+            const qs = new URLSearchParams();
+            qs.append("u", this.vizUrl);
+            return `https://www.facebook.com/sharer/sharer.php?${qs.toString()}`;
+        },
         vizUrl(): string {
             const qs = new URLSearchParams();
             qs.append("v", this.token);
@@ -97,7 +114,11 @@ export default Vue.extend({
 .share-options {
     padding: 20px;
 
-    .twitter-share-button {
+    a div {
+        width: 40px;
+    }
+
+    .share-button {
         padding: 10px 10px 10px 0px;
         cursor: pointer;
         display: flex;
