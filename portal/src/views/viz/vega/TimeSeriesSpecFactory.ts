@@ -44,13 +44,13 @@ export class TimeSeriesSpecFactory {
                 const range = constrained[0];
                 if (series.ds.shouldConstrainBy([range.minimum, range.maximum])) {
                     const d = [range.minimum, range.maximum];
-                    console.log("viz: constrained", series.ds.graphing.dataRange, d);
+                    // console.log("viz: constrained", series.ds.graphing.dataRange, d);
                     return d;
                 } else {
-                    console.log(`viz: constrain-skip`);
+                    // console.log(`viz: constrain-skip`);
                 }
             } else {
-                console.log(`viz: constrain-none`);
+                // console.log(`viz: constrain-none`);
             }
             return series.queried.dataRange;
         };
@@ -497,7 +497,7 @@ export class TimeSeriesSpecFactory {
                 } else {
                     const lineMark = {
                         type: "line",
-                        style: (i === 0) ? "primaryLine" : "secondaryLine",
+                        style: i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -529,11 +529,13 @@ export class TimeSeriesSpecFactory {
         // TODO Unique by thresholds and perhaps y value?
         const ruleMarks = _.flatten(
             mapSeries((series, i) => {
+                const domain = makeSeriesDomain(series);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
                 if (thresholds) {
                     return thresholds.levels
                         .filter((level) => level.label != null)
+                        .filter((level) => level.value != null && level.value >= domain[0] && level.value < domain[1])
                         .map((level) => {
                             return {
                                 type: "rule",
@@ -573,7 +575,7 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        console.log("viz: rules", ruleMarks);
+        // console.log("viz: rules", ruleMarks);
 
         const marks = [...brushMarks, ...ruleMarks, ...seriesMarks];
 
@@ -877,7 +879,7 @@ export class TimeSeriesSpecFactory {
                     grid: true,
                     gridDash: [2, 2],
                 },
-                style: chartStyles
+                style: chartStyles,
             },
             signals: signals,
             data: data,

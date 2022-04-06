@@ -1175,22 +1175,22 @@ type StationSensorRow struct {
 	StationID       int32          `db:"station_id" json:"stationId"`
 	StationName     string         `db:"station_name" json:"stationName"`
 	StationLocation *data.Location `db:"station_location" json:"stationLocation"`
-	ModuleID        string         `db:"module_id" json:"moduleId"`
-	ModuleKey       string         `db:"module_key" json:"moduleKey"`
-	SensorID        int64          `db:"sensor_id" json:"sensorId"`
-	SensorKey       string         `db:"sensor_key" json:"sensorKey"`
-	SensorReadAt    time.Time      `db:"sensor_read_at" json:"sensorReadAt"`
+	ModuleID        *string        `db:"module_id" json:"moduleId"`
+	ModuleKey       *string        `db:"module_key" json:"moduleKey"`
+	SensorID        *int64         `db:"sensor_id" json:"sensorId"`
+	SensorKey       *string        `db:"sensor_key" json:"sensorKey"`
+	SensorReadAt    *time.Time     `db:"sensor_read_at" json:"sensorReadAt"`
 }
 
 type StationSensor struct {
 	StationID       int32          `json:"stationId"`
 	StationName     string         `json:"stationName"`
 	StationLocation *data.Location `json:"stationLocation"`
-	ModuleID        string         `json:"moduleId"`
-	ModuleKey       string         `json:"moduleKey"`
-	SensorID        int64          `json:"sensorId"`
-	SensorKey       string         `json:"sensorKey"`
-	SensorReadAt    time.Time      `json:"sensorReadAt"`
+	ModuleID        *string        `json:"moduleId"`
+	ModuleKey       *string        `json:"moduleKey"`
+	SensorID        *int64         `json:"sensorId"`
+	SensorKey       *string        `json:"sensorKey"`
+	SensorReadAt    *time.Time     `json:"sensorReadAt"`
 	Order           int32          `json:"order"`
 }
 
@@ -1203,15 +1203,17 @@ func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(`
 		SELECT    
-			station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
-			encode(station_module.hardware_id, 'base64') AS module_id, station_module.name AS module_key,
-			sensor_id, s.key AS sensor_key,
+			station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
+			encode(station_module.hardware_id, 'base64') AS module_id,
+			station_module.name AS module_key,
+			sensor_id AS sensor_id,
+			sensor.key AS sensor_key,
 			updated.time AS sensor_read_at                                                                                                                      
-		FROM fieldkit.aggregated_sensor_updated AS updated
-		JOIN fieldkit.aggregated_sensor AS s ON (s.id = updated.sensor_id)
-		JOIN fieldkit.station AS station ON (updated.station_id = station.id)
-		JOIN fieldkit.station_module AS station_module ON (updated.module_id = station_module.id)
-		WHERE station_id IN (?)
+		FROM fieldkit.station AS station
+		LEFT JOIN fieldkit.aggregated_sensor_updated AS updated ON (updated.station_id = station.id)
+		LEFT JOIN fieldkit.aggregated_sensor AS sensor ON (updated.sensor_id = sensor.id)
+		LEFT JOIN fieldkit.station_module AS station_module ON (updated.module_id = station_module.id)
+		WHERE station.id IN (?)
 		ORDER BY sensor_read_at DESC
 		`, stations)
 	if err != nil {
@@ -1231,20 +1233,28 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	metaRepository := NewModuleMetaRepository(sr.db)
 
 	for _, row := range rows {
-		if !strings.HasPrefix(row.ModuleKey, "fk.") && !strings.HasPrefix(row.ModuleKey, "wh.") {
-			row.ModuleKey = "fk." + strings.TrimPrefix(row.ModuleKey, "modules.")
+		var moduleKey *string
+		if row.ModuleKey != nil {
+			if !strings.HasPrefix(*row.ModuleKey, "fk.") && !strings.HasPrefix(*row.ModuleKey, "wh.") {
+				newKey := "fk." + strings.TrimPrefix(*row.ModuleKey, "modules.")
+				moduleKey = &newKey
+			} else {
+				moduleKey = row.ModuleKey
+			}
 		}
-		moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, row.SensorKey)
 		order := 0
-		if moduleAndSensor != nil {
-			order = moduleAndSensor.Sensor.Order
+		if row.SensorKey != nil {
+			moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, *row.SensorKey)
+			if moduleAndSensor != nil {
+				order = moduleAndSensor.Sensor.Order
+			}
 		}
 		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
 			StationID:       row.StationID,
 			StationName:     row.StationName,
 			StationLocation: row.StationLocation,
 			ModuleID:        row.ModuleID,
-			ModuleKey:       row.ModuleKey,
+			ModuleKey:       moduleKey,
 			SensorID:        row.SensorID,
 			SensorKey:       row.SensorKey,
 			SensorReadAt:    row.SensorReadAt,
