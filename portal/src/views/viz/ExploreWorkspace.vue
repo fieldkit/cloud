@@ -454,12 +454,13 @@ export default Vue.extend({
 }
 
 .controls-container .tree-pair div {
-    flex-basis: content;
+    flex-basis: 50%;
 }
 .tree-key {
+    flex-basis: 0;
+    margin-right: 15px;
     line-height: 35px;
     font-size: 40px;
-    margin-right: 15px;
 }
 
 .controls-container .right {
