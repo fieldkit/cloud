@@ -3,7 +3,6 @@ package social
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -66,83 +65,26 @@ type SharedWorkspacePayload struct {
 	photoUrl    string
 }
 
-func matchUserAgent(partial string) mux.MatcherFunc {
-	return func(req *http.Request, match *mux.RouteMatch) bool {
-		if userAgent, ok := req.Header[http.CanonicalHeaderKey("user-agent")]; ok {
-			if len(userAgent) == 0 {
-				return false
-			}
-			return strings.Contains(strings.ToLower(userAgent[0]), strings.ToLower(partial))
-		}
-		return false
-	}
-}
-
 const metaOnlyTemplate = `{{- range $i, $meta := .Metas }}
 <meta {{ $meta.Attribute }}="{{ $meta.Key }}" content="{{ $meta.Value }}" />
 {{- end }}`
 
-func (sc SocialContext) serveMeta(w http.ResponseWriter, req *http.Request, meta []*Meta) error {
-	original, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
-	if err != nil {
-		return err
-	}
-
-	_ = original
-
-	t, err := template.New("social-meta").Parse(metaOnlyTemplate)
-	if err != nil {
-		return err
-	}
-
-	w.WriteHeader(http.StatusOK)
-
-	data := struct {
-		Metas []*Meta
-	}{
-		Metas: meta,
-	}
-
-	var rendered bytes.Buffer
-	err = t.Execute(&rendered, data)
-	if err != nil {
-		return err
-	}
-
-	replaced := strings.Replace(string(original), "<title>", rendered.String()+"<title>", 1)
-
-	w.Write([]byte(replaced))
-
-	return nil
-}
-
-func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
+func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
 
 	projectId, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
 	project, err := sc.projectRepository.QueryByID(ctx, int32(projectId))
 	if err != nil {
-		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			log.Errorw("error-query", "error", err)
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		return
+		return nil, err
 	}
 
 	if project.Privacy != data.Public {
-		log.Errorw("error-permission", "project_id", projectId)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
 
 	// NOTE TODO We're casually assuming https everywhere.
@@ -161,21 +103,13 @@ func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request)
 
 	meta, err := sc.schema.SharedProject(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error", "error", err, "project_id", projectId)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
 
-	err = sc.serveMeta(w, req, meta)
-	if err != nil {
-		log.Errorw("error", "error", err)
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+	return meta, nil
 }
 
-func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
+func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
 
@@ -197,38 +131,29 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 
 		resolved, err := repository.Resolve(ctx, token)
 		if err != nil {
-			log.Errorw("error-internal", "error", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			return nil, err
 		}
 		if resolved == nil {
-			log.Errorw("error-bad-token", "token", token)
-			w.WriteHeader(http.StatusNotFound)
-			return
+			return nil, err
 		}
 
 		bookmark = resolved.Bookmark
 	}
 
 	if bookmark == "" {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return nil, fmt.Errorf("empty bookmark")
 	}
 
 	log.Infow("social-workspace-card", "bookmark", bookmark)
 
 	parsed, err := data.ParseBookmark(bookmark)
 	if err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
 	sensorRows := []*data.Sensor{}
 	if err := sc.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
 	mmr := repositories.NewModuleMetaRepository(sc.db)
@@ -254,18 +179,14 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 		for _, s := range v.Sensors {
 			station, err := sr.QueryStationByID(ctx, s.StationID)
 			if err != nil {
-				log.Errorw("error-internal", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+				return nil, err
 			}
 
 			sensorKey := sensorIdToKey[s.SensorID]
 
 			sensorMeta, err := mmr.FindByFullKey(ctx, sensorKey)
 			if err != nil {
-				log.Errorw("error-internal", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+				return nil, err
 			}
 
 			label := sensorMeta.Sensor.Strings["en-us"]["label"]
@@ -301,27 +222,72 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 
 	meta, err := sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error", "error", err)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
 
-	err = sc.serveMeta(w, req, meta)
+	return meta, nil
+}
+
+func (sc SocialContext) serveMeta(ctx context.Context, w http.ResponseWriter, req *http.Request, meta []*Meta) error {
+	serving, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
 	if err != nil {
-		log.Errorw("error", "error", err)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return err
+	}
+
+	if len(meta) > 0 {
+		t, err := template.New("social-meta").Parse(metaOnlyTemplate)
+		if err != nil {
+			return err
+		}
+
+		data := struct {
+			Metas []*Meta
+		}{
+			Metas: meta,
+		}
+
+		var rendered bytes.Buffer
+		err = t.Execute(&rendered, data)
+		if err == nil {
+			serving = []byte(strings.Replace(string(serving), "<title>", rendered.String()+"<title>", 1))
+		}
+	} else {
+		log := Logger(ctx).Sugar()
+		log.Infow("social:meta:empty")
+	}
+
+	// TODO Include `error` in this either has data for the JS or information.
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(serving))
+
+	return err
+}
+
+func (sc SocialContext) logErrorsAndServeOriginalIndex(f func(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		ctx := context.Background()
+		meta, err := f(ctx, w, req)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("social:meta:error", "error", err)
+		}
+
+		err = sc.serveMeta(ctx, w, req, meta)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("social:serve:error", "error", err)
+		}
 	}
 }
 
 func (sc *SocialContext) Register(r *mux.Router) {
-	r.HandleFunc("/dashboard/projects/{id:[0-9]+}", sc.SharedProject)
-	r.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", sc.SharedProject)
-	r.HandleFunc("/dashboard/explore/{bookmark}", sc.SharedWorkspace)
-	r.HandleFunc("/dashboard/share/{bookmark}", sc.SharedWorkspace)
-	r.HandleFunc("/dashboard/explore", sc.SharedWorkspace)
-	r.HandleFunc("/dashboard/share", sc.SharedWorkspace)
-	r.HandleFunc("/viz/share", sc.SharedWorkspace)
-	r.HandleFunc("/viz/export", sc.SharedWorkspace)
-	r.HandleFunc("/viz", sc.SharedWorkspace)
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}", sc.logErrorsAndServeOriginalIndex(sc.SharedProject))
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", sc.logErrorsAndServeOriginalIndex(sc.SharedProject))
+	r.HandleFunc("/dashboard/explore/{bookmark}", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/share/{bookmark}", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/explore", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/share", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz/share", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz/export", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
 }
