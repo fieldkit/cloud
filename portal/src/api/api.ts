@@ -317,6 +317,7 @@ export interface Station {
     updatedAt: number;
     battery: number | null;
     location: StationLocation | null;
+    locationName: string;
     placeNameOther: string | null;
     placeNameNative: string | null;
     recordingStartedAt: Date | null;

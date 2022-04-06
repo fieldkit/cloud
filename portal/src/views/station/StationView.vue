@@ -2,12 +2,20 @@
     <StandardLayout v-if="station">
         <div class="container-wrap notes-view">
             <DoubleHeader
+                backRoute="viewProject"
                 :title="station.name"
                 :subtitle="headerSubtitle"
                 :backTitle="$tc('layout.backProjectDashboard')"
-                backRoute="viewProject"
                 :backRouteParams="{ id: station.id }"
             />
+
+            <section v-if="mapped">
+                <div class="container-map">
+                    <!--                    <StationMap :mapped="mapped" v-if="mapped" :showStations="true" />-->
+                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
+                </div>
+            </section>
+
             <section class="section-station">
                 <div class="container-box">
                     <div class="flex flex-al-center">
@@ -26,15 +34,12 @@
                     </div>
 
                     <div>
-                        <div v-if="station.location" class="station-row flex flex-space-between">
-                            <div class="flex flex-al-center station-location">
+                        <div class="station-row flex flex-space-between">
+                            <div v-if="station.locationName" class="flex flex-al-center station-location">
                                 <i class="icon icon-location"></i>
-                                <!--
-                                <span>{{ station.location }}</span>
--->
-                                <span>Los Angeles</span>
+                                <span>{{ station.locationName }}</span>
                             </div>
-                            <div class="flex">
+                            <div v-if="station.location" class="flex">
                                 <div class="station-coordinate">
                                     <div>{{ station.location.latitude | prettyCoordinate }}</div>
                                     <div>{{ $tc("station.latitude") }}</div>
@@ -69,10 +74,10 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="notes.media" class="station-photos">
+                <div v-if="photos" class="station-photos">
                     <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
                         <!-- somehow using v-for like so needs the next v-if -->
-                        <AuthenticatedPhoto v-if="notes.media[index]" :url="notes.media[index].url" />
+                        <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                         <i v-else class="photo icon icon-image-placeholder"></i>
                     </div>
                     <router-link :to="{ name: 'test' }" class="station-photos-nav">
@@ -81,7 +86,7 @@
                 </div>
             </section>
 
-            <section class="container-box section-readings">
+            <section class="container-box section-readings" v-if="selectedModule">
                 <div class="station-readings">
                     <ul>
                         <li
@@ -101,13 +106,7 @@
                 </div>
             </section>
 
-            <section>
-                <div class="container-map">
-                    <!--                    <StationMap :mapped="mapped" v-if="mapped && false" :showStations="true" />-->
-                </div>
-            </section>
-
-            <section v-if="notes && notes.notes" class="container-box">
+            <section v-if="notes" class="container-box">
                 <div class="notifications">
                     <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
 
@@ -116,7 +115,7 @@
                 <NotesForm
                     v-bind:key="station.id"
                     :station="station"
-                    :notes="notes"
+                    :notes="{ notes, media }"
                     :readonly="false"
                     @save="saveForm"
                     @change="onChange"
@@ -127,19 +126,21 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable vue/no-unused-components */
+
 import Vue from "vue";
 import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { ActionTypes, DisplayStation, MappedStations, ModuleSensor, ProjectModule } from "@/store";
+import { ActionTypes, BoundingRectangle, DisplayModule, DisplayStation, MappedStations, ModuleSensor, ProjectModule } from "@/store";
 import * as utils from "@/utilities";
 import StationMap from "@/views/station/StationMap.vue";
-import { mergeNotes, NoteMedia, Notes, PortalStationNotesReply } from "@/views/notes/model";
+import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes, PortalStationNotesReply } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import { serializePromiseChain } from "@/utilities";
-import { convertOldFirmwareResponse } from "@/utilities";
+import StationsMap from "@/views/shared/StationsMap.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -149,58 +150,19 @@ export default Vue.extend({
         StationPhoto,
         LatestStationReadings,
         // StationMap,
+        StationsMap,
         NotesForm,
         AuthenticatedPhoto,
     },
-    mounted() {
-        // this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.id });
-
-        this.$services.api
-            .getStation(this.$route.params.id)
-            .then((station) => {
-                this.station = new DisplayStation(station);
-                this.selectedModule = this.station.modules[0];
-
-                console.log("radoi sel module", this.selectedModule);
-
-                //selmodule.name = modules.water.ph
-
-                //sensor.sensorModule.key = fk.water.ph
-
-                console.log("radoi station", this.station);
-                //    console.log("radoi module", this.selectedModule);
-
-                //   console.log("gettinggg radoi station notes by id", this.station.id);
-                // get notes & media
-                this.$services.api
-                    .getStationNotes(this.station.id)
-                    .then((notes) => {
-                        //        console.log("Radoi notes", notes);
-                        this.notes = notes;
-
-                        console.log("GOT NOTES", this.notes);
-                    })
-                    .catch((e) => {
-                        console.log("Radoi e notes", e);
-                    });
-            })
-            .catch((e) => {
-                console.log("e radoi station", e);
-            });
-    },
     data(): {
-        station: DisplayStation | null;
-        notes: { [stationId: number]: PortalStationNotesReply };
         notesState: {
             dirty: boolean;
             success: boolean;
             failed: boolean;
         };
-        selectedModule: ModuleSensor | null;
+        selectedModule: DisplayModule | null;
     } {
         return {
-            station: null,
-            notes: {},
             notesState: {
                 dirty: false,
                 success: false,
@@ -209,11 +171,26 @@ export default Vue.extend({
             selectedModule: null,
         };
     },
-    computed: {
-        photos(this: any) {
-            return NoteMedia.onlyPhotos(this.notes.media);
+    watch: {
+        station() {
+            this.selectedModule = this.station.modules[0];
         },
-        headerSubtitle() {
+    },
+    computed: {
+        station(): DisplayStation {
+           // console.log("radoi active station", this.$state.stations.stations[this.$route.params.id]);
+            return this.$state.stations.stations[this.$route.params.id];
+        },
+        notes(): PortalStationNotes[] {
+            return this.$state.notes.notes;
+        },
+        media(): PortalNoteMedia[] {
+            return this.$state.notes.media;
+        },
+        photos(): NoteMedia[] {
+            return NoteMedia.onlyPhotos(this.$state.notes.media);
+        },
+        headerSubtitle(): string {
             let subtitle;
             if (this.station && this.station.deployedAt && this.$options.filters?.prettyDate) {
                 if (this.station.deployedAt) {
@@ -224,40 +201,23 @@ export default Vue.extend({
             }
             return subtitle;
         },
-        /*station(): DisplayStation {
-            console.log("rrr", this.$getters.stationsById[this.$route.params.id]);
-            return this.$getters.stationsById[this.$route.params.id];
-        },*/
-        mapped(): any {
-            const stationId = parseInt(this.$route.params.id);
-            const station = this.$getters.mapped.stations.filter((station) => station.id === stationId);
+        mapBounds(): BoundingRectangle {
+            /*if (this.project.bounds?.min && this.project.bounds?.max) {
+                return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
+            }*/
 
-            if (!this.$getters.mapped) {
+            return MappedStations.defaultBounds();
+        },
+        mapped(): MappedStations | null {
+
+            if (!this.station.id) {
+                console.log("Radoi mapped null");
                 return null;
             }
-            /* if (this.bounds) {
-                console.log(`focusing bounds: ${this.bounds}`);
-                return this.$getters.mapped.overrideBounds(this.bounds);
-            }*/
 
-            /* if (this.station.id) {
-                console.log(`focusing station: ${this.id}`);
-                return this.$getters.mapped.focusOn(this.id);
-            }*/
-
-            const mapped = this.$getters.mapped;
+            const mapped = MappedStations.make([this.station]);
             console.log("radoi mapped", mapped);
-
-            const returnValue = {
-                features: mapped.features,
-                bounds: mapped.bounds,
-                stations: station,
-                isSingleType: mapped.isSingleType,
-            };
-
-            console.log("radoi filtered", returnValue);
-
-            return returnValue;
+            return mapped.focusOn(this.station.id);
         },
     },
     beforeRouteUpdate(to: never, from: never, next: any) {
@@ -269,6 +229,10 @@ export default Vue.extend({
         if (this.confirmLeave()) {
             next();
         }
+    },
+    beforeMount(): void {
+        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.id });
+        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.id });
     },
     methods: {
         getBatteryIcon(): string {
@@ -285,13 +249,13 @@ export default Vue.extend({
             this.notesState.failed = false;
 
             await serializePromiseChain(formNotes.addedPhotos, (photo) => {
-                return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then((media) => {
+                return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then(() => {
                     return [];
                 });
             }).then(() => {
-                const payload = mergeNotes(this.notes[this.station.id], formNotes);
+                const payload = mergeNotes({ notes: this.notes, media: this.media }, formNotes);
                 return this.$services.api.patchStationNotes(this.station.id, payload).then(
-                    (updated) => {
+                    () => {
                         this.notesState.dirty = false;
                         this.notesState.success = true;
                     },
@@ -350,9 +314,9 @@ export default Vue.extend({
 
         ::v-deep .station-photo {
             margin-right: 20px;
-            object-fit: contain;
             width: 90px;
             height: 90px;
+            object-fit: cover;
             border-radius: 5px;
         }
 
@@ -360,6 +324,12 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
+            max-height: 192px;
+
+            &:nth-of-type(3),
+            &:nth-of-type(4) {
+                margin-bottom: 0;
+            }
 
             img {
                 width: 100%;
@@ -438,6 +408,7 @@ export default Vue.extend({
             padding: 27px 20px 10px 30px;
             border-left: 1px solid var(--color-border);
             transform: translateX(-1px);
+            width: 100%;
         }
 
         ul {
@@ -531,6 +502,10 @@ export default Vue.extend({
     color: #6a6d71;
 }
 
+.stations-map {
+    height: 404px;
+}
+
 .notes-form {
     padding: 0;
 
@@ -551,5 +526,50 @@ export default Vue.extend({
 
 section {
     margin-bottom: 20px;
+}
+
+// copied from NotesView
+
+.notes-view {
+    @include bp-down($md) {
+        max-width: 600px;
+    }
+    @include bp-down($xs) {
+        padding-bottom: 100px;
+    }
+}
+.notes-view .lower {
+    display: flex;
+    background: white;
+    margin-top: 20px;
+    position: relative;
+
+    @include bp-down($xs) {
+        margin-top: -15px;
+    }
+}
+.loading-container {
+    height: 100%;
+    @include flex(center);
+}
+.notes-view .lower .loading-container.empty {
+    padding: 20px;
+}
+
+.notification {
+    margin-top: 0;
+}
+
+.notification.success {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px;
+    border-radius: 4px;
+}
+.notification.success {
+    background-color: #d4edda;
+}
+.notification.failed {
+    background-color: #f8d7da;
 }
 </style>

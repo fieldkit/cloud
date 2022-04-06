@@ -240,6 +240,7 @@ export default Vue.extend({
             this.failed = false;
             this.loading = true;
             await this.$services.api.getStationNotes(stationId).then((notes) => {
+                console.log("NOTES radoi", notes);
                 Vue.set(this.notes, stationId, notes);
                 this.loading = false;
             });

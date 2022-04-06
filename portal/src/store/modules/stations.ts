@@ -74,6 +74,7 @@ export class DisplayStation {
     public readonly deployedAt: Date | null = null;
     public readonly totalReadings = 0;
     public readonly location: Location | null = null;
+    public readonly locationName: string;
     public readonly photos: Photos;
     public readonly modules: DisplayModule[] = [];
     public readonly placeNameOther: string | null;
@@ -90,6 +91,7 @@ export class DisplayStation {
         this.configurations = station.configurations;
         this.photos = station.photos;
         this.battery = station.battery;
+        this.locationName = station.locationName;
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
@@ -524,7 +526,6 @@ const mutations = {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
-        console.log("SET STAT ERADOI");
         Vue.set(state.stations, payload.id, new DisplayStation(payload));
     },
     [PROJECT_LOADED]: (state: StationsState, project: Project) => {
