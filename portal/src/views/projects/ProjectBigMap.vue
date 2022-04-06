@@ -13,8 +13,9 @@
             </div>
             <!-- fixme: currently restricted to floodnet project; locale query -->
             <div class="map-legend" v-if="id === 174 && levels.length > 0">
-                <div class="legend-item" v-for="item, idx in levels" :key="idx">
-                    <span class="legend-dot" :style="{color: item.color}">&#x25CF;</span><span>{{ item.label["enUS"] }}</span>
+                <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
+                    <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
+                    <span>{{ item.label["enUS"] }}</span>
                 </div>
             </div>
             <div class="container-map">
@@ -63,14 +64,10 @@ export default Vue.extend({
     data(): {
         layoutChanges: number;
         activeStationId: number | null;
-        legendItems: object[];
     } {
         return {
             layoutChanges: 0,
             activeStationId: null,
-            legendItems: [{label: "Major Flooding", color: "red"}, 
-                        {label: "Minor Flooding", color: "blue"}, 
-                        {label: "No Flooding", color: "green"}]
         };
     },
     props: {
@@ -121,17 +118,15 @@ export default Vue.extend({
         exploreContext(): ExploreContext {
             return new ExploreContext(this.project.id);
         },
-        levels(): object[]{
-            let allLevels: object[] = []
-            try{
-                allLevels = this.displayProject.stations[0].configurations.all[0].modules[0].sensors[0].meta.viz[0].thresholds.levels.filter(d => d["label"]);
+        levels(): object[] {
+            try {
+                return this.displayProject.stations[0].configurations.all[0].modules[0].sensors[0].meta.viz[0].thresholds.levels.filter(
+                    (d) => d["label"]
+                );
+            } catch (error) {
+                return [];
             }
-            catch(error){
-                console.log("No thresholds")
-            }
-            
-            return allLevels
-        }
+        },
     },
     watch: {
         id(): Promise<any> {
@@ -209,7 +204,7 @@ export default Vue.extend({
     margin-bottom: 5px;
     text-overflow: ellipsis;
     overflow: hidden;
-    white-space:nowrap;
+    white-space: nowrap;
     max-height: 1em;
     width: 240px;
 }
@@ -277,9 +272,9 @@ export default Vue.extend({
     font-family: $font-family-fieldkit-bold;
 
     .legend-item {
-        margin-bottom: .5em;
+        margin-bottom: 0.5em;
     }
-    .legend-item:last-child{
+    .legend-item:last-child {
         margin-bottom: 0px;
     }
     .legend-dot {
