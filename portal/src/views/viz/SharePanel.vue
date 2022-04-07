@@ -5,22 +5,16 @@
             <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
-            <div>
-                <a class="share-button" :href="twitterUrl" target="blank">
-                    <div>
-                        <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
-                    </div>
-                    Twitter
-                </a>
-            </div>
-            <div>
-                <a class="share-button" :href="facebookUrl" target="blank">
-                    <div>
-                        <img alt="Share on Facebook" src="../../assets/icon-facebook.svg" />
-                    </div>
+            <a class="share-button" :href="twitterUrl" target="blank">
+                <i class="icon icon-twitter" aria-label="Share on Twitter"></i>
+                Twitter
+            </a>
+            <a class="share-button" :href="facebookUrl" target="blank">
+                <i class="icon icon-facebook" aria-label="Share on Facebook"></i>
+                <span>
                     Facebook
-                </a>
-            </div>
+                </span>
+            </a>
         </div>
     </div>
 </template>
@@ -98,7 +92,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .share-panel .heading {
-    padding: 1em;
+    padding: 25px 20px;
     display: flex;
     align-items: center;
 }
@@ -114,12 +108,14 @@ export default Vue.extend({
 .share-options {
     padding: 20px;
 
-    a div {
-        width: 40px;
+    .icon {
+        width: 20px;
+        font-size: 19px;
+        margin-right: 10px;
     }
 
     .share-button {
-        padding: 10px 10px 10px 0px;
+        padding: 11px 10px 13px 0px;
         cursor: pointer;
         display: flex;
         align-items: center;
