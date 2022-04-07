@@ -401,7 +401,7 @@ func main() {
 	rootRouter.Handle("/robots.txt", robotsFinal)
 	rootRouter.PathPrefix("/.well-known").Handler(wellKnownServer)
 
-	socialMeta := social.NewContext(services.Database, config.ApiHost, config.PortalDomain, config.PortalRoot)
+	socialMeta := social.NewContext(services.Database, config.PortalRoot)
 	socialMeta.Register(rootRouter)
 
 	localApiOnly := rootRouter.Host("fk-service:8000").Subrouter()

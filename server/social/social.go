@@ -44,8 +44,6 @@ type SocialContext struct {
 	db                *sqlxcache.DB
 	projectRepository *repositories.ProjectRepository
 	schema            MetaSchema
-	baseApiUrl        string
-	basePortalUrl     string
 	rootPath          string
 }
 
@@ -69,6 +67,16 @@ const metaOnlyTemplate = `{{- range $i, $meta := .Metas }}
 <meta {{ $meta.Attribute }}="{{ $meta.Key }}" content="{{ $meta.Value }}" />
 {{- end }}`
 
+func (sc *SocialContext) getRequestHost(req *http.Request) string {
+	protocol := "https" // We're never accessed over http.
+	forwardedHostKey := http.CanonicalHeaderKey("x-forwarded-host")
+	forwardedHeader := req.Header.Values(forwardedHostKey)
+	if len(forwardedHeader) == 0 {
+		return fmt.Sprintf("%s://%s", protocol, req.Host)
+	}
+	return fmt.Sprintf("%s://%s", protocol, forwardedHeader[0])
+}
+
 func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
@@ -87,15 +95,16 @@ func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWrite
 		return nil, err
 	}
 
-	// NOTE TODO We're casually assuming https everywhere.
 	size := 800
-	photoUrl := fmt.Sprintf("%s/projects/%d/media?size=%d", sc.baseApiUrl, project.ID, size)
+	requestHost := sc.getRequestHost(req)
+	photoUrl := fmt.Sprintf("%s/projects/%d/media?size=%d", requestHost, project.ID, size)
+	linkUrl := fmt.Sprintf("%s%s", requestHost, req.URL.String())
 
-	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL)
+	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL, "request_host", requestHost)
 
 	sharedPayload := &SharedProjectPayload{
 		project:  project,
-		url:      fmt.Sprintf("https://%s%s", sc.basePortalUrl, req.URL.String()),
+		url:      linkUrl,
 		photoUrl: photoUrl,
 		width:    size,
 		height:   size,
@@ -111,24 +120,21 @@ func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWrite
 
 func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
-	vars := mux.Vars(req)
 
 	bookmark := ""
+	// Deprecated
+	vars := mux.Vars(req)
 	if vars["bookmark"] != "" {
-		bookmark = vars["bookmark"] // Deprecated
+		bookmark = vars["bookmark"]
 	}
-
 	qs := req.URL.Query()
-
 	if qs.Get("bookmark") != "" {
 		bookmark = qs.Get("bookmark")
 	}
-
 	if qs.Get("v") != "" {
 		token := qs.Get("v")
 
 		repository := repositories.NewBookmarkRepository(sc.db)
-
 		resolved, err := repository.Resolve(ctx, token)
 		if err != nil {
 			return nil, err
@@ -144,7 +150,9 @@ func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWri
 		return nil, fmt.Errorf("empty bookmark")
 	}
 
-	log.Infow("social-workspace-card", "bookmark", bookmark)
+	requestHost := sc.getRequestHost(req)
+
+	log.Infow("social-workspace-card", "bookmark", bookmark, "url", req.URL, "request_host", requestHost)
 
 	parsed, err := data.ParseBookmark(bookmark)
 	if err != nil {
@@ -210,10 +218,11 @@ func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWri
 
 	// We're assuming https here.
 	now := time.Now()
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", sc.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", requestHost, url.QueryEscape(bookmark), now.Unix())
+	linkUrl := fmt.Sprintf("%s%s", requestHost, req.URL.String())
 
 	sharedPayload := &SharedWorkspacePayload{
-		url:         fmt.Sprintf("https://%s%s", sc.basePortalUrl, req.URL.String()),
+		url:         linkUrl,
 		photoUrl:    photoUrl,
 		title:       title,
 		description: description,
@@ -235,28 +244,26 @@ func (sc SocialContext) serveMeta(ctx context.Context, w http.ResponseWriter, re
 	}
 
 	if len(meta) > 0 {
-		t, err := template.New("social-meta").Parse(metaOnlyTemplate)
-		if err != nil {
-			return err
-		}
-
-		data := struct {
-			Metas []*Meta
-		}{
-			Metas: meta,
-		}
-
-		var rendered bytes.Buffer
-		err = t.Execute(&rendered, data)
+		template, err := template.New("social-meta").Parse(metaOnlyTemplate)
 		if err == nil {
-			serving = []byte(strings.Replace(string(serving), "<title>", rendered.String()+"<title>", 1))
+			data := struct {
+				Metas []*Meta
+			}{
+				Metas: meta,
+			}
+
+			var rendered bytes.Buffer
+			err = template.Execute(&rendered, data)
+			if err == nil {
+				serving = []byte(strings.Replace(string(serving), "<title>", rendered.String()+"<title>", 1))
+			}
 		}
 	} else {
 		log := Logger(ctx).Sugar()
 		log.Infow("social:meta:empty")
 	}
 
-	// TODO Include `error` in this either has data for the JS or information.
+	// TODO Include `error` in this either as data.
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(serving))
 

@@ -81,13 +81,11 @@ func (s *CombinedSchema) SharedWorkspace(ctx context.Context, rw http.ResponseWr
 	return meta, nil
 }
 
-func NewContext(db *sqlxcache.DB, baseApiUrl, basePortalUrl, rootPath string) (cc *CombinedContext) {
+func NewContext(db *sqlxcache.DB, rootPath string) (cc *CombinedContext) {
 	return &CombinedContext{
 		SocialContext{
 			db:                db,
 			projectRepository: repositories.NewProjectRepository(db),
-			baseApiUrl:        baseApiUrl,
-			basePortalUrl:     basePortalUrl,
 			rootPath:          rootPath,
 			schema:            &CombinedSchema{},
 		},
