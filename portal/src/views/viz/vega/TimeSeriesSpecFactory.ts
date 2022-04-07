@@ -492,7 +492,7 @@ export class TimeSeriesSpecFactory {
                         },
                         update: {
                             fillOpacity: {
-                                signal: `hover && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
                             },
                         },
                     },
