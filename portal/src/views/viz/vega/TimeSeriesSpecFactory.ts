@@ -108,7 +108,7 @@ export class TimeSeriesSpecFactory {
                               })
                             : null;
 
-                        const name = { name: hoverName };
+                        const name = { name: hoverName, vizInfo: series.vizInfo };
                         const data = series.queried.data.map((datum) => _.extend(datum, name));
 
                         return [
@@ -614,8 +614,6 @@ export class TimeSeriesSpecFactory {
         );
 
         const cellMarks = () => {
-            const title = ""; // series.vizInfo.label;
-            const suffix = ""; // series.vizInfo.unitOfMeasure || "";
             return [
                 {
                     name: "cell",
@@ -627,12 +625,12 @@ export class TimeSeriesSpecFactory {
                         enter: {
                             path: { field: "layout_path" },
                             fill: { value: "transparent" },
-                            strokeWidth: { value: 0.35 },
-                            stroke: { value: "red" },
+                            // strokeWidth: { value: 0.35 },
+                            // stroke: { value: "red" },
                             tooltip: {
                                 signal: `{
-                                title: '${title}',
-                                Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
+                                title: datum.vizInfo.label,
+                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
                             }`,
                             },
