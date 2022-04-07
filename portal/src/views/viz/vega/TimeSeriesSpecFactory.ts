@@ -91,61 +91,71 @@ export class TimeSeriesSpecFactory {
             {
                 name: "brush_store",
             },
-        ].concat(
-            _.flatten(
-                mapSeries((series, i) => {
-                    const hoverName = makeHoverName(i);
-                    const thresholds = makeSeriesThresholds(series);
-                    const transforms = thresholds
-                        ? thresholds.levels.map((level, l: number) => {
-                              return {
-                                  type: "formula",
-                                  expr: "datum.value <= " + level.value + " ? datum.value : null",
-                                  as: makeThresholdLevelAlias(i, l),
-                              };
-                          })
-                        : null;
+        ]
+            .concat(
+                _.flatten(
+                    mapSeries((series, i) => {
+                        const hoverName = makeHoverName(i);
+                        const thresholds = makeSeriesThresholds(series);
+                        const scales = makeScales(i);
+                        const transforms = thresholds
+                            ? thresholds.levels.map((level, l: number) => {
+                                  return {
+                                      type: "formula",
+                                      expr: "datum.value <= " + level.value + " ? datum.value : null",
+                                      as: makeThresholdLevelAlias(i, l),
+                                  };
+                              })
+                            : null;
 
-                    const name = { name: hoverName };
-                    const data = series.queried.data.map((datum) => _.extend(datum, name));
+                        const name = { name: hoverName };
+                        const data = series.queried.data.map((datum) => _.extend(datum, name));
 
-                    return [
-                        {
-                            name: makeDataName(i),
-                            values: data,
-                            transform: transforms,
-                        },
-                        {
-                            name: makeValidDataName(i),
-                            source: makeDataName(i),
-                            transform: [
-                                {
-                                    type: "filter",
-                                    expr: "isValid(datum.value)",
-                                },
-                                {
-                                    type: "formula",
-                                    expr: "scale('x', datum.time)",
-                                    as: "layout_x",
-                                },
-                                {
-                                    type: "formula",
-                                    expr: "scale('y', datum.value)",
-                                    as: "layout_y",
-                                },
-                                {
-                                    type: "voronoi",
-                                    x: "layout_x",
-                                    y: "layout_y",
-                                    size: [{ signal: "width" }, { signal: "height" }],
-                                    as: "layout_path",
-                                },
-                            ],
-                        },
-                    ];
-                })
+                        return [
+                            {
+                                name: makeDataName(i),
+                                values: data,
+                                transform: transforms,
+                            },
+                            {
+                                name: makeValidDataName(i),
+                                source: makeDataName(i),
+                                transform: [
+                                    {
+                                        type: "filter",
+                                        expr: "isValid(datum.value)",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: `scale('${scales.x}', datum.time)`,
+                                        as: "layout_x",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: `scale('${scales.y}', datum.value)`,
+                                        as: "layout_y",
+                                    },
+                                ],
+                            },
+                        ];
+                    })
+                )
             )
-        );
+            .concat([
+                {
+                    name: "all_layouts",
+                    source: mapSeries((series, i) => makeValidDataName(i)),
+                    transform: [
+                        {
+                            type: "voronoi",
+                            x: "layout_x",
+                            y: "layout_y",
+                            size: [{ signal: "width" }, { signal: "height" }],
+                            as: "layout_path",
+                        },
+                    ],
+                },
+            ]);
 
         const legends = _.flatten(
             mapSeries((series, i) => {
@@ -387,8 +397,8 @@ export class TimeSeriesSpecFactory {
             mapSeries((series, i) => {
                 const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
-                const title = series.vizInfo.label;
-                const suffix = series.vizInfo.unitOfMeasure || "";
+                // const title = series.vizInfo.label;
+                // const suffix = series.vizInfo.unitOfMeasure || "";
                 const thresholds = makeSeriesThresholds(series);
 
                 const firstLineMark = {
@@ -479,7 +489,7 @@ export class TimeSeriesSpecFactory {
                         */
                         update: {
                             fillOpacity: {
-                                signal: `new_hover == datum ? 1 : 0.0`,
+                                signal: `new_hover && new_hover.sensorId == datum.sensorId && new_hover.time == datum.time ? 1 : 0.0`,
                             },
                         },
                     },
@@ -603,34 +613,36 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        const cellMarks = mapSeries((series, i) => {
-            const title = series.vizInfo.label;
-            const suffix = series.vizInfo.unitOfMeasure || "";
-            return {
-                name: "cell",
-                type: "path",
-                from: {
-                    data: makeValidDataName(i),
-                },
-                encode: {
-                    enter: {
-                        path: { field: "layout_path" },
-                        fill: { value: "transparent" },
-                        // strokeWidth: { value: 0.35 },
-                        // stroke: { value: "red" },
-                        tooltip: {
-                            signal: `{
+        const cellMarks = () => {
+            const title = ""; // series.vizInfo.label;
+            const suffix = ""; // series.vizInfo.unitOfMeasure || "";
+            return [
+                {
+                    name: "cell",
+                    type: "path",
+                    from: {
+                        data: "all_layouts",
+                    },
+                    encode: {
+                        enter: {
+                            path: { field: "layout_path" },
+                            fill: { value: "transparent" },
+                            strokeWidth: { value: 0.35 },
+                            stroke: { value: "red" },
+                            tooltip: {
+                                signal: `{
                                 title: '${title}',
                                 Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
                             }`,
+                            },
                         },
                     },
                 },
-            };
-        });
+            ];
+        };
 
-        const marks = [...cellMarks, ...brushMarks, ...ruleMarks, ...seriesMarks];
+        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
@@ -909,7 +921,7 @@ export class TimeSeriesSpecFactory {
             axes as never[],
             legends as never[],
             marks as never[],
-            false
+            true
         );
     }
 
