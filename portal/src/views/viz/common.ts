@@ -266,9 +266,11 @@ export class DataSetSeries {
 
     public shouldConstrainBy(range: [number, number]): boolean {
         if (this.graphing == null) {
+            // console.log("viz: constrain:no-graphing");
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
+            // console.log("viz: constrain:nope", this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;

@@ -33,7 +33,16 @@ class Chart {
             const name = sensor.strings["en-us"]["label"] || "Unknown";
             const data = dataResponses[index][0];
             const scale = [];
-            const vizInfo = new VizInfo(data.key, scale, station, sensor.unitOfMeasure, data.key, name, sensor.viz || [], sensor.ranges);
+            const vizInfo = new VizInfo(
+                sensor.key,
+                scale,
+                station,
+                sensor.unitOfMeasure,
+                sensor.key,
+                name,
+                sensor.viz || [],
+                sensor.ranges
+            );
 
             return new SeriesData(data.key, new DataSetSeries(vizSensor, data), data, vizInfo);
         });
