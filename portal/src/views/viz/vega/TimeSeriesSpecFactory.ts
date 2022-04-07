@@ -433,7 +433,7 @@ export class TimeSeriesSpecFactory {
                 const symbolMark = {
                     type: "symbol",
                     from: {
-                        data: makeDataName(i),
+                        data: makeValidDataName(i),
                     },
                     encode: {
                         enter: {
@@ -454,6 +454,7 @@ export class TimeSeriesSpecFactory {
                             size: {
                                 value: 100,
                             },
+                            /*
                             tooltip: {
                                 signal: `{
                                         title: '${title}',
@@ -461,21 +462,24 @@ export class TimeSeriesSpecFactory {
                                         time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
                                     }`,
                             },
+                            */
                             fill: {
                                 value: "blue",
                             },
                             fillOpacity: {
-                                value: 0,
+                                value: 0.5,
                             },
                         },
+                        /*
                         hover: {
                             fillOpacity: {
                                 value: 0.5,
                             },
                         },
+                        */
                         update: {
                             fillOpacity: {
-                                value: 0,
+                                signal: `new_hover == datum ? 1 : 0.0`,
                             },
                         },
                     },
@@ -514,7 +518,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: _.concat([firstLineMark], thresholdsMarks as never[] /*, [symbolMark] as never[]*/),
+                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
                         },
                     ];
                 } else {
@@ -543,7 +547,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: [firstLineMark, lineMark /*, symbolMark*/],
+                            marks: [firstLineMark, lineMark, symbolMark],
                         },
                     ];
                 }
@@ -612,8 +616,8 @@ export class TimeSeriesSpecFactory {
                     enter: {
                         path: { field: "layout_path" },
                         fill: { value: "transparent" },
-                        strokeWidth: { value: 0.35 },
-                        stroke: { value: "red" },
+                        // strokeWidth: { value: 0.35 },
+                        // stroke: { value: "red" },
                         tooltip: {
                             signal: `{
                                 title: '${title}',
