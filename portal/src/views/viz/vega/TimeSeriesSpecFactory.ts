@@ -9,7 +9,6 @@ export class TimeSeriesSpecFactory {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
-        const makeDataVoronoiName = (i: number) => `table${i + 1}Voronoi`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
@@ -144,7 +143,7 @@ export class TimeSeriesSpecFactory {
             .concat([
                 {
                     name: "all_layouts",
-                    source: mapSeries((series, i) => makeValidDataName(i)),
+                    source: this.allSeries.map((series, i) => makeValidDataName(i)),
                     transform: [
                         {
                             type: "voronoi",
@@ -155,7 +154,7 @@ export class TimeSeriesSpecFactory {
                         },
                     ],
                 },
-            ]);
+            ] as any[]);
 
         const legends = _.flatten(
             mapSeries((series, i) => {
@@ -397,8 +396,6 @@ export class TimeSeriesSpecFactory {
             mapSeries((series, i) => {
                 const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
-                // const title = series.vizInfo.label;
-                // const suffix = series.vizInfo.unitOfMeasure || "";
                 const thresholds = makeSeriesThresholds(series);
 
                 const firstLineMark = {
@@ -464,15 +461,6 @@ export class TimeSeriesSpecFactory {
                             size: {
                                 value: 100,
                             },
-                            /*
-                            tooltip: {
-                                signal: `{
-                                        title: '${title}',
-                                        Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
-                                        time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
-                                    }`,
-                            },
-                            */
                             fill: {
                                 value: "blue",
                             },
@@ -480,16 +468,9 @@ export class TimeSeriesSpecFactory {
                                 value: 0.5,
                             },
                         },
-                        /*
-                        hover: {
-                            fillOpacity: {
-                                value: 0.5,
-                            },
-                        },
-                        */
                         update: {
                             fillOpacity: {
-                                signal: `new_hover && new_hover.sensorId == datum.sensorId && new_hover.time == datum.time ? 1 : 0.0`,
+                                signal: `hover && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
                             },
                         },
                     },
@@ -665,12 +646,6 @@ export class TimeSeriesSpecFactory {
             },
             {
                 name: "hover",
-                value: {
-                    name: makeHoverName(0),
-                },
-            },
-            {
-                name: "new_hover",
                 on: [
                     {
                         events: "@cell:mouseover",
@@ -919,7 +894,7 @@ export class TimeSeriesSpecFactory {
             axes as never[],
             legends as never[],
             marks as never[],
-            true
+            false
         );
     }
 

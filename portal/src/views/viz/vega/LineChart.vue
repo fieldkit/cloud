@@ -51,15 +51,14 @@ export default Vue.extend({
 
             this.vega = vegaInfo;
 
-            vegaInfo.view.addSignalListener("new_hover", (_, value) => {
-                console.log("new_hover", value);
-            });
+            /*
             vegaInfo.view.addSignalListener("unit", (_, value) => {
                 console.log("unit", value);
             });
             vegaInfo.view.addSignalListener("hover", (_, value) => {
                 console.log("hover", value);
             });
+            */
 
             let scrubbed = [];
             vegaInfo.view.addSignalListener("brush", (_, value) => {
