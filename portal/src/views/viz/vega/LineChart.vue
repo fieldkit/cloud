@@ -51,6 +51,16 @@ export default Vue.extend({
 
             this.vega = vegaInfo;
 
+            vegaInfo.view.addSignalListener("new_hover", (_, value) => {
+                console.log("new_hover", value);
+            });
+            vegaInfo.view.addSignalListener("unit", (_, value) => {
+                console.log("unit", value);
+            });
+            vegaInfo.view.addSignalListener("hover", (_, value) => {
+                console.log("hover", value);
+            });
+
             let scrubbed = [];
             vegaInfo.view.addSignalListener("brush", (_, value) => {
                 scrubbed = value.time;
@@ -61,7 +71,7 @@ export default Vue.extend({
                 }
             });
 
-            console.log("viz: vega:ready", vegaInfo.view.getState());
+            console.log("viz: vega:ready", vegaInfo.view.getState(), vegaInfo.view.data("table1Valid"));
         },
         async downloadChart(fileFormat: string): Promise<void> {
             // From https://vega.github.io/vega/docs/api/view/#view_toImageURL

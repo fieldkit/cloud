@@ -29,6 +29,12 @@ export class TimeSeriesSpecFactory {
 
         const solidColors = true;
 
+        // Always showing hovering state.
+        const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
+        // Early hovering behavior.
+        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
+        const ifHovering = alwaysShowHovering;
+
         const makeSeriesThresholds = (series: SeriesData) => {
             if (solidColors) {
                 return undefined;
@@ -73,6 +79,7 @@ export class TimeSeriesSpecFactory {
 
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+
         console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
         const makeDomainX = () => {
@@ -116,6 +123,23 @@ export class TimeSeriesSpecFactory {
                                     type: "filter",
                                     expr: "isValid(datum.value)",
                                 },
+                                {
+                                    type: "formula",
+                                    expr: "scale('x', datum.time)",
+                                    as: "layout_x",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: "scale('y', datum.value)",
+                                    as: "layout_y",
+                                },
+                                {
+                                    type: "voronoi",
+                                    x: "layout_x",
+                                    y: "layout_y",
+                                    size: [{ signal: "width" }, { signal: "height" }],
+                                    as: "layout_path",
+                                },
                             ],
                         },
                     ];
@@ -125,8 +149,7 @@ export class TimeSeriesSpecFactory {
 
         const legends = _.flatten(
             mapSeries((series, i) => {
-                const hoverName = makeHoverName(i);
-                const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.1`;
+                const hoverCheck = ifHovering(i, 1, 0.1);
                 return {
                     titleColor: "#2c3e50",
                     labelColor: "#2c3e50",
@@ -163,8 +186,7 @@ export class TimeSeriesSpecFactory {
             _.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
-                    const hoverName = makeHoverName(i);
-                    const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.2`;
+                    const hoverCheck = ifHovering(i, 1, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
 
@@ -363,8 +385,7 @@ export class TimeSeriesSpecFactory {
 
         const seriesMarks = _.flatten(
             mapSeries((series, i) => {
-                const hoverName = makeHoverName(i);
-                const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.3`;
+                const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
                 const title = series.vizInfo.label;
                 const suffix = series.vizInfo.unitOfMeasure || "";
@@ -461,6 +482,7 @@ export class TimeSeriesSpecFactory {
                 };
 
                 if (thresholds) {
+                    const hoverCheck = ifHovering(i, 1, 0.1);
                     const thresholdsMarks = thresholds.levels
                         .map((level, l: number) => {
                             const alias = makeThresholdLevelAlias(i, l);
@@ -481,7 +503,7 @@ export class TimeSeriesSpecFactory {
                                     },
                                     update: {
                                         strokeOpacity: {
-                                            signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
+                                            signal: hoverCheck,
                                         },
                                     },
                                 },
@@ -492,10 +514,11 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                            marks: _.concat([firstLineMark], thresholdsMarks as never[] /*, [symbolMark] as never[]*/),
                         },
                     ];
                 } else {
+                    const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
                         style: i === 0 ? "primaryLine" : "secondaryLine",
@@ -512,7 +535,7 @@ export class TimeSeriesSpecFactory {
                             },
                             update: {
                                 strokeOpacity: {
-                                    signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
+                                    signal: hoverCheck,
                                 },
                             },
                         },
@@ -520,7 +543,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: [firstLineMark, lineMark, symbolMark],
+                            marks: [firstLineMark, lineMark /*, symbolMark*/],
                         },
                     ];
                 }
@@ -576,40 +599,34 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        const testMarks = mapSeries((series, i) => {
-            const name = makeDataVoronoiName(i);
-            const scales = makeScales(i);
+        const cellMarks = mapSeries((series, i) => {
+            const title = series.vizInfo.label;
+            const suffix = series.vizInfo.unitOfMeasure || "";
             return {
-                name: name,
+                name: "cell",
                 type: "path",
                 from: {
                     data: makeValidDataName(i),
                 },
                 encode: {
                     enter: {
-                        layoutx: { scale: scales.x, field: "time" },
-                        layouty: { scale: scales.y, field: "value" },
+                        path: { field: "layout_path" },
                         fill: { value: "transparent" },
                         strokeWidth: { value: 0.35 },
                         stroke: { value: "red" },
-                    },
-                    update: {
-                        layoutx: { scale: scales.x, field: "time" },
-                        layouty: { scale: scales.y, field: "value" },
+                        tooltip: {
+                            signal: `{
+                                title: '${title}',
+                                Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
+                                time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
+                            }`,
+                        },
                     },
                 },
-                transform: [
-                    {
-                        type: "voronoi",
-                        x: "layoutx",
-                        y: "layouty",
-                        size: [{ signal: "width" }, { signal: "height" }],
-                    },
-                ],
             };
         });
 
-        const marks = [...brushMarks, ...ruleMarks, ...testMarks, ...seriesMarks];
+        const marks = [...cellMarks, ...brushMarks, ...ruleMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
@@ -637,11 +654,20 @@ export class TimeSeriesSpecFactory {
                 value: {
                     name: makeHoverName(0),
                 },
+            },
+            {
+                name: "new_hover",
                 on: [
                     {
-                        events: "symbol:mouseover",
+                        events: "@cell:mouseover",
                         update: "datum",
                     },
+                    /*
+                    {
+                        events: "@cell:mouseout",
+                        update: "null",
+                    },
+                    */
                 ],
             },
             {
