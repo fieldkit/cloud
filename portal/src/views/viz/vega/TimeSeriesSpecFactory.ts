@@ -107,13 +107,35 @@ export class TimeSeriesSpecFactory {
                               })
                             : null;
 
-                        const name = { name: hoverName, vizInfo: series.vizInfo };
-                        const data = series.queried.data.map((datum) => _.extend(datum, name));
+                        // TODO We can eventually remove hoverName here
+                        const properties = { name: hoverName, vizInfo: series.vizInfo };
+                        const original = series.queried.data.map((datum) => _.extend(datum, properties));
+                        const interval = 60000 * 5;
+                        const grouped = _(original)
+                            .groupBy((datum) => {
+                                return Math.floor(datum.time / interval) * interval;
+                            })
+                            .mapValues((bin, time) => {
+                                const valid = bin.filter((datum) => _.isNumber(datum.value));
+                                if (valid.length == 1) {
+                                    return valid[0];
+                                }
+                                if (valid.length > 1) {
+                                    // TODO Apply bin aggregate
+                                    return valid[0];
+                                }
+                                return {
+                                    time: time,
+                                };
+                            })
+                            .value();
+
+                        const prepared = _.values(grouped);
 
                         return [
                             {
                                 name: makeDataName(i),
-                                values: data,
+                                values: prepared,
                                 transform: transforms,
                             },
                             {

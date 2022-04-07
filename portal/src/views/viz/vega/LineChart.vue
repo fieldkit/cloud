@@ -70,7 +70,10 @@ export default Vue.extend({
                 }
             });
 
-            console.log("viz: vega:ready", vegaInfo.view.getState(), vegaInfo.view.data("all_layouts"));
+            console.log("viz: vega:ready", {
+                state: vegaInfo.view.getState(),
+                layouts: vegaInfo.view.data("all_layouts"),
+            });
         },
         async downloadChart(fileFormat: string): Promise<void> {
             // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
