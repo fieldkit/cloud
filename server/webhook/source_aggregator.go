@@ -128,12 +128,14 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 							return fmt.Errorf("parsed-sensor has no sensor key")
 						}
 
-						ask := handlers.AggregateSensorKey{
-							SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
-							ModuleID:  saved.Module.ID,
-						}
-						if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, parsedSensor.Value); err != nil {
-							return fmt.Errorf("adding: %v", err)
+						if !parsedSensor.Transient {
+							ask := handlers.AggregateSensorKey{
+								SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
+								ModuleID:  saved.Module.ID,
+							}
+							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, parsedSensor.Value); err != nil {
+								return fmt.Errorf("adding: %v", err)
+							}
 						}
 					}
 				}
