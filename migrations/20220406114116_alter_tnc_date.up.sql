@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.user ALTER COLUMN tnc_date SET DEFAULT '0001-01-01';
