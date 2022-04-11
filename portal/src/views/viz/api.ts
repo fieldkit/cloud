@@ -64,14 +64,12 @@ export interface Summary {
 }
 
 export interface DataRow {
-    id: number;
     time: number;
-    stationId: number;
-    sensorId: number;
-    moduleId: number;
+    stationId: number | null;
+    sensorId: number | null;
+    moduleId: number | null;
     location: [number, number] | null;
-    value: number;
-    name: string | undefined;
+    value: number | null;
 }
 
 export interface SensorDataResponse {

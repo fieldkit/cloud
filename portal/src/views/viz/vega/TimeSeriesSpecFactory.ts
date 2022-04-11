@@ -161,7 +161,12 @@ export class TimeSeriesSpecFactory {
                                         return valid[0];
                                     }
                                     return {
-                                        time: time,
+                                        time: Number(time),
+                                        stationId: null,
+                                        moduleId: null,
+                                        sensorId: null,
+                                        location: null,
+                                        value: null,
                                     };
                                 })
                                 .value();
