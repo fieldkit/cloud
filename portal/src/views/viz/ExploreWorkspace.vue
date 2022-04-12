@@ -461,6 +461,10 @@ export default Vue.extend({
     margin-right: 15px;
     line-height: 35px;
     font-size: 40px;
+
+    body.floodnet & {
+        margin-top: -10px;
+    }
 }
 
 .controls-container .right {
