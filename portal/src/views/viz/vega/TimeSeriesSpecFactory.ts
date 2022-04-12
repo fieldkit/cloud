@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
 import chartStyles from "./chartStyles";
+import { DataRow } from "../api";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
@@ -107,35 +108,105 @@ export class TimeSeriesSpecFactory {
                               })
                             : null;
 
+                        function calculateTimeDeltas(rows: DataRow[]) {
+                            const initial: { prev: DataRow | null; deltas: number[] } = {
+                                prev: null,
+                                deltas: [] as number[],
+                            };
+                            return _.reduce(
+                                rows,
+                                (state, datum) => {
+                                    if (state.prev != null) {
+                                        state.deltas.push(datum.time - state.prev.time);
+                                    }
+                                    return _.extend(state, { prev: datum });
+                                },
+                                initial
+                            ).deltas;
+                        }
+
+                        function calculateGaps(rows: DataRow[]) {
+                            const initial: { prev: DataRow | null; gaps: number[] } = {
+                                prev: null,
+                                gaps: [0] as number[],
+                            };
+                            return _.reduce(
+                                rows,
+                                (state, datum) => {
+                                    if (_.isNumber(datum.value)) {
+                                        if (state.gaps[state.gaps.length - 1] > 0) {
+                                            state.gaps.push(0);
+                                        }
+                                    } else {
+                                        state.gaps[state.gaps.length - 1]++;
+                                    }
+                                    return state;
+                                },
+                                initial
+                            ).gaps;
+                        }
+
+                        function rebin(rows: DataRow[], interval: number): DataRow[] {
+                            const grouped = _(rows)
+                                .groupBy((datum) => {
+                                    return Math.floor(datum.time / interval) * interval;
+                                })
+                                .mapValues((bin, time) => {
+                                    const valid = bin.filter((datum) => _.isNumber(datum.value));
+                                    if (valid.length == 1) {
+                                        return valid[0];
+                                    }
+                                    if (valid.length > 1) {
+                                        // TODO Apply bin aggregate
+                                        return valid[0];
+                                    }
+                                    return {
+                                        time: Number(time),
+                                        stationId: null,
+                                        moduleId: null,
+                                        sensorId: null,
+                                        location: null,
+                                        value: null,
+                                    };
+                                })
+                                .value();
+
+                            return _.values(grouped);
+                        }
+
                         // TODO We can eventually remove hoverName here
                         const properties = { name: hoverName, vizInfo: series.vizInfo };
                         const original = series.queried.data.map((datum) => _.extend(datum, properties));
-                        const interval = 60000 * 5;
-                        const grouped = _(original)
-                            .groupBy((datum) => {
-                                return Math.floor(datum.time / interval) * interval;
-                            })
-                            .mapValues((bin, time) => {
-                                const valid = bin.filter((datum) => _.isNumber(datum.value));
-                                if (valid.length == 1) {
-                                    return valid[0];
-                                }
-                                if (valid.length > 1) {
-                                    // TODO Apply bin aggregate
-                                    return valid[0];
-                                }
-                                return {
-                                    time: time,
-                                };
-                            })
-                            .value();
 
-                        const prepared = _.values(grouped);
+                        function sanitize(original: DataRow[]): DataRow[] {
+                            const valid = original.filter((datum) => _.isNumber(datum.value));
+                            const deltas = calculateTimeDeltas(valid);
+
+                            console.log("viz: gaps", calculateGaps(original));
+                            console.log("viz: deltas", _.mean(deltas) / 60000);
+
+                            // Very simple heuristic for enabling re-bin. We
+                            // basically rebin to the average interval if more
+                            // of the data is invalid than valid. I think we can
+                            // do better.
+                            if (original.length - valid.length > valid.length) {
+                                const meanBetweenValid = _.mean(deltas);
+                                const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
+                                console.log("viz: rebin", interval);
+                                return rebin(original, interval);
+                            } else {
+                                console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+                            }
+
+                            return original;
+                        }
+
+                        const sanitized = sanitize(original);
 
                         return [
                             {
                                 name: makeDataName(i),
-                                values: prepared,
+                                values: sanitized,
                                 transform: transforms,
                             },
                             {

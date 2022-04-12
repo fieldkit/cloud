@@ -113,6 +113,9 @@ export class DisplayStation {
         if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
             this.latestPrimary = prioritizedSensors[0].reading;
         }
+        else {
+            this.latestPrimary = null;
+        }
 
         if (station.location) {
             if (station.location.precise) {

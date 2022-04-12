@@ -203,7 +203,7 @@ export class QueriedData {
             if (values.length == 0) throw new Error(`empty data ranges`);
             if (times.length == 0) throw new Error(`empty time ranges`);
 
-            this.dataRange = makeRange(values);
+            this.dataRange = makeRange(values as number[]);
             this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {

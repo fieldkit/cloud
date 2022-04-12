@@ -568,7 +568,6 @@ export default function routerFactory(store) {
                 next();
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
-            /*
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
@@ -582,12 +581,11 @@ export default function routerFactory(store) {
                     next();
                 }
             } else {
-                const queryParams = new URLSearchParams();
-                queryParams.append("after", to.fullPath);
-                next("/login?" + queryParams.toString());
+                // const queryParams = new URLSearchParams();
+                // queryParams.append("after", to.fullPath);
+                // next("/login?" + queryParams.toString());
+                next();
             }
-            */
-            next();
         } else {
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {
