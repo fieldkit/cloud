@@ -2,7 +2,7 @@
     <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="layoutChanges++">
         <template v-if="viewType === 'list'">
             <div class="stations-list" v-if="stations && stations.length > 0">
-                <StationSummary
+                <StationHoverSummary
                     v-for="station in stations"
                     v-bind:key="station.id"
                     class="summary-container"
@@ -22,7 +22,7 @@
                     :showStations="true"
                 />
             </div>
-            <StationSummary
+            <StationHoverSummary
                 v-if="activeStation"
                 class="summary-container"
                 @close="closeSummary"
@@ -59,7 +59,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
-import StationSummary from "./shared/StationSummary.vue";
+import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 
 import { mapState, mapGetters } from "vuex";
@@ -72,7 +72,7 @@ export default Vue.extend({
     components: {
         StandardLayout,
         StationsMap,
-        StationSummary,
+        StationHoverSummary,
     },
     props: {
         id: {

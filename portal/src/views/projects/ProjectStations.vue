@@ -70,7 +70,7 @@
                     :showStations="project.showStations"
                     :mapBounds="mapBounds"
                 />
-                <StationSummary
+                <StationHoverSummary
                     v-if="activeStation"
                     :station="activeStation"
                     :readings="false"
@@ -92,7 +92,7 @@ import { ExploreContext } from "@/views/viz/common";
 import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
 import * as ActionTypes from "@/store/actions";
 
-import StationSummary from "@/views/shared/StationSummary.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
@@ -103,7 +103,7 @@ import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
 export default Vue.extend({
     name: "ProjectStations",
     components: {
-        StationSummary,
+        StationHoverSummary,
         StationPickerModal,
         StationsMap,
         PaginationControls,
