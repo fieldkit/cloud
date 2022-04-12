@@ -511,11 +511,6 @@ export default Vue.extend({
     display: flex;
     justify-content: center;
 }
-.floodnet {
-    .tree-key {
-        margin-top: -10px;
-    }
-}
 
 .controls-container .right {
     display: flex;
