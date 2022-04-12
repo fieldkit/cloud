@@ -1,8 +1,8 @@
 <template>
     <div class="marker-container" @click="onClick">
-        <span class="value-label">{{ value !== undefined ? value : "&ndash;" | prettyNum }}</span>
+        <span class="value-label">{{ value === null || value === undefined ? "&ndash;" : value | prettyNum }}</span>
         <svg viewBox="0 0 36 36">
-            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="color" />
+            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="value !== null ? color : '#ccc'" />
         </svg>
     </div>
 </template>
@@ -24,11 +24,6 @@ export default Vue.extend({
         id: {
             type: Number,
         },
-    },
-    mounted() {
-        if (this.value === undefined) {
-            this.color = "#ccc";
-        }
     },
     methods: {
         onClick() {
