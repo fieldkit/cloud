@@ -247,6 +247,11 @@ export default Vue.extend({
     width: 100%;
     padding-right: 65px;
     text-align: justify;
+
+    @include bp-down($xs) {
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
 }
 
 .tiptap-editing {

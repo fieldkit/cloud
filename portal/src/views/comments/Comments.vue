@@ -44,7 +44,7 @@
                     v-bind:id="'comment-id-' + post.id"
                     :ref="post.id"
                 >
-                    <div class="comment-main">
+                    <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column-post">
                             <div class="post-header">
@@ -518,6 +518,10 @@ header {
                 height: 42px;
             }
         }
+
+        .new-comment-wrap {
+            flex: 0 0 calc(100% - 65px);
+        }
     }
 
     &-wrap {
@@ -525,7 +529,6 @@ header {
         width: 100%;
         position: relative;
         background-color: #fff;
-        flex: 0 0 calc(100% - 65px);
     }
 }
 
