@@ -4,7 +4,7 @@ import chartStyles from "./chartStyles";
 import { DataRow } from "../api";
 
 export class TimeSeriesSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
+    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
 
     create() {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);

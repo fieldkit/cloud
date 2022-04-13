@@ -11,7 +11,7 @@ import { default as vegaEmbed } from "vega-embed";
 
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
-import { ScrubberSpecFactory } from "./ScrubberSpecFactory";
+import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
 
 export default {
     name: "Scrubber",
@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         async refresh(): Promise<void> {
-            const factory = new ScrubberSpecFactory(this.series);
+            const factory = new ScrubberSpecFactory(this.series, new ChartSettings(TimeRange.mergeArrays([this.visible])));
 
             const spec = factory.create();
 
@@ -94,11 +94,13 @@ export default {
                 console.log("viz: error", error);
             }
         },
-        async pickRange(timeRange): Promise<void> {
+        async pickRange(timeRange: number[]): Promise<void> {
             const first = this.series[0];
             if (first.ds) {
-                const maximum = first.queried.timeRange;
-                if (_.isEqual(maximum, timeRange)) {
+                const xDomainsAll = this.series.map((series: SeriesData) => series.queried.timeRange);
+                const allRanges = [...xDomainsAll, this.visible];
+                const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
+                if (_.isEqual(timeRangeAll, timeRange)) {
                     await this.brush([]);
                 } else {
                     await this.brush(timeRange);
