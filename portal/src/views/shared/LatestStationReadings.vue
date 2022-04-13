@@ -125,6 +125,7 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
+                            console.log(`sensor:`, sensor);
 
                             return new SensorReading(
                                 key,

@@ -155,7 +155,6 @@ export default Vue.extend({
             return this.$getters.projectsById[this.project.id].stations;
         },
         mappedProject(): MappedStations | null {
-            console.log("radoi project mapped", this.$getters.projectsById[this.project.id].mapped);
             return this.$getters.projectsById[this.project.id].mapped;
         },
         activeStation(): DisplayStation | null {

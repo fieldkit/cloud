@@ -113,7 +113,6 @@ export default Vue.extend({
             }
             if (this.id) {
                 console.log(`focusing station: ${this.id}`);
-                console.log("focus", this.$getters.mapped.focusOn(this.id));
                 return this.$getters.mapped.focusOn(this.id);
             }
             return this.$getters.mapped;

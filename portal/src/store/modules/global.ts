@@ -5,7 +5,7 @@ import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
-import {NotesState} from '@/store';
+import { NotesState } from "@/store";
 
 export interface RouteState {
     name: string | null;

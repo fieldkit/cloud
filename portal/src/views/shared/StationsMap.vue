@@ -94,6 +94,7 @@ export default Vue.extend({
             }
         },
         mapped(): void {
+            console.log("map: mapped changed", this.mapped);
             this.updateMap();
         },
         showStations(): void {
