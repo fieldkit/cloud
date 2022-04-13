@@ -106,22 +106,24 @@ export default Vue.extend({
 }
 
 .share-options {
-    padding: 20px;
+    padding: 20px 0;
 
     .icon {
         width: 20px;
         font-size: 19px;
         margin-right: 10px;
+        margin-top: -2px;
     }
 
     .share-button {
-        padding: 11px 10px 13px 0px;
+        padding: 11px 20px 13px 20px;
         cursor: pointer;
         display: flex;
         align-items: center;
+        transition: background-color 0.25s;
 
-        img {
-            padding: 5px 10px 5px 5px;
+        &:hover {
+            background-color: #f4f5f7;
         }
     }
 
