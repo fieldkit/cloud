@@ -37,10 +37,13 @@
                 <div class="busy-panel">&nbsp;</div>
                 <div class="station-summary">
                     <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
-                    <div class="pagination">
-                        <div class="button" v-on:click="onSummaryPrevious" v-bind:class="{ enabled: canSummaryPrevious }">◀</div>
-                        <div>{{ summaryIndex + 1 }} of {{ stationIds.length }}</div>
-                        <div class="button" v-on:click="onSummaryNext" v-bind:class="{ enabled: canSummaryNext }">▶</div>
+                    <div class="pagination" v-if="workspace && !workspace.empty">
+                        <PaginationControls
+                            :page="selectedIndex"
+                            :totalPages="getValidStations().length"
+                            @new-page="onNewSummaryStation"
+                            textual
+                        />
                     </div>
                 </div>
 
@@ -62,6 +65,7 @@ import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
+import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
 import { mapState, mapGetters } from "vuex";
 import { DisplayStation } from "@/store";
@@ -82,6 +86,7 @@ export default Vue.extend({
         ExportPanel,
         Comments,
         StationSummaryContent,
+        PaginationControls,
     },
     props: {
         token: {
@@ -104,12 +109,14 @@ export default Vue.extend({
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
-        summaryIndex: number;
+        selectedIndex: number;
+        validStations: number[];
     } {
         return {
             workspace: null,
             showNoSensors: false,
-            summaryIndex: 0,
+            selectedIndex: 0,
+            validStations: [],
         };
     },
     computed: {
@@ -131,18 +138,11 @@ export default Vue.extend({
             }
             return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
         },
-        stationIds(): number[] {
-            return Object.keys(this.stations).map((d) => +d);
+        selectedId(): number {
+            return +_.flattenDeep(this.bookmark.g)[0];
         },
         selectedStation(): DisplayStation {
-            const selectedId: any = _.flattenDeep(this.bookmark.g)[0];
-            return this.stations[selectedId];
-        },
-        canSummaryNext(): boolean {
-            return true;
-        },
-        canSummaryPrevious(): boolean {
-            return true;
+            return this.stations[this.selectedId];
         },
     },
     watch: {
@@ -193,7 +193,6 @@ export default Vue.extend({
                 return Promise.resolve(this.workspace);
             }
             console.log("viz: bookmark-change", bookmark);
-            console.log("CHANGE CHANGE CHANGE", this.idFromBookmark(bookmark));
             await this.openBookmark(bookmark);
         },
         async openBookmark(bookmark: Bookmark): Promise<void> {
@@ -264,25 +263,19 @@ export default Vue.extend({
                     }
                 });
         },
-        idFromBookmark(bookmark) {
-            console.log(this.stations);
-            this.selectedStation = this.stations[_.flattenDeep(bookmark.g)[0]];
-            return _.flattenDeep(bookmark.g)[0];
+        getValidStations(): number[] {
+            const validStations = Object.entries(this.workspace.stations)
+                .filter(([key, station]) => station.sensors.length > 0)
+                .map((d) => +d[0]);
+
+            this.selectedIndex = validStations.indexOf(this.selectedId);
+
+            return validStations;
         },
         onNewSummaryStation(evt) {
-            this.summaryIndex = evt;
-        },
-        onSummaryNext() {
-            if (this.canSummaryNext) {
-                this.showStation(this.stationIds[this.stationIds.indexOf(this.selectedStation.id) + 1]);
-            }
-
-            console.log("summary next", this.selectedStation.id, this.stationIds, this.stationIds.indexOf(this.selectedStation.id));
-        },
-        onSummaryPrevious() {
-            if (this.canSummaryPrevious) {
-                this.showStation(this.stationIds[this.stationIds.indexOf(this.selectedStation.id) - 1]);
-            }
+            const stations = this.getValidStations();
+            this.showStation(stations[evt]);
+            this.selectedIndex = evt;
         },
     },
 });
@@ -658,39 +651,22 @@ export default Vue.extend({
     padding: 20px;
     display: flex;
     justify-content: space-between;
+
+    .summary-content {
+        align-items: center;
+    }
+    @include bp-down($sm) {
+        flex-direction: column;
+        
+        .pagination {
+            margin-top: .5em;
+        }
+    }
 }
 .pagination {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 12px;
     margin-right: 13px;
     justify-content: center;
+}
 
-    .button {
-        padding: 0;
-        border: 0;
-        margin-bottom: 0;
-        user-select: none;
-        font-size: 12px;
-        color: #d8d8d8;
-        justify-content: center;
-        align-items: center;
-    }
-
-    @include bp-down($xs) {
-        margin-top: 0;
-    }
-}
-.pagination .button:first-child {
-    margin-right: 5px;
-    line-height: 10px;
-}
-.pagination .button:last-child {
-    margin-left: 5px;
-}
-.pagination .button.enabled {
-    color: #2c3e50;
-    cursor: pointer;
-}
 </style>

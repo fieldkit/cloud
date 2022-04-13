@@ -1,7 +1,7 @@
 <template>
-    <div class="pagination">
+    <div class="pagination" :class="{textual: textual}">
         <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">◀</div>
-        <div class="pages">
+        <div class="pages" v-if="!textual">
             <div
                 v-for="page in pages"
                 v-bind:key="page.number"
@@ -12,11 +12,13 @@
                 ●
             </div>
         </div>
+        <div v-if="textual">{{ page + 1}} of {{ totalPages }}</div>
         <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">▶</div>
     </div>
 </template>
 
 <script lang="ts">
+import { findParentNodeClosestToPos } from "@tiptap/core";
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 
@@ -34,6 +36,10 @@ export default Vue.extend({
         maximumPages: {
             type: Number,
             default: 7,
+        },
+        textual: {
+            type: Boolean,
+            default: false,
         },
     },
     computed: {
@@ -70,18 +76,45 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .pagination .button {
     font-size: 22px;
     color: #d8d8d8;
     justify-content: center;
     align-items: center;
+
+    .textual & {
+        font-size: 12px;
+    }
 }
-.pagination .button:first-child {
+.button:first-child {
     margin-right: 10px;
+
+    .textual &{
+        margin-right: 5px;
+        line-height: 10px;
+    }
 }
-.pagination .button:last-child {
+.button:last-child {
     margin-left: 10px;
+
+    .textual &{
+        margin-left: 5px;
+    }
+}
+.pagination .textual {
+    font-size: 12px;
+    align-items: center;
+}
+.pagination .textual .button {
+    padding: 0;
+    border: 0;
+    margin-bottom: 0;
+    user-select: none;
+    font-size: 12px;
+    color: #d8d8d8;
+    justify-content: center;
+    align-items: center;
 }
 .pagination .button.enabled {
     color: #2c3e50;
