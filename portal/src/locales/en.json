@@ -95,7 +95,7 @@
         "backToPrevious": "Back to Previous",
         "backProject": "Back to {name}",
         "backToStations": "Back to Stations",
-        "backToSensors": "Back to Sensors"
+        "backToSensors": "Back to Sensor Map"
     },
     "projects": {
         "title": {
