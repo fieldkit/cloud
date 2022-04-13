@@ -46,6 +46,10 @@ export default Vue.extend({
             type: Number,
             required: true,
         },
+        moduleKey: {
+            type: String,
+            required: false,
+        },
     },
     data(): {
         allSensorsMemoized: () => Promise<SensorsResponse>;
@@ -60,6 +64,9 @@ export default Vue.extend({
     },
     watch: {
         async id(): Promise<void> {
+            await this.refresh();
+        },
+        async moduleKey(): Promise<void> {
             await this.refresh();
         },
     },
@@ -80,7 +87,11 @@ export default Vue.extend({
             return Promise.all([data(), this.allSensorsMemoized()])
                 .then(([data, meta]) => {
                     const sensorsToModule = _.fromPairs(
-                        _.flatten(meta.modules.map((module) => module.sensors.map((sensor) => [sensor.fullKey, module])))
+                        _.flatten(
+                            meta.modules.map((module) => {
+                                return module.sensors.map((sensor) => [sensor.fullKey, module]);
+                            })
+                        )
                     );
 
                     const idsToKey = _.mapValues(
@@ -115,6 +126,7 @@ export default Vue.extend({
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
                             console.log(`sensor:`, sensor);
+
                             return new SensorReading(
                                 key,
                                 classes.join(" "),
@@ -135,7 +147,11 @@ export default Vue.extend({
                 })
                 .then((sensors) => {
                     console.log(`sensors`, sensors);
-                    this.sensors = sensors;
+                    if (this.moduleKey) {
+                        this.sensors = sensors.filter((sensor) => sensor.sensorModule.key === this.moduleKey);
+                    } else {
+                        this.sensors = sensors;
+                    }
                     this.loading = false;
                     this.$emit("layoutChange");
                     return this.sensors;
@@ -152,6 +168,10 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+
+    @at-root .station-readings & {
+        justify-content: flex-start;
+    }
 }
 .readings-simple .reading-container {
     background-color: white;

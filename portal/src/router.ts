@@ -28,6 +28,8 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
+import StationView from "./views/station/StationView.vue";
+
 import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
@@ -340,6 +342,20 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/station/:id",
+        name: "viewStation",
+        component: StationView,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+            };
+        },
+        meta: {
             secured: true,
         },
     },
