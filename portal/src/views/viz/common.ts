@@ -203,7 +203,7 @@ export class QueriedData {
             if (values.length == 0) throw new Error(`empty data ranges`);
             if (times.length == 0) throw new Error(`empty time ranges`);
 
-            this.dataRange = makeRange(values);
+            this.dataRange = makeRange(values as number[]);
             this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {
@@ -266,10 +266,11 @@ export class DataSetSeries {
 
     public shouldConstrainBy(range: [number, number]): boolean {
         if (this.graphing == null) {
+            // console.log("viz: constrain:no-graphing");
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
-            console.log(`viz: constrain:nope`, this.graphing.dataRange[1], range[1]);
+            // console.log("viz: constrain:nope", this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;

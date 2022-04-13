@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="20px" viewBox="0 0 10 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>Facebook Icon</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="12_DataViz_UI_Desktop" transform="translate(-1089.000000, -256.000000)" fill="#2C3E50" fill-rule="nonzero">
+            <g id="Group-18" transform="translate(1065.000000, 66.000000)">
+                <g id="Group-10" transform="translate(24.000000, 189.000000)">
+                    <path d="M2,5.55 L2,7.55 L-1.30917499e-12,7.55 L-1.30917499e-12,10.79 L2,10.79 L2,20.53 L5.21,20.53 L5.21,10.75 L8.44,10.75 L8.95,7.51 L5.21,7.51 L5.21,5.89 C5.21,5.04 5.49,4.24 6.7,4.24 L9.13,4.24 L9.13,1 L5.69,1 C2.79,1 2,2.91 2,5.55 Z" id="Facebook-Icon"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

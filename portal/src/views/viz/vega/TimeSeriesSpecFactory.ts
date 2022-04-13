@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
 import chartStyles from "./chartStyles";
+import { DataRow } from "../api";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
@@ -28,6 +29,12 @@ export class TimeSeriesSpecFactory {
 
         const solidColors = true;
 
+        // Always showing hovering state.
+        const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
+        // Early hovering behavior.
+        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
+        const ifHovering = alwaysShowHovering;
+
         const makeSeriesThresholds = (series: SeriesData) => {
             if (solidColors) {
                 return undefined;
@@ -44,13 +51,13 @@ export class TimeSeriesSpecFactory {
                 const range = constrained[0];
                 if (series.ds.shouldConstrainBy([range.minimum, range.maximum])) {
                     const d = [range.minimum, range.maximum];
-                    console.log("viz: constrained", series.ds.graphing.dataRange, d);
+                    // console.log("viz: constrained", series.ds.graphing.dataRange, d);
                     return d;
                 } else {
-                    console.log(`viz: constrain-skip`);
+                    // console.log(`viz: constrain-skip`);
                 }
             } else {
-                console.log(`viz: constrain-none`);
+                // console.log(`viz: constrain-none`);
             }
             return series.queried.dataRange;
         };
@@ -72,6 +79,7 @@ export class TimeSeriesSpecFactory {
 
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+
         console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
         const makeDomainX = () => {
@@ -83,49 +91,167 @@ export class TimeSeriesSpecFactory {
             {
                 name: "brush_store",
             },
-        ].concat(
-            _.flatten(
-                mapSeries((series, i) => {
-                    const hoverName = makeHoverName(i);
-                    const thresholds = makeSeriesThresholds(series);
-                    const transforms = thresholds
-                        ? thresholds.levels.map((level, l: number) => {
-                              return {
-                                  type: "formula",
-                                  expr: "datum.value <= " + level.value + " ? datum.value : null",
-                                  as: makeThresholdLevelAlias(i, l),
-                              };
-                          })
-                        : null;
+        ]
+            .concat(
+                _.flatten(
+                    mapSeries((series, i) => {
+                        const hoverName = makeHoverName(i);
+                        const thresholds = makeSeriesThresholds(series);
+                        const scales = makeScales(i);
+                        const transforms = thresholds
+                            ? thresholds.levels.map((level, l: number) => {
+                                  return {
+                                      type: "formula",
+                                      expr: "datum.value <= " + level.value + " ? datum.value : null",
+                                      as: makeThresholdLevelAlias(i, l),
+                                  };
+                              })
+                            : null;
 
-                    const name = { name: hoverName };
-                    const data = series.queried.data.map((datum) => _.extend(datum, name));
-
-                    return [
-                        {
-                            name: makeDataName(i),
-                            values: data,
-                            transform: transforms,
-                        },
-                        {
-                            name: makeValidDataName(i),
-                            source: makeDataName(i),
-                            transform: [
-                                {
-                                    type: "filter",
-                                    expr: "isValid(datum.value)",
+                        function calculateTimeDeltas(rows: DataRow[]) {
+                            const initial: { prev: DataRow | null; deltas: number[] } = {
+                                prev: null,
+                                deltas: [] as number[],
+                            };
+                            return _.reduce(
+                                rows,
+                                (state, datum) => {
+                                    if (state.prev != null) {
+                                        state.deltas.push(datum.time - state.prev.time);
+                                    }
+                                    return _.extend(state, { prev: datum });
                                 },
-                            ],
-                        },
-                    ];
-                })
+                                initial
+                            ).deltas;
+                        }
+
+                        function calculateGaps(rows: DataRow[]) {
+                            const initial: { prev: DataRow | null; gaps: number[] } = {
+                                prev: null,
+                                gaps: [0] as number[],
+                            };
+                            return _.reduce(
+                                rows,
+                                (state, datum) => {
+                                    if (_.isNumber(datum.value)) {
+                                        if (state.gaps[state.gaps.length - 1] > 0) {
+                                            state.gaps.push(0);
+                                        }
+                                    } else {
+                                        state.gaps[state.gaps.length - 1]++;
+                                    }
+                                    return state;
+                                },
+                                initial
+                            ).gaps;
+                        }
+
+                        function rebin(rows: DataRow[], interval: number): DataRow[] {
+                            const grouped = _(rows)
+                                .groupBy((datum) => {
+                                    return Math.floor(datum.time / interval) * interval;
+                                })
+                                .mapValues((bin, time) => {
+                                    const valid = bin.filter((datum) => _.isNumber(datum.value));
+                                    if (valid.length == 1) {
+                                        return valid[0];
+                                    }
+                                    if (valid.length > 1) {
+                                        // TODO Apply bin aggregate
+                                        return valid[0];
+                                    }
+                                    return {
+                                        time: Number(time),
+                                        stationId: null,
+                                        moduleId: null,
+                                        sensorId: null,
+                                        location: null,
+                                        value: null,
+                                    };
+                                })
+                                .value();
+
+                            return _.values(grouped);
+                        }
+
+                        // TODO We can eventually remove hoverName here
+                        const properties = { name: hoverName, vizInfo: series.vizInfo };
+                        const original = series.queried.data.map((datum) => _.extend(datum, properties));
+
+                        function sanitize(original: DataRow[]): DataRow[] {
+                            const valid = original.filter((datum) => _.isNumber(datum.value));
+                            const deltas = calculateTimeDeltas(valid);
+
+                            console.log("viz: gaps", calculateGaps(original));
+                            console.log("viz: deltas", _.mean(deltas) / 60000);
+
+                            // Very simple heuristic for enabling re-bin. We
+                            // basically rebin to the average interval if more
+                            // of the data is invalid than valid. I think we can
+                            // do better.
+                            if (original.length - valid.length > valid.length) {
+                                const meanBetweenValid = _.mean(deltas);
+                                const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
+                                console.log("viz: rebin", interval);
+                                return rebin(original, interval);
+                            } else {
+                                console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+                            }
+
+                            return original;
+                        }
+
+                        const sanitized = sanitize(original);
+
+                        return [
+                            {
+                                name: makeDataName(i),
+                                values: sanitized,
+                                transform: transforms,
+                            },
+                            {
+                                name: makeValidDataName(i),
+                                source: makeDataName(i),
+                                transform: [
+                                    {
+                                        type: "filter",
+                                        expr: "isValid(datum.value)",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: `scale('${scales.x}', datum.time)`,
+                                        as: "layout_x",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: `scale('${scales.y}', datum.value)`,
+                                        as: "layout_y",
+                                    },
+                                ],
+                            },
+                        ];
+                    })
+                )
             )
-        );
+            .concat([
+                {
+                    name: "all_layouts",
+                    source: this.allSeries.map((series, i) => makeValidDataName(i)),
+                    transform: [
+                        {
+                            type: "voronoi",
+                            x: "layout_x",
+                            y: "layout_y",
+                            size: [{ signal: "width" }, { signal: "height" }],
+                            as: "layout_path",
+                        },
+                    ],
+                },
+            ] as any[]);
 
         const legends = _.flatten(
             mapSeries((series, i) => {
-                const hoverName = makeHoverName(i);
-                const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.1`;
+                const hoverCheck = ifHovering(i, 1, 0.1);
                 return {
                     titleColor: "#2c3e50",
                     labelColor: "#2c3e50",
@@ -162,8 +288,7 @@ export class TimeSeriesSpecFactory {
             _.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
-                    const hoverName = makeHoverName(i);
-                    const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.2`;
+                    const hoverCheck = ifHovering(i, 1, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
 
@@ -362,11 +487,8 @@ export class TimeSeriesSpecFactory {
 
         const seriesMarks = _.flatten(
             mapSeries((series, i) => {
-                const hoverName = makeHoverName(i);
-                const hoverCheck = `hover.name == '${hoverName}' ? 1 : 0.3`;
+                const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
-                const title = series.vizInfo.label;
-                const suffix = series.vizInfo.unitOfMeasure || "";
                 const thresholds = makeSeriesThresholds(series);
 
                 const firstLineMark = {
@@ -411,7 +533,7 @@ export class TimeSeriesSpecFactory {
                 const symbolMark = {
                     type: "symbol",
                     from: {
-                        data: makeDataName(i),
+                        data: makeValidDataName(i),
                     },
                     encode: {
                         enter: {
@@ -432,34 +554,23 @@ export class TimeSeriesSpecFactory {
                             size: {
                                 value: 100,
                             },
-                            tooltip: {
-                                signal: `{
-                                        title: '${title}',
-                                        Value: join([round(datum.value*10)/10, '${suffix}'], ' '),
-                                        time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
-                                    }`,
-                            },
                             fill: {
                                 value: "blue",
                             },
-                            fillOpacity: {
-                                value: 0,
-                            },
-                        },
-                        hover: {
                             fillOpacity: {
                                 value: 0.5,
                             },
                         },
                         update: {
                             fillOpacity: {
-                                value: 0,
+                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
                             },
                         },
                     },
                 };
 
                 if (thresholds) {
+                    const hoverCheck = ifHovering(i, 1, 0.1);
                     const thresholdsMarks = thresholds.levels
                         .map((level, l: number) => {
                             const alias = makeThresholdLevelAlias(i, l);
@@ -480,7 +591,7 @@ export class TimeSeriesSpecFactory {
                                     },
                                     update: {
                                         strokeOpacity: {
-                                            signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
+                                            signal: hoverCheck,
                                         },
                                     },
                                 },
@@ -495,9 +606,10 @@ export class TimeSeriesSpecFactory {
                         },
                     ];
                 } else {
+                    const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: (i === 0) ? "primaryLine" : "secondaryLine",
+                        style: i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -511,7 +623,7 @@ export class TimeSeriesSpecFactory {
                             },
                             update: {
                                 strokeOpacity: {
-                                    signal: `hover.name == '${hoverName}' ? 1 : 0.1`,
+                                    signal: hoverCheck,
                                 },
                             },
                         },
@@ -529,11 +641,13 @@ export class TimeSeriesSpecFactory {
         // TODO Unique by thresholds and perhaps y value?
         const ruleMarks = _.flatten(
             mapSeries((series, i) => {
+                const domain = makeSeriesDomain(series);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
                 if (thresholds) {
                     return thresholds.levels
                         .filter((level) => level.label != null)
+                        .filter((level) => level.value != null && level.value >= domain[0] && level.value < domain[1])
                         .map((level) => {
                             return {
                                 type: "rule",
@@ -573,9 +687,34 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        console.log("viz: rules", ruleMarks);
+        const cellMarks = () => {
+            return [
+                {
+                    name: "cell",
+                    type: "path",
+                    from: {
+                        data: "all_layouts",
+                    },
+                    encode: {
+                        enter: {
+                            path: { field: "layout_path" },
+                            fill: { value: "transparent" },
+                            // strokeWidth: { value: 0.35 },
+                            // stroke: { value: "red" },
+                            tooltip: {
+                                signal: `{
+                                title: datum.vizInfo.label,
+                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
+                                time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
+                            }`,
+                            },
+                        },
+                    },
+                },
+            ];
+        };
 
-        const marks = [...brushMarks, ...ruleMarks, ...seriesMarks];
+        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
@@ -600,14 +739,17 @@ export class TimeSeriesSpecFactory {
             },
             {
                 name: "hover",
-                value: {
-                    name: makeHoverName(0),
-                },
                 on: [
                     {
-                        events: "symbol:mouseover",
+                        events: "@cell:mouseover",
                         update: "datum",
                     },
+                    /*
+                    {
+                        events: "@cell:mouseout",
+                        update: "null",
+                    },
+                    */
                 ],
             },
             {
@@ -674,7 +816,8 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "brush_translate_delta",
                         },
-                        update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                        update:
+                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                     },
                     {
                         events: {
@@ -705,7 +848,8 @@ export class TimeSeriesSpecFactory {
                                 scale: "x",
                             },
                         ],
-                        update: '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        update:
+                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },
@@ -877,7 +1021,7 @@ export class TimeSeriesSpecFactory {
                     grid: true,
                     gridDash: [2, 2],
                 },
-                style: chartStyles
+                style: chartStyles,
             },
             signals: signals,
             data: data,

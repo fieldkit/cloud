@@ -275,7 +275,7 @@ export class Graph extends Viz {
         if (this.dataSets.length) {
             const all = _.flatten(
                 this.dataSets.map((ds) => {
-                    if (ds && ds.graphing) {
+                    if (ds && ds.graphing && ds.all) {
                         return [ds];
                     }
                     return [];

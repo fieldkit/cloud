@@ -11,6 +11,18 @@
                     <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
                 </div>
             </div>
+            <!-- fixme: currently restricted to floodnet project -->
+            <div class="map-legend" v-if="id === 174 && levels.length > 0">
+                <h4>{{ keyTitle }}</h4>
+                <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
+                    <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
+                    <span>{{ item.label["enUS"] }}</span>
+                </div>
+                <div class="legend-item" v-if="hasStationsWithoutData">
+                    <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
+                    <span>No Data</span>
+                </div>
+            </div>
             <div class="container-map">
                 <StationsMap
                     @show-summary="showSummary"
@@ -111,6 +123,26 @@ export default Vue.extend({
         exploreContext(): ExploreContext {
             return new ExploreContext(this.project.id);
         },
+        stationsWithData(): DisplayStation[] {
+            return this.displayProject.stations.filter((station) => station.latestPrimary != null);
+        },
+        hasStationsWithoutData(): boolean {
+            return this.stationsWithData.length < this.projectStations.length;
+        },
+        keyTitle(): string {
+            if (this.stationsWithData.length > 0) {
+                return this.getThresholds(this.stationsWithData).label["enUS"];
+            } else {
+                return "";
+            }
+        },
+        levels(): object[] {
+            if (this.stationsWithData.length > 0) {
+                return this.getThresholds(this.stationsWithData).levels.filter((d) => d["label"]);
+            } else {
+                return [];
+            }
+        },
     },
     watch: {
         id(): Promise<any> {
@@ -136,6 +168,13 @@ export default Vue.extend({
         },
         onCloseSummary(): void {
             this.activeStationId = null;
+        },
+        getThresholds(stations: DisplayStation[]): object[] {
+            try {
+                return stations[0].configurations.all[0].modules[0].sensors[0].meta.viz[0].thresholds;
+            } catch (error) {
+                return [];
+            }
         },
     },
 });
@@ -188,7 +227,7 @@ export default Vue.extend({
     margin-bottom: 5px;
     text-overflow: ellipsis;
     overflow: hidden;
-    white-space:nowrap;
+    white-space: nowrap;
     max-height: 1em;
     width: 240px;
 }
@@ -235,6 +274,43 @@ export default Vue.extend({
     @include bp-down($sm) {
         top: 54px;
         height: calc(100% - 54px);
+    }
+}
+.map-legend {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    position: relative;
+    z-index: $z-index-top;
+    position: absolute;
+    bottom: 37px;
+    left: 65px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    text-align: left;
+    padding: 15px;
+    padding-right: 30px;
+    font-family: $font-family-medium;
+
+    h4 {
+        margin: 0 0 0.5em 0;
+        font-family: $font-family-bold;
+    }
+
+    .legend-item {
+        margin-bottom: 0.2em;
+    }
+    .legend-item:last-child {
+        margin-bottom: 0px;
+    }
+    .legend-dot {
+        margin-right: 10px;
+        font-size: 1.5em;
+    }
+
+    @include bp-down($sm) {
+        display: none;
     }
 }
 

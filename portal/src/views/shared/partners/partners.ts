@@ -17,7 +17,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             class: "floodnet",
             icon: "/favicon-floodnet.ico",
             sharing: {
-                viz: `Checkout this data on FloodNet!`, // TODO i18n
+                viz: `Check out this data on FloodNet!`, // TODO i18n
             },
             projectId: 174,
             interpolate: (baseString: string) => {
