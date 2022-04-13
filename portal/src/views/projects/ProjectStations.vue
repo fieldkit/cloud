@@ -246,10 +246,9 @@ export default Vue.extend({
         },
         openNotes(this: any, station: DisplayStation): Promise<any> {
             return this.$router.push({
-                name: "viewProjectStationNotes", // TEMPORARY
+                name: "viewStation",
                 params: {
-                    projectId: this.project.id, // TEMPORARY
-                    stationId: station.id,
+                    id: station.id,
                 },
             });
         },
