@@ -1,4 +1,4 @@
-FROM golang:1.16.4-buster AS source
+FROM golang:1.17.8-buster AS source
 
 WORKDIR /work
 

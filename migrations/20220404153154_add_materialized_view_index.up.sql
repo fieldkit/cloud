@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX ON fieldkit.aggregated_sensor_updated (station_id, sensor_id, module_id);

@@ -44,7 +44,7 @@
                     v-bind:id="'comment-id-' + post.id"
                     :ref="post.id"
                 >
-                    <div class="comment-main">
+                    <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
                         <UserPhoto :user="post.author"></UserPhoto>
                         <div class="column-post">
                             <div class="post-header">
@@ -465,13 +465,16 @@ header {
 
 ::v-deep .new-comment {
     @include flex(flex-end);
-    flex-wrap: wrap;
     padding: 22px 0;
     position: relative;
 
     @include bp-down($xs) {
         margin: 0 -10px;
         padding: 15px 10px 15px 10px;
+    }
+
+    @media screen and (max-width: 320px) {
+        flex-wrap: wrap;
     }
 
     .container.data-view & {
@@ -499,6 +502,10 @@ header {
 
     .button-submit {
         margin-left: auto;
+
+        @media screen and (max-width: 320px) {
+            width: 100%;
+        }
     }
 
     &:not(.reply) {
@@ -511,6 +518,10 @@ header {
                 height: 42px;
             }
         }
+
+        .new-comment-wrap {
+            flex: 0 0 calc(100% - 65px);
+        }
     }
 
     &-wrap {
@@ -518,7 +529,6 @@ header {
         width: 100%;
         position: relative;
         background-color: #fff;
-        flex: 0 0 calc(100% - 65px);
     }
 }
 
@@ -677,7 +687,11 @@ header {
 
     @include bp-down($xs) {
         margin-left: 0;
-        flex: 0 0 calc(100% - 65px);
+    }
+
+    @media screen and (max-width: 320px) {
+        flex: 0 0 calc(100% - 55px);
+        margin-right: 0;
     }
 
     * {

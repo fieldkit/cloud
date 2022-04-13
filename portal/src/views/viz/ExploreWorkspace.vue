@@ -162,10 +162,11 @@ export default Vue.extend({
             return this.workspace.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
-            console.log("viz: bookmark-change", bookmark);
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
+                console.log("viz: bookmark-no-change", bookmark);
                 return Promise.resolve(this.workspace);
             }
+            console.log("viz: bookmark-change", bookmark);
             await this.openBookmark(bookmark);
         },
         async openBookmark(bookmark: Bookmark): Promise<void> {
@@ -455,6 +456,16 @@ export default Vue.extend({
 .controls-container .tree-pair div {
     flex-basis: 50%;
 }
+.tree-key {
+    flex-basis: 0;
+    margin-right: 15px;
+    line-height: 35px;
+    font-size: 40px;
+
+    body.floodnet & {
+        margin-top: -10px;
+    }
+}
 
 .controls-container .right {
     display: flex;
@@ -571,13 +582,17 @@ export default Vue.extend({
 
 .brush_brush_bg path {
     body.floodnet & {
-        fill: var(--color-border);
+        fill: var(--color-primary);
         fill-opacity: 1;
     }
 }
 
 .layer_1_marks path {
     fill: var(--color-primary);
+
+    body.floodnet & {
+        fill: #3f5d62;
+    }
 }
 
 .one {

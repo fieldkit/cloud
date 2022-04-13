@@ -36,6 +36,17 @@ export class TimeRange {
         return this.start == Time.Min || this.end == Time.Max;
     }
 
+    public contains(o: TimeRange): boolean {
+        return this.start <= o.start && this.end >= o.end;
+    }
+
+    public describe(): string[] {
+        if (this.isExtreme()) {
+            return ["extreme", "extreme"];
+        }
+        return this.toArray().map((t) => new Date(t).toISOString());
+    }
+
     public static mergeArrays(ranges: number[][]): TimeRange {
         if (ranges.length == 0) {
             return TimeRange.eternity;
@@ -52,12 +63,12 @@ export class TimeRange {
         return new TimeRange(min, max);
     }
 
-    public static mergeRanges(ranges: TimeRange[]): TimeRange {
-        return TimeRange.mergeArrays(ranges.map((r) => r.array));
+    public static mergeArraysIgnoreExtreme(ranges: number[][]): TimeRange {
+        return TimeRange.mergeArrays(ranges.filter((r) => r[0] != Time.Min && r[1] != Time.Max));
     }
 
-    public contains(o: TimeRange): boolean {
-        return this.start <= o.start && this.end >= o.end;
+    public static mergeRanges(ranges: TimeRange[]): TimeRange {
+        return TimeRange.mergeArrays(ranges.map((r) => r.array));
     }
 }
 
@@ -203,7 +214,7 @@ export class QueriedData {
             if (values.length == 0) throw new Error(`empty data ranges`);
             if (times.length == 0) throw new Error(`empty time ranges`);
 
-            this.dataRange = makeRange(values);
+            this.dataRange = makeRange(values as number[]);
             this.timeRangeData = makeRange(times);
 
             if (this.timeRangeQueried.isExtreme()) {
@@ -250,7 +261,7 @@ export class QueriedData {
 }
 
 export class DataSetSeries {
-    constructor(public readonly vizSensor: VizSensor, public graphing: QueriedData | null = null) {}
+    constructor(public readonly vizSensor: VizSensor, public graphing: QueriedData | null = null, public all: QueriedData | null = null) {}
 
     public bookmark(): VizSensor {
         return this.vizSensor;
@@ -266,10 +277,11 @@ export class DataSetSeries {
 
     public shouldConstrainBy(range: [number, number]): boolean {
         if (this.graphing == null) {
+            // console.log("viz: constrain:no-graphing");
             return false;
         }
         if (this.graphing.dataRange[1] > range[1]) {
-            console.log(`viz: constrain:nope`, this.graphing.dataRange[1], range[1]);
+            // console.log("viz: constrain:nope", this.graphing.dataRange[1], range[1]);
             return false;
         }
         return true;

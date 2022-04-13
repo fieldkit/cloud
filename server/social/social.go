@@ -1,12 +1,14 @@
 package social
 
 import (
+	"bytes"
 	"context"
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -19,179 +21,147 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type Meta struct {
+	Attribute string
+	Key       string
+	Value     string
+}
+
+func NewMetaName(key, value string) *Meta {
+	return &Meta{Attribute: "name", Key: key, Value: value}
+}
+
+func NewMetaProperty(key, value string) *Meta {
+	return &Meta{Attribute: "property", Key: key, Value: value}
+}
+
 type MetaSchema interface {
-	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) error
-	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) error
+	SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedProjectPayload) ([]*Meta, error)
+	SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request, payload *SharedWorkspacePayload) ([]*Meta, error)
 }
 
 type SocialContext struct {
 	db                *sqlxcache.DB
 	projectRepository *repositories.ProjectRepository
-	baseApiUrl        string
 	schema            MetaSchema
+	rootPath          string
 }
 
 type SharedProjectPayload struct {
 	project  *data.Project
+	url      string
 	photoUrl string
+	width    int
+	height   int
 }
 
 type SharedWorkspacePayload struct {
 	bookmark    *data.Bookmark
 	title       string
 	description string
+	url         string
 	photoUrl    string
 }
 
-func matchUserAgent(partial string) mux.MatcherFunc {
-	return func(req *http.Request, match *mux.RouteMatch) bool {
-		if userAgent, ok := req.Header[http.CanonicalHeaderKey("user-agent")]; ok {
-			if len(userAgent) == 0 {
-				return false
-			}
-			return strings.Contains(strings.ToLower(userAgent[0]), strings.ToLower(partial))
-		}
-		return false
+const metaOnlyTemplate = `{{- range $i, $meta := .Metas }}
+<meta {{ $meta.Attribute }}="{{ $meta.Key }}" content="{{ $meta.Value }}" />
+{{- end }}`
+
+func (sc *SocialContext) getRequestHost(req *http.Request) string {
+	protocol := "https" // We're never accessed over http.
+	forwardedHostKey := http.CanonicalHeaderKey("x-forwarded-host")
+	forwardedHeader := req.Header.Values(forwardedHostKey)
+	if len(forwardedHeader) == 0 {
+		return fmt.Sprintf("%s://%s", protocol, req.Host)
 	}
+	return fmt.Sprintf("%s://%s", protocol, forwardedHeader[0])
 }
 
-const metaOnlyTemplate = `<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {{- range $key, $value := .Metas }}
-        <meta name="{{ $key }}" content="{{ $value }}" />
-        {{- end }}
-    </head>
-    <body>Intentionally left blank.</body>
-</html>`
-
-func serveMeta(w http.ResponseWriter, req *http.Request, meta map[string]string) error {
-	t, err := template.New("social-meta").Parse(metaOnlyTemplate)
-	if err != nil {
-		return err
-	}
-
-	w.WriteHeader(http.StatusOK)
-
-	data := struct {
-		Metas map[string]string
-	}{
-		Metas: meta,
-	}
-
-	err = t.Execute(w, data)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (sc *SocialContext) SharedProject(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
+func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
 	vars := mux.Vars(req)
 
 	projectId, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
 	project, err := sc.projectRepository.QueryByID(ctx, int32(projectId))
 	if err != nil {
-		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			log.Errorw("error-query", "error", err)
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		return
+		return nil, err
 	}
 
 	if project.Privacy != data.Public {
-		log.Errorw("error-permission", "project_id", projectId)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
 
-	// NOTE TODO We're casually assuming https everywhere.
-	photoUrl := fmt.Sprintf("%s/projects/%d/media", sc.baseApiUrl, project.ID)
+	size := 800
+	requestHost := sc.getRequestHost(req)
+	photoUrl := fmt.Sprintf("%s/projects/%d/media?size=%d", requestHost, project.ID, size)
+	linkUrl := fmt.Sprintf("%s%s", requestHost, req.URL.String())
 
-	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL)
+	log.Infow("social-project-card", "project_id", project.ID, "url", req.URL, "request_host", requestHost)
 
 	sharedPayload := &SharedProjectPayload{
 		project:  project,
+		url:      linkUrl,
 		photoUrl: photoUrl,
+		width:    size,
+		height:   size,
 	}
 
-	err = sc.schema.SharedProject(ctx, w, req, sharedPayload)
+	meta, err := sc.schema.SharedProject(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error", "project_id", projectId)
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
+
+	return meta, nil
 }
 
-func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
+func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
-	vars := mux.Vars(req)
 
 	bookmark := ""
+	// Deprecated
+	vars := mux.Vars(req)
 	if vars["bookmark"] != "" {
-		bookmark = vars["bookmark"] // Deprecated
+		bookmark = vars["bookmark"]
 	}
-
 	qs := req.URL.Query()
-
 	if qs.Get("bookmark") != "" {
 		bookmark = qs.Get("bookmark")
 	}
-
 	if qs.Get("v") != "" {
 		token := qs.Get("v")
 
 		repository := repositories.NewBookmarkRepository(sc.db)
-
 		resolved, err := repository.Resolve(ctx, token)
 		if err != nil {
-			log.Errorw("error-internal", "error", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			return nil, err
 		}
 		if resolved == nil {
-			log.Errorw("error-bad-token", "token", token)
-			w.WriteHeader(http.StatusNotFound)
-			return
+			return nil, err
 		}
 
 		bookmark = resolved.Bookmark
 	}
 
 	if bookmark == "" {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		return nil, fmt.Errorf("empty bookmark")
 	}
 
-	log.Infow("social-workspace-card", "bookmark", bookmark)
+	requestHost := sc.getRequestHost(req)
+
+	log.Infow("social-workspace-card", "bookmark", bookmark, "url", req.URL, "request_host", requestHost)
 
 	parsed, err := data.ParseBookmark(bookmark)
 	if err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return nil, err
 	}
 
 	sensorRows := []*data.Sensor{}
 	if err := sc.db.SelectContext(ctx, &sensorRows, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
-		log.Errorw("error-internal", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
 	mmr := repositories.NewModuleMetaRepository(sc.db)
@@ -209,7 +179,7 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 	ranges := make([]string, 0)
 
 	title := ""
-	description := ""
+	description := "FieldKit Chart"
 
 	for _, v := range parsed.Vizes() {
 		log.Infow("viz:parsed", "v", v)
@@ -217,18 +187,14 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 		for _, s := range v.Sensors {
 			station, err := sr.QueryStationByID(ctx, s.StationID)
 			if err != nil {
-				log.Errorw("error-internal", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+				return nil, err
 			}
 
 			sensorKey := sensorIdToKey[s.SensorID]
 
 			sensorMeta, err := mmr.FindByFullKey(ctx, sensorKey)
 			if err != nil {
-				log.Errorw("error-internal", "error", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+				return nil, err
 			}
 
 			label := sensorMeta.Sensor.Strings["en-us"]["label"]
@@ -252,19 +218,83 @@ func (sc *SocialContext) SharedWorkspace(w http.ResponseWriter, req *http.Reques
 
 	// We're assuming https here.
 	now := time.Now()
-	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", sc.baseApiUrl, url.QueryEscape(bookmark), now.Unix())
+	photoUrl := fmt.Sprintf("%s/charting/rendered?bookmark=%v&ts=%v", requestHost, url.QueryEscape(bookmark), now.Unix())
+	linkUrl := fmt.Sprintf("%s%s", requestHost, req.URL.String())
 
 	sharedPayload := &SharedWorkspacePayload{
+		url:         linkUrl,
 		photoUrl:    photoUrl,
 		title:       title,
 		description: description,
 		bookmark:    parsed,
 	}
 
-	err = sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
+	meta, err := sc.schema.SharedWorkspace(ctx, w, req, sharedPayload)
 	if err != nil {
-		log.Errorw("error")
-		w.WriteHeader(http.StatusForbidden)
-		return
+		return nil, err
 	}
+
+	return meta, nil
+}
+
+func (sc SocialContext) serveMeta(ctx context.Context, w http.ResponseWriter, req *http.Request, meta []*Meta) error {
+	serving, err := os.ReadFile(filepath.Join(sc.rootPath, "index.html"))
+	if err != nil {
+		return err
+	}
+
+	if len(meta) > 0 {
+		template, err := template.New("social-meta").Parse(metaOnlyTemplate)
+		if err == nil {
+			data := struct {
+				Metas []*Meta
+			}{
+				Metas: meta,
+			}
+
+			var rendered bytes.Buffer
+			err = template.Execute(&rendered, data)
+			if err == nil {
+				serving = []byte(strings.Replace(string(serving), "<title>", rendered.String()+"<title>", 1))
+			}
+		}
+	} else {
+		log := Logger(ctx).Sugar()
+		log.Infow("social:meta:empty")
+	}
+
+	// TODO Include `error` in this either as data.
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(serving))
+
+	return err
+}
+
+func (sc SocialContext) logErrorsAndServeOriginalIndex(f func(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		ctx := context.Background()
+		meta, err := f(ctx, w, req)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("social:meta:error", "error", err)
+		}
+
+		err = sc.serveMeta(ctx, w, req, meta)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("social:serve:error", "error", err)
+		}
+	}
+}
+
+func (sc *SocialContext) Register(r *mux.Router) {
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}", sc.logErrorsAndServeOriginalIndex(sc.SharedProject))
+	r.HandleFunc("/dashboard/projects/{id:[0-9]+}/public", sc.logErrorsAndServeOriginalIndex(sc.SharedProject))
+	r.HandleFunc("/dashboard/explore/{bookmark}", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/share/{bookmark}", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/explore", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/dashboard/share", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz/share", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz/export", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
+	r.HandleFunc("/viz", sc.logErrorsAndServeOriginalIndex(sc.SharedWorkspace))
 }

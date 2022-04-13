@@ -42,3 +42,7 @@ export const NEED_EXPORTS = "NEED_EXPORTS";
 export const BEGIN_EXPORT = "BEGIN_EXPORT";
 
 export const NOTIFICATIONS_SEEN = "NOTIFICATIONS_SEEN";
+
+// Notes
+
+export const NEED_NOTES = "NEED_NOTES";

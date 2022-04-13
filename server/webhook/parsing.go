@@ -15,10 +15,11 @@ import (
 )
 
 type ParsedReading struct {
-	Key      string  `json:"key"`
-	Value    float64 `json:"value"`
-	Battery  bool    `json:"battery"`
-	Location bool    `json:"location"`
+	Key       string  `json:"key"`
+	Value     float64 `json:"value"`
+	Battery   bool    `json:"battery"`
+	Location  bool    `json:"location"`
+	Transient bool    `json:"transient"`
 }
 
 type ParsedMessage struct {
@@ -215,10 +216,11 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 			if value, ok := toFloat(maybeValue); ok {
 				reading := &ParsedReading{
-					Key:      sensor.Key,
-					Battery:  sensor.Battery,
-					Location: sensor.Location,
-					Value:    value,
+					Key:       sensor.Key,
+					Battery:   sensor.Battery,
+					Location:  sensor.Location,
+					Transient: sensor.Transient,
+					Value:     value,
 				}
 
 				sensors = append(sensors, reading)

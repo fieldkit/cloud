@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <router-link :to="{ name: 'projects' }">
+        <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
         <div

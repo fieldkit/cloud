@@ -28,6 +28,8 @@ import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
+import StationView from "./views/station/StationView.vue";
+
 import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
@@ -344,6 +346,20 @@ const routes = [
         },
     },
     {
+        path: "/dashboard/station/:id",
+        name: "viewStation",
+        component: StationView,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/explore",
         name: "exploreBookmark",
         component: ExploreView,
@@ -568,7 +584,6 @@ export default function routerFactory(store) {
                 next();
             }
         } else if (to.matched.some((record) => record.meta.secured)) {
-            /*
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
@@ -582,12 +597,11 @@ export default function routerFactory(store) {
                     next();
                 }
             } else {
-                const queryParams = new URLSearchParams();
-                queryParams.append("after", to.fullPath);
-                next("/login?" + queryParams.toString());
+                // const queryParams = new URLSearchParams();
+                // queryParams.append("after", to.fullPath);
+                // next("/login?" + queryParams.toString());
+                next();
             }
-            */
-            next();
         } else {
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {

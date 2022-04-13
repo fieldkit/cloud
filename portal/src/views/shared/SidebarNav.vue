@@ -1,7 +1,7 @@
 <template>
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
-            <router-link :to="{ name: 'projects' }">
+            <router-link :to="{ name: 'root' }">
                 <Logo />
             </router-link>
         </div>
@@ -9,7 +9,7 @@
             <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22" />
         </a>
         <div id="inner-nav">
-            <div class="nav-section">
+            <div v-if="!isPartnerCustomisationEnabled()" class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
                         <i class="icon icon-projects"></i>

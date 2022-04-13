@@ -5,9 +5,15 @@
             <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
-            <a class="twitter-share-button" :href="twitterUrl" target="blank">
-                <img alt="Share on Twitter" src="../../assets/icon-twitter.svg" />
+            <a class="share-button" :href="twitterUrl" target="blank">
+                <i class="icon icon-twitter" aria-label="Share on Twitter"></i>
                 Twitter
+            </a>
+            <a class="share-button" :href="facebookUrl" target="blank">
+                <i class="icon icon-facebook" aria-label="Share on Facebook"></i>
+                <span>
+                    Facebook
+                </span>
             </a>
         </div>
     </div>
@@ -17,9 +23,8 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-
+import { getPartnerCustomization } from "@/views/shared/partners";
 import { mapState } from "vuex";
-import { serializeBookmark } from "./viz";
 
 function getRelativeUrl(href: string): string {
     const link = document.createElement("a");
@@ -54,8 +59,19 @@ export default Vue.extend({
         twitterUrl(): string {
             const qs = new URLSearchParams();
             qs.append("url", this.vizUrl);
-            qs.append("text", "Check out this data on FieldKit!");
+            // TODO We should probably have a "non-partner" customization.
+            const partnerCustomization = getPartnerCustomization();
+            if (partnerCustomization != null) {
+                qs.append("text", partnerCustomization.sharing.viz);
+            } else {
+                qs.append("text", "Check out this data on FieldKit!");
+            }
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
+        },
+        facebookUrl(): string {
+            const qs = new URLSearchParams();
+            qs.append("u", this.vizUrl);
+            return `https://www.facebook.com/sharer/sharer.php?${qs.toString()}`;
         },
         vizUrl(): string {
             const qs = new URLSearchParams();
@@ -76,7 +92,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .share-panel .heading {
-    padding: 1em;
+    padding: 25px 20px;
     display: flex;
     align-items: center;
 }
@@ -90,16 +106,24 @@ export default Vue.extend({
 }
 
 .share-options {
-    padding: 20px;
+    padding: 20px 0;
 
-    .twitter-share-button {
-        padding: 10px 10px 10px 0px;
+    .icon {
+        width: 20px;
+        font-size: 19px;
+        margin-right: 10px;
+        margin-top: -2px;
+    }
+
+    .share-button {
+        padding: 11px 20px 13px 20px;
         cursor: pointer;
         display: flex;
         align-items: center;
+        transition: background-color 0.25s;
 
-        img {
-            padding: 5px 10px 5px 5px;
+        &:hover {
+            background-color: #f4f5f7;
         }
     }
 

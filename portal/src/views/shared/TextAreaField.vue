@@ -56,6 +56,8 @@ export default Vue.extend({
     border: 0;
     border-radius: 0;
     border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    resize: none;
+    overflow: hidden;
 }
 .has-float-label textarea:focus {
     outline: none;

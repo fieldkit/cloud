@@ -31,9 +31,18 @@ class Chart {
         const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
             const { vizSensor, sensor, station } = row;
             const name = sensor.strings["en-us"]["label"] || "Unknown";
-            const data = dataResponses[index];
+            const data = dataResponses[index][0];
             const scale = [];
-            const vizInfo = new VizInfo(data.key, scale, station, sensor.unitOfMeasure, data.key, name, sensor.viz || [], sensor.ranges);
+            const vizInfo = new VizInfo(
+                sensor.key,
+                scale,
+                station,
+                sensor.unitOfMeasure,
+                sensor.key,
+                name,
+                sensor.viz || [],
+                sensor.ranges
+            );
 
             return new SeriesData(data.key, new DataSetSeries(vizSensor, data), data, vizInfo);
         });
@@ -113,7 +122,7 @@ app.get("/charting/rendered", async (req, res, next) => {
         const bookmark = JSON.parse(queryArgument(req.query.bookmark));
         const w = Number(req.query.w || 800 * 2);
         const h = Number(req.query.h || 418 * 2);
-        const settings = new ChartSettings(w, h);
+        const settings = new ChartSettings(TimeRange.eternity, w, h);
 
         console.log(`charting: bookmark`, JSON.stringify(bookmark));
 
@@ -239,7 +248,7 @@ app.get("/charting/rendered", async (req, res, next) => {
             .mapValues((r) => r.map((c) => c.handled))
             .mapValues((r, k) => {
                 const chart = charts[k];
-                return chart.prepare(r[0], r[1]);
+                return chart.prepare(r[0], r.slice(1));
             })
             .value();
 

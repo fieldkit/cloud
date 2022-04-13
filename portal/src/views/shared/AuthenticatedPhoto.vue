@@ -1,5 +1,5 @@
 <template>
-    <img :src="photo" class="authenticated-photo photo" v-if="photo" alt="Image" />
+    <img v-if="photo" :src="photo" class="authenticated-photo photo" alt="Image" />
 </template>
 
 <script lang="ts">
@@ -36,4 +36,6 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+
+</style>

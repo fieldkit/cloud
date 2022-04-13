@@ -52,7 +52,12 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 	cached, ok := m.cache[deviceKey]
 	if ok {
-		return m.updateLinkedFields(ctx, cached.station, pm)
+		err := m.updateLinkedFields(ctx, cached.station, pm)
+		if err != nil {
+			return nil, err
+		}
+
+		return cached.station, nil
 	}
 
 	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.deviceID)
@@ -86,7 +91,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		station = added
 	} else {
-		// TODO Update device name
+		station.Name = pm.deviceName
 	}
 
 	// Add or create the provision.
@@ -112,6 +117,8 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
 
+	log := Logger(ctx).Sugar()
+
 	for _, moduleSchema := range pm.schema.Station.Modules {
 		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
@@ -133,32 +140,33 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 
 		for index, sensorSchema := range moduleSchema.Sensors {
-			// sensorPrefix := fmt.Sprintf("%s.%s", modulePrefix, sensor.Key)
-
-			// Add or create the sensor..
-			sensor := &data.ModuleSensor{
-				ConfigurationID: configuration.ID,
-				ModuleID:        module.ID,
-				Index:           uint32(index),
-				Name:            sensorSchema.Key,
-				ReadingValue:    nil,
-				ReadingTime:     nil,
-			}
-
-			for _, pr := range pm.data {
-				if pr.Key == sensorSchema.Key {
-					sensor.ReadingValue = &pr.Value
-					sensor.ReadingTime = &pm.receivedAt
-					break
+			// Transient sensors aren't saved.
+			if !sensorSchema.Transient {
+				// Add or create the sensor..
+				sensor := &data.ModuleSensor{
+					ConfigurationID: configuration.ID,
+					ModuleID:        module.ID,
+					Index:           uint32(index),
+					Name:            sensorSchema.Key,
+					ReadingValue:    nil,
+					ReadingTime:     nil,
 				}
-			}
 
-			if sensorSchema.UnitOfMeasure != nil {
-				sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-			}
+				for _, pr := range pm.data {
+					if pr.Key == sensorSchema.Key {
+						sensor.ReadingValue = &pr.Value
+						sensor.ReadingTime = &pm.receivedAt
+						break
+					}
+				}
 
-			if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-				return nil, err
+				if sensorSchema.UnitOfMeasure != nil {
+					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+				}
+
+				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+					return nil, err
+				}
 			}
 		}
 
@@ -174,18 +182,22 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			station: whStation,
 		}
 
-		Logger(ctx).Sugar().Infow("wh:loaded-station", "station_id", station.ID)
+		log.Infow("wh:loaded-station", "station_id", station.ID)
 
-		return m.updateLinkedFields(ctx, whStation, pm)
+		err = m.updateLinkedFields(ctx, whStation, pm)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
+	return m.cache[deviceKey].station, nil
 }
 
-func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) (*WebHookStation, error) {
+func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) error {
 	for _, parsedReading := range pm.data {
 		if parsedReading.Battery {
-			// TODO This is very wasteful when doing bulk processing.
+			// TODO This is very wasteful when doing bulk processing, would be
+			// nice to save until the very end and do once.
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
 		}
@@ -200,8 +212,8 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookS
 	station.Station.UpdatedAt = now
 
 	if err := m.sr.UpdateStation(ctx, station.Station); err != nil {
-		return nil, fmt.Errorf("error updating station linked fields: %v", err)
+		return fmt.Errorf("error updating station linked fields: %v", err)
 	}
 
-	return station, nil
+	return nil
 }

@@ -7,6 +7,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { TimeRange, VizSensor } from "./common";
 import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
+import chartStyles from "./vega/chartStyles";
 
 export const SensorSelectionRow = Vue.extend({
     name: "SensorSelectionRow",
@@ -137,11 +138,16 @@ export const SelectionControls = Vue.extend({
             this.viz.log("raise viz-change-sensors", newParams);
             this.$emit("viz-change-sensors", newParams);
         },
+        getKeyColor(idx) {
+            const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
+            return color;
+        },
     },
     template: `
 		<div class="left half">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
-                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)" />
+                <div class="tree-key" :style="{color: getKeyColor(index)}">&#9632;</div>
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
                 <div class="actions" v-if="showAdd || showRemove">
                     <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
                     <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
@@ -240,10 +246,10 @@ export const ViewingControls = Vue.extend({
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
-                const rangeViz = this.viz.visible;
+                const rangeViz = this.viz.visibleTimeRange;
                 const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                    console.log("viz: raising viz-time-zoomed");
+                    console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("viz: swallowing viz-time-zoomed");

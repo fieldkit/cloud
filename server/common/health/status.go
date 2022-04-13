@@ -67,7 +67,7 @@ func StatusHandler(ctx context.Context) http.Handler {
 
 		req.Header.Del("Authorization")
 
-		log.Infow("status", "headers", req.Header)
+		log.Infow("status", "headers", req.Header, "host", req.Host)
 
 		sr, err := MakeStatusResponse(ctx)
 		if err != nil {

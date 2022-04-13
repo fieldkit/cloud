@@ -1,5 +1,5 @@
 import { getString, getSeriesThresholds } from "./customizations";
-import { SeriesData } from "../common";
+import { SeriesData, TimeRange } from "../common";
 import _ from "lodash";
 
 export { getString, getSeriesThresholds, SeriesData };
@@ -7,7 +7,12 @@ export { getString, getSeriesThresholds, SeriesData };
 export type MapFunction<T> = (series: SeriesData, i: number) => T;
 
 export class ChartSettings {
-    constructor(public readonly w: number, public readonly h: number, public readonly auto = false) {}
+    constructor(
+        public readonly timeRange = TimeRange.eternity,
+        public readonly w: number = 0,
+        public readonly h: number = 0,
+        public readonly auto = false
+    ) {}
 
     public apply(spec: unknown): unknown {
         if (this.auto) {
@@ -36,6 +41,6 @@ export class ChartSettings {
         return _.extend(spec, containerSize);
     }
 
-    public static Container = new ChartSettings(0, 0, false);
-    public static Auto = new ChartSettings(0, 0, true);
+    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false);
+    public static Auto = new ChartSettings(TimeRange.eternity, 0, 0, true);
 }

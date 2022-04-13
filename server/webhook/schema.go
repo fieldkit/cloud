@@ -12,6 +12,7 @@ type MessageSchemaSensor struct {
 	Expression    string  `json:"expression"`
 	Battery       bool    `json:"battery"`
 	Location      bool    `json:"location"`
+	Transient     bool    `json:"transient"`
 	UnitOfMeasure *string `json:"units"`
 }
 
