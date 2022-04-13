@@ -199,7 +199,7 @@
         "nativeLand": "Native Land:",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "viewAllPhotos": "View all photos"
+        "managePhotos": "Manage photos"
     },
     "user": {
         "profile": {

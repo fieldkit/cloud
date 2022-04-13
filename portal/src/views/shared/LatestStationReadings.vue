@@ -167,6 +167,10 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+
+    @at-root .station-readings & {
+        justify-content: flex-start;
+    }
 }
 .readings-simple .reading-container {
     background-color: white;

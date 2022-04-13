@@ -33,7 +33,7 @@
                                 <span>{{ station.locationName }}</span>
                             </div>
                             <div v-if="station.location" class="flex">
-                                <div class="station-coordinate">
+                                <div class="station-coordinate" :style="station.location ? { 'padding-left': 0 } : ''">
                                     <div>{{ station.location.latitude | prettyCoordinate }}</div>
                                     <div>{{ $tc("station.latitude") }}</div>
                                 </div>
@@ -71,10 +71,13 @@
                     <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
                         <!-- somehow using v-for like so needs the next v-if -->
                         <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
-                        <i v-else class="photo icon icon-image-placeholder"></i>
+                        <div v-else class="photo-placeholder">
+                            <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                        </div>
                     </div>
                     <router-link :to="{ name: 'test' }" class="station-photos-nav">
-                        {{ $t("station.viewAllPhotos") }}
+                        <i class="icon icon-grid"></i>
+                        {{ $t("station.managePhotos") }}
                     </router-link>
                 </div>
             </section>
@@ -92,8 +95,12 @@
                             <span>{{ $t(getModuleName(module)) }}</span>
                         </li>
                     </ul>
+                    <header v-if="isMobileView">
+                        <img alt="Module icon" :src="getModuleImg(selectedModule)" />
+                        {{ $t(getModuleName(selectedModule)) }}
+                    </header>
                     <div class="station-readings-values">
-                        <header>{{ $t(getModuleName(selectedModule)) }}</header>
+                        <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
                         <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
                     </div>
                 </div>
@@ -158,6 +165,7 @@ export default Vue.extend({
             failed: boolean;
         };
         selectedModule: DisplayModule | null;
+        isMobileView: boolean;
     } {
         return {
             notesState: {
@@ -166,6 +174,7 @@ export default Vue.extend({
                 failed: false,
             },
             selectedModule: null,
+            isMobileView: window.screen.availWidth <= 500,
         };
     },
     watch: {
@@ -175,7 +184,6 @@ export default Vue.extend({
     },
     computed: {
         station(): DisplayStation {
-            // console.log("radoi active station", this.$state.stations.stations[this.$route.params.id]);
             return this.$state.stations.stations[this.$route.params.id];
         },
         notes(): PortalStationNotes[] {
@@ -199,20 +207,14 @@ export default Vue.extend({
             return subtitle;
         },
         mapBounds(): BoundingRectangle {
-            /*if (this.project.bounds?.min && this.project.bounds?.max) {
-                return new BoundingRectangle(this.project.bounds?.min, this.project.bounds?.max);
-            }*/
-
             return MappedStations.defaultBounds();
         },
         mapped(): MappedStations | null {
             if (!this.station.id) {
-                console.log("Radoi mapped null");
                 return null;
             }
 
             const mapped = MappedStations.make([this.station]);
-            console.log("radoi mapped", mapped);
             return mapped.focusOn(this.station.id);
         },
     },
@@ -275,7 +277,7 @@ export default Vue.extend({
             }
             return true;
         },
-        getModuleName(module) {
+        getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
         },
     },
@@ -316,7 +318,12 @@ export default Vue.extend({
 
         @include bp-down($sm) {
             flex-wrap: wrap;
-            margin-top: 0;
+            margin-top: 20px;
+            margin-bottom: 60px;
+        }
+
+        @include bp-down($xs) {
+            margin-top: -10px;
         }
 
         > div {
@@ -346,7 +353,7 @@ export default Vue.extend({
                 margin-bottom: 0;
             }
 
-            img {
+            > img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
@@ -380,12 +387,17 @@ export default Vue.extend({
 
         img {
             margin-right: 10px;
+            margin-bottom: 5px;
             width: 30px;
             height: 30px;
         }
     }
     &-coordinate {
         padding: 0 15px;
+
+        @include bp-down($xs) {
+            display: flex;
+        }
 
         &:last-of-type {
             padding-right: 0;
@@ -394,15 +406,35 @@ export default Vue.extend({
         div:nth-of-type(2) {
             font-size: 12px;
             margin-top: 2px;
+
+            @include bp-down($xs) {
+                order: -1;
+                margin-right: 10px;
+            }
         }
     }
     &-location {
         align-self: flex-start;
+        padding-right: 10px;
+
+        @include bp-down($xs) {
+            flex: 0 0 100%;
+            border-top: 1px solid var(--color-border);
+            padding-top: 15px;
+            margin-top: 15px;
+            order: 3;
+        }
     }
     &-row {
         padding: 15px 0;
         max-width: 350px;
         @include flex(center);
+
+        &:first-of-type {
+            @include bp-down($xs) {
+                padding-top: 30px;
+            }
+        }
 
         &:not(:last-of-type) {
             border-bottom: solid 1px var(--color-border);
@@ -416,6 +448,10 @@ export default Vue.extend({
             }
         }
 
+        @include bp-down($xs) {
+            flex-wrap: wrap;
+        }
+
         .icon {
             margin-right: 7px;
             align-self: flex-start;
@@ -426,12 +462,21 @@ export default Vue.extend({
         font-size: 16px;
         display: flex;
         min-height: 130px;
+        position: relative;
+
+        @include bp-down($xs) {
+            padding-top: 54px;
+        }
 
         &-values {
             padding: 27px 20px 10px 30px;
             border-left: 1px solid var(--color-border);
             transform: translateX(-1px);
             width: 100%;
+
+            @include bp-down($xs) {
+                padding: 20px 25px;
+            }
         }
 
         ul {
@@ -479,6 +524,11 @@ export default Vue.extend({
 
         ::v-deep .reading-container {
             flex: 0 0 calc(33% - 10px);
+            margin-right: 10px;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
 
             @include bp-down($lg) {
                 flex: 0 0 calc(50% - 10px);
@@ -494,6 +544,20 @@ export default Vue.extend({
             padding-bottom: 15px;
             border-bottom: 1px solid var(--color-border);
             margin-bottom: 20px;
+            width: 100%;
+            display: flex;
+
+            img {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+            }
+
+            @include bp-down($xs) {
+                padding: 15px 10px;
+                font-size: 18px;
+                @include position(absolute, 0 null null 0);
+            }
         }
     }
 
@@ -538,7 +602,11 @@ export default Vue.extend({
 }
 
 .stations-map {
-    height: 404px;
+    height: 400px;
+
+    @include bp-down($sm) {
+        height: 450px;
+    }
 }
 
 section {
@@ -580,5 +648,26 @@ section {
 }
 .notification.failed {
     background-color: #f8d7da;
+}
+
+.icon-location {
+    margin-top: 1px;
+}
+
+.photo-placeholder {
+    @include flex(center, center);
+    height: 100%;
+    background-color: var(--color-border);
+    opacity: 0.5;
+
+    img {
+        width: 40%;
+        height: 40%;
+    }
+}
+
+.icon-grid {
+    font-size: 12px;
+    margin-right: 5px;
 }
 </style>

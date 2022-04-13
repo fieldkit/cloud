@@ -93,13 +93,10 @@ export default Vue.extend({
                 });
             }
         },
-       /* mapped(): void {
-            console.log("map: mapped changed", this.mapped);
-            console.log("radoi 1");
+        mapped(): void {
             this.updateMap();
-        },*/
+        },
         showStations(): void {
-            console.log("radoi 2");
             this.updateMap();
         },
     },
@@ -127,7 +124,6 @@ export default Vue.extend({
 
                 this.ready = true;
                 this.updateMap();
-                console.log("radoi settimeout");
 
                 // Force model to update.
                 this.newBounds();
