@@ -106,7 +106,7 @@
                 </div>
             </section>
 
-            <section v-if="mapped">
+            <section v-if="showMap">
                 <div class="container-map">
                     <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
                 </div>
@@ -215,7 +215,15 @@ export default Vue.extend({
             }
 
             const mapped = MappedStations.make([this.station]);
+
             return mapped.focusOn(this.station.id);
+        },
+        showMap(): boolean {
+            if (this.mapped && this.mapped.features.length > 0) {
+                return true;
+            }
+
+            return false;
         },
     },
     beforeRouteUpdate(to: never, from: never, next: any) {
