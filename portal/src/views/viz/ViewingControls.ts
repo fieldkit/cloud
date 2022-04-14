@@ -131,7 +131,7 @@ export const SelectionControls = Vue.extend({
             if (this.viz.busy) {
                 return [];
             }
-            this.viz.log("station-options", { options: this.workspace.stationOptions });
+            // this.viz.log("station-options", { options: this.workspace.stationOptions });
             return this.workspace.stationOptions;
         },
         showRemove(): boolean {
@@ -148,7 +148,7 @@ export const SelectionControls = Vue.extend({
             }
             const stationId = vizSensor[0]; // TODO VizSensor
             const sensorOptions = this.workspace.sensorOptions(stationId);
-            this.viz.log("sensor-options", { options: sensorOptions });
+            // this.viz.log("sensor-options", { options: sensorOptions });
             return sensorOptions;
         },
         raiseChangeSeries(index: number, newSeries: DataSetSeries): void {

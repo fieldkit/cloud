@@ -5,6 +5,14 @@ export interface PartnerCustomization {
     sharing: {
         viz: string;
     };
+    nav: {
+        viz: {
+            back: {
+                // project: string;
+                map: { label: string };
+            };
+        };
+    };
     projectId: number;
     interpolate: (base: string) => string;
 }
@@ -18,6 +26,14 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             icon: "/favicon-floodnet.ico",
             sharing: {
                 viz: `Check out this data on FloodNet!`, // TODO i18n
+            },
+            nav: {
+                viz: {
+                    back: {
+                        // project: "layout.backProjectDashboard",
+                        map: { label: "layout.backToSensors" },
+                    },
+                },
             },
             projectId: 174,
             interpolate: (baseString: string) => {
