@@ -401,7 +401,7 @@ export default Vue.extend({
         white-space: nowrap;
 
         @at-root body.floodnet & {
-            color: var(--color-dark) !important;
+            color: var(--color-dark);
         }
     }
 }
