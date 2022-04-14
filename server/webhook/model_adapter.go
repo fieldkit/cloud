@@ -91,7 +91,9 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		station = added
 	} else {
-		station.Name = pm.deviceName
+		if pm.deviceName != "" {
+			station.Name = pm.deviceName
+		}
 	}
 
 	// Add or create the provision.

@@ -148,14 +148,18 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
-	if err != nil {
-		return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
-	}
+	deviceNameString := ""
 
-	deviceNameString, ok := deviceNameRaw.(string)
-	if !ok {
-		return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+	if schema.Station.NameExpression != "" {
+		deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
+		if err != nil {
+			return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+		}
+
+		deviceNameString, ok := deviceNameRaw.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+		}
 	}
 
 	receivedAtRaw, err := m.evaluate(ctx, cache, source, schema.Station.ReceivedExpression)
