@@ -32,7 +32,7 @@
                     :mapBounds="mapBounds"
                 />
             </div>
-            <StationSummary
+            <StationHoverSummary
                 v-if="activeStation"
                 :station="activeStation"
                 :readings="false"
@@ -52,7 +52,7 @@ import * as ActionTypes from "@/store/actions";
 import * as utils from "../../utilities";
 import { ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
 import StationsMap from "../shared/StationsMap.vue";
-import StationSummary from "@/views/shared/StationSummary.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 
@@ -63,7 +63,7 @@ export default Vue.extend({
     components: {
         ...CommonComponents,
         StationsMap,
-        StationSummary,
+        StationHoverSummary,
         StandardLayout,
     },
     data(): {

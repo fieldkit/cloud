@@ -1,25 +1,8 @@
 <template>
     <div class="station-hover-summary" v-if="viewingSummary && station">
-        <div class="row general-row">
-            <div class="image-container">
-                <StationPhoto :station="station" />
-            </div>
-            <div class="station-details">
-                <div class="station-name">{{ station.name }}</div>
-                <div class="station-seen" v-if="station.updatedAt">
-                    Last Seen
-                    <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
-                </div>
-                <div class="station-battery" v-if="station.battery">
-                    <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                    <span class="small-light">{{ station.battery }} %</span>
-                </div>
-                <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                    <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
-                </div>
-            </div>
+        <StationSummaryContent :station="station">
             <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
-        </div>
+        </StationSummaryContent>
 
         <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
             <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
@@ -73,13 +56,15 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
+import StationSummaryContent from "./StationSummaryContent.vue";
 import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
 import * as utils from "@/utilities";
 
 export default Vue.extend({
-    name: "StationSummary",
+    name: "StationHoverSummary",
     components: {
         ...CommonComponents,
+        StationSummaryContent,
     },
     data: () => {
         return {
@@ -151,47 +136,6 @@ export default Vue.extend({
         font-family: $font-family-light;
     }
 }
-.image-container {
-    min-width: 124px;
-    text-align: center;
-    padding-right: 11px;
-}
-.image-container img {
-    max-width: 124px;
-    max-height: 100px;
-    padding: 5px;
-}
-.station-name {
-    font-size: 18px;
-    font-family: var(--font-family-bold);
-    margin-bottom: 2px;
-}
-.station-synced {
-    font-size: 14px;
-}
-.station-battery {
-    margin: 5px 0 0;
-    display: flex;
-    line-height: 13px;
-}
-.battery {
-    width: 20px;
-    height: 11px;
-    padding-right: 5px;
-}
-.module-icon-container {
-    float: left;
-    margin-right: 10px;
-    margin-top: 5px;
-    box-shadow: 0 2px 4px 0 var(--color-border);
-    border-radius: 50%;
-    display: flex;
-
-    img {
-        width: 22px;
-        height: 22px;
-    }
-}
 .location-coordinates {
     display: flex;
     flex-direction: row;
@@ -209,12 +153,6 @@ export default Vue.extend({
             font-size: 12px;
         }
     }
-}
-.general-row {
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    padding-right: 23px;
 }
 .coordinates-row {
     display: flex;
@@ -235,9 +173,6 @@ export default Vue.extend({
 .close-button {
     cursor: pointer;
     @include position(absolute, -7px -5px null null);
-}
-.station-details {
-    text-align: left;
 }
 .where-row {
     text-align: left;
@@ -274,10 +209,6 @@ export default Vue.extend({
 }
 .icon {
     padding-right: 7px;
-}
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
 }
 ::v-deep .reading {
     height: 35px;
