@@ -103,9 +103,6 @@ body {
         --font-family-medium: #{$font-family-floodnet-medium};
         --font-family-light: #{$font-family-floodnet-medium};
         --font-family-bold: #{$font-family-floodnet-bold};
-        // v-calendar overwrite
-        --blue-600: #{$color-floodnet-primary};
-        --blue-200: #{lighten($color-floodnet-primary, 11%)};
     }
 }
 
