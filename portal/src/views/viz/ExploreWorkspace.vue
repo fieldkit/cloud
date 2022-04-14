@@ -66,7 +66,7 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
+import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { DisplayStation, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
@@ -134,10 +134,14 @@ export default Vue.extend({
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
+            const partnerCustomization = getPartnerCustomization();
+            if (partnerCustomization != null) {
+                return partnerCustomization.nav.viz.back.label;
+            }
             if (this.bookmark && this.bookmark.p.length > 0) {
                 return "layout.backProjectDashboard";
             }
-            return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
+            return "layout.backToStations";
         },
         selectedId(): number {
             return +_.flattenDeep(this.bookmark.g)[0];
@@ -182,11 +186,16 @@ export default Vue.extend({
     },
     methods: {
         async onBack() {
-            console.log("viz:back", this.bookmark);
-            if (this.bookmark.p && this.bookmark.p.length > 0) {
-                await this.$router.push({ name: "viewProject", params: { id: this.bookmark.p[0] } });
+            const partnerCustomization = getPartnerCustomization();
+            console.log("viz:back", this.bookmark, partnerCustomization);
+            if (partnerCustomization != null) {
+                await this.$router.push(partnerCustomization.nav.viz.back.route);
             } else {
-                await this.$router.push({ name: "mapAllStations" });
+                if (this.bookmark.p && this.bookmark.p.length > 0) {
+                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.p[0] } });
+                } else {
+                    await this.$router.push({ name: "mapAllStations" });
+                }
             }
         },
         async addChart() {
@@ -258,7 +267,8 @@ export default Vue.extend({
                             this.bookmark.v,
                             [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
                             stationIds,
-                            this.bookmark.p
+                            this.bookmark.p,
+                            this.bookmark.c
                         );
 
                         this.$emit("open-bookmark", bookmark);

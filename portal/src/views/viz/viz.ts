@@ -168,7 +168,8 @@ export class Bookmark {
         public readonly v: number,
         public readonly g: GroupBookmark[],
         public readonly s: number[] = [],
-        public readonly p: number[] = []
+        public readonly p: number[] = [],
+        public readonly c: ExploreContext | null = null
     ) {}
 
     private get allVizes(): VizBookmark[] {
@@ -213,9 +214,10 @@ type PossibleBookmarks = {
     s: number[];
     p: number[] | undefined;
     g: LegacyGroupBookmark[] | GroupBookmark[];
+    c: ExploreContext | null;
 };
 
-function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: GroupBookmark[]; p: number[] } {
+function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: GroupBookmark[]; p: number[]; c: ExploreContext | null } {
     return {
         v: raw.v,
         s: raw.s,
@@ -236,6 +238,7 @@ function migrateBookmark(raw: PossibleBookmarks): { v: number; s: number[]; g: G
                 })
             )
         ),
+        c: raw.c,
     };
 }
 
@@ -652,7 +655,12 @@ export class Workspace implements VizInfoFactory {
         return this.stationIds;
     }
 
-    constructor(private readonly meta: SensorsResponse, private groups: Group[] = [], public readonly projects: number[] = []) {
+    constructor(
+        private readonly meta: SensorsResponse,
+        private groups: Group[] = [],
+        public readonly projects: number[] = [],
+        public readonly context: ExploreContext | null = null
+    ) {
         this.refreshStationIds();
     }
 
@@ -707,7 +715,7 @@ export class Workspace implements VizInfoFactory {
                             .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
                         const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
                         this.stations[station.id] = station;
-                        console.log("viz: station-meta", { station, info });
+                        // console.log("viz: station-meta", { station, info });
                         return station;
                     });
                 }) as Promise<unknown>
@@ -950,7 +958,8 @@ export class Workspace implements VizInfoFactory {
             Bookmark.Version,
             this.groups.map((group) => group.bookmark()),
             this.allStationIds,
-            this.projects
+            this.projects,
+            this.context
         );
     }
 
@@ -961,7 +970,8 @@ export class Workspace implements VizInfoFactory {
         return new Workspace(
             meta,
             bm.g.map((gm) => Group.fromBookmark(gm)),
-            bm.p
+            bm.p,
+            bm.c
         );
     }
 
@@ -987,7 +997,7 @@ export class Workspace implements VizInfoFactory {
 export class BookmarkFactory {
     public static forStation(stationId: number, context: ExploreContext | null = null): Bookmark {
         if (context && context.project) {
-            return new Bookmark(Bookmark.Version, [], [stationId], [context.project]);
+            return new Bookmark(Bookmark.Version, [], [stationId], [context.project], context);
         }
         return new Bookmark(Bookmark.Version, [], [stationId], []);
     }

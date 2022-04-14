@@ -80,7 +80,7 @@ export class TimeSeriesSpecFactory {
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
 
-        console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+        // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
         const makeDomainX = () => {
             // I can't think of a good reason to just always specify this.

@@ -121,7 +121,7 @@ export default Vue.extend({
             return MappedStations.defaultBounds();
         },
         exploreContext(): ExploreContext {
-            return new ExploreContext(this.project.id);
+            return new ExploreContext(this.project.id, true);
         },
         stationsWithData(): DisplayStation[] {
             return this.displayProject.stations.filter((station) => station.latestPrimary != null);
