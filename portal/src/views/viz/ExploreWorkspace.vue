@@ -35,7 +35,7 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
-                <div class="station-summary">
+                <div class="station-summary" v-if="hasDisplayStations">
                     <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
                     <div class="pagination" v-if="workspace && !workspace.empty">
                         <PaginationControls
@@ -144,6 +144,9 @@ export default Vue.extend({
         selectedStation(): DisplayStation {
             return this.stations[this.selectedId];
         },
+        hasDisplayStations(): boolean {
+            return Object.keys(this.stations).length > 0;
+        }
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
