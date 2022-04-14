@@ -41,7 +41,7 @@ func MaxValue(values []float64) float64 {
 }
 
 func (c *sourceAggregatorConfig) Apply(key handlers.AggregateSensorKey, values []float64) (float64, error) {
-	if strings.HasSuffix(key.SensorKey, ".depth") {
+	if strings.HasSuffix(key.SensorKey, ".depth") { // HACK HACK
 		if len(values) == 0 {
 			return 0, fmt.Errorf("aggregating empty slice")
 		}
@@ -78,7 +78,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 	schemas := NewMessageSchemaRepository(i.db)
 
 	for {
-		batchLog := Logger(ctx).Sugar()
+		batchLog := Logger(ctx).Sugar().With("batch_start_time", batch.StartTime)
 
 		if err := query(ctx, batch); err != nil {
 			if err == sql.ErrNoRows || err == io.EOF {
