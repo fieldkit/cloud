@@ -1,7 +1,7 @@
 <template>
     <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
         <div class="sidebar-header">
-            <router-link :to="{ name: 'projects' }">
+            <router-link :to="{ name: 'root' }">
                 <Logo />
             </router-link>
         </div>

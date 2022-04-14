@@ -19,6 +19,7 @@ type Options struct {
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 	File        string
 	SchemaID    int
+	Verbose     bool
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -31,13 +32,13 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	source_aggregator := webhook.NewSourceAggregator(db)
+	aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
 
 	if options.File != "" && options.SchemaID > 0 {
-		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID))
+		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID), options.Verbose)
 	} else {
 		if options.SchemaID > 0 {
 			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
@@ -47,7 +48,7 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	if source != nil {
-		if err := source_aggregator.ProcessSource(ctx, source, startTime); err != nil {
+		if err := aggregator.ProcessSource(ctx, source, startTime); err != nil {
 			return err
 		}
 	}
@@ -61,6 +62,7 @@ func main() {
 
 	flag.StringVar(&options.File, "file", "", "csv file")
 	flag.IntVar(&options.SchemaID, "schema-id", 0, "schema id to process")
+	flag.BoolVar(&options.Verbose, "verbose", false, "increased verbosity")
 
 	flag.Parse()
 

@@ -69,11 +69,16 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .note-editor {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding: 1em;
     border: 1px solid var(--color-border);
     border-radius: 4px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding: 15px 20px 5px;
+
+    @include bp-down($xs) {
+        border: 0;
+        padding: 0;
+    }
 }
 
 .field {

@@ -74,6 +74,7 @@ export class DisplayStation {
     public readonly deployedAt: Date | null = null;
     public readonly totalReadings = 0;
     public readonly location: Location | null = null;
+    public readonly locationName: string;
     public readonly photos: Photos;
     public readonly modules: DisplayModule[] = [];
     public readonly placeNameOther: string | null;
@@ -81,6 +82,7 @@ export class DisplayStation {
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
     public readonly latestPrimary: number | null;
+    public readonly firmwareNumber: number | null;
     public readonly primarySensor: ModuleSensor | null;
 
     constructor(station: Station) {
@@ -89,6 +91,7 @@ export class DisplayStation {
         this.configurations = station.configurations;
         this.photos = station.photos;
         this.battery = station.battery;
+        this.locationName = station.locationName;
         this.placeNameOther = station.placeNameOther;
         this.placeNameNative = station.placeNameNative;
         this.deployedAt = station.recordingStartedAt;
@@ -123,6 +126,8 @@ export class DisplayStation {
             }
             this.regions = station.location.regions;
         }
+
+        this.firmwareNumber = station.firmwareNumber;
     }
 }
 

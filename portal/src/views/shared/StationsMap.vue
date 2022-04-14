@@ -30,7 +30,7 @@ import ValueMarker from "./ValueMarker.vue";
 import * as d3 from "d3";
 import mapboxgl from "mapbox-gl";
 
-interface ProtectedData {
+export interface ProtectedData {
     map: any;
 }
 

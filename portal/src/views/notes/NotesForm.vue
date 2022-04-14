@@ -2,7 +2,7 @@
     <div class="notes-form">
         <vue-confirm-dialog />
         <div class="header">
-            <div class="name">{{ station.name }}</div>
+            <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% Complete</div>
             <div class="buttons" v-if="isAuthenticated">
                 <button type="submit" class="button" v-on:click="onSave">Save</button>
@@ -209,24 +209,27 @@ export default Vue.extend({
     text-align: left;
     display: flex;
     flex-direction: column;
-    padding: 28px;
     background: #fff;
     cursor: initial;
 
     @include bp-down($md) {
-        padding: 25px 8px;
+        padding: 25px 10px;
         border-bottom: 1px solid var(--color-border);
     }
 }
 
 .header {
     @include flex(center);
-    padding-bottom: 11px;
+    padding-bottom: 15px;
     border-bottom: 1px solid var(--color-border);
 
     @include bp-down($md) {
         border: 0;
         padding: 0;
+    }
+
+    @include bp-down($xs) {
+        flex-wrap: wrap;
     }
 }
 
@@ -234,6 +237,10 @@ export default Vue.extend({
     color: #2c3e50;
     font-size: 20px;
     font-weight: 500;
+
+    @include bp-down($xs) {
+        font-size: 18px;
+    }
 }
 
 .header .completed {
@@ -241,6 +248,13 @@ export default Vue.extend({
     color: #0a67aa;
     font-size: 14px;
     font-weight: 600;
+
+    @include bp-down($xs) {
+        order: 3;
+        margin-left: 0;
+        flex-basis: 100%;
+        font-size: 12px;
+    }
 
     body.floodnet & {
         color: #6a6d71;
@@ -255,7 +269,7 @@ export default Vue.extend({
 }
 
 .site-notes {
-    margin-top: 26px;
+    margin-top: 30px;
 
     @include bp-down($sm) {
         margin-top: 18px;
@@ -276,6 +290,11 @@ export default Vue.extend({
     margin-left: 7px;
     margin-bottom: 0;
     @include flex(center, center);
+
+    @include bp-down($xs) {
+        height: 25px;
+        transform: translateY(8px);
+    }
 }
 
 .photo-container {

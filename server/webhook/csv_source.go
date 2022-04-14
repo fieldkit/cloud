@@ -13,16 +13,16 @@ import (
 type CsvMessageSource struct {
 	path     string
 	schemaID int32
-	file     io.Reader
 	reader   *csv.Reader
 	columns  []string
 	verbose  bool
 }
 
-func NewCsvMessageSource(path string, schemaID int32) *CsvMessageSource {
+func NewCsvMessageSource(path string, schemaID int32, verbose bool) *CsvMessageSource {
 	return &CsvMessageSource{
 		path:     path,
 		schemaID: schemaID,
+		verbose:  verbose,
 	}
 }
 

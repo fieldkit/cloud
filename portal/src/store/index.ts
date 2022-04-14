@@ -22,9 +22,11 @@ export * from "./modules/progress";
 export * from "./modules/layout";
 export * from "./modules/notifications";
 export * from "./modules/global";
+export * from "./modules/notes";
 
 import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
+import {notes} from '@/store/modules/notes';
 
 export { MutationTypes, ActionTypes };
 
@@ -72,6 +74,7 @@ export default function(services: Services) {
             map: map(services),
             progress: progress(services),
             layout: layout(services),
+            notes: notes(services),
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

@@ -1,13 +1,18 @@
-import _, { first } from "lodash";
-import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
+import _ from "lodash";
+import { ChartSettings, SeriesData } from "./SpecFactory";
+import { TimeRange } from "../common";
+
+export { ChartSettings };
 
 export class ScrubberSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = new ChartSettings(0, 0)) {}
+    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
 
     create() {
-        const first = this.allSeries[0];
+        const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        // We ignore extreme ranges here because of this.settings.timeRange
+        const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
+        const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
         return {
             $schema: "https://vega.github.io/schema/vega-lite/v5.json",

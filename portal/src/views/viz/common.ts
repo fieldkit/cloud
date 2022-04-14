@@ -36,6 +36,17 @@ export class TimeRange {
         return this.start == Time.Min || this.end == Time.Max;
     }
 
+    public contains(o: TimeRange): boolean {
+        return this.start <= o.start && this.end >= o.end;
+    }
+
+    public describe(): string[] {
+        if (this.isExtreme()) {
+            return ["extreme", "extreme"];
+        }
+        return this.toArray().map((t) => new Date(t).toISOString());
+    }
+
     public static mergeArrays(ranges: number[][]): TimeRange {
         if (ranges.length == 0) {
             return TimeRange.eternity;
@@ -52,12 +63,12 @@ export class TimeRange {
         return new TimeRange(min, max);
     }
 
-    public static mergeRanges(ranges: TimeRange[]): TimeRange {
-        return TimeRange.mergeArrays(ranges.map((r) => r.array));
+    public static mergeArraysIgnoreExtreme(ranges: number[][]): TimeRange {
+        return TimeRange.mergeArrays(ranges.filter((r) => r[0] != Time.Min && r[1] != Time.Max));
     }
 
-    public contains(o: TimeRange): boolean {
-        return this.start <= o.start && this.end >= o.end;
+    public static mergeRanges(ranges: TimeRange[]): TimeRange {
+        return TimeRange.mergeArrays(ranges.map((r) => r.array));
     }
 }
 
