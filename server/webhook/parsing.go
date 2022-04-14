@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/itchyny/gojq"
@@ -76,6 +77,16 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 		}
 
 		compiled, err = gojq.Compile(parsed,
+			gojq.WithFunction("coerce_to_number", 0, 0, func(x interface{}, xs []interface{}) interface{} {
+				if x, ok := x.(string); ok {
+					f, err := strconv.ParseFloat(strings.Replace(x, "i", "", 1), 32)
+					if err != nil {
+						return err
+					}
+					return f
+				}
+				return x
+			}),
 			gojq.WithFunction("clamp", 0, 3, func(x interface{}, xs []interface{}) interface{} {
 				if x, ok := toFloat(x); ok {
 					if len(xs) == 0 {
