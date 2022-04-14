@@ -362,6 +362,10 @@ export default Vue.extend({
         bottom: 2px;
         right: 25px;
 
+        body.floodnet & {
+            padding: 10px 0;
+        }
+
         @include bp-down($sm) {
             right: 10px;
         }
@@ -382,7 +386,7 @@ export default Vue.extend({
     z-index: $z-index-top;
     background: linear-gradient(to right, rgba(1, 1, 1, 0) 10%, #fff);
 
-    .body.floodnet & {
+    body.floodnet & {
         bottom: 0;
     }
 
@@ -395,6 +399,10 @@ export default Vue.extend({
         border: 0;
         font-family: var(--font-family-bold);
         white-space: nowrap;
+
+        @at-root body.floodnet & {
+            color: var(--color-dark) !important;
+        }
     }
 }
 </style>
