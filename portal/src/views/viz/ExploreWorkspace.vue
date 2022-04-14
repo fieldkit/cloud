@@ -68,7 +68,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
 import { mapState, mapGetters } from "vuex";
-import { DisplayStation } from "@/store";
+import { DisplayStation, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
@@ -125,6 +125,7 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
+            allStations: (s: GlobalState) => s.stations.stations,
         }),
         addIcon(): unknown {
             return this.$loadAsset("icon-compare.svg");
@@ -142,11 +143,11 @@ export default Vue.extend({
             return +_.flattenDeep(this.bookmark.g)[0];
         },
         selectedStation(): DisplayStation {
-            return this.stations[this.selectedId];
+            return this.allStations[this.selectedId];
         },
         hasDisplayStations(): boolean {
-            return Object.keys(this.stations).length > 0;
-        }
+            return Object.keys(this.allStations).length > 0;
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
@@ -174,6 +175,9 @@ export default Vue.extend({
                         await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
                     }
                 });
+        }
+        if (this.bookmark) {
+            this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.bookmark.p[0] });
         }
     },
     methods: {
@@ -662,9 +666,9 @@ export default Vue.extend({
     }
     @include bp-down($sm) {
         flex-direction: column;
-        
+
         .pagination {
-            margin-top: .5em;
+            margin-top: 0.5em;
         }
     }
 }
@@ -673,5 +677,4 @@ export default Vue.extend({
     margin-right: 13px;
     justify-content: center;
 }
-
 </style>
