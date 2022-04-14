@@ -8,6 +8,34 @@ import { TimeRange, VizSensor } from "./common";
 import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
 import { vueTickHack } from "@/utilities";
 import chartStyles from "./vega/chartStyles";
+import { getPartnerCustomization } from "@/views/shared/partners";
+
+interface VueDatepickerStyles {
+    // this type might be extended with other customisations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
+    highlight: {
+        start: {
+            style: {
+                backgroundColor: string;
+            };
+            contentStyle: {
+                color: string;
+            };
+        };
+        base: {
+            style: {
+                backgroundColor: string;
+            };
+        };
+        end: {
+            style: {
+                backgroundColor: string;
+            };
+            contentStyle: {
+                color: string;
+            };
+        };
+    };
+}
 
 export const SensorSelectionRow = Vue.extend({
     name: "SensorSelectionRow",
@@ -217,6 +245,43 @@ export const ViewingControls = Vue.extend({
                 end: new Date(this.viz.visibleTimeRange.end),
             };
         },
+        //*
+        datepickerStyles(): VueDatepickerStyles {
+            const primaryColor = getComputedStyle(document.body).getPropertyValue("--color-primary");
+            const darkColor = getComputedStyle(document.body).getPropertyValue("--color-dark");
+
+            const addAlpha = (color, opacity) => {
+                const _opacity = Math.round(Math.min(Math.max(opacity || 1, 0), 1) * 255);
+                return color + _opacity.toString(16).toUpperCase();
+            };
+
+            // for calendar range selection
+            return {
+                highlight: {
+                    start: {
+                        style: {
+                            backgroundColor: primaryColor,
+                        },
+                        contentStyle: {
+                            color: getPartnerCustomization() ? darkColor : "#ffffff",
+                        },
+                    },
+                    base: {
+                        style: {
+                            backgroundColor: addAlpha(primaryColor, 0.3),
+                        },
+                    },
+                    end: {
+                        style: {
+                            backgroundColor: primaryColor,
+                        },
+                        contentStyle: {
+                            color: getPartnerCustomization() ? darkColor : "#ffffff",
+                        },
+                    },
+                },
+            };
+        },
     },
     methods: {
         raiseCompare(): void {
@@ -271,7 +336,8 @@ export const ViewingControls = Vue.extend({
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
 					<div class="date-picker">
-						<v-date-picker :value="manualRangeValue" @input="raiseManualTime" mode="date" :masks="{ input: 'MM/DD/YY' }" is-range>
+						<v-date-picker :value="manualRangeValue" @input="raiseManualTime" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
+                                       :drag-attribute="datepickerStyles" is-range>
                             <template v-slot="{ inputValue, inputEvents }">
                                 <div class="flex justify-center items-center">
                                     <input
