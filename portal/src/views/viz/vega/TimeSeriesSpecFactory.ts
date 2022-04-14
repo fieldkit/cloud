@@ -251,26 +251,21 @@ export class TimeSeriesSpecFactory {
 
         const legends = _.flatten(
             mapSeries((series, i) => {
-                const hoverCheck = ifHovering(i, 1, 0.1);
-                return {
-                    titleColor: "#2c3e50",
-                    labelColor: "#2c3e50",
-                    title: series.vizInfo.label,
-                    stroke: makeStrokeName(i),
-                    orient: "top",
-                    direction: "horizontal",
-                    symbolType: "stroke",
-                    padding: 10,
-                    labelOpacity: {
-                        signal: hoverCheck,
+                if (sameSensors && i > 0) {
+                    return [];
+                }
+                return [
+                    {
+                        titleColor: "#2c3e50",
+                        labelColor: "#2c3e50",
+                        title: series.vizInfo.label,
+                        stroke: makeStrokeName(i),
+                        orient: "top",
+                        direction: "horizontal",
+                        symbolType: "stroke",
+                        padding: 10,
                     },
-                    symbolOpacity: {
-                        signal: hoverCheck,
-                    },
-                    titleOpacity: {
-                        signal: hoverCheck,
-                    },
-                };
+                ];
             })
         );
 
