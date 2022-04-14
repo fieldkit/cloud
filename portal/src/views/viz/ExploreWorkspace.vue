@@ -135,11 +135,13 @@ export default Vue.extend({
         },
         backLabelKey(): string {
             const partnerCustomization = getPartnerCustomization();
-            if (partnerCustomization != null) {
-                return partnerCustomization.nav.viz.back.label;
+            if (this.bookmark && this.bookmark.c) {
+                if (!this.bookmark.c.map) {
+                    return "layout.backProjectDashboard";
+                }
             }
-            if (this.bookmark && this.bookmark.p.length > 0) {
-                return "layout.backProjectDashboard";
+            if (partnerCustomization) {
+                return partnerCustomization.nav.viz.back.map.label;
             }
             return "layout.backToStations";
         },
@@ -186,16 +188,14 @@ export default Vue.extend({
     },
     methods: {
         async onBack() {
-            const partnerCustomization = getPartnerCustomization();
-            console.log("viz:back", this.bookmark, partnerCustomization);
-            if (partnerCustomization != null) {
-                await this.$router.push(partnerCustomization.nav.viz.back.route);
-            } else {
-                if (this.bookmark.p && this.bookmark.p.length > 0) {
-                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.p[0] } });
+            if (this.bookmark.c) {
+                if (this.bookmark.c.map) {
+                    await this.$router.push({ name: "viewProjectBigMap", params: { id: this.bookmark.c.project } });
                 } else {
-                    await this.$router.push({ name: "mapAllStations" });
+                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.c.project } });
                 }
+            } else {
+                await this.$router.push({ name: "mapAllStations" });
             }
         },
         async addChart() {
