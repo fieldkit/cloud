@@ -54,6 +54,15 @@ type JqCache struct {
 	compiled map[string]*gojq.Code
 }
 
+type EvaluationError struct {
+	Query    string
+	NoReturn bool
+}
+
+func (m *EvaluationError) Error() string {
+	return "EvaluationError"
+}
+
 func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
@@ -120,7 +129,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 		}
 	}
 
-	return "", fmt.Errorf("query returned nothing '%s': %v", query, err)
+	return "", &EvaluationError{NoReturn: true, Query: query}
 }
 
 func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
@@ -141,6 +150,17 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 	var source interface{}
 	if err := json.Unmarshal(m.Body, &source); err != nil {
 		return nil, fmt.Errorf("error parsing message: %v", err)
+	}
+
+	// Check condition expression if one is present. If this returns nothing we
+	// skip this message w/o errors.
+	if schema.Station.ConditionExpression != "" {
+		if _, err := m.evaluate(ctx, cache, source, schema.Station.ConditionExpression); err != nil {
+			if _, ok := err.(*EvaluationError); ok {
+				return nil, nil
+			}
+			return nil, fmt.Errorf("evaluating condition-expression: %v", err)
+		}
 	}
 
 	deviceIDRaw, err := m.evaluate(ctx, cache, source, schema.Station.IdentifierExpression)

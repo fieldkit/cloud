@@ -105,7 +105,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
-			} else {
+			} else if parsed != nil {
 				if false {
 					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}

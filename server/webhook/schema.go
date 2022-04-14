@@ -25,6 +25,7 @@ type MessageSchemaModule struct {
 type MessageSchemaStation struct {
 	Key                  string                 `json:"key"`
 	Model                string                 `json:"model"`
+	ConditionExpression  string                 `json:"condition"`
 	IdentifierExpression string                 `json:"identifier"`
 	NameExpression       string                 `json:"name"`
 	ReceivedExpression   string                 `json:"received"`
