@@ -19,6 +19,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/partners"
 )
 
 type Meta struct {
@@ -121,6 +122,11 @@ func (sc *SocialContext) SharedProject(ctx context.Context, w http.ResponseWrite
 func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWriter, req *http.Request) ([]*Meta, error) {
 	log := Logger(ctx).Sugar()
 
+	partner, err := partners.GetPartnerForRequest(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
 	bookmark := ""
 	// Deprecated
 	vars := mux.Vars(req)
@@ -179,7 +185,7 @@ func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWri
 	ranges := make([]string, 0)
 
 	title := ""
-	description := "FieldKit Chart"
+	description := partner.Sharing.Title
 
 	for _, v := range parsed.Vizes() {
 		log.Infow("viz:parsed", "v", v)
