@@ -207,6 +207,32 @@ func (h *InfluxDbHandler) Close() error {
 	return nil
 }
 
+func (h *InfluxDbHandler) DoesStationHaveData(ctx context.Context, stationID int32) (bool, error) {
+	queryAPI := h.cli.QueryAPI(h.org)
+
+	query := fmt.Sprintf(`
+		from(bucket:"%s")
+		|> range(start: -10y, stop: now())
+		|> filter(fn: (r) => r._measurement == "reading")
+		|> filter(fn: (r) => r._field == "value")
+		|> filter(fn: (r) => r.station_id == "%v")
+	`, h.bucket, stationID)
+	rows, err := queryAPI.Query(ctx, query)
+	if err != nil {
+		return false, err
+	}
+
+	for rows.Next() {
+		return true, nil
+	}
+
+	if rows.Err() != nil {
+		return false, rows.Err()
+	}
+
+	return false, nil
+}
+
 func process(ctx context.Context, options *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
@@ -217,20 +243,27 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
+	allStationIDs := []int32{}
+	if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
+		return err
+	}
+
 	handler := NewInfluxDbHandler(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket, db)
 
 	if err := handler.Open(ctx); err != nil {
 		return err
 	}
 
-	allStationIDs := []int32{}
-	if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
-		return err
-	}
-
 	stationIds := allStationIDs
 
 	for _, id := range stationIds {
+		if yes, err := handler.DoesStationHaveData(ctx, id); err != nil {
+			return err
+		} else if yes {
+			log.Infow("skipping:has-data", "station_id", id)
+			continue
+		}
+
 		walkParams := &backend.WalkParameters{
 			Start:      time.Time{},
 			End:        time.Now(),
