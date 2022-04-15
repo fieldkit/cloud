@@ -20,7 +20,11 @@
 
             <a v-if="user" class="header-account-name">{{ firstName }}</a>
 
-            <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="log-in" v-if="!isAuthenticated">
+            <router-link
+                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                class="log-in"
+                v-if="!isAuthenticated"
+            >
                 {{ $t("layout.header.login") }}
             </router-link>
 
