@@ -50,6 +50,7 @@ type MessageSchemaRegistration struct {
 
 func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
 	if r.parsed == nil {
+		r.parsed = &MessageSchema{}
 		if err := json.Unmarshal(r.Body, r.parsed); err != nil {
 			return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
 		}

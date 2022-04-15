@@ -3,17 +3,13 @@
         <div class="tiptap-row">
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
-                <div v-if="seeMore" class="see-more">
-                    <button @click="toggleSeeMore(true)">{{ $t("seeMore") }}</button>
-                </div>
-                <div v-if="seeLess" class="see-more">
-                    <button @click="toggleSeeMore(false)">{{ $t("seeLess") }}</button>
-                </div>
             </div>
             <div class="tiptap-side" v-if="!readonly && !empty">
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
         </div>
+        <a v-if="seeMore" class="see-more" @click="toggleSeeMore(true)">{{ $t("seeMore") }}</a>
+        <a v-if="seeLess" class="see-more" @click="toggleSeeMore(false)">{{ $t("seeLess") }}</a>
     </div>
 </template>
 
@@ -245,13 +241,7 @@ export default Vue.extend({
 
 .tiptap-container {
     width: 100%;
-    padding-right: 65px;
     text-align: justify;
-
-    @include bp-down($xs) {
-        padding-right: 0;
-        padding-bottom: 20px;
-    }
 }
 
 .tiptap-editing {
@@ -380,29 +370,19 @@ export default Vue.extend({
 }
 
 .see-more {
-    position: absolute;
-    right: -6px;
-    bottom: 1px;
-    z-index: $z-index-top;
-    background: linear-gradient(to right, rgba(1, 1, 1, 0) 10%, #fff);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-primary);
+    background-color: transparent;
+    border: 0;
+    font-family: var(--font-family-bold);
+    white-space: nowrap;
+    display: inline-block;
+    padding: 10px 0 0;
 
-    body.floodnet & {
-        bottom: 0;
-    }
-
-    button {
-        font-size: 14px;
-        line-height: 1;
-        cursor: pointer;
-        color: var(--color-primary);
-        background-color: transparent;
-        border: 0;
-        font-family: var(--font-family-bold);
-        white-space: nowrap;
-
-        @at-root body.floodnet & {
-            color: var(--color-dark);
-        }
+    @at-root body.floodnet & {
+        color: var(--color-dark);
     }
 }
 </style>
