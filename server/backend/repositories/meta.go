@@ -29,6 +29,14 @@ func verboseLoggerFor(ctx context.Context, databaseRecord *data.DataRecord, verb
 	return logging.OnlyLogIf(loggerFor(ctx, databaseRecord), verbose)
 }
 
+type MissingSensorMetaError struct {
+	MetaRecordID int64
+}
+
+func (e *MissingSensorMetaError) Error() string {
+	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
+}
+
 type MetaFactory struct {
 	filtering         *Filtering
 	modulesRepository *ModuleMetaRepository
@@ -93,7 +101,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			key := strcase.ToLowerCamel(sensor.Name)
 			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(ctx, &hf, sensor.Name)
 			if err != nil {
-				return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
+				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
 
 			fullKey := extraModule.Key + "." + key

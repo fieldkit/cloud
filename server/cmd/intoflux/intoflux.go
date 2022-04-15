@@ -37,6 +37,11 @@ type stationInfo struct {
 	station   *data.Station
 }
 
+type ImportErrors struct {
+	MissingMeta map[string]int64
+	ValueNaN    map[string]int64
+}
+
 type InfluxDbHandler struct {
 	url          string
 	token        string
@@ -48,7 +53,9 @@ type InfluxDbHandler struct {
 	stations     *repositories.StationRepository
 	querySensors *repositories.SensorRepository
 	byProvision  map[int64]*stationInfo
+	skipping     map[int64]bool
 	sensors      map[string]int64
+	errors       *ImportErrors
 }
 
 func NewInfluxDbHandler(url, token, org, bucket string, db *sqlxcache.DB) (h *InfluxDbHandler) {
@@ -68,6 +75,11 @@ func NewInfluxDbHandler(url, token, org, bucket string, db *sqlxcache.DB) (h *In
 		stations:     repositories.NewStationRepository(db),
 		querySensors: repositories.NewSensorRepository(db),
 		byProvision:  make(map[int64]*stationInfo),
+		skipping:     make(map[int64]bool),
+		errors: &ImportErrors{
+			ValueNaN:    make(map[string]int64),
+			MissingMeta: make(map[string]int64),
+		},
 	}
 }
 
@@ -95,6 +107,10 @@ func (h *InfluxDbHandler) Open(ctx context.Context) error {
 }
 
 func (h *InfluxDbHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+	if v, ok := h.skipping[p.ID]; ok && v {
+		return nil
+	}
+
 	log := logging.Logger(ctx).Sugar()
 
 	if _, ok := h.byProvision[p.ID]; !ok {
@@ -112,6 +128,11 @@ func (h *InfluxDbHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.D
 
 	_, err := h.metaFactory.Add(ctx, meta, true)
 	if err != nil {
+		if _, ok := err.(*repositories.MissingSensorMetaError); ok {
+			log.Infow("missing-meta", "meta_record_id", meta.ID)
+			h.skipping[p.ID] = true
+			return nil
+		}
 		return err
 	}
 
@@ -121,6 +142,10 @@ func (h *InfluxDbHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.D
 }
 
 func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	if v, ok := h.skipping[p.ID]; ok && v {
+		return nil
+	}
+
 	log := logging.Logger(ctx).Sugar()
 
 	stationInfo := h.byProvision[p.ID]
@@ -138,13 +163,13 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 
 	for key, rv := range filtered.Record.Readings {
 		if math.IsNaN(rv.Value) {
-			log.Infow("influx:nan-value", "key", key.SensorKey)
+			h.errors.ValueNaN[key.SensorKey] += 1
 			continue
 		}
 
 		sensorID, ok := h.sensors[key.SensorKey]
 		if !ok {
-			log.Infow("influx:unknown-sensor", "key", key.SensorKey)
+			h.errors.MissingMeta[key.SensorKey] += 1
 			continue
 		}
 
@@ -164,6 +189,8 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 
 		h.write.WritePoint(dp)
 	}
+
+	_ = log
 
 	return nil
 }
@@ -229,7 +256,7 @@ func main() {
 
 	flag.Parse()
 
-	logging.Configure(false, "scratch")
+	logging.Configure(false, "influx")
 
 	log := logging.Logger(ctx).Sugar()
 
