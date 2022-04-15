@@ -20,7 +20,8 @@ const (
 )
 
 type SourceAggregator struct {
-	db *sqlxcache.DB
+	db      *sqlxcache.DB
+	verbose bool
 }
 
 type sourceAggregatorConfig struct {
@@ -83,7 +84,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		if err := query(ctx, batch); err != nil {
 			if err == sql.ErrNoRows || err == io.EOF {
 				batchLog.Infow("eof")
-				return nil
+				break
 			}
 			return err
 		}
@@ -106,7 +107,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else if parsed != nil {
-				if false {
+				if i.verbose {
 					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
@@ -147,6 +148,10 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		if err := aggregator.Close(ctx); err != nil {
 			return err
 		}
+	}
+
+	if err := model.Close(ctx); err != nil {
+		return err
 	}
 
 	return nil
