@@ -8,7 +8,7 @@
             </div>
         </div>
         <Logo class="form-header-logo"></Logo>
-        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" @login="save" />
+        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" :busy="busy" @login="save" />
     </div>
 </template>
 

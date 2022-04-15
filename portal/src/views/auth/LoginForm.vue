@@ -4,33 +4,42 @@
         <div class="form-group" v-if="spoofing">
             <TextField v-model="form.spoofEmail" :label="$t('login.form.spoofEmail.label')" />
             <div class="form-errors" v-if="$v.form.spoofEmail.$error">
-                <div v-if="!$v.form.spoofEmail.required">{{$t('login.form.spoofEmail.required')}}</div>
-                <div v-if="!$v.form.spoofEmail.email">{{$t('login.form.spoofEmail.valid')}}</div>
+                <div v-if="!$v.form.spoofEmail.required">{{ $t("login.form.spoofEmail.required") }}</div>
+                <div v-if="!$v.form.spoofEmail.email">{{ $t("login.form.spoofEmail.valid") }}</div>
             </div>
         </div>
         <div class="form-group">
             <TextField v-model="form.email" :label="$t('login.form.email.label')" />
             <div class="form-errors" v-if="$v.form.email.$error">
-                <div v-if="!$v.form.email.required">{{$t('login.form.email.required')}}</div>
-                <div v-if="!$v.form.email.email">{{$t('login.form.email.valid')}}</div>
+                <div v-if="!$v.form.email.required">{{ $t("login.form.email.required") }}</div>
+                <div v-if="!$v.form.email.email">{{ $t("login.form.email.valid") }}</div>
             </div>
         </div>
         <div class="form-group">
             <TextField v-model="form.password" :label="$t('login.form.password.label')" type="password" />
             <div class="form-errors" v-if="$v.form.password.$error">
-                <div v-if="!$v.form.password.required">{{$t('login.form.password.required')}}</div>
-                <div v-if="!$v.form.password.min">{{$t('login.form.password.valid')}}</div>
+                <div v-if="!$v.form.password.required">{{ $t("login.form.password.required") }}</div>
+                <div v-if="!$v.form.password.min">{{ $t("login.form.password.valid") }}</div>
             </div>
         </div>
         <div class="form-link-recover">
-            <router-link :to="{ name: 'recover', query: forwardAfterQuery }" class="form-link">{{$t('login.resetLink')}}</router-link>
+            <router-link :to="{ name: 'recover', query: forwardAfterQuery }" class="form-link">{{ $t("login.resetLink") }}</router-link>
         </div>
         <div v-if="failed" class="login-failed">
-          {{$t('login.loginFailed')}}
+            {{ $t("login.loginFailed") }}
         </div>
-        <button class="form-submit" type="submit">{{$t('login.loginButton')}}</button>
+        <button class="form-submit" type="submit">
+            <div class="loading-spinner-wrap">
+                <Spinner class="loading-spinner" v-if="busy" />
+            </div>
+            <template v-if="!busy">
+                {{ $t("login.loginButton") }}
+            </template>
+        </button>
         <div>
-            <router-link :to="{ name: 'register', query: forwardAfterQuery }" class="form-link">{{$t('login.createAccountLink')}}</router-link>
+            <router-link :to="{ name: 'register', query: forwardAfterQuery }" class="form-link">
+                {{ $t("login.createAccountLink") }}
+            </router-link>
         </div>
     </form>
 </template>
@@ -63,6 +72,10 @@ export default Vue.extend({
             type: Object as PropType<{ after?: string }>,
             default: false,
         },
+        busy: {
+            type: Boolean,
+            default: false,
+        },
     },
     data(): {
         form: {
@@ -84,7 +97,7 @@ export default Vue.extend({
             form: {
                 spoofEmail: {
                     // eslint-disable-next-line
-                    required: requiredIf(function (this: any) {
+                    required: requiredIf(function(this: any) {
                         return this.spoofing;
                     }),
                     email,
@@ -106,7 +119,7 @@ export default Vue.extend({
         },
         async save(): Promise<void> {
             this.$v.form.$touch();
-            if (this.$v.form.$pending || this.$v.form.$error) {
+            if (this.busy || this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
             const payload = this.createPayload();
@@ -118,4 +131,29 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/forms.scss";
+
+.form-submit {
+    position: relative;
+}
+
+.loading-spinner {
+    width: 20px; 
+    height: 20px;
+    margin: 0 10px 0;
+    background: linear-gradient(to right, #fff 10%, rgba(0, 0, 0, 0) 42%);
+
+    &-wrap {
+        @include position(absolute, 50% null null 50%);
+        @include flex(center, center);
+        transform: translate(-50%, -50%);
+    }
+
+    &:before {
+        background-color: #fff;
+    }
+
+    &:after {
+        background-color: var(--color-secondary);
+    }
+}
 </style>

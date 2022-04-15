@@ -1,7 +1,7 @@
 <template>
     <div class="form-container" v-if="credentialsNecessary">
         <Logo class="form-header-logo"></Logo>
-        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="false" @login="save" />
+        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="false" :busy="busy" @login="save" />
     </div>
 </template>
 
