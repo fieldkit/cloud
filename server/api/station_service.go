@@ -19,6 +19,8 @@ import (
 
 	"goa.design/goa/v3/security"
 
+	goa "goa.design/goa/v3/pkg"
+
 	station "github.com/fieldkit/cloud/server/api/gen/station"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -381,6 +383,13 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 	return
 }
 
+func isForbidden(err error) bool {
+	if se, ok := err.(*goa.ServiceError); ok {
+		return se.Name == "forbidden"
+	}
+	return false
+}
+
 func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
@@ -401,15 +410,23 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 	stations := make([]*station.StationFull, 0)
 
 	for _, project := range projects {
+		including := false
 		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
 			ID: project.ID,
 		})
 		if err != nil {
+			if isForbidden(err) {
+				continue
+			}
 			return nil, err
+		} else {
+			including = true
 		}
 
-		for _, s := range projectStations.Stations {
-			stations = append(stations, s)
+		if including {
+			for _, s := range projectStations.Stations {
+				stations = append(stations, s)
+			}
 		}
 	}
 
