@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/conservify/sqlxcache"
+	"go.uber.org/zap"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
@@ -48,11 +49,13 @@ type WebHookStation struct {
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
+	log := Logger(ctx).Sugar()
+
 	deviceKey := hex.EncodeToString(pm.deviceID)
 
 	cached, ok := m.cache[deviceKey]
 	if ok {
-		err := m.updateLinkedFields(ctx, cached.station, pm)
+		err := m.updateLinkedFields(ctx, log, cached.station, pm)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +94,9 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		station = added
 	} else {
-		station.Name = pm.deviceName
+		if pm.deviceName != "" {
+			station.Name = pm.deviceName
+		}
 	}
 
 	// Add or create the provision.
@@ -116,8 +121,6 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	if len(pm.schema.Station.Modules) != 1 {
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
-
-	log := Logger(ctx).Sugar()
 
 	for _, moduleSchema := range pm.schema.Station.Modules {
 		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
@@ -184,7 +187,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		log.Infow("wh:loaded-station", "station_id", station.ID)
 
-		err = m.updateLinkedFields(ctx, whStation, pm)
+		err = m.updateLinkedFields(ctx, log, whStation, pm)
 		if err != nil {
 			return nil, err
 		}
@@ -193,16 +196,14 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	return m.cache[deviceKey].station, nil
 }
 
-func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookStation, pm *ParsedMessage) error {
+func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredLogger, station *WebHookStation, pm *ParsedMessage) error {
 	for _, parsedReading := range pm.data {
 		if parsedReading.Battery {
-			// TODO This is very wasteful when doing bulk processing, would be
-			// nice to save until the very end and do once.
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
 		}
 		if parsedReading.Location {
-			Logger(ctx).Sugar().Warnw("location parsing unimplemented")
+			log.Warnw("location parsing unimplemented")
 		}
 	}
 
@@ -211,9 +212,19 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, station *WebHookS
 	station.Station.IngestionAt = &now
 	station.Station.UpdatedAt = now
 
-	if err := m.sr.UpdateStation(ctx, station.Station); err != nil {
-		return fmt.Errorf("error updating station linked fields: %v", err)
-	}
+	// These changes to station are saved once in Close.
 
+	return nil
+}
+
+func (m *ModelAdapter) Close(ctx context.Context) error {
+	log := Logger(ctx).Sugar()
+	for _, cacheEntry := range m.cache {
+		station := cacheEntry.station.Station
+		log.Infow("saving station", "station_id", station.ID)
+		if err := m.sr.UpdateStation(ctx, station); err != nil {
+			return fmt.Errorf("error saving station: %v", err)
+		}
+	}
 	return nil
 }

@@ -80,7 +80,7 @@ export class TimeSeriesSpecFactory {
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
 
-        console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+        // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
         const makeDomainX = () => {
             // I can't think of a good reason to just always specify this.
@@ -251,26 +251,21 @@ export class TimeSeriesSpecFactory {
 
         const legends = _.flatten(
             mapSeries((series, i) => {
-                const hoverCheck = ifHovering(i, 1, 0.1);
-                return {
-                    titleColor: "#2c3e50",
-                    labelColor: "#2c3e50",
-                    title: series.vizInfo.label,
-                    stroke: makeStrokeName(i),
-                    orient: "top",
-                    direction: "horizontal",
-                    symbolType: "stroke",
-                    padding: 10,
-                    labelOpacity: {
-                        signal: hoverCheck,
+                if (sameSensors && i > 0) {
+                    return [];
+                }
+                return [
+                    {
+                        titleColor: "#2c3e50",
+                        labelColor: "#2c3e50",
+                        title: series.vizInfo.label,
+                        stroke: makeStrokeName(i),
+                        orient: "top",
+                        direction: "horizontal",
+                        symbolType: "stroke",
+                        padding: 10,
                     },
-                    symbolOpacity: {
-                        signal: hoverCheck,
-                    },
-                    titleOpacity: {
-                        signal: hoverCheck,
-                    },
-                };
+                ];
             })
         );
 
@@ -289,6 +284,7 @@ export class TimeSeriesSpecFactory {
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
                     const hoverCheck = ifHovering(i, 1, 0.2);
+                    const hoverCheckGrid = ifHovering(i, 0.5, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
 
@@ -300,11 +296,12 @@ export class TimeSeriesSpecFactory {
                         tickCount: 5,
                         titlePadding: 10,
                         domainOpacity: 0,
+                        gridDash: [],
                         titleOpacity: {
                             signal: hoverCheck,
                         },
                         gridOpacity: {
-                            signal: hoverCheck,
+                            signal: hoverCheckGrid,
                         },
                         labelOpacity: {
                             signal: hoverCheck,
@@ -671,11 +668,11 @@ export class TimeSeriesSpecFactory {
                                             value: level.value,
                                         },
                                         stroke: { value: level.color },
-                                        strokeDash: { value: [4, 4] },
+                                        strokeDash: { value: [4, 2] },
                                         opacity: { value: 0.1 },
                                         strokeOpacity: { value: 0.1 },
                                         strokeWidth: {
-                                            value: 1,
+                                            value: 1.5,
                                         },
                                     },
                                 },
@@ -1019,7 +1016,7 @@ export class TimeSeriesSpecFactory {
                     tickOpacity: 0,
                     domain: false,
                     grid: true,
-                    gridDash: [2, 2],
+                    gridDash: [],
                 },
                 style: chartStyles,
             },

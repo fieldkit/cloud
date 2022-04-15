@@ -25,6 +25,7 @@ type MessageSchemaModule struct {
 type MessageSchemaStation struct {
 	Key                  string                 `json:"key"`
 	Model                string                 `json:"model"`
+	ConditionExpression  string                 `json:"condition"`
 	IdentifierExpression string                 `json:"identifier"`
 	NameExpression       string                 `json:"name"`
 	ReceivedExpression   string                 `json:"received"`
@@ -36,20 +37,23 @@ type MessageSchema struct {
 }
 
 type MessageSchemaRegistration struct {
-	ID              int32      `db:"id"`
-	OwnerID         int32      `db:"owner_id"`
-	Name            string     `db:"name"`
-	Token           []byte     `db:"token"`
-	Body            []byte     `db:"body"`
-	ReceivedAt      *time.Time `db:"received_at"`
-	ProcessedAt     *time.Time `db:"processed_at"`
-	ProcessInterval *int32     `db:"process_interval"`
+	ID              int32          `db:"id"`
+	OwnerID         int32          `db:"owner_id"`
+	Name            string         `db:"name"`
+	Token           []byte         `db:"token"`
+	Body            []byte         `db:"body"`
+	ReceivedAt      *time.Time     `db:"received_at"`
+	ProcessedAt     *time.Time     `db:"processed_at"`
+	ProcessInterval *int32         `db:"process_interval"`
+	parsed          *MessageSchema `db:"-"`
 }
 
 func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
-	s := &MessageSchema{}
-	if err := json.Unmarshal(r.Body, s); err != nil {
-		return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
+	if r.parsed == nil {
+		r.parsed = &MessageSchema{}
+		if err := json.Unmarshal(r.Body, r.parsed); err != nil {
+			return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
+		}
 	}
-	return s, nil
+	return r.parsed, nil
 }

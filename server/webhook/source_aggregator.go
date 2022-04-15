@@ -20,7 +20,8 @@ const (
 )
 
 type SourceAggregator struct {
-	db *sqlxcache.DB
+	db      *sqlxcache.DB
+	verbose bool
 }
 
 type sourceAggregatorConfig struct {
@@ -41,7 +42,7 @@ func MaxValue(values []float64) float64 {
 }
 
 func (c *sourceAggregatorConfig) Apply(key handlers.AggregateSensorKey, values []float64) (float64, error) {
-	if strings.HasSuffix(key.SensorKey, ".depth") {
+	if strings.HasSuffix(key.SensorKey, ".depth") { // HACK HACK
 		if len(values) == 0 {
 			return 0, fmt.Errorf("aggregating empty slice")
 		}
@@ -78,12 +79,12 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 	schemas := NewMessageSchemaRepository(i.db)
 
 	for {
-		batchLog := Logger(ctx).Sugar()
+		batchLog := Logger(ctx).Sugar().With("batch_start_time", batch.StartTime)
 
 		if err := query(ctx, batch); err != nil {
 			if err == sql.ErrNoRows || err == io.EOF {
 				batchLog.Infow("eof")
-				return nil
+				break
 			}
 			return err
 		}
@@ -105,8 +106,8 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
-			} else {
-				if false {
+			} else if parsed != nil {
+				if i.verbose {
 					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
@@ -147,6 +148,10 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		if err := aggregator.Close(ctx); err != nil {
 			return err
 		}
+	}
+
+	if err := model.Close(ctx); err != nil {
+		return err
 	}
 
 	return nil

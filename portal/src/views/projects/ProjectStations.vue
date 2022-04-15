@@ -70,7 +70,7 @@
                     :showStations="project.showStations"
                     :mapBounds="mapBounds"
                 />
-                <StationSummary
+                <StationHoverSummary
                     v-if="activeStation"
                     :station="activeStation"
                     :readings="false"
@@ -92,7 +92,7 @@ import { ExploreContext } from "@/views/viz/common";
 import { BoundingRectangle, DisplayProject, DisplayStation, MappedStations } from "@/store";
 import * as ActionTypes from "@/store/actions";
 
-import StationSummary from "@/views/shared/StationSummary.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import TinyStation from "@/views/shared/TinyStation.vue";
@@ -103,7 +103,7 @@ import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
 export default Vue.extend({
     name: "ProjectStations",
     components: {
-        StationSummary,
+        StationHoverSummary,
         StationPickerModal,
         StationsMap,
         PaginationControls,
@@ -304,7 +304,6 @@ export default Vue.extend({
 .section-body {
     display: flex;
     flex-direction: row;
-    height: 420px;
 }
 .stations-container {
     display: flex;
@@ -358,7 +357,6 @@ export default Vue.extend({
     flex: 1;
     display: flex;
     flex-direction: column;
-    z-index: $z-index-header;
 
     @include bp-down($xs) {
         flex-basis: 85%;
@@ -366,9 +364,11 @@ export default Vue.extend({
 }
 .stations-panel .stations {
     padding: 20px 25px 0;
+    min-width: 280px;
 
     @include bp-down($xs) {
         padding: 20px 10px;
+        min-width: 75vw;
     }
 }
 .stations-panel .stations > * {
@@ -378,7 +378,11 @@ export default Vue.extend({
     transition: width 0.5s;
     position: relative;
     flex: 2;
-    height: 100%;
+    min-height: 420px;
+
+    #map {
+        height: 100%;
+    }
 }
 .station-box {
     height: 38px;

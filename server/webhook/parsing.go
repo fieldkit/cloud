@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/itchyny/gojq"
@@ -54,6 +55,15 @@ type JqCache struct {
 	compiled map[string]*gojq.Code
 }
 
+type EvaluationError struct {
+	Query    string
+	NoReturn bool
+}
+
+func (m *EvaluationError) Error() string {
+	return "EvaluationError"
+}
+
 func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
@@ -67,6 +77,16 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 		}
 
 		compiled, err = gojq.Compile(parsed,
+			gojq.WithFunction("coerce_to_number", 0, 0, func(x interface{}, xs []interface{}) interface{} {
+				if x, ok := x.(string); ok {
+					f, err := strconv.ParseFloat(strings.Replace(x, "i", "", 1), 32)
+					if err != nil {
+						return err
+					}
+					return f
+				}
+				return x
+			}),
 			gojq.WithFunction("clamp", 0, 3, func(x interface{}, xs []interface{}) interface{} {
 				if x, ok := toFloat(x); ok {
 					if len(xs) == 0 {
@@ -120,7 +140,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 		}
 	}
 
-	return "", fmt.Errorf("query returned nothing '%s': %v", query, err)
+	return "", &EvaluationError{NoReturn: true, Query: query}
 }
 
 func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
@@ -143,19 +163,34 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("error parsing message: %v", err)
 	}
 
+	// Check condition expression if one is present. If this returns nothing we
+	// skip this message w/o errors.
+	if schema.Station.ConditionExpression != "" {
+		if _, err := m.evaluate(ctx, cache, source, schema.Station.ConditionExpression); err != nil {
+			if _, ok := err.(*EvaluationError); ok {
+				return nil, nil
+			}
+			return nil, fmt.Errorf("evaluating condition-expression: %v", err)
+		}
+	}
+
 	deviceIDRaw, err := m.evaluate(ctx, cache, source, schema.Station.IdentifierExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
-	if err != nil {
-		return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
-	}
+	deviceNameString := ""
 
-	deviceNameString, ok := deviceNameRaw.(string)
-	if !ok {
-		return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+	if schema.Station.NameExpression != "" {
+		deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
+		if err != nil {
+			return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+		}
+
+		deviceNameString, ok := deviceNameRaw.(string)
+		if !ok {
+			return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+		}
 	}
 
 	receivedAtRaw, err := m.evaluate(ctx, cache, source, schema.Station.ReceivedExpression)
@@ -163,21 +198,31 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
 
-	receivedAtString, ok := receivedAtRaw.(string)
-	if !ok {
+	var receivedAt *time.Time
+	if receivedAtString, ok := receivedAtRaw.(string); ok {
+		parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
+		if err != nil {
+			parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
+			if err != nil {
+				// NOTE: NOAA Tidal data was missing seconds.
+				parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+				if err != nil {
+					return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+				}
+			}
+		}
+
+		receivedAt = &parsed
+	} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
+		parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
+
+		receivedAt = &parsed
+	} else {
 		return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
 	}
 
-	receivedAt, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
-	if err != nil {
-		receivedAt, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
-		if err != nil {
-			// NOTE: NOAA Tidal data was missing seconds.
-			receivedAt, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
-			if err != nil {
-				return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
-			}
-		}
+	if receivedAt == nil {
+		return nil, fmt.Errorf("missing received-at")
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
@@ -234,7 +279,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		deviceID:   deviceID,
 		deviceName: deviceNameString,
 		data:       sensors,
-		receivedAt: receivedAt,
+		receivedAt: *receivedAt,
 		ownerID:    schemaRegistration.OwnerID,
 		schemaID:   schemaRegistration.ID,
 		schema:     schema,

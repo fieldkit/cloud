@@ -35,6 +35,17 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
+                <div class="station-summary" v-if="hasDisplayStations">
+                    <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
+                    <div class="pagination" v-if="workspace && !workspace.empty">
+                        <PaginationControls
+                            :page="selectedIndex"
+                            :totalPages="getValidStations().length"
+                            @new-page="onNewSummaryStation"
+                            textual
+                        />
+                    </div>
+                </div>
 
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
@@ -47,15 +58,18 @@
 <script lang="ts">
 import Promise from "bluebird";
 
+import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
-import { callStationsStations } from "../shared/partners/StationOrSensor.vue";
+import StationSummaryContent from "../shared/StationSummaryContent.vue";
+import PaginationControls from "@/views/shared/PaginationControls.vue";
+import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
+import { DisplayStation, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
@@ -71,6 +85,8 @@ export default Vue.extend({
         SharePanel,
         ExportPanel,
         Comments,
+        StationSummaryContent,
+        PaginationControls,
     },
     props: {
         token: {
@@ -93,10 +109,14 @@ export default Vue.extend({
     data(): {
         workspace: Workspace | null;
         showNoSensors: boolean;
+        selectedIndex: number;
+        validStations: number[];
     } {
         return {
             workspace: null,
             showNoSensors: false,
+            selectedIndex: 0,
+            validStations: [],
         };
     },
     computed: {
@@ -105,6 +125,7 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
+            allStations: (s: GlobalState) => s.stations.stations,
         }),
         addIcon(): unknown {
             return this.$loadAsset("icon-compare.svg");
@@ -113,10 +134,25 @@ export default Vue.extend({
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
-            if (this.bookmark && this.bookmark.p.length > 0) {
-                return "layout.backProjectDashboard";
+            const partnerCustomization = getPartnerCustomization();
+            if (this.bookmark && this.bookmark.c) {
+                if (!this.bookmark.c.map) {
+                    return "layout.backProjectDashboard";
+                }
             }
-            return callStationsStations() ? "layout.backToStations" : "layout.backToSensors";
+            if (partnerCustomization) {
+                return partnerCustomization.nav.viz.back.map.label;
+            }
+            return "layout.backToStations";
+        },
+        selectedId(): number {
+            return +_.flattenDeep(this.bookmark.g)[0];
+        },
+        selectedStation(): DisplayStation {
+            return this.allStations[this.selectedId];
+        },
+        hasDisplayStations(): boolean {
+            return Object.keys(this.allStations).length > 0;
         },
     },
     watch: {
@@ -146,12 +182,18 @@ export default Vue.extend({
                     }
                 });
         }
+        if (this.bookmark) {
+            this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.bookmark.p[0] });
+        }
     },
     methods: {
         async onBack() {
-            console.log("viz:back", this.bookmark);
-            if (this.bookmark.p && this.bookmark.p.length > 0) {
-                await this.$router.push({ name: "viewProject", params: { id: this.bookmark.p[0] } });
+            if (this.bookmark.c) {
+                if (this.bookmark.c.map) {
+                    await this.$router.push({ name: "viewProjectBigMap", params: { id: this.bookmark.c.project } });
+                } else {
+                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.c.project } });
+                }
             } else {
                 await this.$router.push({ name: "mapAllStations" });
             }
@@ -225,7 +267,8 @@ export default Vue.extend({
                             this.bookmark.v,
                             [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
                             stationIds,
-                            this.bookmark.p
+                            this.bookmark.p,
+                            this.bookmark.c
                         );
 
                         this.$emit("open-bookmark", bookmark);
@@ -236,6 +279,20 @@ export default Vue.extend({
                         await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
                     }
                 });
+        },
+        getValidStations(): number[] {
+            const validStations = Object.entries(this.workspace.stations)
+                .filter(([key, station]) => station.sensors.length > 0)
+                .map((d) => +d[0]);
+
+            this.selectedIndex = validStations.indexOf(this.selectedId);
+
+            return validStations;
+        },
+        onNewSummaryStation(evt) {
+            const stations = this.getValidStations();
+            this.showStation(stations[evt]);
+            this.selectedIndex = evt;
         },
     },
 });
@@ -413,8 +470,8 @@ export default Vue.extend({
     padding: 10px;
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
-    align-items: baseline;
-    min-height: 80px;
+    align-items: center;
+    min-height: 60px;
 }
 
 .controls-container .row-2 {
@@ -606,5 +663,28 @@ export default Vue.extend({
     &:nth-child(n + 1) {
         margin-left: 20px;
     }
+}
+.station-summary {
+    background-color: #fff;
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+
+    .summary-content {
+        align-items: center;
+    }
+    @include bp-down($sm) {
+        flex-direction: column;
+
+        .pagination {
+            margin-top: 0.5em;
+        }
+    }
+}
+.pagination {
+    display: flex;
+    margin-right: 13px;
+    justify-content: center;
 }
 </style>

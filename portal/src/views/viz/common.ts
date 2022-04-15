@@ -298,5 +298,5 @@ export class SeriesData {
 }
 
 export class ExploreContext {
-    constructor(public readonly project: number | null = null) {}
+    constructor(public readonly project: number | null = null, public readonly map = false) {}
 }
