@@ -37,6 +37,15 @@ func (e *MissingSensorMetaError) Error() string {
 	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
 }
 
+type MalformedMetaError struct {
+	MetaRecordID int64
+	Malformed    string
+}
+
+func (e *MalformedMetaError) Error() string {
+	return fmt.Sprintf("MalformedMetaError(missing-record--id=%v, '%v')", e.MetaRecordID, e.Malformed)
+}
+
 type MetaFactory struct {
 	filtering         *Filtering
 	modulesRepository *ModuleMetaRepository
@@ -71,8 +80,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	}
 
 	if meta.Identity == nil {
-		log.Warnw("malformed-meta", "record", meta)
-		return nil, fmt.Errorf("malformed meta: no identity")
+		return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID}
 	}
 
 	allModules := make([]*DataMetaModule, 0)
@@ -83,13 +91,11 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		sensors := make([]*DataMetaSensor, 0)
 
 		if module.Header == nil {
-			log.Warnw("malformed-meta-module", "record", meta)
-			return nil, fmt.Errorf("malformed module meta: no header")
+			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "header"}
 		}
 
 		if module.Sensors == nil {
-			log.Warnw("malformed-meta-sensors", "record", meta)
-			return nil, fmt.Errorf("malformed sensors meta: no sensors")
+			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
 		}
 
 		hf := HeaderFields{

@@ -38,8 +38,9 @@ type stationInfo struct {
 }
 
 type ImportErrors struct {
-	MissingMeta map[string]int64
-	ValueNaN    map[string]int64
+	ValueNaN      map[string]int64
+	MissingMeta   map[string]int64
+	MalformedMeta map[string]int64
 }
 
 type InfluxDbHandler struct {
@@ -77,8 +78,9 @@ func NewInfluxDbHandler(url, token, org, bucket string, db *sqlxcache.DB) (h *In
 		byProvision:  make(map[int64]*stationInfo),
 		skipping:     make(map[int64]bool),
 		errors: &ImportErrors{
-			ValueNaN:    make(map[string]int64),
-			MissingMeta: make(map[string]int64),
+			ValueNaN:      make(map[string]int64),
+			MissingMeta:   make(map[string]int64),
+			MalformedMeta: make(map[string]int64),
 		},
 	}
 }
@@ -130,6 +132,11 @@ func (h *InfluxDbHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.D
 	if err != nil {
 		if _, ok := err.(*repositories.MissingSensorMetaError); ok {
 			log.Infow("missing-meta", "meta_record_id", meta.ID)
+			h.skipping[p.ID] = true
+			return nil
+		}
+		if _, ok := err.(*repositories.MalformedMetaError); ok {
+			log.Infow("malformed-meta", "meta_record_id", meta.ID)
 			h.skipping[p.ID] = true
 			return nil
 		}
