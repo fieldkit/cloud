@@ -668,7 +668,8 @@ export class TimeSeriesSpecFactory {
                                             value: level.value,
                                         },
                                         stroke: { value: level.color },
-                                        strokeDash: { value: [4, 2] },
+                                        strokeDash: { value: [1, 4] },
+                                        strokeCap: { value: "round" },
                                         opacity: { value: 0.1 },
                                         strokeOpacity: { value: 0.1 },
                                         strokeWidth: {
