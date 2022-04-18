@@ -50,7 +50,7 @@
             </div>
         </div>
         <div class="sidebar-header sidebar-compass">
-            <router-link :to="{ name: 'projects' }">
+            <router-link :to="{ name: 'root' }">
                 <i role="img" class="icon" :class="narrowSidebarLogoIconClass" :aria-label="narrowSidebarLogoAlt"></i>
             </router-link>
         </div>
