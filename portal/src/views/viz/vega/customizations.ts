@@ -36,6 +36,8 @@ export function getSeriesThresholds(series): Thresholds | null {
     if (series.vizInfo.viz.length > 0) {
         const vizConfig = series.vizInfo.viz[0];
         const thresholds = vizConfig.thresholds;
+        thresholds.levels = thresholds.levels.filter(d => !d.hidden );
+
         if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
             return thresholds;
         }

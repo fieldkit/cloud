@@ -16,9 +16,10 @@ type SensorRanges struct {
 }
 
 type VizThreshold struct {
-	Label map[string]string `json:"label"`
-	Value float64           `json:"value"`
-	Color string            `json:"color"`
+	Label  map[string]string `json:"label"`
+	Value  float64           `json:"value"`
+	Color  string            `json:"color"`
+	Hidden bool              `json:"hidden"`
 }
 
 type VizThresholds struct {

@@ -13,7 +13,7 @@
             </div>
             <!-- fixme: currently restricted to floodnet project -->
             <div class="map-legend" v-if="id === 174 && levels.length > 0">
-                <h4>{{ keyTitle }}</h4>
+                <h4>Current {{ keyTitle }}</h4>
                 <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                     <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
                     <span>{{ item.label["enUS"] }}</span>
