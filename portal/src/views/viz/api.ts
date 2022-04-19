@@ -18,6 +18,7 @@ export interface VizThresholds {
         label: { [index: string]: string };
         value: number;
         color: string;
+        hidden: boolean;
     }[];
 }
 
