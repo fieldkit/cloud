@@ -703,7 +703,7 @@ export class TimeSeriesSpecFactory {
                                 signal: `{
                                 title: datum.vizInfo.label,
                                 Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
-                                time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
+                                time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
                             }`,
                             },
                         },
