@@ -179,7 +179,15 @@ export class TimeSeriesSpecFactory {
                                     }
                                     if (valid.length > 1) {
                                         // TODO Apply bin aggregate
-                                        return valid[0];
+                                        const aggregateFunction = series.vizInfo.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean;
+                                        return {
+                                            time: Number(time),
+                                            stationId: valid[0].stationId,
+                                            moduleId: valid[0].moduleId,
+                                            sensorId: valid[0].sensorId,
+                                            location: valid[0].location,
+                                            value: aggregateFunction(valid.map((v) => v.value)) || null,
+                                        };
                                     }
                                     return {
                                         time: Number(time),
@@ -197,14 +205,19 @@ export class TimeSeriesSpecFactory {
 
                         // TODO We can eventually remove hoverName here
                         const properties = { name: hoverName, vizInfo: series.vizInfo };
-                        const original = series.queried.data.map((datum) => _.extend(datum, properties));
+                        const original = series.queried.data;
 
                         function sanitize(original: DataRow[]): DataRow[] {
+                            // This was the first approach we tried to prevent
+                            // the infilled missing values from creating
+                            // distracting graphs of too many valid data
+                            // islands.
+                            /*
                             const valid = original.filter((datum) => _.isNumber(datum.value));
                             const deltas = calculateTimeDeltas(valid);
 
-                            console.log("viz: gaps", calculateGaps(original));
-                            console.log("viz: deltas", _.mean(deltas) / 60000);
+                            // console.log("viz: gaps", calculateGaps(original));
+                            // console.log("viz: deltas", _.mean(deltas) / 60000);
 
                             // Very simple heuristic for enabling re-bin. We
                             // basically rebin to the average interval if more
@@ -218,11 +231,21 @@ export class TimeSeriesSpecFactory {
                             } else {
                                 console.log("viz: rebin-skip", original.length - valid.length, valid.length);
                             }
+                            */
+
+                            // This is the another approach we're trying,
+                            // basically remove missing data if the queried
+                            // resolution is finer than the expected sensor
+                            // data's resolution.
+                            const queriedAggregate = series.queried.aggregate;
+                            if (queriedAggregate.interval < 60) {
+                                return original.filter((datum) => _.isNumber(datum.value));
+                            }
 
                             return original;
                         }
 
-                        const sanitized = sanitize(removeOutliersHack(original));
+                        const sanitized = sanitize(removeOutliersHack(original)).map((datum) => _.extend(datum, properties));
 
                         return [
                             {

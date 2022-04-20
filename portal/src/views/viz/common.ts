@@ -230,6 +230,10 @@ export class QueriedData {
         return this.sdr.data;
     }
 
+    get aggregate() {
+        return this.sdr.aggregate;
+    }
+
     public sorted(): QueriedData {
         const sorted = {
             summaries: this.sdr.summaries,
