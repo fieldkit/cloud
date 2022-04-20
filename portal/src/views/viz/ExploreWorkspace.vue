@@ -314,7 +314,7 @@ export default Vue.extend({
         margin-top: 0;
         margin-bottom: 0;
         margin-right: 5px;
-        font-size: 16px;
+        font-size: 13px;
         display: flex;
         align-items: center;
         line-height: 24px;
