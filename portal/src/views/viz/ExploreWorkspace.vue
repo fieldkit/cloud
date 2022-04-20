@@ -315,10 +315,12 @@ export default Vue.extend({
         margin-bottom: 0;
         margin-right: 5px;
         font-size: 16px;
+        display: flex;
+        align-items: center;
+        line-height: 24px;
     }
     .tooltip-color {
         margin-right: 5px;
-        margin-bottom: -10px;
         font-size: 2em;
     }
     p {
