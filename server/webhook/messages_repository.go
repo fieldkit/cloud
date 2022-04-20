@@ -59,7 +59,19 @@ func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBa
 func (rr *MessagesRepository) QueryBatchForProcessing(ctx context.Context, batch *MessageBatch) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("querying", "start", batch.StartTime, "page", batch.page)
+	if batch.page == 0 {
+		summary := &BatchSummary{}
+		if err := rr.db.GetContext(ctx, summary, `
+			SELECT COUNT(id) AS total, MIN(created_at) AS start, MAX(created_at) AS end
+			FROM fieldkit.ttn_messages WHERE NOT ignored
+			`); err != nil {
+			return err
+		}
+
+		batch.pages = int32(math.Ceil(float64(summary.Total) / float64(BatchSize)))
+	}
+
+	log.Infow("querying", "start", batch.StartTime, "page", batch.page, "pages", batch.pages)
 
 	messages := []*WebHookMessage{}
 	if err := rr.db.SelectContext(ctx, &messages, `
