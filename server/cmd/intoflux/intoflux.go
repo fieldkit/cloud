@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"io"
 	"math"
 	"time"
 
@@ -21,6 +23,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
@@ -255,36 +258,91 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	handler := NewInfluxDbHandler(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket, db)
-
-	if err := handler.Open(ctx); err != nil {
-		return err
-	}
-
 	stationIds := allStationIDs
 
-	for _, id := range stationIds {
-		if yes, err := handler.DoesStationHaveData(ctx, id); err != nil {
+	if false {
+		handler := NewInfluxDbHandler(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket, db)
+
+		if err := handler.Open(ctx); err != nil {
 			return err
-		} else if yes {
-			log.Infow("skipping:has-data", "station_id", id)
-			continue
 		}
 
-		walkParams := &backend.WalkParameters{
-			Start:      time.Time{},
-			End:        time.Now(),
-			StationIDs: []int32{id},
+		for _, id := range stationIds {
+			if yes, err := handler.DoesStationHaveData(ctx, id); err != nil {
+				return err
+			} else if yes {
+				log.Infow("skipping:has-data", "station_id", id)
+				continue
+			}
+
+			walkParams := &backend.WalkParameters{
+				Start:      time.Time{},
+				End:        time.Now(),
+				StationIDs: []int32{id},
+			}
+
+			rw := backend.NewRecordWalker(db)
+			if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
+				return err
+			}
 		}
 
-		rw := backend.NewRecordWalker(db)
-		if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
+		if err := handler.Close(); err != nil {
 			return err
 		}
 	}
 
-	if err := handler.Close(); err != nil {
-		return err
+	schemas := webhook.NewMessageSchemaRepository(db)
+
+	source := webhook.NewDatabaseMessageSource(db, int32(-1))
+
+	jqCache := &webhook.JqCache{}
+
+	batch := &webhook.MessageBatch{
+		StartTime: time.Time{},
+	}
+
+	for {
+		batchLog := logging.Logger(ctx).Sugar().With("batch_start_time", batch.StartTime)
+
+		if err := source.NextBatch(ctx, batch); err != nil {
+			if err == sql.ErrNoRows || err == io.EOF {
+				batchLog.Infow("eof")
+				break
+			}
+			return err
+		}
+
+		if batch.Messages == nil {
+			return fmt.Errorf("no messages")
+		}
+
+		batchLog.Infow("batch")
+
+		_, err := schemas.QuerySchemas(ctx, batch)
+		if err != nil {
+			return fmt.Errorf("message schemas (%v)", err)
+		}
+
+		for _, row := range batch.Messages {
+			rowLog := logging.Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
+
+			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
+			if err != nil {
+				rowLog.Infow("wh:skipping", "reason", err)
+			} else if parsed != nil {
+				for _, parsedSensor := range parsed.Data {
+					key := parsedSensor.Key
+					if key == "" {
+						return fmt.Errorf("parsed-sensor has no sensor key")
+					}
+
+					if !parsedSensor.Transient {
+						rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data, "batch_size", len(batch.Messages))
+					}
+				}
+			}
+		}
 	}
 
 	return nil

@@ -24,14 +24,14 @@ type ParsedReading struct {
 }
 
 type ParsedMessage struct {
-	original   *WebHookMessage
-	deviceID   []byte
-	deviceName string
-	data       []*ParsedReading
-	receivedAt time.Time
-	schema     *MessageSchema
-	schemaID   int32
-	ownerID    int32
+	Original   *WebHookMessage
+	DeviceID   []byte
+	DeviceName string
+	Data       []*ParsedReading
+	ReceivedAt time.Time
+	Schema     *MessageSchema
+	SchemaID   int32
+	OwnerID    int32
 }
 
 func toFloat(x interface{}) (float64, bool) {
@@ -276,12 +276,12 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 	}
 
 	return &ParsedMessage{
-		deviceID:   deviceID,
-		deviceName: deviceNameString,
-		data:       sensors,
-		receivedAt: *receivedAt,
-		ownerID:    schemaRegistration.OwnerID,
-		schemaID:   schemaRegistration.ID,
-		schema:     schema,
+		DeviceID:   deviceID,
+		DeviceName: deviceNameString,
+		Data:       sensors,
+		ReceivedAt: *receivedAt,
+		OwnerID:    schemaRegistration.OwnerID,
+		SchemaID:   schemaRegistration.ID,
+		Schema:     schema,
 	}, nil
 }
