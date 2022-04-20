@@ -45,6 +45,7 @@ type WebHookStation struct {
 	Configuration *data.StationConfiguration
 	Station       *data.Station
 	Module        *data.StationModule
+	Sensors       []*data.ModuleSensor
 	SensorPrefix  string
 }
 
@@ -122,6 +123,8 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
 
+	sensors := make([]*data.ModuleSensor, 0)
+
 	for _, moduleSchema := range pm.schema.Station.Modules {
 		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
@@ -170,6 +173,8 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
 					return nil, err
 				}
+
+				sensors = append(sensors, sensor)
 			}
 		}
 
@@ -179,6 +184,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			Configuration: configuration,
 			Station:       station,
 			Module:        module,
+			Sensors:       sensors,
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
@@ -209,10 +215,20 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 
 	now := time.Now()
 
+	// These changes to station are saved once in Close.
+
 	station.Station.IngestionAt = &now
 	station.Station.UpdatedAt = now
 
-	// These changes to station are saved once in Close.
+	for _, moduleSensor := range station.Sensors {
+		for _, pr := range pm.data {
+			if pr.Key == moduleSensor.Name {
+				moduleSensor.ReadingValue = &pr.Value
+				moduleSensor.ReadingTime = &pm.receivedAt
+				break
+			}
+		}
+	}
 
 	return nil
 }
@@ -221,9 +237,19 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
-		log.Infow("saving station", "station_id", station.ID)
+
+		log.Infow("saving:station", "station_id", station.ID)
+
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
 			return fmt.Errorf("error saving station: %v", err)
+		}
+
+		for _, moduleSensor := range cacheEntry.station.Sensors {
+			log.Infow("saving:sensor", "station_id", station.ID, "sensor_id", moduleSensor.ID, "value", moduleSensor.ReadingValue, "time", moduleSensor.ReadingTime)
+
+			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

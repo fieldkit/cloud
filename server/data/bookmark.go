@@ -63,7 +63,7 @@ func ParseBookmark(s string) (*Bookmark, error) {
 	return &b, nil
 }
 
-func (b *Bookmark) Vizes() []*BookmarkViz {
+func (b *Bookmark) Vizes() ([]*BookmarkViz, error) {
 	vizes := make([]*BookmarkViz, 0)
 
 	MaxTime := int64(8640000000000000)
@@ -73,30 +73,56 @@ func (b *Bookmark) Vizes() []*BookmarkViz {
 		for _, g2 := range g1 {
 			for _, viz := range g2 {
 				if len(viz) == 5 {
-					timeRange := viz[1].([]interface{})
+					timeRange, ok := viz[1].([]interface{})
+					if !ok {
+						return nil, fmt.Errorf("bookmark:malformed")
+					}
 
-					startRaw := int64(timeRange[0].(float64))
-					endRaw := int64(timeRange[1].(float64))
+					startRaw, ok := timeRange[0].(float64)
+					if !ok {
+						return nil, fmt.Errorf("bookmark:malformed")
+					}
+
+					endRaw, ok := timeRange[1].(float64)
+					if !ok {
+						return nil, fmt.Errorf("bookmark:malformed")
+					}
 
 					bookmarkViz := &BookmarkViz{
-						Start:       time.Unix(0, startRaw*int64(time.Millisecond)),
-						End:         time.Unix(0, endRaw*int64(time.Millisecond)),
-						ExtremeTime: startRaw == MinTime || endRaw == MaxTime,
+						Start:       time.Unix(0, int64(startRaw)*int64(time.Millisecond)),
+						End:         time.Unix(0, int64(endRaw)*int64(time.Millisecond)),
+						ExtremeTime: int64(startRaw) == MinTime || int64(endRaw) == MaxTime,
 						Sensors:     make([]*BookmarkSensor, 0),
 					}
 
 					for _, s := range viz[0].([]interface{}) {
-						values := s.([]interface{})
-						stationID := int32(values[0].(float64))
-						sensorAndModule := values[1].([]interface{})
-						moduleID := sensorAndModule[0].(string)
-						sensorID := int64(sensorAndModule[1].(float64))
+						values, ok := s.([]interface{})
+						if !ok {
+							return nil, fmt.Errorf("bookmark:malformed")
+						}
+						stationID, ok := values[0].(float64)
+						if !ok {
+							return nil, fmt.Errorf("bookmark:malformed")
+						}
 
-						bookmarkViz.Sensors = append(bookmarkViz.Sensors, &BookmarkSensor{
-							StationID: stationID,
-							ModuleID:  moduleID,
-							SensorID:  sensorID,
-						})
+						sensorAndModule, ok := values[1].([]interface{})
+						if !ok || len(sensorAndModule) != 2 {
+							return nil, fmt.Errorf("bookmark:malformed")
+						}
+
+						if moduleID, ok := sensorAndModule[0].(string); !ok {
+							return nil, fmt.Errorf("bookmark:malformed")
+						} else {
+							if sensorID, ok := sensorAndModule[1].(float64); !ok {
+								return nil, fmt.Errorf("bookmark:malformed")
+							} else {
+								bookmarkViz.Sensors = append(bookmarkViz.Sensors, &BookmarkSensor{
+									StationID: int32(stationID),
+									SensorID:  int64(sensorID),
+									ModuleID:  moduleID,
+								})
+							}
+						}
 					}
 
 					vizes = append(vizes, bookmarkViz)
@@ -105,22 +131,30 @@ func (b *Bookmark) Vizes() []*BookmarkViz {
 		}
 	}
 
-	return vizes
+	return vizes, nil
 }
 
-func (b *Bookmark) StationIDs() []int32 {
+func (b *Bookmark) StationIDs() ([]int32, error) {
 	ids := make([]int32, 0)
 
 	for _, g1 := range b.Groups {
 		for _, g2 := range g1 {
 			for _, viz := range g2 {
 				if len(viz) == 6 {
-					for _, id := range viz[0].([]interface{}) {
+					stationIDs, ok := viz[0].([]interface{})
+					if !ok {
+						return nil, fmt.Errorf("bookmark:malformed")
+					}
+					for _, id := range stationIDs {
 						ids = append(ids, int32(id.(float64)))
 					}
 				}
 				if len(viz) == 5 {
-					for _, s := range viz[0].([]interface{}) {
+					stationIDs, ok := viz[0].([]interface{})
+					if !ok {
+						return nil, fmt.Errorf("bookmark:malformed")
+					}
+					for _, s := range stationIDs {
 						values := s.([]interface{})
 						ids = append(ids, int32(values[0].(float64)))
 					}
@@ -129,5 +163,5 @@ func (b *Bookmark) StationIDs() []int32 {
 		}
 	}
 
-	return ids
+	return ids, nil
 }

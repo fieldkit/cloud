@@ -108,6 +108,27 @@ export class TimeSeriesSpecFactory {
                               })
                             : null;
 
+                        function removeOutliersHack(rows: DataRow[]): DataRow[] {
+                            if (series.vizInfo.firmwareKey == "wh.floodnet.depth") {
+                                return rows.map((row) => {
+                                    if (!row) throw new Error();
+                                    if (_.isNumber(row.value) && row.value >= 38) {
+                                        return {
+                                            time: row.time,
+                                            stationId: null,
+                                            sensorId: null,
+                                            moduleId: null,
+                                            location: null,
+                                            value: null,
+                                        };
+                                    }
+                                    return row;
+                                });
+                            }
+
+                            return rows;
+                        }
+
                         function calculateTimeDeltas(rows: DataRow[]) {
                             const initial: { prev: DataRow | null; deltas: number[] } = {
                                 prev: null,
@@ -201,7 +222,7 @@ export class TimeSeriesSpecFactory {
                             return original;
                         }
 
-                        const sanitized = sanitize(original);
+                        const sanitized = sanitize(removeOutliersHack(original));
 
                         return [
                             {
@@ -815,8 +836,7 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "brush_translate_delta",
                         },
-                        update:
-                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                        update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                     },
                     {
                         events: {
@@ -847,8 +867,7 @@ export class TimeSeriesSpecFactory {
                                 scale: "x",
                             },
                         ],
-                        update:
-                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        update: '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },

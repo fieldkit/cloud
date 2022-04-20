@@ -252,8 +252,8 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 		ON CONFLICT (module_id, sensor_index)
 			DO UPDATE SET name = EXCLUDED.name,
                           unit_of_measure = EXCLUDED.unit_of_measure,
-						  reading_last = COALESCE(s.reading_last, EXCLUDED.reading_last),
-						  reading_time = COALESCE(s.reading_time, EXCLUDED.reading_time)
+						  reading_last = COALESCE(EXCLUDED.reading_last, s.reading_last),
+						  reading_time = COALESCE(EXCLUDED.reading_time, s.reading_time)
 		RETURNING *
 		`, sensor); err != nil {
 		return nil, err

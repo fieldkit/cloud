@@ -186,8 +186,12 @@ func (sc *SocialContext) SharedWorkspace(ctx context.Context, w http.ResponseWri
 
 	title := ""
 	description := partner.Sharing.Title
+	vizes, err := parsed.Vizes()
+	if err != nil {
+		return nil, err
+	}
 
-	for _, v := range parsed.Vizes() {
+	for _, v := range vizes {
 		log.Infow("viz:parsed", "v", v)
 
 		for _, s := range v.Sensors {
