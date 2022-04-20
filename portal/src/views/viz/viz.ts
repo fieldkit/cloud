@@ -4,6 +4,7 @@ import {
     SensorsResponse,
     SensorDataResponse,
     SensorInfoResponse,
+    Time,
     ModuleID,
     SensorSpec,
     Ids,
@@ -376,7 +377,7 @@ export class Graph extends Viz {
             const days = fastTime as number;
             const start = new Date(sensorRange.end);
             start.setDate(start.getDate() - days);
-            return new TimeRange(start.getTime(), sensorRange.end);
+            return new TimeRange(start.getTime(), Time.Max);
         }
     }
 

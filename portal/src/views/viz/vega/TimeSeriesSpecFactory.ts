@@ -2,6 +2,7 @@ import _ from "lodash";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { DataRow } from "../api";
+import { makeRange } from "../common";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
@@ -42,14 +43,159 @@ export class TimeSeriesSpecFactory {
             return getSeriesThresholds(series);
         };
 
+        const filteredData = mapSeries((series, i) => {
+            function removeOutliersHack(rows: DataRow[]): DataRow[] {
+                // TODO HACK
+                if (series.vizInfo.firmwareKey == "wh.floodnet.depth") {
+                    return rows.map((row) => {
+                        if (!row) throw new Error();
+                        if (_.isNumber(row.value) && row.value >= 38) {
+                            return {
+                                time: row.time,
+                                stationId: null,
+                                sensorId: null,
+                                moduleId: null,
+                                location: null,
+                                value: null,
+                            };
+                        }
+                        return row;
+                    });
+                }
+
+                return rows;
+            }
+
+            function calculateTimeDeltas(rows: DataRow[]) {
+                const initial: { prev: DataRow | null; deltas: number[] } = {
+                    prev: null,
+                    deltas: [] as number[],
+                };
+                return _.reduce(
+                    rows,
+                    (state, datum) => {
+                        if (state.prev != null) {
+                            state.deltas.push(datum.time - state.prev.time);
+                        }
+                        return _.extend(state, { prev: datum });
+                    },
+                    initial
+                ).deltas;
+            }
+
+            function calculateGaps(rows: DataRow[]) {
+                const initial: { prev: DataRow | null; gaps: number[] } = {
+                    prev: null,
+                    gaps: [0] as number[],
+                };
+                return _.reduce(
+                    rows,
+                    (state, datum) => {
+                        if (_.isNumber(datum.value)) {
+                            if (state.gaps[state.gaps.length - 1] > 0) {
+                                state.gaps.push(0);
+                            }
+                        } else {
+                            state.gaps[state.gaps.length - 1]++;
+                        }
+                        return state;
+                    },
+                    initial
+                ).gaps;
+            }
+
+            function rebin(rows: DataRow[], interval: number): DataRow[] {
+                const grouped = _(rows)
+                    .groupBy((datum) => {
+                        return Math.floor(datum.time / interval) * interval;
+                    })
+                    .mapValues((bin, time) => {
+                        const valid = bin.filter((datum) => _.isNumber(datum.value));
+                        if (valid.length == 1) {
+                            return valid[0];
+                        }
+                        if (valid.length > 1) {
+                            // TODO HACK
+                            const aggregateFunction = series.vizInfo.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean;
+                            return {
+                                time: Number(time),
+                                stationId: valid[0].stationId,
+                                moduleId: valid[0].moduleId,
+                                sensorId: valid[0].sensorId,
+                                location: valid[0].location,
+                                value: aggregateFunction(valid.map((v) => v.value)) || null,
+                            };
+                        }
+                        return {
+                            time: Number(time),
+                            stationId: null,
+                            moduleId: null,
+                            sensorId: null,
+                            location: null,
+                            value: null,
+                        };
+                    })
+                    .value();
+
+                return _.values(grouped);
+            }
+
+            // TODO We can eventually remove hoverName here
+            const hoverName = makeHoverName(i);
+            const properties = { name: hoverName, vizInfo: series.vizInfo };
+            const original = series.queried.data;
+
+            function sanitize(original: DataRow[]): DataRow[] {
+                // This was the first approach we tried to prevent
+                // the infilled missing values from creating
+                // distracting graphs of too many valid data
+                // islands.
+                /*
+                    const valid = original.filter((datum) => _.isNumber(datum.value));
+                    const deltas = calculateTimeDeltas(valid);
+
+                    // console.log("viz: gaps", calculateGaps(original));
+                    // console.log("viz: deltas", _.mean(deltas) / 60000);
+
+                    // Very simple heuristic for enabling re-bin. We
+                    // basically rebin to the average interval if more
+                    // of the data is invalid than valid. I think we can
+                    // do better.
+                    if (original.length - valid.length > valid.length) {
+                        const meanBetweenValid = _.mean(deltas);
+                        const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
+                        console.log("viz: rebin", interval);
+                        return rebin(original, interval);
+                    } else {
+                        console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+                    }
+                */
+
+                // This is the another approach we're trying,
+                // basically remove missing data if the queried
+                // resolution is finer than the expected sensor
+                // data's resolution.
+                const queriedAggregate = series.queried.aggregate;
+                if (queriedAggregate.interval <= 60) {
+                    return original.filter((datum) => _.isNumber(datum.value));
+                }
+
+                return original;
+            }
+
+            return sanitize(removeOutliersHack(original)).map((datum) => _.extend(datum, properties));
+        });
+
         // This returns the domain for a single series. Primarily responsible
         // for constraining the axis domains to whatever minimums have been
         // configured for that sensor.
-        const makeSeriesDomain = (series) => {
+        const makeSeriesDomain = (series, i: number) => {
+            const data = filteredData[i].filter((datum) => _.isNumber(datum.value)).map((datum) => datum.value);
+            const filteredRange = makeRange(data);
             const constrained = series.vizInfo.constrainedRanges;
             if (series.ds.graphing && constrained.length > 0) {
                 const range = constrained[0];
-                if (series.ds.shouldConstrainBy([range.minimum, range.maximum])) {
+                if (series.ds.shouldConstrainBy(filteredRange, [range.minimum, range.maximum])) {
                     const d = [range.minimum, range.maximum];
                     // console.log("viz: constrained", series.ds.graphing.dataRange, d);
                     return d;
@@ -59,22 +205,22 @@ export class TimeSeriesSpecFactory {
             } else {
                 // console.log(`viz: constrain-none`);
             }
-            return series.queried.dataRange;
+            return filteredRange;
         };
 
         // Are the sensors being charted the same? If they are then we should
         // use the same axis domain for both, and pick one that covers both.
         const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
         const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
-        const yDomainsAll = this.allSeries.map(makeSeriesDomain);
+        const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
-        const makeDomainY = _.memoize((series) => {
+        const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensors) {
                 console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
-            return makeSeriesDomain(series);
+            return makeSeriesDomain(series, i);
         });
 
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
@@ -95,7 +241,6 @@ export class TimeSeriesSpecFactory {
             .concat(
                 _.flatten(
                     mapSeries((series, i) => {
-                        const hoverName = makeHoverName(i);
                         const thresholds = makeSeriesThresholds(series);
                         const scales = makeScales(i);
                         const transforms = thresholds
@@ -108,105 +253,10 @@ export class TimeSeriesSpecFactory {
                               })
                             : null;
 
-                        function calculateTimeDeltas(rows: DataRow[]) {
-                            const initial: { prev: DataRow | null; deltas: number[] } = {
-                                prev: null,
-                                deltas: [] as number[],
-                            };
-                            return _.reduce(
-                                rows,
-                                (state, datum) => {
-                                    if (state.prev != null) {
-                                        state.deltas.push(datum.time - state.prev.time);
-                                    }
-                                    return _.extend(state, { prev: datum });
-                                },
-                                initial
-                            ).deltas;
-                        }
-
-                        function calculateGaps(rows: DataRow[]) {
-                            const initial: { prev: DataRow | null; gaps: number[] } = {
-                                prev: null,
-                                gaps: [0] as number[],
-                            };
-                            return _.reduce(
-                                rows,
-                                (state, datum) => {
-                                    if (_.isNumber(datum.value)) {
-                                        if (state.gaps[state.gaps.length - 1] > 0) {
-                                            state.gaps.push(0);
-                                        }
-                                    } else {
-                                        state.gaps[state.gaps.length - 1]++;
-                                    }
-                                    return state;
-                                },
-                                initial
-                            ).gaps;
-                        }
-
-                        function rebin(rows: DataRow[], interval: number): DataRow[] {
-                            const grouped = _(rows)
-                                .groupBy((datum) => {
-                                    return Math.floor(datum.time / interval) * interval;
-                                })
-                                .mapValues((bin, time) => {
-                                    const valid = bin.filter((datum) => _.isNumber(datum.value));
-                                    if (valid.length == 1) {
-                                        return valid[0];
-                                    }
-                                    if (valid.length > 1) {
-                                        // TODO Apply bin aggregate
-                                        return valid[0];
-                                    }
-                                    return {
-                                        time: Number(time),
-                                        stationId: null,
-                                        moduleId: null,
-                                        sensorId: null,
-                                        location: null,
-                                        value: null,
-                                    };
-                                })
-                                .value();
-
-                            return _.values(grouped);
-                        }
-
-                        // TODO We can eventually remove hoverName here
-                        const properties = { name: hoverName, vizInfo: series.vizInfo };
-                        const original = series.queried.data.map((datum) => _.extend(datum, properties));
-
-                        function sanitize(original: DataRow[]): DataRow[] {
-                            const valid = original.filter((datum) => _.isNumber(datum.value));
-                            const deltas = calculateTimeDeltas(valid);
-
-                            console.log("viz: gaps", calculateGaps(original));
-                            console.log("viz: deltas", _.mean(deltas) / 60000);
-
-                            // Very simple heuristic for enabling re-bin. We
-                            // basically rebin to the average interval if more
-                            // of the data is invalid than valid. I think we can
-                            // do better.
-                            if (original.length - valid.length > valid.length) {
-                                const meanBetweenValid = _.mean(deltas);
-                                const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
-                                console.log("viz: rebin", interval);
-                                return rebin(original, interval);
-                            } else {
-                                console.log("viz: rebin-skip", original.length - valid.length, valid.length);
-                            }
-
-                            return original;
-                        }
-
-                        const sanitized = sanitize(original);
-
                         return [
                             {
                                 name: makeDataName(i),
-                                values: sanitized,
+                                values: filteredData[i],
                                 transform: transforms,
                             },
                             {
@@ -292,7 +342,7 @@ export class TimeSeriesSpecFactory {
                         title: series.vizInfo.label,
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
-                        domain: makeDomainY(series),
+                        domain: makeDomainY(i, series),
                         tickCount: 5,
                         titlePadding: 10,
                         domainOpacity: 0,
@@ -313,7 +363,7 @@ export class TimeSeriesSpecFactory {
 
         const scales = _.flatten(
             mapSeries((series, i) => {
-                const yDomain = makeDomainY(series);
+                const yDomain = makeDomainY(i, series);
                 const xDomain = makeDomainX();
 
                 return [
@@ -638,7 +688,7 @@ export class TimeSeriesSpecFactory {
         // TODO Unique by thresholds and perhaps y value?
         const ruleMarks = _.flatten(
             mapSeries((series, i) => {
-                const domain = makeSeriesDomain(series);
+                const domain = makeSeriesDomain(series, i);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
                 if (thresholds) {
@@ -668,7 +718,8 @@ export class TimeSeriesSpecFactory {
                                             value: level.value,
                                         },
                                         stroke: { value: level.color },
-                                        strokeDash: { value: [4, 2] },
+                                        strokeDash: { value: [1, 4] },
+                                        strokeCap: { value: "round" },
                                         opacity: { value: 0.1 },
                                         strokeOpacity: { value: 0.1 },
                                         strokeWidth: {
@@ -702,7 +753,8 @@ export class TimeSeriesSpecFactory {
                                 signal: `{
                                 title: datum.vizInfo.label,
                                 Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
-                                time: timeFormat(datum.time, '%m/%d/%Y %H:%m'),
+                                time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
+                                name: datum.name
                             }`,
                             },
                         },

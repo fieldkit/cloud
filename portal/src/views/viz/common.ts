@@ -188,7 +188,7 @@ export class VizInfo {
     }
 }
 
-function makeRange(values: number[]): [number, number] {
+export function makeRange(values: number[]): [number, number] {
     const min = _.min(values);
     const max = _.max(values);
     if (min === undefined) throw new Error(`no min: ${values.length}`);
@@ -228,6 +228,10 @@ export class QueriedData {
 
     get data() {
         return this.sdr.data;
+    }
+
+    get aggregate() {
+        return this.sdr.aggregate;
     }
 
     public sorted(): QueriedData {
@@ -275,12 +279,12 @@ export class DataSetSeries {
         return this.vizSensor[1];
     }
 
-    public shouldConstrainBy(range: [number, number]): boolean {
+    public shouldConstrainBy(dataRange: [number, number], range: [number, number]): boolean {
         if (this.graphing == null) {
             // console.log("viz: constrain:no-graphing");
             return false;
         }
-        if (this.graphing.dataRange[1] > range[1]) {
+        if (dataRange[1] > range[1]) {
             // console.log("viz: constrain:nope", this.graphing.dataRange[1], range[1]);
             return false;
         }

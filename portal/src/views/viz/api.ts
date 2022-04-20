@@ -18,6 +18,7 @@ export interface VizThresholds {
         label: { [index: string]: string };
         value: number;
         color: string;
+        hidden: boolean;
     }[];
 }
 
@@ -74,7 +75,7 @@ export interface DataRow {
 
 export interface SensorDataResponse {
     summaries: { [index: string]: Summary };
-    aggregate: string;
+    aggregate: { name: string; interval: number };
     data: DataRow[];
 }
 

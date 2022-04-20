@@ -12,6 +12,7 @@ import { default as vegaEmbed } from "vega-embed";
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
+import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
 export default Vue.extend({
@@ -45,7 +46,15 @@ export default Vue.extend({
 
             const vegaInfo = await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
-                tooltip: { offsetX: -50, offsetY: 50 },
+                tooltip: { offsetX: -50,
+                            offsetY: 50,
+                            formatTooltip: (value, sanitize) => {
+                               return  `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(value.name))};">■</span>
+                                        ${sanitize(value.title)}</h3>
+                                        <p class="value">${sanitize(value.Value)}</p>
+                                        <p class="time">${sanitize(value.time)}</p>`
+                            }
+                         },
                 actions: { source: false, editor: false, compiled: false },
             });
 
@@ -90,6 +99,17 @@ export default Vue.extend({
                     console.log(error);
                 });
         },
+        getTooltipColor(name){
+            if(name === "LEFT"){
+                return chartStyles.primaryLine.stroke;
+            }
+            if(name === "RIGHT"){
+                return chartStyles.secondaryLine.stroke;
+            }
+            else {
+                return "#ccc";
+            }
+        }
     },
 });
 </script>

@@ -401,6 +401,8 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 		return nil, "", err
 	}
 
+	log := Logger(ctx).Sugar()
+
 	for _, name := range handlers.AggregateNames {
 		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
 
@@ -430,8 +432,9 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 				duration := summary.End.Time().Sub(summary.Start.Time())
 				queriedRecords = int64(duration.Seconds()) / int64(interval)
 
-				log := Logger(ctx).Sugar()
-				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords, "duration", duration)
+				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords,
+					"duration", duration, "start", summary.Start, "end", summary.End,
+					"start_pretty", summary.Start.Time(), "end_pretty", summary.End.Time())
 			}
 		}
 

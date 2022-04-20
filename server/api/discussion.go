@@ -88,7 +88,13 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 	// TODO Verify the user can see discussion about "bookmark.StationIDs()" stations
 
 	dr := repositories.NewDiscussionRepository(c.db)
-	page, err := dr.QueryByStationIDs(ctx, bookmark.StationIDs())
+
+	stationIDs, err := bookmark.StationIDs()
+	if err != nil {
+		return nil, err
+	}
+
+	page, err := dr.QueryByStationIDs(ctx, stationIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +141,13 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 		if err != nil {
 			return nil, err
 		}
-		for _, id := range bookmark.StationIDs() {
+
+		bookmarkStations, err := bookmark.StationIDs()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, id := range bookmarkStations {
 			stationIDs = append(stationIDs, int64(id))
 		}
 	}
