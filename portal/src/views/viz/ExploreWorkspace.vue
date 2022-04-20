@@ -306,6 +306,30 @@ export default Vue.extend({
     border-radius: 1px;
     box-shadow: none;
     border: none;
+    text-align: left;
+    font-family: "Avenir", sans-serif;
+    color: #2c3e50;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 0;
+        margin-right: 5px;
+        font-size: 16px;
+    }
+    .tooltip-color {
+        margin-right: 5px;
+        margin-bottom: -10px;
+        font-size: 2em;
+    }
+    p {
+        margin: 0.3em;
+    }
+    p.value {
+        font-size: 16px;
+    }
+    p.time {
+        font-size: 13px;
+    }
 }
 #vg-tooltip-element .key {
     display: none;
