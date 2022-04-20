@@ -379,7 +379,7 @@ export default Vue.extend({
     font-family: var(--font-family-bold);
     white-space: nowrap;
     display: inline-block;
-    padding: 10px 0 0;
+    padding: 10px 0;
 
     @at-root body.floodnet & {
         color: var(--color-dark);
