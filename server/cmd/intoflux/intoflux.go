@@ -57,6 +57,9 @@ type InfluxReading struct {
 	SensorID  int64
 	SensorKey string
 	Value     float64
+	Longitude *float64
+	Latitude  *float64
+	Altitude  *float64
 	Tags      map[string]string
 }
 
@@ -70,6 +73,15 @@ func (r *InfluxReading) ToPoint() *write.Point {
 
 	fields := make(map[string]interface{})
 	fields["value"] = r.Value
+
+	if r.Longitude != nil && r.Latitude != nil {
+		fields["longitude"] = *r.Longitude
+		fields["latitude"] = *r.Latitude
+	}
+
+	if r.Altitude != nil {
+		fields["altitude"] = *r.Altitude
+	}
 
 	return influxdb2.NewPoint("reading", tags, fields, r.Time)
 }
@@ -298,6 +310,18 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 			return err
 		}
 
+		var latitude *float64
+		var longitude *float64
+		var altitude *float64
+
+		if len(filtered.Record.Location) >= 2 {
+			longitude = &filtered.Record.Location[0]
+			latitude = &filtered.Record.Location[1]
+			if len(filtered.Record.Location) >= 3 {
+				altitude = &filtered.Record.Location[2]
+			}
+		}
+
 		// TODO Should/can we reuse maps for this?
 		tags := make(map[string]string)
 		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
@@ -311,6 +335,9 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 			SensorKey: key.SensorKey,
 			Value:     rv.Value,
 			Tags:      tags,
+			Longitude: longitude,
+			Latitude:  latitude,
+			Altitude:  altitude,
 		}
 
 		dp := reading.ToPoint()
