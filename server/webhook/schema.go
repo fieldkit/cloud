@@ -29,6 +29,8 @@ type MessageSchemaStation struct {
 	IdentifierExpression string                 `json:"identifier"`
 	NameExpression       string                 `json:"name"`
 	ReceivedExpression   string                 `json:"received"`
+	LatitudeExpression   string                 `json:"latitude"`
+	LongitudeExpression  string                 `json:"longitude"`
 	Modules              []*MessageSchemaModule `json:"modules"`
 }
 
