@@ -246,10 +246,11 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	for _, module := range schema.Station.Modules {
 		for _, sensor := range module.Sensors {
-			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if sensor.Key == "" {
 				return nil, fmt.Errorf("empty sensor-key")
 			}
+
+			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if expectedKey != sensor.Key {
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
 			}
