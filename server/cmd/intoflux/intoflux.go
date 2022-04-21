@@ -20,6 +20,7 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/influxdata/influxdb-client-go/v2/api/write"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -46,6 +47,29 @@ type Influx struct {
 	bucket string
 	cli    influxdb2.Client
 	write  api.WriteAPI
+}
+
+type InfluxReading struct {
+	Time      time.Time
+	StationID int32
+	DeviceID  []byte
+	SensorID  int64
+	SensorKey string
+	Value     float64
+	Tags      map[string]string
+}
+
+func (r *InfluxReading) ToPoint() *write.Point {
+	tags := make(map[string]string)
+	tags["station_id"] = fmt.Sprintf("%v", r.StationID)
+	tags["device_id"] = hex.EncodeToString(r.DeviceID)
+	tags["sensor_id"] = fmt.Sprintf("%v", r.SensorID)
+	tags["sensor_key"] = r.SensorKey
+
+	fields := make(map[string]interface{})
+	fields["value"] = r.Value
+
+	return influxdb2.NewPoint("reading", tags, fields, r.Time)
 }
 
 func NewInflux(url, token, org, bucket string, db *sqlxcache.DB) (h *Influx) {
@@ -269,17 +293,19 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 
 		// TODO Should/can we reuse maps for this?
 		tags := make(map[string]string)
-		fields := make(map[string]interface{})
-
-		tags["station_id"] = fmt.Sprintf("%v", stationInfo.station.ID)
 		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
-		tags["device_id"] = hex.EncodeToString(p.DeviceID)
-		tags["sensor_id"] = fmt.Sprintf("%v", sensorID)
-		tags["sensor_key"] = key.SensorKey
 
-		fields["value"] = rv.Value
+		reading := InfluxReading{
+			Time:      time.Unix(filtered.Record.Time, 0),
+			StationID: stationInfo.station.ID,
+			DeviceID:  p.DeviceID,
+			SensorID:  sensorID,
+			SensorKey: key.SensorKey,
+			Value:     rv.Value,
+			Tags:      tags,
+		}
 
-		dp := influxdb2.NewPoint("reading", tags, fields, time.Unix(filtered.Record.Time, 0))
+		dp := reading.ToPoint()
 
 		h.influx.write.WritePoint(dp)
 	}
@@ -385,17 +411,19 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 							}
 
 							tags := make(map[string]string)
-							fields := make(map[string]interface{})
-
-							tags["station_id"] = fmt.Sprintf("%v", stationID)
 							tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
-							tags["device_id"] = hex.EncodeToString(parsed.DeviceID)
-							tags["sensor_id"] = fmt.Sprintf("%v", sensorID)
-							tags["sensor_key"] = key
 
-							fields["value"] = parsedSensor.Value
+							reading := InfluxReading{
+								Time:      parsed.ReceivedAt,
+								StationID: stationID,
+								DeviceID:  parsed.DeviceID,
+								SensorID:  sensorID,
+								SensorKey: key,
+								Value:     parsedSensor.Value,
+								Tags:      tags,
+							}
 
-							dp := influxdb2.NewPoint("reading", tags, fields, parsed.ReceivedAt)
+							dp := reading.ToPoint()
 
 							influx.write.WritePoint(dp)
 
