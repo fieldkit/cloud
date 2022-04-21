@@ -35,6 +35,8 @@ func process(ctx context.Context, options *Options) error {
 	aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
 
+	// startTime = time.Unix(1646121600, 0)
+
 	var source webhook.MessageSource
 
 	if options.File != "" && options.SchemaID > 0 {
