@@ -53,6 +53,7 @@ type InfluxReading struct {
 	Time      time.Time
 	StationID int32
 	DeviceID  []byte
+	ModuleID  []byte
 	SensorID  int64
 	SensorKey string
 	Value     float64
@@ -61,8 +62,9 @@ type InfluxReading struct {
 
 func (r *InfluxReading) ToPoint() *write.Point {
 	tags := make(map[string]string)
-	tags["station_id"] = fmt.Sprintf("%v", r.StationID)
 	tags["device_id"] = hex.EncodeToString(r.DeviceID)
+	tags["module_id"] = hex.EncodeToString(r.ModuleID)
+	tags["station_id"] = fmt.Sprintf("%v", r.StationID)
 	tags["sensor_id"] = fmt.Sprintf("%v", r.SensorID)
 	tags["sensor_key"] = r.SensorKey
 
@@ -291,14 +293,20 @@ func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.D
 			continue
 		}
 
+		moduleID, err := hex.DecodeString(rv.Module.ID)
+		if err != nil {
+			return err
+		}
+
 		// TODO Should/can we reuse maps for this?
 		tags := make(map[string]string)
 		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
 
 		reading := InfluxReading{
 			Time:      time.Unix(filtered.Record.Time, 0),
-			StationID: stationInfo.station.ID,
 			DeviceID:  p.DeviceID,
+			ModuleID:  moduleID,
+			StationID: stationInfo.station.ID,
 			SensorID:  sensorID,
 			SensorKey: key.SensorKey,
 			Value:     rv.Value,
@@ -415,8 +423,9 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 
 							reading := InfluxReading{
 								Time:      parsed.ReceivedAt,
-								StationID: stationID,
 								DeviceID:  parsed.DeviceID,
+								ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
+								StationID: stationID,
 								SensorID:  sensorID,
 								SensorKey: key,
 								Value:     parsedSensor.Value,
