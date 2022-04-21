@@ -19,7 +19,6 @@ type ParsedReading struct {
 	Key       string  `json:"key"`
 	Value     float64 `json:"value"`
 	Battery   bool    `json:"battery"`
-	Location  bool    `json:"location"`
 	Transient bool    `json:"transient"`
 }
 
@@ -32,6 +31,7 @@ type ParsedMessage struct {
 	Schema     *MessageSchema
 	SchemaID   int32
 	OwnerID    int32
+	Location   []float64
 }
 
 func toFloat(x interface{}) (float64, bool) {
@@ -264,7 +264,6 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 				reading := &ParsedReading{
 					Key:       sensor.Key,
 					Battery:   sensor.Battery,
-					Location:  sensor.Location,
 					Transient: sensor.Transient,
 					Value:     value,
 				}
@@ -272,6 +271,28 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 				sensors = append(sensors, reading)
 			} else {
 				return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+			}
+		}
+	}
+
+	var location []float64
+
+	if schema.Station.LongitudeExpression != "" && schema.Station.LatitudeExpression != "" {
+		maybeLongitude, err := m.evaluate(ctx, cache, source, schema.Station.LongitudeExpression)
+		if err != nil {
+			return nil, fmt.Errorf("evaluating longitude expression: %v", err)
+		}
+
+		maybeLatitude, err := m.evaluate(ctx, cache, source, schema.Station.LatitudeExpression)
+		if err != nil {
+			return nil, fmt.Errorf("evaluating latitude expression: %v", err)
+		}
+
+		if maybeLongitude != nil && maybeLatitude != nil {
+			if longitude, ok := maybeLongitude.(float64); ok {
+				if latitude, ok := maybeLatitude.(float64); ok {
+					location = []float64{longitude, latitude}
+				}
 			}
 		}
 	}
@@ -284,5 +305,6 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		OwnerID:    schemaRegistration.OwnerID,
 		SchemaID:   schemaRegistration.ID,
 		Schema:     schema,
+		Location:   location,
 	}, nil
 }

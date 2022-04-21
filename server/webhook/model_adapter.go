@@ -208,9 +208,6 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
 		}
-		if parsedReading.Location {
-			log.Warnw("location parsing unimplemented")
-		}
 	}
 
 	now := time.Now()

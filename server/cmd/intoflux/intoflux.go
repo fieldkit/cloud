@@ -445,6 +445,14 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 								return err
 							}
 
+							var latitude *float64
+							var longitude *float64
+
+							if len(parsed.Location) >= 2 {
+								longitude = &parsed.Location[0]
+								latitude = &parsed.Location[1]
+							}
+
 							tags := make(map[string]string)
 							tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
 
@@ -456,6 +464,8 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 								SensorID:  sensorID,
 								SensorKey: key,
 								Value:     parsedSensor.Value,
+								Longitude: longitude,
+								Latitude:  latitude,
 								Tags:      tags,
 							}
 
