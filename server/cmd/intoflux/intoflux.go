@@ -75,8 +75,8 @@ func (r *InfluxReading) ToPoint() *write.Point {
 	fields["value"] = r.Value
 
 	if r.Longitude != nil && r.Latitude != nil {
-		fields["longitude"] = *r.Longitude
-		fields["latitude"] = *r.Latitude
+		fields["lon"] = *r.Longitude
+		fields["lat"] = *r.Latitude
 	}
 
 	if r.Altitude != nil {
