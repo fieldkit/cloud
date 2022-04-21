@@ -32,6 +32,7 @@ type Options struct {
 	InfluxDbToken        string `split_words:"true" required:"true"`
 	InfluxDbOrg          string `split_words:"true" required:"true" default:"fk"`
 	InfluxDbBucket       string `split_words:"true" required:"true" default:"sensors"`
+	SchemaID             int
 	Verbose              bool
 	BinaryRecords        bool
 	JsonRecords          bool
@@ -292,6 +293,124 @@ func (h *InfluxDbHandler) OnDone(ctx context.Context) error {
 	return nil
 }
 
+func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
+	log := logging.Logger(ctx).Sugar()
+
+	allStationIDs := []int32{}
+	if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
+		return err
+	}
+
+	stationIds := allStationIDs
+
+	handler := NewInfluxDbHandler(influx, resolver, db)
+
+	for _, id := range stationIds {
+		if yes, err := influx.DoesStationHaveData(ctx, id); err != nil {
+			return err
+		} else if yes {
+			log.Infow("skipping:has-data", "station_id", id)
+			continue
+		}
+
+		walkParams := &backend.WalkParameters{
+			Start:      time.Time{},
+			End:        time.Now(),
+			StationIDs: []int32{id},
+		}
+
+		rw := backend.NewRecordWalker(db)
+		if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
+	schemas := webhook.NewMessageSchemaRepository(db)
+
+	source := webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
+
+	jqCache := &webhook.JqCache{}
+
+	batch := &webhook.MessageBatch{
+		StartTime: time.Time{},
+	}
+
+	for {
+		batchLog := logging.Logger(ctx).Sugar().With("batch_start_time", batch.StartTime)
+
+		if err := source.NextBatch(ctx, batch); err != nil {
+			if err == sql.ErrNoRows || err == io.EOF {
+				batchLog.Infow("eof")
+				break
+			}
+			return err
+		}
+
+		if batch.Messages == nil {
+			return fmt.Errorf("no messages")
+		}
+
+		_, err := schemas.QuerySchemas(ctx, batch)
+		if err != nil {
+			return fmt.Errorf("message schemas (%v)", err)
+		}
+
+		for _, row := range batch.Messages {
+			rowLog := logging.Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
+
+			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
+			if err != nil {
+				rowLog.Infow("wh:skipping", "reason", err)
+			} else if parsed != nil {
+				for _, parsedSensor := range parsed.Data {
+					key := parsedSensor.Key
+					if key == "" {
+						return fmt.Errorf("parsed-sensor has no sensor key")
+					}
+
+					if !parsedSensor.Transient {
+						sensorID, ok := resolver.sensors[key]
+						if !ok {
+							if options.FailOnMissingSensors {
+								return fmt.Errorf("parsed-sensor for unknown sensor: %v", key)
+							}
+						} else {
+							stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
+							if err != nil {
+								return err
+							}
+
+							tags := make(map[string]string)
+							fields := make(map[string]interface{})
+
+							tags["station_id"] = fmt.Sprintf("%v", stationID)
+							tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
+							tags["device_id"] = hex.EncodeToString(parsed.DeviceID)
+							tags["sensor_id"] = fmt.Sprintf("%v", sensorID)
+							tags["sensor_key"] = key
+
+							fields["value"] = parsedSensor.Value
+
+							dp := influxdb2.NewPoint("reading", tags, fields, parsed.ReceivedAt)
+
+							influx.write.WritePoint(dp)
+
+							if options.Verbose {
+								rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func process(ctx context.Context, options *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
@@ -301,13 +420,6 @@ func process(ctx context.Context, options *Options) error {
 	if err != nil {
 		return err
 	}
-
-	allStationIDs := []int32{}
-	if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
-		return err
-	}
-
-	stationIds := allStationIDs
 
 	influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket, db)
 
@@ -322,108 +434,14 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	if options.BinaryRecords {
-		handler := NewInfluxDbHandler(influx, resolver, db)
-
-		for _, id := range stationIds {
-			if yes, err := influx.DoesStationHaveData(ctx, id); err != nil {
-				return err
-			} else if yes {
-				log.Infow("skipping:has-data", "station_id", id)
-				continue
-			}
-
-			walkParams := &backend.WalkParameters{
-				Start:      time.Time{},
-				End:        time.Now(),
-				StationIDs: []int32{id},
-			}
-
-			rw := backend.NewRecordWalker(db)
-			if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
-				return err
-			}
+		if err := processBinary(ctx, options, db, influx, resolver); err != nil {
+			return err
 		}
 	}
 
 	if options.JsonRecords {
-		schemas := webhook.NewMessageSchemaRepository(db)
-
-		source := webhook.NewDatabaseMessageSource(db, int32(-1))
-
-		jqCache := &webhook.JqCache{}
-
-		batch := &webhook.MessageBatch{
-			StartTime: time.Time{},
-		}
-
-		for {
-			batchLog := logging.Logger(ctx).Sugar().With("batch_start_time", batch.StartTime)
-
-			if err := source.NextBatch(ctx, batch); err != nil {
-				if err == sql.ErrNoRows || err == io.EOF {
-					batchLog.Infow("eof")
-					break
-				}
-				return err
-			}
-
-			if batch.Messages == nil {
-				return fmt.Errorf("no messages")
-			}
-
-			_, err := schemas.QuerySchemas(ctx, batch)
-			if err != nil {
-				return fmt.Errorf("message schemas (%v)", err)
-			}
-
-			for _, row := range batch.Messages {
-				rowLog := logging.Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
-
-				parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
-				if err != nil {
-					rowLog.Infow("wh:skipping", "reason", err)
-				} else if parsed != nil {
-					for _, parsedSensor := range parsed.Data {
-						key := parsedSensor.Key
-						if key == "" {
-							return fmt.Errorf("parsed-sensor has no sensor key")
-						}
-
-						if !parsedSensor.Transient {
-							sensorID, ok := resolver.sensors[key]
-							if !ok {
-								if options.FailOnMissingSensors {
-									return fmt.Errorf("parsed-sensor for unknown sensor: %v", key)
-								}
-							} else {
-								stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
-								if err != nil {
-									return err
-								}
-
-								tags := make(map[string]string)
-								fields := make(map[string]interface{})
-
-								tags["station_id"] = fmt.Sprintf("%v", stationID)
-								tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
-								tags["device_id"] = hex.EncodeToString(parsed.DeviceID)
-								tags["sensor_id"] = fmt.Sprintf("%v", sensorID)
-								tags["sensor_key"] = key
-
-								fields["value"] = parsedSensor.Value
-
-								dp := influxdb2.NewPoint("reading", tags, fields, parsed.ReceivedAt)
-
-								influx.write.WritePoint(dp)
-
-								if options.Verbose {
-									rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
-								}
-							}
-						}
-					}
-				}
-			}
+		if err := processJson(ctx, options, db, influx, resolver); err != nil {
+			return err
 		}
 	}
 
@@ -441,6 +459,7 @@ func main() {
 	flag.BoolVar(&options.BinaryRecords, "binary", false, "process binary records")
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
+	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
 
 	flag.Parse()
 
