@@ -35,7 +35,7 @@
                         <span v-bind:class="{ selected: viewingStations }"><StationOrSensor /></span>
                     </div>
                 </router-link>
-                <div v-for="station in stations" v-bind:key="station.id">
+                <div :class="{ 'nl-narrow': sidebar.narrow }" v-for="station in stations" v-bind:key="station.id">
                     <span
                         class="nav-link"
                         v-on:click="showStation(station)"
@@ -277,6 +277,9 @@ export default Vue.extend({
     font-size: 13px;
     margin: 20px 0 0 37px;
     display: inline-block;
+}
+.nl-narrow {
+    display: none;
 }
 
 .nav-link {
