@@ -46,15 +46,16 @@ export default Vue.extend({
 
             const vegaInfo = await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
-                tooltip: { offsetX: -50,
-                            offsetY: 50,
-                            formatTooltip: (value, sanitize) => {
-                               return  `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(value.name))};">■</span>
+                tooltip: {
+                    offsetX: -50,
+                    offsetY: 50,
+                    formatTooltip: (value, sanitize) => {
+                        return `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(value.name))};">■</span>
                                         ${sanitize(value.title)}</h3>
                                         <p class="value">${sanitize(value.Value)}</p>
-                                        <p class="time">${sanitize(value.time)}</p>`
-                            }
-                         },
+                                        <p class="time">${sanitize(value.time)}</p>`;
+                    },
+                },
                 actions: { source: false, editor: false, compiled: false },
             });
 
@@ -78,6 +79,14 @@ export default Vue.extend({
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
+            // Watch for brush drag outside the window
+            vegaInfo.view.addEventListener("mousedown", (e) => {
+                window.addEventListener("mouseup", (e) => {
+                    if (scrubbed.length == 2 && e.target.nodeName !== "path") {
+                        this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                    }
+                });
+            });
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
@@ -99,17 +108,16 @@ export default Vue.extend({
                     console.log(error);
                 });
         },
-        getTooltipColor(name){
-            if(name === "LEFT"){
+        getTooltipColor(name) {
+            if (name === "LEFT") {
                 return chartStyles.primaryLine.stroke;
             }
-            if(name === "RIGHT"){
+            if (name === "RIGHT") {
                 return chartStyles.secondaryLine.stroke;
-            }
-            else {
+            } else {
                 return "#ccc";
             }
-        }
+        },
     },
 });
 </script>
