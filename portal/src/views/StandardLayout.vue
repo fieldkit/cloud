@@ -10,6 +10,7 @@
                 :stations="stations"
                 :projects="userProjects"
                 :narrow="sidebarNarrow"
+                :clipStations="clipStations"
                 @show-station="showStation"
                 @sidebar-toggle="onSidebarToggle"
             />
@@ -65,6 +66,10 @@ export default Vue.extend({
             default: false,
         },
         sidebarNarrow: {
+            type: Boolean,
+            default: false
+        },
+        clipStations: {
             type: Boolean,
             default: false
         }
