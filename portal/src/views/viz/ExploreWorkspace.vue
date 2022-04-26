@@ -489,7 +489,6 @@ export default Vue.extend({
 
 .controls-container .row {
     display: flex;
-    justify-content: space-between;
 }
 
 .controls-container .row-1 {
@@ -526,19 +525,17 @@ export default Vue.extend({
     }
 }
 
-.controls-container .half {
-    flex-basis: 50%;
-}
-
 .controls-container .tree-pair {
     display: flex;
     align-items: center;
     width: 100%;
+    flex: 0 1 500px;
 }
 
-.controls-container .tree-pair div {
-    flex-basis: 50%;
+.controls-container .tree-pair > div {
+    flex: 0 1 auto;
 }
+
 .tree-key {
     flex-basis: 0;
     margin-right: 15px;
@@ -554,10 +551,14 @@ export default Vue.extend({
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    &.time {
+        margin-left: auto;
+    }
 }
 
 .controls-container .right .chart-type {
-    flex-basis: 25%;
+    flex-basis: 110px;
 }
 
 .controls-container .right {
