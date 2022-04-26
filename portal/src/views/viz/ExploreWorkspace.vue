@@ -529,7 +529,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     width: 100%;
-    flex: 0 1 500px;
+    flex: 0 0 500px;
 }
 
 .controls-container .tree-pair > div {
