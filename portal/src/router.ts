@@ -346,12 +346,13 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/station/:id",
+        path: "/dashboard/projects/:projectId/station/:stationId",
         name: "viewStation",
         component: StationView,
         props: (route) => {
             return {
-                id: Number(route.params.id),
+                stationId: Number(route.params.stationId),
+                projectId: Number(route.params.projectId),
                 forcePublic: false,
             };
         },

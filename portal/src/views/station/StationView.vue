@@ -6,7 +6,7 @@
                 :title="station.name"
                 :subtitle="headerSubtitle"
                 :backTitle="$tc('layout.backProjectDashboard')"
-                :backRouteParams="{ id: station.id }"
+                :backRouteParams="{ id: $route.params.projectId }"
             />
 
             <section class="section-station">
@@ -184,7 +184,7 @@ export default Vue.extend({
     },
     computed: {
         station(): DisplayStation {
-            return this.$state.stations.stations[this.$route.params.id];
+            return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
             return this.$state.notes.notes;
@@ -237,8 +237,8 @@ export default Vue.extend({
         }
     },
     beforeMount(): void {
-        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.id });
-        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.id });
+        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
     },
     methods: {
         getBatteryIcon(): string {

@@ -35,7 +35,8 @@
                         <span v-bind:class="{ selected: viewingStations }"><StationOrSensor /></span>
                     </div>
                 </router-link>
-                <div v-for="station in stations" v-bind:key="station.id">
+                <!-- TODO: stations clipped until sidebar navigation is reworked -->
+                <div :class="{ 'nl-narrow': sidebar.narrow }" v-for="station in clippedStations" v-bind:key="station.id">
                     <span
                         class="nav-link"
                         v-on:click="showStation(station)"
@@ -92,6 +93,10 @@ export default Vue.extend({
             type: Boolean,
             default: false,
         },
+        clipStations: {
+            type: Boolean,
+            default: false,
+        }
     },
     mounted(): void {
         const desktopBreakpoint = 1040;
@@ -137,6 +142,16 @@ export default Vue.extend({
                 this.toggleSidebar();
             }
         },
+    },
+    computed: {
+        clippedStations() {
+            if(this.clipStations){
+                return this.stations.slice(0, 10);
+            }
+            else {
+                return this.stations;
+            }
+        }
     },
     methods: {
         showStation(station: unknown): void {
@@ -277,6 +292,9 @@ export default Vue.extend({
     font-size: 13px;
     margin: 20px 0 0 37px;
     display: inline-block;
+}
+.nl-narrow {
+    display: none;
 }
 
 .nav-link {

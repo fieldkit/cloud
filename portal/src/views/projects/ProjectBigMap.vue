@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout @sidebar-toggle="layoutChanges++" :sidebarNarrow="true">
+    <StandardLayout @sidebar-toggle="layoutChanges++" :sidebarNarrow="true" :clipStations="true">
         <div class="project-public project-container" v-if="displayProject">
             <div class="project-detail-card">
                 <div class="photo-container">
