@@ -248,7 +248,8 @@ export default Vue.extend({
             return this.$router.push({
                 name: "viewStation",
                 params: {
-                    id: station.id,
+                    projectId: this.project.id,
+                    stationId: station.id,
                 },
             });
         },
