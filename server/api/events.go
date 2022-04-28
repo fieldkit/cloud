@@ -46,7 +46,12 @@ func (c *EventsService) DataEventsEndpoint(ctx context.Context, payload *eventsS
 	// TODO Verify the user can see discussion about "bookmark.StationIDs()" stations
 
 	er := repositories.NewEventRepository(c.db)
-	all, err := er.QueryByStationIDs(ctx, bookmark.StationIDs())
+	stationIDs, err := bookmark.StationIDs()
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := er.QueryByStationIDs(ctx, stationIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +103,11 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 		if err != nil {
 			return nil, err
 		}
-		for _, id := range bookmark.StationIDs() {
+		bookmarkStationIDs, err := bookmark.StationIDs()
+		if err != nil {
+			return nil, err
+		}
+		for _, id := range bookmarkStationIDs {
 			stationIDs = append(stationIDs, int64(id))
 		}
 	}
