@@ -21,6 +21,7 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
+import { Station } from "@/api/api"
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -785,7 +786,7 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
     public async addFullStations(stations: Station[]): Promise<Workspace> {
-        this.stationsFull = Object.fromEntries(stations.map((e) => [e.id, e]));
+        this.stationsFull = stations;
         return this;
     }
 
