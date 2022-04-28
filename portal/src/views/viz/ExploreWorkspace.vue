@@ -35,7 +35,7 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
-                <div class="station-summary" v-if="hasDisplayStations">
+                <div class="station-summary" v-if="selectedStation">
                     <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
                     <div class="pagination" v-if="workspace && !workspace.empty">
                         <PaginationControls
@@ -43,6 +43,7 @@
                             :totalPages="getValidStations().length"
                             @new-page="onNewSummaryStation"
                             textual
+                            wrap
                         />
                     </div>
                 </div>
@@ -125,7 +126,6 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
-            allStations: (s: GlobalState) => s.stations.stations,
         }),
         addIcon(): unknown {
             return this.$loadAsset("icon-compare.svg");
@@ -148,11 +148,8 @@ export default Vue.extend({
         selectedId(): number {
             return +_.flattenDeep(this.bookmark.g)[0];
         },
-        selectedStation(): DisplayStation {
-            return this.allStations[this.selectedId];
-        },
-        hasDisplayStations(): boolean {
-            return Object.keys(this.allStations).length > 0;
+        selectedStation(): any {
+            return this.workspace.stationsFull[this.selectedId];
         },
     },
     watch: {
@@ -181,9 +178,6 @@ export default Vue.extend({
                         await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
                     }
                 });
-        }
-        if (this.bookmark) {
-            this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.bookmark.p[0] });
         }
     },
     methods: {
