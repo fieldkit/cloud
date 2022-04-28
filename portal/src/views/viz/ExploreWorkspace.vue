@@ -43,6 +43,7 @@
                             :totalPages="getValidStations().length"
                             @new-page="onNewSummaryStation"
                             textual
+                            wrap
                         />
                     </div>
                 </div>
