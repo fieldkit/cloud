@@ -149,7 +149,7 @@ export default Vue.extend({
             return +_.flattenDeep(this.bookmark.g)[0];
         },
         selectedStation(): any {
-            return this.workspace.stationsFull[this.selectedId];
+            return this.workspace.stationsFull.filter( d => d.id === this.selectedId)[0];
         },
     },
     watch: {
