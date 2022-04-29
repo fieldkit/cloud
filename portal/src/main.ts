@@ -78,6 +78,13 @@ Vue.filter("prettyDate", (value) => {
     return moment(value).format("M/D/YYYY");
 });
 
+Vue.filter("prettyDateTime", (value) => {
+    if (!value) {
+        return "N/A";
+    }
+    return moment(value).format("M/D/YYYY, HH:mm");
+});
+
 Vue.filter("prettyPercentage", (value: number | null) => {
     if (value === null || value === undefined) {
         return "--";
