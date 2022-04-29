@@ -29,6 +29,8 @@ import ValueMarker from "./ValueMarker.vue";
 
 import * as d3 from "d3";
 import mapboxgl from "mapbox-gl";
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
 export interface ProtectedData {
     map: any;
@@ -44,11 +46,13 @@ export default Vue.extend({
         mapbox: { token: string; style: string };
         ready: boolean;
         sensorMeta: Map<string, any>;
+        hasGeocoder: boolean;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
+            hasGeocoder: false
         };
     },
     props: {
@@ -148,6 +152,18 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
+            if(!this.hasGeocoder){
+                map.addControl(
+                    new MapboxGeocoder({
+                        accessToken: this.mapbox.token,
+                        mapboxgl: mapboxgl,
+                        collapsed: true,
+                        marker: false
+                    })
+                , 'top-left');
+                this.hasGeocoder = true;
+            }
+            
             // Marker color scale
             const appendColor = (features) => {
                 return features.map((d) => {
