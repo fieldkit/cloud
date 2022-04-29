@@ -129,6 +129,9 @@
             </section>
         </div>
     </StandardLayout>
+    <div v-else class="forbidden-view-bg">
+    
+    </div>
 </template>
 
 <script lang="ts">
@@ -140,7 +143,16 @@ import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { ActionTypes, BoundingRectangle, DisplayModule, DisplayStation, MappedStations, ProjectModule } from "@/store";
+import {
+    ActionTypes,
+    AuthenticationRequiredError,
+    BoundingRectangle,
+    DisplayModule,
+    DisplayStation,
+    ForbiddenError,
+    MappedStations,
+    ProjectModule,
+} from "@/store";
 import * as utils from "@/utilities";
 import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
@@ -237,7 +249,15 @@ export default Vue.extend({
         }
     },
     beforeMount(): void {
-        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
+            if (AuthenticationRequiredError.isInstance(e)) {
+                return this.$router.push({
+                    name: "login",
+                    params: { errorMessage: this.$t("login.privateStation") },
+                    query: { after: this.$route.path },
+                });
+            }
+        });
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
     },
     methods: {
@@ -677,5 +697,15 @@ section {
 .icon-grid {
     font-size: 12px;
     margin-right: 5px;
+}
+
+.forbidden-view-bg {
+    background-image: linear-gradient(#52b5e4, #1b80c9);
+    min-height: 100vh;
+
+    body.floodnet & {
+        background-image: unset;
+        background-color: var(--color-dark);
+    }
 }
 </style>
