@@ -1,12 +1,6 @@
 <template>
     <div class="form-container" v-if="!sso">
-        <div class="message-container" v-if="errorMessage">
-            <img src="@/assets/icon-warning-error.svg" alt="Error" width="15px" />
-            <div>
-                <div class="message-title">{{ errorMessage }}</div>
-                <div class="message-subtitle">{{ $t("login.loginError") }}</div>
-            </div>
-        </div>
+        <ForbiddenBanner v-if="errorMessage" :title="errorMessage" :subtitle="$t('login.loginError')"></ForbiddenBanner>
         <Logo class="form-header-logo"></Logo>
         <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" :busy="busy" @login="save" />
     </div>
@@ -21,12 +15,14 @@ import Logo from "../shared/Logo.vue";
 import FKApi, { LoginPayload } from "@/api/api";
 import { ActionTypes } from "@/store";
 import { toSingleValue } from "@/utilities";
+import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
 
 export default Vue.extend({
     components: {
         ...CommonComponents,
         LoginForm,
         Logo,
+        ForbiddenBanner,
     },
     props: {
         spoofing: {
@@ -114,36 +110,4 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/forms.scss";
-.message {
-    &-container {
-        display: flex;
-        width: 460px;
-        background-color: #f4f5f7;
-        box-sizing: border-box;
-        padding: 15px 15px;
-        max-width: calc(100vw - 20px);
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 80px;
-        line-height: 1.5;
-
-        > img {
-            margin-right: 10px;
-        }
-
-        @include bp-down($xs) {
-            width: 330px;
-        }
-    }
-
-    &-title {
-        font-size: 16px;
-        text-align: left;
-    }
-
-    &-subtitle {
-        font-size: 12px;
-        text-align: left;
-    }
-}
 </style>
