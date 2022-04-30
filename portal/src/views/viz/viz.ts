@@ -21,6 +21,7 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
+import { Station } from "@/api/api"
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -640,6 +641,7 @@ export class Querier {
 
 export class Workspace implements VizInfoFactory {
     private stationIds: StationID[] = [];
+    private stationsFull: Station[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
@@ -654,6 +656,10 @@ export class Workspace implements VizInfoFactory {
 
     public get allStationIds(): StationID[] {
         return this.stationIds;
+    }
+
+    public get allStations(): Station[] {
+        return this.stationsFull;
     }
 
     constructor(
@@ -777,6 +783,10 @@ export class Workspace implements VizInfoFactory {
 
     public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
         group.timeZoomed(zoom);
+        return this;
+    }
+    public async addFullStations(stations: Station[]): Promise<Workspace> {
+        this.stationsFull = stations;
         return this;
     }
 

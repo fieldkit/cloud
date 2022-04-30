@@ -1,5 +1,5 @@
 <template>
-    <div class="pagination" :class="{textual: textual}">
+    <div class="pagination" :class="{ textual: textual }">
         <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">◀</div>
         <div class="pages" v-if="!textual">
             <div
@@ -12,7 +12,7 @@
                 ●
             </div>
         </div>
-        <div v-if="textual">{{ page + 1}} of {{ totalPages }}</div>
+        <div v-if="textual">{{ page + 1 }} of {{ totalPages }}</div>
         <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">▶</div>
     </div>
 </template>
@@ -41,6 +41,10 @@ export default Vue.extend({
             type: Boolean,
             default: false,
         },
+        wrap: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         pages(this: any) {
@@ -52,19 +56,33 @@ export default Vue.extend({
             });
         },
         canPageNext(this: any) {
-            return this.page < this.totalPages - 1;
+            if (this.wrap) {
+                return true;
+            } else {
+                return this.page < this.totalPages - 1;
+            }
         },
         canPagePrevious(this: any) {
-            return this.page > 0;
+            if (this.wrap) {
+                return true;
+            } else {
+                return this.page > 0;
+            }
         },
     },
     methods: {
         onPrevious() {
+            if (this.wrap && this.page <= 0) {
+                this.$emit("new-page", this.totalPages - 1);
+            }
             if (this.page > 0) {
                 this.$emit("new-page", this.page - 1);
             }
         },
         onNext() {
+            if (this.wrap && this.page >= this.totalPages - 1) {
+                this.$emit("new-page", 0);
+            }
             if (this.page < this.totalPages - 1) {
                 this.$emit("new-page", this.page + 1);
             }
@@ -90,7 +108,7 @@ export default Vue.extend({
 .button:first-child {
     margin-right: 10px;
 
-    .textual &{
+    .textual & {
         margin-right: 5px;
         line-height: 10px;
     }
@@ -98,7 +116,7 @@ export default Vue.extend({
 .button:last-child {
     margin-left: 10px;
 
-    .textual &{
+    .textual & {
         margin-left: 5px;
     }
 }
