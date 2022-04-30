@@ -20,6 +20,7 @@ type VizThreshold struct {
 	Value  float64           `json:"value"`
 	Color  string            `json:"color"`
 	Hidden bool              `json:"hidden"`
+	Start  float64           `json:"start"`
 }
 
 type VizThresholds struct {
