@@ -18,6 +18,8 @@ interface ThresholdLevel {
     value: number | null;
     offset: number | null;
     color: string;
+    hidden: boolean;
+    start: number;
 }
 
 interface Thresholds {
