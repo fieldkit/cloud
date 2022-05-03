@@ -585,18 +585,6 @@ section {
     margin-bottom: 20px;
 }
 
-// copied from NotesView
-
-.notes-view .lower {
-    display: flex;
-    background: white;
-    margin-top: 20px;
-    position: relative;
-
-    @include bp-down($xs) {
-        margin-top: -15px;
-    }
-}
 .loading-container {
     height: 100%;
     @include flex(center);
