@@ -162,7 +162,9 @@ export default Vue.extend({
                     callback: async (confirm) => {
                         if (confirm) {
                             await this.$services.api.deleteMedia(photo.id);
-                            this.notes.media = this.notes.media.filter((media) => media.id !== photo.id);
+                            await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                            await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+                            await this.$store.dispatch(ActionTypes.NEED_STATIONS);
                             return;
                         }
                     },
@@ -172,11 +174,10 @@ export default Vue.extend({
             if (event === "use-as-station-image") {
                 this.$services.api
                     .setStationImage(this.station.id, photo.id)
-                    .then((result) => {
-                        this.notesState.success = true;
+                    .then(() => {
                         this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                     })
-                    .catch((e) => {
+                    .catch(() => {
                         this.notesState.failed = true;
                     });
             }
@@ -204,6 +205,9 @@ export default Vue.extend({
                     .uploadStationMedia(this.station.id, photo.key, photo.file)
                     .then(async (uploadedPhoto: PortalNoteMedia) => {
                         await this.$services.api.setStationImage(this.station.id, uploadedPhoto.id);
+                        await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+                        await this.$store.dispatch(ActionTypes.NEED_STATIONS);
+                        await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                     });
             }
         },
@@ -220,7 +224,7 @@ export default Vue.extend({
             return;
         },
 
-        async onSave(formNotes: Notes): Promise<void> {
+        async onSave(): Promise<void> {
             this.$v.form.$touch();
             if (this.$v.form.$pending || this.$v.form.$error) {
                 return;
@@ -229,12 +233,12 @@ export default Vue.extend({
             this.notesState.success = false;
             this.notesState.failed = false;
 
-            await serializePromiseChain(formNotes.addedPhotos, (photo) => {
+            await serializePromiseChain(this.form.addedPhotos, (photo) => {
                 return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then(() => {
                     return [];
                 });
             }).then(() => {
-                const payload = mergeNotes({ notes: this.notes, media: this.media }, formNotes);
+                const payload = mergeNotes({ notes: this.notes, media: this.media }, this.form);
                 return this.$services.api
                     .patchStationNotes(this.station.id, payload)
                     .then(
@@ -246,11 +250,10 @@ export default Vue.extend({
                             this.notesState.failed = true;
                         }
                     )
-                    .catch((e) => {
-                        console.log("radoi e", e);
-                    })
                     .finally(() => {
+                        this.form = Notes.createFrom(this.notes);
                         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                     });
             });
         },
