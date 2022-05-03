@@ -1,11 +1,15 @@
 <template>
     <div class="notes-form">
         <vue-confirm-dialog />
+        <div class="notifications">
+            <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
+            <div v-if="notesState.success" class="notification success">{{ $tc("notes.success") }}</div>
+        </div>
         <div class="header">
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% Complete</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button type="submit" class="button" v-on:click="onSave">Save</button>
+                <button type="submit" class="button" @click="onSave">Save</button>
             </div>
         </div>
         <div class="site-notes">
@@ -50,11 +54,13 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 import CommonComponents from "@/views/shared";
 
-import { Notes, AddedPhoto, NoteMedia, PortalNoteMedia } from "./model";
+import { Notes, AddedPhoto, NoteMedia, PortalNoteMedia, mergeNotes } from "./model";
 import NoteEditor from "./NoteEditor.vue";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 
 import NewPhoto from "../../assets/image-placeholder.svg";
+import { serializePromiseChain } from "@/utilities";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     name: "NotesForm",
@@ -99,12 +105,30 @@ export default Vue.extend({
                     event: "delete-media",
                 },
             ],
+            notesState: {
+                dirty: false,
+                success: false,
+                failed: false,
+            },
         };
+    },
+    beforeRouteUpdate(to: never, from: never, next: any) {
+        if (this.confirmLeave()) {
+            next();
+        }
+    },
+    beforeRouteLeave(to: never, from: never, next: any) {
+        if (this.confirmLeave()) {
+            next();
+        }
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
         photos(this: any) {
             return NoteMedia.onlyPhotos(this.notes.media);
+        },
+        media(): PortalNoteMedia[] {
+            return this.$state.notes.media;
         },
         completed(this: any) {
             const notesProgress = this.form.progress;
@@ -117,13 +141,6 @@ export default Vue.extend({
         this.form = Notes.createFrom(this.notes);
     },
     methods: {
-        onSave(this: any) {
-            this.$v.form.$touch();
-            if (this.$v.form.$pending || this.$v.form.$error) {
-                return;
-            }
-            this.$emit("save", this.form);
-        },
         onImage(this: any, image: any) {
             const reader = new FileReader();
             reader.readAsDataURL(image.file);
@@ -132,9 +149,6 @@ export default Vue.extend({
                     this.form.addedPhotos.push(new AddedPhoto(image.type, image.file, ev.target.result));
                 }
             };
-            this.$emit("change", this.form);
-        },
-        onChange() {
             this.$emit("change", this.form);
         },
         async onPhotoOptionClick(event: string, photo: PortalNoteMedia) {
@@ -156,7 +170,14 @@ export default Vue.extend({
             }
 
             if (event === "use-as-station-image") {
-                await this.$services.api.setStationImage(this.station.id, photo.id);
+                this.$services.api
+                    .setStationImage(this.station.id, photo.id)
+                    .then((result) => {
+                        this.notesState.success = true;
+                    })
+                    .catch((e) => {
+                        this.notesState.failed = true;
+                    });
             }
         },
         async onUnsavedPhotoOptionClick(event: string, photo: AddedPhoto) {
@@ -196,6 +217,55 @@ export default Vue.extend({
             const photoIndex = this.form.addedPhotos.findIndex((addedPhoto: NoteMedia) => addedPhoto.key === photo.key);
             this.form.addedPhotos.splice(photoIndex, 1);
             return;
+        },
+
+        async onSave(formNotes: Notes): Promise<void> {
+            this.$v.form.$touch();
+            if (this.$v.form.$pending || this.$v.form.$error) {
+                return;
+            }
+
+            this.notesState.success = false;
+            this.notesState.failed = false;
+
+            await serializePromiseChain(formNotes.addedPhotos, (photo) => {
+                return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then(() => {
+                    return [];
+                });
+            }).then(() => {
+                const payload = mergeNotes({ notes: this.notes, media: this.media }, formNotes);
+                return this.$services.api
+                    .patchStationNotes(this.station.id, payload)
+                    .then(
+                        () => {
+                            this.notesState.dirty = false;
+                            this.notesState.success = true;
+                        },
+                        () => {
+                            this.notesState.failed = true;
+                        }
+                    )
+                    .catch((e) => {
+                        console.log("radoi e", e);
+                    })
+                    .finally(() => {
+                        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                    });
+            });
+        },
+        onChange(): void {
+            this.notesState.dirty = true;
+        },
+        confirmLeave(): boolean {
+            if (this.notesState.dirty) {
+                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
+                    this.notesState.dirty = false;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return true;
         },
     },
 });
@@ -352,5 +422,22 @@ export default Vue.extend({
 
 ::v-deep .placeholder-container {
     flex-basis: 100%;
+}
+
+.notification {
+    margin-top: 0;
+}
+
+.notification.success {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 2px;
+    border-radius: 4px;
+}
+.notification.success {
+    background-color: #d4edda;
+}
+.notification.failed {
+    background-color: #f8d7da;
 }
 </style>
