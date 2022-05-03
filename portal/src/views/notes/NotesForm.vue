@@ -174,6 +174,7 @@ export default Vue.extend({
                     .setStationImage(this.station.id, photo.id)
                     .then((result) => {
                         this.notesState.success = true;
+                        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                     })
                     .catch((e) => {
                         this.notesState.failed = true;
