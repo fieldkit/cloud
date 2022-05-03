@@ -164,7 +164,6 @@ export default Vue.extend({
                             await this.$services.api.deleteMedia(photo.id);
                             await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                             await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
-                            await this.$store.dispatch(ActionTypes.NEED_STATIONS);
                             return;
                         }
                     },
@@ -253,7 +252,6 @@ export default Vue.extend({
                     .finally(() => {
                         this.form = Notes.createFrom(this.notes);
                         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
-                        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                     });
             });
         },
