@@ -13,6 +13,7 @@ import (
 	"github.com/montanaflynn/stats"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 const (
@@ -144,13 +145,21 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		}
 	}
 
-	for _, aggregator := range aggregators {
+	stationIDs := make([]int32, 0)
+	for id, aggregator := range aggregators {
+		stationIDs = append(stationIDs, id)
 		if err := aggregator.Close(ctx); err != nil {
 			return err
 		}
 	}
 
 	if err := model.Close(ctx); err != nil {
+		return err
+	}
+
+	sr := repositories.NewStationRepository(i.db)
+	err := sr.RefreshStationSensors(ctx, stationIDs)
+	if err != nil {
 		return err
 	}
 

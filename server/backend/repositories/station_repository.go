@@ -1171,6 +1171,43 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 	return nil, nil
 }
 
+type UpdatedSensorRow struct {
+	StationID int32      `db:"station_id"`
+	SensorID  *int64     `db:"sensor_id"`
+	ModuleID  *string    `db:"module_id"`
+	Time      *time.Time `db:"time"`
+}
+
+func (sr *StationRepository) RefreshStationSensors(ctx context.Context, stations []int32) error {
+	query, args, err := sqlx.In(`
+		SELECT station_id, sensor_id, module_id, max(time) AS "time" FROM fieldkit.aggregated_10s
+		WHERE station_id IN (?)
+		GROUP BY station_id, sensor_id, module_id
+		`, stations)
+	if err != nil {
+		return err
+	}
+
+	rows := []*UpdatedSensorRow{}
+	if err := sr.db.SelectContext(ctx, &rows, sr.db.Rebind(query), args...); err != nil {
+		return err
+	}
+
+	for _, row := range rows {
+		if _, err := sr.db.NamedExecContext(ctx, `
+			INSERT INTO fieldkit.aggregated_sensor_updated
+				(station_id, sensor_id, module_id, time) VALUES
+				(:station_id, :sensor_id, :module_id, :time)
+			ON CONFLICT (station_id, sensor_id, module_id)
+			DO UPDATE SET time = EXCLUDED.time
+			`, row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 type StationSensorRow struct {
 	StationID       int32          `db:"station_id" json:"stationId"`
 	StationName     string         `db:"station_name" json:"stationName"`
