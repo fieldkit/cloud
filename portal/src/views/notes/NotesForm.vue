@@ -161,10 +161,16 @@ export default Vue.extend({
                     },
                     callback: async (confirm) => {
                         if (confirm) {
-                            await this.$services.api.deleteMedia(photo.id);
-                            await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
-                            await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
-                            return;
+                            this.$services.api
+                                .deleteMedia(photo.id)
+                                .then(async () => {
+                                    await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                                    this.$emit("update-station-photo");
+                                    this.notesState.success = true;
+                                })
+                                .catch(() => {
+                                    this.notesState.failed = true;
+                                });
                         }
                     },
                 });
@@ -174,7 +180,8 @@ export default Vue.extend({
                 this.$services.api
                     .setStationImage(this.station.id, photo.id)
                     .then(() => {
-                        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+                        this.$emit("update-station-photo");
+                        this.notesState.success = true;
                     })
                     .catch(() => {
                         this.notesState.failed = true;
@@ -203,10 +210,16 @@ export default Vue.extend({
                 this.$services.api
                     .uploadStationMedia(this.station.id, photo.key, photo.file)
                     .then(async (uploadedPhoto: PortalNoteMedia) => {
-                        await this.$services.api.setStationImage(this.station.id, uploadedPhoto.id);
-                        await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
-                        await this.$store.dispatch(ActionTypes.NEED_STATIONS);
-                        await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                        console.log("RADOI UPLOADED PHOTO", uploadedPhoto);
+                        this.$services.api
+                            .setStationImage(this.station.id, uploadedPhoto.id)
+                            .then(() => {
+                                this.$emit("update-station-photo");
+                                this.notesState.success = true;
+                            })
+                            .catch(() => {
+                                this.notesState.failed = true;
+                            });
                     });
             }
         },

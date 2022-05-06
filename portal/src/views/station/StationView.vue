@@ -13,7 +13,7 @@
                 <section class="section-station">
                     <div class="container-box">
                         <div class="flex flex-al-center">
-                            <StationPhoto :station="station" />
+                            <StationPhoto :station="station" ref="stationPhoto" />
                             <div>
                                 <div class="station-name">{{ station.name }}</div>
                                 <div>
@@ -114,7 +114,13 @@
                 </section>
 
                 <section v-if="notes" class="section-notes container-box">
-                    <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
+                    <NotesForm
+                        v-bind:key="station.id"
+                        :station="station"
+                        :notes="{ notes, media }"
+                        :readonly="false"
+                        @update-station-photo="$refs['stationPhoto'].refresh()"
+                    />
                 </section>
             </div>
         </StandardLayout>
