@@ -69,7 +69,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { DisplayStation, ActionTypes } from "@/store";
+import { Station, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
@@ -148,8 +148,11 @@ export default Vue.extend({
         selectedId(): number {
             return +_.flattenDeep(this.bookmark.g)[0];
         },
-        selectedStation(): any {
-            return this.workspace.stationsFull.filter( d => d.id === this.selectedId)[0];
+        selectedStation(): Station | null {
+            if (this.workspace) {
+                return this.workspace.getStation(this.selectedId);
+            }
+            return null;
         },
     },
     watch: {
