@@ -2,29 +2,51 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <div class="new-comment" :class="{ 'align-center': !user }">
-            <UserPhoto :user="user"></UserPhoto>
-            <template v-if="user">
-                <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+        <SectionToggle leftLabel="Log an event" rightLabel="Comment">
+            <template #left>
+                <div class="event-sensor-selector">
+                    <label for="allProjectRadio">
+                        <div class="event-sensor-radio">
+                            <input type="radio" id="allProjectRadio" name="eventLevel" checked/>
+                            <span class="radio-label">All Project Sensors</span>
+                            <p>People will see this event when viewing data for any stations that belong to these projects</p>
+                        </div>
+                    </label>
+                    <label for="allSensorsRadio">
+                        <div class="event-sensor-radio">
+                            <input type="radio" id="allSensorsRadio" name="eventLevel"/>
+                            <span class="radio-label">Just These Sensors</span>
+                            <p>People will see this event only when viewing data for these stations</p>
+                        </div>
+                    </label>
                 </div>
             </template>
-            <template v-else>
-                <p class="need-login-msg" @click="test()">
-                    {{ $tc("comments.loginToComment.part1") }}
-                    <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
-                        {{ $tc("comments.loginToComment.part2") }}
-                    </router-link>
-                    {{ $tc("comments.loginToComment.part3") }}
-                </p>
-                <router-link
-                    :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
-                    class="button-submit"
-                >
-                    {{ $t("login.loginButton") }}
-                </router-link>
+            <template #right>
+                <div class="new-comment" :class="{ 'align-center': !user }">
+                    <UserPhoto :user="user"></UserPhoto>
+                    <template v-if="user">
+                        <div class="new-comment-wrap">  
+                            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="need-login-msg" @click="test()">
+                            {{ $tc("comments.loginToComment.part1") }}
+                            <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                                {{ $tc("comments.loginToComment.part2") }}
+                            </router-link>
+                            {{ $tc("comments.loginToComment.part3") }}
+                        </p>
+                        <router-link
+                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                            class="button-submit"
+                        >
+                            {{ $t("login.loginButton") }}
+                        </router-link>
+                    </template>
+                </div>
             </template>
-        </div>
+        </SectionToggle>
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
@@ -34,7 +56,7 @@
         <div class="list" v-if="posts && posts.length > 0">
             <div class="subheader">
                 <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
-                <header v-if="viewType === 'data'">Notes & Comments</header>
+                <header v-if="viewType === 'data'">Events & Comments</header>
             </div>
             <transition-group name="fade">
                 <div
@@ -135,6 +157,7 @@ import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
+import SectionToggle from "@/views/shared/SectionToggle.vue";
 
 export default Vue.extend({
     name: "Comments",
@@ -142,6 +165,7 @@ export default Vue.extend({
         ...CommonComponents,
         ListItemOptions,
         Tiptap,
+        SectionToggle
     },
     props: {
         user: {
@@ -707,5 +731,39 @@ header {
 
 .no-comments {
     margin-top: 20px;
+}
+.event-sensor-selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.event-sensor-radio {
+    //width: 340px;
+    border: solid 1px #d8dce0;
+    padding: 15px;
+    padding-bottom: 10px;
+    margin-left: 10px;
+    border-radius: 3px;
+    flex: 1;
+
+    p {
+        margin-left: 30px;
+    }
+
+    .radio-label {
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: 900;
+        margin-left: 10px;
+    }
+    input:checked {
+        background-color: red;
+    }
+}
+
+.event-sensor-radio > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
+    background-color: #ffd6bb;
+    border: 1px solid #ff6600;
 }
 </style>
