@@ -335,6 +335,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 
 	aggregate := "fieldkit.aggregated_10s"
 	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT * FROM (
 			(SELECT
 				id,   
 				time,                                               
@@ -344,6 +345,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 				value,                                              
 				-1 AS time_group
 			FROM %s WHERE time <= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			ORDER BY time DESC
 			LIMIT 1)
 			UNION
 			(SELECT
@@ -355,7 +357,9 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 				value,                                              
 				1 AS time_group
 			FROM %s WHERE time >= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			ORDER BY time ASC
 			LIMIT 1)
+		) AS q ORDER BY q.time
 	`, aggregate, aggregate), aqp.Start, aqp.Stations, moduleIds, sensorIds, aqp.End, aqp.Stations, moduleIds, sensorIds)
 	if err != nil {
 		return nil, err
