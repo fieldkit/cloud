@@ -165,7 +165,7 @@ export default Vue.extend({
                                 .deleteMedia(photo.id)
                                 .then(async () => {
                                     await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
-                                    this.$emit("update-station-photo");
+                                  await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                                     this.notesState.success = true;
                                 })
                                 .catch(() => {
@@ -179,8 +179,8 @@ export default Vue.extend({
             if (event === "use-as-station-image") {
                 this.$services.api
                     .setStationImage(this.station.id, photo.id)
-                    .then(() => {
-                        this.$emit("update-station-photo");
+                    .then(async () => {
+                        await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
                         this.notesState.success = true;
                     })
                     .catch(() => {
@@ -210,11 +210,11 @@ export default Vue.extend({
                 this.$services.api
                     .uploadStationMedia(this.station.id, photo.key, photo.file)
                     .then(async (uploadedPhoto: PortalNoteMedia) => {
-                        console.log("RADOI UPLOADED PHOTO", uploadedPhoto);
                         this.$services.api
                             .setStationImage(this.station.id, uploadedPhoto.id)
-                            .then(() => {
-                                this.$emit("update-station-photo");
+                            .then(async () => {
+                                await this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+                                await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                                 this.notesState.success = true;
                             })
                             .catch(() => {
@@ -222,18 +222,6 @@ export default Vue.extend({
                             });
                     });
             }
-        },
-        async deleteMedia(photo: PortalNoteMedia): Promise<void> {
-            if (photo.id) {
-                await this.$services.api.deleteMedia(photo.id);
-                this.notes.media = this.notes.media.filter(
-                    (media: { id: number; key: string; url: string; contentType: string }) => media.id !== photo.id
-                );
-                return;
-            }
-            const photoIndex = this.form.addedPhotos.findIndex((addedPhoto: NoteMedia) => addedPhoto.key === photo.key);
-            this.form.addedPhotos.splice(photoIndex, 1);
-            return;
         },
 
         async onSave(): Promise<void> {
