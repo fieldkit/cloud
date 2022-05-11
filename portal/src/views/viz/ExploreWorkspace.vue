@@ -149,7 +149,7 @@ export default Vue.extend({
             return +_.flattenDeep(this.bookmark.g)[0];
         },
         selectedStation(): any {
-            return this.workspace.stationsFull.filter( d => d.id === this.selectedId)[0];
+            return this.workspace.stationsFull.filter((d) => d.id === this.selectedId)[0];
         },
     },
     watch: {
@@ -574,6 +574,16 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+
+    span {
+        &:nth-of-type(1) {
+            margin-right: 5px;
+        }
+    }
+
+    .vc-day-layer {
+        left: -2px;
+    }
 }
 
 .controls-container .date-picker input {
