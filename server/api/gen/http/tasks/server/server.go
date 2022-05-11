@@ -148,8 +148,8 @@ func NewCORSHandler() http.Handler {
 // handleTasksOrigin applies the CORS response headers corresponding to the
 // origin for the service tasks.
 func handleTasksOrigin(h http.Handler) http.Handler {
-	spec0 := regexp.MustCompile("(.+[.])?fklocal.org:\\d+")
-	spec1 := regexp.MustCompile("127.0.0.1:\\d+")
+	spec1 := regexp.MustCompile("(.+[.])?fklocal.org:\\d+")
+	spec2 := regexp.MustCompile("192.168.100.11:\\d+")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -158,7 +158,19 @@ func handleTasksOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOriginRegexp(origin, spec0) {
+		if cors.MatchOrigin(origin, "*") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOriginRegexp(origin, spec1) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
@@ -171,7 +183,7 @@ func handleTasksOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOriginRegexp(origin, spec1) {
+		if cors.MatchOriginRegexp(origin, spec2) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")

@@ -18,13 +18,14 @@ var JWTAuth = JWTSecurity("jwt", func() {
 })
 
 var Origins = []string{
+    "*",
 	"https://fieldkit.org",
 	"https://*.fieldkit.org",
 	"https://dataviz.floodnet.nyc",
 	"https://fkdev.org",
 	"https://*.fkdev.org",
 	"/(.+[.])?fklocal.org:\\d+/", // Dev
-	"/127.0.0.1:\\d+/",           // Dev
+	"/192.168.100.11:\\d+/",           // Dev
 }
 
 func commonOptions() {

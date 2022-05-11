@@ -73,7 +73,7 @@ require (
 	github.com/llgcode/draw2d v0.0.0-20161104081029-1286d3b2030a
 	github.com/lucasb-eyer/go-colorful v0.0.0-20170223221042-c900de9dbbc7
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
-	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/mattn/go-colorable v0.1.4
 	github.com/mattn/go-isatty v0.0.13
 	github.com/montanaflynn/stats v0.5.0

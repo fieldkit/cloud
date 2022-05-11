@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div class="button-submit" @click="openExports">
+                        <div v-show="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>

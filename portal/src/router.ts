@@ -604,10 +604,12 @@ export default function routerFactory(store) {
                 next();
             }
         } else {
+            console.log('ssssssssssssss', from.name, to.name);
             if (to.name === null) {
                 if (store.getters.isAuthenticated) {
                     next("/dashboard");
                 } else {
+                    console.log('de ce');
                     next("/login");
                 }
             } else {
