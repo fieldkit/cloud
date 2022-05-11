@@ -84,7 +84,7 @@ button {
         @include position(absolute, 0 null null null);
         opacity: 0;
         visibility: hidden;
-        padding: 10px;
+        padding: 7px 12px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         background: #fff;
         z-index: $z-index-top;
@@ -103,10 +103,7 @@ button {
             cursor: pointer;
             text-align: left;
             width: 100%;
-
-            &:not(:last-of-type) {
-                margin-bottom: 10px;
-            }
+            padding: 7px 0;
         }
     }
 }

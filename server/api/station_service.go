@@ -80,11 +80,6 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return nil, err
-	}
-
 	deviceId, err := hex.DecodeString(payload.DeviceID)
 	if err != nil {
 		return nil, err
@@ -102,9 +97,14 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 	if len(stations) > 0 {
 		existing := stations[0]
 
-		if existing.OwnerID != p.UserID() {
-			log.Infow("station conflict", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
-			return nil, station.MakeStationOwnerConflict(errors.New("station already registered"))
+		p, err := NewPermissions(ctx, c.options).ForStation(existing)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.CanModify(); err != nil {
+			log.Infow("permission:denied", "device_id", deviceId, "user_id", p.UserID(), "owner_id", existing.OwnerID, "station_id", existing.ID)
+			return nil, station.MakeStationOwnerConflict(errors.New("permission-denied"))
 		}
 
 		if payload.LocationName != nil {
@@ -119,6 +119,11 @@ func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (
 			Auth: &payload.Auth,
 			ID:   existing.ID,
 		})
+	}
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
 	}
 
 	now := time.Now()

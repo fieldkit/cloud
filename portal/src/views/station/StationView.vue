@@ -114,19 +114,7 @@
                 </section>
 
                 <section v-if="notes" class="section-notes container-box">
-                    <div class="notifications">
-                        <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
-
-                        <div v-if="notesState.success" class="notification success">{{ $tc("notes.success") }}</div>
-                    </div>
-                    <NotesForm
-                        v-bind:key="station.id"
-                        :station="station"
-                        :notes="{ notes, media }"
-                        :readonly="false"
-                        @save="saveForm"
-                        @change="onChange"
-                    />
+                    <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
                 </section>
             </div>
         </StandardLayout>
@@ -176,21 +164,11 @@ export default Vue.extend({
         ForbiddenBanner,
     },
     data(): {
-        notesState: {
-            dirty: boolean;
-            success: boolean;
-            failed: boolean;
-        };
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
     } {
         return {
-            notesState: {
-                dirty: false,
-                success: false,
-                failed: false,
-            },
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
@@ -247,16 +225,6 @@ export default Vue.extend({
             return false;
         },
     },
-    beforeRouteUpdate(to: never, from: never, next: any) {
-        if (this.confirmLeave()) {
-            next();
-        }
-    },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.confirmLeave()) {
-            next();
-        }
-    },
     beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
 
@@ -279,41 +247,6 @@ export default Vue.extend({
         },
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
-        },
-        async saveForm(formNotes: Notes): Promise<void> {
-            this.notesState.success = false;
-            this.notesState.failed = false;
-
-            await serializePromiseChain(formNotes.addedPhotos, (photo) => {
-                return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then(() => {
-                    return [];
-                });
-            }).then(() => {
-                const payload = mergeNotes({ notes: this.notes, media: this.media }, formNotes);
-                return this.$services.api.patchStationNotes(this.station.id, payload).then(
-                    () => {
-                        this.notesState.dirty = false;
-                        this.notesState.success = true;
-                    },
-                    () => {
-                        this.notesState.failed = true;
-                    }
-                );
-            });
-        },
-        onChange(): void {
-            this.notesState.dirty = true;
-        },
-        confirmLeave(): boolean {
-            if (this.notesState.dirty) {
-                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
-                    this.notesState.dirty = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            return true;
         },
         getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
@@ -652,41 +585,12 @@ section {
     margin-bottom: 20px;
 }
 
-// copied from NotesView
-
-.notes-view .lower {
-    display: flex;
-    background: white;
-    margin-top: 20px;
-    position: relative;
-
-    @include bp-down($xs) {
-        margin-top: -15px;
-    }
-}
 .loading-container {
     height: 100%;
     @include flex(center);
 }
 .notes-view .lower .loading-container.empty {
     padding: 20px;
-}
-
-.notification {
-    margin-top: 0;
-}
-
-.notification.success {
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 2px;
-    border-radius: 4px;
-}
-.notification.success {
-    background-color: #d4edda;
-}
-.notification.failed {
-    background-color: #f8d7da;
 }
 
 .icon-location {

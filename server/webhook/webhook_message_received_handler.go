@@ -21,13 +21,13 @@ func NewWebHookMessageRececivedHandler(db *sqlxcache.DB, metrics *logging.Metric
 }
 
 func (h *WebHookMessageRececivedHandler) Handle(ctx context.Context, m *WebHookMessageReceived) error {
-	source_aggregator := NewSourceAggregator(h.db)
+	sourceAggregator := NewSourceAggregator(h.db)
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 
 	source := NewDatabaseMessageSource(h.db, m.SchemaID)
 
-	if err := source_aggregator.ProcessSource(ctx, source, startTime); err != nil {
+	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err
 
 	}

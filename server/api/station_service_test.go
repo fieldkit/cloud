@@ -429,37 +429,36 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 }
 
 func TestGetStationsPublicProjectAsMember(t *testing.T) {
-    assert := assert.New(t)
-    e, err := tests.NewTestEnv()
-    assert.NoError(err)
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
 
-    project, err := e.AddProjectWithPrivacy(data.Public)
-    assert.NoError(err)
+	project, err := e.AddProjectWithPrivacy(data.Public)
+	assert.NoError(err)
 
-    owner, err := e.AddUser()
-    assert.NoError(err)
+	owner, err := e.AddUser()
+	assert.NoError(err)
 
-    fd, err := e.AddStationsToProject(project, owner, 2)
-    assert.NoError(err)
+	fd, err := e.AddStationsToProject(project, owner, 2)
+	assert.NoError(err)
 
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
 
-    api, err := NewTestableApi(e)
-    assert.NoError(err)
+	member, err := e.AddUser()
+	assert.NoError(err)
 
-    member, err := e.AddUser()
-    assert.NoError(err)
+	err = e.AddProjectUser(project, member, data.MemberRole)
+	assert.NoError(err)
 
-    err = e.AddProjectUser(project, member, data.MemberRole)
-    assert.NoError(err)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
+	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(member))
+	rr := tests.ExecuteRequest(req, api)
 
-    req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/%d/stations", fd.Project.ID), nil)
-    req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(member))
-    rr := tests.ExecuteRequest(req, api)
+	assert.Equal(http.StatusOK, rr.Code)
 
-    assert.Equal(http.StatusOK, rr.Code)
-
-    ja := jsonassert.New(t)
-    ja.Assertf(rr.Body.String(), `
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
     {
         "stations": [
             {
@@ -586,7 +585,7 @@ func TestAddStationAlreadyOthers(t *testing.T) {
 	{
 		"id": "<<PRESENCE>>",
 		"name": "station-owner-conflict",
-		"message": "station already registered",
+		"message": "permission-denied",
 		"timeout": false,
 		"fault": false,
 		"temporary": false
