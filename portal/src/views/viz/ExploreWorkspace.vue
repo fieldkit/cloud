@@ -577,6 +577,16 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+
+    span {
+        &:nth-of-type(1) {
+            margin-right: 5px;
+        }
+    }
+
+    .vc-day-layer {
+        left: -2px;
+    }
 }
 
 .controls-container .date-picker input {
