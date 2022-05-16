@@ -16,7 +16,7 @@
                 </span>
             </a>
             <a class="share-button share-button--url">
-                <i class="icon icon-copy" aria-label="Copy URL"></i>
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
                 <span>
                     {{ $t("sharePanel.copyUrl") }}
                 </span>
