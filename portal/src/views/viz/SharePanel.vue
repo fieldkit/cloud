@@ -219,6 +219,7 @@ export default Vue.extend({
         padding: 5px 10px;
         border-radius: 4px;
         transition: opacity 0.25s;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
         @include position(absolute, null 0 -30px null);
 
         &.visible {
