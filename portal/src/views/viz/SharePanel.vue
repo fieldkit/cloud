@@ -16,19 +16,18 @@
                 </span>
             </a>
             <a class="share-button share-button--url">
-                <i class="icon icon-copy" aria-label="Share on Facebook"></i>
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
                 <span>
-                    Copy URL
+                    {{ $t("sharePanel.copyUrl") }}
                 </span>
             </a>
             <div class="url" target="blank">
                 <input readonly ref="url" :value="getCurrentURL()" />
-
                 <button @click="copyUrlToClipboard()">
-                    Copy
+                    {{ $t("sharePanel.copyBtn") }}
                 </button>
                 <span :class="{ visible: showCopiedLink }" class="url-copied">
-                    Link copied
+                    {{ $t("sharePanel.linkCopied") }}
                 </span>
             </div>
         </div>
@@ -220,6 +219,7 @@ export default Vue.extend({
         padding: 5px 10px;
         border-radius: 4px;
         transition: opacity 0.25s;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
         @include position(absolute, null 0 -30px null);
 
         &.visible {
