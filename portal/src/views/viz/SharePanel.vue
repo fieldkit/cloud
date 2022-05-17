@@ -30,6 +30,12 @@
                     {{ $t("sharePanel.linkCopied") }}
                 </span>
             </div>
+            <a class="share-button" @click="openMailClient()">
+                <i class="icon icon-mail"></i>
+                <span>
+                    {{ $t("sharePanel.emailUrl") }}
+                </span>
+            </a>
         </div>
     </div>
 </template>
@@ -40,6 +46,7 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { getPartnerCustomization } from "@/views/shared/partners";
 import { mapState } from "vuex";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 function getRelativeUrl(href: string): string {
     const link = document.createElement("a");
@@ -117,6 +124,13 @@ export default Vue.extend({
                 }, 3000);
             });
         },
+      openMailClient(): void {
+            const body = this.getCurrentURL();
+            const subject = isCustomisationEnabled()
+                ? this.$t("sharePanel.emailSubject.floodnet")
+                : this.$t("sharePanel.emailSubject.fieldkit");
+            window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+        },
     },
 });
 </script>
@@ -146,6 +160,10 @@ export default Vue.extend({
         font-size: 19px;
         margin-right: 10px;
         margin-top: -2px;
+
+        &-mail {
+            font-size: 14px;
+        }
     }
 
     .share-button {
