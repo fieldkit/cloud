@@ -1,151 +1,155 @@
 <template>
-    <StandardLayout v-if="station">
-        <div class="container-wrap">
-            <DoubleHeader
-                backRoute="viewProject"
-                :title="station.name"
-                :subtitle="headerSubtitle"
-                :backTitle="$tc('layout.backProjectDashboard')"
-                :backRouteParams="{ id: $route.params.projectId }"
-            />
-
-            <section class="section-station">
-                <div class="container-box">
-                    <div class="flex flex-al-center">
-                        <StationPhoto :station="station" />
-                        <div>
-                            <div class="station-name">{{ station.name }}</div>
-                            <div>
-                                {{ $tc("station.lastSynced") }}
-                                <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
-                            </div>
-                            <div class="station-battery" v-if="station.battery">
-                                <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                                <span class="small-light">{{ station.battery.toFixed() }} %</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="station-row flex flex-space-between">
-                            <div v-if="station.locationName" class="flex flex-al-center station-location">
-                                <i class="icon icon-location"></i>
-                                <span>{{ station.locationName }}</span>
-                            </div>
-                            <div v-if="station.location" class="flex">
-                                <div class="station-coordinate" :style="station.location ? { 'padding-left': 0 } : ''">
-                                    <div>{{ station.location.latitude | prettyCoordinate }}</div>
-                                    <div>{{ $tc("station.latitude") }}</div>
-                                </div>
-                                <div class="station-coordinate">
-                                    <div>{{ station.location.longitude | prettyCoordinate }}</div>
-                                    <div>{{ $tc("station.longitude") }}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-if="station.placeNameNative" class="station-row">
-                            <i class="icon icon-location"></i>
-                            <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
-                        </div>
-
-                        <div v-if="station.firmwareNumber" class="station-row">
-                            <span>{{ $tc("station.firmwareVersion") }}</span>
-                            <span class="ml-10">{{ station.firmwareNumber }}</span>
-                        </div>
-
-                        <div class="station-row">
-                            <span>{{ $tc("station.modules") }}</span>
-                            <div class="station-modules ml-10">
-                                <img
-                                    v-for="module in station.modules"
-                                    v-bind:key="module.name"
-                                    alt="Module icon"
-                                    :src="getModuleImg(module)"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                        <!-- somehow using v-for like so needs the next v-if -->
-                        <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
-                        <div v-else class="photo-placeholder">
-                            <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
-                        </div>
-                    </div>
-                    <router-link :to="{ name: 'test' }" class="station-photos-nav">
-                        <i class="icon icon-grid"></i>
-                        {{ $t("station.managePhotos") }}
-                    </router-link>
-                </div>
-            </section>
-
-            <section class="container-box section-readings" v-if="selectedModule">
-                <div class="station-readings">
-                    <ul>
-                        <li
-                            v-for="module in station.modules"
-                            v-bind:key="module.name"
-                            :class="{ active: module.name === selectedModule.name }"
-                            @click="selectedModule = module"
-                        >
-                            <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <span>{{ $t(getModuleName(module)) }}</span>
-                        </li>
-                    </ul>
-                    <header v-if="isMobileView">
-                        <img alt="Module icon" :src="getModuleImg(selectedModule)" />
-                        {{ $t(getModuleName(selectedModule)) }}
-                    </header>
-                    <div class="station-readings-values">
-                        <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
-                        <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
-                    </div>
-                </div>
-            </section>
-
-            <section v-if="showMap">
-                <div class="container-map">
-                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
-                </div>
-            </section>
-
-            <section v-if="notes" class="section-notes container-box">
-                <div class="notifications">
-                    <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
-
-                    <div v-if="notesState.success" class="notification success">{{ $tc("notes.success") }}</div>
-                </div>
-                <NotesForm
-                    v-bind:key="station.id"
-                    :station="station"
-                    :notes="{ notes, media }"
-                    :readonly="false"
-                    @save="saveForm"
-                    @change="onChange"
+    <div v-if="!isBusy">
+        <StandardLayout v-if="station">
+            <div class="container-wrap">
+                <DoubleHeader
+                    backRoute="viewProject"
+                    :title="station.name"
+                    :subtitle="headerSubtitle"
+                    :backTitle="$tc('layout.backProjectDashboard')"
+                    :backRouteParams="{ id: $route.params.projectId }"
                 />
-            </section>
+
+                <section class="section-station">
+                    <div class="container-box">
+                        <div class="flex flex-al-center">
+                            <StationPhoto :station="station" />
+                            <div>
+                                <div class="station-name">{{ station.name }}</div>
+                                <div>
+                                    {{ $tc("station.lastSynced") }}
+                                    <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
+                                </div>
+                                <div class="station-battery" v-if="station.battery">
+                                    <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
+                                    <span class="small-light">{{ station.battery.toFixed() }} %</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="station-row flex flex-space-between">
+                                <div v-if="station.locationName" class="flex flex-al-center station-location">
+                                    <i class="icon icon-location"></i>
+                                    <span>{{ station.locationName }}</span>
+                                </div>
+                                <div v-if="station.location" class="flex">
+                                    <div class="station-coordinate" :style="station.location ? { 'padding-left': 0 } : ''">
+                                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
+                                        <div>{{ $tc("station.latitude") }}</div>
+                                    </div>
+                                    <div class="station-coordinate">
+                                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
+                                        <div>{{ $tc("station.longitude") }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="station.placeNameNative" class="station-row">
+                                <i class="icon icon-location"></i>
+                                <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
+                            </div>
+
+                            <div v-if="station.firmwareNumber" class="station-row">
+                                <span>{{ $tc("station.firmwareVersion") }}</span>
+                                <span class="ml-10">{{ station.firmwareNumber }}</span>
+                            </div>
+
+                            <div class="station-row">
+                                <span>{{ $tc("station.modules") }}</span>
+                                <div class="station-modules ml-10">
+                                    <img
+                                        v-for="module in station.modules"
+                                        v-bind:key="module.name"
+                                        alt="Module icon"
+                                        :src="getModuleImg(module)"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="photos" class="station-photos">
+                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                            <!-- somehow using v-for like so needs the next v-if -->
+                            <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
+                            <div v-else class="photo-placeholder">
+                                <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                            </div>
+                        </div>
+                        <router-link :to="{ name: 'test' }" class="station-photos-nav">
+                            <i class="icon icon-grid"></i>
+                            {{ $t("station.managePhotos") }}
+                        </router-link>
+                    </div>
+                </section>
+
+                <section class="container-box section-readings" v-if="selectedModule">
+                    <div class="station-readings">
+                        <ul>
+                            <li
+                                v-for="module in station.modules"
+                                v-bind:key="module.name"
+                                :class="{ active: module.name === selectedModule.name }"
+                                @click="selectedModule = module"
+                            >
+                                <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
+                                <span>{{ $t(getModuleName(module)) }}</span>
+                            </li>
+                        </ul>
+                        <header v-if="isMobileView">
+                            <img alt="Module icon" :src="getModuleImg(selectedModule)" />
+                            {{ $t(getModuleName(selectedModule)) }}
+                        </header>
+                        <div class="station-readings-values">
+                            <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
+                            <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
+                        </div>
+                    </div>
+                </section>
+
+                <section v-if="showMap">
+                    <div class="container-map">
+                        <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
+                    </div>
+                </section>
+
+                <section v-if="notes" class="section-notes container-box">
+                    <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
+                </section>
+            </div>
+        </StandardLayout>
+        <div v-else class="forbidden-view-bg">
+            <ForbiddenBanner :title="$t('unauthorized')" :subtitle="$t('unauthorizedStation')"></ForbiddenBanner>
+            <router-link to="/dashboard">
+                {{ $t("layout.backProjects") }}
+            </router-link>
         </div>
-    </StandardLayout>
+    </div>
 </template>
 
 <script lang="ts">
-/* eslint-disable vue/no-unused-components */
-
 import Vue from "vue";
 import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { ActionTypes, BoundingRectangle, DisplayModule, DisplayStation, MappedStations, ProjectModule } from "@/store";
+import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
+import {
+    ActionTypes,
+    AuthenticationRequiredError,
+    BoundingRectangle,
+    DisplayModule,
+    DisplayStation,
+    MappedStations,
+    ProjectModule,
+} from "@/store";
 import * as utils from "@/utilities";
 import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import { serializePromiseChain } from "@/utilities";
 import StationsMap from "@/views/shared/StationsMap.vue";
+import { mapGetters } from "vuex";
 
 export default Vue.extend({
     name: "StationView",
@@ -157,32 +161,27 @@ export default Vue.extend({
         StationsMap,
         NotesForm,
         AuthenticatedPhoto,
+        ForbiddenBanner,
     },
     data(): {
-        notesState: {
-            dirty: boolean;
-            success: boolean;
-            failed: boolean;
-        };
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
+        loading: boolean;
     } {
         return {
-            notesState: {
-                dirty: false,
-                success: false,
-                failed: false,
-            },
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
+            loading: true,
         };
     },
     watch: {
         station() {
+            this.loading = false;
             this.selectedModule = this.station.modules[0];
         },
     },
     computed: {
+        ...mapGetters({ isBusy: "isBusy" }),
         station(): DisplayStation {
             return this.$state.stations.stations[this.$route.params.stationId];
         },
@@ -226,19 +225,18 @@ export default Vue.extend({
             return false;
         },
     },
-    beforeRouteUpdate(to: never, from: never, next: any) {
-        if (this.confirmLeave()) {
-            next();
-        }
-    },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.confirmLeave()) {
-            next();
-        }
-    },
-    beforeMount(): void {
-        this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId });
+    beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+
+        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
+            if (AuthenticationRequiredError.isInstance(e)) {
+                return this.$router.push({
+                    name: "login",
+                    params: { errorMessage: this.$t("login.privateStation") },
+                    query: { after: this.$route.path },
+                });
+            }
+        });
     },
     methods: {
         getBatteryIcon(): string {
@@ -250,41 +248,6 @@ export default Vue.extend({
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        async saveForm(formNotes: Notes): Promise<void> {
-            this.notesState.success = false;
-            this.notesState.failed = false;
-
-            await serializePromiseChain(formNotes.addedPhotos, (photo) => {
-                return this.$services.api.uploadStationMedia(this.station.id, photo.key, photo.file).then(() => {
-                    return [];
-                });
-            }).then(() => {
-                const payload = mergeNotes({ notes: this.notes, media: this.media }, formNotes);
-                return this.$services.api.patchStationNotes(this.station.id, payload).then(
-                    () => {
-                        this.notesState.dirty = false;
-                        this.notesState.success = true;
-                    },
-                    () => {
-                        this.notesState.failed = true;
-                    }
-                );
-            });
-        },
-        onChange(): void {
-            this.notesState.dirty = true;
-        },
-        confirmLeave(): boolean {
-            if (this.notesState.dirty) {
-                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
-                    this.notesState.dirty = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        },
         getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
         },
@@ -295,6 +258,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 @import "../../scss/layout";
+@import "../../scss/forms.scss";
 
 * {
     box-sizing: border-box;
@@ -621,41 +585,12 @@ section {
     margin-bottom: 20px;
 }
 
-// copied from NotesView
-
-.notes-view .lower {
-    display: flex;
-    background: white;
-    margin-top: 20px;
-    position: relative;
-
-    @include bp-down($xs) {
-        margin-top: -15px;
-    }
-}
 .loading-container {
     height: 100%;
     @include flex(center);
 }
 .notes-view .lower .loading-container.empty {
     padding: 20px;
-}
-
-.notification {
-    margin-top: 0;
-}
-
-.notification.success {
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 2px;
-    border-radius: 4px;
-}
-.notification.success {
-    background-color: #d4edda;
-}
-.notification.failed {
-    background-color: #f8d7da;
 }
 
 .icon-location {
@@ -677,5 +612,26 @@ section {
 .icon-grid {
     font-size: 12px;
     margin-right: 5px;
+}
+
+.forbidden-view-bg {
+    background-image: linear-gradient(#52b5e4, #1b80c9);
+    min-height: 100vh;
+    padding-top: 50px;
+
+    body.floodnet & {
+        background-image: unset;
+        background-color: var(--color-dark);
+    }
+
+    a {
+        color: #fff;
+        margin-top: 20px;
+        display: block;
+    }
+}
+
+.message-container {
+    margin: 0 auto;
 }
 </style>

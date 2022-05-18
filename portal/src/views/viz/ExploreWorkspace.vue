@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div class="button-submit" @click="openExports">
+                        <div v-show="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -69,7 +69,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { DisplayStation, ActionTypes } from "@/store";
+import { Station, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
@@ -148,8 +148,11 @@ export default Vue.extend({
         selectedId(): number {
             return +_.flattenDeep(this.bookmark.g)[0];
         },
-        selectedStation(): any {
-            return this.workspace.stationsFull.filter( d => d.id === this.selectedId)[0];
+        selectedStation(): Station | null {
+            if (this.workspace) {
+                return this.workspace.getStation(this.selectedId);
+            }
+            return null;
         },
     },
     watch: {
@@ -574,6 +577,16 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+
+    span {
+        &:nth-of-type(1) {
+            margin-right: 5px;
+        }
+    }
+
+    .vc-day-layer {
+        left: -2px;
+    }
 }
 
 .controls-container .date-picker input {

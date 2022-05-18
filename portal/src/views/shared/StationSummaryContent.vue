@@ -7,7 +7,7 @@
             <div class="station-name">{{ station.name }}</div>
             <div class="station-seen" v-if="station.updatedAt">
                 Last Seen
-                <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
+                <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
             </div>
             <div class="station-battery" v-if="station.battery">
                 <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
@@ -117,5 +117,8 @@ export default Vue.extend({
 .small-light {
     font-size: 12px;
     color: #6a6d71;
+}
+.station-seen {
+    font-size: 12px;
 }
 </style>

@@ -21,7 +21,7 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
-import { Station } from "@/api/api"
+import { Station } from "@/api/api";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -645,6 +645,16 @@ export class Workspace implements VizInfoFactory {
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
+
+    public getStation(id: number): Station | null {
+        if (this.stationsFull) {
+            const found = this.stationsFull.filter((d) => d.id === id);
+            if (found.length > 0) {
+                return found[0];
+            }
+        }
+        return null;
+    }
 
     public get empty(): boolean {
         return this.allVizes.length === 0;

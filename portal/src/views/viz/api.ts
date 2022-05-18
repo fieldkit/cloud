@@ -19,6 +19,7 @@ export interface VizThresholds {
         value: number;
         color: string;
         hidden: boolean;
+        start: number;
     }[];
 }
 

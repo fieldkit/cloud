@@ -274,6 +274,7 @@ export default Vue.extend({
 .toggle-icon-container {
     float: right;
     margin: 16px -38px 0 0;
+    transform: translateY(40px);
     position: relative;
     z-index: 2;
     cursor: pointer;

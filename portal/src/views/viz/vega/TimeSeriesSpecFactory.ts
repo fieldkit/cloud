@@ -693,8 +693,8 @@ export class TimeSeriesSpecFactory {
                 const thresholds = getSeriesThresholds(series);
                 if (thresholds) {
                     return thresholds.levels
-                        .filter((level) => level.label != null)
-                        .filter((level) => level.value != null && level.value >= domain[0] && level.value < domain[1])
+                        .filter((level) => level.label != null && !level.hidden)
+                        .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
                         .map((level) => {
                             return {
                                 type: "rule",
@@ -711,11 +711,11 @@ export class TimeSeriesSpecFactory {
                                         },
                                         y: {
                                             scale: scales.y,
-                                            value: level.value,
+                                            value: level.start,
                                         },
                                         y2: {
                                             scale: scales.y,
-                                            value: level.value,
+                                            value: level.start,
                                         },
                                         stroke: { value: level.color },
                                         strokeDash: { value: [1, 4] },

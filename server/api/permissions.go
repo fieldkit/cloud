@@ -264,7 +264,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 
 	pr := repositories.NewProjectRepository(p.options.Database)
 
-	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	stationProjects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
-		projects:           projects,
+		stationProjects:    stationProjects,
 	}
 
 	return
@@ -292,7 +292,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 
 	pr := repositories.NewProjectRepository(p.options.Database)
 
-	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	stationProjects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +300,7 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
-		projects:           projects,
+		stationProjects:    stationProjects,
 	}
 
 	return
@@ -313,7 +313,7 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 
 	pr := repositories.NewProjectRepository(p.options.Database)
 
-	projects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	stationProjets, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +321,7 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
-		projects:           projects,
+		stationProjects:    stationProjets,
 	}
 
 	return
@@ -329,8 +329,8 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 
 type stationPermissions struct {
 	defaultPermissions
-	station  *data.Station
-	projects []*data.Project
+	station         *data.Station
+	stationProjects []*data.Project
 }
 
 func (p *stationPermissions) Station() *data.Station {
@@ -351,7 +351,7 @@ func (p *stationPermissions) CanView() error {
 
 	// We don't know until we check the projects the station is a part
 	// of, one of them has to be public.
-	for _, project := range p.projects {
+	for _, project := range p.stationProjects {
 		subPermissions, err := NewPermissions(p.context, p.options).ForProjectByID(project.ID)
 		if err != nil {
 			return err
@@ -366,15 +366,34 @@ func (p *stationPermissions) CanView() error {
 }
 
 func (p *stationPermissions) CanModify() error {
+	// Administrators can do anything.
 	if p.IsAdmin() {
 		return nil
 	}
 
-	if p.station.OwnerID != p.UserID() {
+	// Owners can always modify their stations.
+	if !p.Anonymous() {
+		if p.station.OwnerID == p.UserID() {
+			return nil
+		}
+	} else {
+		// Anonymous can't modify anything.
 		return p.forbidden("forbidden")
 	}
 
-	return nil
+	// Check each of the station's projects to see if we have write permissions.
+	for _, project := range p.stationProjects {
+		projectPermissions, err := NewPermissions(p.context, p.options).ForProjectByID(project.ID)
+		if err != nil {
+			return err
+		}
+
+		if err := projectPermissions.CanModify(); err == nil {
+			return nil
+		}
+	}
+
+	return p.forbidden("forbidden")
 }
 
 func (p *stationPermissions) IsReadOnly() bool {

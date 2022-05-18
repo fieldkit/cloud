@@ -305,14 +305,31 @@ export const ViewingControls = Vue.extend({
         raiseChangeSensors(...args: unknown[]): void {
             this.$emit("viz-change-sensors", ...args);
         },
-        raiseManualTime(fromPicker): void {
+        raiseManualTime(fromPicker, pickerType): void {
             if (fromPicker) {
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
+
+                if (!this.manualRangeValue) {
+                    return;
+                }
+
+                let pickerStart: Date = new Date();
+                let pickerEnd: Date = new Date();
+
+                if (pickerType === "start") {
+                    pickerStart = fromPicker;
+                    pickerEnd = this.manualRangeValue.end;
+                }
+                if (pickerType === "end") {
+                    pickerStart = this.manualRangeValue.start;
+                    pickerEnd = fromPicker;
+                }
+
                 const rangeViz = this.viz.visibleTimeRange;
-                const rangePicker = new TimeRange(fromPicker.start.getTime(), fromPicker.end.getTime());
+                const rangePicker = new TimeRange(pickerStart.getTime(), pickerEnd.getTime());
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
                     console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
@@ -335,24 +352,34 @@ export const ViewingControls = Vue.extend({
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }">Month</div>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
 					<div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
-					<div class="date-picker">
-						<v-date-picker :value="manualRangeValue" @input="raiseManualTime" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
-                                       :drag-attribute="datepickerStyles" is-range>
+					<div class="date-picker flex" v-if="manualRangeValue">
+						<v-date-picker :value="manualRangeValue.start" @input="raiseManualTime($event, 'start')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
+                                       :drag-attribute="datepickerStyles" :maxDate="manualRangeValue.end" is-inline
+                        >
                             <template v-slot="{ inputValue, inputEvents }">
                                 <div class="flex justify-center items-center">
                                     <input
-                                        :value="inputValue.start"
-                                        v-on="inputEvents.start"
-                                        class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
-                                    />
-                                    <input
-                                        :value="inputValue.end"
-                                        v-on="inputEvents.end"
+                                        :value="inputValue"
+                                        v-on="inputEvents"
+                                        placeholder="Start date"
                                         class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
                                     />
                                 </div>
                             </template>
                         </v-date-picker>
+                        <v-date-picker :value="manualRangeValue.end" @input="raiseManualTime($event, 'end')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
+                                     :drag-attribute="datepickerStyles" :minDate="manualRangeValue.start">
+                        <template v-slot="{ inputValue, inputEvents }">
+                          <div class="flex justify-center items-center">
+                            <input
+                                :value="inputValue"
+                                v-on="inputEvents"
+                                placeholder="End date"
+                                class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
+                            />
+                          </div>
+                        </template>
+                      </v-date-picker>
 					</div>
 				</div>
 			</div>
