@@ -344,7 +344,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 				ST_AsBinary(location) AS location,
 				value,                                              
 				-1 AS time_group
-			FROM %s WHERE time <= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time <= ?
 			ORDER BY time DESC
 			LIMIT 1)
 			UNION
@@ -356,11 +356,11 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 				ST_AsBinary(location) AS location,
 				value,                                              
 				1 AS time_group
-			FROM %s WHERE time >= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ?
 			ORDER BY time ASC
 			LIMIT 1)
 		) AS q ORDER BY q.time
-	`, aggregate, aggregate), aqp.Start, aqp.Stations, moduleIds, sensorIds, aqp.End, aqp.Stations, moduleIds, sensorIds)
+	`, aggregate, aggregate), aqp.Stations, moduleIds, sensorIds, aqp.Start, aqp.Stations, moduleIds, sensorIds, aqp.End)
 	if err != nil {
 		return nil, err
 	}
@@ -415,8 +415,8 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 			MIN(time) AS start,
 			MAX(time) AS end,
 			COUNT(*) AS number_records
-			FROM %s WHERE time >= ? AND time < ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?);
-			`, table), qp.Start, qp.End, qp.Stations, moduleIds, sensorIds)
+			FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
+			`, table), qp.Stations, moduleIds, sensorIds, qp.Start, qp.End)
 		if err != nil {
 			return nil, "", err
 		}
@@ -472,7 +472,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
 				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
 			FROM %s
-			WHERE time >= ? AND time <= ? AND station_id IN (?) AND sensor_id IN (?)
+			WHERE station_id IN (?) AND sensor_id IN (?) AND time >= ? AND time <= ?
 			ORDER BY time
 		),
 		with_temporal_clustering AS (
@@ -516,7 +516,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 										   LAG(time) OVER (ORDER BY time) AS previous_timestamp,
 				EXTRACT(epoch FROM (time - LAG(time) OVER (ORDER BY time))) AS time_difference
 			FROM %s
-			WHERE time >= ? AND time <= ? AND station_id IN (?) AND module_id IN (?) AND sensor_id IN (?)
+			WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time <= ?
 			ORDER BY time
 		),
 		with_temporal_clustering AS (
@@ -565,9 +565,9 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 
 	buildQuery := func() (query string, args []interface{}, err error) {
 		if aqp.Complete {
-			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Start, aqp.End, aqp.Stations, moduleIds, sensorIds, aqp.TimeGroupThreshold)
+			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Stations, moduleIds, sensorIds, aqp.Start, aqp.End, aqp.TimeGroupThreshold)
 		}
-		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, aqp.Stations, moduleIds, sensorIds, aqp.TimeGroupThreshold)
+		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, moduleIds, sensorIds, aqp.Stations, aqp.TimeGroupThreshold)
 	}
 
 	query, args, err := buildQuery()
