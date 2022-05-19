@@ -407,16 +407,29 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 	log := Logger(ctx).Sugar()
 
+	var dailySummary *AggregateSummary
+
 	for _, name := range handlers.AggregateNames {
 		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
 
-		query, args, err := sqlx.In(fmt.Sprintf(`
-			SELECT
-			MIN(time) AS start,
-			MAX(time) AS end,
-			COUNT(*) AS number_records
-			FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
+		getQueryFn := func() (query string, args []interface{}, err error) {
+			if dailySummary == nil {
+				return sqlx.In(fmt.Sprintf(`
+					SELECT
+					MIN(time) AS start,
+					MAX(time) AS end,
+					COUNT(*) AS number_records
+					FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
+				`, table), qp.Stations, moduleIds, sensorIds, qp.Start, qp.End)
+			}
+			return sqlx.In(fmt.Sprintf(`
+				SELECT
+				COUNT(*) AS number_records
+				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
 			`, table), qp.Stations, moduleIds, sensorIds, qp.Start, qp.End)
+		}
+
+		query, args, err := getQueryFn()
 		if err != nil {
 			return nil, "", err
 		}
@@ -424,6 +437,13 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 		summary := &AggregateSummary{}
 		if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
 			return nil, "", err
+		}
+
+		if dailySummary == nil {
+			dailySummary = summary
+		} else {
+			summary.Start = dailySummary.Start
+			summary.End = dailySummary.End
 		}
 
 		// Queried records depends on if we're doing a complete query,
@@ -438,7 +458,8 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 				log.Infow("aggregate", "queried", queriedRecords, "records", summary.NumberRecords,
 					"duration", duration, "start", summary.Start, "end", summary.End,
-					"start_pretty", summary.Start.Time(), "end_pretty", summary.End.Time())
+					"start_pretty", summary.Start.Time(), "end_pretty", summary.End.Time(),
+					"aggregate_table", table)
 			}
 		}
 
