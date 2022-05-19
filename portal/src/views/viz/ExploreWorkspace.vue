@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div class="button-submit" @click="openExports">
+                        <div v-show="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -576,6 +576,16 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+
+    span {
+        &:nth-of-type(1) {
+            margin-right: 5px;
+        }
+    }
+
+    .vc-day-layer {
+        left: -2px;
+    }
 }
 
 .controls-container .date-picker input {

@@ -15,6 +15,21 @@
                     Facebook
                 </span>
             </a>
+            <a class="share-button share-button--url">
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
+                <span>
+                    {{ $t("sharePanel.copyUrl") }}
+                </span>
+            </a>
+            <div class="url" target="blank">
+                <input readonly ref="url" :value="getCurrentURL()" />
+                <button @click="copyUrlToClipboard()">
+                    {{ $t("sharePanel.copyBtn") }}
+                </button>
+                <span :class="{ visible: showCopiedLink }" class="url-copied">
+                    {{ $t("sharePanel.linkCopied") }}
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -51,8 +66,12 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: (): {} => {
-        return {};
+    data: (): {
+        showCopiedLink: boolean;
+    } => {
+        return {
+            showCopiedLink: false,
+        };
     },
     computed: {
         ...mapState({}),
@@ -86,11 +105,25 @@ export default Vue.extend({
         onShareTwitter() {
             console.log("ok");
         },
+        getCurrentURL(): string {
+            return window.location.href;
+        },
+        copyUrlToClipboard(): void {
+            const inputEl = this.$refs["url"] as HTMLInputElement;
+            navigator.clipboard.writeText(inputEl.value).then(() => {
+                this.showCopiedLink = true;
+                setTimeout(() => {
+                    this.showCopiedLink = false;
+                }, 3000);
+            });
+        },
     },
 });
 </script>
 
 <style lang="scss">
+@import "src/scss/mixins";
+
 .share-panel .heading {
     padding: 25px 20px;
     display: flex;
@@ -125,6 +158,14 @@ export default Vue.extend({
         &:hover {
             background-color: #f4f5f7;
         }
+
+        &--url {
+            cursor: initial;
+
+            &:hover {
+                background-color: initial;
+            }
+        }
     }
 
     .link {
@@ -134,6 +175,57 @@ export default Vue.extend({
         border-radius: 4px;
         cursor: pointer;
         margin-bottom: 1em;
+    }
+
+    .url {
+        margin: 0 20px;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        input {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 14px;
+            margin-left: 30px;
+            border: 0;
+            width: 100%;
+            color: var(--color-dark);
+            font-family: var(--font-family-medium);
+            background-color: transparent;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        button {
+            margin-left: 10px;
+            font-size: 12px;
+            padding: 5px 10px;
+            background-color: #ffffff;
+            border: 1px solid #d7dce1;
+            border-radius: 4px;
+            font-family: var(--font-family-bold);
+        }
+    }
+
+    .url-copied {
+        background-color: rgba(160, 219, 225, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: opacity 0.25s;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
+        @include position(absolute, null 0 -30px null);
+
+        &.visible {
+            opacity: 1;
+            visibility: visible;
+        }
     }
 }
 </style>
