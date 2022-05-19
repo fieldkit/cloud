@@ -182,6 +182,41 @@ export class ScrubberSpecFactory {
                     name: "brush",
                     update: "vlSelectionResolve(\"brush_store\", \"union\")"
                 },
+                // TODO block all other events when scrubber handle clicked
+                {
+                    name: "scrub_handle_left",
+                    value:
+                    {},
+                    on:
+                    [
+                        {
+                            events:
+                            {
+                                type: "mouseup",
+                                marktype: "symbol",
+                                markname: "left_scrub"
+                            },
+                            update: "scrub_handle_left + 1"
+                        }
+                    ]
+                },
+                {
+                    name: "scrub_handle_right",
+                    value:
+                    {},
+                    on:
+                    [
+                        {
+                            events:
+                            {
+                                type: "mouseup",
+                                marktype: "symbol",
+                                markname: "right_scrub"
+                            },
+                            update: "scrub_handle_right + 1"
+                        }
+                    ]
+                },
                 {
                     name: "brush_x",
                     value:
@@ -189,18 +224,22 @@ export class ScrubberSpecFactory {
                     on:
                     [
                         {
+                            // Update brush xy on area mousedown
                             events:
                             {
                                 source: "scope",
                                 type: "mousedown",
                                 filter:
                                 [
-                                    "!event.item || event.item.mark.name !== \"brush_brush\" || event.item.mark.name === 'left_scrub' || event.item.mark.name === 'right_scrub'"
+                                    //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
+                                    "!event.item || event.item.mark.name !== \"brush_brush\""
                                 ]
                             },
                             update: "[x(unit), x(unit)]"
                         },
                         {
+                            //Update right extent of brush on mouse down
+                            // TODO: filter does not seem to prevent mousedown on scrubber handle from happening
                             events:
                             {
                                 source: "window",
@@ -213,7 +252,8 @@ export class ScrubberSpecFactory {
                                         type: "mousedown",
                                         filter:
                                         [
-                                            "!event.item || event.item.mark.name !== \"brush_brush\" || event.item.mark.name === 'left_scrub' || event.item.mark.name === 'right_scrub'"
+                                            //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
+                                            "!event.item || event.item.mark.name !== \"brush_brush\""
                                         ]
                                     },
                                     {
@@ -320,12 +360,13 @@ export class ScrubberSpecFactory {
                     on:
                     [
                         {
+                            // start brush area translation
                             events:
                             [
                                 {
                                     source: "scope",
                                     type: "mousedown",
-                                    markname: "brush_brush"
+                                    markname: "brush_brush",
                                 }
                             ],
                             update: "{x: x(unit), y: y(unit), extent_x: slice(brush_x)}"
@@ -339,6 +380,7 @@ export class ScrubberSpecFactory {
                     on:
                     [
                         {
+                            // translate brush area after mousdown
                             events:
                             [
                                 {
@@ -350,7 +392,8 @@ export class ScrubberSpecFactory {
                                         {
                                             source: "scope",
                                             type: "mousedown",
-                                            markname: "brush_brush"
+                                            markname: "brush_brush",
+                                            filter: "event.item.name !== \"right_scrub\""
                                         },
                                         {
                                             source: "window",
@@ -704,7 +747,8 @@ export class ScrubberSpecFactory {
                       },
                       update: {
                         xc: {signal: "brush_x[1] + 1"},
-                        fill: {value: "#999"},
+                        fill: {value: "#b6b6b6"},
+                        stroke: {value: "#999"}
                       }
                     }
                 },
@@ -721,7 +765,8 @@ export class ScrubberSpecFactory {
                       },
                       update: {
                         xc: {signal: "brush_x[0] + 1"},
-                        fill: {value: "#999"},
+                        fill: {value: "#b6b6b6"},
+                        stroke: {value: "#999"}
                       }
                     }
                 },

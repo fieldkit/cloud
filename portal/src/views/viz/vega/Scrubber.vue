@@ -60,6 +60,15 @@ export default {
                     scrubbed = this.series[0].data.timeRange;
                 }
             });
+            // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
+            //     console.log("SCRUB HANDLE RIGHT", value)
+            // });
+            // vegaInfo.view.addSignalListener("scrub_handle_right", (_, value) => {
+            //     console.log("SCRUB HANDLE RIGHT", value)
+            // });
+            // vegaInfo.view.addEventListener("mousedown", (evt, value) => {
+            //     console.log(evt, value);
+            // });
             vegaInfo.view.addEventListener("mouseup", () => {
                 console.log("viz: vega:scrubber-brush", scrubbed);
                 if (scrubbed.length == 2) {
