@@ -21,6 +21,12 @@
                     {{ $t("sharePanel.copyUrl") }}
                 </span>
             </a>
+            <a class="share-button" @click="openMailClient()">
+                <i class="icon icon-mail"></i>
+                <span>
+                    {{ $t("sharePanel.emailUrl") }}
+                </span>
+            </a>
             <div class="url" target="blank">
                 <input readonly ref="url" :value="getCurrentURL()" />
                 <button @click="copyUrlToClipboard()">
@@ -30,12 +36,6 @@
                     {{ $t("sharePanel.linkCopied") }}
                 </span>
             </div>
-            <a class="share-button" @click="openMailClient()">
-                <i class="icon icon-mail"></i>
-                <span>
-                    {{ $t("sharePanel.emailUrl") }}
-                </span>
-            </a>
         </div>
     </div>
 </template>
