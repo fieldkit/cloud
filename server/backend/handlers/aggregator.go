@@ -54,7 +54,7 @@ type MaximumFunction struct {
 }
 
 func (f *MaximumFunction) Apply(values []float64) (float64, error) {
-	return stats.Mean(values)
+	return stats.Max(values)
 }
 
 type AggregateSensorKey struct {
