@@ -4,3 +4,5 @@ export const LOADING = "LOADING";
 export const INITIALIZE = "INITIALZE";
 
 export const NOTES_UPDATE = "NOTES_UPDATE";
+
+export const DATA_EVENTS_UPDATE = "DATA_EVENTS_UPDATE"

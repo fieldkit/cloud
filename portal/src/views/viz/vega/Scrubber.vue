@@ -12,6 +12,8 @@ import { default as vegaEmbed } from "vega-embed";
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
+import { DiscussionState } from "@/store/modules/discussion";
+import { ActionTypes } from "@/store";
 
 export default {
     name: "Scrubber",
@@ -39,9 +41,14 @@ export default {
             this.pickRange(this.visible);
         },
     },
+    computed: {
+        dataEvents () {
+            return this.$getters.dataEvents;
+        }
+    },
     methods: {
         async refresh(): Promise<void> {
-            const factory = new ScrubberSpecFactory(this.series, new ChartSettings(TimeRange.mergeArrays([this.visible])));
+            const factory = new ScrubberSpecFactory(this.series, new ChartSettings(TimeRange.mergeArrays([this.visible])), this.dataEvents);
 
             const spec = factory.create();
 
@@ -74,6 +81,11 @@ export default {
                 if (scrubbed.length == 2) {
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
+            });
+
+            console.log("viz: scrubber", {
+                state: vegaInfo.view.getState(),
+                data: vegaInfo.view.data("data_1")
             });
 
             this.pickRange(this.visible);
@@ -116,6 +128,22 @@ export default {
                 }
             }
         },
+        //TODO move to store
+        // async getDataEvents() {
+        //     await this.$services.api
+        //         .getDataEvents(JSON.stringify(this.parentData))
+        //         .then( (response) => {
+        //             console.log(response)
+        //         })
+        //         .catch((e) => {
+        //             console.error(e);
+        //             //this.errorMessage = CommentsErrorsEnum.postComment;
+        //         });
+
+        // },
+        getDataEvents() {
+            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
+        }
     },
 };
 </script>

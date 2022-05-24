@@ -5,7 +5,7 @@ import { TimeRange } from "../common";
 export { ChartSettings };
 
 export class ScrubberSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
+    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container, private readonly dataEvents = null) {}
 
     create() {
         const first = this.allSeries[0]; // TODO
@@ -13,6 +13,8 @@ export class ScrubberSpecFactory {
         // We ignore extreme ranges here because of this.settings.timeRange
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
+
+        console.log("DATA EVENTS SCRUBBER", this.dataEvents)
 
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",
@@ -151,7 +153,11 @@ export class ScrubberSpecFactory {
                             offset: "zero"
                         }
                     ]
-                }
+                },
+                {
+                    name: "data_events",
+                    values: this.dataEvents,
+                },
             ],
             signals:
             [
@@ -767,6 +773,48 @@ export class ScrubberSpecFactory {
                         xc: {signal: "brush_x[0] + 1"},
                         fill: {value: "#b6b6b6"},
                         stroke: {value: "#999"}
+                      }
+                    }
+                },
+                {
+                    type: "symbol",
+                    interactive: false,
+                    clip: true,
+                    name: "de_circle",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        yc: {value: 0},
+                        fill: {value: "white"},
+                        stroke: {value: "#999"},
+                        size: {value: 200},
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "start"}
+                      }
+                    }
+                },
+                {
+                    type: "symbol",
+                    interactive: false,
+                    clip: true,
+                    name: "de_flag",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        yc: {value: 0},
+                        fill: {value: "#52b5e4"},
+                        size: {value: 100},
+                        shape: {value: "triangle-right"},
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "start"}
                       }
                     }
                 },

@@ -2,7 +2,7 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <SectionToggle leftLabel="Log an event" rightLabel="Comment">
+        <SectionToggle leftLabel="Log an event" rightLabel="Comment" @toggle="onSectionToggle" default="right" v-if="viewType === 'data'">
             <template #left>
                 <div class="event-sensor-selector">
                     <label for="allProjectRadio">
@@ -19,6 +19,30 @@
                             <p>People will see this event only when viewing data for these stations</p>
                         </div>
                     </label>
+                </div>
+                <div class="new-comment" :class="{ 'align-center': !user }">
+                    <UserPhoto :user="user"></UserPhoto>
+                    <template v-if="user">
+                        <div class="new-comment-wrap">  
+                            <Tiptap v-model="newDataEvent.title" placeholder="Event Title" saveLabel="Post" @save="saveDataEvent(newDataEvent)" />
+                            <Tiptap v-model="newDataEvent.description" placeholder="Event Description" saveLabel="Post" @save="saveDataEvent(newDataEvent)" />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="need-login-msg" @click="test()">
+                            {{ $tc("comments.loginToComment.part1") }}
+                            <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                                {{ $tc("comments.loginToComment.part2") }}
+                            </router-link>
+                            {{ $tc("comments.loginToComment.part3") }}
+                        </p>
+                        <router-link
+                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                            class="button-submit"
+                        >
+                            {{ $t("login.loginButton") }}
+                        </router-link>
+                    </template>
                 </div>
             </template>
             <template #right>
@@ -47,6 +71,30 @@
                 </div>
             </template>
         </SectionToggle>
+        <!-- TODO: code repeated for project view; componentize -->
+        <div class="new-comment" :class="{ 'align-center': !user }" v-if="viewType === 'project'">
+            <UserPhoto :user="user"></UserPhoto>
+            <template v-if="user">
+                <div class="new-comment-wrap">  
+                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                </div>
+            </template>
+            <template v-else>
+                <p class="need-login-msg" @click="test()">
+                    {{ $tc("comments.loginToComment.part1") }}
+                    <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                        {{ $tc("comments.loginToComment.part2") }}
+                    </router-link>
+                    {{ $tc("comments.loginToComment.part3") }}
+                </p>
+                <router-link
+                    :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                    class="button-submit"
+                >
+                    {{ $t("login.loginButton") }}
+                </router-link>
+            </template>
+        </div>
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
@@ -151,13 +199,17 @@
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import { NewComment } from "@/views/comments/model";
-import { Comment } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
+import { Comment, DataEvent } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
+import { Bookmark } from "@/views/viz/viz";
+import { TimeRange } from "@/views/viz/viz/common";
+import { ActionTypes } from "@/store";
+
 
 export default Vue.extend({
     name: "Comments",
@@ -179,6 +231,7 @@ export default Vue.extend({
     },
     data(): {
         posts: Comment[];
+        dataEvents: DataEvent[];
         isLoading: boolean;
         placeholder: string | null;
         viewType: string;
@@ -193,10 +246,18 @@ export default Vue.extend({
             body: string | null;
             threadId: number | null;
         };
+        newDataEvent: {
+            projectId: number | null;
+            bookmark: string | null;
+            body: string | null;
+            title: string | null;
+        };
         errorMessage: string | null;
+        logMode: string;
     } {
         return {
             posts: [],
+            dataEvents: [],
             isLoading: false,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
@@ -211,7 +272,14 @@ export default Vue.extend({
                 body: "",
                 threadId: null,
             },
+            newDataEvent: {
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                bookmark: null,
+                body: "",
+                title: "",
+            },
             errorMessage: null,
+            logMode: "comment",
         };
     },
     watch: {
@@ -220,6 +288,8 @@ export default Vue.extend({
         },
     },
     mounted(): Promise<void> {
+        this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
+
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
@@ -230,6 +300,46 @@ export default Vue.extend({
             } else {
                 return "Write a comment about this Data View";
             }
+        },
+        getDataEvents() {
+            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
+        },
+        async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
+            this.errorMessage = null;
+
+            if (this.viewType === "data") {
+                const tb: Bookmark = this.parentData;
+                dataEvent.bookmark = JSON.stringify(this.parentData);
+            }
+
+            const timeRange: TimeRange = this.parentData.allTimeRange;
+            dataEvent.start = timeRange.start;
+            dataEvent.end = timeRange.end;
+            console.log("SAVE DATA EVENT", dataEvent)
+
+            await this.$services.api
+                .postDataEvent(dataEvent)
+                .then((response: { event: DataEvent }) => {
+                    // add data-event to the posts array
+                    if (this.dataEvents) {
+                        this.dataEvents.unshift(
+                            new DataEvent(
+                                response.event.id,
+                                response.event.author,
+                                response.event.bookmark,
+                                response.event.description,
+                                response.event.createdAt,
+                                response.event.updatedAt
+                            )
+                        );
+                    } else {
+                        console.log(`posts is null`);
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.errorMessage = CommentsErrorsEnum.postComment;
+                });
         },
         async save(comment: NewComment): Promise<void> {
             this.errorMessage = null;
@@ -400,6 +510,15 @@ export default Vue.extend({
                 }
             });
         },
+        onSectionToggle(evt) {
+            console.log("SECTION TOGGLE", evt)
+            if(evt === "right"){
+                this.logMode = "comment";
+            }
+            if(evt === "left"){
+                this.logMode = "event";
+            }
+        }
     },
 });
 </script>
@@ -545,6 +664,11 @@ header {
 
         .new-comment-wrap {
             flex: 0 0 calc(100% - 65px);
+            flex-direction: column;
+
+            .tiptap-container {
+                margin-top: 10px;
+            }
         }
     }
 
@@ -739,7 +863,8 @@ header {
     justify-content: center;
 }
 .event-sensor-radio {
-    //width: 340px;
+    max-width: 100vh;
+    height: 115px;
     border: solid 1px #d8dce0;
     padding: 15px;
     padding-bottom: 10px;

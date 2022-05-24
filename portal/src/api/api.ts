@@ -5,8 +5,8 @@ import Config from "../secrets";
 import { keysToCamel } from "@/json-tools";
 import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
-import { NewComment } from "@/views/comments/model";
-import { Comment } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
+import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
 import { promiseAfter } from "@/utilities";
 import Backoff from "backoff";
@@ -390,6 +390,10 @@ class FKApi {
             const token = this.token.getHeader();
             headers["Authorization"] = token;
         }
+
+        console.log("PARAMS", params.data)
+        
+        
         return {
             method: params.method,
             url: params.url,
@@ -1312,6 +1316,13 @@ class FKApi {
             });
         }
     }
+    private parseDataEvent(event: DataEvent): Comment {
+        return _.extend(event, {
+            body: JSON.parse(event.description),
+            replies: []
+        });
+
+    }
 
     private parseBodies(posts: Comment[]): Comment[] {
         return posts.map((c) => {
@@ -1357,7 +1368,7 @@ class FKApi {
             },
         });
 
-        // console.log("comments", returned);
+        //console.log("comments", returned);
 
         return {
             post: this.parseBody(returned.post),
@@ -1383,6 +1394,39 @@ class FKApi {
         console.log("edit", returned);
 
         return returned;
+    }
+
+    public async postDataEvent(dataEvent: NewDataEvent): Promise<{ event: DataEvent }> {
+        console.log("save-event-log", dataEvent);
+
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events",
+            data: {
+                event: _.extend({}, dataEvent, {
+                    body: JSON.stringify(dataEvent.body),
+                    description: dataEvent.description.content[0].content[0].text,
+                    title: dataEvent.title.content[0].content[0].text,
+                }),
+            },
+        });
+
+        console.log("comments", returned);
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async getDataEvents(payload) {
+        const qp = new URLSearchParams();
+        qp.append("bookmark", payload);
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + `/data-events?${qp.toString()}`,
+        });
     }
 
     public async seenNotifications(payload) {

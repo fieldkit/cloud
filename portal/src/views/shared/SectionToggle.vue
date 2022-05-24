@@ -22,22 +22,26 @@ export default Vue.extend({
         rightLabel: {
             type: String,
             required: true
+        },
+        default: {
+            type: String,
+            default: "left"
         }
-
     },
     data(): {
         selectedSection: any;
     } {
         return {
-            selectedSection: "left",
+            selectedSection: this.default,
         };
     },
     methods: {
         toggleClickHandler(evt, section) {
-            this.selectedSection = section
+            this.selectedSection = section;
+            this.$emit("toggle", section);
         },
         matchSection(section) {
-            return this.selectedSection === section
+            return this.selectedSection === section;
         }
     }
 });
@@ -49,7 +53,7 @@ export default Vue.extend({
     justify-content: center;
     display: flex;
     margin-bottom: 15px;
-    
+
     .selected {
         background-color: #2c3e50;
         color: white;
