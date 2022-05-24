@@ -15,6 +15,9 @@ export interface PartnerCustomization {
     };
     projectId: number;
     interpolate: (base: string) => string;
+    email: {
+        subject: string;
+    };
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -39,9 +42,66 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             interpolate: (baseString: string) => {
                 return baseString + "floodnet";
             },
+            email: {
+                subject: "sharePanel.emailSubject.floodnet",
+            },
         };
     }
     return null;
+}
+
+export function getPartnerCustomizationWithDefault(): PartnerCustomization {
+    // dataviz.floodnet.nyc, floodnet.fieldkit.org
+    if (window.location.hostname.indexOf("floodnet.") >= 0) {
+        return {
+            title: "Data Dashboard - FloodNet",
+            class: "floodnet",
+            icon: "/favicon-floodnet.ico",
+            sharing: {
+                viz: `Check out this data on FloodNet!`, // TODO i18n
+            },
+            nav: {
+                viz: {
+                    back: {
+                        // project: "layout.backProjectDashboard",
+                        map: { label: "layout.backToSensors" },
+                    },
+                },
+            },
+            projectId: 174,
+            interpolate: (baseString: string) => {
+                return baseString + "floodnet";
+            },
+            email: {
+                subject: "sharePanel.emailSubject.floodnet",
+            },
+        };
+    }
+
+    // default values copied from floodnet object, should be replaced as we go
+    return {
+        title: "Data Dashboard - FloodNet",
+        class: "floodnet",
+        icon: "/favicon-floodnet.ico",
+        sharing: {
+            viz: `Check out this data on FloodNet!`, // TODO i18n
+        },
+        nav: {
+            viz: {
+                back: {
+                    // project: "layout.backProjectDashboard",
+                    map: { label: "layout.backToSensors" },
+                },
+            },
+        },
+        projectId: 174,
+        interpolate: (baseString: string) => {
+            return baseString + "floodnet";
+        },
+        email: {
+            subject: "sharePanel.emailSubject.fieldkit",
+        },
+    };
 }
 
 export function isCustomisationEnabled(): boolean {

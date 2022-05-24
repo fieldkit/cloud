@@ -44,7 +44,7 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import { getPartnerCustomization } from "@/views/shared/partners";
+import { getPartnerCustomization, getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 import { mapState } from "vuex";
 import { isCustomisationEnabled } from "@/views/shared/partners";
 
@@ -124,11 +124,10 @@ export default Vue.extend({
                 }, 3000);
             });
         },
-      openMailClient(): void {
+        openMailClient(): void {
+            const partnerCustomization = getPartnerCustomizationWithDefault();
             const body = this.getCurrentURL();
-            const subject = isCustomisationEnabled()
-                ? this.$t("sharePanel.emailSubject.floodnet")
-                : this.$t("sharePanel.emailSubject.fieldkit");
+            const subject = this.$t(partnerCustomization.email.subject);
             window.location.href = "mailto:?subject=" + subject + "&body=" + body;
         },
     },
@@ -143,10 +142,12 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 }
+
 .share-panel .heading .title {
     font-size: 20px;
     font-weight: 500;
 }
+
 .share-panel .heading .close-button {
     margin-left: auto;
     cursor: pointer;
