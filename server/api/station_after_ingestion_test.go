@@ -92,6 +92,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 				"updatedAt": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
+				"interestingness": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": null,
