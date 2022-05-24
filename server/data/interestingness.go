@@ -23,8 +23,18 @@ type Window struct {
 	Duration time.Duration
 }
 
+type NowFunc func() time.Time
+
+func defaultNow() time.Time {
+	return time.Now()
+}
+
+var (
+	WindowNow = defaultNow
+)
+
 func (w *Window) Includes(test time.Time) bool {
-	now := time.Now()
+	now := WindowNow()
 	windowStart := now.Add(-w.Duration)
 	return test.After(windowStart)
 }
