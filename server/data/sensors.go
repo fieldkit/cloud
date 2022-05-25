@@ -8,8 +8,9 @@ import (
 )
 
 type Sensor struct {
-	ID  int64  `db:"id"`
-	Key string `db:"key"`
+	ID                      int64  `db:"id"`
+	Key                     string `db:"key"`
+	InterestingnessPriority *int32 `db:"interestingness_priority"`
 }
 
 type NumericWireTime time.Time

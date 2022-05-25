@@ -1948,6 +1948,33 @@ func unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v *StationO
 	return res
 }
 
+// unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView
+// builds a value of type *stationviews.StationInterestingnessView from a value
+// of type *StationInterestingnessResponseBody.
+func unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v *StationInterestingnessResponseBody) *stationviews.StationInterestingnessView {
+	res := &stationviews.StationInterestingnessView{}
+	res.Windows = make([]*stationviews.StationInterestingnessWindowView, len(v.Windows))
+	for i, val := range v.Windows {
+		res.Windows[i] = unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView
+// builds a value of type *stationviews.StationInterestingnessWindowView from a
+// value of type *StationInterestingnessWindowResponseBody.
+func unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView(v *StationInterestingnessWindowResponseBody) *stationviews.StationInterestingnessWindowView {
+	res := &stationviews.StationInterestingnessWindowView{
+		Seconds:         v.Seconds,
+		Interestingness: v.Interestingness,
+		Value:           v.Value,
+		Time:            v.Time,
+	}
+
+	return res
+}
+
 // unmarshalStationUploadResponseBodyToStationviewsStationUploadView builds a
 // value of type *stationviews.StationUploadView from a value of type
 // *StationUploadResponseBody.
@@ -2186,6 +2213,7 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		IngestionAt:        v.IngestionAt,
 	}
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
+	res.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v.Interestingness)
 	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))
 	for i, val := range v.Uploads {
 		res.Uploads[i] = unmarshalStationUploadResponseBodyToStationviewsStationUploadView(val)
