@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout @sidebar-toggle="layoutChanges++" :sidebarNarrow="true" :clipStations="true">
+    <StandardLayout @sidebar-toggle="sidebarToggle()" :sidebarNarrow="true" :clipStations="true">
         <div class="project-public project-container" v-if="displayProject">
             <div class="project-detail-card">
                 <div class="photo-container">
@@ -205,6 +205,11 @@ export default Vue.extend({
             } catch (error) {
                 return [];
             }
+        },
+        sidebarToggle() {
+            setTimeout(() => {
+                this.layoutChanges++;
+            }, 250);
         },
     },
 });
