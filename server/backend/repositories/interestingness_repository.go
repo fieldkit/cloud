@@ -28,7 +28,7 @@ func (r *InterestingnessRepository) QueryByStationID(ctx context.Context, id int
 
 	mapped := make(map[time.Duration]*data.StationInterestingness)
 	for _, row := range iness {
-		mapped[time.Duration(row.WindowSeconds)] = row
+		mapped[time.Duration(row.WindowSeconds)*time.Second] = row
 	}
 
 	return mapped, nil
