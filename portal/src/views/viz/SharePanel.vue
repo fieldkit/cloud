@@ -15,27 +15,6 @@
                     Facebook
                 </span>
             </a>
-            <a class="share-button share-button--url">
-                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
-                <span>
-                    {{ $t("sharePanel.copyUrl") }}
-                </span>
-            </a>
-            <a class="share-button" @click="openMailClient()">
-                <i class="icon icon-mail"></i>
-                <span>
-                    {{ $t("sharePanel.emailUrl") }}
-                </span>
-            </a>
-            <div class="url" target="blank">
-                <input readonly ref="url" :value="getCurrentURL()" />
-                <button @click="copyUrlToClipboard()">
-                    {{ $t("sharePanel.copyBtn") }}
-                </button>
-                <span :class="{ visible: showCopiedLink }" class="url-copied">
-                    {{ $t("sharePanel.linkCopied") }}
-                </span>
-            </div>
         </div>
     </div>
 </template>
