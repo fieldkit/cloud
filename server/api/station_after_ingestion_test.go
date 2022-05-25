@@ -93,6 +93,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
+				"attributes": "<<PRESENCE>>",
 				"uploads": "<<PRESENCE>>",
 				"name": "<<PRESENCE>>",
 				"photos": null,

@@ -934,6 +934,16 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		})
 	}
 
+	attributes := make([]*station.StationProjectAttribute, 0)
+	for _, attribute := range sf.Attributes {
+		attributes = append(attributes, &station.StationProjectAttribute{
+			ProjectID:   attribute.ProjectID,
+			AttributeID: attribute.AttributeID,
+			Name:        attribute.Name,
+			StringValue: attribute.StringValue,
+		})
+	}
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
@@ -941,6 +951,9 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
 		Interestingness: &station.StationInterestingness{
 			Windows: windows,
+		},
+		Attributes: &station.StationProjectAttributes{
+			Attributes: attributes,
 		},
 		Uploads: transformUploads(sf.Ingestions),
 		Configurations: &station.StationConfigurations{
