@@ -864,9 +864,8 @@ export class Workspace implements VizInfoFactory {
                     uniqueSensors.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
                         let label = i18n.tc(row.sensorKey) || row.sensorKey;
-                        //TODO floodnet hack
-                        if(flatten) {
-                            label = moduleMeta.sensors.filter( d => d.fullKey === row.sensorKey )[0]['strings']['enUs']['label'];
+                        if (flatten) {
+                            label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
                         }
                         const optionId = `${row.moduleId}-${row.sensorId}`;
                         const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
@@ -882,11 +881,10 @@ export class Workspace implements VizInfoFactory {
                 if (!moduleAge) throw new Error(`viz: Expected module age: no sensors?`);
 
                 const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
-                
-                if (flatten){
+
+                if (flatten) {
                     return children[0];
-                }
-                else {
+                } else {
                     return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
                 }
             }

@@ -147,7 +147,9 @@ export const SelectionControls = Vue.extend({
                 return [];
             }
             const stationId = vizSensor[0]; // TODO VizSensor
-            const sensorOptions = this.workspace.sensorOptions(stationId, this.workspace.projects[0] === 174); //TODO floodnet hack
+            const maybePartner = getPartnerCustomization();
+            const flatten = maybePartner != null && maybePartner.projectId != null && this.workspace.projects[0] === maybePartner.projectId;
+            const sensorOptions = this.workspace.sensorOptions(stationId, flatten);
             // this.viz.log("sensor-options", { options: sensorOptions });
             return sensorOptions;
         },
