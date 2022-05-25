@@ -23,11 +23,16 @@ type ParsedReading struct {
 	Transient bool    `json:"transient"`
 }
 
+type ParsedAttribute struct {
+	StringValue string `json:"string_value"`
+}
+
 type ParsedMessage struct {
 	original   *WebHookMessage
 	deviceID   []byte
 	deviceName string
 	data       []*ParsedReading
+	attributes map[string]*ParsedAttribute
 	receivedAt time.Time
 	schema     *MessageSchema
 	schemaID   int32
@@ -275,10 +280,31 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		}
 	}
 
+	attributes := make(map[string]*ParsedAttribute)
+
+	if schema.Station.Attributes != nil {
+		for _, attribute := range schema.Station.Attributes {
+			maybeValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
+			if err != nil {
+				return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
+			}
+
+			value, ok := maybeValue.(string)
+			if !ok {
+				return nil, fmt.Errorf("unexpected attribute value: %v", maybeValue)
+			}
+
+			attributes[attribute.Name] = &ParsedAttribute{
+				StringValue: value,
+			}
+		}
+	}
+
 	return &ParsedMessage{
 		deviceID:   deviceID,
 		deviceName: deviceNameString,
 		data:       sensors,
+		attributes: attributes,
 		receivedAt: *receivedAt,
 		ownerID:    schemaRegistration.OwnerID,
 		schemaID:   schemaRegistration.ID,

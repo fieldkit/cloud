@@ -22,14 +22,20 @@ type MessageSchemaModule struct {
 	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 
+type MessageSchemaAttribute struct {
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+}
+
 type MessageSchemaStation struct {
-	Key                  string                 `json:"key"`
-	Model                string                 `json:"model"`
-	ConditionExpression  string                 `json:"condition"`
-	IdentifierExpression string                 `json:"identifier"`
-	NameExpression       string                 `json:"name"`
-	ReceivedExpression   string                 `json:"received"`
-	Modules              []*MessageSchemaModule `json:"modules"`
+	Key                  string                    `json:"key"`
+	Model                string                    `json:"model"`
+	ConditionExpression  string                    `json:"condition"`
+	IdentifierExpression string                    `json:"identifier"`
+	NameExpression       string                    `json:"name"`
+	ReceivedExpression   string                    `json:"received"`
+	Modules              []*MessageSchemaModule    `json:"modules"`
+	Attributes           []*MessageSchemaAttribute `json:"attributes"`
 }
 
 type MessageSchema struct {
