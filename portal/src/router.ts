@@ -59,7 +59,7 @@ function makeDefaultRouteForProject(projectId: number) {
 
 function getRoot() {
     const partnerCustomization = getPartnerCustomization();
-    if (partnerCustomization == null) {
+    if (partnerCustomization == null || partnerCustomization.projectId == null) {
         return {
             path: "/",
             name: "root",

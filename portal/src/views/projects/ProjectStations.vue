@@ -246,9 +246,9 @@ export default Vue.extend({
         },
         openNotes(this: any, station: DisplayStation): Promise<any> {
             return this.$router.push({
-                name: "viewProjectStationNotes", // TEMPORARY
+                name: "viewStation",
                 params: {
-                    projectId: this.project.id, // TEMPORARY
+                    projectId: this.project.id,
                     stationId: station.id,
                 },
             });
@@ -274,6 +274,7 @@ export default Vue.extend({
 .toggle-icon-container {
     float: right;
     margin: 16px -38px 0 0;
+    transform: translateY(40px);
     position: relative;
     z-index: 2;
     cursor: pointer;

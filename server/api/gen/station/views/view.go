@@ -57,6 +57,7 @@ type StationFullView struct {
 	Name               *string
 	Owner              *StationOwnerView
 	DeviceID           *string
+	Interestingness    *StationInterestingnessView
 	Uploads            []*StationUploadView
 	Photos             *StationPhotosView
 	ReadOnly           *bool
@@ -81,6 +82,21 @@ type StationFullView struct {
 type StationOwnerView struct {
 	ID   *int32
 	Name *string
+}
+
+// StationInterestingnessView is a type that runs validations on a projected
+// type.
+type StationInterestingnessView struct {
+	Windows []*StationInterestingnessWindowView
+}
+
+// StationInterestingnessWindowView is a type that runs validations on a
+// projected type.
+type StationInterestingnessWindowView struct {
+	Seconds         *int32
+	Interestingness *float64
+	Value           *float64
+	Time            *int64
 }
 
 // StationUploadView is a type that runs validations on a projected type.
@@ -234,6 +250,7 @@ var (
 			"name",
 			"owner",
 			"deviceId",
+			"interestingness",
 			"uploads",
 			"photos",
 			"readOnly",
@@ -303,6 +320,7 @@ var (
 			"name",
 			"owner",
 			"deviceId",
+			"interestingness",
 			"uploads",
 			"photos",
 			"readOnly",
@@ -410,6 +428,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.DeviceID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("deviceId", "result"))
 	}
+	if result.Interestingness == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("interestingness", "result"))
+	}
 	if result.Uploads == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("uploads", "result"))
 	}
@@ -427,6 +448,11 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if result.Interestingness != nil {
+		if err2 := ValidateStationInterestingnessView(result.Interestingness); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
@@ -467,6 +493,40 @@ func ValidateStationOwnerView(result *StationOwnerView) (err error) {
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	return
+}
+
+// ValidateStationInterestingnessView runs the validations defined on
+// StationInterestingnessView.
+func ValidateStationInterestingnessView(result *StationInterestingnessView) (err error) {
+	if result.Windows == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("windows", "result"))
+	}
+	for _, e := range result.Windows {
+		if e != nil {
+			if err2 := ValidateStationInterestingnessWindowView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateStationInterestingnessWindowView runs the validations defined on
+// StationInterestingnessWindowView.
+func ValidateStationInterestingnessWindowView(result *StationInterestingnessWindowView) (err error) {
+	if result.Seconds == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("seconds", "result"))
+	}
+	if result.Interestingness == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("interestingness", "result"))
+	}
+	if result.Value == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("value", "result"))
+	}
+	if result.Time == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("time", "result"))
 	}
 	return
 }

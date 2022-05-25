@@ -355,5 +355,17 @@
         "title": "Field Notes",
         "failed": "Oops, there was a problem saving your changes.",
         "success": "Saved."
+    },
+    "unauthorized": "Unauthorized",
+    "unauthorizedStation": "You don't have access to view this station",
+    "sharePanel": {
+        "copyUrl": "Copy URL",
+        "copyBtn": "Copy",
+        "linkCopied": "Link copied",
+        "emailUrl": "Email URL",
+        "emailSubject": {
+            "fieldkit": "Check out this data on FieldKit!",
+            "floodnet": "Check out this data on FloodNet!"
+        }
     }
 }

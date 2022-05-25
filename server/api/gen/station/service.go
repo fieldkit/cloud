@@ -76,6 +76,7 @@ type StationFull struct {
 	Name               string
 	Owner              *StationOwner
 	DeviceID           string
+	Interestingness    *StationInterestingness
 	Uploads            []*StationUpload
 	Photos             *StationPhotos
 	ReadOnly           bool
@@ -211,6 +212,17 @@ type StationProgress struct {
 type StationOwner struct {
 	ID   int32
 	Name string
+}
+
+type StationInterestingness struct {
+	Windows []*StationInterestingnessWindow
+}
+
+type StationInterestingnessWindow struct {
+	Seconds         int32
+	Interestingness float64
+	Value           float64
+	Time            int64
 }
 
 type StationUpload struct {
@@ -459,6 +471,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
 	}
+	if vres.Interestingness != nil {
+		res.Interestingness = transformStationviewsStationInterestingnessViewToStationInterestingness(vres.Interestingness)
+	}
 	if vres.Uploads != nil {
 		res.Uploads = make([]*StationUpload, len(vres.Uploads))
 		for i, val := range vres.Uploads {
@@ -503,6 +518,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
+	}
+	if res.Interestingness != nil {
+		vres.Interestingness = transformStationInterestingnessToStationviewsStationInterestingnessView(res.Interestingness)
 	}
 	if res.Uploads != nil {
 		vres.Uploads = make([]*stationviews.StationUploadView, len(res.Uploads))
@@ -737,6 +755,38 @@ func transformStationviewsStationOwnerViewToStationOwner(v *stationviews.Station
 	return res
 }
 
+// transformStationviewsStationInterestingnessViewToStationInterestingness
+// builds a value of type *StationInterestingness from a value of type
+// *stationviews.StationInterestingnessView.
+func transformStationviewsStationInterestingnessViewToStationInterestingness(v *stationviews.StationInterestingnessView) *StationInterestingness {
+	if v == nil {
+		return nil
+	}
+	res := &StationInterestingness{}
+	if v.Windows != nil {
+		res.Windows = make([]*StationInterestingnessWindow, len(v.Windows))
+		for i, val := range v.Windows {
+			res.Windows[i] = transformStationviewsStationInterestingnessWindowViewToStationInterestingnessWindow(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationInterestingnessWindowViewToStationInterestingnessWindow
+// builds a value of type *StationInterestingnessWindow from a value of type
+// *stationviews.StationInterestingnessWindowView.
+func transformStationviewsStationInterestingnessWindowViewToStationInterestingnessWindow(v *stationviews.StationInterestingnessWindowView) *StationInterestingnessWindow {
+	res := &StationInterestingnessWindow{
+		Seconds:         *v.Seconds,
+		Interestingness: *v.Interestingness,
+		Value:           *v.Value,
+		Time:            *v.Time,
+	}
+
+	return res
+}
+
 // transformStationviewsStationUploadViewToStationUpload builds a value of type
 // *StationUpload from a value of type *stationviews.StationUploadView.
 func transformStationviewsStationUploadViewToStationUpload(v *stationviews.StationUploadView) *StationUpload {
@@ -921,6 +971,35 @@ func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stati
 	res := &stationviews.StationOwnerView{
 		ID:   &v.ID,
 		Name: &v.Name,
+	}
+
+	return res
+}
+
+// transformStationInterestingnessToStationviewsStationInterestingnessView
+// builds a value of type *stationviews.StationInterestingnessView from a value
+// of type *StationInterestingness.
+func transformStationInterestingnessToStationviewsStationInterestingnessView(v *StationInterestingness) *stationviews.StationInterestingnessView {
+	res := &stationviews.StationInterestingnessView{}
+	if v.Windows != nil {
+		res.Windows = make([]*stationviews.StationInterestingnessWindowView, len(v.Windows))
+		for i, val := range v.Windows {
+			res.Windows[i] = transformStationInterestingnessWindowToStationviewsStationInterestingnessWindowView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationInterestingnessWindowToStationviewsStationInterestingnessWindowView
+// builds a value of type *stationviews.StationInterestingnessWindowView from a
+// value of type *StationInterestingnessWindow.
+func transformStationInterestingnessWindowToStationviewsStationInterestingnessWindowView(v *StationInterestingnessWindow) *stationviews.StationInterestingnessWindowView {
+	res := &stationviews.StationInterestingnessWindowView{
+		Seconds:         &v.Seconds,
+		Interestingness: &v.Interestingness,
+		Value:           &v.Value,
+		Time:            &v.Time,
 	}
 
 	return res

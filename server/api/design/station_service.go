@@ -113,6 +113,19 @@ var StationDataSummary = Type("StationDataSummary", func() {
 	Required("start", "end", "numberOfSamples")
 })
 
+var StationInterestingnessWindow = Type("StationInterestingnessWindow", func() {
+	Attribute("seconds", Int32)
+	Attribute("interestingness", Float64)
+	Attribute("value", Float64)
+	Attribute("time", Int64)
+	Required("seconds", "interestingness", "value", "time")
+})
+
+var StationInterestingness = Type("StationInterestingness", func() {
+	Attribute("windows", ArrayOf(StationInterestingnessWindow))
+	Required("windows")
+})
+
 var StationFull = ResultType("application/vnd.app.station.full", func() {
 	TypeName("StationFull")
 	Attributes(func() {
@@ -120,10 +133,11 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("name")
 		Attribute("owner", Owner)
 		Attribute("deviceId", String)
+		Attribute("interestingness", StationInterestingness)
 		Attribute("uploads", ArrayOf(StationUpload))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
-		Required("id", "name", "owner", "deviceId", "uploads", "photos", "readOnly")
+		Required("id", "name", "owner", "deviceId", "interestingness", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
 		Attribute("recordingStartedAt", Int64)
@@ -151,6 +165,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("name")
 		Attribute("owner")
 		Attribute("deviceId")
+		Attribute("interestingness")
 		Attribute("uploads")
 		Attribute("photos")
 		Attribute("readOnly")

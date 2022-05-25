@@ -9,6 +9,7 @@ import (
 
 	"github.com/conservify/sqlxcache"
 
+	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
 )
 
@@ -54,7 +55,7 @@ type MaximumFunction struct {
 }
 
 func (f *MaximumFunction) Apply(values []float64) (float64, error) {
-	return stats.Mean(values)
+	return stats.Max(values)
 }
 
 type AggregateSensorKey struct {
@@ -430,16 +431,14 @@ func (v *Aggregator) Close(ctx context.Context) error {
 }
 
 func (v *Aggregator) refreshSensors(ctx context.Context) error {
-	sensors := []*data.Sensor{}
-	if err := v.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
+	querySensors := repositories.NewSensorsRepository(v.db)
+
+	queried, err := querySensors.QueryAllSensors(ctx)
+	if err != nil {
 		return err
 	}
 
-	v.sensors = make(map[string]*data.Sensor)
-
-	for _, sensor := range sensors {
-		v.sensors[sensor.Key] = sensor
-	}
+	v.sensors = queried
 
 	return nil
 }

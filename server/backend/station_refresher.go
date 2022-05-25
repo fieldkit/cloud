@@ -7,6 +7,7 @@ import (
 	"github.com/conservify/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
+	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type StationRefresher struct {
@@ -36,7 +37,18 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 		End:        time.Now(),
 		StationIDs: []int32{stationID},
 	}
-	return sr.walk(ctx, walkParams, completely)
+
+	if err := sr.walk(ctx, walkParams, completely); err != nil {
+		return err
+	}
+
+	stationRepository := repositories.NewStationRepository(sr.db)
+	err := stationRepository.RefreshStationSensors(ctx, []int32{stationID})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely bool) error {

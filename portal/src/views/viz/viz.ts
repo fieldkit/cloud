@@ -21,6 +21,7 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
+import { Station } from "@/api/api";
 import i18n from "@/i18n";
 import FKApi from "@/api/api";
 
@@ -640,9 +641,20 @@ export class Querier {
 
 export class Workspace implements VizInfoFactory {
     private stationIds: StationID[] = [];
+    private stationsFull: Station[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
+
+    public getStation(id: number): Station | null {
+        if (this.stationsFull) {
+            const found = this.stationsFull.filter((d) => d.id === id);
+            if (found.length > 0) {
+                return found[0];
+            }
+        }
+        return null;
+    }
 
     public get empty(): boolean {
         return this.allVizes.length === 0;
@@ -654,6 +666,10 @@ export class Workspace implements VizInfoFactory {
 
     public get allStationIds(): StationID[] {
         return this.stationIds;
+    }
+
+    public get allStations(): Station[] {
+        return this.stationsFull;
     }
 
     constructor(
@@ -779,6 +795,10 @@ export class Workspace implements VizInfoFactory {
         group.timeZoomed(zoom);
         return this;
     }
+    public async addFullStations(stations: Station[]): Promise<Workspace> {
+        this.stationsFull = stations;
+        return this;
+    }
 
     public async addStationIds(ids: number[]): Promise<Workspace> {
         if (_.difference(ids, this.stationIds).length == 0) {
@@ -820,7 +840,7 @@ export class Workspace implements VizInfoFactory {
         });
     }
 
-    public sensorOptions(stationId: number): SensorTreeOption[] {
+    public sensorOptions(stationId: number, flatten = false): SensorTreeOption[] {
         const station = this.stations[stationId];
         if (!station) throw new Error("viz: No station");
         const allSensors = station.sensors;
@@ -843,7 +863,10 @@ export class Workspace implements VizInfoFactory {
                 const children: SensorTreeOption[] = _.flatten(
                     uniqueSensors.map((row) => {
                         const age = moment.utc(row.sensorReadAt);
-                        const label = i18n.tc(row.sensorKey) || row.sensorKey;
+                        let label = i18n.tc(row.sensorKey) || row.sensorKey;
+                        if (flatten) {
+                            label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
+                        }
                         const optionId = `${row.moduleId}-${row.sensorId}`;
                         const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
                         if (sensor.length) {
@@ -858,7 +881,12 @@ export class Workspace implements VizInfoFactory {
                 if (!moduleAge) throw new Error(`viz: Expected module age: no sensors?`);
 
                 const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
-                return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
+
+                if (flatten) {
+                    return children[0];
+                } else {
+                    return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
+                }
             }
         );
 

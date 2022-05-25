@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div class="button-submit" @click="openExports">
+                        <div v-show="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -35,7 +35,7 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
-                <div class="station-summary" v-if="hasDisplayStations">
+                <div class="station-summary" v-if="selectedStation">
                     <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
                     <div class="pagination" v-if="workspace && !workspace.empty">
                         <PaginationControls
@@ -43,6 +43,7 @@
                             :totalPages="getValidStations().length"
                             @new-page="onNewSummaryStation"
                             textual
+                            wrap
                         />
                     </div>
                 </div>
@@ -68,7 +69,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { DisplayStation, ActionTypes } from "@/store";
+import { Station, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
@@ -125,7 +126,6 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,
             userProjects: (s: GlobalState) => s.stations.user.projects,
-            allStations: (s: GlobalState) => s.stations.stations,
         }),
         addIcon(): unknown {
             return this.$loadAsset("icon-compare.svg");
@@ -148,11 +148,11 @@ export default Vue.extend({
         selectedId(): number {
             return +_.flattenDeep(this.bookmark.g)[0];
         },
-        selectedStation(): DisplayStation {
-            return this.allStations[this.selectedId];
-        },
-        hasDisplayStations(): boolean {
-            return Object.keys(this.allStations).length > 0;
+        selectedStation(): Station | null {
+            if (this.workspace) {
+                return this.workspace.getStation(this.selectedId);
+            }
+            return null;
         },
     },
     watch: {
@@ -181,9 +181,6 @@ export default Vue.extend({
                         await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
                     }
                 });
-        }
-        if (this.bookmark) {
-            this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.bookmark.p[0] });
         }
     },
     methods: {
@@ -557,16 +554,13 @@ export default Vue.extend({
     }
 }
 
-.controls-container .right .chart-type {
-    flex-basis: 110px;
-}
-
 .controls-container .right {
     font-size: 12px;
 }
 
 .controls-container .right.half {
     align-items: flex-start;
+    flex: 0 0 110px;
 }
 
 .controls-container .view-by {
@@ -580,6 +574,16 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+
+    span {
+        &:nth-of-type(1) {
+            margin-right: 5px;
+        }
+    }
+
+    .vc-day-layer {
+        left: -2px;
+    }
 }
 
 .controls-container .date-picker input {
