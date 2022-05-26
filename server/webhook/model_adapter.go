@@ -300,19 +300,25 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 		}
 
 		if len(cacheEntry.station.Attributes) > 0 {
+			names := make([]string, 0)
+			skipped := make([]string, 0)
 			attributes := make([]*data.StationProjectAttribute, 0)
-			for _, attribute := range cacheEntry.station.Attributes {
+			for name, attribute := range cacheEntry.station.Attributes {
 				if attribute.StringValue != nil {
+					names = append(names, name)
 					attributes = append(attributes, &data.StationProjectAttribute{
 						StationID:   station.ID,
 						AttributeID: attribute.AttributeID,
 						StringValue: *attribute.StringValue,
 					})
+				} else {
+					skipped = append(skipped, name)
 				}
 			}
 
 			if len(attributes) > 0 {
-				log.Infow("saving:attributes", "station_id", station.ID)
+				log.Infow("saving:attributes", "station_id", station.ID, "attribute_names", names, "skipped_attribute_names", skipped)
+
 				if _, err := attributesRepository.UpsertStationAttributes(ctx, attributes); err != nil {
 					return err
 				}
