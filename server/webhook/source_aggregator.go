@@ -169,14 +169,19 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 	stationIDs := make([]int32, 0)
 	for id, aggregator := range aggregators {
-		stationIDs = append(stationIDs, id)
 		if err := aggregator.Close(ctx); err != nil {
 			return err
 		}
+
+		stationIDs = append(stationIDs, id)
 	}
 
 	if err := model.Close(ctx); err != nil {
 		return err
+	}
+
+	if len(stationIDs) == 0 {
+		Logger(ctx).Sugar().Warnw("wh:zero-stations")
 	}
 
 	sr := repositories.NewStationRepository(i.db)
