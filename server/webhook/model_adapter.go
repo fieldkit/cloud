@@ -232,6 +232,10 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 
 	// These changes to station are saved once in Close.
 
+	// Give integrators the option to just skip this. Could become a nil check.
+	if len(pm.deviceName) != 0 {
+		station.Station.Name = pm.deviceName
+	}
 	station.Station.IngestionAt = &now
 	station.Station.UpdatedAt = now
 
