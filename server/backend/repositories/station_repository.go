@@ -1216,6 +1216,10 @@ type UpdatedSensorRow struct {
 }
 
 func (sr *StationRepository) RefreshStationSensors(ctx context.Context, stations []int32) error {
+	if len(stations) == 0 {
+		return nil
+	}
+
 	query, args, err := sqlx.In(`
 		SELECT station_id, sensor_id, module_id, max(time) AS "time" FROM fieldkit.aggregated_10s
 		WHERE station_id IN (?)
