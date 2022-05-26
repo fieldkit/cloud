@@ -75,7 +75,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	// Add or create the station, this may also mean creating the station model for this schema.
 	station := updating
 	if updating == nil {
-		model, err := m.sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Station.Model)
+		model, err := m.sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Model)
 		if err != nil {
 			return nil, err
 		}
@@ -136,13 +136,13 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return nil, err
 	}
 
-	if len(pm.schema.Station.Modules) != 1 {
+	if len(pm.schema.Modules) != 1 {
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
 
 	sensors := make([]*data.ModuleSensor, 0)
 
-	for _, moduleSchema := range pm.schema.Station.Modules {
+	for _, moduleSchema := range pm.schema.Modules {
 		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
 		// Add or create the station module..

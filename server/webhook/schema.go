@@ -39,7 +39,8 @@ type MessageSchemaStation struct {
 }
 
 type MessageSchema struct {
-	Station MessageSchemaStation `json:"station"`
+	Station  *MessageSchemaStation   `json:"station"` // Deprecated
+	Stations []*MessageSchemaStation `json:"stations"`
 }
 
 type MessageSchemaRegistration struct {
@@ -56,10 +57,19 @@ type MessageSchemaRegistration struct {
 
 func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
 	if r.parsed == nil {
-		r.parsed = &MessageSchema{}
-		if err := json.Unmarshal(r.Body, r.parsed); err != nil {
+		parsed := &MessageSchema{}
+		if err := json.Unmarshal(r.Body, parsed); err != nil {
 			return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
 		}
+
+		if parsed.Station != nil {
+			parsed.Stations = []*MessageSchemaStation{parsed.Station}
+		} else if parsed.Stations == nil {
+			return nil, fmt.Errorf("malformed json message schema")
+		}
+
+		r.parsed = parsed
 	}
+
 	return r.parsed, nil
 }
