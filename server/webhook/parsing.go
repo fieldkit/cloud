@@ -24,7 +24,7 @@ type ParsedReading struct {
 }
 
 type ParsedAttribute struct {
-	StringValue string `json:"string_value"`
+	JSONValue interface{} `json:"json_value"`
 }
 
 type ParsedMessage struct {
@@ -223,9 +223,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	deviceID, err := hex.DecodeString(deviceIDString)
 	if err != nil {
-		if false {
-			return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
-		}
 		deviceID = []byte(deviceIDString)
 	}
 
@@ -266,18 +263,13 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	if stationSchema.Attributes != nil {
 		for _, attribute := range stationSchema.Attributes {
-			maybeValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
+			jsonValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
 			if err != nil {
 				return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
 			}
 
-			value, ok := maybeValue.(string)
-			if !ok {
-				return nil, fmt.Errorf("unexpected attribute value: %v", maybeValue)
-			}
-
 			attributes[attribute.Name] = &ParsedAttribute{
-				StringValue: value,
+				JSONValue: jsonValue,
 			}
 		}
 	}

@@ -251,7 +251,13 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 	if pm.attributes != nil {
 		for name, parsed := range pm.attributes {
 			if attribute, ok := station.Attributes[name]; ok {
-				attribute.StringValue = &parsed.StringValue
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					attribute.StringValue = &stringValue
+				} else {
+					if false {
+						log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
+					}
+				}
 			} else {
 				log.Warnw("wh:unknown-attribute", "attribute_name", name)
 			}
