@@ -226,9 +226,6 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
 		}
-		if parsedReading.Location {
-			log.Warnw("location parsing unimplemented")
-		}
 	}
 
 	now := time.Now()
@@ -251,11 +248,20 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 	if pm.attributes != nil {
 		for name, parsed := range pm.attributes {
 			if attribute, ok := station.Attributes[name]; ok {
-				if stringValue, ok := parsed.JSONValue.(string); ok {
-					attribute.StringValue = &stringValue
+				if parsed.Location {
+					if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
+						// Either has altitude or it doesn't.
+						if len(coordinates) == 2 || len(coordinates) == 3 {
+							station.Station.Location = data.NewLocation(coordinates)
+						}
+					}
 				} else {
-					if false {
-						log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
+					if stringValue, ok := parsed.JSONValue.(string); ok {
+						attribute.StringValue = &stringValue
+					} else {
+						if false {
+							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
+						}
 					}
 				}
 			} else {

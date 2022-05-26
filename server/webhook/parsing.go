@@ -19,12 +19,12 @@ type ParsedReading struct {
 	Key       string  `json:"key"`
 	Value     float64 `json:"value"`
 	Battery   bool    `json:"battery"`
-	Location  bool    `json:"location"`
 	Transient bool    `json:"transient"`
 }
 
 type ParsedAttribute struct {
 	JSONValue interface{} `json:"json_value"`
+	Location  bool        `json:"location"`
 }
 
 type ParsedMessage struct {
@@ -37,6 +37,19 @@ type ParsedMessage struct {
 	schema     *MessageSchemaStation
 	schemaID   int32
 	ownerID    int32
+}
+
+func toFloatArray(x interface{}) ([]float64, bool) {
+	if arrayValue, ok := x.([]interface{}); ok {
+		values := make([]float64, 0)
+		for _, opaque := range arrayValue {
+			if v, ok := toFloat(opaque); ok {
+				values = append(values, v)
+			}
+		}
+		return values, true
+	}
+	return nil, false
 }
 
 func toFloat(x interface{}) (float64, bool) {
@@ -247,7 +260,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				reading := &ParsedReading{
 					Key:       sensor.Key,
 					Battery:   sensor.Battery,
-					Location:  sensor.Location,
 					Transient: sensor.Transient,
 					Value:     value,
 				}
@@ -269,6 +281,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			}
 
 			attributes[attribute.Name] = &ParsedAttribute{
+				Location:  attribute.Location,
 				JSONValue: jsonValue,
 			}
 		}
