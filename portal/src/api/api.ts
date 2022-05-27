@@ -1396,8 +1396,8 @@ class FKApi {
             data: {
                 event: _.extend({}, dataEvent, {
                     body: JSON.stringify(dataEvent.body),
-                    description: dataEvent.description.content[0].content[0].text,
-                    title: dataEvent.title.content[0].content[0].text,
+                    description: dataEvent.description['content'][0].content[0].text,
+                    title: dataEvent.title['content'][0].content[0].text,
                 }),
             },
         });

@@ -9,7 +9,7 @@ import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
 import { notifications } from "./modules/notifications";
-import { dataEvents, discussion } from "./modules/discussion";
+import { dataEvents } from "./modules/discussion";
 import { Services } from "@/api";
 
 export * from "@/api";
