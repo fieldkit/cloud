@@ -391,9 +391,6 @@ class FKApi {
             headers["Authorization"] = token;
         }
 
-        console.log("PARAMS", params.data)
-        
-        
         return {
             method: params.method,
             url: params.url,
@@ -1315,13 +1312,6 @@ class FKApi {
                 replies: this.parseBodies(post.replies),
             });
         }
-    }
-    private parseDataEvent(event: DataEvent): Comment {
-        return _.extend(event, {
-            body: JSON.parse(event.description),
-            replies: []
-        });
-
     }
 
     private parseBodies(posts: Comment[]): Comment[] {

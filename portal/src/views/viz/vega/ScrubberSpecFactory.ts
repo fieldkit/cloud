@@ -14,8 +14,6 @@ export class ScrubberSpecFactory {
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
-        console.log("DATA EVENTS SCRUBBER", this.dataEvents)
-
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",
             description: "FK Scrubber Spec",
@@ -34,6 +32,7 @@ export class ScrubberSpecFactory {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
                     labelColor: "#2c3e50",
+                    offset: 10,
                     titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
@@ -173,6 +172,26 @@ export class ScrubberSpecFactory {
                     ]
                 },
                 {
+                    name: "event_click",
+                    init: "",
+                    on:
+                    [
+                        {
+                            events:
+                            {
+                                source: "scope",
+                                type: "mouseup",
+                                filter:
+                                [
+                                    "event.item.mark.name === \"de_circle\""
+                                ]
+                                
+                            },
+                            update: "event.item.datum.bookmark"
+                        }
+                    ]
+                },
+                {
                     name: "unit",
                     value:
                     {},
@@ -238,7 +257,7 @@ export class ScrubberSpecFactory {
                                 filter:
                                 [
                                     //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
-                                    "!event.item || event.item.mark.name !== \"brush_brush\""
+                                    "!event.item || event.item.mark.name !== \"brush_brush\" || event.item.mark.name !== \"de_circle\""
                                 ]
                             },
                             update: "[x(unit), x(unit)]"
@@ -259,7 +278,7 @@ export class ScrubberSpecFactory {
                                         filter:
                                         [
                                             //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
-                                            "!event.item || event.item.mark.name !== \"brush_brush\""
+                                            "!event.item || event.item.mark.name !== \"brush_brush\" || event.item.mark.name !== \"de_circle\""
                                         ]
                                     },
                                     {
@@ -461,7 +480,7 @@ export class ScrubberSpecFactory {
                             update: "modify(\"brush_store\", brush_tuple, true)"
                         }
                     ]
-                }
+                },
             ],
             marks:
             [
@@ -740,6 +759,47 @@ export class ScrubberSpecFactory {
                       }
                     }
                 },
+
+                {
+                    type: "symbol",
+                    interactive: true,
+                    name: "de_circle",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        yc: {value: 50},
+                        fill: {value: "white"},
+                        stroke: {value: "#999"},
+                        size: {value: 700},
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "start"}
+                      }
+                    }
+                },
+                {
+                    type: "path",
+                    interactive: false,
+                    name: "de_flag",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        yc: {value: 50},
+                        fill: {value: "#52b5e4"},
+                        size: {value: 100},
+                        path: {value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z"}
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "start"}
+                      }
+                    }
+                },
                 {
                     type: "symbol",
                     interactive: true,
@@ -776,48 +836,8 @@ export class ScrubberSpecFactory {
                       }
                     }
                 },
-                {
-                    type: "symbol",
-                    interactive: false,
-                    clip: true,
-                    name: "de_circle",
-                    from:
-                    {
-                        data: "data_events"
-                    },
-                    encode: {
-                      enter: {
-                        yc: {value: 0},
-                        fill: {value: "white"},
-                        stroke: {value: "#999"},
-                        size: {value: 200},
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "start"}
-                      }
-                    }
-                },
-                {
-                    type: "symbol",
-                    interactive: false,
-                    clip: true,
-                    name: "de_flag",
-                    from:
-                    {
-                        data: "data_events"
-                    },
-                    encode: {
-                      enter: {
-                        yc: {value: 0},
-                        fill: {value: "#52b5e4"},
-                        size: {value: 100},
-                        shape: {value: "triangle-right"},
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "start"}
-                      }
-                    }
-                },
+
+
             ],
             scales:
             [

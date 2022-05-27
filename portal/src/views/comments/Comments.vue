@@ -7,14 +7,14 @@
                 <div class="event-sensor-selector">
                     <label for="allProjectRadio">
                         <div class="event-sensor-radio">
-                            <input type="radio" id="allProjectRadio" name="eventLevel" checked/>
+                            <input type="radio" id="allProjectRadio" name="eventLevel" checked />
                             <span class="radio-label">All Project Sensors</span>
                             <p>People will see this event when viewing data for any stations that belong to these projects</p>
                         </div>
                     </label>
                     <label for="allSensorsRadio">
                         <div class="event-sensor-radio">
-                            <input type="radio" id="allSensorsRadio" name="eventLevel"/>
+                            <input type="radio" id="allSensorsRadio" name="eventLevel" />
                             <span class="radio-label">Just These Sensors</span>
                             <p>People will see this event only when viewing data for these stations</p>
                         </div>
@@ -23,15 +23,28 @@
                 <div class="new-comment" :class="{ 'align-center': !user }">
                     <UserPhoto :user="user"></UserPhoto>
                     <template v-if="user">
-                        <div class="new-comment-wrap">  
-                            <Tiptap v-model="newDataEvent.title" placeholder="Event Title" saveLabel="Post" @save="saveDataEvent(newDataEvent)" />
-                            <Tiptap v-model="newDataEvent.description" placeholder="Event Description" saveLabel="Post" @save="saveDataEvent(newDataEvent)" />
+                        <div class="new-comment-wrap">
+                            <Tiptap
+                                v-model="newDataEvent.title"
+                                placeholder="Event Title"
+                                saveLabel="Post"
+                                @save="saveDataEvent(newDataEvent)"
+                            />
+                            <Tiptap
+                                v-model="newDataEvent.description"
+                                placeholder="Event Description"
+                                saveLabel="Post"
+                                @save="saveDataEvent(newDataEvent)"
+                            />
                         </div>
                     </template>
                     <template v-else>
                         <p class="need-login-msg" @click="test()">
                             {{ $tc("comments.loginToComment.part1") }}
-                            <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                            <router-link
+                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                                class="link"
+                            >
                                 {{ $tc("comments.loginToComment.part2") }}
                             </router-link>
                             {{ $tc("comments.loginToComment.part3") }}
@@ -49,14 +62,22 @@
                 <div class="new-comment" :class="{ 'align-center': !user }">
                     <UserPhoto :user="user"></UserPhoto>
                     <template v-if="user">
-                        <div class="new-comment-wrap">  
-                            <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                        <div class="new-comment-wrap">
+                            <Tiptap
+                                v-model="newComment.body"
+                                placeholder="Join the discussion!"
+                                saveLabel="Post"
+                                @save="save(newComment)"
+                            />
                         </div>
                     </template>
                     <template v-else>
                         <p class="need-login-msg" @click="test()">
                             {{ $tc("comments.loginToComment.part1") }}
-                            <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                            <router-link
+                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                                class="link"
+                            >
                                 {{ $tc("comments.loginToComment.part2") }}
                             </router-link>
                             {{ $tc("comments.loginToComment.part3") }}
@@ -75,7 +96,7 @@
         <div class="new-comment" :class="{ 'align-center': !user }" v-if="viewType === 'project'">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
-                <div class="new-comment-wrap">  
+                <div class="new-comment-wrap">
                     <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
                 </div>
             </template>
@@ -101,15 +122,15 @@
         <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
         <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
-        <div class="list" v-if="posts && posts.length > 0">
+        <div class="list" v-if="postsAndEvents && postsAndEvents.length > 0">
             <div class="subheader">
-                <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
+                <span class="comments-counter" v-if="viewType === 'project'">{{ postsAndEvents.length }} comments</span>
                 <header v-if="viewType === 'data'">Events & Comments</header>
             </div>
             <transition-group name="fade">
                 <div
                     class="comment comment-first-level"
-                    v-for="post in posts"
+                    v-for="post in postsAndEvents"
                     v-bind:key="post.id"
                     v-bind:id="'comment-id-' + post.id"
                     :ref="post.id"
@@ -128,7 +149,17 @@
                                 />
                                 <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
                             </div>
-                            <Tiptap v-model="post.body" :readonly="post.readonly" saveLabel="Save" @save="saveEdit(post.id, post.body)" />
+                            <Tiptap
+                                v-if="post.body"
+                                v-model="post.body"
+                                :readonly="post.readonly"
+                                saveLabel="Save"
+                                @save="saveEdit(post.id, post.body)"
+                            />
+                            <div v-else>
+                                <h3>{{ post.title }}</h3>
+                                {{ post.description }}
+                            </div>
                         </div>
                     </div>
                     <div class="column">
@@ -179,7 +210,7 @@
                         </transition>
 
                         <div v-if="user" class="actions">
-                            <button @click="addReply(post)">
+                            <button v-if="post.body" @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
                                 Reply
                             </button>
@@ -200,7 +231,7 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
-import { Comment, DataEvent } from "@/views/comments/model";
+import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
@@ -210,14 +241,13 @@ import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
 import { ActionTypes } from "@/store";
 
-
 export default Vue.extend({
     name: "Comments",
     components: {
         ...CommonComponents,
         ListItemOptions,
         Tiptap,
-        SectionToggle
+        SectionToggle,
     },
     props: {
         user: {
@@ -288,10 +318,17 @@ export default Vue.extend({
         },
     },
     mounted(): Promise<void> {
-        this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
+        this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) }).then(() => {
+            this.dataEvents = [...this.$getters.dataEvents, ...this.dataEvents];
+        });
 
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
+    },
+    computed: {
+        postsAndEvents(): DiscussionBase[] {
+            return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
+        },
     },
     methods: {
         getNewCommentPlaceholder(): string {
@@ -300,9 +337,6 @@ export default Vue.extend({
             } else {
                 return "Write a comment about this Data View";
             }
-        },
-        getDataEvents() {
-            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
         },
         async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
             this.errorMessage = null;
@@ -315,23 +349,28 @@ export default Vue.extend({
             const timeRange: TimeRange = this.parentData.allTimeRange;
             dataEvent.start = timeRange.start;
             dataEvent.end = timeRange.end;
-            console.log("SAVE DATA EVENT", dataEvent)
 
             await this.$services.api
                 .postDataEvent(dataEvent)
                 .then((response: { event: DataEvent }) => {
                     // add data-event to the posts array
                     if (this.dataEvents) {
-                        this.dataEvents.unshift(
-                            new DataEvent(
-                                response.event.id,
-                                response.event.author,
-                                response.event.bookmark,
-                                response.event.description,
-                                response.event.createdAt,
-                                response.event.updatedAt
-                            )
+                        const de = new DataEvent(
+                            response.event.id,
+                            response.event.author,
+                            response.event.bookmark,
+                            response.event.createdAt,
+                            response.event.updatedAt,
+                            response.event.title,
+                            response.event.description,
+                            response.event.start,
+                            response.event.end
                         );
+                        this.dataEvents.unshift(de);
+                        this.newDataEvent.title = "";
+                        this.newDataEvent.description = "";
+
+                        this.$store.dispatch(ActionTypes.NEW_DATA_EVENT, { dataEvent: de });
                     } else {
                         console.log(`posts is null`);
                     }
@@ -511,14 +550,16 @@ export default Vue.extend({
             });
         },
         onSectionToggle(evt) {
-            console.log("SECTION TOGGLE", evt)
-            if(evt === "right"){
+            if (evt === "right") {
                 this.logMode = "comment";
             }
-            if(evt === "left"){
+            if (evt === "left") {
                 this.logMode = "event";
             }
-        }
+        },
+        sortRecent(a, b) {
+            return a.createdAt - b.createdAt;
+        },
     },
 });
 </script>
@@ -665,9 +706,11 @@ header {
         .new-comment-wrap {
             flex: 0 0 calc(100% - 65px);
             flex-direction: column;
+            background-color: rgba(#f4f5f7, 0.55);
 
             .tiptap-container {
                 margin-top: 10px;
+                background-color: white;
             }
         }
     }
@@ -679,6 +722,13 @@ header {
         background-color: #fff;
     }
 }
+// .ProseMirror p.is-editor-empty:first-child::before {
+// 	color: #adb5bd;
+// 	content: attr(data-placeholder);
+// 	float: left;
+// 	height: 0;
+// 	pointer-events: none;
+// }
 
 .comments-counter {
     font-family: $font-family-light;
@@ -861,6 +911,7 @@ header {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    margin-bottom: 15px;
 }
 .event-sensor-radio {
     max-width: 100vh;
@@ -887,7 +938,8 @@ header {
     }
 }
 
-.event-sensor-radio > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
+.event-sensor-radio > input:checked + div {
+    /* (RADIO CHECKED) DIV STYLES */
     background-color: #ffd6bb;
     border: 1px solid #ff6600;
 }

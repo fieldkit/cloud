@@ -40,11 +40,14 @@ export default {
         async visible() {
             this.pickRange(this.visible);
         },
+        async dataEvents(): Promise<void> {
+            await this.refresh();
+        },
     },
     computed: {
-        dataEvents () {
+        dataEvents() {
             return this.$getters.dataEvents;
-        }
+        },
     },
     methods: {
         async refresh(): Promise<void> {
@@ -76,6 +79,12 @@ export default {
             // vegaInfo.view.addEventListener("mousedown", (evt, value) => {
             //     console.log(evt, value);
             // });
+            vegaInfo.view.addSignalListener("event_click", (_, value) => {
+                return this.$router.push({
+                    name: "exploreBookmark",
+                    query: { bookmark: value },
+                });
+            });
             vegaInfo.view.addEventListener("mouseup", () => {
                 console.log("viz: vega:scrubber-brush", scrubbed);
                 if (scrubbed.length == 2) {
@@ -85,7 +94,7 @@ export default {
 
             console.log("viz: scrubber", {
                 state: vegaInfo.view.getState(),
-                data: vegaInfo.view.data("data_1")
+                data: vegaInfo.view.data("data_1"),
             });
 
             this.pickRange(this.visible);
@@ -128,22 +137,10 @@ export default {
                 }
             }
         },
-        //TODO move to store
-        // async getDataEvents() {
-        //     await this.$services.api
-        //         .getDataEvents(JSON.stringify(this.parentData))
-        //         .then( (response) => {
-        //             console.log(response)
-        //         })
-        //         .catch((e) => {
-        //             console.error(e);
-        //             //this.errorMessage = CommentsErrorsEnum.postComment;
-        //         });
 
-        // },
         getDataEvents() {
             this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
-        }
+        },
     },
 };
 </script>

@@ -50,3 +50,4 @@ export const NEED_NOTES = "NEED_NOTES";
 // Discussion
 
 export const NEED_DATA_EVENTS = "NEED_DATA_EVENTS";
+export const NEW_DATA_EVENT = "NEW_DATA_EVENT";
