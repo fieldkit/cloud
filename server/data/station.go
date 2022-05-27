@@ -81,7 +81,7 @@ type Station struct {
 	FirmwareTime       *int64     `db:"firmware_time"`
 	PlaceOther         *string    `db:"place_other"`
 	PlaceNative        *string    `db:"place_native"`
-	PhotoID            int32     `db:"photo_id"`
+	PhotoID            int32      `db:"photo_id"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
@@ -214,15 +214,17 @@ type AggregatedDataSummary struct {
 }
 
 type StationFull struct {
-	Station        *Station
-	Owner          *User
-	Areas          []*StationArea
-	Ingestions     []*Ingestion
-	Configurations []*StationConfiguration
-	Modules        []*StationModule
-	Sensors        []*ModuleSensor
-	DataSummary    *AggregatedDataSummary
-	HasImages      bool
+	Station         *Station
+	Owner           *User
+	Interestingness []*StationInterestingness
+	Attributes      []*StationProjectNamedAttribute
+	Areas           []*StationArea
+	Ingestions      []*Ingestion
+	Configurations  []*StationConfiguration
+	Modules         []*StationModule
+	Sensors         []*ModuleSensor
+	DataSummary     *AggregatedDataSummary
+	HasImages       bool
 }
 
 type EssentialStation struct {

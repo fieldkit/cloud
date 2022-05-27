@@ -1585,6 +1585,64 @@ func marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v *stationvie
 	return res
 }
 
+// marshalStationviewsStationInterestingnessViewToStationInterestingnessResponseBody
+// builds a value of type *StationInterestingnessResponseBody from a value of
+// type *stationviews.StationInterestingnessView.
+func marshalStationviewsStationInterestingnessViewToStationInterestingnessResponseBody(v *stationviews.StationInterestingnessView) *StationInterestingnessResponseBody {
+	res := &StationInterestingnessResponseBody{}
+	if v.Windows != nil {
+		res.Windows = make([]*StationInterestingnessWindowResponseBody, len(v.Windows))
+		for i, val := range v.Windows {
+			res.Windows[i] = marshalStationviewsStationInterestingnessWindowViewToStationInterestingnessWindowResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalStationviewsStationInterestingnessWindowViewToStationInterestingnessWindowResponseBody
+// builds a value of type *StationInterestingnessWindowResponseBody from a
+// value of type *stationviews.StationInterestingnessWindowView.
+func marshalStationviewsStationInterestingnessWindowViewToStationInterestingnessWindowResponseBody(v *stationviews.StationInterestingnessWindowView) *StationInterestingnessWindowResponseBody {
+	res := &StationInterestingnessWindowResponseBody{
+		Seconds:         *v.Seconds,
+		Interestingness: *v.Interestingness,
+		Value:           *v.Value,
+		Time:            *v.Time,
+	}
+
+	return res
+}
+
+// marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody
+// builds a value of type *StationProjectAttributesResponseBody from a value of
+// type *stationviews.StationProjectAttributesView.
+func marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody(v *stationviews.StationProjectAttributesView) *StationProjectAttributesResponseBody {
+	res := &StationProjectAttributesResponseBody{}
+	if v.Attributes != nil {
+		res.Attributes = make([]*StationProjectAttributeResponseBody, len(v.Attributes))
+		for i, val := range v.Attributes {
+			res.Attributes[i] = marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody
+// builds a value of type *StationProjectAttributeResponseBody from a value of
+// type *stationviews.StationProjectAttributeView.
+func marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody(v *stationviews.StationProjectAttributeView) *StationProjectAttributeResponseBody {
+	res := &StationProjectAttributeResponseBody{
+		ProjectID:   *v.ProjectID,
+		AttributeID: *v.AttributeID,
+		Name:        *v.Name,
+		StringValue: *v.StringValue,
+	}
+
+	return res
+}
+
 // marshalStationviewsStationUploadViewToStationUploadResponseBody builds a
 // value of type *StationUploadResponseBody from a value of type
 // *stationviews.StationUploadView.
@@ -1836,6 +1894,12 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)
+	}
+	if v.Interestingness != nil {
+		res.Interestingness = marshalStationviewsStationInterestingnessViewToStationInterestingnessResponseBody(v.Interestingness)
+	}
+	if v.Attributes != nil {
+		res.Attributes = marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody(v.Attributes)
 	}
 	if v.Uploads != nil {
 		res.Uploads = make([]*StationUploadResponseBody, len(v.Uploads))

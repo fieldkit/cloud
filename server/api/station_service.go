@@ -924,12 +924,38 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		}
 	}
 
+	windows := make([]*station.StationInterestingnessWindow, 0)
+	for _, iness := range sf.Interestingness {
+		windows = append(windows, &station.StationInterestingnessWindow{
+			Seconds:         iness.WindowSeconds,
+			Interestingness: float64(iness.Interestingness),
+			Value:           iness.ReadingValue,
+			Time:            iness.ReadingTime.Unix() * 1000,
+		})
+	}
+
+	attributes := make([]*station.StationProjectAttribute, 0)
+	for _, attribute := range sf.Attributes {
+		attributes = append(attributes, &station.StationProjectAttribute{
+			ProjectID:   attribute.ProjectID,
+			AttributeID: attribute.AttributeID,
+			Name:        attribute.Name,
+			StringValue: attribute.StringValue,
+		})
+	}
+
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
 		ReadOnly: readOnly,
 		DeviceID: hex.EncodeToString(sf.Station.DeviceID),
-		Uploads:  transformUploads(sf.Ingestions),
+		Interestingness: &station.StationInterestingness{
+			Windows: windows,
+		},
+		Attributes: &station.StationProjectAttributes{
+			Attributes: attributes,
+		},
+		Uploads: transformUploads(sf.Ingestions),
 		Configurations: &station.StationConfigurations{
 			All: configurations,
 		},

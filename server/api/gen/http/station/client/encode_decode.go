@@ -1948,6 +1948,60 @@ func unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v *StationO
 	return res
 }
 
+// unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView
+// builds a value of type *stationviews.StationInterestingnessView from a value
+// of type *StationInterestingnessResponseBody.
+func unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v *StationInterestingnessResponseBody) *stationviews.StationInterestingnessView {
+	res := &stationviews.StationInterestingnessView{}
+	res.Windows = make([]*stationviews.StationInterestingnessWindowView, len(v.Windows))
+	for i, val := range v.Windows {
+		res.Windows[i] = unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView
+// builds a value of type *stationviews.StationInterestingnessWindowView from a
+// value of type *StationInterestingnessWindowResponseBody.
+func unmarshalStationInterestingnessWindowResponseBodyToStationviewsStationInterestingnessWindowView(v *StationInterestingnessWindowResponseBody) *stationviews.StationInterestingnessWindowView {
+	res := &stationviews.StationInterestingnessWindowView{
+		Seconds:         v.Seconds,
+		Interestingness: v.Interestingness,
+		Value:           v.Value,
+		Time:            v.Time,
+	}
+
+	return res
+}
+
+// unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView
+// builds a value of type *stationviews.StationProjectAttributesView from a
+// value of type *StationProjectAttributesResponseBody.
+func unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(v *StationProjectAttributesResponseBody) *stationviews.StationProjectAttributesView {
+	res := &stationviews.StationProjectAttributesView{}
+	res.Attributes = make([]*stationviews.StationProjectAttributeView, len(v.Attributes))
+	for i, val := range v.Attributes {
+		res.Attributes[i] = unmarshalStationProjectAttributeResponseBodyToStationviewsStationProjectAttributeView(val)
+	}
+
+	return res
+}
+
+// unmarshalStationProjectAttributeResponseBodyToStationviewsStationProjectAttributeView
+// builds a value of type *stationviews.StationProjectAttributeView from a
+// value of type *StationProjectAttributeResponseBody.
+func unmarshalStationProjectAttributeResponseBodyToStationviewsStationProjectAttributeView(v *StationProjectAttributeResponseBody) *stationviews.StationProjectAttributeView {
+	res := &stationviews.StationProjectAttributeView{
+		ProjectID:   v.ProjectID,
+		AttributeID: v.AttributeID,
+		Name:        v.Name,
+		StringValue: v.StringValue,
+	}
+
+	return res
+}
+
 // unmarshalStationUploadResponseBodyToStationviewsStationUploadView builds a
 // value of type *stationviews.StationUploadView from a value of type
 // *StationUploadResponseBody.
@@ -2186,6 +2240,8 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		IngestionAt:        v.IngestionAt,
 	}
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
+	res.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v.Interestingness)
+	res.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(v.Attributes)
 	res.Uploads = make([]*stationviews.StationUploadView, len(v.Uploads))
 	for i, val := range v.Uploads {
 		res.Uploads[i] = unmarshalStationUploadResponseBodyToStationviewsStationUploadView(val)

@@ -15,6 +15,27 @@
                     Facebook
                 </span>
             </a>
+            <a class="share-button share-button--url">
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
+                <span>
+                    {{ $t("sharePanel.copyUrl") }}
+                </span>
+            </a>
+            <a class="share-button" @click="openMailClient()">
+                <i class="icon icon-mail"></i>
+                <span>
+                    {{ $t("sharePanel.emailUrl") }}
+                </span>
+            </a>
+            <div class="url" target="blank">
+                <input readonly ref="url" :value="getCurrentURL()" />
+                <button @click="copyUrlToClipboard()">
+                    {{ $t("sharePanel.copyBtn") }}
+                </button>
+                <span :class="{ visible: showCopiedLink }" class="url-copied">
+                    {{ $t("sharePanel.linkCopied") }}
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -23,8 +44,9 @@
 import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import { getPartnerCustomization } from "@/views/shared/partners";
+import { getPartnerCustomization, getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 import { mapState } from "vuex";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 function getRelativeUrl(href: string): string {
     const link = document.createElement("a");
@@ -51,8 +73,12 @@ export default Vue.extend({
             required: true,
         },
     },
-    data: (): {} => {
-        return {};
+    data: (): {
+        showCopiedLink: boolean;
+    } => {
+        return {
+            showCopiedLink: false,
+        };
     },
     computed: {
         ...mapState({}),
@@ -86,20 +112,42 @@ export default Vue.extend({
         onShareTwitter() {
             console.log("ok");
         },
+        getCurrentURL(): string {
+            return window.location.href;
+        },
+        copyUrlToClipboard(): void {
+            const inputEl = this.$refs["url"] as HTMLInputElement;
+            navigator.clipboard.writeText(inputEl.value).then(() => {
+                this.showCopiedLink = true;
+                setTimeout(() => {
+                    this.showCopiedLink = false;
+                }, 3000);
+            });
+        },
+        openMailClient(): void {
+            const partnerCustomization = getPartnerCustomizationWithDefault();
+            const body = this.getCurrentURL();
+            const subject = this.$t(partnerCustomization.email.subject);
+            window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+        },
     },
 });
 </script>
 
 <style lang="scss">
+@import "src/scss/mixins";
+
 .share-panel .heading {
     padding: 25px 20px;
     display: flex;
     align-items: center;
 }
+
 .share-panel .heading .title {
     font-size: 20px;
     font-weight: 500;
 }
+
 .share-panel .heading .close-button {
     margin-left: auto;
     cursor: pointer;
@@ -113,6 +161,10 @@ export default Vue.extend({
         font-size: 19px;
         margin-right: 10px;
         margin-top: -2px;
+
+        &-mail {
+            font-size: 14px;
+        }
     }
 
     .share-button {
@@ -125,6 +177,14 @@ export default Vue.extend({
         &:hover {
             background-color: #f4f5f7;
         }
+
+        &--url {
+            cursor: initial;
+
+            &:hover {
+                background-color: initial;
+            }
+        }
     }
 
     .link {
@@ -134,6 +194,58 @@ export default Vue.extend({
         border-radius: 4px;
         cursor: pointer;
         margin-bottom: 1em;
+    }
+
+    .url {
+        margin: 0 20px;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        input {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 14px;
+            margin-left: 30px;
+            width: 100%;
+            height: 21px;
+            padding-left: 5px;
+            color: var(--color-dark);
+            border: 1px solid var(--color-border);
+            font-family: var(--font-family-medium);
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        button {
+            margin-left: 10px;
+            font-size: 12px;
+            padding: 5px 10px;
+            background-color: #ffffff;
+            border: 1px solid #d7dce1;
+            border-radius: 4px;
+            font-family: var(--font-family-bold);
+        }
+    }
+
+    .url-copied {
+        background-color: rgba(160, 219, 225, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: opacity 0.25s;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
+        @include position(absolute, null 0 -35px null);
+
+        &.visible {
+            opacity: 1;
+            visibility: visible;
+        }
     }
 }
 </style>

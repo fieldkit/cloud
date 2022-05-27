@@ -22,16 +22,34 @@ type ParsedReading struct {
 	Transient bool    `json:"transient"`
 }
 
+type ParsedAttribute struct {
+	JSONValue interface{} `json:"json_value"`
+	Location  bool        `json:"location"`
+}
+
 type ParsedMessage struct {
 	Original   *WebHookMessage
 	DeviceID   []byte
 	DeviceName string
 	Data       []*ParsedReading
+	Attributes map[string]*ParsedAttribute
 	ReceivedAt time.Time
-	Schema     *MessageSchema
+	Schema     *MessageSchemaStation
 	SchemaID   int32
 	OwnerID    int32
-	Location   []float64
+}
+
+func toFloatArray(x interface{}) ([]float64, bool) {
+	if arrayValue, ok := x.([]interface{}); ok {
+		values := make([]float64, 0)
+		for _, opaque := range arrayValue {
+			if v, ok := toFloat(opaque); ok {
+				values = append(values, v)
+			}
+		}
+		return values, true
+	}
+	return nil, false
 }
 
 func toFloat(x interface{}) (float64, bool) {
@@ -143,46 +161,28 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 	return "", &EvaluationError{NoReturn: true, Query: query}
 }
 
-func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
-	if m.SchemaID == nil {
-		return nil, fmt.Errorf("missing schema id")
-	}
-
-	schemaRegistration, ok := schemas[*m.SchemaID]
-	if !ok {
-		return nil, fmt.Errorf("missing schema")
-	}
-
-	schema, err := schemaRegistration.Parse()
-	if err != nil {
-		return nil, fmt.Errorf("error parsing schema: %v", err)
-	}
-
-	var source interface{}
-	if err := json.Unmarshal(m.Body, &source); err != nil {
-		return nil, fmt.Errorf("error parsing message: %v", err)
-	}
-
+func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
-	if schema.Station.ConditionExpression != "" {
-		if _, err := m.evaluate(ctx, cache, source, schema.Station.ConditionExpression); err != nil {
+	if stationSchema.ConditionExpression != "" {
+		if _, err := m.evaluate(ctx, cache, source, stationSchema.ConditionExpression); err != nil {
 			if _, ok := err.(*EvaluationError); ok {
+				// No luck, skipping and maybe another stationSchema will cover this message.
 				return nil, nil
 			}
 			return nil, fmt.Errorf("evaluating condition-expression: %v", err)
 		}
 	}
 
-	deviceIDRaw, err := m.evaluate(ctx, cache, source, schema.Station.IdentifierExpression)
+	deviceIDRaw, err := m.evaluate(ctx, cache, source, stationSchema.IdentifierExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
 	deviceNameString := ""
 
-	if schema.Station.NameExpression != "" {
-		deviceNameRaw, err := m.evaluate(ctx, cache, source, schema.Station.NameExpression)
+	if stationSchema.NameExpression != "" {
+		deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression)
 		if err != nil {
 			return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
 		}
@@ -193,7 +193,7 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		}
 	}
 
-	receivedAtRaw, err := m.evaluate(ctx, cache, source, schema.Station.ReceivedExpression)
+	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
@@ -236,15 +236,12 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	deviceID, err := hex.DecodeString(deviceIDString)
 	if err != nil {
-		if false {
-			return nil, fmt.Errorf("malformed device eui: %v", deviceIDRaw)
-		}
 		deviceID = []byte(deviceIDString)
 	}
 
 	sensors := make([]*ParsedReading, 0)
 
-	for _, module := range schema.Station.Modules {
+	for _, module := range stationSchema.Modules {
 		for _, sensor := range module.Sensors {
 			if sensor.Key == "" {
 				return nil, fmt.Errorf("empty sensor-key")
@@ -275,24 +272,18 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		}
 	}
 
-	var location []float64
+	attributes := make(map[string]*ParsedAttribute)
 
-	if schema.Station.LongitudeExpression != "" && schema.Station.LatitudeExpression != "" {
-		maybeLongitude, err := m.evaluate(ctx, cache, source, schema.Station.LongitudeExpression)
-		if err != nil {
-			return nil, fmt.Errorf("evaluating longitude expression: %v", err)
-		}
+	if stationSchema.Attributes != nil {
+		for _, attribute := range stationSchema.Attributes {
+			jsonValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
+			if err != nil {
+				return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
+			}
 
-		maybeLatitude, err := m.evaluate(ctx, cache, source, schema.Station.LatitudeExpression)
-		if err != nil {
-			return nil, fmt.Errorf("evaluating latitude expression: %v", err)
-		}
-
-		if maybeLongitude != nil && maybeLatitude != nil {
-			if longitude, ok := maybeLongitude.(float64); ok {
-				if latitude, ok := maybeLatitude.(float64); ok {
-					location = []float64{longitude, latitude}
-				}
+			attributes[attribute.Name] = &ParsedAttribute{
+				Location:  attribute.Location,
+				JSONValue: jsonValue,
 			}
 		}
 	}
@@ -301,10 +292,41 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		DeviceID:   deviceID,
 		DeviceName: deviceNameString,
 		Data:       sensors,
+		Attributes: attributes,
 		ReceivedAt: *receivedAt,
 		OwnerID:    schemaRegistration.OwnerID,
 		SchemaID:   schemaRegistration.ID,
-		Schema:     schema,
-		Location:   location,
+		Schema:     stationSchema,
 	}, nil
+}
+
+func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
+	if m.SchemaID == nil {
+		return nil, fmt.Errorf("missing schema id")
+	}
+
+	schemaRegistration, ok := schemas[*m.SchemaID]
+	if !ok {
+		return nil, fmt.Errorf("missing schema")
+	}
+
+	schema, err := schemaRegistration.Parse()
+	if err != nil {
+		return nil, fmt.Errorf("error parsing schema: %v", err)
+	}
+
+	var source interface{}
+	if err := json.Unmarshal(m.Body, &source); err != nil {
+		return nil, fmt.Errorf("error parsing message: %v", err)
+	}
+
+	for _, stationSchema := range schema.Stations {
+		if p, err = m.tryParse(ctx, cache, schemaRegistration, stationSchema, source); err != nil {
+			return nil, err
+		} else if p != nil {
+			break
+		}
+	}
+
+	return p, nil
 }

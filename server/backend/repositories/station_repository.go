@@ -491,6 +491,27 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
+	iness := []*data.StationInterestingness{}
+	if err := r.db.SelectContext(ctx, &iness, `
+		SELECT
+			s.id, s.station_id, s.window_seconds, s.interestingness, s.reading_sensor_id, s.reading_module_id, s.reading_value, s.reading_time
+		FROM fieldkit.station_interestingness AS s
+		WHERE s.station_id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	attributes := []*data.StationProjectNamedAttribute{}
+	if err := r.db.SelectContext(ctx, &attributes, `
+		SELECT
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+		FROM fieldkit.station_project_attribute AS spa
+		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
+		WHERE spa.station_id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
 	areas := []*data.StationArea{}
 	if err := r.db.SelectContext(ctx, &areas, `
 		SELECT
@@ -577,7 +598,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -599,6 +620,27 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	owners := []*data.User{}
 	if err := r.db.SelectContext(ctx, &owners, `
 		SELECT * FROM fieldkit.user WHERE id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	iness := []*data.StationInterestingness{}
+	if err := r.db.SelectContext(ctx, &iness, `
+		SELECT
+			s.id, s.station_id, s.window_seconds, s.interestingness, s.reading_sensor_id, s.reading_module_id, s.reading_value, s.reading_time
+		FROM fieldkit.station_interestingness AS s
+		WHERE s.station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
+		`, id); err != nil {
+		return nil, err
+	}
+
+	attributes := []*data.StationProjectNamedAttribute{}
+	if err := r.db.SelectContext(ctx, &attributes, `
+		SELECT
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+		FROM fieldkit.station_project_attribute AS spa
+		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
+		WHERE spa.station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
 		`, id); err != nil {
 		return nil, err
 	}
@@ -708,7 +750,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -727,6 +769,27 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		SELECT *
 		FROM fieldkit.user
 		WHERE id IN (SELECT owner_id FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1))
+		`, id); err != nil {
+		return nil, err
+	}
+
+	iness := []*data.StationInterestingness{}
+	if err := r.db.SelectContext(ctx, &iness, `
+		SELECT
+			s.id, s.station_id, s.window_seconds, s.interestingness, s.reading_sensor_id, s.reading_module_id, s.reading_value, s.reading_time
+		FROM fieldkit.station_interestingness AS s
+		WHERE s.station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		`, id); err != nil {
+		return nil, err
+	}
+
+	attributes := []*data.StationProjectNamedAttribute{}
+	if err := r.db.SelectContext(ctx, &attributes, `
+		SELECT
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+		FROM fieldkit.station_project_attribute AS spa
+		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
+		WHERE spa.station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
 		`, id); err != nil {
 		return nil, err
 	}
@@ -853,13 +916,18 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, areas []*data.StationArea, dataSummaries []*data.AggregatedDataSummary,
-	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision, configurations []*data.StationConfiguration,
+func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, iness []*data.StationInterestingness,
+	attributes []*data.StationProjectNamedAttribute, areas []*data.StationArea,
+	dataSummaries []*data.AggregatedDataSummary,
+	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision,
+	configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
+
 	ownersByID := make(map[int32]*data.User)
+	inessByID := make(map[int32][]*data.StationInterestingness)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
 	summariesByStationID := make(map[int32]*data.AggregatedDataSummary)
 	mediaByStationID := make(map[int32][]*data.FieldNoteMedia)
@@ -867,6 +935,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	sensorsByStationID := make(map[int32][]*data.ModuleSensor)
 	stationIDsByDeviceID := make(map[string]int32)
 	areasByStationID := make(map[int32][]*data.StationArea)
+	attributesByStationID := make(map[int32][]*data.StationProjectNamedAttribute)
 
 	for _, station := range stations {
 		key := hex.EncodeToString(station.DeviceID)
@@ -875,11 +944,21 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 		modulesByStationID[station.ID] = make([]*data.StationModule, 0)
 		sensorsByStationID[station.ID] = make([]*data.ModuleSensor, 0)
 		areasByStationID[station.ID] = make([]*data.StationArea, 0)
+		inessByID[station.ID] = make([]*data.StationInterestingness, 0)
+		attributesByStationID[station.ID] = make([]*data.StationProjectNamedAttribute, 0)
 		stationIDsByDeviceID[key] = station.ID
 	}
 
 	for _, v := range owners {
 		ownersByID[v.ID] = v
+	}
+
+	for _, v := range iness {
+		inessByID[v.StationID] = append(inessByID[v.StationID], v)
+	}
+
+	for _, v := range attributes {
+		attributesByStationID[v.StationID] = append(attributesByStationID[v.StationID], v)
 	}
 
 	for _, v := range areas {
@@ -935,15 +1014,17 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	all := make([]*data.StationFull, 0, len(stations))
 	for _, station := range stations {
 		all = append(all, &data.StationFull{
-			Station:        station,
-			Owner:          ownersByID[station.OwnerID],
-			Areas:          areasByStationID[station.ID],
-			Ingestions:     ingestionsByDeviceID[station.DeviceIDHex()],
-			Configurations: configurationsByStationID[station.ID],
-			Modules:        modulesByStationID[station.ID],
-			Sensors:        sensorsByStationID[station.ID],
-			DataSummary:    summariesByStationID[station.ID],
-			HasImages:      len(mediaByStationID[station.ID]) > 0,
+			Station:         station,
+			Owner:           ownersByID[station.OwnerID],
+			Areas:           areasByStationID[station.ID],
+			Interestingness: inessByID[station.ID],
+			Attributes:      attributesByStationID[station.ID],
+			Ingestions:      ingestionsByDeviceID[station.DeviceIDHex()],
+			Configurations:  configurationsByStationID[station.ID],
+			Modules:         modulesByStationID[station.ID],
+			Sensors:         sensorsByStationID[station.ID],
+			DataSummary:     summariesByStationID[station.ID],
+			HasImages:       len(mediaByStationID[station.ID]) > 0,
 		})
 	}
 
@@ -1179,6 +1260,10 @@ type UpdatedSensorRow struct {
 }
 
 func (sr *StationRepository) RefreshStationSensors(ctx context.Context, stations []int32) error {
+	if len(stations) == 0 {
+		return nil
+	}
+
 	query, args, err := sqlx.In(`
 		SELECT station_id, sensor_id, module_id, max(time) AS "time" FROM fieldkit.aggregated_10s
 		WHERE station_id IN (?)
