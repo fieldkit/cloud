@@ -46,7 +46,7 @@ charting-tests: charting-setup
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/intoflux
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -83,6 +83,8 @@ sanitizer: $(BUILD)/sanitizer
 
 webhook: $(BUILD)/webhook
 
+intoflux: $(BUILD)/intoflux
+
 scratch: $(BUILD)/scratch
 
 $(BUILD)/server: $(SERVER_SOURCES)
@@ -102,6 +104,9 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 
 $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 	cd server/cmd/webhook && $(GO) build -o $@ *.go
+
+$(BUILD)/intoflux: server/cmd/intoflux/*.go $(SERVER_SOURCES)
+	cd server/cmd/intoflux && $(GO) build -o $@ *.go
 
 $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go
