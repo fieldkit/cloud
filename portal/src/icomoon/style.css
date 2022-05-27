@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?pzoslh');
-  src:  url('fonts/icomoon.eot?pzoslh#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?pzoslh') format('truetype'),
-    url('fonts/icomoon.woff?pzoslh') format('woff'),
-    url('fonts/icomoon.svg?pzoslh#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?6w5b15');
+  src:  url('fonts/icomoon.eot?6w5b15#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?6w5b15') format('truetype'),
+    url('fonts/icomoon.woff?6w5b15') format('woff'),
+    url('fonts/icomoon.svg?6w5b15#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -29,7 +29,7 @@
   content: "\e929";
 }
 .icon-copy:before {
-  content: "\e900";
+  content: "\e9323";
 }
 .icon-grid:before {
   content: "\e927";
@@ -63,7 +63,7 @@
   color: #1b80c9;
 }
 .icon-reply:before {
-  content: "\e904";
+  content: "\e900";
 }
 .icon-projects:before {
   content: "\e905";
