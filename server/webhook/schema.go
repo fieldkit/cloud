@@ -11,7 +11,6 @@ type MessageSchemaSensor struct {
 	Name          string  `json:"name"`
 	Expression    string  `json:"expression"`
 	Battery       bool    `json:"battery"`
-	Location      bool    `json:"location"`
 	Transient     bool    `json:"transient"`
 	UnitOfMeasure *string `json:"units"`
 }
@@ -22,18 +21,26 @@ type MessageSchemaModule struct {
 	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 
+type MessageSchemaAttribute struct {
+	Name       string `json:"name"`
+	Expression string `json:"expression"`
+	Location   bool   `json:"location"`
+}
+
 type MessageSchemaStation struct {
-	Key                  string                 `json:"key"`
-	Model                string                 `json:"model"`
-	ConditionExpression  string                 `json:"condition"`
-	IdentifierExpression string                 `json:"identifier"`
-	NameExpression       string                 `json:"name"`
-	ReceivedExpression   string                 `json:"received"`
-	Modules              []*MessageSchemaModule `json:"modules"`
+	Key                  string                    `json:"key"`
+	Model                string                    `json:"model"`
+	ConditionExpression  string                    `json:"condition"`
+	IdentifierExpression string                    `json:"identifier"`
+	NameExpression       string                    `json:"name"`
+	ReceivedExpression   string                    `json:"received"`
+	Modules              []*MessageSchemaModule    `json:"modules"`
+	Attributes           []*MessageSchemaAttribute `json:"attributes"`
 }
 
 type MessageSchema struct {
-	Station MessageSchemaStation `json:"station"`
+	Station  *MessageSchemaStation   `json:"station"` // Deprecated
+	Stations []*MessageSchemaStation `json:"stations"`
 }
 
 type MessageSchemaRegistration struct {
@@ -50,10 +57,19 @@ type MessageSchemaRegistration struct {
 
 func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
 	if r.parsed == nil {
-		r.parsed = &MessageSchema{}
-		if err := json.Unmarshal(r.Body, r.parsed); err != nil {
+		parsed := &MessageSchema{}
+		if err := json.Unmarshal(r.Body, parsed); err != nil {
 			return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
 		}
+
+		if parsed.Station != nil {
+			parsed.Stations = []*MessageSchemaStation{parsed.Station}
+		} else if parsed.Stations == nil {
+			return nil, fmt.Errorf("malformed json message schema")
+		}
+
+		r.parsed = parsed
 	}
+
 	return r.parsed, nil
 }

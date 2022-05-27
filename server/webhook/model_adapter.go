@@ -47,6 +47,7 @@ type WebHookStation struct {
 	Module        *data.StationModule
 	Sensors       []*data.ModuleSensor
 	SensorPrefix  string
+	Attributes    map[string]*data.StationAttributeSlot
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
@@ -74,7 +75,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	// Add or create the station, this may also mean creating the station model for this schema.
 	station := updating
 	if updating == nil {
-		model, err := m.sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Station.Model)
+		model, err := m.sr.FindOrCreateStationModel(ctx, pm.schemaID, pm.schema.Model)
 		if err != nil {
 			return nil, err
 		}
@@ -100,8 +101,24 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 	}
 
+	attributesRepository := repositories.NewAttributesRepository(m.db)
+
+	attributeRows, err := attributesRepository.QueryStationProjectAttributes(ctx, station.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	attributes := make(map[string]*data.StationAttributeSlot)
+	for _, attribute := range attributeRows {
+		if _, ok := attributes[attribute.Name]; ok {
+			return nil, fmt.Errorf("duplicate attribute: %v", attribute.Name)
+		}
+		attributes[attribute.Name] = attribute
+	}
+
 	// Add or create the provision.
-	defaultGenerationID := pm.deviceID // TODO
+	// TODO Consider eventually using an expression to drive the re-up of this?
+	defaultGenerationID := pm.deviceID
 	provision, err := m.pr.QueryOrCreateProvision(ctx, pm.deviceID, defaultGenerationID)
 	if err != nil {
 		return nil, err
@@ -119,13 +136,13 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return nil, err
 	}
 
-	if len(pm.schema.Station.Modules) != 1 {
+	if len(pm.schema.Modules) != 1 {
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}
 
 	sensors := make([]*data.ModuleSensor, 0)
 
-	for _, moduleSchema := range pm.schema.Station.Modules {
+	for _, moduleSchema := range pm.schema.Modules {
 		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
 
 		// Add or create the station module..
@@ -185,6 +202,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			Station:       station,
 			Module:        module,
 			Sensors:       sensors,
+			Attributes:    attributes,
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
@@ -208,15 +226,16 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 			battery := float32(parsedReading.Value)
 			station.Station.Battery = &battery
 		}
-		if parsedReading.Location {
-			log.Warnw("location parsing unimplemented")
-		}
 	}
 
 	now := time.Now()
 
 	// These changes to station are saved once in Close.
 
+	// Give integrators the option to just skip this. Could become a nil check.
+	if len(pm.deviceName) != 0 {
+		station.Station.Name = pm.deviceName
+	}
 	station.Station.IngestionAt = &now
 	station.Station.UpdatedAt = now
 
@@ -230,11 +249,39 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		}
 	}
 
+	if pm.attributes != nil {
+		for name, parsed := range pm.attributes {
+			if attribute, ok := station.Attributes[name]; ok {
+				if parsed.Location {
+					if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
+						// Either has altitude or it doesn't.
+						if len(coordinates) == 2 || len(coordinates) == 3 {
+							station.Station.Location = data.NewLocation(coordinates)
+						}
+					}
+				} else {
+					if stringValue, ok := parsed.JSONValue.(string); ok {
+						attribute.StringValue = &stringValue
+					} else {
+						if false {
+							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
+						}
+					}
+				}
+			} else {
+				log.Warnw("wh:unknown-attribute", "attribute_name", name)
+			}
+		}
+	}
+
 	return nil
 }
 
 func (m *ModelAdapter) Close(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
+
+	attributesRepository := repositories.NewAttributesRepository(m.db)
+
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
 
@@ -251,6 +298,33 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 				return err
 			}
 		}
+
+		if len(cacheEntry.station.Attributes) > 0 {
+			names := make([]string, 0)
+			skipped := make([]string, 0)
+			attributes := make([]*data.StationProjectAttribute, 0)
+			for name, attribute := range cacheEntry.station.Attributes {
+				if attribute.StringValue != nil {
+					names = append(names, name)
+					attributes = append(attributes, &data.StationProjectAttribute{
+						StationID:   station.ID,
+						AttributeID: attribute.AttributeID,
+						StringValue: *attribute.StringValue,
+					})
+				} else {
+					skipped = append(skipped, name)
+				}
+			}
+
+			if len(attributes) > 0 {
+				log.Infow("saving:attributes", "station_id", station.ID, "attribute_names", names, "skipped_attribute_names", skipped)
+
+				if _, err := attributesRepository.UpsertStationAttributes(ctx, attributes); err != nil {
+					return err
+				}
+			}
+		}
 	}
+
 	return nil
 }
