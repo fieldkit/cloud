@@ -13,8 +13,11 @@ export interface PartnerCustomization {
             };
         };
     };
-    projectId: number;
+    projectId: number | null;
     interpolate: (base: string) => string;
+    email: {
+        subject: string;
+    };
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -39,9 +42,43 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             interpolate: (baseString: string) => {
                 return baseString + "floodnet";
             },
+            email: {
+                subject: "sharePanel.emailSubject.floodnet",
+            },
         };
     }
     return null;
+}
+
+export function getPartnerCustomizationWithDefault(): PartnerCustomization {
+    const maybePartner = getPartnerCustomization();
+    if (maybePartner) {
+        return maybePartner;
+    }
+
+    return {
+        title: "Data Dashboard - FieldKit",
+        class: "fieldkit",
+        icon: "/favicon-fieldkit.ico",
+        sharing: {
+            viz: `Check out this data on FieldKit!`, // TODO i18n
+        },
+        nav: {
+            viz: {
+                back: {
+                    // project: "layout.backProjectDashboard",
+                    map: { label: "layout.backToStations" },
+                },
+            },
+        },
+        projectId: null,
+        interpolate: (baseString: string) => {
+            return baseString;
+        },
+        email: {
+            subject: "sharePanel.emailSubject.fieldkit",
+        },
+    };
 }
 
 export function isCustomisationEnabled(): boolean {

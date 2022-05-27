@@ -361,6 +361,11 @@
     "sharePanel": {
         "copyUrl": "Copy URL",
         "copyBtn": "Copy",
-        "linkCopied": "Link copied"
+        "linkCopied": "Link copied",
+        "emailUrl": "Email URL",
+        "emailSubject": {
+            "fieldkit": "Check out this data on FieldKit!",
+            "floodnet": "Check out this data on FloodNet!"
+        }
     }
 }

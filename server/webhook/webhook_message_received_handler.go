@@ -29,7 +29,6 @@ func (h *WebHookMessageRececivedHandler) Handle(ctx context.Context, m *WebHookM
 
 	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err
-
 	}
 
 	return nil

@@ -553,16 +553,13 @@ export default Vue.extend({
     }
 }
 
-.controls-container .right .chart-type {
-    flex-basis: 110px;
-}
-
 .controls-container .right {
     font-size: 12px;
 }
 
 .controls-container .right.half {
     align-items: flex-start;
+    flex: 0 0 110px;
 }
 
 .controls-container .view-by {

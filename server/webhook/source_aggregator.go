@@ -14,16 +14,12 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/data"
 )
 
 const (
 	AggregatingBatchSize = 100
 )
-
-type SourceAggregator struct {
-	db      *sqlxcache.DB
-	verbose bool
-}
 
 type sourceAggregatorConfig struct {
 }
@@ -52,9 +48,16 @@ func (c *sourceAggregatorConfig) Apply(key handlers.AggregateSensorKey, values [
 	return stats.Mean(values)
 }
 
+type SourceAggregator struct {
+	db       *sqlxcache.DB
+	handlers *handlers.InterestingnessHandler
+	verbose  bool
+}
+
 func NewSourceAggregator(db *sqlxcache.DB) *SourceAggregator {
 	return &SourceAggregator{
-		db: db,
+		db:       db,
+		handlers: handlers.NewInterestingnessHandler(db),
 	}
 }
 
@@ -66,6 +69,10 @@ func (i *SourceAggregator) ProcessSource(ctx context.Context, source MessageSour
 	return i.processBatches(ctx, batch, func(ctx context.Context, batch *MessageBatch) error {
 		return source.NextBatch(ctx, batch)
 	})
+}
+
+func (i *SourceAggregator) processIncomingReading(ctx context.Context, ir *data.IncomingReading) error {
+	return i.handlers.ConsiderReading(ctx, ir)
 }
 
 func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBatch, query func(ctx context.Context, batch *MessageBatch) error) error {
@@ -109,7 +116,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else if parsed != nil {
 				if i.verbose {
-					rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
+					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
 				}
 
 				if saved, err := model.Save(ctx, parsed); err != nil {
@@ -120,23 +127,38 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 					}
 					aggregator := aggregators[saved.Station.ID]
 
-					if err := aggregator.NextTime(ctx, parsed.ReceivedAt); err != nil {
+					if err := aggregator.NextTime(ctx, parsed.receivedAt); err != nil {
 						return fmt.Errorf("adding: %v", err)
 					}
 
-					for _, parsedSensor := range parsed.Data {
+					for _, parsedSensor := range parsed.data {
 						key := parsedSensor.Key
 						if key == "" {
 							return fmt.Errorf("parsed-sensor has no sensor key")
 						}
 
 						if !parsedSensor.Transient {
+							sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
+
 							ask := handlers.AggregateSensorKey{
-								SensorKey: fmt.Sprintf("%s.%s", saved.SensorPrefix, key),
+								SensorKey: sensorKey,
 								ModuleID:  saved.Module.ID,
 							}
-							if err := aggregator.AddSample(ctx, parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
+
+							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, parsedSensor.Value); err != nil {
 								return fmt.Errorf("adding: %v", err)
+							}
+
+							ir := &data.IncomingReading{
+								StationID: saved.Station.ID,
+								ModuleID:  saved.Module.ID,
+								SensorKey: sensorKey,
+								Time:      parsed.receivedAt,
+								Value:     parsedSensor.Value,
+							}
+
+							if err := i.processIncomingReading(ctx, ir); err != nil {
+								return err
 							}
 						}
 					}
@@ -147,14 +169,19 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 	stationIDs := make([]int32, 0)
 	for id, aggregator := range aggregators {
-		stationIDs = append(stationIDs, id)
 		if err := aggregator.Close(ctx); err != nil {
 			return err
 		}
+
+		stationIDs = append(stationIDs, id)
 	}
 
 	if err := model.Close(ctx); err != nil {
 		return err
+	}
+
+	if len(stationIDs) == 0 {
+		Logger(ctx).Sugar().Warnw("wh:zero-stations")
 	}
 
 	sr := repositories.NewStationRepository(i.db)
