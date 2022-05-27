@@ -1614,6 +1614,35 @@ func marshalStationviewsStationInterestingnessWindowViewToStationInterestingness
 	return res
 }
 
+// marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody
+// builds a value of type *StationProjectAttributesResponseBody from a value of
+// type *stationviews.StationProjectAttributesView.
+func marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody(v *stationviews.StationProjectAttributesView) *StationProjectAttributesResponseBody {
+	res := &StationProjectAttributesResponseBody{}
+	if v.Attributes != nil {
+		res.Attributes = make([]*StationProjectAttributeResponseBody, len(v.Attributes))
+		for i, val := range v.Attributes {
+			res.Attributes[i] = marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody
+// builds a value of type *StationProjectAttributeResponseBody from a value of
+// type *stationviews.StationProjectAttributeView.
+func marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResponseBody(v *stationviews.StationProjectAttributeView) *StationProjectAttributeResponseBody {
+	res := &StationProjectAttributeResponseBody{
+		ProjectID:   *v.ProjectID,
+		AttributeID: *v.AttributeID,
+		Name:        *v.Name,
+		StringValue: *v.StringValue,
+	}
+
+	return res
+}
+
 // marshalStationviewsStationUploadViewToStationUploadResponseBody builds a
 // value of type *StationUploadResponseBody from a value of type
 // *stationviews.StationUploadView.
@@ -1868,6 +1897,9 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Interestingness != nil {
 		res.Interestingness = marshalStationviewsStationInterestingnessViewToStationInterestingnessResponseBody(v.Interestingness)
+	}
+	if v.Attributes != nil {
+		res.Attributes = marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody(v.Attributes)
 	}
 	if v.Uploads != nil {
 		res.Uploads = make([]*StationUploadResponseBody, len(v.Uploads))

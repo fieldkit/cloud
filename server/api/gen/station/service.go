@@ -77,6 +77,7 @@ type StationFull struct {
 	Owner              *StationOwner
 	DeviceID           string
 	Interestingness    *StationInterestingness
+	Attributes         *StationProjectAttributes
 	Uploads            []*StationUpload
 	Photos             *StationPhotos
 	ReadOnly           bool
@@ -223,6 +224,17 @@ type StationInterestingnessWindow struct {
 	Interestingness float64
 	Value           float64
 	Time            int64
+}
+
+type StationProjectAttributes struct {
+	Attributes []*StationProjectAttribute
+}
+
+type StationProjectAttribute struct {
+	ProjectID   int32
+	AttributeID int64
+	Name        string
+	StringValue string
 }
 
 type StationUpload struct {
@@ -474,6 +486,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.Interestingness != nil {
 		res.Interestingness = transformStationviewsStationInterestingnessViewToStationInterestingness(vres.Interestingness)
 	}
+	if vres.Attributes != nil {
+		res.Attributes = transformStationviewsStationProjectAttributesViewToStationProjectAttributes(vres.Attributes)
+	}
 	if vres.Uploads != nil {
 		res.Uploads = make([]*StationUpload, len(vres.Uploads))
 		for i, val := range vres.Uploads {
@@ -521,6 +536,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 	}
 	if res.Interestingness != nil {
 		vres.Interestingness = transformStationInterestingnessToStationviewsStationInterestingnessView(res.Interestingness)
+	}
+	if res.Attributes != nil {
+		vres.Attributes = transformStationProjectAttributesToStationviewsStationProjectAttributesView(res.Attributes)
 	}
 	if res.Uploads != nil {
 		vres.Uploads = make([]*stationviews.StationUploadView, len(res.Uploads))
@@ -787,6 +805,38 @@ func transformStationviewsStationInterestingnessWindowViewToStationInterestingne
 	return res
 }
 
+// transformStationviewsStationProjectAttributesViewToStationProjectAttributes
+// builds a value of type *StationProjectAttributes from a value of type
+// *stationviews.StationProjectAttributesView.
+func transformStationviewsStationProjectAttributesViewToStationProjectAttributes(v *stationviews.StationProjectAttributesView) *StationProjectAttributes {
+	if v == nil {
+		return nil
+	}
+	res := &StationProjectAttributes{}
+	if v.Attributes != nil {
+		res.Attributes = make([]*StationProjectAttribute, len(v.Attributes))
+		for i, val := range v.Attributes {
+			res.Attributes[i] = transformStationviewsStationProjectAttributeViewToStationProjectAttribute(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationviewsStationProjectAttributeViewToStationProjectAttribute
+// builds a value of type *StationProjectAttribute from a value of type
+// *stationviews.StationProjectAttributeView.
+func transformStationviewsStationProjectAttributeViewToStationProjectAttribute(v *stationviews.StationProjectAttributeView) *StationProjectAttribute {
+	res := &StationProjectAttribute{
+		ProjectID:   *v.ProjectID,
+		AttributeID: *v.AttributeID,
+		Name:        *v.Name,
+		StringValue: *v.StringValue,
+	}
+
+	return res
+}
+
 // transformStationviewsStationUploadViewToStationUpload builds a value of type
 // *StationUpload from a value of type *stationviews.StationUploadView.
 func transformStationviewsStationUploadViewToStationUpload(v *stationviews.StationUploadView) *StationUpload {
@@ -1000,6 +1050,35 @@ func transformStationInterestingnessWindowToStationviewsStationInterestingnessWi
 		Interestingness: &v.Interestingness,
 		Value:           &v.Value,
 		Time:            &v.Time,
+	}
+
+	return res
+}
+
+// transformStationProjectAttributesToStationviewsStationProjectAttributesView
+// builds a value of type *stationviews.StationProjectAttributesView from a
+// value of type *StationProjectAttributes.
+func transformStationProjectAttributesToStationviewsStationProjectAttributesView(v *StationProjectAttributes) *stationviews.StationProjectAttributesView {
+	res := &stationviews.StationProjectAttributesView{}
+	if v.Attributes != nil {
+		res.Attributes = make([]*stationviews.StationProjectAttributeView, len(v.Attributes))
+		for i, val := range v.Attributes {
+			res.Attributes[i] = transformStationProjectAttributeToStationviewsStationProjectAttributeView(val)
+		}
+	}
+
+	return res
+}
+
+// transformStationProjectAttributeToStationviewsStationProjectAttributeView
+// builds a value of type *stationviews.StationProjectAttributeView from a
+// value of type *StationProjectAttribute.
+func transformStationProjectAttributeToStationviewsStationProjectAttributeView(v *StationProjectAttribute) *stationviews.StationProjectAttributeView {
+	res := &stationviews.StationProjectAttributeView{
+		ProjectID:   &v.ProjectID,
+		AttributeID: &v.AttributeID,
+		Name:        &v.Name,
+		StringValue: &v.StringValue,
 	}
 
 	return res

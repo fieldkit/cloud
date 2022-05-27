@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/big"
+	"strconv"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -152,7 +154,7 @@ func (h *Influx) DoesStationHaveData(ctx context.Context, stationID int32) (bool
 
 type Resolver struct {
 	queryStations *repositories.StationRepository
-	querySensors  *repositories.SensorRepository
+	querySensors  *repositories.SensorsRepository
 	sensors       map[string]int64
 	stations      map[string]*data.Station
 }
@@ -160,7 +162,7 @@ type Resolver struct {
 func NewResolver(db *sqlxcache.DB) *Resolver {
 	return &Resolver{
 		queryStations: repositories.NewStationRepository(db),
-		querySensors:  repositories.NewSensorRepository(db),
+		querySensors:  repositories.NewSensorsRepository(db),
 	}
 }
 
@@ -210,7 +212,7 @@ type InfluxDbHandler struct {
 	resolve      *Resolver
 	metaFactory  *repositories.MetaFactory
 	stations     *repositories.StationRepository
-	querySensors *repositories.SensorRepository
+	querySensors *repositories.SensorsRepository
 	byProvision  map[int64]*stationInfo
 	skipping     map[int64]bool
 	errors       *importErrors
@@ -222,7 +224,7 @@ func NewInfluxDbHandler(influx *Influx, resolve *Resolver, db *sqlxcache.DB) (h 
 		resolve:      resolve,
 		metaFactory:  repositories.NewMetaFactory(db),
 		stations:     repositories.NewStationRepository(db),
-		querySensors: repositories.NewSensorRepository(db),
+		querySensors: repositories.NewSensorsRepository(db),
 		byProvision:  make(map[int64]*stationInfo),
 		skipping:     make(map[int64]bool),
 		errors: &importErrors{
@@ -389,6 +391,36 @@ func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, infl
 	return nil
 }
 
+func toFloatArray(x interface{}) ([]float64, bool) {
+	if arrayValue, ok := x.([]interface{}); ok {
+		values := make([]float64, 0)
+		for _, opaque := range arrayValue {
+			if v, ok := toFloat(opaque); ok {
+				values = append(values, v)
+			}
+		}
+		return values, true
+	}
+	return nil, false
+}
+
+func toFloat(x interface{}) (float64, bool) {
+	switch x := x.(type) {
+	case int:
+		return float64(x), true
+	case float64:
+		return x, true
+	case string:
+		f, err := strconv.ParseFloat(x, 64)
+		return f, err == nil
+	case *big.Int:
+		f, err := strconv.ParseFloat(x.String(), 64)
+		return f, err == nil
+	default:
+		return 0.0, false
+	}
+}
+
 func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
 	schemas := webhook.NewMessageSchemaRepository(db)
 
@@ -427,6 +459,21 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else if parsed != nil {
+				var latitude *float64
+				var longitude *float64
+
+				for _, attribute := range parsed.Attributes {
+					if attribute.Location && attribute.JSONValue != nil {
+						if coordinates, ok := toFloatArray(attribute.JSONValue); ok {
+							if len(coordinates) >= 2 {
+								longitude = &coordinates[0]
+								latitude = &coordinates[1]
+								break
+							}
+						}
+					}
+				}
+
 				for _, parsedSensor := range parsed.Data {
 					key := parsedSensor.Key
 					if key == "" {
@@ -443,14 +490,6 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 							stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
 							if err != nil {
 								return err
-							}
-
-							var latitude *float64
-							var longitude *float64
-
-							if len(parsed.Location) >= 2 {
-								longitude = &parsed.Location[0]
-								latitude = &parsed.Location[1]
 							}
 
 							tags := make(map[string]string)
