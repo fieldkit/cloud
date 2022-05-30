@@ -695,7 +695,7 @@ class FKApi {
 
     getStation(id): Promise<Station> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/stations/" + id,
         });
