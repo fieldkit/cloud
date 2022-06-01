@@ -262,7 +262,7 @@ export default Vue.extend({
 
                         const bookmark = new Bookmark(
                             this.bookmark.v,
-                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.Default]]]],
                             stationIds,
                             this.bookmark.p,
                             this.bookmark.c

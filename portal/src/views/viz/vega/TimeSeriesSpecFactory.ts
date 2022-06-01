@@ -225,6 +225,7 @@ export class TimeSeriesSpecFactory {
 
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        console.log("TIME RANGE", this.allSeries)
 
         // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
@@ -328,6 +329,7 @@ export class TimeSeriesSpecFactory {
                 labelPadding: -24,
                 tickSize: 30,
                 tickDash: [2, 2],
+                title: "Time"
             },
         ].concat(
             _.flatten(

@@ -86,6 +86,7 @@ export enum FastTime {
     Month = 30,
     Year = 365,
     All = 0,
+    Default = FastTime.TwoWeeks,
 }
 
 export enum ChartType {
