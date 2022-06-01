@@ -185,6 +185,9 @@ export default Vue.extend({
         station(): DisplayStation {
             return this.$state.stations.stations[this.$route.params.stationId];
         },
+        attributes(): any {
+            return this.station.attributes;
+        },
         notes(): PortalStationNotes[] {
             return this.$state.notes.notes;
         },
