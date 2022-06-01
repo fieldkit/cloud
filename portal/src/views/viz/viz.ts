@@ -537,14 +537,17 @@ export class Group {
                     index,
                 };
             })
-            .filter((r) => r.graph.dataSets[0].all != null) // TODO Ignoring others
-            .map((r) => {
-                const all = r.graph.dataSets[0].all; // TODO Ignoring others
-                if (!all) throw new Error(`no viz data on Graph`);
-                return new Scrubber(r.index, all, r.graph);
-            });
+            .filter((r) => r.graph.dataSets[0].all != null); // TODO Ignoring others
 
-        return new Scrubbers(this.id, this.visible_, children);
+        const childScrubbers = children.map((r) => {
+            const all = r.graph.dataSets[0].all; // TODO Ignoring others
+            if (!all) throw new Error(`no viz data on Graph`);
+            return new Scrubber(r.index, all, r.graph);
+        });
+
+        const mergedVisible = TimeRange.mergeArrays(children.map((v) => v.graph.visibleTimeRange.toArray()));
+        console.log("viz: scrubbers", this.visible_.toArray(), mergedVisible);
+        return new Scrubbers(this.id, mergedVisible, childScrubbers);
     }
 
     public bookmark(): GroupBookmark {
