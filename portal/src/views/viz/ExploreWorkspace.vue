@@ -260,9 +260,14 @@ export default Vue.extend({
                         const stationIds = associated.stations.map((station) => station.id);
                         console.log(`viz: show-station-associated`, associated, stationIds);
 
+                        //TODO do this more elegantly
+                        const end = _.max(quickSensors.stations[stationId].map(d => new Date(d.sensorReadAt))).getTime();
+                        const start = _.max(quickSensors.stations[stationId].map(d => new Date(d.sensorReadAt))) - ((24*60*60*1000) * 14);
+
                         const bookmark = new Bookmark(
                             this.bookmark.v,
-                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.Default]]]],
+                            //[[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.Default]]]],
+                            [[[[[vizSensor], [start, end], [], ChartType.TimeSeries, FastTime.Default]]]],
                             stationIds,
                             this.bookmark.p,
                             this.bookmark.c
