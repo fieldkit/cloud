@@ -178,7 +178,7 @@ func NewAggregateQueryParams(qp *QueryParams, selectedAggregateName string, summ
 	}
 
 	expected := int64(0)
-	if summary != nil {
+	if summary != nil && summary.Start != nil && summary.End != nil {
 		expected = summary.NumberRecords
 	}
 
@@ -460,7 +460,10 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 		// Queried records depends on if we're doing a complete query,
 		// filling in missing samples.
-		queriedRecords := summary.NumberRecords
+		queriedRecords := int64(0)
+		if summary.Start != nil && summary.End != nil {
+			queriedRecords = summary.NumberRecords
+		}
 
 		if qp.Complete {
 			if summary.Start != nil && summary.End != nil {
