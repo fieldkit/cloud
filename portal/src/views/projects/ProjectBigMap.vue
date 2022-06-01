@@ -9,6 +9,7 @@
                     <p class="detail-title">{{ project.name }}</p>
                     <div class="detail-description">{{ project.description }}</div>
                     <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
+                    <a href="https://www.floodnet.nyc/" target="_blank" class="link">{{ $t("linkToFloodnet") }} ></a>
                 </div>
             </div>
 
@@ -251,8 +252,11 @@ export default Vue.extend({
     .link {
         color: $color-fieldkit-primary;
         font-size: 12px;
-        padding-bottom: 15px;
-        margin-bottom: 10pxs;
+        display: block;
+
+        &:not(:last-of-type) {
+            margin-bottom: 10px;
+        }
     }
 }
 .detail-title {
