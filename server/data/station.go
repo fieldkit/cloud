@@ -217,6 +217,7 @@ type StationFull struct {
 	Station         *Station
 	Owner           *User
 	Interestingness []*StationInterestingness
+	Attributes      []*StationProjectNamedAttribute
 	Areas           []*StationArea
 	Ingestions      []*Ingestion
 	Configurations  []*StationConfiguration

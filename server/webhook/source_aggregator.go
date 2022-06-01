@@ -116,7 +116,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 				rowLog.Infow("wh:skipping", "reason", err)
 			} else if parsed != nil {
 				if i.verbose {
-					rowLog.Infow("wh:parsed", "received_at", parsed.receivedAt, "device_name", parsed.deviceName, "data", parsed.data)
+					rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
 				}
 
 				if saved, err := model.Save(ctx, parsed); err != nil {
@@ -127,11 +127,11 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 					}
 					aggregator := aggregators[saved.Station.ID]
 
-					if err := aggregator.NextTime(ctx, parsed.receivedAt); err != nil {
+					if err := aggregator.NextTime(ctx, parsed.ReceivedAt); err != nil {
 						return fmt.Errorf("adding: %v", err)
 					}
 
-					for _, parsedSensor := range parsed.data {
+					for _, parsedSensor := range parsed.Data {
 						key := parsedSensor.Key
 						if key == "" {
 							return fmt.Errorf("parsed-sensor has no sensor key")
@@ -145,7 +145,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 								ModuleID:  saved.Module.ID,
 							}
 
-							if err := aggregator.AddSample(ctx, parsed.receivedAt, nil, ask, parsedSensor.Value); err != nil {
+							if err := aggregator.AddSample(ctx, parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
 								return fmt.Errorf("adding: %v", err)
 							}
 
@@ -153,7 +153,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 								StationID: saved.Station.ID,
 								ModuleID:  saved.Module.ID,
 								SensorKey: sensorKey,
-								Time:      parsed.receivedAt,
+								Time:      parsed.ReceivedAt,
 								Value:     parsedSensor.Value,
 							}
 

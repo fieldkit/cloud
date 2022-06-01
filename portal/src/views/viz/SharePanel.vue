@@ -187,11 +187,12 @@ export default Vue.extend({
             white-space: nowrap;
             font-size: 14px;
             margin-left: 30px;
-            border: 0;
             width: 100%;
+            height: 21px;
+            padding-left: 5px;
             color: var(--color-dark);
+            border: 1px solid var(--color-border);
             font-family: var(--font-family-medium);
-            background-color: transparent;
 
             &:focus {
                 outline: none;
@@ -218,7 +219,7 @@ export default Vue.extend({
         border-radius: 4px;
         transition: opacity 0.25s;
         box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
-        @include position(absolute, null 0 -30px null);
+        @include position(absolute, null 0 -35px null);
 
         &.visible {
             opacity: 1;

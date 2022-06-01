@@ -125,4 +125,16 @@ export default {
 .viz {
     width: 100%;
 }
+g.left_scrub:hover > path {
+    cursor: ew-resize;
+}
+g.right_scrub:hover > path {
+    cursor: ew-resize;
+}
+g.brush_brush:hover {
+    cursor: grab;
+}
+g.brush_brush:hover:active {
+    cursor: grabbing;
+}
 </style>

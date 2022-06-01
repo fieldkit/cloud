@@ -251,24 +251,43 @@ export default Vue.extend({
                             });
                         }
 
-                        const vizSensor: VizSensor = [
-                            stationId,
-                            [quickSensors.stations[stationId][0].moduleId, quickSensors.stations[stationId][0].sensorId],
-                        ];
+                        const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
+                        const sensorId = quickSensors.stations[stationId][0].sensorId;
+                        const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
                         const associated = await this.$services.api.getAssociatedStations(stationId);
                         const stationIds = associated.stations.map((station) => station.id);
                         console.log(`viz: show-station-associated`, associated, stationIds);
 
-                        const bookmark = new Bookmark(
-                            this.bookmark.v,
-                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
-                            stationIds,
-                            this.bookmark.p,
-                            this.bookmark.c
-                        );
+                        const getInitialBookmark = () => {
+                            const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
+                            if (quickSensor.length == 1) {
+                                const end = new Date(quickSensor[0].sensorReadAt);
+                                const start = new Date(end);
 
-                        this.$emit("open-bookmark", bookmark);
+                                start.setDate(end.getDate() - 14); // TODO Use getFastTime
+
+                                return new Bookmark(
+                                    this.bookmark.v,
+                                    [[[[[vizSensor], [start.getTime(), end.getTime()], [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
+                                    stationIds,
+                                    this.bookmark.p,
+                                    this.bookmark.c
+                                );
+                            }
+
+                            console.log("viz: ERROR missing expected quick row, default to FastTime.All");
+
+                            return new Bookmark(
+                                this.bookmark.v,
+                                [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                                stationIds,
+                                this.bookmark.p,
+                                this.bookmark.c
+                            );
+                        };
+
+                        this.$emit("open-bookmark", getInitialBookmark());
                     });
                 })
                 .catch(async (e) => {

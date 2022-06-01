@@ -266,7 +266,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
 	}, qc))
-	workers := que.NewWorkerPool(qc, workMap, 2)
+	workers := que.NewWorkerPool(qc, workMap, 1)
 
 	go workers.Start()
 
