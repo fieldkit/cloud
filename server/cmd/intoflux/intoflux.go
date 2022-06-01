@@ -422,8 +422,6 @@ func toFloat(x interface{}) (float64, bool) {
 }
 
 func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
-	schemas := webhook.NewMessageSchemaRepository(db)
-
 	source := webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
 
 	jqCache := &webhook.JqCache{}
@@ -445,11 +443,6 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 
 		if batch.Messages == nil {
 			return fmt.Errorf("no messages")
-		}
-
-		_, err := schemas.QuerySchemas(ctx, batch)
-		if err != nil {
-			return fmt.Errorf("message schemas (%v)", err)
 		}
 
 		for _, row := range batch.Messages {
