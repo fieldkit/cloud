@@ -257,7 +257,12 @@ type QueriedModuleId struct {
 	ModuleID int64 `db:"module_id"`
 }
 
-func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int64, []int64, error) {
+type sensorDatabaseIds struct {
+	moduleIds []int64
+	sensorIds []int64
+}
+
+func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) (*sensorDatabaseIds, error) {
 	moduleHardwareIds := make([][]byte, 0)
 	sensorIds := make([]int64, 0)
 
@@ -266,7 +271,7 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int
 
 		rawId, err := base64.StdEncoding.DecodeString(mAndS.ModuleID)
 		if err != nil {
-			return nil, nil, fmt.Errorf("error decoding: '%v'", mAndS.ModuleID)
+			return nil, fmt.Errorf("error decoding: '%v'", mAndS.ModuleID)
 		}
 
 		moduleHardwareIds = append(moduleHardwareIds, rawId)
@@ -275,24 +280,27 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int
 	moduleIds := make([]int64, 0)
 
 	if len(moduleHardwareIds) == 0 {
-		return moduleIds, sensorIds, nil
+		return &sensorDatabaseIds{
+			moduleIds: moduleIds,
+			sensorIds: sensorIds,
+		}, nil
 	}
 
 	query, args, err := sqlx.In(`SELECT id AS module_id FROM fieldkit.station_module WHERE hardware_id IN (?)`, moduleHardwareIds)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	rows := []*QueriedModuleId{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	log := Logger(ctx).Sugar()
 
 	if len(rows) == 0 {
 		log.Infow("modules-none", "module_hardware_ids", moduleHardwareIds)
-		return nil, nil, fmt.Errorf("no-modules")
+		return nil, fmt.Errorf("no-modules")
 	}
 
 	for _, row := range rows {
@@ -301,7 +309,10 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) ([]int
 
 	log.Infow("modules", "module_hardware_ids", moduleHardwareIds, "module_ids", moduleIds)
 
-	return moduleIds, sensorIds, nil
+	return &sensorDatabaseIds{
+		moduleIds: moduleIds,
+		sensorIds: sensorIds,
+	}, nil
 }
 
 type DataRow struct {
@@ -328,7 +339,7 @@ func scanRow(queried *sqlx.Rows, row *DataRow) error {
 }
 
 func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQueryParams) (rr []*DataRow, err error) {
-	moduleIds, sensorIds, err := dq.getIds(ctx, aqp.Sensors)
+	databaseIds, err := dq.getIds(ctx, aqp.Sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -360,7 +371,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 			ORDER BY time ASC
 			LIMIT 1)
 		) AS q ORDER BY q.time
-	`, aggregate, aggregate), aqp.Stations, moduleIds, sensorIds, aqp.Start, aqp.Stations, moduleIds, sensorIds, aqp.End)
+	`, aggregate, aggregate), aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Start, aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.End)
 	if err != nil {
 		return nil, err
 	}
@@ -400,7 +411,7 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
-	moduleIds, sensorIds, err := dq.getIds(ctx, qp.Sensors)
+	databaseIds, err := dq.getIds(ctx, qp.Sensors)
 	if err != nil {
 		return nil, "", err
 	}
@@ -420,13 +431,14 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 					MAX(time) AS end,
 					COUNT(*) AS number_records
 					FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-				`, table), qp.Stations, moduleIds, sensorIds, qp.Start, qp.End)
+				`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
 			}
+
 			return sqlx.In(fmt.Sprintf(`
 				SELECT
 				COUNT(*) AS number_records
 				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-			`, table), qp.Stations, moduleIds, sensorIds, qp.Start, qp.End)
+			`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
 		}
 
 		query, args, err := getQueryFn()
@@ -480,7 +492,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 
 	tableName := handlers.MakeAggregateTableName(dq.tableSuffix, aqp.AggregateName)
 
-	moduleIds, sensorIds, err := dq.getIds(ctx, aqp.Sensors)
+	databaseIds, err := dq.getIds(ctx, aqp.Sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -581,14 +593,14 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 		FROM complete
 		`, tableName)
 
-	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "module_ids", moduleIds, "sensors_ids", sensorIds, "stations", aqp.Stations,
+	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "module_ids", databaseIds.moduleIds, "sensors_ids", databaseIds.sensorIds, "stations", aqp.Stations,
 		"start", aqp.Start, "end", aqp.End, "interval", aqp.Interval, "tgs", aqp.TimeGroupThreshold)
 
 	buildQuery := func() (query string, args []interface{}, err error) {
 		if aqp.Complete {
-			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Stations, moduleIds, sensorIds, aqp.Start, aqp.End, aqp.TimeGroupThreshold)
+			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Start, aqp.End, aqp.TimeGroupThreshold)
 		}
-		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, moduleIds, sensorIds, aqp.Stations, aqp.TimeGroupThreshold)
+		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Stations, aqp.TimeGroupThreshold)
 	}
 
 	query, args, err := buildQuery()
