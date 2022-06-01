@@ -191,7 +191,7 @@ export class TimeSeriesSpecFactory {
         // configured for that sensor.
         const makeSeriesDomain = (series, i: number) => {
             const data = filteredData[i].filter((datum) => _.isNumber(datum.value)).map((datum) => datum.value);
-            const filteredRange = makeRange(data);
+            const filteredRange = data.length > 0 ? makeRange(data) : [0, 0];
             const constrained = series.vizInfo.constrainedRanges;
             if (series.ds.graphing && constrained.length > 0) {
                 const range = constrained[0];
