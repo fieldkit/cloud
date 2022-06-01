@@ -235,7 +235,6 @@ export const ViewingControls = Vue.extend({
             return allTypes.filter((type) => _.some(names, (name) => name == type.vueName));
         },
         manualRangeValue(): { start: Date; end: Date } | null {
-            // console.log(`manual-range-value:`, this.viz.visible, this.viz.visibleTimeRange);
             if (!this.viz.visibleTimeRange || this.viz.visibleTimeRange.isExtreme()) {
                 // TODO This happens initially cause we query for
                 // eternity... probably best if this isn't set until

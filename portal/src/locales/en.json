@@ -367,5 +367,6 @@
             "fieldkit": "Check out this data on FieldKit!",
             "floodnet": "Check out this data on FloodNet!"
         }
-    }
+    },
+    "linkToFloodnet": "Project Info, Methodology & Data Sources"
 }

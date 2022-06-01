@@ -312,11 +312,12 @@ export class Graph extends Viz {
     }
 
     public get visibleTimeRange(): TimeRange {
-        if (this.visible.isExtreme()) {
-            const range = this.timeRangeOfAll;
-            if (range) {
-                return range;
-            }
+        const range = this.timeRangeOfAll;
+        const visible = this.visible;
+        if (range && visible.isExtreme()) {
+            const start = visible.start == Time.Min ? range.start : visible.start;
+            const end = visible.end == Time.Max ? range.end : visible.end;
+            return new TimeRange(start, end);
         }
         return this.visible;
     }
@@ -537,14 +538,17 @@ export class Group {
                     index,
                 };
             })
-            .filter((r) => r.graph.dataSets[0].all != null) // TODO Ignoring others
-            .map((r) => {
-                const all = r.graph.dataSets[0].all; // TODO Ignoring others
-                if (!all) throw new Error(`no viz data on Graph`);
-                return new Scrubber(r.index, all, r.graph);
-            });
+            .filter((r) => r.graph.dataSets[0].all != null); // TODO Ignoring others
 
-        return new Scrubbers(this.id, this.visible_, children);
+        const childScrubbers = children.map((r) => {
+            const all = r.graph.dataSets[0].all; // TODO Ignoring others
+            if (!all) throw new Error(`no viz data on Graph`);
+            return new Scrubber(r.index, all, r.graph);
+        });
+
+        const mergedVisible = TimeRange.mergeArrays(children.map((v) => v.graph.visibleTimeRange.toArray()));
+        console.log("viz: scrubbers", this.visible_.toArray(), mergedVisible);
+        return new Scrubbers(this.id, mergedVisible, childScrubbers);
     }
 
     public bookmark(): GroupBookmark {
