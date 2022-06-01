@@ -49,7 +49,7 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.2
-	github.com/gorilla/mux v1.7.4
+	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/govau/que-go v1.0.1
 	github.com/h2non/filetype v1.0.10
@@ -61,6 +61,7 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/inconshreveable/mousetrap v1.0.0
+	github.com/influxdata/influxdb-client-go/v2 v2.8.1 // indirect
 	github.com/itchyny/gojq v0.12.5
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
@@ -74,7 +75,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v0.0.0-20170223221042-c900de9dbbc7
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d
 	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
-	github.com/mattn/go-colorable v0.1.4
+	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.13
 	github.com/montanaflynn/stats v0.5.0
 	github.com/muesli/smartcrop v0.3.0
@@ -112,7 +113,6 @@ require (
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
-	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20201009162240-fcf82128ed91
 	google.golang.org/appengine v1.6.7
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect

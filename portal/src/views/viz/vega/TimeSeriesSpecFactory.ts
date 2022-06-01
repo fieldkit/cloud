@@ -191,7 +191,7 @@ export class TimeSeriesSpecFactory {
         // configured for that sensor.
         const makeSeriesDomain = (series, i: number) => {
             const data = filteredData[i].filter((datum) => _.isNumber(datum.value)).map((datum) => datum.value);
-            const filteredRange = makeRange(data);
+            const filteredRange = data.length > 0 ? makeRange(data) : [0, 0];
             const constrained = series.vizInfo.constrainedRanges;
             if (series.ds.graphing && constrained.length > 0) {
                 const range = constrained[0];
@@ -225,7 +225,6 @@ export class TimeSeriesSpecFactory {
 
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
-        console.log("TIME RANGE", this.allSeries)
 
         // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
@@ -233,6 +232,8 @@ export class TimeSeriesSpecFactory {
             // I can't think of a good reason to just always specify this.
             return timeRangeAll;
         };
+
+        const xDomain = makeDomainX();
 
         const data = [
             {
@@ -324,12 +325,23 @@ export class TimeSeriesSpecFactory {
             {
                 orient: "bottom",
                 scale: "x",
-                domain: makeDomainX(),
-                tickCount: 8,
+                domain: xDomain,
+                tickCount: 6,
                 labelPadding: -24,
                 tickSize: 30,
                 tickDash: [2, 2],
-                title: "Time"
+                title: "Time",
+                format: {
+                    year: "%m/%d/%Y",
+                    quarter: "%m/%d/%Y",
+                    month: "%m/%d/%Y",
+                    week: "%m/%d/%Y",
+                    date: "%m/%d/%Y",
+                    hours: "%m/%d/%Y %H:%M",
+                    minutes: "%m/%d/%Y %H:%M",
+                    seconds: "%m/%d/%Y %H:%M",
+                    milliseconds: "%m/%d/%Y %H:%M",
+                },
             },
         ].concat(
             _.flatten(
@@ -366,7 +378,6 @@ export class TimeSeriesSpecFactory {
         const scales = _.flatten(
             mapSeries((series, i) => {
                 const yDomain = makeDomainY(i, series);
-                const xDomain = makeDomainX();
 
                 return [
                     {

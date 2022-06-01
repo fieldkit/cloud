@@ -28,15 +28,15 @@ type ParsedAttribute struct {
 }
 
 type ParsedMessage struct {
-	original   *WebHookMessage
-	deviceID   []byte
-	deviceName string
-	data       []*ParsedReading
-	attributes map[string]*ParsedAttribute
-	receivedAt time.Time
-	schema     *MessageSchemaStation
-	schemaID   int32
-	ownerID    int32
+	Original   *WebHookMessage
+	DeviceID   []byte
+	DeviceName string
+	Data       []*ParsedReading
+	Attributes map[string]*ParsedAttribute
+	ReceivedAt time.Time
+	Schema     *MessageSchemaStation
+	SchemaID   int32
+	OwnerID    int32
 }
 
 func toFloatArray(x interface{}) ([]float64, bool) {
@@ -243,10 +243,11 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	for _, module := range stationSchema.Modules {
 		for _, sensor := range module.Sensors {
-			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if sensor.Key == "" {
 				return nil, fmt.Errorf("empty sensor-key")
 			}
+
+			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if expectedKey != sensor.Key {
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
 			}
@@ -288,14 +289,14 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	}
 
 	return &ParsedMessage{
-		deviceID:   deviceID,
-		deviceName: deviceNameString,
-		data:       sensors,
-		attributes: attributes,
-		receivedAt: *receivedAt,
-		ownerID:    schemaRegistration.OwnerID,
-		schemaID:   schemaRegistration.ID,
-		schema:     stationSchema,
+		DeviceID:   deviceID,
+		DeviceName: deviceNameString,
+		Data:       sensors,
+		Attributes: attributes,
+		ReceivedAt: *receivedAt,
+		OwnerID:    schemaRegistration.OwnerID,
+		SchemaID:   schemaRegistration.ID,
+		Schema:     stationSchema,
 	}, nil
 }
 
