@@ -233,6 +233,8 @@ export class TimeSeriesSpecFactory {
             return timeRangeAll;
         };
 
+        const xDomain = makeDomainX();
+
         const data = [
             {
                 name: "brush_store",
@@ -323,11 +325,22 @@ export class TimeSeriesSpecFactory {
             {
                 orient: "bottom",
                 scale: "x",
-                domain: makeDomainX(),
-                tickCount: 8,
+                domain: xDomain,
+                tickCount: 6,
                 labelPadding: -24,
                 tickSize: 30,
                 tickDash: [2, 2],
+                format: {
+                    year: "%m/%d/%Y",
+                    quarter: "%m/%d/%Y",
+                    month: "%m/%d/%Y",
+                    week: "%m/%d/%Y",
+                    date: "%m/%d/%Y",
+                    hours: "%m/%d/%Y %H:%M",
+                    minutes: "%m/%d/%Y %H:%M",
+                    seconds: "%m/%d/%Y %H:%M",
+                    milliseconds: "%m/%d/%Y %H:%M",
+                },
             },
         ].concat(
             _.flatten(
@@ -364,7 +377,6 @@ export class TimeSeriesSpecFactory {
         const scales = _.flatten(
             mapSeries((series, i) => {
                 const yDomain = makeDomainY(i, series);
-                const xDomain = makeDomainX();
 
                 return [
                     {
