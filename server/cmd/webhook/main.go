@@ -12,7 +12,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
@@ -35,8 +34,6 @@ func process(ctx context.Context, options *Options) error {
 
 	aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
-
-	// startTime = time.Unix(1646121600, 0)
 
 	var source webhook.MessageSource
 
@@ -76,13 +73,15 @@ func main() {
 
 	logging.Configure(false, "webhook")
 
-	data.WindowNow = func() time.Time {
-		now, err := time.Parse("2006-01-02 15:04:05.999999999+00:00", "2022-04-08 13:07:47.910000+00:00")
-		if err != nil {
-			panic(err)
+	/*
+		data.WindowNow = func() time.Time {
+			now, err := time.Parse("2006-01-02 15:04:05.999999999+00:00", "2022-04-08 13:07:47.910000+00:00")
+			if err != nil {
+				panic(err)
+			}
+			return now
 		}
-		return now
-	}
+	*/
 
 	log := logging.Logger(ctx).Sugar()
 
