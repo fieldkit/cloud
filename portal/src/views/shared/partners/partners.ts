@@ -18,6 +18,10 @@ export interface PartnerCustomization {
     email: {
         subject: string;
     };
+    links: {
+        text: string;
+        url: string;
+    }[];
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -45,6 +49,12 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             email: {
                 subject: "sharePanel.emailSubject.floodnet",
             },
+            links: [
+                {
+                    text: "linkToFloodnet",
+                    url: "https://www.floodnet.nyc/",
+                },
+            ],
         };
     }
     return null;
@@ -78,6 +88,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         email: {
             subject: "sharePanel.emailSubject.fieldkit",
         },
+        links: [],
     };
 }
 

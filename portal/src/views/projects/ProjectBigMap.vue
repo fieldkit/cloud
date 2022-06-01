@@ -9,7 +9,9 @@
                     <p class="detail-title">{{ project.name }}</p>
                     <div class="detail-description">{{ project.description }}</div>
                     <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
-                    <a href="https://www.floodnet.nyc/" target="_blank" class="link">{{ $t("linkToFloodnet") }} ></a>
+                    <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
+                        {{ $t(link.text) }} >
+                    </a>
                 </div>
             </div>
 
@@ -82,6 +84,7 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 
 import { ExploreContext } from "@/views/viz/common";
+import { getPartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -169,6 +172,9 @@ export default Vue.extend({
             } else {
                 return [];
             }
+        },
+        partnerCustomization() {
+            return getPartnerCustomization();
         },
     },
     watch: {
