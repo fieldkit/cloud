@@ -311,11 +311,12 @@ export class Graph extends Viz {
     }
 
     public get visibleTimeRange(): TimeRange {
-        if (this.visible.isExtreme()) {
-            const range = this.timeRangeOfAll;
-            if (range) {
-                return range;
-            }
+        const range = this.timeRangeOfAll;
+        const visible = this.visible;
+        if (range && visible.isExtreme()) {
+            const start = visible.start == Time.Min ? range.start : visible.start;
+            const end = visible.end == Time.Max ? range.end : visible.end;
+            return new TimeRange(start, end);
         }
         return this.visible;
     }
