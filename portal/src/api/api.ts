@@ -330,7 +330,7 @@ export interface Station {
     recordingStartedAt: Date | null;
     firmwareNumber: number | null;
     attributes: {
-        attributes: ProjectAttribute[]; // TODO: fix after BE response fix
+        attributes: ProjectAttribute[];
     };
 }
 
