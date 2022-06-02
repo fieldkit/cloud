@@ -330,6 +330,7 @@ export class TimeSeriesSpecFactory {
                 labelPadding: -24,
                 tickSize: 30,
                 tickDash: [2, 2],
+                title: "Time",
                 format: {
                     year: "%m/%d/%Y",
                     quarter: "%m/%d/%Y",
