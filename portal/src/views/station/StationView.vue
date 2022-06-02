@@ -107,6 +107,10 @@
                     </div>
                 </section>
 
+                <section v-if="attributes.length > 0" class="section-notes container-box">
+                    <ProjectAttributes :attributes="attributes" />
+                </section>
+
                 <section v-if="showMap">
                     <div class="container-map">
                         <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
@@ -142,14 +146,15 @@ import {
     DisplayModule,
     DisplayStation,
     MappedStations,
+    ProjectAttribute,
     ProjectModule,
 } from "@/store";
 import * as utils from "@/utilities";
 import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
-import { serializePromiseChain } from "@/utilities";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import { mapGetters } from "vuex";
+import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -162,6 +167,7 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ForbiddenBanner,
+        ProjectAttributes,
     },
     data(): {
         selectedModule: DisplayModule | null;
@@ -185,9 +191,6 @@ export default Vue.extend({
         station(): DisplayStation {
             return this.$state.stations.stations[this.$route.params.stationId];
         },
-        attributes(): any {
-            return this.station.attributes;
-        },
         notes(): PortalStationNotes[] {
             return this.$state.notes.notes;
         },
@@ -196,6 +199,10 @@ export default Vue.extend({
         },
         photos(): NoteMedia[] {
             return NoteMedia.onlyPhotos(this.$state.notes.media);
+        },
+        attributes(): ProjectAttribute[] {
+            const station = this.$state.stations.stations[this.$route.params.stationId];
+            return station.attributes;
         },
         headerSubtitle(): string {
             let subtitle;

@@ -367,5 +367,9 @@
             "fieldkit": "Check out this data on FieldKit!",
             "floodnet": "Check out this data on FloodNet!"
         }
+    },
+    "attributes": {
+        "title": "Attributes",
+        "noValueYet": "Nothing added yet"
     }
 }

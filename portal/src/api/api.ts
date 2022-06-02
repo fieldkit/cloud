@@ -306,10 +306,10 @@ export interface StationLocation {
 }
 
 export interface ProjectAttribute {
-    attribute_id: number;
-    project_id: number;
+    attributeId: number;
+    projectId: number;
     name: string;
-    string_value: string;
+    stringValue: string;
 }
 
 export interface Station {
@@ -329,7 +329,9 @@ export interface Station {
     placeNameNative: string | null;
     recordingStartedAt: Date | null;
     firmwareNumber: number | null;
-    attributes: ProjectAttribute[];
+    attributes: {
+        attributes: ProjectAttribute[]; // TODO: fix after BE response fix
+    };
 }
 
 export interface ProjectsResponse {

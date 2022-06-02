@@ -99,7 +99,7 @@ export class DisplayStation {
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
-        this.attributes = station.attributes;
+        this.attributes = station.attributes.attributes // TODO: fix after BE response fix
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
