@@ -305,6 +305,13 @@ export interface StationLocation {
     readonly regions: StationRegion[] | null;
 }
 
+export interface ProjectAttribute {
+    attributeId: number;
+    projectId: number;
+    name: string;
+    stringValue: string;
+}
+
 export interface Station {
     id: number;
     name: string;
@@ -322,6 +329,9 @@ export interface Station {
     placeNameNative: string | null;
     recordingStartedAt: Date | null;
     firmwareNumber: number | null;
+    attributes: {
+        attributes: ProjectAttribute[];
+    };
 }
 
 export interface ProjectsResponse {

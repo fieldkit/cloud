@@ -25,12 +25,14 @@ type Options struct {
 func process(ctx context.Context, options *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
-	log.Infow("starting")
+	log.Infow("opening database")
 
 	db, err := sqlxcache.Open("postgres", options.PostgresURL)
 	if err != nil {
 		return err
 	}
+
+	log.Infow("opened, preparing source")
 
 	aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
@@ -48,6 +50,8 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	if source != nil {
+		log.Infow("processing")
+
 		if err := aggregator.ProcessSource(ctx, source, startTime); err != nil {
 			return err
 		}
@@ -66,7 +70,7 @@ func main() {
 
 	flag.Parse()
 
-	if options.File != "" && options.SchemaID == 0 {
+	if options.File == "" && options.SchemaID == 0 {
 		flag.PrintDefaults()
 		return
 	}

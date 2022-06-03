@@ -368,5 +368,9 @@
             "floodnet": "Check out this data on FloodNet!"
         }
     },
-    "linkToFloodnet": "Project Info, Methodology & Data Sources"
+    "linkToFloodnet": "Project Info, Methodology & Data Sources",
+    "attributes": {
+        "title": "Attributes",
+        "noValueYet": "Nothing added yet"
+    }
 }

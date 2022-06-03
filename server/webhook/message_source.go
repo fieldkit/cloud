@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/conservify/sqlxcache"
@@ -25,21 +26,27 @@ func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32) *DatabaseMessage
 }
 
 func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) error {
+	log := Logger(ctx).Sugar()
+
 	schemas := NewMessageSchemaRepository(s.db)
 	messages := NewMessagesRepository(s.db)
 
-	if s.schemaID > 0 {
-		if !s.started {
-			if err := schemas.StartProcessingSchema(ctx, s.schemaID); err != nil {
-				return err
-			}
-			s.started = true
-		}
-
-		return messages.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)
+	if s.schemaID == 0 {
+		return fmt.Errorf("schema_id is required")
 	}
 
-	return messages.QueryBatchForProcessing(ctx, batch)
+	if !s.started {
+		log.Infow("initializing", "schema_id", s.schemaID)
+
+		if err := schemas.StartProcessingSchema(ctx, s.schemaID); err != nil {
+			return err
+		}
+		s.started = true
+
+		log.Infow("ready", "schema_id", s.schemaID)
+	}
+
+	return messages.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)
 }
 
 type EmptySource struct {
