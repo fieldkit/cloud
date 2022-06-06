@@ -46,6 +46,7 @@ type MessageSchema struct {
 type MessageSchemaRegistration struct {
 	ID              int32          `db:"id"`
 	OwnerID         int32          `db:"owner_id"`
+	ProjectID       *int32         `db:"project_id"`
 	Name            string         `db:"name"`
 	Token           []byte         `db:"token"`
 	Body            []byte         `db:"body"`

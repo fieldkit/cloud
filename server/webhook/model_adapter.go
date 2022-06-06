@@ -94,6 +94,14 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
+		if pm.ProjectID != nil {
+			pr := repositories.NewProjectRepository(m.db)
+
+			if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
+				return nil, err
+			}
+		}
+
 		station = added
 	} else {
 		if pm.DeviceName != "" {

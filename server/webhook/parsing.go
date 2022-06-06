@@ -37,6 +37,7 @@ type ParsedMessage struct {
 	Schema     *MessageSchemaStation
 	SchemaID   int32
 	OwnerID    int32
+	ProjectID  *int32
 }
 
 func toFloatArray(x interface{}) ([]float64, bool) {
@@ -296,6 +297,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		ReceivedAt: *receivedAt,
 		OwnerID:    schemaRegistration.OwnerID,
 		SchemaID:   schemaRegistration.ID,
+		ProjectID:  schemaRegistration.ProjectID,
 		Schema:     stationSchema,
 	}, nil
 }
