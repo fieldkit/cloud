@@ -15,27 +15,27 @@
                     Facebook
                 </span>
             </a>
-            <a class="share-button share-button--url">
-                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
-                <span>
-                    {{ $t("sharePanel.copyUrl") }}
-                </span>
-            </a>
             <a class="share-button" @click="openMailClient()">
                 <i class="icon icon-mail"></i>
                 <span>
                     {{ $t("sharePanel.emailUrl") }}
                 </span>
             </a>
-            <div class="url" target="blank">
-                <input readonly ref="url" :value="getCurrentURL()" />
-                <button @click="copyUrlToClipboard()">
-                    {{ $t("sharePanel.copyBtn") }}
-                </button>
-                <span :class="{ visible: showCopiedLink }" class="url-copied">
-                    {{ $t("sharePanel.linkCopied") }}
+            <a class="share-button share-button--url">
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
+                <span>
+                    {{ $t("sharePanel.copyUrl") }}
                 </span>
-            </div>
+                <div class="url" target="blank">
+                    <input readonly ref="url" :value="getCurrentURL()" />
+                    <button @click="copyUrlToClipboard()">
+                        {{ $t("sharePanel.copyBtn") }}
+                    </button>
+                    <span :class="{ visible: showCopiedLink }" class="url-copied">
+                        {{ $t("sharePanel.linkCopied") }}
+                    </span>
+                </div>
+            </a>
         </div>
     </div>
 </template>
@@ -180,10 +180,7 @@ export default Vue.extend({
 
         &--url {
             cursor: initial;
-
-            &:hover {
-                background-color: initial;
-            }
+            flex-wrap: wrap;
         }
     }
 
@@ -197,19 +194,20 @@ export default Vue.extend({
     }
 
     .url {
-        margin: 0 20px;
+        margin-left: 32px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         position: relative;
+        flex: 1 1 100%;
 
         input {
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
             font-size: 14px;
-            margin-left: 30px;
             width: 100%;
-            height: 21px;
+            height: 32px;
             padding-left: 5px;
             color: var(--color-dark);
             border: 1px solid var(--color-border);
@@ -223,7 +221,7 @@ export default Vue.extend({
         button {
             margin-left: 10px;
             font-size: 12px;
-            padding: 5px 10px;
+            padding: 6px 10px;
             background-color: #ffffff;
             border: 1px solid #d7dce1;
             border-radius: 4px;
