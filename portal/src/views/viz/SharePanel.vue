@@ -113,7 +113,9 @@ export default Vue.extend({
             console.log("ok");
         },
         getCurrentURL(): string {
-            return window.location.href;
+            const path = this.$route.path.split("/")[2];
+            const fullPath = window.location.href.replace("/" + path, "");
+            return fullPath;
         },
         copyUrlToClipboard(): void {
             const inputEl = this.$refs["url"] as HTMLInputElement;
