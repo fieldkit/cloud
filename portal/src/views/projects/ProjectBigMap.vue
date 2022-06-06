@@ -219,7 +219,6 @@ export default Vue.extend({
             }, 250);
         },
         isPartnerCustomisationEnabled(): boolean {
-          console.log("radoi", isCustomisationEnabled());
             return isCustomisationEnabled();
         },
     },
