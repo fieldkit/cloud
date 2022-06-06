@@ -95,7 +95,8 @@
         "backToPrevious": "Back to Previous",
         "backProject": "Back to {name}",
         "backToStations": "Back to Stations",
-        "backToSensors": "Back to Sensor Map"
+        "backToSensors": "Back to Sensor Map",
+        "backStationDashboard": "Back to Station Dashboard"
     },
     "projects": {
         "title": {
@@ -199,7 +200,11 @@
         "nativeLand": "Native Land:",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "managePhotos": "Manage photos"
+        "managePhotos": "Manage photos",
+        "allPhotos": "All photos",
+        "replacePhoto": "Replace photo",
+        "deletePhoto": "Delete Photo",
+        "setAsStationImage": "Set as Station Image"
     },
     "user": {
         "profile": {

@@ -76,7 +76,7 @@
                                 <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                             </div>
                         </div>
-                        <router-link :to="{ name: 'test' }" class="station-photos-nav">
+                        <router-link :to="{ name: 'viewStationPhotos' }" class="station-photos-nav">
                             <i class="icon icon-grid"></i>
                             {{ $t("station.managePhotos") }}
                         </router-link>
@@ -266,9 +266,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/layout";
-@import "../../scss/forms.scss";
+@import "src/scss/mixins";
+@import "src/scss/layout";
+@import "src/scss/forms.scss";
 
 * {
     box-sizing: border-box;

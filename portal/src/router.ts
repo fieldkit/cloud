@@ -35,6 +35,7 @@ import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
 import { getPartnerCustomization } from "@/views/shared/partners";
+import StationPhotosView from '@/views/station/StationPhotosView.vue';
 
 Vue.use(Router);
 
@@ -349,6 +350,21 @@ const routes = [
         path: "/dashboard/projects/:projectId/station/:stationId",
         name: "viewStation",
         component: StationView,
+        props: (route) => {
+            return {
+                stationId: Number(route.params.stationId),
+                projectId: Number(route.params.projectId),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/projects/:projectId/station/:stationId/photos",
+        name: "viewStationPhotos",
+        component: StationPhotosView,
         props: (route) => {
             return {
                 stationId: Number(route.params.stationId),
