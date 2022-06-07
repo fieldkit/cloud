@@ -93,6 +93,30 @@ export default Vue.extend({
             }
         };
 
+        const CustomNewLine = Extension.create({
+            name: "newline",
+            addCommands() {
+                return {
+                    addNewline: () => ({ state, dispatch }) => {
+                        const { schema, tr } = state;
+                        const paragraph = schema.nodes.paragraph;
+
+                        const transaction = tr
+                            .deleteSelection()
+                            .replaceSelectionWith(paragraph.create(), true)
+                            .scrollIntoView();
+                        if (dispatch) dispatch(transaction);
+                        return true;
+                    },
+                } as never;
+            },
+            addKeyboardShortcuts() {
+                return {
+                    "Shift-Enter": () => (this.editor.commands as any).addNewline(),
+                };
+            },
+        });
+
         const ModifyEnter = Extension.create({
             addKeyboardShortcuts() {
                 return {
@@ -124,6 +148,7 @@ export default Vue.extend({
                 Text,
                 Placeholder,
                 ModifyEnter,
+                CustomNewLine,
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
