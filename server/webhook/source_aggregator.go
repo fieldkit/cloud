@@ -111,54 +111,56 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		for _, row := range batch.Messages {
 			rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
 
-			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
+			allParsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
-			} else if parsed != nil {
-				if i.verbose {
-					rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
-				}
-
-				if saved, err := model.Save(ctx, parsed); err != nil {
-					return err
-				} else if parsed.ReceivedAt != nil {
-					if aggregators[saved.Station.ID] == nil {
-						aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize, config)
-					}
-					aggregator := aggregators[saved.Station.ID]
-
-					if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
-						return fmt.Errorf("adding: %v", err)
+			} else if allParsed != nil {
+				for _, parsed := range allParsed {
+					if i.verbose {
+						rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
 					}
 
-					for _, parsedSensor := range parsed.Data {
-						key := parsedSensor.Key
-						if key == "" {
-							return fmt.Errorf("parsed-sensor has no sensor key")
+					if saved, err := model.Save(ctx, parsed); err != nil {
+						return err
+					} else if parsed.ReceivedAt != nil {
+						if aggregators[saved.Station.ID] == nil {
+							aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize, config)
+						}
+						aggregator := aggregators[saved.Station.ID]
+
+						if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
+							return fmt.Errorf("adding: %v", err)
 						}
 
-						if !parsedSensor.Transient {
-							sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
-
-							ask := handlers.AggregateSensorKey{
-								SensorKey: sensorKey,
-								ModuleID:  saved.Module.ID,
+						for _, parsedSensor := range parsed.Data {
+							key := parsedSensor.Key
+							if key == "" {
+								return fmt.Errorf("parsed-sensor has no sensor key")
 							}
 
-							if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
-								return fmt.Errorf("adding: %v", err)
-							}
+							if !parsedSensor.Transient {
+								sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
 
-							ir := &data.IncomingReading{
-								StationID: saved.Station.ID,
-								ModuleID:  saved.Module.ID,
-								SensorKey: sensorKey,
-								Time:      *parsed.ReceivedAt,
-								Value:     parsedSensor.Value,
-							}
+								ask := handlers.AggregateSensorKey{
+									SensorKey: sensorKey,
+									ModuleID:  saved.Module.ID,
+								}
 
-							if err := i.processIncomingReading(ctx, ir); err != nil {
-								return err
+								if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
+									return fmt.Errorf("adding: %v", err)
+								}
+
+								ir := &data.IncomingReading{
+									StationID: saved.Station.ID,
+									ModuleID:  saved.Module.ID,
+									SensorKey: sensorKey,
+									Time:      *parsed.ReceivedAt,
+									Value:     parsedSensor.Value,
+								}
+
+								if err := i.processIncomingReading(ctx, ir); err != nil {
+									return err
+								}
 							}
 						}
 					}

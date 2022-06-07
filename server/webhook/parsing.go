@@ -210,21 +210,21 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		if receivedAtString, ok := receivedAtRaw.(string); ok {
 			parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
 			if err != nil {
-			parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
-			if err != nil {
-				// NOTE: NOAA Tidal data was missing seconds.
-				parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+				parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
 				if err != nil {
-					return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+					// NOTE: NOAA Tidal data was missing seconds.
+					parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+					if err != nil {
+						return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+					}
 				}
 			}
-		}
 
-		receivedAt = &parsed
-	} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
-		parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
+			receivedAt = &parsed
+		} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
+			parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
 
-		receivedAt = &parsed
+			receivedAt = &parsed
 		} else {
 			return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
 		}
@@ -269,14 +269,14 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				if value, ok := toFloat(maybeValue); ok {
 					reading := &ParsedReading{
 						Key:       sensor.Key,
-					Battery:   sensor.Battery,
-					Transient: sensor.Transient,
-					Value:     value,
-				}
+						Battery:   sensor.Battery,
+						Transient: sensor.Transient,
+						Value:     value,
+					}
 
-				sensors = append(sensors, reading)
-			} else {
-				return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+					sensors = append(sensors, reading)
+				} else {
+					return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
 				}
 			}
 		}
@@ -312,7 +312,15 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	}, nil
 }
 
-func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
+func (m *WebHookMessage) unrollArrays(ctx context.Context, source interface{}) ([]interface{}, error) {
+	if array, ok := source.([]interface{}); ok {
+		return array, nil
+	}
+
+	return []interface{}{source}, nil
+}
+
+func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) ([]*ParsedMessage, error) {
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema id")
 	}
@@ -332,13 +340,23 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("error parsing message: %v", err)
 	}
 
-	for _, stationSchema := range schema.Stations {
-		if p, err = m.tryParse(ctx, cache, schemaRegistration, stationSchema, source); err != nil {
-			return nil, err
-		} else if p != nil {
-			break
+	unrolled, err := m.unrollArrays(ctx, source)
+	if err != nil {
+		return nil, err
+	}
+
+	parsed := make([]*ParsedMessage, 0)
+
+	for _, sourceObject := range unrolled {
+		for _, stationSchema := range schema.Stations {
+			if p, err := m.tryParse(ctx, cache, schemaRegistration, stationSchema, sourceObject); err != nil {
+				return nil, err
+			} else if p != nil {
+				parsed = append(parsed, p)
+				break
+			}
 		}
 	}
 
-	return p, nil
+	return parsed, nil
 }
