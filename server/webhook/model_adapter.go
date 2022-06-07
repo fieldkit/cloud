@@ -269,22 +269,22 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 
 	if pm.Attributes != nil {
 		for name, parsed := range pm.Attributes {
-			if attribute, ok := station.Attributes[name]; ok {
-				if parsed.Location {
-					if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
-						// Either has altitude or it doesn't.
-						if len(coordinates) == 2 || len(coordinates) == 3 {
-							station.Station.Location = data.NewLocation(coordinates)
-						}
+			if parsed.Location {
+				if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
+					// Either has altitude or it doesn't.
+					if len(coordinates) == 2 || len(coordinates) == 3 {
+						station.Station.Location = data.NewLocation(coordinates)
 					}
-				} else if parsed.Associated {
-					if stringValue, ok := parsed.JSONValue.(string); ok {
-						ids := strings.Split(stringValue, ",")
-						for index, id := range ids {
-							station.AssociatedDeviceIDs[id] = int32(index)
-						}
+				}
+			} else if parsed.Associated {
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					ids := strings.Split(stringValue, ",")
+					for index, id := range ids {
+						station.AssociatedDeviceIDs[id] = int32(index)
 					}
-				} else {
+				}
+			} else {
+				if attribute, ok := station.Attributes[name]; ok {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
 						attribute.StringValue = &stringValue
 					} else {
@@ -292,9 +292,9 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
 						}
 					}
+				} else {
+					log.Warnw("wh:unknown-attribute", "attribute_name", name)
 				}
-			} else {
-				log.Warnw("wh:unknown-attribute", "attribute_name", name)
 			}
 		}
 	}
