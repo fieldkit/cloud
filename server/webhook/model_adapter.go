@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/conservify/sqlxcache"
@@ -41,13 +42,14 @@ func NewModelAdapter(db *sqlxcache.DB) (m *ModelAdapter) {
 }
 
 type WebHookStation struct {
-	Provision     *data.Provision
-	Configuration *data.StationConfiguration
-	Station       *data.Station
-	Module        *data.StationModule
-	Sensors       []*data.ModuleSensor
-	SensorPrefix  string
-	Attributes    map[string]*data.StationAttributeSlot
+	Provision           *data.Provision
+	Configuration       *data.StationConfiguration
+	Station             *data.Station
+	Module              *data.StationModule
+	Sensors             []*data.ModuleSensor
+	SensorPrefix        string
+	Attributes          map[string]*data.StationAttributeSlot
+	AssociatedDeviceIDs map[string]int32
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
@@ -178,15 +180,15 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			for index, sensorSchema := range moduleSchema.Sensors {
 				// Transient sensors aren't saved.
 				if !sensorSchema.Transient {
-				// Add or create the sensor..
-				sensor := &data.ModuleSensor{
-					ConfigurationID: configuration.ID,
-					ModuleID:        module.ID,
-					Index:           uint32(index),
-					Name:            sensorSchema.Key,
-					ReadingValue:    nil,
-					ReadingTime:     nil,
-				}
+					// Add or create the sensor..
+					sensor := &data.ModuleSensor{
+						ConfigurationID: configuration.ID,
+						ModuleID:        module.ID,
+						Index:           uint32(index),
+						Name:            sensorSchema.Key,
+						ReadingValue:    nil,
+						ReadingTime:     nil,
+					}
 
 					for _, pr := range pm.Data {
 						if pr.Key == sensorSchema.Key {
@@ -196,12 +198,12 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 						}
 					}
 
-				if sensorSchema.UnitOfMeasure != nil {
-					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-				}
+					if sensorSchema.UnitOfMeasure != nil {
+						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+					}
 
-				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-					return nil, err
+					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+						return nil, err
 					}
 
 					sensors = append(sensors, sensor)
@@ -275,6 +277,13 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 							station.Station.Location = data.NewLocation(coordinates)
 						}
 					}
+				} else if parsed.Associated {
+					if stringValue, ok := parsed.JSONValue.(string); ok {
+						ids := strings.Split(stringValue, ",")
+						for index, id := range ids {
+							station.AssociatedDeviceIDs[id] = int32(index)
+						}
+					}
 				} else {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
 						attribute.StringValue = &stringValue
@@ -312,6 +321,25 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 
 			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
 				return err
+			}
+		}
+
+		for deviceIDString, priority := range cacheEntry.station.AssociatedDeviceIDs {
+			deviceID, err := hex.DecodeString(deviceIDString)
+			if err != nil {
+				deviceID = []byte(deviceIDString)
+			}
+
+			if associating, err := m.sr.QueryStationByDeviceID(ctx, deviceID); err != nil {
+				if err != sql.ErrNoRows {
+					return fmt.Errorf("querying associated station: %v", err)
+				}
+			} else if associating != nil {
+				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, priority); err != nil {
+					return fmt.Errorf("associated station: %v", err)
+				}
+			} else {
+				log.Infow("saving:unknown-associated", "device_id", deviceIDString)
 			}
 		}
 

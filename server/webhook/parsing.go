@@ -23,8 +23,9 @@ type ParsedReading struct {
 }
 
 type ParsedAttribute struct {
-	JSONValue interface{} `json:"json_value"`
-	Location  bool        `json:"location"`
+	JSONValue  interface{} `json:"json_value"`
+	Location   bool        `json:"location"`
+	Associated bool        `json:"associated"`
 }
 
 type ParsedMessage struct {
@@ -163,6 +164,8 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 }
 
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
+	log := Logger(ctx).Sugar()
+
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
 	if stationSchema.ConditionExpression != "" {
@@ -289,8 +292,9 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			}
 
 			attributes[attribute.Name] = &ParsedAttribute{
-				Location:  attribute.Location,
-				JSONValue: jsonValue,
+				Location:   attribute.Location,
+				Associated: attribute.Associated,
+				JSONValue:  jsonValue,
 			}
 		}
 	}

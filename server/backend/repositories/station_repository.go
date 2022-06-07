@@ -1390,3 +1390,36 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 
 	return byStation, nil
 }
+
+func (r *StationRepository) AssociateStations(ctx context.Context, stationID, associatedStationID, priority int32) (err error) {
+	if _, err := r.db.ExecContext(ctx, `
+		INSERT INTO fieldkit.associated_station (station_id, associated_station_id, priority)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (station_id, associated_station_id)
+		DO UPDATE SET priority = EXCLUDED.priority
+		`, stationID, associatedStationID, priority); err != nil {
+		return err
+	}
+	return nil
+}
+
+type associatedStation struct {
+	AssociatedStationID int32 `db:"associated_station_id"`
+	Priority            int32 `db:"priority"`
+}
+
+func (r *StationRepository) QueryAssociatedStations(ctx context.Context, stationID int32) (map[int32]int32, error) {
+	flatStations := make([]*associatedStation, 0)
+	if err := r.db.SelectContext(ctx, &flatStations, `
+		SELECT associated_station_id, priority FROM fieldkit.associated_station WHERE station_id = $1
+		`, stationID); err != nil {
+		return nil, err
+	}
+
+	byID := make(map[int32]int32)
+	for _, s := range flatStations {
+		byID[s.AssociatedStationID] = s.Priority
+	}
+
+	return byID, nil
+}
