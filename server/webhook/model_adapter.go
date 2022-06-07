@@ -75,6 +75,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	// Add or create the station, this may also mean creating the station model for this schema.
 	station := updating
 	if updating == nil {
+		if pm.DeviceName == nil {
+			return nil, fmt.Errorf("no station-name")
+		}
+
 		model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
 		if err != nil {
 			return nil, err
@@ -82,7 +86,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		updating = &data.Station{
 			DeviceID:  pm.DeviceID,
-			Name:      pm.DeviceName,
+			Name:      *pm.DeviceName,
 			OwnerID:   pm.OwnerID,
 			ModelID:   model.ID,
 			CreatedAt: time.Now(),
@@ -104,8 +108,8 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		station = added
 	} else {
-		if pm.DeviceName != "" {
-			station.Name = pm.DeviceName
+		if pm.DeviceName != nil {
+			station.Name = *pm.DeviceName
 		}
 	}
 
@@ -170,9 +174,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		for index, sensorSchema := range moduleSchema.Sensors {
-			// Transient sensors aren't saved.
-			if !sensorSchema.Transient {
+		if pm.ReceivedAt != nil {
+			for index, sensorSchema := range moduleSchema.Sensors {
+				// Transient sensors aren't saved.
+				if !sensorSchema.Transient {
 				// Add or create the sensor..
 				sensor := &data.ModuleSensor{
 					ConfigurationID: configuration.ID,
@@ -183,13 +188,13 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 					ReadingTime:     nil,
 				}
 
-				for _, pr := range pm.Data {
-					if pr.Key == sensorSchema.Key {
-						sensor.ReadingValue = &pr.Value
-						sensor.ReadingTime = &pm.ReceivedAt
-						break
+					for _, pr := range pm.Data {
+						if pr.Key == sensorSchema.Key {
+							sensor.ReadingValue = &pr.Value
+							sensor.ReadingTime = pm.ReceivedAt
+							break
+						}
 					}
-				}
 
 				if sensorSchema.UnitOfMeasure != nil {
 					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
@@ -197,9 +202,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
 					return nil, err
-				}
+					}
 
-				sensors = append(sensors, sensor)
+					sensors = append(sensors, sensor)
+				}
 			}
 		}
 
@@ -241,18 +247,20 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 	// These changes to station are saved once in Close.
 
 	// Give integrators the option to just skip this. Could become a nil check.
-	if len(pm.DeviceName) != 0 {
-		station.Station.Name = pm.DeviceName
+	if pm.DeviceName != nil {
+		station.Station.Name = *pm.DeviceName
 	}
 	station.Station.IngestionAt = &now
 	station.Station.UpdatedAt = now
 
-	for _, moduleSensor := range station.Sensors {
-		for _, pr := range pm.Data {
-			if pr.Key == moduleSensor.Name {
-				moduleSensor.ReadingValue = &pr.Value
-				moduleSensor.ReadingTime = &pm.ReceivedAt
-				break
+	if pm.ReceivedAt != nil {
+		for _, moduleSensor := range station.Sensors {
+			for _, pr := range pm.Data {
+				if pr.Key == moduleSensor.Name {
+					moduleSensor.ReadingValue = &pr.Value
+					moduleSensor.ReadingTime = pm.ReceivedAt
+					break
+				}
 			}
 		}
 	}

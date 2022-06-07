@@ -451,7 +451,7 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
-			} else if parsed != nil {
+			} else if parsed != nil && parsed.ReceivedAt != nil {
 				var latitude *float64
 				var longitude *float64
 
@@ -489,7 +489,7 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 							tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
 
 							reading := InfluxReading{
-								Time:      parsed.ReceivedAt,
+								Time:      *parsed.ReceivedAt,
 								DeviceID:  parsed.DeviceID,
 								ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
 								StationID: stationID,

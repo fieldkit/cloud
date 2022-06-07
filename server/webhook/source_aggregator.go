@@ -121,13 +121,13 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 				if saved, err := model.Save(ctx, parsed); err != nil {
 					return err
-				} else {
+				} else if parsed.ReceivedAt != nil {
 					if aggregators[saved.Station.ID] == nil {
 						aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize, config)
 					}
 					aggregator := aggregators[saved.Station.ID]
 
-					if err := aggregator.NextTime(ctx, parsed.ReceivedAt); err != nil {
+					if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
 						return fmt.Errorf("adding: %v", err)
 					}
 
@@ -145,7 +145,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 								ModuleID:  saved.Module.ID,
 							}
 
-							if err := aggregator.AddSample(ctx, parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
+							if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
 								return fmt.Errorf("adding: %v", err)
 							}
 
@@ -153,7 +153,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 								StationID: saved.Station.ID,
 								ModuleID:  saved.Module.ID,
 								SensorKey: sensorKey,
-								Time:      parsed.ReceivedAt,
+								Time:      *parsed.ReceivedAt,
 								Value:     parsedSensor.Value,
 							}
 

@@ -29,15 +29,15 @@ type ParsedAttribute struct {
 
 type ParsedMessage struct {
 	Original   *WebHookMessage
-	DeviceID   []byte
-	DeviceName string
-	Data       []*ParsedReading
-	Attributes map[string]*ParsedAttribute
-	ReceivedAt time.Time
 	Schema     *MessageSchemaStation
 	SchemaID   int32
 	OwnerID    int32
 	ProjectID  *int32
+	DeviceID   []byte
+	ReceivedAt *time.Time
+	Data       []*ParsedReading
+	DeviceName *string
+	Attributes map[string]*ParsedAttribute
 }
 
 func toFloatArray(x interface{}) ([]float64, bool) {
@@ -180,29 +180,33 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameString := ""
+	var deviceName *string
 
 	if stationSchema.NameExpression != "" {
-		deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression)
-		if err != nil {
-			return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+		if deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression); err != nil {
+			if _, ok := err.(*EvaluationError); !ok {
+				return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+			}
+		} else {
+			if deviceNameString, ok := deviceNameRaw.(string); !ok {
+				return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+			} else {
+				deviceName = &deviceNameString
+			}
 		}
-
-		deviceNameString, ok := deviceNameRaw.(string)
-		if !ok {
-			return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
-		}
-	}
-
-	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
-	if err != nil {
-		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
 
 	var receivedAt *time.Time
-	if receivedAtString, ok := receivedAtRaw.(string); ok {
-		parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
-		if err != nil {
+
+	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
+	if err != nil {
+		if _, ok := err.(*EvaluationError); !ok {
+			return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
+		}
+	} else {
+		if receivedAtString, ok := receivedAtRaw.(string); ok {
+			parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
+			if err != nil {
 			parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
 			if err != nil {
 				// NOTE: NOAA Tidal data was missing seconds.
@@ -218,12 +222,9 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
 
 		receivedAt = &parsed
-	} else {
-		return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
-	}
-
-	if receivedAt == nil {
-		return nil, fmt.Errorf("missing received-at")
+		} else {
+			return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
+		}
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
@@ -255,12 +256,16 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
-				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
-			}
-
-			if value, ok := toFloat(maybeValue); ok {
-				reading := &ParsedReading{
-					Key:       sensor.Key,
+				log.Infow("evaluation-error", "error", err)
+				/*
+					if _, ok := err.(*EvaluationError); !ok {
+						return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
+					}
+				*/
+			} else {
+				if value, ok := toFloat(maybeValue); ok {
+					reading := &ParsedReading{
+						Key:       sensor.Key,
 					Battery:   sensor.Battery,
 					Transient: sensor.Transient,
 					Value:     value,
@@ -269,6 +274,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				sensors = append(sensors, reading)
 			} else {
 				return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+				}
 			}
 		}
 	}
@@ -291,10 +297,10 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	return &ParsedMessage{
 		DeviceID:   deviceID,
-		DeviceName: deviceNameString,
+		DeviceName: deviceName,
 		Data:       sensors,
 		Attributes: attributes,
-		ReceivedAt: *receivedAt,
+		ReceivedAt: receivedAt,
 		OwnerID:    schemaRegistration.OwnerID,
 		SchemaID:   schemaRegistration.ID,
 		ProjectID:  schemaRegistration.ProjectID,
