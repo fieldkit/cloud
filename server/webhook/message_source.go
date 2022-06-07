@@ -13,15 +13,17 @@ type MessageSource interface {
 }
 
 type DatabaseMessageSource struct {
-	db       *sqlxcache.DB
-	started  bool
-	schemaID int32
+	db        *sqlxcache.DB
+	started   bool
+	schemaID  int32
+	messageID int64
 }
 
-func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32) *DatabaseMessageSource {
+func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32, messageID int64) *DatabaseMessageSource {
 	return &DatabaseMessageSource{
-		db:       db,
-		schemaID: schemaID,
+		db:        db,
+		schemaID:  schemaID,
+		messageID: messageID,
 	}
 }
 
@@ -31,7 +33,7 @@ func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBat
 	schemas := NewMessageSchemaRepository(s.db)
 	messages := NewMessagesRepository(s.db)
 
-	if s.schemaID == 0 {
+	if s.messageID == 0 && s.schemaID == 0 {
 		return fmt.Errorf("schema_id is required")
 	}
 
@@ -44,6 +46,10 @@ func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBat
 		s.started = true
 
 		log.Infow("ready", "schema_id", s.schemaID)
+	}
+
+	if s.messageID > 0 {
+		return messages.QueryMessageForProcessing(ctx, batch, s.messageID)
 	}
 
 	return messages.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)
