@@ -193,35 +193,38 @@ export default Vue.extend({
     methods: {
         async includeAssociated(ws: Workspace): Promise<Workspace> {
             const allStationIds = ws.allStationIds;
-            console.log("viz: include-associated(0)");
+            console.log("viz: include-associated(0)", allStationIds);
 
-            const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
-                if (ForbiddenError.isInstance(e)) {
-                    await this.$router.push({
-                        name: "login",
-                        params: { errorMessage: String(this.$t("login.privateStation")) },
-                        query: { after: this.$route.path },
-                    });
+            if (allStationIds.length > 0) {
+                const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
+                    if (ForbiddenError.isInstance(e)) {
+                        await this.$router.push({
+                            name: "login",
+                            params: { errorMessage: String(this.$t("login.privateStation")) },
+                            query: { after: this.$route.path },
+                        });
+                    }
+                });
+                if (associated) {
+                    const ids = associated.stations.map((s) => s.station.id);
+                    console.log(`viz: include-associated(0)`, associated);
+                    console.log(
+                        `viz: include-associated(0)`,
+                        associated.stations
+                            .filter((row) => row.manual)
+                            .map((row) => {
+                                return { station: row.station, manual: row.manual };
+                            }),
+                        associated.stations
+                            .filter((row) => row.location)
+                            .map((row) => {
+                                return { station: row.station, location: row.location };
+                            })
+                    );
+                    await ws.addStationIds(ids);
+                    await ws.addFullStations(associated.stations.map((s) => s.station));
+                    await ws.addAssociatedStations(associated.stations);
                 }
-            });
-            if (associated) {
-                const ids = associated.stations.map((s) => s.station.id);
-                console.log(`viz: include-associated(0)`, associated);
-                console.log(
-                    `viz: include-associated(0)`,
-                    associated.stations
-                        .filter((row) => row.manual)
-                        .map((row) => {
-                            return { station: row.station, manual: row.manual };
-                        }),
-                    associated.stations
-                        .filter((row) => row.location)
-                        .map((row) => {
-                            return { station: row.station, location: row.location };
-                        })
-                );
-                await ws.addStationIds(ids);
-                await ws.addFullStations(associated.stations.map((s) => s.station));
             }
 
             return ws;
