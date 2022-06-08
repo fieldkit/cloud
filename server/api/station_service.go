@@ -405,7 +405,14 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
+	sr := repositories.NewStationRepository(c.options.Database)
+
 	pr := repositories.NewProjectRepository(c.options.Database)
+
+	firstStation, err := sr.QueryStationByID(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
 	if err != nil {
@@ -416,6 +423,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 	for _, project := range projects {
 		including := false
+
 		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
 			ID: project.ID,
 		})
@@ -429,10 +437,33 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		}
 
 		if including {
+			byID := make(map[int32]*station.AssociatedStation)
+
 			for _, s := range projectStations.Stations {
-				stations = append(stations, &station.AssociatedStation{
+				associated := &station.AssociatedStation{
 					Station: s,
-				})
+					Project: &station.AssociatedViaProject{
+						ID: project.ID,
+					},
+				}
+
+				byID[s.ID] = associated
+
+				stations = append(stations, associated)
+			}
+
+			if firstStation.Location != nil {
+				if nearby, err := sr.QueryNearbyProjectStations(ctx, project.ID, firstStation.Location); err != nil {
+					return nil, err
+				} else {
+					for _, ns := range nearby {
+						if associated, ok := byID[ns.StationID]; ok {
+							associated.Location = &station.AssociatedViaLocation{
+								Distance: ns.Distance,
+							}
+						}
+					}
+				}
 			}
 		}
 	}
