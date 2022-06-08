@@ -212,13 +212,14 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 
 		whStation := &WebHookStation{
-			SensorPrefix:  modulePrefix,
-			Provision:     provision,
-			Configuration: configuration,
-			Station:       station,
-			Module:        module,
-			Sensors:       sensors,
-			Attributes:    attributes,
+			SensorPrefix:        modulePrefix,
+			Provision:           provision,
+			Configuration:       configuration,
+			Station:             station,
+			Module:              module,
+			Sensors:             sensors,
+			Attributes:          attributes,
+			AssociatedDeviceIDs: make(map[string]int32),
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
@@ -280,7 +281,9 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 				if stringValue, ok := parsed.JSONValue.(string); ok {
 					ids := strings.Split(stringValue, ",")
 					for index, id := range ids {
-						station.AssociatedDeviceIDs[id] = int32(index)
+						if id != "" {
+							station.AssociatedDeviceIDs[id] = int32(index)
+						}
 					}
 				}
 			} else {
@@ -333,6 +336,8 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 			if associating, err := m.sr.QueryStationByDeviceID(ctx, deviceID); err != nil {
 				if err != sql.ErrNoRows {
 					return fmt.Errorf("querying associated station: %v", err)
+				} else {
+					log.Infow("saving:unknown-associated", "device_id", deviceIDString)
 				}
 			} else if associating != nil {
 				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, priority); err != nil {
