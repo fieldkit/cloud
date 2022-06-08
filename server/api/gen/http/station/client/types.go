@@ -1287,6 +1287,7 @@ type AssociatedStationResponseBody struct {
 	Station  *StationFullResponseBody           `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
 	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body
@@ -1299,6 +1300,12 @@ type AssociatedViaProjectResponseBody struct {
 // types.
 type AssociatedViaLocationResponseBody struct {
 	Distance *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
+}
+
+// AssociatedViaManualResponseBody is used to define fields on response body
+// types.
+type AssociatedViaManualResponseBody struct {
+	Priority *int32 `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -4029,6 +4036,11 @@ func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) 
 			err = goa.MergeErrors(err, err2)
 		}
 	}
+	if body.Manual != nil {
+		if err2 := ValidateAssociatedViaManualResponseBody(body.Manual); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
@@ -4046,6 +4058,15 @@ func ValidateAssociatedViaProjectResponseBody(body *AssociatedViaProjectResponse
 func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationResponseBody) (err error) {
 	if body.Distance == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaManualResponseBody runs the validations defined on
+// AssociatedViaManualResponseBody
+func ValidateAssociatedViaManualResponseBody(body *AssociatedViaManualResponseBody) (err error) {
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }

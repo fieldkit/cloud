@@ -328,6 +328,7 @@ type AssociatedStation struct {
 	Station  *StationFull
 	Project  *AssociatedViaProject
 	Location *AssociatedViaLocation
+	Manual   *AssociatedViaManual
 }
 
 type AssociatedViaProject struct {
@@ -336,6 +337,10 @@ type AssociatedViaProject struct {
 
 type AssociatedViaLocation struct {
 	Distance float32
+}
+
+type AssociatedViaManual struct {
+	Priority int32
 }
 
 type EssentialStation struct {
@@ -729,6 +734,9 @@ func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedS
 	if vres.Location != nil {
 		res.Location = transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(vres.Location)
 	}
+	if vres.Manual != nil {
+		res.Manual = transformStationviewsAssociatedViaManualViewToAssociatedViaManual(vres.Manual)
+	}
 	if vres.Station != nil {
 		res.Station = newStationFull(vres.Station)
 	}
@@ -744,6 +752,9 @@ func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedSt
 	}
 	if res.Location != nil {
 		vres.Location = transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(res.Location)
+	}
+	if res.Manual != nil {
+		vres.Manual = transformAssociatedViaManualToStationviewsAssociatedViaManualView(res.Manual)
 	}
 	if res.Station != nil {
 		vres.Station = newStationFullView(res.Station)
@@ -1439,6 +1450,20 @@ func transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(v *st
 	return res
 }
 
+// transformStationviewsAssociatedViaManualViewToAssociatedViaManual builds a
+// value of type *AssociatedViaManual from a value of type
+// *stationviews.AssociatedViaManualView.
+func transformStationviewsAssociatedViaManualViewToAssociatedViaManual(v *stationviews.AssociatedViaManualView) *AssociatedViaManual {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaManual{
+		Priority: *v.Priority,
+	}
+
+	return res
+}
+
 // transformAssociatedViaProjectToStationviewsAssociatedViaProjectView builds a
 // value of type *stationviews.AssociatedViaProjectView from a value of type
 // *AssociatedViaProject.
@@ -1462,6 +1487,20 @@ func transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(v *As
 	}
 	res := &stationviews.AssociatedViaLocationView{
 		Distance: &v.Distance,
+	}
+
+	return res
+}
+
+// transformAssociatedViaManualToStationviewsAssociatedViaManualView builds a
+// value of type *stationviews.AssociatedViaManualView from a value of type
+// *AssociatedViaManual.
+func transformAssociatedViaManualToStationviewsAssociatedViaManualView(v *AssociatedViaManual) *stationviews.AssociatedViaManualView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaManualView{
+		Priority: &v.Priority,
 	}
 
 	return res

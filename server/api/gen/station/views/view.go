@@ -236,6 +236,7 @@ type AssociatedStationView struct {
 	Station  *StationFullView
 	Project  *AssociatedViaProjectView
 	Location *AssociatedViaLocationView
+	Manual   *AssociatedViaManualView
 }
 
 // AssociatedViaProjectView is a type that runs validations on a projected type.
@@ -247,6 +248,11 @@ type AssociatedViaProjectView struct {
 // type.
 type AssociatedViaLocationView struct {
 	Distance *float32
+}
+
+// AssociatedViaManualView is a type that runs validations on a projected type.
+type AssociatedViaManualView struct {
+	Priority *int32
 }
 
 // DownloadedPhotoView is a type that runs validations on a projected type.
@@ -409,6 +415,7 @@ var (
 			"station",
 			"project",
 			"location",
+			"manual",
 		},
 	}
 	// AssociatedStationMap is a map of attribute names in result type
@@ -418,6 +425,7 @@ var (
 			"station",
 			"project",
 			"location",
+			"manual",
 		},
 	}
 	// StationJobMap is a map of attribute names in result type StationJob indexed
@@ -924,6 +932,11 @@ func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
+	if result.Manual != nil {
+		if err2 := ValidateAssociatedViaManualView(result.Manual); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	if result.Station != nil {
 		if err2 := ValidateStationFullView(result.Station); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -946,6 +959,15 @@ func ValidateAssociatedViaProjectView(result *AssociatedViaProjectView) (err err
 func ValidateAssociatedViaLocationView(result *AssociatedViaLocationView) (err error) {
 	if result.Distance == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "result"))
+	}
+	return
+}
+
+// ValidateAssociatedViaManualView runs the validations defined on
+// AssociatedViaManualView.
+func ValidateAssociatedViaManualView(result *AssociatedViaManualView) (err error) {
+	if result.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
 	}
 	return
 }

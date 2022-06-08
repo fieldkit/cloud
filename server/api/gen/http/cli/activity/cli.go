@@ -3180,7 +3180,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 903725847 --size 379421300 --if-none-match "Corrupti dicta est expedita ex." --auth "Ipsam quidem provident delectus commodi in."
+    `+os.Args[0]+` station download- photo --station-id 379421300 --size 114212079 --if-none-match "Dicta est expedita." --auth "Consequatur ipsam quidem provident delectus commodi."
 `, os.Args[0])
 }
 
@@ -3196,7 +3196,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 311211900 --page-size 1530027841 --owner-id 2067171375 --query "Soluta at sit qui non." --sort-by "Nobis et repellat et quis." --auth "Qui libero eveniet atque ea."
+    `+os.Args[0]+` station list- all --page 1530027841 --page-size 2067171375 --owner-id 2019061545 --query "At sit qui non omnis nobis." --sort-by "Repellat et quis saepe qui libero." --auth "Atque ea excepturi."
 `, os.Args[0])
 }
 
@@ -3208,7 +3208,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station delete --station-id 1769257682 --auth "Qui ad molestiae facilis."
+    `+os.Args[0]+` station delete --station-id 1204046227 --auth "Quis qui ad molestiae."
 `, os.Args[0])
 }
 
@@ -3220,7 +3220,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station admin- search --query "Sed iure dolor." --auth "Est aperiam dolorum eum unde quia."
+    `+os.Args[0]+` station admin- search --query "Voluptatibus sed iure dolor." --auth "Est aperiam dolorum eum unde quia."
 `, os.Args[0])
 }
 

@@ -227,6 +227,11 @@ var AssociatedViaLocation = Type("AssociatedViaLocation", func() {
 	Required("distance")
 })
 
+var AssociatedViaManual = Type("AssociatedViaManual", func() {
+	Attribute("priority", Int32)
+	Required("priority")
+})
+
 var AssociatedStation = ResultType("application/vnd.app.associated.station", func() {
 	TypeName("AssociatedStation")
 	Attributes(func() {
@@ -234,11 +239,13 @@ var AssociatedStation = ResultType("application/vnd.app.associated.station", fun
 		Required("station")
 		Attribute("project", AssociatedViaProject)
 		Attribute("location", AssociatedViaLocation)
+		Attribute("manual", AssociatedViaManual)
 	})
 	View("default", func() {
 		Attribute("station")
 		Attribute("project")
 		Attribute("location")
+		Attribute("manual")
 	})
 })
 

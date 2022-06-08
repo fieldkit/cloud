@@ -1937,6 +1937,9 @@ func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *
 	if v.Location != nil {
 		res.Location = marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(v.Location)
 	}
+	if v.Manual != nil {
+		res.Manual = marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(v.Manual)
+	}
 
 	return res
 }
@@ -1964,6 +1967,20 @@ func marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponse
 	}
 	res := &AssociatedViaLocationResponseBody{
 		Distance: *v.Distance,
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody
+// builds a value of type *AssociatedViaManualResponseBody from a value of type
+// *stationviews.AssociatedViaManualView.
+func marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(v *stationviews.AssociatedViaManualView) *AssociatedViaManualResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaManualResponseBody{
+		Priority: *v.Priority,
 	}
 
 	return res

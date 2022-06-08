@@ -1287,6 +1287,7 @@ type AssociatedStationResponseBody struct {
 	Station  *StationFullResponseBody           `form:"station" json:"station" xml:"station"`
 	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body
@@ -1299,6 +1300,12 @@ type AssociatedViaProjectResponseBody struct {
 // types.
 type AssociatedViaLocationResponseBody struct {
 	Distance float32 `form:"distance" json:"distance" xml:"distance"`
+}
+
+// AssociatedViaManualResponseBody is used to define fields on response body
+// types.
+type AssociatedViaManualResponseBody struct {
+	Priority int32 `form:"priority" json:"priority" xml:"priority"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.

@@ -414,6 +414,11 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
+	associatedWithFirst, err := sr.QueryAssociatedStations(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
 	if err != nil {
 		return nil, err
@@ -450,6 +455,18 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 				byID[s.ID] = associated
 
 				stations = append(stations, associated)
+			}
+
+			log := Logger(ctx).Sugar()
+
+			for id, priority := range associatedWithFirst {
+				if associated, ok := byID[id]; ok {
+					associated.Manual = &station.AssociatedViaManual{
+						Priority: priority,
+					}
+				} else {
+					log.Infow("associated:missing", "asociated_station_id", id)
+				}
 			}
 
 			if firstStation.Location != nil {
