@@ -1931,6 +1931,40 @@ func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *
 	if v.Station != nil {
 		res.Station = marshalStationviewsStationFullViewToStationFullResponseBody(v.Station)
 	}
+	if v.Project != nil {
+		res.Project = marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(v.Project)
+	}
+	if v.Location != nil {
+		res.Location = marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(v.Location)
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody
+// builds a value of type *AssociatedViaProjectResponseBody from a value of
+// type *stationviews.AssociatedViaProjectView.
+func marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(v *stationviews.AssociatedViaProjectView) *AssociatedViaProjectResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaProjectResponseBody{
+		ID: *v.ID,
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody
+// builds a value of type *AssociatedViaLocationResponseBody from a value of
+// type *stationviews.AssociatedViaLocationView.
+func marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(v *stationviews.AssociatedViaLocationView) *AssociatedViaLocationResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaLocationResponseBody{
+		Distance: *v.Distance,
+	}
 
 	return res
 }

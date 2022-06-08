@@ -233,7 +233,20 @@ type AssociatedStationCollectionView []*AssociatedStationView
 
 // AssociatedStationView is a type that runs validations on a projected type.
 type AssociatedStationView struct {
-	Station *StationFullView
+	Station  *StationFullView
+	Project  *AssociatedViaProjectView
+	Location *AssociatedViaLocationView
+}
+
+// AssociatedViaProjectView is a type that runs validations on a projected type.
+type AssociatedViaProjectView struct {
+	ID *int32
+}
+
+// AssociatedViaLocationView is a type that runs validations on a projected
+// type.
+type AssociatedViaLocationView struct {
+	Distance *float32
 }
 
 // DownloadedPhotoView is a type that runs validations on a projected type.
@@ -394,6 +407,8 @@ var (
 	AssociatedStationCollectionMap = map[string][]string{
 		"default": []string{
 			"station",
+			"project",
+			"location",
 		},
 	}
 	// AssociatedStationMap is a map of attribute names in result type
@@ -401,6 +416,8 @@ var (
 	AssociatedStationMap = map[string][]string{
 		"default": []string{
 			"station",
+			"project",
+			"location",
 		},
 	}
 	// StationJobMap is a map of attribute names in result type StationJob indexed
@@ -897,11 +914,38 @@ func ValidateAssociatedStationCollectionView(result AssociatedStationCollectionV
 // ValidateAssociatedStationView runs the validations defined on
 // AssociatedStationView using the "default" view.
 func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
-
+	if result.Project != nil {
+		if err2 := ValidateAssociatedViaProjectView(result.Project); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if result.Location != nil {
+		if err2 := ValidateAssociatedViaLocationView(result.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	if result.Station != nil {
 		if err2 := ValidateStationFullView(result.Station); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateAssociatedViaProjectView runs the validations defined on
+// AssociatedViaProjectView.
+func ValidateAssociatedViaProjectView(result *AssociatedViaProjectView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	return
+}
+
+// ValidateAssociatedViaLocationView runs the validations defined on
+// AssociatedViaLocationView.
+func ValidateAssociatedViaLocationView(result *AssociatedViaLocationView) (err error) {
+	if result.Distance == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "result"))
 	}
 	return
 }

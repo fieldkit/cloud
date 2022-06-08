@@ -1284,7 +1284,21 @@ type AssociatedStationCollectionResponseBody []*AssociatedStationResponseBody
 // AssociatedStationResponseBody is used to define fields on response body
 // types.
 type AssociatedStationResponseBody struct {
-	Station *StationFullResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
+	Station  *StationFullResponseBody           `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
+	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+}
+
+// AssociatedViaProjectResponseBody is used to define fields on response body
+// types.
+type AssociatedViaProjectResponseBody struct {
+	ID *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+}
+
+// AssociatedViaLocationResponseBody is used to define fields on response body
+// types.
+type AssociatedViaLocationResponseBody struct {
+	Distance *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -4004,6 +4018,34 @@ func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) 
 		if err2 := ValidateStationFullResponseBody(body.Station); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	if body.Project != nil {
+		if err2 := ValidateAssociatedViaProjectResponseBody(body.Project); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Location != nil {
+		if err2 := ValidateAssociatedViaLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAssociatedViaProjectResponseBody runs the validations defined on
+// AssociatedViaProjectResponseBody
+func ValidateAssociatedViaProjectResponseBody(body *AssociatedViaProjectResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaLocationResponseBody runs the validations defined on
+// AssociatedViaLocationResponseBody
+func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationResponseBody) (err error) {
+	if body.Distance == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "body"))
 	}
 	return
 }

@@ -2264,6 +2264,40 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 func unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(v *AssociatedStationResponseBody) *stationviews.AssociatedStationView {
 	res := &stationviews.AssociatedStationView{}
 	res.Station = unmarshalStationFullResponseBodyToStationviewsStationFullView(v.Station)
+	if v.Project != nil {
+		res.Project = unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v.Project)
+	}
+	if v.Location != nil {
+		res.Location = unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(v.Location)
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView
+// builds a value of type *stationviews.AssociatedViaProjectView from a value
+// of type *AssociatedViaProjectResponseBody.
+func unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v *AssociatedViaProjectResponseBody) *stationviews.AssociatedViaProjectView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaProjectView{
+		ID: v.ID,
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView
+// builds a value of type *stationviews.AssociatedViaLocationView from a value
+// of type *AssociatedViaLocationResponseBody.
+func unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(v *AssociatedViaLocationResponseBody) *stationviews.AssociatedViaLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaLocationView{
+		Distance: v.Distance,
+	}
 
 	return res
 }

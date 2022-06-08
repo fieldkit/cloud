@@ -1284,7 +1284,21 @@ type AssociatedStationResponseBodyCollection []*AssociatedStationResponseBody
 // AssociatedStationResponseBody is used to define fields on response body
 // types.
 type AssociatedStationResponseBody struct {
-	Station *StationFullResponseBody `form:"station" json:"station" xml:"station"`
+	Station  *StationFullResponseBody           `form:"station" json:"station" xml:"station"`
+	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+}
+
+// AssociatedViaProjectResponseBody is used to define fields on response body
+// types.
+type AssociatedViaProjectResponseBody struct {
+	ID int32 `form:"id" json:"id" xml:"id"`
+}
+
+// AssociatedViaLocationResponseBody is used to define fields on response body
+// types.
+type AssociatedViaLocationResponseBody struct {
+	Distance float32 `form:"distance" json:"distance" xml:"distance"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.

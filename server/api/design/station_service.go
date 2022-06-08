@@ -217,14 +217,28 @@ var StationsFull = ResultType("application/vnd.app.stations.full", func() {
 	})
 })
 
+var AssociatedViaProject = Type("AssociatedViaProject", func() {
+	Attribute("id", Int32)
+	Required("id")
+})
+
+var AssociatedViaLocation = Type("AssociatedViaLocation", func() {
+	Attribute("distance", Float32)
+	Required("distance")
+})
+
 var AssociatedStation = ResultType("application/vnd.app.associated.station", func() {
 	TypeName("AssociatedStation")
 	Attributes(func() {
 		Attribute("station", StationFull)
 		Required("station")
+		Attribute("project", AssociatedViaProject)
+		Attribute("location", AssociatedViaLocation)
 	})
 	View("default", func() {
 		Attribute("station")
+		Attribute("project")
+		Attribute("location")
 	})
 })
 

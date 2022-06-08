@@ -325,7 +325,17 @@ type StationFullCollection []*StationFull
 type AssociatedStationCollection []*AssociatedStation
 
 type AssociatedStation struct {
-	Station *StationFull
+	Station  *StationFull
+	Project  *AssociatedViaProject
+	Location *AssociatedViaLocation
+}
+
+type AssociatedViaProject struct {
+	ID int32
+}
+
+type AssociatedViaLocation struct {
+	Distance float32
 }
 
 type EssentialStation struct {
@@ -713,6 +723,12 @@ func newAssociatedStationCollectionView(res AssociatedStationCollection) station
 // type AssociatedStation.
 func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedStation {
 	res := &AssociatedStation{}
+	if vres.Project != nil {
+		res.Project = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(vres.Project)
+	}
+	if vres.Location != nil {
+		res.Location = transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(vres.Location)
+	}
 	if vres.Station != nil {
 		res.Station = newStationFull(vres.Station)
 	}
@@ -723,6 +739,12 @@ func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedS
 // type AssociatedStationView using the "default" view.
 func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedStationView {
 	vres := &stationviews.AssociatedStationView{}
+	if res.Project != nil {
+		vres.Project = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(res.Project)
+	}
+	if res.Location != nil {
+		vres.Location = transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(res.Location)
+	}
 	if res.Station != nil {
 		vres.Station = newStationFullView(res.Station)
 	}
@@ -1384,6 +1406,62 @@ func transformStationRegionToStationviewsStationRegionView(v *StationRegion) *st
 				}
 			}
 		}
+	}
+
+	return res
+}
+
+// transformStationviewsAssociatedViaProjectViewToAssociatedViaProject builds a
+// value of type *AssociatedViaProject from a value of type
+// *stationviews.AssociatedViaProjectView.
+func transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(v *stationviews.AssociatedViaProjectView) *AssociatedViaProject {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaProject{
+		ID: *v.ID,
+	}
+
+	return res
+}
+
+// transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation builds
+// a value of type *AssociatedViaLocation from a value of type
+// *stationviews.AssociatedViaLocationView.
+func transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(v *stationviews.AssociatedViaLocationView) *AssociatedViaLocation {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaLocation{
+		Distance: *v.Distance,
+	}
+
+	return res
+}
+
+// transformAssociatedViaProjectToStationviewsAssociatedViaProjectView builds a
+// value of type *stationviews.AssociatedViaProjectView from a value of type
+// *AssociatedViaProject.
+func transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(v *AssociatedViaProject) *stationviews.AssociatedViaProjectView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaProjectView{
+		ID: &v.ID,
+	}
+
+	return res
+}
+
+// transformAssociatedViaLocationToStationviewsAssociatedViaLocationView builds
+// a value of type *stationviews.AssociatedViaLocationView from a value of type
+// *AssociatedViaLocation.
+func transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(v *AssociatedViaLocation) *stationviews.AssociatedViaLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaLocationView{
+		Distance: &v.Distance,
 	}
 
 	return res
