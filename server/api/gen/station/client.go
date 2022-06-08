@@ -112,13 +112,13 @@ func (c *Client) ListProject(ctx context.Context, p *ListProjectPayload) (res *S
 }
 
 // ListAssociated calls the "list associated" endpoint of the "station" service.
-func (c *Client) ListAssociated(ctx context.Context, p *ListAssociatedPayload) (res *StationsFull, err error) {
+func (c *Client) ListAssociated(ctx context.Context, p *ListAssociatedPayload) (res *AssociatedStations, err error) {
 	var ires interface{}
 	ires, err = c.ListAssociatedEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*StationsFull), nil
+	return ires.(*AssociatedStations), nil
 }
 
 // DownloadPhoto calls the "download photo" endpoint of the "station" service.

@@ -132,7 +132,7 @@ type ListProjectResponseBody struct {
 // ListAssociatedResponseBody is the type of the "station" service "list
 // associated" endpoint HTTP response body.
 type ListAssociatedResponseBody struct {
-	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+	Stations AssociatedStationCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
 // DownloadPhotoResponseBody is the type of the "station" service "download
@@ -1277,6 +1277,37 @@ type StationFullResponseBody struct {
 	Data               *StationDataSummaryResponseBody       `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
+// AssociatedStationCollectionResponseBody is used to define fields on response
+// body types.
+type AssociatedStationCollectionResponseBody []*AssociatedStationResponseBody
+
+// AssociatedStationResponseBody is used to define fields on response body
+// types.
+type AssociatedStationResponseBody struct {
+	Station  *StationFullResponseBody           `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
+	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+}
+
+// AssociatedViaProjectResponseBody is used to define fields on response body
+// types.
+type AssociatedViaProjectResponseBody struct {
+	ID *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+}
+
+// AssociatedViaLocationResponseBody is used to define fields on response body
+// types.
+type AssociatedViaLocationResponseBody struct {
+	Distance *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
+}
+
+// AssociatedViaManualResponseBody is used to define fields on response body
+// types.
+type AssociatedViaManualResponseBody struct {
+	Priority *int32 `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
+}
+
 // EssentialStationResponseBody is used to define fields on response body types.
 type EssentialStationResponseBody struct {
 	ID                 *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -1894,13 +1925,13 @@ func NewListProjectBadRequest(body *ListProjectBadRequestResponseBody) *goa.Serv
 	return v
 }
 
-// NewListAssociatedStationsFullOK builds a "station" service "list associated"
-// endpoint result from a HTTP "OK" response.
-func NewListAssociatedStationsFullOK(body *ListAssociatedResponseBody) *stationviews.StationsFullView {
-	v := &stationviews.StationsFullView{}
-	v.Stations = make([]*stationviews.StationFullView, len(body.Stations))
+// NewListAssociatedAssociatedStationsOK builds a "station" service "list
+// associated" endpoint result from a HTTP "OK" response.
+func NewListAssociatedAssociatedStationsOK(body *ListAssociatedResponseBody) *stationviews.AssociatedStationsView {
+	v := &stationviews.AssociatedStationsView{}
+	v.Stations = make([]*stationviews.AssociatedStationView, len(body.Stations))
 	for i, val := range body.Stations {
-		v.Stations[i] = unmarshalStationFullResponseBodyToStationviewsStationFullView(val)
+		v.Stations[i] = unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(val)
 	}
 
 	return v
@@ -3967,6 +3998,75 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 		if err2 := ValidateStationDataSummaryResponseBody(body.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateAssociatedStationCollectionResponseBody runs the validations defined
+// on AssociatedStationCollectionResponseBody
+func ValidateAssociatedStationCollectionResponseBody(body AssociatedStationCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateAssociatedStationResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateAssociatedStationResponseBody runs the validations defined on
+// AssociatedStationResponseBody
+func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) (err error) {
+	if body.Station == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("station", "body"))
+	}
+	if body.Station != nil {
+		if err2 := ValidateStationFullResponseBody(body.Station); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Project != nil {
+		if err2 := ValidateAssociatedViaProjectResponseBody(body.Project); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Location != nil {
+		if err2 := ValidateAssociatedViaLocationResponseBody(body.Location); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Manual != nil {
+		if err2 := ValidateAssociatedViaManualResponseBody(body.Manual); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAssociatedViaProjectResponseBody runs the validations defined on
+// AssociatedViaProjectResponseBody
+func ValidateAssociatedViaProjectResponseBody(body *AssociatedViaProjectResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaLocationResponseBody runs the validations defined on
+// AssociatedViaLocationResponseBody
+func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationResponseBody) (err error) {
+	if body.Distance == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaManualResponseBody runs the validations defined on
+// AssociatedViaManualResponseBody
+func ValidateAssociatedViaManualResponseBody(body *AssociatedViaManualResponseBody) (err error) {
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }

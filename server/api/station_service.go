@@ -395,7 +395,7 @@ func isForbidden(err error) bool {
 	return false
 }
 
-func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
+func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.AssociatedStations, err error) {
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -405,17 +405,30 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
+	sr := repositories.NewStationRepository(c.options.Database)
+
 	pr := repositories.NewProjectRepository(c.options.Database)
+
+	firstStation, err := sr.QueryStationByID(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	associatedWithFirst, err := sr.QueryAssociatedStations(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	stations := make([]*station.StationFull, 0)
+	stations := make([]*station.AssociatedStation, 0)
 
 	for _, project := range projects {
 		including := false
+
 		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
 			ID: project.ID,
 		})
@@ -429,13 +442,50 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		}
 
 		if including {
+			byID := make(map[int32]*station.AssociatedStation)
+
 			for _, s := range projectStations.Stations {
-				stations = append(stations, s)
+				associated := &station.AssociatedStation{
+					Station: s,
+					Project: &station.AssociatedViaProject{
+						ID: project.ID,
+					},
+				}
+
+				byID[s.ID] = associated
+
+				stations = append(stations, associated)
+			}
+
+			log := Logger(ctx).Sugar()
+
+			for id, priority := range associatedWithFirst {
+				if associated, ok := byID[id]; ok {
+					associated.Manual = &station.AssociatedViaManual{
+						Priority: priority,
+					}
+				} else {
+					log.Infow("associated:missing", "asociated_station_id", id)
+				}
+			}
+
+			if firstStation.Location != nil {
+				if nearby, err := sr.QueryNearbyProjectStations(ctx, project.ID, firstStation.Location); err != nil {
+					return nil, err
+				} else {
+					for _, ns := range nearby {
+						if associated, ok := byID[ns.StationID]; ok {
+							associated.Location = &station.AssociatedViaLocation{
+								Distance: ns.Distance,
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 
-	response = &station.StationsFull{
+	response = &station.AssociatedStations{
 		Stations: stations,
 	}
 

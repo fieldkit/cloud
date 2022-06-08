@@ -262,7 +262,7 @@ func NewListAssociatedEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.En
 		if err != nil {
 			return nil, err
 		}
-		vres := NewViewedStationsFull(res, "default")
+		vres := NewViewedAssociatedStations(res, "default")
 		return vres, nil
 	}
 }

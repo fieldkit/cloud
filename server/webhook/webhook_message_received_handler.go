@@ -25,7 +25,7 @@ func (h *WebHookMessageRececivedHandler) Handle(ctx context.Context, m *WebHookM
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 
-	source := NewDatabaseMessageSource(h.db, m.SchemaID)
+	source := NewDatabaseMessageSource(h.db, m.SchemaID, 0)
 
 	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err

@@ -38,6 +38,13 @@ type MessageBatch struct {
 	id        int64
 }
 
+type BatchSummary struct {
+	Total     int64      `db:"total"`
+	MaximumID int64      `db:"maximum_id"`
+	Start     *time.Time `db:"start"`
+	End       *time.Time `db:"end"`
+}
+
 func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
 	batch.Messages = nil
 
@@ -59,11 +66,27 @@ func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBa
 	return nil
 }
 
-type BatchSummary struct {
-	Total     int64      `db:"total"`
-	MaximumID int64      `db:"maximum_id"`
-	Start     *time.Time `db:"start"`
-	End       *time.Time `db:"end"`
+func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, batch *MessageBatch, messageID int64) error {
+	log := Logger(ctx).Sugar()
+
+	if batch.Messages != nil {
+		return sql.ErrNoRows
+	}
+
+	started := time.Now()
+
+	messages := []*WebHookMessage{}
+	if err := rr.db.SelectContext(ctx, &messages, `
+		SELECT id, created_at, schema_id, headers, body FROM fieldkit.ttn_messages WHERE (id = $1) 
+		`, messageID); err != nil {
+		return err
+	}
+
+	elapsed := time.Since(started)
+
+	log.Infow("queried", "elapsed", elapsed, "records", len(messages))
+
+	return rr.processQuery(ctx, batch, messages)
 }
 
 func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {

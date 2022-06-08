@@ -422,7 +422,7 @@ func toFloat(x interface{}) (float64, bool) {
 }
 
 func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
-	source := webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
+	source := webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0)
 
 	jqCache := &webhook.JqCache{}
 
@@ -448,65 +448,70 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx
 		for _, row := range batch.Messages {
 			rowLog := logging.Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
 
-			parsed, err := row.Parse(ctx, jqCache, batch.Schemas)
+			allParsed, err := row.Parse(ctx, jqCache, batch.Schemas)
 			if err != nil {
 				rowLog.Infow("wh:skipping", "reason", err)
-			} else if parsed != nil {
-				var latitude *float64
-				var longitude *float64
+			} else {
+				for _, parsed := range allParsed {
+					if parsed.ReceivedAt != nil {
 
-				for _, attribute := range parsed.Attributes {
-					if attribute.Location && attribute.JSONValue != nil {
-						if coordinates, ok := toFloatArray(attribute.JSONValue); ok {
-							if len(coordinates) >= 2 {
-								longitude = &coordinates[0]
-								latitude = &coordinates[1]
-								break
+						var latitude *float64
+						var longitude *float64
+
+						for _, attribute := range parsed.Attributes {
+							if attribute.Location && attribute.JSONValue != nil {
+								if coordinates, ok := toFloatArray(attribute.JSONValue); ok {
+									if len(coordinates) >= 2 {
+										longitude = &coordinates[0]
+										latitude = &coordinates[1]
+										break
+									}
+								}
 							}
 						}
-					}
-				}
 
-				for _, parsedSensor := range parsed.Data {
-					key := parsedSensor.Key
-					if key == "" {
-						return fmt.Errorf("parsed-sensor has no sensor key")
-					}
-
-					if !parsedSensor.Transient {
-						sensorID, ok := resolver.sensors[key]
-						if !ok {
-							if options.FailOnMissingSensors {
-								return fmt.Errorf("parsed-sensor for unknown sensor: %v", key)
-							}
-						} else {
-							stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
-							if err != nil {
-								return err
+						for _, parsedSensor := range parsed.Data {
+							key := parsedSensor.Key
+							if key == "" {
+								return fmt.Errorf("parsed-sensor has no sensor key")
 							}
 
-							tags := make(map[string]string)
-							tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
+							if !parsedSensor.Transient {
+								sensorID, ok := resolver.sensors[key]
+								if !ok {
+									if options.FailOnMissingSensors {
+										return fmt.Errorf("parsed-sensor for unknown sensor: %v", key)
+									}
+								} else {
+									stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
+									if err != nil {
+										return err
+									}
 
-							reading := InfluxReading{
-								Time:      parsed.ReceivedAt,
-								DeviceID:  parsed.DeviceID,
-								ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
-								StationID: stationID,
-								SensorID:  sensorID,
-								SensorKey: key,
-								Value:     parsedSensor.Value,
-								Longitude: longitude,
-								Latitude:  latitude,
-								Tags:      tags,
-							}
+									tags := make(map[string]string)
+									tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
 
-							dp := reading.ToPoint()
+									reading := InfluxReading{
+										Time:      *parsed.ReceivedAt,
+										DeviceID:  parsed.DeviceID,
+										ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
+										StationID: stationID,
+										SensorID:  sensorID,
+										SensorKey: key,
+										Value:     parsedSensor.Value,
+										Longitude: longitude,
+										Latitude:  latitude,
+										Tags:      tags,
+									}
 
-							influx.write.WritePoint(dp)
+									dp := reading.ToPoint()
 
-							if options.Verbose {
-								rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
+									influx.write.WritePoint(dp)
+
+									if options.Verbose {
+										rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
+									}
+								}
 							}
 						}
 					}

@@ -23,21 +23,22 @@ type ParsedReading struct {
 }
 
 type ParsedAttribute struct {
-	JSONValue interface{} `json:"json_value"`
-	Location  bool        `json:"location"`
+	JSONValue  interface{} `json:"json_value"`
+	Location   bool        `json:"location"`
+	Associated bool        `json:"associated"`
 }
 
 type ParsedMessage struct {
 	Original   *WebHookMessage
-	DeviceID   []byte
-	DeviceName string
-	Data       []*ParsedReading
-	Attributes map[string]*ParsedAttribute
-	ReceivedAt time.Time
 	Schema     *MessageSchemaStation
 	SchemaID   int32
 	OwnerID    int32
 	ProjectID  *int32
+	DeviceID   []byte
+	ReceivedAt *time.Time
+	Data       []*ParsedReading
+	DeviceName *string
+	Attributes map[string]*ParsedAttribute
 }
 
 func toFloatArray(x interface{}) ([]float64, bool) {
@@ -163,6 +164,8 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 }
 
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
+	log := Logger(ctx).Sugar()
+
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
 	if stationSchema.ConditionExpression != "" {
@@ -180,50 +183,51 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
 	}
 
-	deviceNameString := ""
+	var deviceName *string
 
 	if stationSchema.NameExpression != "" {
-		deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression)
-		if err != nil {
-			return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+		if deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression); err != nil {
+			if _, ok := err.(*EvaluationError); !ok {
+				return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+			}
+		} else {
+			if deviceNameString, ok := deviceNameRaw.(string); !ok {
+				return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
+			} else {
+				deviceName = &deviceNameString
+			}
 		}
-
-		deviceNameString, ok := deviceNameRaw.(string)
-		if !ok {
-			return nil, fmt.Errorf("unexpected device-name value: %v", deviceNameString)
-		}
-	}
-
-	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
-	if err != nil {
-		return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
 	}
 
 	var receivedAt *time.Time
-	if receivedAtString, ok := receivedAtRaw.(string); ok {
-		parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
-		if err != nil {
-			parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
+
+	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
+	if err != nil {
+		if _, ok := err.(*EvaluationError); !ok {
+			return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
+		}
+	} else {
+		if receivedAtString, ok := receivedAtRaw.(string); ok {
+			parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
 			if err != nil {
-				// NOTE: NOAA Tidal data was missing seconds.
-				parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+				parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
 				if err != nil {
-					return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+					// NOTE: NOAA Tidal data was missing seconds.
+					parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+					if err != nil {
+						return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+					}
 				}
 			}
+
+			receivedAt = &parsed
+		} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
+			parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
+
+			receivedAt = &parsed
+		} else {
+			return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
 		}
-
-		receivedAt = &parsed
-	} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
-		parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
-
-		receivedAt = &parsed
-	} else {
-		return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
-	}
-
-	if receivedAt == nil {
-		return nil, fmt.Errorf("missing received-at")
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
@@ -255,20 +259,25 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
-				return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
-			}
-
-			if value, ok := toFloat(maybeValue); ok {
-				reading := &ParsedReading{
-					Key:       sensor.Key,
-					Battery:   sensor.Battery,
-					Transient: sensor.Transient,
-					Value:     value,
-				}
-
-				sensors = append(sensors, reading)
+				log.Infow("evaluation-error", "error", err)
+				/*
+					if _, ok := err.(*EvaluationError); !ok {
+						return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
+					}
+				*/
 			} else {
-				return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+				if value, ok := toFloat(maybeValue); ok {
+					reading := &ParsedReading{
+						Key:       sensor.Key,
+						Battery:   sensor.Battery,
+						Transient: sensor.Transient,
+						Value:     value,
+					}
+
+					sensors = append(sensors, reading)
+				} else {
+					return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+				}
 			}
 		}
 	}
@@ -283,18 +292,19 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			}
 
 			attributes[attribute.Name] = &ParsedAttribute{
-				Location:  attribute.Location,
-				JSONValue: jsonValue,
+				Location:   attribute.Location,
+				Associated: attribute.Associated,
+				JSONValue:  jsonValue,
 			}
 		}
 	}
 
 	return &ParsedMessage{
 		DeviceID:   deviceID,
-		DeviceName: deviceNameString,
+		DeviceName: deviceName,
 		Data:       sensors,
 		Attributes: attributes,
-		ReceivedAt: *receivedAt,
+		ReceivedAt: receivedAt,
 		OwnerID:    schemaRegistration.OwnerID,
 		SchemaID:   schemaRegistration.ID,
 		ProjectID:  schemaRegistration.ProjectID,
@@ -302,7 +312,15 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	}, nil
 }
 
-func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) (p *ParsedMessage, err error) {
+func (m *WebHookMessage) unrollArrays(ctx context.Context, source interface{}) ([]interface{}, error) {
+	if array, ok := source.([]interface{}); ok {
+		return array, nil
+	}
+
+	return []interface{}{source}, nil
+}
+
+func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[int32]*MessageSchemaRegistration) ([]*ParsedMessage, error) {
 	if m.SchemaID == nil {
 		return nil, fmt.Errorf("missing schema id")
 	}
@@ -322,13 +340,23 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 		return nil, fmt.Errorf("error parsing message: %v", err)
 	}
 
-	for _, stationSchema := range schema.Stations {
-		if p, err = m.tryParse(ctx, cache, schemaRegistration, stationSchema, source); err != nil {
-			return nil, err
-		} else if p != nil {
-			break
+	unrolled, err := m.unrollArrays(ctx, source)
+	if err != nil {
+		return nil, err
+	}
+
+	parsed := make([]*ParsedMessage, 0)
+
+	for _, sourceObject := range unrolled {
+		for _, stationSchema := range schema.Stations {
+			if p, err := m.tryParse(ctx, cache, schemaRegistration, stationSchema, sourceObject); err != nil {
+				return nil, err
+			} else if p != nil {
+				parsed = append(parsed, p)
+				break
+			}
 		}
 	}
 
-	return p, nil
+	return parsed, nil
 }

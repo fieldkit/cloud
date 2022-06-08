@@ -753,6 +753,31 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
+type NearbyStation struct {
+	StationID int32   `db:"station_id" json:"station_id"`
+	Distance  float32 `db:"distance" json:"distance"`
+}
+
+func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, projectID int32, location *data.Location) ([]*NearbyStation, error) {
+	nearby := make([]*NearbyStation, 0)
+	if err := r.db.SelectContext(ctx, &nearby, `
+	    WITH distances AS (
+			SELECT
+				s.id AS station_id,
+				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
+			FROM fieldkit.project_station AS ps
+			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
+			WHERE ps.project_id = $1 AND s.location IS NOT NULL
+			ORDER BY distance
+		)
+		SELECT * FROM distances WHERE distance > 0 LIMIT 5
+		`, projectID, location); err != nil {
+		return nil, err
+	}
+
+	return nearby, nil
+}
+
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
@@ -1156,6 +1181,7 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_10s WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.aggregated_sensor_updated WHERE station_id IN ($1);`,
 		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
@@ -1389,4 +1415,37 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	}
 
 	return byStation, nil
+}
+
+func (r *StationRepository) AssociateStations(ctx context.Context, stationID, associatedStationID, priority int32) (err error) {
+	if _, err := r.db.ExecContext(ctx, `
+		INSERT INTO fieldkit.associated_station (station_id, associated_station_id, priority)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (station_id, associated_station_id)
+		DO UPDATE SET priority = EXCLUDED.priority
+		`, stationID, associatedStationID, priority); err != nil {
+		return err
+	}
+	return nil
+}
+
+type associatedStation struct {
+	AssociatedStationID int32 `db:"associated_station_id"`
+	Priority            int32 `db:"priority"`
+}
+
+func (r *StationRepository) QueryAssociatedStations(ctx context.Context, stationID int32) (map[int32]int32, error) {
+	flatStations := make([]*associatedStation, 0)
+	if err := r.db.SelectContext(ctx, &flatStations, `
+		SELECT associated_station_id, priority FROM fieldkit.associated_station WHERE station_id = $1
+		`, stationID); err != nil {
+		return nil, err
+	}
+
+	byID := make(map[int32]int32)
+	for _, s := range flatStations {
+		byID[s.AssociatedStationID] = s.Priority
+	}
+
+	return byID, nil
 }

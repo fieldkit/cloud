@@ -72,6 +72,7 @@ import { mapState, mapGetters } from "vuex";
 import { Station, ActionTypes } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
+import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 
@@ -146,7 +147,7 @@ export default Vue.extend({
             return "layout.backToStations";
         },
         selectedId(): number {
-            return +_.flattenDeep(this.bookmark.g)[0];
+            return Number(_.flattenDeep(this.bookmark.g)[0]);
         },
         selectedStation(): Station | null {
             if (this.workspace) {
@@ -162,6 +163,12 @@ export default Vue.extend({
                 await this.workspace.updateFromBookmark(newValue);
             }
         },
+        async selectedId(newValue: number, oldValue: number): Promise<void> {
+            console.log("viz: selected-changed-associated", newValue);
+            if (this.workspace) {
+                await this.includeAssociated(this.workspace);
+            }
+        },
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
@@ -174,7 +181,7 @@ export default Vue.extend({
                         return this.showStation(this.bookmark.s[0]);
                     }
                     console.log("viz: before-create-workspace", this.bookmark);
-                    await this.createWorkspaceIfNecessary();
+                    const ws = await this.createWorkspaceIfNecessary();
                 })
                 .catch(async (e) => {
                     if (e.name === "ForbiddenError") {
@@ -184,6 +191,44 @@ export default Vue.extend({
         }
     },
     methods: {
+        async includeAssociated(ws: Workspace): Promise<Workspace> {
+            const allStationIds = ws.allStationIds;
+            console.log("viz: include-associated(0)", allStationIds);
+
+            if (allStationIds.length > 0) {
+                const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
+                    if (ForbiddenError.isInstance(e)) {
+                        await this.$router.push({
+                            name: "login",
+                            params: { errorMessage: String(this.$t("login.privateStation")) },
+                            query: { after: this.$route.path },
+                        });
+                    }
+                });
+                if (associated) {
+                    const ids = associated.stations.map((s) => s.station.id);
+                    console.log(`viz: include-associated(0)`, associated);
+                    console.log(
+                        `viz: include-associated(0)`,
+                        associated.stations
+                            .filter((row) => row.manual)
+                            .map((row) => {
+                                return { station: row.station, manual: row.manual };
+                            }),
+                        associated.stations
+                            .filter((row) => row.location)
+                            .map((row) => {
+                                return { station: row.station, location: row.location };
+                            })
+                    );
+                    await ws.addStationIds(ids);
+                    await ws.addFullStations(associated.stations.map((s) => s.station));
+                    await ws.addAssociatedStations(associated.stations);
+                }
+            }
+
+            return ws;
+        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -226,15 +271,15 @@ export default Vue.extend({
             }
 
             const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
-            if (this.bookmark) {
-                this.workspace = Workspace.fromBookmark(allSensors, this.bookmark);
-            } else {
-                this.workspace = new Workspace(allSensors);
-            }
+            const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
 
             console.log(`viz: workspace-created`);
 
-            return this.workspace;
+            await this.includeAssociated(ws);
+
+            this.workspace = ws;
+
+            return ws;
         },
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
@@ -256,7 +301,7 @@ export default Vue.extend({
                         const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
                         const associated = await this.$services.api.getAssociatedStations(stationId);
-                        const stationIds = associated.stations.map((station) => station.id);
+                        const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
                         console.log(`viz: show-station-associated`, associated, stationIds);
 
                         const getInitialBookmark = () => {
