@@ -132,7 +132,7 @@ type ListProjectResponseBody struct {
 // ListAssociatedResponseBody is the type of the "station" service "list
 // associated" endpoint HTTP response body.
 type ListAssociatedResponseBody struct {
-	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+	Stations AssociatedStationResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
 // DownloadPhotoResponseBody is the type of the "station" service "download
@@ -1277,6 +1277,16 @@ type StationFullResponseBody struct {
 	Data               *StationDataSummaryResponseBody       `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
+// AssociatedStationResponseBodyCollection is used to define fields on response
+// body types.
+type AssociatedStationResponseBodyCollection []*AssociatedStationResponseBody
+
+// AssociatedStationResponseBody is used to define fields on response body
+// types.
+type AssociatedStationResponseBody struct {
+	Station *StationFullResponseBody `form:"station" json:"station" xml:"station"`
+}
+
 // EssentialStationResponseBody is used to define fields on response body types.
 type EssentialStationResponseBody struct {
 	ID                 int64                        `form:"id" json:"id" xml:"id"`
@@ -1483,12 +1493,12 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 
 // NewListAssociatedResponseBody builds the HTTP response body from the result
 // of the "list associated" endpoint of the "station" service.
-func NewListAssociatedResponseBody(res *stationviews.StationsFullView) *ListAssociatedResponseBody {
+func NewListAssociatedResponseBody(res *stationviews.AssociatedStationsView) *ListAssociatedResponseBody {
 	body := &ListAssociatedResponseBody{}
 	if res.Stations != nil {
-		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
+		body.Stations = make([]*AssociatedStationResponseBody, len(res.Stations))
 		for i, val := range res.Stations {
-			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+			body.Stations[i] = marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(val)
 		}
 	}
 	return body

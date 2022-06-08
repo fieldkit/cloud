@@ -217,6 +217,28 @@ var StationsFull = ResultType("application/vnd.app.stations.full", func() {
 	})
 })
 
+var AssociatedStation = ResultType("application/vnd.app.associated.station", func() {
+	TypeName("AssociatedStation")
+	Attributes(func() {
+		Attribute("station", StationFull)
+		Required("station")
+	})
+	View("default", func() {
+		Attribute("station")
+	})
+})
+
+var AssociatedStations = ResultType("application/vnd.app.associated.stations", func() {
+	TypeName("AssociatedStations")
+	Attributes(func() {
+		Attribute("stations", CollectionOf(AssociatedStation))
+		Required("stations")
+	})
+	View("default", func() {
+		Attribute("stations")
+	})
+})
+
 var EssentialStation = Type("EssentialStation", func() {
 	Attribute("id", Int64)
 	Attribute("deviceId")
@@ -446,7 +468,7 @@ var _ = Service("station", func() {
 			Required("id")
 		})
 
-		Result(StationsFull)
+		Result(AssociatedStations)
 
 		HTTP(func() {
 			GET("stations/{id}/associated")

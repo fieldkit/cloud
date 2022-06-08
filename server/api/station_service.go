@@ -395,7 +395,7 @@ func isForbidden(err error) bool {
 	return false
 }
 
-func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
+func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.AssociatedStations, err error) {
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -412,7 +412,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
-	stations := make([]*station.StationFull, 0)
+	stations := make([]*station.AssociatedStation, 0)
 
 	for _, project := range projects {
 		including := false
@@ -430,12 +430,14 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 		if including {
 			for _, s := range projectStations.Stations {
-				stations = append(stations, s)
+				stations = append(stations, &station.AssociatedStation{
+					Station: s,
+				})
 			}
 		}
 	}
 
-	response = &station.StationsFull{
+	response = &station.AssociatedStations{
 		Stations: stations,
 	}
 

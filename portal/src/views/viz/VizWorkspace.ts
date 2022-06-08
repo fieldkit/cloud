@@ -30,10 +30,10 @@ export const VizWorkspace = Vue.extend({
             }
         });
         if (associated) {
-            const ids = associated.stations.map((s) => s.id);
+            const ids = associated.stations.map((s) => s.station.id);
             console.log(`viz: include-associated(1)`, associated);
             await this.workspace.addStationIds(ids);
-            await this.workspace.addFullStations(associated.stations);
+            await this.workspace.addFullStations(associated.stations.map((s) => s.station));
         }
 
         return await this.workspace.query();

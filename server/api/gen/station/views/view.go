@@ -27,6 +27,15 @@ type StationsFull struct {
 	View string
 }
 
+// AssociatedStations is the viewed result type that is projected based on a
+// view.
+type AssociatedStations struct {
+	// Type to project
+	Projected *AssociatedStationsView
+	// View to render
+	View string
+}
+
 // DownloadedPhoto is the viewed result type that is projected based on a view.
 type DownloadedPhoto struct {
 	// Type to project
@@ -213,6 +222,20 @@ type StationsFullView struct {
 // type.
 type StationFullCollectionView []*StationFullView
 
+// AssociatedStationsView is a type that runs validations on a projected type.
+type AssociatedStationsView struct {
+	Stations AssociatedStationCollectionView
+}
+
+// AssociatedStationCollectionView is a type that runs validations on a
+// projected type.
+type AssociatedStationCollectionView []*AssociatedStationView
+
+// AssociatedStationView is a type that runs validations on a projected type.
+type AssociatedStationView struct {
+	Station *StationFullView
+}
+
 // DownloadedPhotoView is a type that runs validations on a projected type.
 type DownloadedPhotoView struct {
 	Length      *int64
@@ -295,6 +318,13 @@ var (
 			"stations",
 		},
 	}
+	// AssociatedStationsMap is a map of attribute names in result type
+	// AssociatedStations indexed by view name.
+	AssociatedStationsMap = map[string][]string{
+		"default": []string{
+			"stations",
+		},
+	}
 	// DownloadedPhotoMap is a map of attribute names in result type
 	// DownloadedPhoto indexed by view name.
 	DownloadedPhotoMap = map[string][]string{
@@ -359,6 +389,20 @@ var (
 			"data",
 		},
 	}
+	// AssociatedStationCollectionMap is a map of attribute names in result type
+	// AssociatedStationCollection indexed by view name.
+	AssociatedStationCollectionMap = map[string][]string{
+		"default": []string{
+			"station",
+		},
+	}
+	// AssociatedStationMap is a map of attribute names in result type
+	// AssociatedStation indexed by view name.
+	AssociatedStationMap = map[string][]string{
+		"default": []string{
+			"station",
+		},
+	}
 	// StationJobMap is a map of attribute names in result type StationJob indexed
 	// by view name.
 	StationJobMap = map[string][]string{
@@ -389,6 +433,18 @@ func ValidateStationsFull(result *StationsFull) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateStationsFullView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateAssociatedStations runs the validations defined on the viewed result
+// type AssociatedStations.
+func ValidateAssociatedStations(result *AssociatedStations) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateAssociatedStationsView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -809,6 +865,41 @@ func ValidateStationsFullView(result *StationsFullView) (err error) {
 func ValidateStationFullCollectionView(result StationFullCollectionView) (err error) {
 	for _, item := range result {
 		if err2 := ValidateStationFullView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAssociatedStationsView runs the validations defined on
+// AssociatedStationsView using the "default" view.
+func ValidateAssociatedStationsView(result *AssociatedStationsView) (err error) {
+
+	if result.Stations != nil {
+		if err2 := ValidateAssociatedStationCollectionView(result.Stations); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAssociatedStationCollectionView runs the validations defined on
+// AssociatedStationCollectionView using the "default" view.
+func ValidateAssociatedStationCollectionView(result AssociatedStationCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateAssociatedStationView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAssociatedStationView runs the validations defined on
+// AssociatedStationView using the "default" view.
+func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
+
+	if result.Station != nil {
+		if err2 := ValidateStationFullView(result.Station); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}

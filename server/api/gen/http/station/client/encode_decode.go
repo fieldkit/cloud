@@ -1126,13 +1126,13 @@ func DecodeListAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, 
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("station", "list associated", err)
 			}
-			p := NewListAssociatedStationsFullOK(&body)
+			p := NewListAssociatedAssociatedStationsOK(&body)
 			view := "default"
-			vres := &stationviews.StationsFull{Projected: p, View: view}
-			if err = stationviews.ValidateStationsFull(vres); err != nil {
+			vres := &stationviews.AssociatedStations{Projected: p, View: view}
+			if err = stationviews.ValidateAssociatedStations(vres); err != nil {
 				return nil, goahttp.ErrValidationError("station", "list associated", err)
 			}
-			res := station.NewStationsFull(vres)
+			res := station.NewAssociatedStations(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -2254,6 +2254,16 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	if v.Data != nil {
 		res.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(v.Data)
 	}
+
+	return res
+}
+
+// unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView
+// builds a value of type *stationviews.AssociatedStationView from a value of
+// type *AssociatedStationResponseBody.
+func unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(v *AssociatedStationResponseBody) *stationviews.AssociatedStationView {
+	res := &stationviews.AssociatedStationView{}
+	res.Station = unmarshalStationFullResponseBodyToStationviewsStationFullView(v.Station)
 
 	return res
 }

@@ -852,7 +852,7 @@ func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) g
 // the station list associated endpoint.
 func EncodeListAssociatedResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*stationviews.StationsFull)
+		res := v.(*stationviews.AssociatedStations)
 		enc := encoder(ctx, w)
 		body := NewListAssociatedResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
@@ -1918,6 +1918,18 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Data != nil {
 		res.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(v.Data)
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody
+// builds a value of type *AssociatedStationResponseBody from a value of type
+// *stationviews.AssociatedStationView.
+func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *stationviews.AssociatedStationView) *AssociatedStationResponseBody {
+	res := &AssociatedStationResponseBody{}
+	if v.Station != nil {
+		res.Station = marshalStationviewsStationFullViewToStationFullResponseBody(v.Station)
 	}
 
 	return res
