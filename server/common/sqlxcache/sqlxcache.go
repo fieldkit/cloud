@@ -3,6 +3,7 @@ package sqlxcache
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"sync"
 
 	"github.com/jmoiron/sqlx"
@@ -40,6 +41,14 @@ func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
 	return stmt, nil
 }
 
+func (db *DB) prepare(ctx context.Context, query string) (*sqlx.Stmt, error) {
+	tx := db.Transaction(ctx)
+	if tx != nil {
+		return tx.PreparexContext(ctx, query)
+	}
+	return db.db.PreparexContext(ctx, query)
+}
+
 func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
@@ -48,13 +57,21 @@ func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, e
 		return db.stmtWithTx(ctx, stmt), nil
 	}
 
-	stmt, err := db.db.PreparexContext(ctx, query)
+	stmt, err := db.prepare(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(prepare) %v", err)
 	}
 
 	db.cache[query] = stmt
 	return db.stmtWithTx(ctx, stmt), nil
+}
+
+func (db *DB) prepareNamed(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
+	tx := db.Transaction(ctx)
+	if tx != nil {
+		return tx.PrepareNamedContext(ctx, query)
+	}
+	return db.db.PrepareNamedContext(ctx, query)
 }
 
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
@@ -65,9 +82,9 @@ func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.Na
 		return db.namedStmtWithTx(ctx, namedStmt), nil
 	}
 
-	namedStmt, err := db.db.PrepareNamedContext(ctx, query)
+	namedStmt, err := db.prepareNamed(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(prepare) %v", err)
 	}
 
 	db.cacheNamed[query] = namedStmt
