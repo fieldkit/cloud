@@ -7,8 +7,8 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	"github.com/conservify/sqlxcache"
 	information "github.com/fieldkit/cloud/server/api/gen/information"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"

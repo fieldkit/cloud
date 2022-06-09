@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"

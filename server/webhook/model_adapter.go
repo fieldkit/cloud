@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"go.uber.org/zap"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"

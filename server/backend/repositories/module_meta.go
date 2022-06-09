@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/conservify/sqlxcache"
 	"github.com/fieldkit/cloud/server/common/errors"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 const (

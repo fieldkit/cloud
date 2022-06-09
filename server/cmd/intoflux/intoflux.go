@@ -14,7 +14,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"

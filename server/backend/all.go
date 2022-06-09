@@ -1,7 +1,7 @@
 package backend
 
 import (
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )

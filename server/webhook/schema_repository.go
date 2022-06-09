@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 type MessageSchemaRepository struct {

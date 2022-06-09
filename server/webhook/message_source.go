@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 type MessageSource interface {

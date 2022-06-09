@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/montanaflynn/stats"
 

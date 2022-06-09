@@ -11,7 +11,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 )

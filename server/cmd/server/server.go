@@ -26,7 +26,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/health"
 	"github.com/fieldkit/cloud/server/common/jobs"
