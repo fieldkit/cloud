@@ -40,7 +40,7 @@ func (r *StationRepository) FindOrCreateStationModel(ctx context.Context, ttnSch
 		if err == sql.ErrNoRows {
 			model = &data.StationModel{}
 			model.Name = name
-			model.ThingsNetworkSchemaID = &ttnSchemaID
+			model.SchemaID = &ttnSchemaID
 			if err := r.db.NamedGetContext(ctx, model, `INSERT INTO fieldkit.station_model (ttn_schema_id, name) VALUES (:ttn_schema_id, :name) RETURNING id`, model); err != nil {
 				return nil, err
 			}
