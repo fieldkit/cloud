@@ -34,6 +34,7 @@ type RawQueryParams struct {
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
+	InfluxDB   *bool   `json:"influxdb"`
 }
 
 type ModuleAndSensor struct {

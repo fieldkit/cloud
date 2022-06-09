@@ -32,6 +32,7 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 		Aggregate:  payload.Aggregate,
 		Tail:       payload.Tail,
 		Complete:   payload.Complete,
+		InfluxDB:   payload.InfluxDB,
 	}, nil
 }
 
