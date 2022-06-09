@@ -469,6 +469,31 @@ func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, conf
 	return nil
 }
 
+type NearbyStation struct {
+	StationID int32   `db:"station_id" json:"station_id"`
+	Distance  float32 `db:"distance" json:"distance"`
+}
+
+func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, projectID int32, location *data.Location) ([]*NearbyStation, error) {
+	nearby := make([]*NearbyStation, 0)
+	if err := r.db.SelectContext(ctx, &nearby, `
+	    WITH distances AS (
+			SELECT
+				s.id AS station_id,
+				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
+			FROM fieldkit.project_station AS ps
+			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
+			WHERE ps.project_id = $1 AND s.location IS NOT NULL
+			ORDER BY distance
+		)
+		SELECT * FROM distances WHERE distance > 0 LIMIT 5
+		`, projectID, location); err != nil {
+		return nil, err
+	}
+
+	return nearby, nil
+}
+
 func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*data.StationFull, error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
@@ -751,31 +776,6 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	}
 
 	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
-}
-
-type NearbyStation struct {
-	StationID int32   `db:"station_id" json:"station_id"`
-	Distance  float32 `db:"distance" json:"distance"`
-}
-
-func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, projectID int32, location *data.Location) ([]*NearbyStation, error) {
-	nearby := make([]*NearbyStation, 0)
-	if err := r.db.SelectContext(ctx, &nearby, `
-	    WITH distances AS (
-			SELECT
-				s.id AS station_id,
-				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
-			FROM fieldkit.project_station AS ps
-			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
-			WHERE ps.project_id = $1 AND s.location IS NOT NULL
-			ORDER BY distance
-		)
-		SELECT * FROM distances WHERE distance > 0 LIMIT 5
-		`, projectID, location); err != nil {
-		return nil, err
-	}
-
-	return nearby, nil
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
