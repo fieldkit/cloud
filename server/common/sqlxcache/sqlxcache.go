@@ -4,40 +4,25 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"sync"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type DB struct {
-	db         *sqlx.DB
-	mu         sync.Mutex
-	cache      map[string]*sqlx.Stmt
-	cacheNamed map[string]*sqlx.NamedStmt
+	db *sqlx.DB
 }
 
 func newDB(db *sqlx.DB) *DB {
 	return &DB{
-		db:         db,
-		cache:      make(map[string]*sqlx.Stmt),
-		cacheNamed: make(map[string]*sqlx.NamedStmt),
+		db: db,
 	}
 }
 
 func (db *DB) cacheStmt(query string) (*sqlx.Stmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if stmt, ok := db.cache[query]; ok {
-		return stmt, nil
-	}
-
 	stmt, err := db.db.Preparex(query)
 	if err != nil {
 		return nil, err
 	}
-
-	db.cache[query] = stmt
 	return stmt, nil
 }
 
@@ -50,19 +35,11 @@ func (db *DB) prepare(ctx context.Context, query string) (*sqlx.Stmt, error) {
 }
 
 func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if stmt, ok := db.cache[query]; ok {
-		return db.stmtWithTx(ctx, stmt), nil
-	}
-
 	stmt, err := db.prepare(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("(prepare) %v", err)
 	}
 
-	db.cache[query] = stmt
 	return db.stmtWithTx(ctx, stmt), nil
 }
 
@@ -75,19 +52,11 @@ func (db *DB) prepareNamed(ctx context.Context, query string) (*sqlx.NamedStmt, 
 }
 
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	if namedStmt, ok := db.cacheNamed[query]; ok {
-		return db.namedStmtWithTx(ctx, namedStmt), nil
-	}
-
 	namedStmt, err := db.prepareNamed(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("(prepare) %v", err)
 	}
 
-	db.cacheNamed[query] = namedStmt
 	return db.namedStmtWithTx(ctx, namedStmt), nil
 }
 
@@ -181,7 +150,6 @@ func (db *DB) ExecContext(ctx context.Context, query string, args ...interface{}
 	return stmt.ExecContext(ctx, args...)
 }
 
-// not sqlx
 func (db *DB) NamedGetContext(ctx context.Context, dest interface{}, query string, arg interface{}) error {
 	namedStmt, err := db.cacheNamedStmtContext(ctx, query)
 	if err != nil {
