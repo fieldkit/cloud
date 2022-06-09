@@ -1185,6 +1185,8 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.station_project_attribute WHERE station_id IN ($1)`,
+		`DELETE FROM fieldkit.station_interestingness WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.station_activity WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.project_station WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.station WHERE id IN ($1)`,
