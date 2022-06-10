@@ -79,78 +79,19 @@ func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	return nil
 }
 
-func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT
-		id,
-		time,
-		station_id,
-		sensor_id,
-		module_id,
-		value
-		FROM (
-			SELECT
-				ROW_NUMBER() OVER (PARTITION BY agg.sensor_id ORDER BY time DESC) AS r,
-				agg.*
-			FROM %s AS agg
-			WHERE agg.station_id IN (?)
-		) AS q
-		WHERE
-		q.r <= ?
-		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
-	if err != nil {
-		return nil, err
-	}
-
-	queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
-	if err != nil {
-		return nil, err
-	}
-
-	defer queried.Close()
-
-	rows := make([]*backend.DataRow, 0)
-
-	for queried.Next() {
-		row := &backend.DataRow{}
-		if err = scanRow(queried, row); err != nil {
-			return nil, err
-		}
-
-		rows = append(rows, row)
-	}
-
-	data := &SensorTailData{
-		Data: rows,
-	}
-
-	return &sensor.DataResult{
-		Object: data,
-	}, nil
+type DataBackend interface {
+	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
+	TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
 }
 
-func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
+type PostgresBackend struct {
+	db *sqlxcache.DB
+}
+
+func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	log := Logger(ctx).Sugar()
 
-	rawParams, err := NewRawQueryParamsFromSensorData(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	qp, err := rawParams.BuildQueryParams()
-	if err != nil {
-		return nil, sensor.MakeBadRequest(err)
-	}
-
-	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
-
-	if qp.Tail > 0 {
-		return c.tail(ctx, qp)
-	} else if len(qp.Sensors) == 0 {
-		return c.stationsMeta(ctx, qp.Stations)
-	}
-
-	dq := backend.NewDataQuerier(c.db)
+	dq := backend.NewDataQuerier(pgb.db)
 
 	summaries, selectedAggregateName, err := dq.SelectAggregate(ctx, qp)
 	if err != nil {
@@ -216,6 +157,96 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		},
 		rows,
 		outerRows,
+	}
+
+	return data, nil
+}
+
+func (pgb *PostgresBackend) TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+	query, args, err := sqlx.In(fmt.Sprintf(`
+		SELECT
+		id,
+		time,
+		station_id,
+		sensor_id,
+		module_id,
+		value
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER (PARTITION BY agg.sensor_id ORDER BY time DESC) AS r,
+				agg.*
+			FROM %s AS agg
+			WHERE agg.station_id IN (?)
+		) AS q
+		WHERE
+		q.r <= ?
+		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
+	if err != nil {
+		return nil, err
+	}
+
+	queried, err := pgb.db.QueryxContext(ctx, pgb.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer queried.Close()
+
+	rows := make([]*backend.DataRow, 0)
+
+	for queried.Next() {
+		row := &backend.DataRow{}
+		if err = scanRow(queried, row); err != nil {
+			return nil, err
+		}
+
+		rows = append(rows, row)
+	}
+
+	return &SensorTailData{
+		Data: rows,
+	}, nil
+}
+
+func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
+	be := &PostgresBackend{db: c.db}
+
+	data, err := be.TailData(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sensor.DataResult{
+		Object: data,
+	}, nil
+}
+
+func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
+	rawParams, err := NewRawQueryParamsFromSensorData(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	qp, err := rawParams.BuildQueryParams()
+	if err != nil {
+		return nil, sensor.MakeBadRequest(err)
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
+
+	if qp.Tail > 0 {
+		return c.tail(ctx, qp)
+	} else if len(qp.Sensors) == 0 {
+		return c.stationsMeta(ctx, qp.Stations)
+	}
+
+	be := &PostgresBackend{db: c.db}
+
+	data, err := be.QueryData(ctx, qp)
+	if err != nil {
+		return nil, err
 	}
 
 	return &sensor.DataResult{
@@ -324,3 +355,8 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 		Forbidden:    func(m string) error { return sensor.MakeForbidden(errors.New(m)) },
 	})
 }
+
+/*
+type InfluxDBBackend struct {
+}
+*/
