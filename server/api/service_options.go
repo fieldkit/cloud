@@ -44,10 +44,12 @@ type ControllerOptions struct {
 
 	// Subscribed listeners
 	subscriptions *Subscriptions
+
+	influxConfig *InfluxDBConfig
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *InfluxDBConfig) (controllerOptions *ControllerOptions, err error) {
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err
@@ -77,6 +79,7 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		locations:     locations,
 		que:           que,
 		subscriptions: NewSubscriptions(),
+		influxConfig:  influxConfig,
 	}
 
 	return

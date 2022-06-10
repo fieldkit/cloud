@@ -42,7 +42,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Emailer:    "default",
 	}
 
-	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating service options: %v", err)
 	}

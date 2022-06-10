@@ -196,21 +196,37 @@ func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryPara
 	}, nil
 }
 
-type SensorService struct {
-	options *ControllerOptions
-	db      *sqlxcache.DB
+type InfluxDBConfig struct {
+	Url      string
+	Token    string
+	Username string
+	Password string
+	Org      string
+	Bucket   string
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorService {
+type SensorService struct {
+	options      *ControllerOptions
+	influxConfig *InfluxDBConfig
+	db           *sqlxcache.DB
+}
+
+func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *InfluxDBConfig) *SensorService {
 	return &SensorService{
-		options: options,
-		db:      options.Database,
+		options:      options,
+		influxConfig: influxConfig,
+		db:           options.Database,
 	}
 }
 
 func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) DataBackend {
 	if qp.InfluxDB {
-		return &InfluxDBBackend{}
+		if c.influxConfig == nil {
+			log := Logger(ctx).Sugar()
+			log.Errorw("fatal: Missing InfluxDB configuration")
+		} else {
+			return &InfluxDBBackend{}
+		}
 	}
 	return &PostgresBackend{db: c.db}
 }

@@ -123,7 +123,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvc := NewInformationService(ctx, options)
 	informationEndpoints := information.NewEndpoints(informationSvc)
 
-	sensorSvc := NewSensorService(ctx, options)
+	sensorSvc := NewSensorService(ctx, options, options.influxConfig)
 	sensorEndpoints := sensor.NewEndpoints(sensorSvc)
 
 	notesSvc := NewNotesService(ctx, options)

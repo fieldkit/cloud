@@ -50,32 +50,59 @@ type Options struct {
 }
 
 type Config struct {
-	Addr                  string   `split_words:"true" default:"127.0.0.1:8080" required:"true"`
-	PostgresURL           string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	SessionKey            string   `split_words:"true"`
-	MapboxToken           string   `split_words:"true"`
-	TwitterConsumerKey    string   `split_words:"true"`
-	TwitterConsumerSecret string   `split_words:"true"`
-	AWSProfile            string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	Emailer               string   `split_words:"true" default:"default" required:"true"`
-	EmailOverride         string   `split_words:"true" default:""`
-	Archiver              string   `split_words:"true" default:"default" required:"true"`
-	PortalRoot            string   `split_words:"true"`
-	WellKnownRoot         string   `split_words:"true"`
-	Domain                string   `split_words:"true" default:"fklocal.org:8080" required:"true"`
-	HttpScheme            string   `split_words:"true" default:"https"`
-	ApiDomain             string   `split_words:"true" default:""`
-	PortalDomain          string   `split_words:"true" default:""`
-	ApiHost               string   `split_words:"true" default:""`
-	MediaBucketName       string   `split_words:"true" default:""` // Deprecated
-	StreamsBucketName     string   `split_words:"true" default:""` // Deprecated
-	MediaBuckets          []string `split_words:"true" default:""`
-	StreamsBuckets        []string `split_words:"true" default:""`
-	AwsId                 string   `split_words:"true" default:""`
-	AwsSecret             string   `split_words:"true" default:""`
-	StatsdAddress         string   `split_words:"true" default:""`
-	Production            bool     `envconfig:"production"`
-	LoggingFull           bool     `envconfig:"logging_full"`
+	Addr        string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+
+	// Tip, using required can help decipher the expected env name.
+	InfluxDbUrl      string `split_words:"true" requied:"false"`
+	InfluxDbToken    string `split_words:"true" requied:"false"`
+	InfluxDbUsername string `split_words:"true" requied:"false"`
+	InfluxDbPassword string `split_words:"true" requied:"false"`
+	InfluxDbOrg      string `split_words:"true" requied:"false"`
+	InfluxDbBucket   string `split_words:"true" requied:"false"`
+
+	SessionKey  string `split_words:"true"`
+	MapboxToken string `split_words:"true"`
+
+	PortalRoot    string `split_words:"true"`
+	WellKnownRoot string `split_words:"true"`
+	Domain        string `split_words:"true" default:"fklocal.org:8080" required:"true"`
+	HttpScheme    string `split_words:"true" default:"https"`
+	ApiDomain     string `split_words:"true" default:""`
+	PortalDomain  string `split_words:"true" default:""`
+	ApiHost       string `split_words:"true" default:""`
+
+	StatsdAddress string `split_words:"true" default:""`
+	Production    bool   `envconfig:"production"`
+	LoggingFull   bool   `envconfig:"logging_full"`
+
+	AWSProfile        string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	Emailer           string   `split_words:"true" default:"default" required:"true"`
+	EmailOverride     string   `split_words:"true" default:""`
+	Archiver          string   `split_words:"true" default:"default" required:"true"`
+	MediaBucketName   string   `split_words:"true" default:""` // Deprecated
+	StreamsBucketName string   `split_words:"true" default:""` // Deprecated
+	MediaBuckets      []string `split_words:"true" default:""`
+	StreamsBuckets    []string `split_words:"true" default:""`
+	AwsId             string   `split_words:"true" default:""`
+	AwsSecret         string   `split_words:"true" default:""`
+
+	TwitterConsumerKey    string `split_words:"true"`
+	TwitterConsumerSecret string `split_words:"true"`
+}
+
+func (c *Config) influxConfig() *api.InfluxDBConfig {
+	if c.InfluxDbToken == "" || c.InfluxDbUrl == "" || c.InfluxDbBucket == "" || c.InfluxDbOrg == "" {
+		return nil
+	}
+	return &api.InfluxDBConfig{
+		Url:      c.InfluxDbUrl,
+		Token:    c.InfluxDbToken,
+		Username: c.InfluxDbUsername,
+		Password: c.InfluxDbPassword,
+		Org:      c.InfluxDbOrg,
+		Bucket:   c.InfluxDbBucket,
+	}
 }
 
 func getBucketNames(config *Config) *api.BucketNames {
@@ -282,7 +309,12 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Buckets:       bucketNames,
 	}
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
+	influxConfig := config.influxConfig()
+	if influxConfig == nil {
+		log.Infow("influxdb-config-missing")
+	}
+
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig)
 	if err != nil {
 		return nil, err
 	}
