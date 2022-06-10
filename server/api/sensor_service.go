@@ -48,6 +48,25 @@ func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorSe
 	}
 }
 
+type SensorTailData struct {
+	Data []*backend.DataRow `json:"data"`
+}
+
+type AggregateInfo struct {
+	Name     string    `json:"name"`
+	Interval int32     `json:"interval"`
+	Complete bool      `json:"complete"`
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+}
+
+type QueriedData struct {
+	Summaries map[string]*backend.AggregateSummary `json:"summaries"`
+	Aggregate AggregateInfo                        `json:"aggregate"`
+	Data      []*backend.DataRow                   `json:"data"`
+	Outer     []*backend.DataRow                   `json:"outer"`
+}
+
 func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	if err := queried.StructScan(row); err != nil {
 		return fmt.Errorf("error scanning row: %v", err)
@@ -101,42 +120,13 @@ func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sen
 		rows = append(rows, row)
 	}
 
-	data := struct {
-		Data interface{} `json:"data"`
-	}{
-		rows,
+	data := &SensorTailData{
+		Data: rows,
 	}
 
 	return &sensor.DataResult{
 		Object: data,
 	}, nil
-}
-
-func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
-	sr := repositories.NewStationRepository(c.db)
-
-	byStation, err := sr.QueryStationSensors(ctx, stations)
-	if err != nil {
-		return nil, err
-	}
-
-	data := struct {
-		Stations map[int32][]*repositories.StationSensor `json:"stations"`
-	}{
-		byStation,
-	}
-
-	return &sensor.DataResult{
-		Object: data,
-	}, nil
-}
-
-type AggregateInfo struct {
-	Name     string    `json:"name"`
-	Interval int32     `json:"interval"`
-	Complete bool      `json:"complete"`
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
@@ -215,12 +205,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		rows = hackedRows
 	}
 
-	data := struct {
-		Summaries map[string]*backend.AggregateSummary `json:"summaries"`
-		Aggregate AggregateInfo                        `json:"aggregate"`
-		Data      interface{}                          `json:"data"`
-		Outer     interface{}                          `json:"outer"`
-	}{
+	data := &QueriedData{
 		summaries,
 		AggregateInfo{
 			Name:     aqp.AggregateName,
@@ -231,6 +216,27 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		},
 		rows,
 		outerRows,
+	}
+
+	return &sensor.DataResult{
+		Object: data,
+	}, nil
+}
+
+type StationsMeta struct {
+	Stations map[int32][]*repositories.StationSensor `json:"stations"`
+}
+
+func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
+	sr := repositories.NewStationRepository(c.db)
+
+	byStation, err := sr.QueryStationSensors(ctx, stations)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &StationsMeta{
+		Stations: byStation,
 	}
 
 	return &sensor.DataResult{
