@@ -81,7 +81,7 @@ func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 
 type DataBackend interface {
 	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
-	TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
+	QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
 }
 
 type PostgresBackend struct {
@@ -162,7 +162,7 @@ func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	return data, nil
 }
 
-func (pgb *PostgresBackend) TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
 		id,
@@ -211,7 +211,7 @@ func (pgb *PostgresBackend) TailData(ctx context.Context, qp *backend.QueryParam
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
 	be := &PostgresBackend{db: c.db}
 
-	data, err := be.TailData(ctx, qp)
+	data, err := be.QueryTail(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
@@ -280,6 +280,11 @@ type SensorMeta struct {
 	Key string `json:"key"`
 }
 
+type MetaResult struct {
+	Sensors []*SensorMeta `json:"sensors"`
+	Modules interface{}   `json:"modules"`
+}
+
 func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 	keysToId := []*data.Sensor{}
 	if err := c.db.SelectContext(ctx, &keysToId, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
@@ -300,12 +305,9 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 		return nil, err
 	}
 
-	data := struct {
-		Sensors []*SensorMeta `json:"sensors"`
-		Modules interface{}   `json:"modules"`
-	}{
-		sensors,
-		modules,
+	data := &MetaResult{
+		Sensors: sensors,
+		Modules: modules,
 	}
 
 	return &sensor.MetaResult{
@@ -376,7 +378,7 @@ func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	return data, nil
 }
 
-func (idb *InfluxDBBackend) TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+func (idb *InfluxDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
 	return &SensorTailData{
 		Data: make([]*backend.DataRow, 0),
 	}, nil
