@@ -421,8 +421,8 @@ func toFloat(x interface{}) (float64, bool) {
 	}
 }
 
-func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
-	source := webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0)
+func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver, schemaID int32) error {
+	source := webhook.NewDatabaseMessageSource(db, schemaID, 0)
 
 	jqCache := &webhook.JqCache{}
 
@@ -551,8 +551,24 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	if options.JsonRecords {
-		if err := processJson(ctx, options, db, influx, resolver); err != nil {
-			return err
+		ids := make([]int32, 0)
+		if options.SchemaID == -1 {
+			msr := webhook.NewMessageSchemaRepository(db)
+			if schemas, err := msr.QueryAllSchemas(ctx); err != nil {
+				return err
+			} else {
+				for _, schema := range schemas {
+					ids = append(ids, schema.ID)
+				}
+			}
+		} else {
+			ids = append(ids, int32(options.SchemaID))
+		}
+
+		for _, schemaID := range ids {
+			if err := processJsonSchema(ctx, options, db, influx, resolver, schemaID); err != nil {
+				return err
+			}
 		}
 	}
 
