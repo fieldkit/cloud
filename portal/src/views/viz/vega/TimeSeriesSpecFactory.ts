@@ -175,8 +175,7 @@ export class TimeSeriesSpecFactory {
                 // basically remove missing data if the queried
                 // resolution is finer than the expected sensor
                 // data's resolution.
-                const queriedAggregate = series.queried.aggregate;
-                if (queriedAggregate.interval <= 60) {
+                if (series.queried.shouldIgnoreMissing) {
                     return original.filter((datum) => _.isNumber(datum.value));
                 }
 

@@ -230,14 +230,12 @@ export class QueriedData {
         return this.sdr.data;
     }
 
-    get aggregate() {
-        return this.sdr.aggregate;
+    get shouldIgnoreMissing(): boolean {
+        return false; // TODO this.sdr.aggregate.interval <= 60;
     }
 
     public sorted(): QueriedData {
         const sorted = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortBy(this.sdr.data, (d) => d.time),
         };
         return new QueriedData(this.key, this.timeRangeQueried, sorted);
@@ -245,8 +243,6 @@ export class QueriedData {
 
     public removeMalformed(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: this.sdr.data.filter((d) => d.sensorId),
         };
         console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
@@ -255,8 +251,6 @@ export class QueriedData {
 
     public removeDuplicates(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
         console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
