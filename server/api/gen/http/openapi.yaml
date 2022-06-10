@@ -3568,7 +3568,7 @@ paths:
         required: false
         type: integer
         format: int32
-      - name: InfluxDB
+      - name: influx
         in: query
         required: false
         type: boolean

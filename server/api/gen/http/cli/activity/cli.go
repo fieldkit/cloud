@@ -428,7 +428,7 @@ func ParseEndpoint(
 		sensorDataAggregateFlag  = sensorDataFlags.String("aggregate", "", "")
 		sensorDataCompleteFlag   = sensorDataFlags.String("complete", "", "")
 		sensorDataTailFlag       = sensorDataFlags.String("tail", "", "")
-		sensorDataInfluxDBFlag   = sensorDataFlags.String("influx-db", "", "")
+		sensorDataInfluxFlag     = sensorDataFlags.String("influx", "", "")
 		sensorDataAuthFlag       = sensorDataFlags.String("auth", "", "")
 
 		sensorBookmarkFlags        = flag.NewFlagSet("bookmark", flag.ExitOnError)
@@ -1558,7 +1558,7 @@ func ParseEndpoint(
 				data = nil
 			case "data":
 				endpoint = c.Data()
-				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataCompleteFlag, *sensorDataTailFlag, *sensorDataInfluxDBFlag, *sensorDataAuthFlag)
+				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataCompleteFlag, *sensorDataTailFlag, *sensorDataInfluxFlag, *sensorDataAuthFlag)
 			case "bookmark":
 				endpoint = c.Bookmark()
 				data, err = sensorc.BuildBookmarkPayload(*sensorBookmarkBookmarkFlag, *sensorBookmarkAuthFlag)
@@ -2959,7 +2959,7 @@ Example:
 }
 
 func sensorDataUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -complete BOOL -tail INT32 -influx-db BOOL -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -complete BOOL -tail INT32 -influx BOOL -auth STRING
 
 Data implements data.
     -start INT64: 
@@ -2970,11 +2970,11 @@ Data implements data.
     -aggregate STRING: 
     -complete BOOL: 
     -tail INT32: 
-    -influx-db BOOL: 
+    -influx BOOL: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 3276232484733589293 --end 6029664753132516509 --stations "Mollitia sit." --sensors "Non voluptatem voluptatem." --resolution 1763918823 --aggregate "Voluptate tempora." --complete false --tail 1482709695 --influx-db false --auth "Tempore omnis."
+    `+os.Args[0]+` sensor data --start 3276232484733589293 --end 6029664753132516509 --stations "Mollitia sit." --sensors "Non voluptatem voluptatem." --resolution 1763918823 --aggregate "Voluptate tempora." --complete false --tail 1482709695 --influx false --auth "Tempore omnis."
 `, os.Args[0])
 }
 

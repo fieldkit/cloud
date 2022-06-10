@@ -32,20 +32,8 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 		Aggregate:  payload.Aggregate,
 		Tail:       payload.Tail,
 		Complete:   payload.Complete,
-		InfluxDB:   payload.InfluxDB,
+		InfluxDB:   payload.Influx,
 	}, nil
-}
-
-type SensorService struct {
-	options *ControllerOptions
-	db      *sqlxcache.DB
-}
-
-func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorService {
-	return &SensorService{
-		options: options,
-		db:      options.Database,
-	}
 }
 
 type SensorTailData struct {
@@ -208,8 +196,27 @@ func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryPara
 	}, nil
 }
 
+type SensorService struct {
+	options *ControllerOptions
+	db      *sqlxcache.DB
+}
+
+func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorService {
+	return &SensorService{
+		options: options,
+		db:      options.Database,
+	}
+}
+
+func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) DataBackend {
+	if qp.InfluxDB {
+		return &InfluxDBBackend{}
+	}
+	return &PostgresBackend{db: c.db}
+}
+
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
-	be := &PostgresBackend{db: c.db}
+	be := c.chooseBackend(ctx, qp)
 
 	data, err := be.QueryTail(ctx, qp)
 	if err != nil {
@@ -242,7 +249,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 
-	be := &PostgresBackend{db: c.db}
+	be := c.chooseBackend(ctx, qp)
 
 	data, err := be.QueryData(ctx, qp)
 	if err != nil {

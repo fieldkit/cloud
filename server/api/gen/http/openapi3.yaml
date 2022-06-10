@@ -9141,7 +9141,7 @@ paths:
           example: 560334729
           format: int32
         example: 1021179311
-      - name: InfluxDB
+      - name: influx
         in: query
         allowEmptyValue: true
         schema:

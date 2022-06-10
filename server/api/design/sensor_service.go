@@ -35,7 +35,7 @@ var _ = Service("sensor", func() {
 			Attribute("aggregate", String)
 			Attribute("complete", Boolean)
 			Attribute("tail", Int32)
-			Attribute("InfluxDB", Boolean)
+			Attribute("influx", Boolean)
 		})
 
 		Result(func() {
@@ -55,7 +55,7 @@ var _ = Service("sensor", func() {
 				Param("aggregate")
 				Param("complete")
 				Param("tail")
-				Param("InfluxDB")
+				Param("influx")
 			})
 
 			Response(func() {
