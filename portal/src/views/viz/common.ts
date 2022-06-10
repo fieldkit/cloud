@@ -115,6 +115,7 @@ export class DataQueryParams {
         queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
+        queryParams.append("influx", "true");
         return queryParams;
     }
 
