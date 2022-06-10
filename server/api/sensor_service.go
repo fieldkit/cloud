@@ -147,16 +147,16 @@ func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	}
 
 	data := &QueriedData{
-		summaries,
-		AggregateInfo{
+		Summaries: summaries,
+		Aggregate: AggregateInfo{
 			Name:     aqp.AggregateName,
 			Interval: aqp.Interval,
 			Complete: aqp.Complete,
 			Start:    aqp.Start,
 			End:      aqp.End,
 		},
-		rows,
-		outerRows,
+		Data:  rows,
+		Outer: outerRows,
 	}
 
 	return data, nil
@@ -356,7 +356,28 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 	})
 }
 
-/*
 type InfluxDBBackend struct {
 }
-*/
+
+func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
+	data := &QueriedData{
+		Summaries: make(map[string]*backend.AggregateSummary),
+		Aggregate: AggregateInfo{
+			Name:     "",
+			Interval: 0,
+			Complete: qp.Complete,
+			Start:    qp.Start,
+			End:      qp.End,
+		},
+		Data:  make([]*backend.DataRow, 0),
+		Outer: make([]*backend.DataRow, 0),
+	}
+
+	return data, nil
+}
+
+func (idb *InfluxDBBackend) TailData(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+	return &SensorTailData{
+		Data: make([]*backend.DataRow, 0),
+	}, nil
+}
