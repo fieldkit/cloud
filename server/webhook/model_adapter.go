@@ -157,7 +157,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	sensors := make([]*data.ModuleSensor, 0)
 
 	for _, moduleSchema := range pm.Schema.Modules {
-		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
+		modulePrefix := moduleSchema.KeyPrefix()
 
 		// Add or create the station module..
 		module := &data.StationModule{

@@ -163,6 +163,7 @@ func NewResolver(db *sqlxcache.DB) *Resolver {
 	return &Resolver{
 		queryStations: repositories.NewStationRepository(db),
 		querySensors:  repositories.NewSensorsRepository(db),
+		stations:      make(map[string]*data.Station),
 	}
 }
 
@@ -454,7 +455,6 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 			} else {
 				for _, parsed := range allParsed {
 					if parsed.ReceivedAt != nil {
-
 						var latitude *float64
 						var longitude *float64
 
@@ -477,10 +477,14 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 							}
 
 							if !parsedSensor.Transient {
-								sensorID, ok := resolver.sensors[key]
+								sensorKey := parsedSensor.FullSensorKey
+
+								sensorID, ok := resolver.sensors[sensorKey]
 								if !ok {
 									if options.FailOnMissingSensors {
-										return fmt.Errorf("parsed-sensor for unknown sensor: %v", key)
+										return fmt.Errorf("parsed-sensor for unknown sensor: %v", sensorKey)
+									} else {
+										rowLog.Infow("wh:missing", "key", sensorKey, "sensors", resolver.sensors)
 									}
 								} else {
 									stationID, err := resolver.LookupStationID(ctx, parsed.DeviceID)
@@ -497,7 +501,7 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 										ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
 										StationID: stationID,
 										SensorID:  sensorID,
-										SensorKey: key,
+										SensorKey: sensorKey,
 										Value:     parsedSensor.Value,
 										Longitude: longitude,
 										Latitude:  latitude,

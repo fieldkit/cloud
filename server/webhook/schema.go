@@ -21,6 +21,10 @@ type MessageSchemaModule struct {
 	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 
+func (m *MessageSchemaModule) KeyPrefix() string {
+	return fmt.Sprintf("%s.%s", WebHookSensorPrefix, m.Key)
+}
+
 type MessageSchemaAttribute struct {
 	Name       string `json:"name"`
 	Expression string `json:"expression"`

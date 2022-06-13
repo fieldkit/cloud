@@ -16,10 +16,12 @@ import (
 )
 
 type ParsedReading struct {
-	Key       string  `json:"key"`
-	Value     float64 `json:"value"`
-	Battery   bool    `json:"battery"`
-	Transient bool    `json:"transient"`
+	Key             string  `json:"key"`
+	ModuleKeyPrefix string  `json:"module_key_prefix"`
+	FullSensorKey   string  `json:"full_sensor_key"`
+	Value           float64 `json:"value"`
+	Battery         bool    `json:"battery"`
+	Transient       bool    `json:"transient"`
 }
 
 type ParsedAttribute struct {
@@ -257,6 +259,9 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
 			}
 
+			moduleKeyPrefix := module.KeyPrefix()
+			fullSensorKey := fmt.Sprintf("%s.%s", moduleKeyPrefix, sensor.Key)
+
 			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
 				log.Infow("evaluation-error", "error", err)
@@ -268,10 +273,12 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			} else {
 				if value, ok := toFloat(maybeValue); ok {
 					reading := &ParsedReading{
-						Key:       sensor.Key,
-						Battery:   sensor.Battery,
-						Transient: sensor.Transient,
-						Value:     value,
+						Key:             sensor.Key,
+						ModuleKeyPrefix: moduleKeyPrefix,
+						FullSensorKey:   fullSensorKey,
+						Battery:         sensor.Battery,
+						Transient:       sensor.Transient,
+						Value:           value,
 					}
 
 					sensors = append(sensors, reading)
