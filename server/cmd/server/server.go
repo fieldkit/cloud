@@ -33,11 +33,13 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/api"
+	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
-	_ "github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/social"
+
+	_ "github.com/fieldkit/cloud/server/messages"
 
 	"github.com/govau/que-go"
 	"github.com/jackc/pgx"
@@ -91,11 +93,11 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 }
 
-func (c *Config) influxConfig() *api.InfluxDBConfig {
+func (c *Config) influxConfig() *querying.InfluxDBConfig {
 	if c.InfluxDbToken == "" || c.InfluxDbUrl == "" || c.InfluxDbBucket == "" || c.InfluxDbOrg == "" {
 		return nil
 	}
-	return &api.InfluxDBConfig{
+	return &querying.InfluxDBConfig{
 		Url:      c.InfluxDbUrl,
 		Token:    c.InfluxDbToken,
 		Username: c.InfluxDbUsername,

@@ -4,16 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
-	"strconv"
-	"time"
 
 	_ "github.com/lib/pq"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
-	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
 
@@ -23,6 +17,8 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+
+	"github.com/fieldkit/cloud/server/api/querying"
 )
 
 func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQueryParams, error) {
@@ -39,182 +35,13 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 	}, nil
 }
 
-type SensorTailData struct {
-	Data []*backend.DataRow `json:"data"`
-}
-
-type AggregateInfo struct {
-	Name     string    `json:"name"`
-	Interval int32     `json:"interval"`
-	Complete bool      `json:"complete"`
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-}
-
-type QueriedData struct {
-	Summaries map[string]*backend.AggregateSummary `json:"summaries"`
-	Aggregate AggregateInfo                        `json:"aggregate"`
-	Data      []*backend.DataRow                   `json:"data"`
-	Outer     []*backend.DataRow                   `json:"outer"`
-}
-
-func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
-	if err := queried.StructScan(row); err != nil {
-		return fmt.Errorf("error scanning row: %v", err)
-	}
-
-	if row.Value != nil && math.IsNaN(*row.Value) {
-		row.Value = nil
-	}
-
-	return nil
-}
-
-type DataBackend interface {
-	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
-	QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
-}
-
-type PostgresBackend struct {
-	db *sqlxcache.DB
-}
-
-func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
-	log := Logger(ctx).Sugar()
-
-	dq := backend.NewDataQuerier(pgb.db)
-
-	summaries, selectedAggregateName, err := dq.SelectAggregate(ctx, qp)
-	if err != nil {
-		return nil, err
-	}
-
-	aqp, err := backend.NewAggregateQueryParams(qp, selectedAggregateName, summaries[selectedAggregateName])
-	if err != nil {
-		return nil, err
-	}
-
-	rows := make([]*backend.DataRow, 0)
-	if aqp.ExpectedRecords > 0 {
-		queried, err := dq.QueryAggregate(ctx, aqp)
-		if err != nil {
-			return nil, err
-		}
-
-		defer queried.Close()
-
-		for queried.Next() {
-			row := &backend.DataRow{}
-			if err = scanRow(queried, row); err != nil {
-				return nil, err
-			}
-
-			rows = append(rows, row)
-		}
-	} else {
-		log.Infow("empty summary")
-	}
-
-	outerRows, err := dq.QueryOuterValues(ctx, aqp)
-	if err != nil {
-		return nil, err
-	}
-
-	if qp.Complete {
-		hackedRows := make([]*backend.DataRow, 0, len(rows)+len(outerRows))
-		if outerRows[0] != nil {
-			outerRows[0].Time = data.NumericWireTime(aqp.Start)
-			hackedRows = append(hackedRows, outerRows[0])
-		}
-		for i := 0; i < len(rows); i += 1 {
-			hackedRows = append(hackedRows, rows[i])
-		}
-		if outerRows[1] != nil {
-			outerRows[1].Time = data.NumericWireTime(aqp.End)
-			hackedRows = append(hackedRows, outerRows[1])
-		}
-
-		rows = hackedRows
-	}
-
-	data := &QueriedData{
-		Summaries: summaries,
-		Aggregate: AggregateInfo{
-			Name:     aqp.AggregateName,
-			Interval: aqp.Interval,
-			Complete: aqp.Complete,
-			Start:    aqp.Start,
-			End:      aqp.End,
-		},
-		Data:  rows,
-		Outer: outerRows,
-	}
-
-	return data, nil
-}
-
-func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT
-		id,
-		time,
-		station_id,
-		sensor_id,
-		module_id,
-		value
-		FROM (
-			SELECT
-				ROW_NUMBER() OVER (PARTITION BY agg.sensor_id ORDER BY time DESC) AS r,
-				agg.*
-			FROM %s AS agg
-			WHERE agg.station_id IN (?)
-		) AS q
-		WHERE
-		q.r <= ?
-		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
-	if err != nil {
-		return nil, err
-	}
-
-	queried, err := pgb.db.QueryxContext(ctx, pgb.db.Rebind(query), args...)
-	if err != nil {
-		return nil, err
-	}
-
-	defer queried.Close()
-
-	rows := make([]*backend.DataRow, 0)
-
-	for queried.Next() {
-		row := &backend.DataRow{}
-		if err = scanRow(queried, row); err != nil {
-			return nil, err
-		}
-
-		rows = append(rows, row)
-	}
-
-	return &SensorTailData{
-		Data: rows,
-	}, nil
-}
-
-type InfluxDBConfig struct {
-	Url      string
-	Token    string
-	Username string
-	Password string
-	Org      string
-	Bucket   string
-}
-
 type SensorService struct {
 	options      *ControllerOptions
-	influxConfig *InfluxDBConfig
+	influxConfig *querying.InfluxDBConfig
 	db           *sqlxcache.DB
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *InfluxDBConfig) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig) *SensorService {
 	return &SensorService{
 		options:      options,
 		influxConfig: influxConfig,
@@ -222,16 +49,16 @@ func NewSensorService(ctx context.Context, options *ControllerOptions, influxCon
 	}
 }
 
-func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (DataBackend, error) {
+func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (querying.DataBackend, error) {
 	if qp.InfluxDB {
 		if c.influxConfig == nil {
 			log := Logger(ctx).Sugar()
 			log.Errorw("fatal: Missing InfluxDB configuration")
 		} else {
-			return NewInfluxDBBackend(c.influxConfig)
+			return querying.NewInfluxDBBackend(c.influxConfig)
 		}
 	}
-	return &PostgresBackend{db: c.db}, nil
+	return querying.NewPostgresBackend(c.db), nil
 }
 
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
@@ -388,131 +215,4 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 		Unauthorized: func(m string) error { return sensor.MakeUnauthorized(errors.New(m)) },
 		Forbidden:    func(m string) error { return sensor.MakeForbidden(errors.New(m)) },
 	})
-}
-
-type InfluxDBBackend struct {
-	config   *InfluxDBConfig
-	cli      influxdb2.Client
-	queryAPI api.QueryAPI
-}
-
-func NewInfluxDBBackend(config *InfluxDBConfig) (*InfluxDBBackend, error) {
-	cli := influxdb2.NewClient(config.Url, config.Token)
-
-	query := cli.QueryAPI(config.Org)
-
-	return &InfluxDBBackend{
-		config:   config,
-		cli:      cli,
-		queryAPI: query,
-	}, nil
-}
-
-func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
-	if len(qp.Stations) != 1 {
-		return nil, fmt.Errorf("multiple stations unsupported")
-	}
-
-	log := Logger(ctx).Sugar()
-
-	query := fmt.Sprintf(`
-		from(bucket: "%s")
-		|> range(start: %d, stop: %d)
-		|> filter(fn: (r) => r._measurement == "reading")
-		|> filter(fn: (r) => r._field == "value")
-		|> filter(fn: (r) => r.station_id == "%v")
-		|> aggregateWindow(every: 12h, fn: max)
-		|> yield(name: "max")
-	`, idb.config.Bucket, qp.Start.Unix(), qp.End.Unix(), qp.Stations[0])
-
-	log.Infow("influx:querying", "query", query, "start", qp.Start, "end", qp.End)
-
-	rows, err := idb.queryAPI.Query(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	dataRows := make([]*backend.DataRow, 0)
-
-	for rows.Next() {
-		record := rows.Record()
-		time := record.Time()
-
-		rawValue := record.Value()
-		var floatValue *float64
-		if rawValue != nil {
-			if maybeFloatValue, ok := rawValue.(float64); !ok {
-				log.Infow("influx:unexpected", "value", rawValue)
-			} else {
-				floatValue = &maybeFloatValue
-			}
-		}
-
-		values := record.Values()
-		stationIDRaw := values["station_id"]
-		sensorIDRaw := values["sensor_id"]
-		moduleIDRaw := values["module_id"]
-
-		row := &backend.DataRow{
-			Time:      data.NumericWireTime(time),
-			Value:     nil,
-			StationID: nil,
-			SensorID:  nil,
-			ModuleID:  nil,
-			Location:  nil,
-		}
-
-		if stationIDRaw != nil && sensorIDRaw != nil && moduleIDRaw != nil {
-			stationID, stationOk := strconv.Atoi(stationIDRaw.(string))
-			sensorID, sensorOk := strconv.Atoi(sensorIDRaw.(string))
-			moduleID := moduleIDRaw.(string)
-			if sensorOk == nil && stationOk == nil {
-				stationIDi32 := int32(stationID)
-				sensorIDi64 := int64(sensorID)
-				row = &backend.DataRow{
-					Time:      data.NumericWireTime(time),
-					Value:     floatValue,
-					StationID: &stationIDi32,
-					SensorID:  &sensorIDi64,
-					ModuleID:  &moduleID,
-					Location:  nil,
-				}
-			} else {
-				log.Infow("influx:unexpected", "values", values)
-			}
-		} else {
-			log.Infow("influx:unexpected", "values", values)
-		}
-
-		dataRows = append(dataRows, row)
-	}
-
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	log.Infow("influx:queried", "rows", len(dataRows))
-
-	queriedData := &QueriedData{
-		Summaries: make(map[string]*backend.AggregateSummary),
-		Aggregate: AggregateInfo{
-			Name:     "",
-			Interval: 0,
-			Complete: qp.Complete,
-			Start:    qp.Start,
-			End:      qp.End,
-		},
-		Data:  dataRows,
-		Outer: make([]*backend.DataRow, 0),
-	}
-
-	return queriedData, nil
-}
-
-func (idb *InfluxDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
-	return &SensorTailData{
-		Data: make([]*backend.DataRow, 0),
-	}, nil
 }
