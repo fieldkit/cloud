@@ -5,11 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	_ "github.com/lib/pq"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
@@ -219,20 +222,23 @@ func NewSensorService(ctx context.Context, options *ControllerOptions, influxCon
 	}
 }
 
-func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) DataBackend {
+func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (DataBackend, error) {
 	if qp.InfluxDB {
 		if c.influxConfig == nil {
 			log := Logger(ctx).Sugar()
 			log.Errorw("fatal: Missing InfluxDB configuration")
 		} else {
-			return &InfluxDBBackend{}
+			return NewInfluxDBBackend(c.influxConfig)
 		}
 	}
-	return &PostgresBackend{db: c.db}
+	return &PostgresBackend{db: c.db}, nil
 }
 
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
-	be := c.chooseBackend(ctx, qp)
+	be, err := c.chooseBackend(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
 
 	data, err := be.QueryTail(ctx, qp)
 	if err != nil {
@@ -265,7 +271,10 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 
-	be := c.chooseBackend(ctx, qp)
+	be, err := c.chooseBackend(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
 
 	data, err := be.QueryData(ctx, qp)
 	if err != nil {
@@ -382,10 +391,89 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 }
 
 type InfluxDBBackend struct {
+	config   *InfluxDBConfig
+	cli      influxdb2.Client
+	queryAPI api.QueryAPI
+}
+
+func NewInfluxDBBackend(config *InfluxDBConfig) (*InfluxDBBackend, error) {
+	cli := influxdb2.NewClient(config.Url, config.Token)
+
+	query := cli.QueryAPI(config.Org)
+
+	return &InfluxDBBackend{
+		config:   config,
+		cli:      cli,
+		queryAPI: query,
+	}, nil
 }
 
 func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
-	data := &QueriedData{
+	log := Logger(ctx).Sugar()
+
+	query := fmt.Sprintf(`
+		from(bucket: "%s")
+		|> range(start: %d, stop: %d)
+		|> filter(fn: (r) => r._measurement == "reading")
+		|> filter(fn: (r) => r._field == "value")
+		|> filter(fn: (r) => r.station_id == "%v")
+		|> yield(name: "max")
+	`, idb.config.Bucket, qp.Start.Unix(), qp.End.Unix(), qp.Stations[0])
+
+	log.Infow("influx:querying", "query", query)
+
+	rows, err := idb.queryAPI.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	dataRows := make([]*backend.DataRow, 0)
+
+	for rows.Next() {
+		record := rows.Record()
+
+		time := record.Time()
+		value := record.Value()
+
+		if floatValue, ok := value.(float64); !ok {
+			log.Infow("influx:unexpected", "value", value)
+		} else {
+			values := record.Values()
+
+			stationIDString := values["station_id"].(string)
+			sensorIDString := values["sensor_id"].(string)
+			moduleID := values["module_id"].(string)
+
+			stationID, stationOk := strconv.Atoi(stationIDString)
+
+			sensorID, sensorOk := strconv.Atoi(sensorIDString)
+
+			if sensorOk == nil && stationOk == nil {
+				stationIDi32 := int32(stationID)
+				sensorIDi64 := int64(sensorID)
+				dataRows = append(dataRows, &backend.DataRow{
+					Time:      data.NumericWireTime(time),
+					Value:     &floatValue,
+					StationID: &stationIDi32,
+					SensorID:  &sensorIDi64,
+					ModuleID:  &moduleID,
+					Location:  nil,
+				})
+			} else {
+				log.Infow("influx:unexpected", "values", values)
+			}
+		}
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	log.Infow("influx:queried", "rows", len(dataRows))
+
+	queriedData := &QueriedData{
 		Summaries: make(map[string]*backend.AggregateSummary),
 		Aggregate: AggregateInfo{
 			Name:     "",
@@ -394,11 +482,11 @@ func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 			Start:    qp.Start,
 			End:      qp.End,
 		},
-		Data:  make([]*backend.DataRow, 0),
+		Data:  dataRows,
 		Outer: make([]*backend.DataRow, 0),
 	}
 
-	return data, nil
+	return queriedData, nil
 }
 
 func (idb *InfluxDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
