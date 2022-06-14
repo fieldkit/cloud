@@ -1953,7 +1953,9 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 // builds a value of type *AssociatedStationResponseBody from a value of type
 // *stationviews.AssociatedStationView.
 func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *stationviews.AssociatedStationView) *AssociatedStationResponseBody {
-	res := &AssociatedStationResponseBody{}
+	res := &AssociatedStationResponseBody{
+		Hidden: *v.Hidden,
+	}
 	if v.Station != nil {
 		res.Station = marshalStationviewsStationFullViewToStationFullResponseBody(v.Station)
 	}

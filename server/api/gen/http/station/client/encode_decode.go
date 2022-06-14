@@ -2280,7 +2280,9 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 // builds a value of type *stationviews.AssociatedStationView from a value of
 // type *AssociatedStationResponseBody.
 func unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(v *AssociatedStationResponseBody) *stationviews.AssociatedStationView {
-	res := &stationviews.AssociatedStationView{}
+	res := &stationviews.AssociatedStationView{
+		Hidden: v.Hidden,
+	}
 	res.Station = unmarshalStationFullResponseBodyToStationviewsStationFullView(v.Station)
 	if v.Project != nil {
 		res.Project = unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v.Project)

@@ -347,6 +347,7 @@ export interface AssociatedStation {
     manual?: { priority: number };
     location?: { distance: number };
     project?: { id: number };
+    hidden: boolean;
 }
 
 export interface AssociatedStationsResponse {

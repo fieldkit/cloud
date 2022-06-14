@@ -336,6 +336,7 @@ type AssociatedStation struct {
 	Project  *AssociatedViaProject
 	Location *AssociatedViaLocation
 	Manual   *AssociatedViaManual
+	Hidden   bool
 }
 
 type AssociatedViaProject struct {
@@ -741,6 +742,9 @@ func newAssociatedStationCollectionView(res AssociatedStationCollection) station
 // type AssociatedStation.
 func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedStation {
 	res := &AssociatedStation{}
+	if vres.Hidden != nil {
+		res.Hidden = *vres.Hidden
+	}
 	if vres.Project != nil {
 		res.Project = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(vres.Project)
 	}
@@ -759,7 +763,9 @@ func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedS
 // newAssociatedStationView projects result type AssociatedStation to projected
 // type AssociatedStationView using the "default" view.
 func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedStationView {
-	vres := &stationviews.AssociatedStationView{}
+	vres := &stationviews.AssociatedStationView{
+		Hidden: &res.Hidden,
+	}
 	if res.Project != nil {
 		vres.Project = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(res.Project)
 	}

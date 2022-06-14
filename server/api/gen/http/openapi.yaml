@@ -5054,37 +5054,37 @@ definitions:
     properties:
       created_at:
         type: integer
-        example: 5015150029469780572
+        example: 1233134986107382033
         format: int64
       id:
         type: integer
-        example: 8223368983497526306
+        example: 926618490236083793
         format: int64
       key:
         type: string
-        example: Magnam eos fugiat nam.
+        example: Labore id.
       meta:
-        example: Exercitationem quod omnis molestiae tempora voluptatem numquam.
+        example: Accusantium aspernatur neque hic sint aliquid assumenda.
       project:
         $ref: '#/definitions/ProjectSummaryResponseBody'
       station:
         $ref: '#/definitions/StationSummaryResponseBody'
       type:
         type: string
-        example: Aspernatur neque hic sint aliquid.
+        example: Corrupti et repellendus doloremque aspernatur nesciunt tenetur.
     description: ActivityEntryResponseBody result type (default view)
     example:
-      created_at: 2382146596540086362
-      id: 8388885503157239845
-      key: Harum impedit deleniti.
-      meta: Dignissimos inventore veniam consequatur.
+      created_at: 8423881628678236190
+      id: 7784523234912546843
+      key: Omnis molestiae tempora voluptatem numquam maiores.
+      meta: Veritatis corporis et.
       project:
         id: 5327466049263484762
         name: Et voluptatem.
       station:
         id: 2080015101063758930
         name: Accusamus adipisci non voluptatem eius magni deserunt.
-      type: Veritatis corporis et.
+      type: Impedit deleniti qui.
     required:
     - id
     - key
@@ -5100,6 +5100,17 @@ definitions:
       $ref: '#/definitions/ActivityEntryResponseBody'
     description: ActivityEntryCollectionResponseBody is the result type for an array of ActivityEntryResponseBody (default view)
     example:
+    - created_at: 7971362681274114734
+      id: 6936870854682057065
+      key: Explicabo numquam et quis exercitationem.
+      meta: Natus cum facere quos ut rerum.
+      project:
+        id: 5327466049263484762
+        name: Et voluptatem.
+      station:
+        id: 2080015101063758930
+        name: Accusamus adipisci non voluptatem eius magni deserunt.
+      type: Repellendus dolor illo sunt quaerat.
     - created_at: 7971362681274114734
       id: 6936870854682057065
       key: Explicabo numquam et quis exercitationem.
@@ -5160,7 +5171,7 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: project_bad-request_response_body result type (default view)
     example:
       fault: false
@@ -5203,15 +5214,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: project_forbidden_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: false
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -5226,7 +5237,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -5242,18 +5253,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: project_not-found_response_body result type (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
+      temporary: false
       timeout: false
     required:
     - name
@@ -5270,11 +5281,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 542353407
+        example: 1405503890
         format: int32
       total:
         type: integer
-        example: 838722975
+        example: 1491331333
         format: int32
     description: ProjectResponseBody result type (default view)
     example:
@@ -5323,8 +5334,8 @@ definitions:
           id: 2080015101063758930
           name: Accusamus adipisci non voluptatem eius magni deserunt.
         type: Repellendus dolor illo sunt quaerat.
-      page: 496117001
-      total: 1208935944
+      page: 1571892727
+      total: 125883581
     required:
     - activities
     - total
@@ -5359,7 +5370,7 @@ definitions:
         example: true
     description: project_unauthorized_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -5379,7 +5390,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -5399,14 +5410,14 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: station_bad-request_response_body result type (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: false
     required:
     - name
@@ -5438,7 +5449,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -5450,7 +5461,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -5465,7 +5476,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -5481,18 +5492,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: station_not-found_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: true
     required:
     - name
@@ -5509,11 +5520,11 @@ definitions:
         $ref: '#/definitions/ActivityEntryResponseBodyCollection'
       page:
         type: integer
-        example: 128789773
+        example: 1970274266
         format: int32
       total:
         type: integer
-        example: 112251727
+        example: 417707570
         format: int32
     description: StationResponseBody result type (default view)
     example:
@@ -5562,8 +5573,8 @@ definitions:
           id: 2080015101063758930
           name: Accusamus adipisci non voluptatem eius magni deserunt.
         type: Repellendus dolor illo sunt quaerat.
-      page: 755309911
-      total: 868493328
+      page: 328536916
+      total: 892121005
     required:
     - activities
     - total
@@ -5575,7 +5586,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -5591,18 +5602,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: false
     description: station_unauthorized_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
+      temporary: false
       timeout: true
     required:
     - name
@@ -5615,6 +5626,9 @@ definitions:
     title: 'Mediatype identifier: application/vnd.app.associated.station; view=default'
     type: object
     properties:
+      hidden:
+        type: boolean
+        example: true
       location:
         $ref: '#/definitions/AssociatedViaLocationResponseBody'
       manual:
@@ -5625,6 +5639,7 @@ definitions:
         $ref: '#/definitions/StationFullResponseBody'
     description: AssociatedStationResponseBody result type (default view)
     example:
+      hidden: false
       location:
         distance: 0.8127633
       manual:
@@ -6085,6 +6100,7 @@ definitions:
           url: Molestias dolores atque sint recusandae quo.
     required:
     - station
+    - hidden
   AssociatedStationResponseBodyCollection:
     title: 'Mediatype identifier: application/vnd.app.associated.station; type=collection; view=default'
     type: array
@@ -6092,7 +6108,8 @@ definitions:
       $ref: '#/definitions/AssociatedStationResponseBody'
     description: AssociatedStationCollectionResponseBody is the result type for an array of AssociatedStationResponseBody (default view)
     example:
-    - location:
+    - hidden: false
+      location:
         distance: 0.8127633
       manual:
         priority: 398059248
@@ -6550,7 +6567,926 @@ definitions:
           type: Eos laudantium consequuntur eos voluptatibus rerum minima.
           uploadId: Quasi sint.
           url: Molestias dolores atque sint recusandae quo.
-    - location:
+    - hidden: false
+      location:
+        distance: 0.8127633
+      manual:
+        priority: 398059248
+      project:
+        id: 362101268
+      station:
+        attributes:
+          attributes:
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+        battery: 0.7673294
+        configurations:
+          all:
+          - id: 1199571918719106006
+            metaRecordId: 6783442371292563743
+            modules:
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            provisionId: 2064445161482763081
+            sourceId: 1476951614
+            time: 2785462766740754587
+          - id: 1199571918719106006
+            metaRecordId: 6783442371292563743
+            modules:
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            provisionId: 2064445161482763081
+            sourceId: 1476951614
+            time: 2785462766740754587
+        data:
+          end: 4315864360876627575
+          numberOfSamples: 2660373874497683885
+          start: 4905126164574709612
+        deviceId: Eius vero omnis nesciunt delectus unde sunt.
+        firmwareNumber: 704022910
+        firmwareTime: 7351372657780035177
+        id: 76831435
+        ingestionAt: 1716952139686201520
+        interestingness:
+          windows:
+          - interestingness: 0.5378975281963301
+            seconds: 1151584531
+            time: 7094590989413600731
+            value: 0.5302415417204458
+          - interestingness: 0.5378975281963301
+            seconds: 1151584531
+            time: 7094590989413600731
+            value: 0.5302415417204458
+        location:
+          precise:
+          - 0.19140492971467962
+          - 0.09821684482131016
+          regions:
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          url: Magni ut aperiam corporis ut.
+        locationName: Vel consequatur.
+        memoryAvailable: 384974814
+        memoryUsed: 451806285
+        model:
+          name: Harum dolore.
+          only_visible_via_association: true
+        name: Quod provident.
+        owner:
+          id: 1575270198
+          name: Ipsam eos sed nesciunt libero totam facilis.
+        photos:
+          small: Ipsum necessitatibus voluptatem quis.
+        placeNameNative: Est enim ut quo.
+        placeNameOther: Occaecati quae tenetur.
+        readOnly: true
+        recordingStartedAt: 1744909282979253986
+        syncedAt: 6702451495430807622
+        updatedAt: 8536631691780208569
+        uploads:
+        - blocks:
+          - 1898103155583066456
+          - 1103560948581785679
+          id: 8903882248930871778
+          size: 3375305193808902502
+          time: 4527113397684244729
+          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
+          uploadId: Quasi sint.
+          url: Molestias dolores atque sint recusandae quo.
+        - blocks:
+          - 1898103155583066456
+          - 1103560948581785679
+          id: 8903882248930871778
+          size: 3375305193808902502
+          time: 4527113397684244729
+          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
+          uploadId: Quasi sint.
+          url: Molestias dolores atque sint recusandae quo.
+    - hidden: false
+      location:
+        distance: 0.8127633
+      manual:
+        priority: 398059248
+      project:
+        id: 362101268
+      station:
+        attributes:
+          attributes:
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+          - attribute_id: 4107830224581333359
+            name: Ratione libero fugiat vitae illum.
+            project_id: 2125141991
+            string_value: Quae eum est architecto.
+        battery: 0.7673294
+        configurations:
+          all:
+          - id: 1199571918719106006
+            metaRecordId: 6783442371292563743
+            modules:
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            provisionId: 2064445161482763081
+            sourceId: 1476951614
+            time: 2785462766740754587
+          - id: 1199571918719106006
+            metaRecordId: 6783442371292563743
+            modules:
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            - flags: 1977393835
+              fullKey: Voluptas et error eos molestiae.
+              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
+              id: 1156881719861355378
+              internal: false
+              meta:
+                Aperiam non corrupti.: Saepe enim.
+                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
+              metaRecordId: 3888506491729612177
+              name: Excepturi nam non doloribus amet.
+              position: 2075290436
+              sensors:
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+              - fullKey: Praesentium minima molestias sequi id ratione cum.
+                key: Harum animi vel ut repellat consequuntur reiciendis.
+                meta:
+                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
+                name: Voluptatem officia et nulla magni quia ut.
+                ranges:
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                - maximum: 0.69275653
+                  minimum: 0.6246691
+                reading:
+                  last: 0.9369838
+                  time: 6953281521083243039
+                unitOfMeasure: Tenetur aut.
+            provisionId: 2064445161482763081
+            sourceId: 1476951614
+            time: 2785462766740754587
+        data:
+          end: 4315864360876627575
+          numberOfSamples: 2660373874497683885
+          start: 4905126164574709612
+        deviceId: Eius vero omnis nesciunt delectus unde sunt.
+        firmwareNumber: 704022910
+        firmwareTime: 7351372657780035177
+        id: 76831435
+        ingestionAt: 1716952139686201520
+        interestingness:
+          windows:
+          - interestingness: 0.5378975281963301
+            seconds: 1151584531
+            time: 7094590989413600731
+            value: 0.5302415417204458
+          - interestingness: 0.5378975281963301
+            seconds: 1151584531
+            time: 7094590989413600731
+            value: 0.5302415417204458
+        location:
+          precise:
+          - 0.19140492971467962
+          - 0.09821684482131016
+          regions:
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          - name: Eos quis.
+            shape:
+            - - - 0.7397062856045757
+                - 0.5839448648894914
+              - - 0.7644291400051861
+                - 0.20364963248657247
+            - - - 0.9098484963768594
+                - 0.7989659404458161
+              - - 0.024290470972727254
+                - 0.20674085129404673
+                - 0.3454835619814658
+                - 0.2782327432827066
+              - - 0.4000020059726889
+                - 0.8958040593022891
+                - 0.3352281537348182
+                - 0.10498478266928823
+              - - 0.028462277177202663
+                - 0.7050721196094334
+            - - - 0.4120237007452419
+                - 0.49844129850630875
+                - 0.06551659251595354
+                - 0.6754383101180541
+              - - 0.09431242584837447
+                - 0.808660288803971
+                - 0.023536220682771773
+              - - 0.8120452602884417
+                - 0.8462616546855267
+              - - 0.6971637614200277
+                - 0.92373584315049
+            - - - 0.782107318068964
+                - 0.42381773345486373
+                - 0.6496366338633103
+              - - 0.6814676811887991
+                - 0.27159701117092644
+              - - 0.3892529041630197
+                - 0.39889683911193946
+                - 0.6239790777429448
+              - - 0.9292571327946825
+                - 0.8971884856034876
+                - 0.010618819894491519
+          url: Magni ut aperiam corporis ut.
+        locationName: Vel consequatur.
+        memoryAvailable: 384974814
+        memoryUsed: 451806285
+        model:
+          name: Harum dolore.
+          only_visible_via_association: true
+        name: Quod provident.
+        owner:
+          id: 1575270198
+          name: Ipsam eos sed nesciunt libero totam facilis.
+        photos:
+          small: Ipsum necessitatibus voluptatem quis.
+        placeNameNative: Est enim ut quo.
+        placeNameOther: Occaecati quae tenetur.
+        readOnly: true
+        recordingStartedAt: 1744909282979253986
+        syncedAt: 6702451495430807622
+        updatedAt: 8536631691780208569
+        uploads:
+        - blocks:
+          - 1898103155583066456
+          - 1103560948581785679
+          id: 8903882248930871778
+          size: 3375305193808902502
+          time: 4527113397684244729
+          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
+          uploadId: Quasi sint.
+          url: Molestias dolores atque sint recusandae quo.
+        - blocks:
+          - 1898103155583066456
+          - 1103560948581785679
+          id: 8903882248930871778
+          size: 3375305193808902502
+          time: 4527113397684244729
+          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
+          uploadId: Quasi sint.
+          url: Molestias dolores atque sint recusandae quo.
+    - hidden: false
+      location:
         distance: 0.8127633
       manual:
         priority: 398059248
@@ -7050,9 +7986,9 @@ definitions:
     properties:
       url:
         type: string
-        example: Fuga aut aut illo.
+        example: Perferendis rerum ullam omnis.
     example:
-      url: Quos odit.
+      url: Eum fuga aut aut illo.
     required:
     - url
   AvailableRoleResponseBody:
@@ -7110,14 +8046,14 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: noop_bad-request_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: false
     required:
     - name
@@ -7160,8 +8096,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -7192,18 +8128,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: noop_not-found_response_body result type (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: true
     required:
     - name
@@ -7219,7 +8155,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -7246,8 +8182,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -7282,15 +8218,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: device summary_bad-request_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
     - name
     - id
@@ -7321,7 +8257,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -7333,7 +8269,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: false
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -7364,11 +8300,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: device summary_not-found_response_body result type (default view)
     example:
       fault: true
@@ -7424,7 +8360,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -7440,7 +8376,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -7452,7 +8388,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: false
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -7466,20 +8402,20 @@ definitions:
     properties:
       first:
         type: integer
-        example: 1368234620975253740
+        example: 1216262650718535203
         format: int64
       last:
         type: integer
-        example: 5410545110801906845
+        example: 8639603801316652940
         format: int64
       size:
         type: integer
-        example: 2326338939621782288
+        example: 1082892153955809152
         format: int64
     example:
-      first: 8368291541936007320
-      last: 6636269595067157661
-      size: 4293374116740095115
+      first: 2326338939621782288
+      last: 1368234620975253740
+      size: 6876749810032961166
     required:
     - size
     - first
@@ -7490,20 +8426,20 @@ definitions:
     properties:
       first:
         type: integer
-        example: 9192098963676777868
+        example: 970238417220155498
         format: int64
       last:
         type: integer
-        example: 1082892153955809152
+        example: 2575963807792530179
         format: int64
       size:
         type: integer
-        example: 1363028032170382127
+        example: 361360267853767804
         format: int64
     example:
-      first: 8639603801316652940
-      last: 6876749810032961166
-      size: 1216262650718535203
+      first: 1363028032170382127
+      last: 9192098963676777868
+      size: 4128309652237936021
     required:
     - size
     - first
@@ -7514,32 +8450,32 @@ definitions:
     properties:
       created:
         type: integer
-        example: 2575963807792530179
+        example: 4648704555067102338
         format: int64
       data:
         $ref: '#/definitions/DeviceDataSummaryResponseBody'
       generation:
         type: string
-        example: Omnis debitis.
+        example: Consequatur eaque dolor.
       meta:
         $ref: '#/definitions/DeviceMetaSummaryResponseBody'
       updated:
         type: integer
-        example: 4128309652237936021
+        example: 6110172620873608092
         format: int64
     description: DeviceProvisionSummaryResponseBody result type (default view)
     example:
-      created: 4537524719812397049
+      created: 2662614532381761747
       data:
         first: 8614329512965021046
         last: 3047045115337937379
         size: 6874328520778874694
-      generation: Accusamus et numquam doloribus.
+      generation: Sed suscipit alias aut.
       meta:
         first: 6832515448265335298
         last: 5881796848122304599
         size: 5913549231965412708
-      updated: 5139827678513212208
+      updated: 8979827232936736749
     required:
     - generation
     - created
@@ -7575,17 +8511,6 @@ definitions:
         last: 5881796848122304599
         size: 5913549231965412708
       updated: 8373689447332978354
-    - created: 3650279478254301020
-      data:
-        first: 8614329512965021046
-        last: 3047045115337937379
-        size: 6874328520778874694
-      generation: Vel ut quis reprehenderit.
-      meta:
-        first: 6832515448265335298
-        last: 5881796848122304599
-        size: 5913549231965412708
-      updated: 8373689447332978354
   DiscourseAuthenticateBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -7593,7 +8518,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -7613,10 +8538,10 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: authenticate_bad-request_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -7652,19 +8577,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: true
     description: authenticate_forbidden_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -7702,12 +8627,12 @@ definitions:
         example: true
     description: authenticate_not-found_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -7721,22 +8646,22 @@ definitions:
     properties:
       email:
         type: string
-        example: Ut qui.
+        example: Eius est odit corporis ut.
       password:
         type: string
-        example: lw6
+        example: plw
         minLength: 10
       sig:
         type: string
-        example: Est odit.
+        example: Suscipit earum odio unde repudiandae.
       sso:
         type: string
-        example: Doloribus suscipit earum odio unde repudiandae nihil.
+        example: Saepe tempore nihil autem.
     example:
-      email: Sed non ab sit nostrum ipsam.
-      password: "600"
-      sig: Libero repellat quisquam aut sed.
-      sso: Et sit quo eveniet et illo.
+      email: Architecto libero repellat quisquam aut sed.
+      password: x4d
+      sig: Quo eveniet et.
+      sso: Facilis et.
     required:
     - sso
     - sig
@@ -7746,17 +8671,17 @@ definitions:
     properties:
       header:
         type: string
-        example: Sint quas dolores commodi.
+        example: Assumenda maxime.
       location:
         type: string
-        example: Atque dolor autem reiciendis ipsum.
+        example: Quis non nostrum culpa atque dolor autem.
       token:
         type: string
-        example: Cum assumenda maxime.
+        example: Ipsum quo.
     example:
-      header: Harum dolorem omnis.
-      location: Nihil et.
-      token: Cum necessitatibus corporis sed placeat ut libero.
+      header: Cum necessitatibus corporis sed placeat ut libero.
+      location: Sint quas dolores commodi.
+      token: Nihil et.
     required:
     - location
     - token
@@ -7784,11 +8709,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: authenticate_unauthorized_response_body result type (default view)
     example:
       fault: true
@@ -7796,7 +8721,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -7811,7 +8736,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -7834,7 +8759,7 @@ definitions:
         example: false
     description: authenticate_user-unverified_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -14141,7 +15066,7 @@ definitions:
       mention: Repudiandae quae quia.
       name: Ullam ullam dignissimos ut consequatur voluptatem mollitia.
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
     required:
     - id
     - name
@@ -14153,26 +15078,26 @@ definitions:
       $ref: '#/definitions/MentionableUserResponseBody'
     description: MentionableUserCollectionResponseBody is the result type for an array of MentionableUserResponseBody (default view)
     example:
-    - id: 671653891
-      mention: Provident vero sed.
-      name: Ab et consectetur.
+    - id: 309500157
+      mention: Et consectetur.
+      name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
       photo:
-        url: Vero alias facere.
-    - id: 671653891
-      mention: Provident vero sed.
-      name: Ab et consectetur.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+    - id: 309500157
+      mention: Et consectetur.
+      name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
       photo:
-        url: Vero alias facere.
-    - id: 671653891
-      mention: Provident vero sed.
-      name: Ab et consectetur.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+    - id: 309500157
+      mention: Et consectetur.
+      name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
       photo:
-        url: Vero alias facere.
-    - id: 671653891
-      mention: Provident vero sed.
-      name: Ab et consectetur.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+    - id: 309500157
+      mention: Et consectetur.
+      name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
   ModulesMetaBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -16681,16 +17606,16 @@ definitions:
     properties:
       id:
         type: integer
-        example: 1130551084
+        example: 1390119645
         format: int32
       name:
         type: string
-        example: Distinctio perferendis rerum ullam omnis sint.
+        example: Beatae reprehenderit maiores soluta eum et voluptatibus.
       photo:
         $ref: '#/definitions/AuthorPhotoResponseBody'
     example:
-      id: 1275213976
-      name: Magni iste quo repellat.
+      id: 542177730
+      name: Odit enim voluptate magni iste quo repellat.
       photo:
         url: Sunt similique aspernatur laudantium commodi magni.
     required:
@@ -21231,14 +22156,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 2157221965588342583
+        example: 8223368983497526306
         format: int64
       name:
         type: string
-        example: Numquam voluptatibus aliquam maxime et vero.
+        example: Magnam eos fugiat nam.
     example:
-      id: 7969312674700801427
-      name: Sit voluptatem possimus rem suscipit.
+      id: 2157221965588342583
+      name: Numquam voluptatibus aliquam maxime et vero.
     required:
     - id
     - name
@@ -21753,15 +22678,15 @@ definitions:
       rejected: false
       role: Ipsa placeat.
       user:
-        admin: true
-        bio: Et necessitatibus nostrum.
-        email: 46r
-        id: 1700826789
-        name: 77m
+        admin: false
+        bio: Omnis non rerum sit et.
+        email: 77m
+        id: 1062565591
+        name: t0j
         photo:
-          url: Vero alias facere.
-        tncDate: 502844838092974547
-        updatedAt: 8382560048670193902
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+        tncDate: 6654374863259033840
+        updatedAt: 7605160953023572699
     required:
     - user
     - role
@@ -21776,51 +22701,51 @@ definitions:
       $ref: '#/definitions/ProjectUserResponseBody'
     description: ProjectUserCollectionResponseBody is the result type for an array of ProjectUserResponseBody (default view)
     example:
-    - accepted: false
-      invited: true
-      membership: Quae rerum optio veniam.
+    - accepted: true
+      invited: false
+      membership: Consequatur enim quisquam rerum modi odio saepe.
       rejected: false
-      role: Enim quisquam rerum modi odio saepe.
+      role: Non quia quo illum.
       user:
-        admin: true
-        bio: Et necessitatibus nostrum.
-        email: 46r
-        id: 1700826789
-        name: 77m
+        admin: false
+        bio: Omnis non rerum sit et.
+        email: 77m
+        id: 1062565591
+        name: t0j
         photo:
-          url: Vero alias facere.
-        tncDate: 502844838092974547
-        updatedAt: 8382560048670193902
-    - accepted: false
-      invited: true
-      membership: Quae rerum optio veniam.
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+        tncDate: 6654374863259033840
+        updatedAt: 7605160953023572699
+    - accepted: true
+      invited: false
+      membership: Consequatur enim quisquam rerum modi odio saepe.
       rejected: false
-      role: Enim quisquam rerum modi odio saepe.
+      role: Non quia quo illum.
       user:
-        admin: true
-        bio: Et necessitatibus nostrum.
-        email: 46r
-        id: 1700826789
-        name: 77m
+        admin: false
+        bio: Omnis non rerum sit et.
+        email: 77m
+        id: 1062565591
+        name: t0j
         photo:
-          url: Vero alias facere.
-        tncDate: 502844838092974547
-        updatedAt: 8382560048670193902
-    - accepted: false
-      invited: true
-      membership: Quae rerum optio veniam.
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+        tncDate: 6654374863259033840
+        updatedAt: 7605160953023572699
+    - accepted: true
+      invited: false
+      membership: Consequatur enim quisquam rerum modi odio saepe.
       rejected: false
-      role: Enim quisquam rerum modi odio saepe.
+      role: Non quia quo illum.
       user:
-        admin: true
-        bio: Et necessitatibus nostrum.
-        email: 46r
-        id: 1700826789
-        name: 77m
+        admin: false
+        bio: Omnis non rerum sit et.
+        email: 77m
+        id: 1062565591
+        name: t0j
         photo:
-          url: Vero alias facere.
-        tncDate: 502844838092974547
-        updatedAt: 8382560048670193902
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+        tncDate: 6654374863259033840
+        updatedAt: 7605160953023572699
   RecordsDataBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -24076,12 +25001,12 @@ definitions:
         items:
           $ref: '#/definitions/EssentialStationResponseBody'
         example:
-        - createdAt: 1629602076602425163
-          deviceId: Mollitia laudantium.
-          firmwareNumber: 1867758127
-          firmwareTime: 5122272239231276047
-          id: 1578762904585350546
-          lastIngestionAt: 1636070822467502035
+        - createdAt: 8547398357538921216
+          deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+          firmwareNumber: 903725847
+          firmwareTime: 1629602076602425163
+          id: 4190948541565015649
+          lastIngestionAt: 490537146336604420
           location:
             precise:
             - 0.5154093133128477
@@ -24136,20 +25061,20 @@ definitions:
                   - 0.7619331154816638
                   - 0.5372944411277311
             url: Quia similique similique vel.
-          memoryAvailable: 2118556932
-          memoryUsed: 239942646
-          name: Aut nisi iusto architecto.
+          memoryAvailable: 332002515
+          memoryUsed: 559227193
+          name: Dolorum ea doloremque sequi quas ipsum mollitia.
           owner:
             id: 1575270198
             name: Ipsam eos sed nesciunt libero totam facilis.
-          recordingStartedAt: 8416694868409917985
-          updatedAt: 490537146336604420
-        - createdAt: 1629602076602425163
-          deviceId: Mollitia laudantium.
-          firmwareNumber: 1867758127
-          firmwareTime: 5122272239231276047
-          id: 1578762904585350546
-          lastIngestionAt: 1636070822467502035
+          recordingStartedAt: 4497360918901239942
+          updatedAt: 9125477786339482815
+        - createdAt: 8547398357538921216
+          deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+          firmwareNumber: 903725847
+          firmwareTime: 1629602076602425163
+          id: 4190948541565015649
+          lastIngestionAt: 490537146336604420
           location:
             precise:
             - 0.5154093133128477
@@ -24204,20 +25129,20 @@ definitions:
                   - 0.7619331154816638
                   - 0.5372944411277311
             url: Quia similique similique vel.
-          memoryAvailable: 2118556932
-          memoryUsed: 239942646
-          name: Aut nisi iusto architecto.
+          memoryAvailable: 332002515
+          memoryUsed: 559227193
+          name: Dolorum ea doloremque sequi quas ipsum mollitia.
           owner:
             id: 1575270198
             name: Ipsam eos sed nesciunt libero totam facilis.
-          recordingStartedAt: 8416694868409917985
-          updatedAt: 490537146336604420
-        - createdAt: 1629602076602425163
-          deviceId: Mollitia laudantium.
-          firmwareNumber: 1867758127
-          firmwareTime: 5122272239231276047
-          id: 1578762904585350546
-          lastIngestionAt: 1636070822467502035
+          recordingStartedAt: 4497360918901239942
+          updatedAt: 9125477786339482815
+        - createdAt: 8547398357538921216
+          deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+          firmwareNumber: 903725847
+          firmwareTime: 1629602076602425163
+          id: 4190948541565015649
+          lastIngestionAt: 490537146336604420
           location:
             precise:
             - 0.5154093133128477
@@ -24272,14 +25197,14 @@ definitions:
                   - 0.7619331154816638
                   - 0.5372944411277311
             url: Quia similique similique vel.
-          memoryAvailable: 2118556932
-          memoryUsed: 239942646
-          name: Aut nisi iusto architecto.
+          memoryAvailable: 332002515
+          memoryUsed: 559227193
+          name: Dolorum ea doloremque sequi quas ipsum mollitia.
           owner:
             id: 1575270198
             name: Ipsam eos sed nesciunt libero totam facilis.
-          recordingStartedAt: 8416694868409917985
-          updatedAt: 490537146336604420
+          recordingStartedAt: 4497360918901239942
+          updatedAt: 9125477786339482815
       total:
         type: integer
         example: 935536029
@@ -24287,12 +25212,12 @@ definitions:
     description: Admin SearchResponseBody result type (default view)
     example:
       stations:
-      - createdAt: 1629602076602425163
-        deviceId: Mollitia laudantium.
-        firmwareNumber: 1867758127
-        firmwareTime: 5122272239231276047
-        id: 1578762904585350546
-        lastIngestionAt: 1636070822467502035
+      - createdAt: 8547398357538921216
+        deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+        firmwareNumber: 903725847
+        firmwareTime: 1629602076602425163
+        id: 4190948541565015649
+        lastIngestionAt: 490537146336604420
         location:
           precise:
           - 0.5154093133128477
@@ -24347,20 +25272,20 @@ definitions:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 2118556932
-        memoryUsed: 239942646
-        name: Aut nisi iusto architecto.
+        memoryAvailable: 332002515
+        memoryUsed: 559227193
+        name: Dolorum ea doloremque sequi quas ipsum mollitia.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 8416694868409917985
-        updatedAt: 490537146336604420
-      - createdAt: 1629602076602425163
-        deviceId: Mollitia laudantium.
-        firmwareNumber: 1867758127
-        firmwareTime: 5122272239231276047
-        id: 1578762904585350546
-        lastIngestionAt: 1636070822467502035
+        recordingStartedAt: 4497360918901239942
+        updatedAt: 9125477786339482815
+      - createdAt: 8547398357538921216
+        deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+        firmwareNumber: 903725847
+        firmwareTime: 1629602076602425163
+        id: 4190948541565015649
+        lastIngestionAt: 490537146336604420
         location:
           precise:
           - 0.5154093133128477
@@ -24415,14 +25340,14 @@ definitions:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 2118556932
-        memoryUsed: 239942646
-        name: Aut nisi iusto architecto.
+        memoryAvailable: 332002515
+        memoryUsed: 559227193
+        name: Dolorum ea doloremque sequi quas ipsum mollitia.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 8416694868409917985
-        updatedAt: 490537146336604420
+        recordingStartedAt: 4497360918901239942
+        updatedAt: 9125477786339482815
       total: 2070411136
     required:
     - stations
@@ -25772,16 +26697,7 @@ definitions:
       body:
         type: string
         example:
-        - 72
-        - 97
-        - 114
-        - 117
-        - 109
-        - 32
-        - 117
-        - 116
-        - 32
-        - 110
+        - 78
         - 101
         - 109
         - 111
@@ -25820,7 +26736,7 @@ definitions:
         example: Voluptatem in amet blanditiis iusto.
       length:
         type: integer
-        example: 1132950471373836852
+        example: 8291979338884193887
         format: int64
     description: Download PhotoResponseBody result type (default view)
     example:
@@ -29253,12 +30169,12 @@ definitions:
         items:
           $ref: '#/definitions/EssentialStationResponseBody'
         example:
-        - createdAt: 1629602076602425163
-          deviceId: Mollitia laudantium.
-          firmwareNumber: 1867758127
-          firmwareTime: 5122272239231276047
-          id: 1578762904585350546
-          lastIngestionAt: 1636070822467502035
+        - createdAt: 8547398357538921216
+          deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+          firmwareNumber: 903725847
+          firmwareTime: 1629602076602425163
+          id: 4190948541565015649
+          lastIngestionAt: 490537146336604420
           location:
             precise:
             - 0.5154093133128477
@@ -29313,20 +30229,20 @@ definitions:
                   - 0.7619331154816638
                   - 0.5372944411277311
             url: Quia similique similique vel.
-          memoryAvailable: 2118556932
-          memoryUsed: 239942646
-          name: Aut nisi iusto architecto.
+          memoryAvailable: 332002515
+          memoryUsed: 559227193
+          name: Dolorum ea doloremque sequi quas ipsum mollitia.
           owner:
             id: 1575270198
             name: Ipsam eos sed nesciunt libero totam facilis.
-          recordingStartedAt: 8416694868409917985
-          updatedAt: 490537146336604420
-        - createdAt: 1629602076602425163
-          deviceId: Mollitia laudantium.
-          firmwareNumber: 1867758127
-          firmwareTime: 5122272239231276047
-          id: 1578762904585350546
-          lastIngestionAt: 1636070822467502035
+          recordingStartedAt: 4497360918901239942
+          updatedAt: 9125477786339482815
+        - createdAt: 8547398357538921216
+          deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+          firmwareNumber: 903725847
+          firmwareTime: 1629602076602425163
+          id: 4190948541565015649
+          lastIngestionAt: 490537146336604420
           location:
             precise:
             - 0.5154093133128477
@@ -29381,14 +30297,14 @@ definitions:
                   - 0.7619331154816638
                   - 0.5372944411277311
             url: Quia similique similique vel.
-          memoryAvailable: 2118556932
-          memoryUsed: 239942646
-          name: Aut nisi iusto architecto.
+          memoryAvailable: 332002515
+          memoryUsed: 559227193
+          name: Dolorum ea doloremque sequi quas ipsum mollitia.
           owner:
             id: 1575270198
             name: Ipsam eos sed nesciunt libero totam facilis.
-          recordingStartedAt: 8416694868409917985
-          updatedAt: 490537146336604420
+          recordingStartedAt: 4497360918901239942
+          updatedAt: 9125477786339482815
       total:
         type: integer
         example: 1561053816
@@ -29396,12 +30312,12 @@ definitions:
     description: List AllResponseBody result type (default view)
     example:
       stations:
-      - createdAt: 1629602076602425163
-        deviceId: Mollitia laudantium.
-        firmwareNumber: 1867758127
-        firmwareTime: 5122272239231276047
-        id: 1578762904585350546
-        lastIngestionAt: 1636070822467502035
+      - createdAt: 8547398357538921216
+        deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+        firmwareNumber: 903725847
+        firmwareTime: 1629602076602425163
+        id: 4190948541565015649
+        lastIngestionAt: 490537146336604420
         location:
           precise:
           - 0.5154093133128477
@@ -29456,20 +30372,20 @@ definitions:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 2118556932
-        memoryUsed: 239942646
-        name: Aut nisi iusto architecto.
+        memoryAvailable: 332002515
+        memoryUsed: 559227193
+        name: Dolorum ea doloremque sequi quas ipsum mollitia.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 8416694868409917985
-        updatedAt: 490537146336604420
-      - createdAt: 1629602076602425163
-        deviceId: Mollitia laudantium.
-        firmwareNumber: 1867758127
-        firmwareTime: 5122272239231276047
-        id: 1578762904585350546
-        lastIngestionAt: 1636070822467502035
+        recordingStartedAt: 4497360918901239942
+        updatedAt: 9125477786339482815
+      - createdAt: 8547398357538921216
+        deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+        firmwareNumber: 903725847
+        firmwareTime: 1629602076602425163
+        id: 4190948541565015649
+        lastIngestionAt: 490537146336604420
         location:
           precise:
           - 0.5154093133128477
@@ -29524,20 +30440,20 @@ definitions:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 2118556932
-        memoryUsed: 239942646
-        name: Aut nisi iusto architecto.
+        memoryAvailable: 332002515
+        memoryUsed: 559227193
+        name: Dolorum ea doloremque sequi quas ipsum mollitia.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 8416694868409917985
-        updatedAt: 490537146336604420
-      - createdAt: 1629602076602425163
-        deviceId: Mollitia laudantium.
-        firmwareNumber: 1867758127
-        firmwareTime: 5122272239231276047
-        id: 1578762904585350546
-        lastIngestionAt: 1636070822467502035
+        recordingStartedAt: 4497360918901239942
+        updatedAt: 9125477786339482815
+      - createdAt: 8547398357538921216
+        deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
+        firmwareNumber: 903725847
+        firmwareTime: 1629602076602425163
+        id: 4190948541565015649
+        lastIngestionAt: 490537146336604420
         location:
           precise:
           - 0.5154093133128477
@@ -29592,14 +30508,14 @@ definitions:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 2118556932
-        memoryUsed: 239942646
-        name: Aut nisi iusto architecto.
+        memoryAvailable: 332002515
+        memoryUsed: 559227193
+        name: Dolorum ea doloremque sequi quas ipsum mollitia.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 8416694868409917985
-        updatedAt: 490537146336604420
+        recordingStartedAt: 4497360918901239942
+        updatedAt: 9125477786339482815
       total: 210793175
     required:
     - stations
@@ -29677,12 +30593,12 @@ definitions:
         example: true
     description: list associated_bad-request_response_body result type (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id
@@ -29713,7 +30629,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -29724,8 +30640,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -29760,7 +30676,7 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: list associated_not-found_response_body result type (default view)
     example:
       fault: true
@@ -29785,7 +30701,8 @@ definitions:
     description: List AssociatedResponseBody result type (default view)
     example:
       stations:
-      - location:
+      - hidden: false
+        location:
           distance: 0.8127633
         manual:
           priority: 398059248
@@ -30243,7 +31160,8 @@ definitions:
             type: Eos laudantium consequuntur eos voluptatibus rerum minima.
             uploadId: Quasi sint.
             url: Molestias dolores atque sint recusandae quo.
-      - location:
+      - hidden: false
+        location:
           distance: 0.8127633
         manual:
           priority: 398059248
@@ -30710,7 +31628,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -30738,7 +31656,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
     - name
     - id
@@ -33526,33 +34444,33 @@ definitions:
         items:
           $ref: '#/definitions/StationJobResponseBody'
         example:
-        - completedAt: 6848202375652086093
-          progress: 0.010296272
-          startedAt: 5117120116013846248
-          title: Deserunt autem eligendi nobis suscipit aut tempore.
-        - completedAt: 6848202375652086093
-          progress: 0.010296272
-          startedAt: 5117120116013846248
-          title: Deserunt autem eligendi nobis suscipit aut tempore.
+        - completedAt: 7209947581850912131
+          progress: 0.44573504
+          startedAt: 6631855443988520161
+          title: Dolores quibusdam laudantium.
+        - completedAt: 7209947581850912131
+          progress: 0.44573504
+          startedAt: 6631855443988520161
+          title: Dolores quibusdam laudantium.
     description: ProgressResponseBody result type (default view)
     example:
       jobs:
-      - completedAt: 6848202375652086093
-        progress: 0.010296272
-        startedAt: 5117120116013846248
-        title: Deserunt autem eligendi nobis suscipit aut tempore.
-      - completedAt: 6848202375652086093
-        progress: 0.010296272
-        startedAt: 5117120116013846248
-        title: Deserunt autem eligendi nobis suscipit aut tempore.
-      - completedAt: 6848202375652086093
-        progress: 0.010296272
-        startedAt: 5117120116013846248
-        title: Deserunt autem eligendi nobis suscipit aut tempore.
-      - completedAt: 6848202375652086093
-        progress: 0.010296272
-        startedAt: 5117120116013846248
-        title: Deserunt autem eligendi nobis suscipit aut tempore.
+      - completedAt: 7209947581850912131
+        progress: 0.44573504
+        startedAt: 6631855443988520161
+        title: Dolores quibusdam laudantium.
+      - completedAt: 7209947581850912131
+        progress: 0.44573504
+        startedAt: 6631855443988520161
+        title: Dolores quibusdam laudantium.
+      - completedAt: 7209947581850912131
+        progress: 0.44573504
+        startedAt: 6631855443988520161
+        title: Dolores quibusdam laudantium.
+      - completedAt: 7209947581850912131
+        progress: 0.44573504
+        startedAt: 6631855443988520161
+        title: Dolores quibusdam laudantium.
     required:
     - jobs
   StationProgressUnauthorizedResponseBody:
@@ -33814,14 +34732,14 @@ definitions:
     properties:
       id:
         type: integer
-        example: 6438273858922625873
+        example: 7969312674700801427
         format: int64
       name:
         type: string
-        example: Eveniet sit amet.
+        example: Sit voluptatem possimus rem suscipit.
     example:
-      id: 1233134986107382033
-      name: Corrupti et repellendus doloremque aspernatur nesciunt tenetur.
+      id: 6438273858922625873
+      name: Eveniet sit amet.
     required:
     - id
     - name
@@ -35378,11 +36296,11 @@ definitions:
         example: Sit ab laboriosam ab suscipit qui deleniti.
       createdAt:
         type: integer
-        example: 673356554385405977
+        example: 8674505140343154351
         format: int64
       id:
         type: integer
-        example: 3396357869118353267
+        example: 1053785162079535074
         format: int64
       replies:
         type: array
@@ -35421,7 +36339,7 @@ definitions:
           updatedAt: 3076405875290090163
       updatedAt:
         type: integer
-        example: 5972341353100145380
+        example: 68084532102936368
         format: int64
     example:
       author:
@@ -35803,7 +36721,7 @@ definitions:
       id: 1243552134
       name: gc6
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 6966469459850354033
       updatedAt: 1295367287001166317
     required:
@@ -36062,7 +36980,7 @@ definitions:
       id: 1865288540
       name: iup
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 3861939578753397108
       updatedAt: 2680758382197045670
     required:
@@ -36939,7 +37857,7 @@ definitions:
       id: 423062157
       name: 64y
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 8510508419202950258
       updatedAt: 5222558950641970358
     required:
@@ -37422,7 +38340,7 @@ definitions:
       id: 680128401
       name: ryl
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 8427902981385044537
       updatedAt: 4921798477478233421
     required:
@@ -37803,66 +38721,36 @@ definitions:
     description: List By ProjectResponseBody result type (default view)
     example:
       users:
-      - accepted: false
-        invited: true
-        membership: Quae rerum optio veniam.
+      - accepted: true
+        invited: false
+        membership: Consequatur enim quisquam rerum modi odio saepe.
         rejected: false
-        role: Enim quisquam rerum modi odio saepe.
+        role: Non quia quo illum.
         user:
-          admin: true
-          bio: Et necessitatibus nostrum.
-          email: 46r
-          id: 1700826789
-          name: 77m
+          admin: false
+          bio: Omnis non rerum sit et.
+          email: 77m
+          id: 1062565591
+          name: t0j
           photo:
-            url: Vero alias facere.
-          tncDate: 502844838092974547
-          updatedAt: 8382560048670193902
-      - accepted: false
-        invited: true
-        membership: Quae rerum optio veniam.
+            url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+          tncDate: 6654374863259033840
+          updatedAt: 7605160953023572699
+      - accepted: true
+        invited: false
+        membership: Consequatur enim quisquam rerum modi odio saepe.
         rejected: false
-        role: Enim quisquam rerum modi odio saepe.
+        role: Non quia quo illum.
         user:
-          admin: true
-          bio: Et necessitatibus nostrum.
-          email: 46r
-          id: 1700826789
-          name: 77m
+          admin: false
+          bio: Omnis non rerum sit et.
+          email: 77m
+          id: 1062565591
+          name: t0j
           photo:
-            url: Vero alias facere.
-          tncDate: 502844838092974547
-          updatedAt: 8382560048670193902
-      - accepted: false
-        invited: true
-        membership: Quae rerum optio veniam.
-        rejected: false
-        role: Enim quisquam rerum modi odio saepe.
-        user:
-          admin: true
-          bio: Et necessitatibus nostrum.
-          email: 46r
-          id: 1700826789
-          name: 77m
-          photo:
-            url: Vero alias facere.
-          tncDate: 502844838092974547
-          updatedAt: 8382560048670193902
-      - accepted: false
-        invited: true
-        membership: Quae rerum optio veniam.
-        rejected: false
-        role: Enim quisquam rerum modi odio saepe.
-        user:
-          admin: true
-          bio: Et necessitatibus nostrum.
-          email: 46r
-          id: 1700826789
-          name: 77m
-          photo:
-            url: Vero alias facere.
-          tncDate: 502844838092974547
-          updatedAt: 8382560048670193902
+            url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+          tncDate: 6654374863259033840
+          updatedAt: 7605160953023572699
     required:
     - users
   UserListByProjectUnauthorizedResponseBody:
@@ -38453,21 +39341,26 @@ definitions:
     description: MentionablesResponseBody result type (default view)
     example:
       users:
-      - id: 671653891
-        mention: Provident vero sed.
-        name: Ab et consectetur.
+      - id: 309500157
+        mention: Et consectetur.
+        name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
         photo:
-          url: Vero alias facere.
-      - id: 671653891
-        mention: Provident vero sed.
-        name: Ab et consectetur.
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      - id: 309500157
+        mention: Et consectetur.
+        name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
         photo:
-          url: Vero alias facere.
-      - id: 671653891
-        mention: Provident vero sed.
-        name: Ab et consectetur.
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      - id: 309500157
+        mention: Et consectetur.
+        name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
         photo:
-          url: Vero alias facere.
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      - id: 309500157
+        mention: Et consectetur.
+        name: Consequuntur sequi consequuntur iusto repudiandae amet nemo.
+        photo:
+          url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
     required:
     - users
   UserMentionablesUnauthorizedResponseBody:
@@ -38529,12 +39422,12 @@ definitions:
       $ref: '#/definitions/ProjectRoleResponse'
     description: Project RolesResponseBody is the result type for an array of ProjectRoleResponse (default view)
     example:
-    - id: 1714992444
-      name: Repellendus quis alias ut ab minima.
-    - id: 1714992444
-      name: Repellendus quis alias ut ab minima.
-    - id: 1714992444
-      name: Repellendus quis alias ut ab minima.
+    - id: 1901135038
+      name: Beatae et omnis dicta eum.
+    - id: 1901135038
+      name: Beatae et omnis dicta eum.
+    - id: 1901135038
+      name: Beatae et omnis dicta eum.
   UserProjectRolesBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -39303,7 +40196,7 @@ definitions:
       id: 502056572
       name: 6i7
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 1470631052178601384
       updatedAt: 2436914890652122326
     required:
@@ -39322,33 +40215,33 @@ definitions:
       $ref: '#/definitions/UserResponseBody'
     description: UserCollectionResponseBody is the result type for an array of UserResponseBody (default view)
     example:
-    - admin: true
-      bio: Et necessitatibus nostrum.
-      email: 46r
-      id: 1700826789
-      name: 77m
+    - admin: false
+      bio: Omnis non rerum sit et.
+      email: 77m
+      id: 1062565591
+      name: t0j
       photo:
-        url: Vero alias facere.
-      tncDate: 502844838092974547
-      updatedAt: 8382560048670193902
-    - admin: true
-      bio: Et necessitatibus nostrum.
-      email: 46r
-      id: 1700826789
-      name: 77m
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      tncDate: 6654374863259033840
+      updatedAt: 7605160953023572699
+    - admin: false
+      bio: Omnis non rerum sit et.
+      email: 77m
+      id: 1062565591
+      name: t0j
       photo:
-        url: Vero alias facere.
-      tncDate: 502844838092974547
-      updatedAt: 8382560048670193902
-    - admin: true
-      bio: Et necessitatibus nostrum.
-      email: 46r
-      id: 1700826789
-      name: 77m
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      tncDate: 6654374863259033840
+      updatedAt: 7605160953023572699
+    - admin: false
+      bio: Omnis non rerum sit et.
+      email: 77m
+      id: 1062565591
+      name: t0j
       photo:
-        url: Vero alias facere.
-      tncDate: 502844838092974547
-      updatedAt: 8382560048670193902
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
+      tncDate: 6654374863259033840
+      updatedAt: 7605160953023572699
   UserResumeBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -39659,23 +40552,23 @@ definitions:
         items:
           $ref: '#/definitions/AvailableRoleResponseBody'
         example:
-        - id: 1708741861
-          name: Quas similique quasi optio animi maxime ut.
-        - id: 1708741861
-          name: Quas similique quasi optio animi maxime ut.
-        - id: 1708741861
-          name: Quas similique quasi optio animi maxime ut.
+        - id: 1775519172
+          name: Accusamus voluptatem.
+        - id: 1775519172
+          name: Accusamus voluptatem.
+        - id: 1775519172
+          name: Accusamus voluptatem.
     description: RolesResponseBody result type (default view)
     example:
       roles:
-      - id: 1708741861
-        name: Quas similique quasi optio animi maxime ut.
-      - id: 1708741861
-        name: Quas similique quasi optio animi maxime ut.
-      - id: 1708741861
-        name: Quas similique quasi optio animi maxime ut.
-      - id: 1708741861
-        name: Quas similique quasi optio animi maxime ut.
+      - id: 1775519172
+        name: Accusamus voluptatem.
+      - id: 1775519172
+        name: Accusamus voluptatem.
+      - id: 1775519172
+        name: Accusamus voluptatem.
+      - id: 1775519172
+        name: Accusamus voluptatem.
     required:
     - roles
   UserRolesUnauthorizedResponseBody:
@@ -40090,7 +40983,7 @@ definitions:
       id: 582884189
       name: yiu
       photo:
-        url: Vero alias facere.
+        url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
       tncDate: 4101722891815332344
       updatedAt: 31118504362203998
     required:

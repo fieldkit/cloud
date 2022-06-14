@@ -244,6 +244,7 @@ type AssociatedStationView struct {
 	Project  *AssociatedViaProjectView
 	Location *AssociatedViaLocationView
 	Manual   *AssociatedViaManualView
+	Hidden   *bool
 }
 
 // AssociatedViaProjectView is a type that runs validations on a projected type.
@@ -425,6 +426,7 @@ var (
 			"project",
 			"location",
 			"manual",
+			"hidden",
 		},
 	}
 	// AssociatedStationMap is a map of attribute names in result type
@@ -435,6 +437,7 @@ var (
 			"project",
 			"location",
 			"manual",
+			"hidden",
 		},
 	}
 	// StationJobMap is a map of attribute names in result type StationJob indexed
@@ -951,6 +954,9 @@ func ValidateAssociatedStationCollectionView(result AssociatedStationCollectionV
 // ValidateAssociatedStationView runs the validations defined on
 // AssociatedStationView using the "default" view.
 func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
+	if result.Hidden == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("hidden", "result"))
+	}
 	if result.Project != nil {
 		if err2 := ValidateAssociatedViaProjectView(result.Project); err2 != nil {
 			err = goa.MergeErrors(err, err2)

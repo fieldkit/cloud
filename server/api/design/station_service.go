@@ -248,12 +248,15 @@ var AssociatedStation = ResultType("application/vnd.app.associated.station", fun
 		Attribute("project", AssociatedViaProject)
 		Attribute("location", AssociatedViaLocation)
 		Attribute("manual", AssociatedViaManual)
+		Attribute("hidden", Boolean)
+		Required("hidden")
 	})
 	View("default", func() {
 		Attribute("station")
 		Attribute("project")
 		Attribute("location")
 		Attribute("manual")
+		Attribute("hidden")
 	})
 })
 

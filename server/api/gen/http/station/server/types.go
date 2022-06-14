@@ -1298,6 +1298,7 @@ type AssociatedStationResponseBody struct {
 	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   bool                               `form:"hidden" json:"hidden" xml:"hidden"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body

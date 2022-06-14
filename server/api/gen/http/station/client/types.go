@@ -1298,6 +1298,7 @@ type AssociatedStationResponseBody struct {
 	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
 	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
 	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   *bool                              `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body
@@ -4053,6 +4054,9 @@ func ValidateAssociatedStationCollectionResponseBody(body AssociatedStationColle
 func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) (err error) {
 	if body.Station == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("station", "body"))
+	}
+	if body.Hidden == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("hidden", "body"))
 	}
 	if body.Station != nil {
 		if err2 := ValidateStationFullResponseBody(body.Station); err2 != nil {

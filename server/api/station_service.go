@@ -492,9 +492,8 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 			}
 
 			for id, associated := range byID {
-				if visible[id] {
-					stations = append(stations, associated)
-				}
+				associated.Hidden = !visible[id]
+				stations = append(stations, associated)
 			}
 		}
 	}
