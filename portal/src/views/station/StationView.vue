@@ -3,11 +3,12 @@
         <StandardLayout v-if="station">
             <div class="container-wrap">
                 <DoubleHeader
+                    v-if="projectId"
                     backRoute="viewProject"
                     :title="station.name"
                     :subtitle="headerSubtitle"
                     :backTitle="$tc('layout.backProjectDashboard')"
-                    :backRouteParams="{ id: $route.params.projectId }"
+                    :backRouteParams="{ id: projectId }"
                 />
 
                 <section class="section-station">
@@ -188,6 +189,9 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters({ isBusy: "isBusy" }),
+        projectId(): string {
+            return this.$route.params.projectId;
+        },
         station(): DisplayStation {
             return this.$state.stations.stations[this.$route.params.stationId];
         },

@@ -12,7 +12,7 @@
             </div>
         </template>
 
-        <template v-if="viewType === 'map'">
+      <template v-if="viewType === 'map'">
             <div class="container-map">
                 <StationsMap
                     @show-summary="showSummary"
@@ -204,13 +204,16 @@ export default Vue.extend({
 }
 
 ::v-deep .summary-container {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+    border: solid 2px #d8dce0;
+    background-color: #fff;
     position: unset;
     margin: 190px 0 60px 119px;
     max-width: calc(100vw - 20px);
 
     .explore-button {
-        margin-bottom: 6px;
+        margin-bottom: 14px;
     }
 
     @include bp-down($sm) {
@@ -334,7 +337,6 @@ export default Vue.extend({
         margin: 20px;
         flex-basis: 389px;
         box-sizing: border-box;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 
         @include bp-down($md) {
             padding: 19px 11px;
@@ -355,6 +357,10 @@ export default Vue.extend({
 
         .close-button {
             display: none;
+        }
+
+        .navigate-button {
+            right: 0;
         }
     }
 }
