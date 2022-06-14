@@ -202,9 +202,9 @@
         "longitude": "Longitude",
         "managePhotos": "Manage photos",
         "allPhotos": "All photos",
-        "replacePhoto": "Replace photo",
         "deletePhoto": "Delete Photo",
-        "setAsStationImage": "Set as Station Image"
+        "setAsStationImage": "Set as Station Image",
+        "addPhotos": "Add photos"
     },
     "user": {
         "profile": {

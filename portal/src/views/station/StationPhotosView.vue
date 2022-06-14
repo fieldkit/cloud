@@ -8,10 +8,14 @@
                 :backRouteParams="{ id: $route.params.stationId }"
             >
                 <template v-slot:default>
-                    <div class="button">
-                        <i class="icon icon-share"></i>
-                        Add photos
-                    </div>
+                    <button class="button-social">
+                        <label for="imageInput">
+                            <i class="icon icon-share"></i>
+                            {{ $tc("station.addPhotos") }}
+                        </label>
+                    </button>
+
+                    <input id="imageInput" type="file" accept="image/*" @change="upload" />
                 </template>
             </DoubleHeader>
 
@@ -32,10 +36,11 @@ import Vue from "vue";
 import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { NoteMedia, Notes, PortalNoteMedia } from "@/views/notes/model";
+import { AddedPhoto, NoteMedia, Notes, PortalNoteMedia } from "@/views/notes/model";
 import { ActionTypes } from "@/store";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import NewPhoto from "@/assets/image-placeholder.svg";
+import { UploadedImage } from "@/views/shared/ImageUploader.vue";
 
 export default Vue.extend({
     name: "StationPhotosView",
@@ -46,6 +51,9 @@ export default Vue.extend({
         ListItemOptions,
     },
     computed: {
+        stationId(): number {
+            return parseInt(this.$route.params.stationId, 10);
+        },
         photos(): NoteMedia[] {
             return NoteMedia.onlyPhotos(this.$state.notes.media);
         },
@@ -67,25 +75,42 @@ export default Vue.extend({
         onPhotoOptionClick() {
             console.log("da");
         },
+        upload(this: any, ev) {
+            console.log("upl", ev);
+
+            const image = ev.target.files[0];
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                if (ev?.target?.result) {
+                    const photo = new AddedPhoto(image.type, image, ev.target.result);
+                    console.log("photo", photo);
+
+                    this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
+                        console.log(media);
+                        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.stationId });
+                        return [];
+                    });
+                }
+            };
+
+            reader.readAsDataURL(image);
+        },
     },
     mounted() {
         this.photoOptions = [
-            {
-                label: this.$tc("station.replacePhoto"),
-                event: "replace-image",
-            },
             {
                 label: this.$tc("station.setAsStationImage"),
                 event: "use-as-station-image",
             },
             {
-                label: this.$tc("station.setAsStationImage"),
-                event: "delete-media",
+                label: this.$tc("station.deletePhoto"),
+                event: "delete-image",
             },
         ];
     },
     beforeMount(): Promise<any> {
-        return this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+        return this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.stationId });
     },
 });
 </script>
@@ -130,8 +155,17 @@ export default Vue.extend({
     ::v-deep .options-btns {
         right: 0;
         top: 40px;
-        border: solid 1px #d8dce0;
-        font-size: 14px;
+        border: solid 1px var(--color-border);
+        border-radius: 1px;
+        padding-right: 25px;
+
+        > * {
+            font-size: 14px;
+        }
     }
+}
+
+input[type="file"] {
+    display: none;
 }
 </style>
