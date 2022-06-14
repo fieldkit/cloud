@@ -654,7 +654,7 @@ export class Workspace implements VizInfoFactory {
     private associated: AssociatedStation[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
-    private readonly showInternalSensors = true;
+    private readonly showInternalSensors = false;
     public version = 0;
 
     public getStation(id: number): Station | null {
