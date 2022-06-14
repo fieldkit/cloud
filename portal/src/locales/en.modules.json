@@ -126,7 +126,8 @@
                 "temperature": "Temperature",
                 "pressure": "Pressure",
                 "sdError": "SD Error",
-                "humidity": "Humidity"
+                "humidity": "Humidity",
+                "maxPrecipLast5MinMmPerMin": "Precipitation"
             }
         }
     }
