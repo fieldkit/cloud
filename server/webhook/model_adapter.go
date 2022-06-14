@@ -83,13 +83,15 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	// Add or create the station.
 	station := updating
 	if updating == nil {
-		if pm.DeviceName == nil {
-			return nil, fmt.Errorf("no station-name")
+		deviceName := string(pm.DeviceID)
+
+		if pm.DeviceName != nil {
+			deviceName = *pm.DeviceName
 		}
 
 		updating = &data.Station{
 			DeviceID:  pm.DeviceID,
-			Name:      *pm.DeviceName,
+			Name:      deviceName,
 			OwnerID:   pm.OwnerID,
 			ModelID:   model.ID,
 			CreatedAt: time.Now(),
@@ -111,10 +113,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		station = added
 	} else {
+		station.ModelID = model.ID
 		if pm.DeviceName != nil {
 			station.Name = *pm.DeviceName
 		}
-		station.ModelID = model.ID
 	}
 
 	attributesRepository := repositories.NewAttributesRepository(m.db)
@@ -315,7 +317,7 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
 
-		log.Infow("saving:station", "station_id", station.ID)
+		log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name)
 
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
 			return fmt.Errorf("error saving station: %v", err)

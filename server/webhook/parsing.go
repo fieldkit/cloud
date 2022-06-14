@@ -260,11 +260,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 			if err != nil {
 				log.Infow("evaluation-error", "error", err)
-				/*
-					if _, ok := err.(*EvaluationError); !ok {
-						return nil, fmt.Errorf("evaluating sensor expression '%s': %v", sensor.Name, err)
-					}
-				*/
 			} else {
 				if value, ok := toFloat(maybeValue); ok {
 					reading := &ParsedReading{
