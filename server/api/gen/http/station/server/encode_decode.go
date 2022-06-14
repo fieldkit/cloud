@@ -750,9 +750,10 @@ func EncodeListProjectResponse(encoder func(context.Context, http.ResponseWriter
 func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id   int32
-			auth *string
-			err  error
+			id               int32
+			disableFiltering *bool
+			auth             *string
+			err              error
 
 			params = mux.Vars(r)
 		)
@@ -764,6 +765,16 @@ func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 			}
 			id = int32(v)
 		}
+		{
+			disableFilteringRaw := r.URL.Query().Get("disable_filtering")
+			if disableFilteringRaw != "" {
+				v, err2 := strconv.ParseBool(disableFilteringRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("disableFiltering", disableFilteringRaw, "boolean"))
+				}
+				disableFiltering = &v
+			}
+		}
 		authRaw := r.Header.Get("Authorization")
 		if authRaw != "" {
 			auth = &authRaw
@@ -771,7 +782,7 @@ func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 		if err != nil {
 			return nil, err
 		}
-		payload := NewListProjectPayload(id, auth)
+		payload := NewListProjectPayload(id, disableFiltering, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
@@ -1573,6 +1584,18 @@ func EncodeProgressError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
+// marshalStationviewsStationFullModelViewToStationFullModelResponseBody builds
+// a value of type *StationFullModelResponseBody from a value of type
+// *stationviews.StationFullModelView.
+func marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v *stationviews.StationFullModelView) *StationFullModelResponseBody {
+	res := &StationFullModelResponseBody{
+		Name:                      *v.Name,
+		OnlyVisibleViaAssociation: *v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // marshalStationviewsStationOwnerViewToStationOwnerResponseBody builds a value
 // of type *StationOwnerResponseBody from a value of type
 // *stationviews.StationOwnerView.
@@ -1891,6 +1914,9 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		PlaceNameNative:    v.PlaceNameNative,
 		SyncedAt:           v.SyncedAt,
 		IngestionAt:        v.IngestionAt,
+	}
+	if v.Model != nil {
+		res.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v.Model)
 	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)

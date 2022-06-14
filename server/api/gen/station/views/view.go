@@ -64,6 +64,7 @@ type StationProgress struct {
 type StationFullView struct {
 	ID                 *int32
 	Name               *string
+	Model              *StationFullModelView
 	Owner              *StationOwnerView
 	DeviceID           *string
 	Interestingness    *StationInterestingnessView
@@ -86,6 +87,12 @@ type StationFullView struct {
 	SyncedAt           *int64
 	IngestionAt        *int64
 	Data               *StationDataSummaryView
+}
+
+// StationFullModelView is a type that runs validations on a projected type.
+type StationFullModelView struct {
+	Name                      *string
+	OnlyVisibleViaAssociation *bool
 }
 
 // StationOwnerView is a type that runs validations on a projected type.
@@ -306,6 +313,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"model",
 			"owner",
 			"deviceId",
 			"interestingness",
@@ -384,6 +392,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"model",
 			"owner",
 			"deviceId",
 			"interestingness",
@@ -521,6 +530,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
+	if result.Model == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("model", "result"))
+	}
 	if result.Owner == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "result"))
 	}
@@ -547,6 +559,11 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
+	}
+	if result.Model != nil {
+		if err2 := ValidateStationFullModelView(result.Model); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
@@ -589,6 +606,18 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateStationFullModelView runs the validations defined on
+// StationFullModelView.
+func ValidateStationFullModelView(result *StationFullModelView) (err error) {
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.OnlyVisibleViaAssociation == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("only_visible_via_association", "result"))
 	}
 	return
 }

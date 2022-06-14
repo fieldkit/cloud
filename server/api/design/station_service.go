@@ -10,6 +10,12 @@ var Owner = Type("StationOwner", func() {
 	Required("id", "name")
 })
 
+var StationFullModel = Type("StationFullModel", func() {
+	Attribute("name", String)
+	Attribute("only_visible_via_association", Boolean)
+	Required("name", "only_visible_via_association")
+})
+
 var StationFullImageRef = Type("ImageRef", func() {
 	Attribute("url", String)
 	Required("url")
@@ -144,6 +150,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 	Attributes(func() {
 		Attribute("id", Int32)
 		Attribute("name")
+		Attribute("model", StationFullModel)
 		Attribute("owner", Owner)
 		Attribute("deviceId", String)
 		Attribute("interestingness", StationInterestingness)
@@ -151,7 +158,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("uploads", ArrayOf(StationUpload))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
-		Required("id", "name", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
+		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
 		Attribute("recordingStartedAt", Int64)
@@ -177,6 +184,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("model")
 		Attribute("owner")
 		Attribute("deviceId")
 		Attribute("interestingness")
@@ -467,12 +475,17 @@ var _ = Service("station", func() {
 			Token("auth")
 			Attribute("id", Int32)
 			Required("id")
+			Attribute("disable_filtering", Boolean)
 		})
 
 		Result(StationsFull)
 
 		HTTP(func() {
 			GET("projects/{id}/stations")
+
+			Params(func() {
+				Param("disable_filtering")
+			})
 
 			httpAuthentication()
 		})

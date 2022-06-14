@@ -35,6 +35,7 @@ type UpdateRequestBody struct {
 type AddResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -64,6 +65,7 @@ type AddResponseBody struct {
 type GetResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -93,6 +95,7 @@ type GetResponseBody struct {
 type UpdateResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -1118,6 +1121,12 @@ type ProgressBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// StationFullModelResponseBody is used to define fields on response body types.
+type StationFullModelResponseBody struct {
+	Name                      *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	OnlyVisibleViaAssociation *bool   `form:"only_visible_via_association,omitempty" json:"only_visible_via_association,omitempty" xml:"only_visible_via_association,omitempty"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -1253,6 +1262,7 @@ type StationFullCollectionResponseBody []*StationFullResponseBody
 type StationFullResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -1377,6 +1387,7 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -1488,6 +1499,7 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -1704,6 +1716,7 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -3620,6 +3633,18 @@ func ValidateProgressBadRequestResponseBody(body *ProgressBadRequestResponseBody
 	return
 }
 
+// ValidateStationFullModelResponseBody runs the validations defined on
+// StationFullModelResponseBody
+func ValidateStationFullModelResponseBody(body *StationFullModelResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.OnlyVisibleViaAssociation == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("only_visible_via_association", "body"))
+	}
+	return
+}
+
 // ValidateStationOwnerResponseBody runs the validations defined on
 // StationOwnerResponseBody
 func ValidateStationOwnerResponseBody(body *StationOwnerResponseBody) (err error) {
@@ -3930,6 +3955,9 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
+	if body.Model == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("model", "body"))
+	}
 	if body.Owner == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
 	}
@@ -3956,6 +3984,11 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.Model != nil {
+		if err2 := ValidateStationFullModelResponseBody(body.Model); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if body.Owner != nil {
 		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {

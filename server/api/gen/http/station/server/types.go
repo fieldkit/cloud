@@ -35,6 +35,7 @@ type UpdateRequestBody struct {
 type AddResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -64,6 +65,7 @@ type AddResponseBody struct {
 type GetResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -93,6 +95,7 @@ type GetResponseBody struct {
 type UpdateResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -1118,6 +1121,12 @@ type ProgressBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// StationFullModelResponseBody is used to define fields on response body types.
+type StationFullModelResponseBody struct {
+	Name                      string `form:"name" json:"name" xml:"name"`
+	OnlyVisibleViaAssociation bool   `form:"only_visible_via_association" json:"only_visible_via_association" xml:"only_visible_via_association"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -1253,6 +1262,7 @@ type StationFullResponseBodyCollection []*StationFullResponseBody
 type StationFullResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -1354,6 +1364,9 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
 	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
+	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
 	}
@@ -1405,6 +1418,9 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
 	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
+	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
 	}
@@ -1455,6 +1471,9 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		PlaceNameNative:    res.PlaceNameNative,
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -2387,9 +2406,10 @@ func NewListMinePayload(auth string) *station.ListMinePayload {
 }
 
 // NewListProjectPayload builds a station service list project endpoint payload.
-func NewListProjectPayload(id int32, auth *string) *station.ListProjectPayload {
+func NewListProjectPayload(id int32, disableFiltering *bool, auth *string) *station.ListProjectPayload {
 	v := &station.ListProjectPayload{}
 	v.ID = id
+	v.DisableFiltering = disableFiltering
 	v.Auth = auth
 
 	return v

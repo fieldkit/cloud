@@ -940,6 +940,11 @@ func EncodeListProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(
 				req.Header.Set("Authorization", head)
 			}
 		}
+		values := req.URL.Query()
+		if p.DisableFiltering != nil {
+			values.Add("disable_filtering", fmt.Sprintf("%v", *p.DisableFiltering))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -1936,6 +1941,18 @@ func DecodeProgressResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView
+// builds a value of type *stationviews.StationFullModelView from a value of
+// type *StationFullModelResponseBody.
+func unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v *StationFullModelResponseBody) *stationviews.StationFullModelView {
+	res := &stationviews.StationFullModelView{
+		Name:                      v.Name,
+		OnlyVisibleViaAssociation: v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -2239,6 +2256,7 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		SyncedAt:           v.SyncedAt,
 		IngestionAt:        v.IngestionAt,
 	}
+	res.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v.Model)
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	res.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v.Interestingness)
 	res.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(v.Attributes)

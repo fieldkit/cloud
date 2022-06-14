@@ -320,7 +320,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false, mm)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false, mm, true)
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +376,12 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false, mm)
+	disableFiltering := false
+	if payload.DisableFiltering != nil {
+		disableFiltering = *payload.DisableFiltering
+	}
+
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false, mm, !disableFiltering)
 	if err != nil {
 		return nil, err
 	}
@@ -396,6 +401,8 @@ func isForbidden(err error) bool {
 }
 
 func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.AssociatedStations, err error) {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -429,8 +436,10 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 	for _, project := range projects {
 		including := false
 
+		disableFiltering := true
 		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
-			ID: project.ID,
+			ID:               project.ID,
+			DisableFiltering: &disableFiltering,
 		})
 		if err != nil {
 			if isForbidden(err) {
@@ -443,6 +452,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 		if including {
 			byID := make(map[int32]*station.AssociatedStation)
+			visible := make(map[int32]bool)
 
 			for _, s := range projectStations.Stations {
 				associated := &station.AssociatedStation{
@@ -453,17 +463,15 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 				}
 
 				byID[s.ID] = associated
-
-				stations = append(stations, associated)
+				visible[s.ID] = !s.Model.OnlyVisibleViaAssociation
 			}
-
-			log := Logger(ctx).Sugar()
 
 			for id, priority := range associatedWithFirst {
 				if associated, ok := byID[id]; ok {
 					associated.Manual = &station.AssociatedViaManual{
 						Priority: priority,
 					}
+					visible[id] = true
 				} else {
 					log.Infow("associated:missing", "asociated_station_id", id)
 				}
@@ -480,6 +488,12 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 							}
 						}
 					}
+				}
+			}
+
+			for id, associated := range byID {
+				if visible[id] {
+					stations = append(stations, associated)
 				}
 			}
 		}
@@ -1023,6 +1037,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		PlaceNameNative:    sf.Station.PlaceNative,
 		Location:           location,
 		Data:               dataSummary,
+		Model: &station.StationFullModel{
+			Name:                      sf.Model.Name,
+			OnlyVisibleViaAssociation: sf.Model.OnlyVisibleViaAssociation,
+		},
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
@@ -1053,7 +1071,7 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta, filtering bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
@@ -1062,7 +1080,9 @@ func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationF
 			return nil, err
 		}
 
-		stations = append(stations, after)
+		if !filtering || !after.Model.OnlyVisibleViaAssociation {
+			stations = append(stations, after)
+		}
 	}
 
 	return stations, nil
