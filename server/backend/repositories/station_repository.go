@@ -67,6 +67,9 @@ func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station
 }
 
 func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Station) (err error) {
+	if station.ModelID == 0 {
+		panic("WTF")
+	}
 	if _, err := r.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.station SET
 			   name = :name,
@@ -82,7 +85,8 @@ func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Sta
 			   firmware_time = :firmware_time,
 			   updated_at = :updated_at,
 			   synced_at = :synced_at,
-			   ingestion_at = :ingestion_at
+			   ingestion_at = :ingestion_at,
+			   model_id = :model_id
 		WHERE id = :id
 		`, station); err != nil {
 		return err
@@ -112,7 +116,7 @@ func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (sta
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
@@ -125,7 +129,7 @@ func (r *StationRepository) QueryStationsByDeviceID(ctx context.Context, deviceI
 	stations = []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -138,7 +142,7 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -151,7 +155,7 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -168,7 +172,7 @@ func (r *StationRepository) QueryStationByPhotoID(ctx context.Context, id int32)
 
 	if err := r.db.GetContext(ctx, station, `
         SELECT
-            id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+            id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
             recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
         FROM fieldkit.station WHERE id IN (SELECT station_id FROM notes_media WHERE id = $1)
         `, id); err != nil {

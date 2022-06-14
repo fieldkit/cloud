@@ -74,16 +74,17 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 	}
 
-	// Add or create the station, this may also mean creating the station model for this schema.
+	// Add or create station model, we use this during creation and updating.
+	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add or create the station.
 	station := updating
 	if updating == nil {
 		if pm.DeviceName == nil {
 			return nil, fmt.Errorf("no station-name")
-		}
-
-		model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
-		if err != nil {
-			return nil, err
 		}
 
 		updating = &data.Station{
@@ -113,6 +114,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		if pm.DeviceName != nil {
 			station.Name = *pm.DeviceName
 		}
+		station.ModelID = model.ID
 	}
 
 	attributesRepository := repositories.NewAttributesRepository(m.db)
