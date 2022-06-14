@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
@@ -39,12 +40,87 @@ func NewInfluxDBBackend(config *InfluxDBConfig) (*InfluxDBBackend, error) {
 	}, nil
 }
 
+type InfluxDBWindow struct {
+	Specifier string
+	Interval  time.Duration
+}
+
+func (w *InfluxDBWindow) CalculateMaximumRows(start, end time.Time) int64 {
+	duration := end.Sub(start)
+	return int64(duration / w.Interval)
+}
+
+var (
+	Windows = []*InfluxDBWindow{
+		&InfluxDBWindow{Specifier: "24h", Interval: time.Hour * 24},
+		&InfluxDBWindow{Specifier: "12h", Interval: time.Hour * 12},
+		&InfluxDBWindow{Specifier: "6h", Interval: time.Hour * 6},
+		&InfluxDBWindow{Specifier: "1h", Interval: time.Hour * 1},
+		&InfluxDBWindow{Specifier: "30m", Interval: time.Minute * 30},
+		&InfluxDBWindow{Specifier: "10m", Interval: time.Minute * 10},
+		&InfluxDBWindow{Specifier: "1m", Interval: time.Minute * 1},
+	}
+)
+
+type DataRange struct {
+	Start *time.Time
+	End   *time.Time
+}
+
+func (idb *InfluxDBBackend) QueryRanges(ctx context.Context, qp *backend.QueryParams) (*DataRange, error) {
+	log := Logger(ctx).Sugar()
+
+	query := fmt.Sprintf(`
+		data = from(bucket: "%s")
+		|> range(start: %d, stop: %d)
+		|> filter(fn: (r) => r["_measurement"] == "reading")
+		|> filter(fn: (r) => r["_field"] == "value")
+		|> filter(fn: (r) => r["station_id"] == "10000")
+		  
+		f = data |> first()
+		l = data |> last()
+			
+		union(tables: [f, l])
+	`, idb.config.Bucket, qp.Start.Unix(), qp.End.Unix() /*, qp.Stations[0]*/)
+
+	log.Infow("influx:querying-ranges", "query", query, "start", qp.Start, "end", qp.End)
+
+	rows, err := idb.queryAPI.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		record := rows.Record()
+		time := record.Time()
+
+		log.Infow("influx:ranges", "time", time)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return nil, nil
+}
+
 func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	if len(qp.Stations) != 1 {
 		return nil, fmt.Errorf("multiple stations unsupported")
 	}
 
 	log := Logger(ctx).Sugar()
+
+	_, err := idb.QueryRanges(ctx, qp)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, window := range Windows {
+		log.Infow("influxdb:window", "specifier", window.Specifier, "rows", window.CalculateMaximumRows(qp.Start, qp.End))
+	}
 
 	query := fmt.Sprintf(`
 		from(bucket: "%s")
