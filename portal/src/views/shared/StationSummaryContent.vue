@@ -5,16 +5,36 @@
         </div>
         <div class="station-details">
             <div class="station-name">{{ station.name }}</div>
-            <div class="station-seen" v-if="station.updatedAt">
-                Last Seen
-                <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
-            </div>
-            <div class="station-battery" v-if="station.battery">
-                <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                <span class="small-light">{{ station.battery | integer }}%</span>
-            </div>
-            <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+
+            <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
+                <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
+                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
+                </div>
+                <div class="location-container" v-if="station.placeNameNative">
+                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                    <span>
+                        Native Lands:
+                        <span class="bold">{{ station.placeNameNative }}</span>
+                    </span>
+                </div>
+
+                <div class="flex">
+                    <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
+                        <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+                    </div>
+                </div>
+
+                <div v-if="station.location" class="coordinates-row">
+                    <div class="coordinate latitude">
+                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
+                        <div>Latitude</div>
+                    </div>
+                    <div class="coordinate longitude">
+                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
+                        <div>Longitude</div>
+                    </div>
+                </div>
             </div>
         </div>
         <slot></slot>
@@ -61,64 +81,89 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .image-container {
-    width: 124px;
+    width: 93px;
     text-align: center;
     padding-right: 11px;
-    height: 100px;
 }
+
 .image-container img {
-    max-width: 124px;
-    max-height: 100px;
-    padding: 5px;
+    width: 100%;
 }
+
 .station-name {
     font-size: 18px;
     font-family: var(--font-family-bold);
-    margin-bottom: 2px;
+    margin-bottom: 5px;
 }
+
 .station-synced {
     font-size: 14px;
 }
+
 .station-battery {
     margin: 5px 0 0;
     display: flex;
     line-height: 13px;
 }
+
 .battery {
     width: 20px;
     height: 11px;
     padding-right: 5px;
 }
+
 .module-icon-container {
-    float: left;
-    margin-right: 10px;
-    margin-top: 5px;
-    box-shadow: 0 2px 4px 0 var(--color-border);
+    margin-right: 6px;
     border-radius: 50%;
     display: flex;
 
     img {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
 }
+
 .general-row {
     display: flex;
     flex-direction: row;
     position: relative;
-    padding-right: 23px;
 }
+
 .station-details {
     text-align: left;
+    padding-right: 15px;
 }
+
 .icon {
-    padding-right: 7px;
+    padding-right: 6px;
 }
+
 .small-light {
     font-size: 12px;
     color: #6a6d71;
 }
+
 .station-seen {
     font-size: 12px;
+}
+
+.coordinates-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 7px;
+}
+
+.where-row {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.where-row > div {
+    padding-bottom: 5px;
+    @include flex(flex-start);
 }
 </style>

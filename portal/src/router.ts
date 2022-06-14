@@ -346,6 +346,20 @@ const routes = [
         },
     },
     {
+        path: "/station/:stationId",
+        name: "viewStationFromMap",
+        component: StationView,
+        props: (route) => {
+            return {
+                stationId: Number(route.params.stationId),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/projects/:projectId/station/:stationId",
         name: "viewStation",
         component: StationView,

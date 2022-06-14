@@ -2,46 +2,8 @@
     <div class="station-hover-summary" v-if="viewingSummary && station">
         <StationSummaryContent :station="station">
             <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
+            <img :alt="$tc('station.navigateToStation')" class="navigate-button" src="@/assets/tooltip-blue.svg" @click="openStationPageTab" />
         </StationSummaryContent>
-
-        <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
-            <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
-                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
-            </div>
-            <div class="location-container" v-if="station.placeNameNative">
-                <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                <template>Native Lands: {{ station.placeNameNative }}</template>
-            </div>
-
-            <div class="coordinates-row">
-                <div v-if="station.location" class="location-coordinates valid">
-                    <div class="coordinate latitude">
-                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
-                        <div>Latitude</div>
-                    </div>
-                    <div class="coordinate longitude">
-                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
-                        <div>Longitude</div>
-                    </div>
-                </div>
-                <!--
-                <div v-else class="location-coordinates missing">
-                    <div class="coordinate latitude">
-                        --
-                        <br />
-                        Latitude
-                    </div>
-                    <div class="coordinate longitude">
-                        --
-                        <br />
-                        Longitude
-                    </div>
-                </div>
-                -->
-                <div class="empty"></div>
-            </div>
-        </div>
 
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
@@ -49,6 +11,18 @@
         </div>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
+
+        <div class="flex">
+            <div class="station-seen" v-if="station.updatedAt">
+                Last Seen
+                <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
+            </div>
+
+            <div class="station-battery" v-if="station.battery">
+                <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
+                <span class="small-light">{{ station.battery | integer }}%</span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -114,6 +88,10 @@ export default Vue.extend({
         layoutChange() {
             this.$emit("layoutChange");
         },
+        openStationPageTab() {
+            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
+            window.open(routeData.href, "_blank");
+        },
     },
 });
 </script>
@@ -128,20 +106,37 @@ export default Vue.extend({
     z-index: 2;
     display: flex;
     flex-direction: column;
-    padding: 23px 21px;
+    padding: 27px 20px 17px;
     width: 389px;
     box-sizing: border-box;
+
+    ::v-deep .station-name {
+        font-size: 16px;
+    }
+
+    ::v-deep .image-container {
+        border-radius: 5px;
+        padding: 0;
+        margin-right: 14px;
+        overflow: hidden;
+
+        img {
+            padding: 0;
+        }
+    }
 
     * {
         font-family: $font-family-light;
     }
 }
+
 .location-coordinates {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     flex-basis: 50%;
 }
+
 .location-coordinates .coordinate {
     display: flex;
     flex-direction: column;
@@ -154,31 +149,17 @@ export default Vue.extend({
         }
     }
 }
-.coordinates-row {
-    display: flex;
-    flex-direction: row;
-    margin-top: 7px;
-}
-.where-row > div {
-    padding-bottom: 8px;
-    @include flex(center);
-}
-.where-row {
-    border-top: 1px solid #f1eeee;
-    margin-top: 18px;
-    padding-top: 12px;
-    display: flex;
-    flex-direction: column;
-}
+
 .close-button {
     cursor: pointer;
     @include position(absolute, -7px -5px null null);
 }
-.where-row {
-    text-align: left;
-    font-size: 14px;
-    color: #2c3e50;
+
+.navigate-button {
+    cursor: pointer;
+    @include position(absolute, -10px 20px null null);
 }
+
 .readings-container {
     margin-top: 7px;
     padding-top: 9px;
@@ -187,6 +168,7 @@ export default Vue.extend({
     font-size: 14px;
     color: #2c3e50;
 }
+
 .readings-container div.title {
     padding-bottom: 13px;
     font-family: var(--font-family-medium);
@@ -195,6 +177,7 @@ export default Vue.extend({
         font-family: var(--font-family-bold);
     }
 }
+
 .explore-button {
     font-size: 18px;
     font-family: var(--font-family-bold);
@@ -207,14 +190,40 @@ export default Vue.extend({
     border-radius: 4px;
     cursor: pointer;
 }
+
 .icon {
     padding-right: 7px;
 }
+
 ::v-deep .reading {
     height: 35px;
 
     .name {
         font-size: 11px;
+    }
+}
+
+.small-light {
+    font-size: 12px;
+    color: #6a6d71;
+}
+
+.station-seen {
+    font-size: 14px;
+    font-family: var(--font-family-bold);
+    align-self: flex-start;
+    margin-right: 15px;
+}
+
+.station-battery {
+    display: flex;
+    align-items: center;
+    line-height: 13px;
+
+    .battery {
+        width: 22px;
+        margin-top: -2px;
+        margin-right: 3px;
     }
 }
 </style>
