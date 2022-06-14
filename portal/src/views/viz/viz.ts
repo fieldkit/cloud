@@ -654,6 +654,7 @@ export class Workspace implements VizInfoFactory {
     private associated: AssociatedStation[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
+    private readonly showInternalSensors = true;
     public version = 0;
 
     public getStation(id: number): Station | null {
@@ -933,8 +934,10 @@ export class Workspace implements VizInfoFactory {
                         const optionId = `${row.moduleId}-${row.sensorId}`;
                         const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
                         if (sensor.length) {
-                            if (sensor[0].internal) {
-                                return [];
+                            if (!this.showInternalSensors) {
+                                if (sensor[0].internal) {
+                                    return [];
+                                }
                             }
                         }
                         return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
