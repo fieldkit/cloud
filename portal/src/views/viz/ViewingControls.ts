@@ -69,7 +69,8 @@ export const SensorSelectionRow = Vue.extend({
             if (this.disabled) {
                 return null;
             }
-            return this.ds.vizSensor[0]; // TODO VizSensor
+            const originalStationId = this.ds.vizSensor[0]; // TODO VizSensor
+            return this.workspace.findStationOverride(this.ds.vizSensor) || originalStationId;
         },
         selectedSensor(): string | null {
             if (this.disabled) {
@@ -97,7 +98,7 @@ export const SensorSelectionRow = Vue.extend({
             vueTickHack(() => {
                 if (!node.moduleId) throw new Error();
                 if (!node.sensorId) throw new Error();
-                const newSeries = this.workspace.makeSeries(this.ds.stationId, [node.moduleId, node.sensorId]);
+                const newSeries = this.workspace.makeSeries(node.stationId || this.ds.stationId, [node.moduleId, node.sensorId]);
                 console.log("raising viz-change-series", newSeries);
                 this.$emit("viz-change-series", newSeries);
             });
@@ -105,8 +106,8 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
-            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
-            <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="1" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
+            <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="3" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,
 });
@@ -146,11 +147,17 @@ export const SelectionControls = Vue.extend({
             if (this.stationOptions.length == 0) {
                 return [];
             }
-            const stationId = vizSensor[0]; // TODO VizSensor
+            const originalStationId = vizSensor[0]; // TODO VizSensor
+            const stationId = this.workspace.findStationOverride(vizSensor) || originalStationId;
             const maybePartner = getPartnerCustomization();
             const flatten = maybePartner != null && maybePartner.projectId != null && this.workspace.projects[0] === maybePartner.projectId;
             const sensorOptions = this.workspace.sensorOptions(stationId, flatten);
-            // this.viz.log("sensor-options", { options: sensorOptions });
+            this.viz.log("viz-sensor-options", {
+                vizSensor: vizSensor,
+                originalStationId: originalStationId,
+                stationId: stationId,
+                options: sensorOptions,
+            });
             return sensorOptions;
         },
         raiseChangeSeries(index: number, newSeries: DataSetSeries): void {

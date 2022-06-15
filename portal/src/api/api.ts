@@ -342,6 +342,18 @@ export interface StationsResponse {
     stations: Station[];
 }
 
+export interface AssociatedStation {
+    station: Station;
+    manual?: { otherStationID: number; priority: number };
+    location?: { distance: number };
+    project?: { id: number };
+    hidden: boolean;
+}
+
+export interface AssociatedStationsResponse {
+    stations: AssociatedStation[];
+}
+
 export type SendFunction = (message: unknown) => Promise<void>;
 
 // Intentionally keeping this synchronous since it'll get used in
@@ -722,13 +734,14 @@ class FKApi {
         });
     }
 
-    getAssociatedStations(id: number): Promise<StationsResponse> {
+    getAssociatedStations(id: number): Promise<AssociatedStationsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + `/stations/${id}/associated`,
         });
     }
+
     getCurrentUser(): Promise<CurrentUser> {
         return this.invoke({
             auth: Auth.Required,

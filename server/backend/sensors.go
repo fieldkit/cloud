@@ -12,7 +12,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/data"
@@ -34,6 +34,7 @@ type RawQueryParams struct {
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
+	InfluxDB   *bool   `json:"influxdb"`
 }
 
 type ModuleAndSensor struct {

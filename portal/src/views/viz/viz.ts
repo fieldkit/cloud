@@ -21,14 +21,14 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
-import { Station } from "@/api/api";
+import FKApi, { Station, AssociatedStation } from "@/api/api";
 import i18n from "@/i18n";
-import FKApi from "@/api/api";
 
 export * from "./common";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
+import { DisplayStation } from "@/store";
 
 type SensorReadAtType = string;
 
@@ -64,18 +64,28 @@ export interface HasSensorParams {
 }
 
 export class StationTreeOption {
-    constructor(public readonly id: string | number, public readonly label: string, public readonly isDisabled: boolean) {}
+    constructor(
+        public readonly id: string | number,
+        public readonly label: string,
+        public readonly isDisabled: boolean,
+        public readonly children: StationTreeOption[] | undefined = undefined
+    ) {}
 }
 
 export class SensorTreeOption {
     constructor(
         public readonly id: string | number,
         public readonly label: string,
-        public readonly children: SensorTreeOption[] | undefined = undefined,
-        public readonly moduleId: ModuleID,
+        public children: SensorTreeOption[] | undefined = undefined, // TODO HACK
+        public readonly moduleId: ModuleID | null,
         public readonly sensorId: number | null,
-        public readonly age: Moment
+        public readonly stationId: number | null,
+        public readonly age: Moment | null
     ) {}
+
+    public reassignStation(stationId: number): SensorTreeOption {
+        return new SensorTreeOption(this.id, this.label, this.children, this.moduleId, this.sensorId, stationId, this.age);
+    }
 }
 
 export enum FastTime {
@@ -647,18 +657,32 @@ export class Querier {
 export class Workspace implements VizInfoFactory {
     private stationIds: StationID[] = [];
     private stationsFull: Station[] = [];
+    private associated: AssociatedStation[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
+    private readonly showInternalSensors = false;
     public version = 0;
 
-    public getStation(id: number): Station | null {
-        if (this.stationsFull) {
-            const found = this.stationsFull.filter((d) => d.id === id);
-            if (found.length > 0) {
-                return found[0];
-            }
-        }
-        return null;
+    public findStationOverride(sensor: VizSensor): number | null {
+        const moduleId = sensor[1][0];
+        const moduleIdToStationId = _.fromPairs(
+            _.flatten(Object.values(this.stations).map((row) => row.sensors.map((sensor) => [sensor.moduleId, row.id])))
+        );
+        const sensorStationId = moduleIdToStationId[moduleId];
+        return this.stationOverrides[sensorStationId];
+    }
+
+    private get stationOverrides(): { [index: number]: number } {
+        return _.fromPairs(
+            this.associated
+                .map((associated) => {
+                    if (associated.manual) {
+                        return [associated.station.id, associated.manual.otherStationID];
+                    }
+                    return [];
+                })
+                .filter((l) => l.length)
+        );
     }
 
     public get empty(): boolean {
@@ -684,6 +708,16 @@ export class Workspace implements VizInfoFactory {
         public readonly context: ExploreContext | null = null
     ) {
         this.refreshStationIds();
+    }
+
+    public getStation(id: number): DisplayStation | null {
+        if (this.stationsFull) {
+            const found = this.stationsFull.filter((d) => d.id === id);
+            if (found.length > 0) {
+                return new DisplayStation(found[0]);
+            }
+        }
+        return null;
     }
 
     private get allVizes(): Viz[] {
@@ -800,6 +834,12 @@ export class Workspace implements VizInfoFactory {
         group.timeZoomed(zoom);
         return this;
     }
+
+    public async addAssociatedStations(associated: AssociatedStation[]): Promise<Workspace> {
+        this.associated = associated;
+        return this;
+    }
+
     public async addFullStations(stations: Station[]): Promise<Workspace> {
         this.stationsFull = stations;
         return this;
@@ -839,15 +879,75 @@ export class Workspace implements VizInfoFactory {
         return this.addGraph(new Graph(TimeRange.eternity, [new DataSetSeries(vizSensor)]));
     }
 
+    private nearbyStationOptions(): StationTreeOption[] {
+        // Notice we skip over manually associated stations as that's a stronger association.
+        const nearby = this.associated.filter((assoc) => this.stations[assoc.station.id] && assoc.location && !assoc.manual);
+        console.log("viz: associated-nearby", nearby);
+        if (nearby.length == 0) {
+            return [];
+        }
+
+        const options = nearby.map((associatedStation) => {
+            const station = associatedStation.station;
+            return new StationTreeOption(station.id, station.name, false);
+        });
+
+        return [new StationTreeOption(`nearby`, "Nearby", false, options)];
+    }
+
+    private manuallyAssociatedStationOptions(): StationTreeOption[] {
+        const manuallyAssociated = this.associated.filter((assoc) => this.stations[assoc.station.id] && assoc.manual);
+        console.log("viz: associated-manually", manuallyAssociated);
+        if (manuallyAssociated.length == 0) {
+            return [];
+        }
+
+        const options = manuallyAssociated.map((associatedStation) => {
+            const station = associatedStation.station;
+            return new StationTreeOption(station.id, station.name, false);
+        });
+
+        return [new StationTreeOption(`manual`, "Associated", false, options)];
+    }
+
     public get stationOptions(): StationTreeOption[] {
-        return Object.values(this.stations).map((station) => {
+        const hiddenById = _.fromPairs(this.associated.map((assoc) => [assoc.station.id, assoc.hidden]));
+        const associatedById = _.groupBy(this.associated, (assoc) => assoc.station.id);
+        const nearby = this.nearbyStationOptions();
+        const manually = this.manuallyAssociatedStationOptions();
+
+        // This is for removing stations that already have an option because of
+        // they're associated. Not a fan of this approach.
+        const unassociated = Object.values(this.stations).filter((station) => {
+            if (hiddenById[station.id]) {
+                return false;
+            }
+
+            const maybeAssociated = associatedById[station.id];
+            if (maybeAssociated && maybeAssociated.length > 0) {
+                return !maybeAssociated[0].location && !maybeAssociated[0].manual;
+            }
+
+            return true;
+        });
+
+        const regular = unassociated.map((station) => {
             return new StationTreeOption(station.id, station.name, station.sensors.length == 0);
         });
+
+        return [...manually, ...nearby, ...regular];
     }
 
     public sensorOptions(stationId: number, flatten = false): SensorTreeOption[] {
         const station = this.stations[stationId];
-        if (!station) throw new Error("viz: No station");
+        if (!station) {
+            throw new Error(`viz: No station: ${stationId}`);
+        }
+
+        if (this.associated.length == 0) {
+            throw new Error("viz: Associated required for sensor-options");
+        }
+
         const allSensors = station.sensors;
         const allModules = _.groupBy(allSensors, (s) => s.moduleId);
         const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
@@ -874,29 +974,57 @@ export class Workspace implements VizInfoFactory {
                         }
                         const optionId = `${row.moduleId}-${row.sensorId}`;
                         const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
-                        if (sensor.length) {
-                            if (sensor[0].internal) {
-                                return [];
+                        if (sensor.length > 0) {
+                            if (!this.showInternalSensors) {
+                                if (sensor[0].internal) {
+                                    return [];
+                                }
                             }
                         }
-                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, age)];
+                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, stationId, age)];
                     })
                 );
                 const moduleAge = _.max(children.map((c) => c.age));
-                if (!moduleAge) throw new Error(`viz: Expected module age: no sensors?`);
+                if (!moduleAge) {
+                    throw new Error(`viz: Expected module age: no sensors?`);
+                }
 
                 const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
 
                 if (flatten) {
                     return children[0];
                 } else {
-                    return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, moduleAge);
+                    return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, stationId, moduleAge);
                 }
             }
         );
 
+        if (_.flatten(options.map((o) => o.children)).length == 1) {
+            const associatedWithStation = this.associated.filter((assoc) => assoc.manual && assoc.manual.otherStationID == stationId);
+            if (associatedWithStation.length) {
+                const associatedSensorOptions = _.flatten(
+                    associatedWithStation.map((associated) => {
+                        const moduleOptions = this.sensorOptions(associated.station.id);
+                        console.log("debug-viz-station", moduleOptions);
+                        return _.flatten(moduleOptions.map((option) => option.children || []));
+                    })
+                );
+
+                const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
+
+                if (!options || options.length != 1 || !options[0].children) {
+                    console.log("viz: unexpected options", options);
+                } else {
+                    options[0].children = [...options[0].children, relatedOption];
+                }
+            }
+        }
+
         const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
-            return -option.age.valueOf();
+            if (option.age) {
+                return -option.age.valueOf();
+            }
+            return 0;
         });
 
         return sorted;

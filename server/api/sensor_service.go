@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
@@ -32,6 +32,7 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 		Aggregate:  payload.Aggregate,
 		Tail:       payload.Tail,
 		Complete:   payload.Complete,
+		InfluxDB:   payload.InfluxDB,
 	}, nil
 }
 

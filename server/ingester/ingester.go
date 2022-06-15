@@ -20,7 +20,7 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/common/goahelpers"

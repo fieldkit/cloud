@@ -10,6 +10,12 @@ var Owner = Type("StationOwner", func() {
 	Required("id", "name")
 })
 
+var StationFullModel = Type("StationFullModel", func() {
+	Attribute("name", String)
+	Attribute("only_visible_via_association", Boolean)
+	Required("name", "only_visible_via_association")
+})
+
 var StationFullImageRef = Type("ImageRef", func() {
 	Attribute("url", String)
 	Required("url")
@@ -144,6 +150,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 	Attributes(func() {
 		Attribute("id", Int32)
 		Attribute("name")
+		Attribute("model", StationFullModel)
 		Attribute("owner", Owner)
 		Attribute("deviceId", String)
 		Attribute("interestingness", StationInterestingness)
@@ -151,7 +158,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("uploads", ArrayOf(StationUpload))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
-		Required("id", "name", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
+		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
 		Attribute("recordingStartedAt", Int64)
@@ -177,6 +184,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("model")
 		Attribute("owner")
 		Attribute("deviceId")
 		Attribute("interestingness")
@@ -210,6 +218,53 @@ var StationsFull = ResultType("application/vnd.app.stations.full", func() {
 	TypeName("StationsFull")
 	Attributes(func() {
 		Attribute("stations", CollectionOf(StationFull))
+		Required("stations")
+	})
+	View("default", func() {
+		Attribute("stations")
+	})
+})
+
+var AssociatedViaProject = Type("AssociatedViaProject", func() {
+	Attribute("id", Int32)
+	Required("id")
+})
+
+var AssociatedViaLocation = Type("AssociatedViaLocation", func() {
+	Attribute("distance", Float32)
+	Required("distance")
+})
+
+var AssociatedViaManual = Type("AssociatedViaManual", func() {
+	Attribute("otherStationID", Int32)
+	Attribute("priority", Int32)
+	Required("otherStationID", "priority")
+})
+
+var AssociatedStation = ResultType("application/vnd.app.associated.station", func() {
+	TypeName("AssociatedStation")
+	Attributes(func() {
+		Attribute("station", StationFull)
+		Required("station")
+		Attribute("project", AssociatedViaProject)
+		Attribute("location", AssociatedViaLocation)
+		Attribute("manual", AssociatedViaManual)
+		Attribute("hidden", Boolean)
+		Required("hidden")
+	})
+	View("default", func() {
+		Attribute("station")
+		Attribute("project")
+		Attribute("location")
+		Attribute("manual")
+		Attribute("hidden")
+	})
+})
+
+var AssociatedStations = ResultType("application/vnd.app.associated.stations", func() {
+	TypeName("AssociatedStations")
+	Attributes(func() {
+		Attribute("stations", CollectionOf(AssociatedStation))
 		Required("stations")
 	})
 	View("default", func() {
@@ -424,12 +479,17 @@ var _ = Service("station", func() {
 			Token("auth")
 			Attribute("id", Int32)
 			Required("id")
+			Attribute("disable_filtering", Boolean)
 		})
 
 		Result(StationsFull)
 
 		HTTP(func() {
 			GET("projects/{id}/stations")
+
+			Params(func() {
+				Param("disable_filtering")
+			})
 
 			httpAuthentication()
 		})
@@ -446,7 +506,7 @@ var _ = Service("station", func() {
 			Required("id")
 		})
 
-		Result(StationsFull)
+		Result(AssociatedStations)
 
 		HTTP(func() {
 			GET("stations/{id}/associated")

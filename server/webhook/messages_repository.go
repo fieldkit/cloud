@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 const (
@@ -38,6 +38,13 @@ type MessageBatch struct {
 	id        int64
 }
 
+type batchSummary struct {
+	Total     int64      `db:"total"`
+	MaximumID *int64     `db:"maximum_id"`
+	Start     *time.Time `db:"start"`
+	End       *time.Time `db:"end"`
+}
+
 func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBatch, messages []*WebHookMessage) error {
 	batch.Messages = nil
 
@@ -59,11 +66,27 @@ func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBa
 	return nil
 }
 
-type BatchSummary struct {
-	Total     int64      `db:"total"`
-	MaximumID int64      `db:"maximum_id"`
-	Start     *time.Time `db:"start"`
-	End       *time.Time `db:"end"`
+func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, batch *MessageBatch, messageID int64) error {
+	log := Logger(ctx).Sugar()
+
+	if batch.Messages != nil {
+		return sql.ErrNoRows
+	}
+
+	started := time.Now()
+
+	messages := []*WebHookMessage{}
+	if err := rr.db.SelectContext(ctx, &messages, `
+		SELECT id, created_at, schema_id, headers, body FROM fieldkit.ttn_messages WHERE (id = $1) 
+		`, messageID); err != nil {
+		return err
+	}
+
+	elapsed := time.Since(started)
+
+	log.Infow("queried", "elapsed", elapsed, "records", len(messages))
+
+	return rr.processQuery(ctx, batch, messages)
 }
 
 func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
@@ -72,7 +95,7 @@ func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Cont
 	if batch.id == 0 {
 		log.Infow("counting")
 
-		summary := &BatchSummary{}
+		summary := &batchSummary{}
 		if err := rr.db.GetContext(ctx, summary, `
 			SELECT MAX(id) AS maximum_id, COUNT(id) AS total, MIN(created_at) AS start, MAX(created_at) AS end
 			FROM fieldkit.ttn_messages WHERE (schema_id = $1) AND (created_at >= $2) AND NOT ignored
@@ -81,7 +104,10 @@ func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Cont
 		}
 
 		batch.totalRows = summary.Total
-		batch.maximumID = summary.MaximumID
+
+		if summary.MaximumID != nil {
+			batch.maximumID = *summary.MaximumID
+		}
 
 		log.Infow("counted", "total_rows", batch.totalRows, "maximum_id", batch.maximumID)
 	}

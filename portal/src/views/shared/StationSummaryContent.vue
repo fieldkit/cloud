@@ -4,27 +4,46 @@
             <StationPhoto :station="station" />
         </div>
         <div class="station-details">
-            <div class="station-name">{{ station.name }}</div>
-            <div class="station-seen" v-if="station.updatedAt">
-                Last Seen
-                <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
+            <div class="station-name">
+                {{ station.name }}
+                <slot name="top-right-actions"></slot>
             </div>
-            <div class="station-battery" v-if="station.battery">
-                <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                <span class="small-light">{{ station.battery | integer }}%</span>
+
+            <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
+                <div class="location-container">
+                    <div v-if="stationLocationName || station.placeNameOther">
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <template>
+                            {{ stationLocationName ? stationLocationName : station.placeNameOther }}
+                        </template>
+                    </div>
+                    <div v-if="station.placeNameNative">
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <span>
+                            Native Lands:
+                            <span class="bold">{{ station.placeNameNative }}</span>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+
+            <div class="station-modules">
+                <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
+                    <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+                </div>
             </div>
+
+            <slot name="extra-detail"></slot>
         </div>
-        <slot></slot>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import * as utils from "@/utilities";
+import { DisplayStation } from "@/store";
+import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationSummaryContent",
@@ -36,8 +55,13 @@ export default Vue.extend({
     },
     props: {
         station: {
-            type: Object,
+            type: Object as PropType<DisplayStation>,
             default: null,
+        },
+    },
+    computed: {
+        stationLocationName(): string {
+            return this.partnerCustomization().stationLocationName(this.station);
         },
     },
     methods: {
@@ -47,11 +71,8 @@ export default Vue.extend({
         getModuleIcon(module) {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-    },
-    filters: {
-        integer: (value) => {
-            if (!value) return "";
-            return Math.round(value);
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
         },
     },
 });
@@ -61,64 +82,91 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .image-container {
-    width: 124px;
+    flex: 0 0 93px;
     text-align: center;
-    padding-right: 11px;
-    height: 100px;
+    margin-right: 11px;
 }
+
 .image-container img {
-    max-width: 124px;
-    max-height: 100px;
-    padding: 5px;
+    width: 100%;
+    border-radius: 3px;
 }
+
 .station-name {
     font-size: 18px;
     font-family: var(--font-family-bold);
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+    padding-right: 45px;
 }
+
 .station-synced {
     font-size: 14px;
 }
-.station-battery {
-    margin: 5px 0 0;
-    display: flex;
-    line-height: 13px;
-}
-.battery {
-    width: 20px;
-    height: 11px;
-    padding-right: 5px;
-}
+
 .module-icon-container {
-    float: left;
-    margin-right: 10px;
-    margin-top: 5px;
-    box-shadow: 0 2px 4px 0 var(--color-border);
+    margin-right: 6px;
     border-radius: 50%;
     display: flex;
 
     img {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
 }
+
 .general-row {
     display: flex;
     flex-direction: row;
     position: relative;
-    padding-right: 23px;
 }
+
 .station-details {
     text-align: left;
 }
+
+.location-container {
+    flex-direction: column;
+    display: flex;
+    margin-top: 2px;
+
+    .summary-content & {
+        flex-direction: row;
+    }
+
+    > div {
+        @include flex(center);
+        margin-bottom: 5px;
+
+        &:first-of-type {
+            .summary-content & {
+                margin-right: 10px;
+            }
+        }
+    }
+}
+
 .icon {
-    padding-right: 7px;
+    padding-right: 5px;
 }
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
+
+.station-modules {
+    @include flex();
+    margin-left: -2px;
 }
-.station-seen {
-    font-size: 12px;
+
+.coordinates-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 7px;
+}
+
+.where-row {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-size: 14px;
+    padding-bottom: 5px;
+    color: var(--color-dark);
 }
 </style>

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 

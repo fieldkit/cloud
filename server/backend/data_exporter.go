@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	pb "github.com/fieldkit/data-protocol"
 

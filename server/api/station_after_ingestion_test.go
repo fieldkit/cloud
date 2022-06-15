@@ -90,6 +90,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
