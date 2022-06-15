@@ -236,8 +236,9 @@ var AssociatedViaLocation = Type("AssociatedViaLocation", func() {
 })
 
 var AssociatedViaManual = Type("AssociatedViaManual", func() {
+	Attribute("otherStationID", Int32)
 	Attribute("priority", Int32)
-	Required("priority")
+	Required("otherStationID", "priority")
 })
 
 var AssociatedStation = ResultType("application/vnd.app.associated.station", func() {

@@ -1316,7 +1316,8 @@ type AssociatedViaLocationResponseBody struct {
 // AssociatedViaManualResponseBody is used to define fields on response body
 // types.
 type AssociatedViaManualResponseBody struct {
-	Priority int32 `form:"priority" json:"priority" xml:"priority"`
+	OtherStationID int32 `form:"otherStationID" json:"otherStationID" xml:"otherStationID"`
+	Priority       int32 `form:"priority" json:"priority" xml:"priority"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.

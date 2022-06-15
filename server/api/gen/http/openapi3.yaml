@@ -13165,7 +13165,8 @@ paths:
                   location:
                     distance: 0.92781854
                   manual:
-                    priority: 1471390124
+                    otherStationID: 1471390124
+                    priority: 55010764
                   project:
                     id: 151703630
                   station:
@@ -14094,7 +14095,8 @@ paths:
                   location:
                     distance: 0.92781854
                   manual:
-                    priority: 1471390124
+                    otherStationID: 1471390124
+                    priority: 55010764
                   project:
                     id: 151703630
                   station:
@@ -15023,7 +15025,8 @@ paths:
                   location:
                     distance: 0.92781854
                   manual:
-                    priority: 1471390124
+                    otherStationID: 1471390124
+                    priority: 55010764
                   project:
                     id: 151703630
                   station:
@@ -15960,7 +15963,7 @@ paths:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
         "401":
           description: ""
           content:
@@ -15968,12 +15971,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: true
-                timeout: false
+                temporary: false
+                timeout: true
         "403":
           description: ""
           content:
@@ -15985,8 +15988,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
         "404":
           description: ""
           content:
@@ -15998,8 +16001,8 @@ paths:
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-                timeout: true
+                temporary: true
+                timeout: false
       security:
       - jwt_header_Authorization:
         - api:access
@@ -17800,9 +17803,9 @@ paths:
               properties:
                 token:
                   type: string
-                  example: Nisi consequuntur ea sed animi inventore maxime.
+                  example: Et est recusandae.
               example:
-                token: Asperiores et animi dolore et est.
+                token: Ut debitis.
             example:
               token: Non nemo saepe.
       responses:
@@ -22397,7 +22400,7 @@ components:
       properties:
         accept:
           type: boolean
-          example: true
+          example: false
       example:
         accept: true
       required:
@@ -22562,29 +22565,29 @@ components:
       properties:
         email:
           type: string
-          example: qz4
+          example: 31s
           format: email
           maxLength: 40
         invite_token:
           type: string
-          example: Et voluptas unde cum enim quae.
+          example: Veritatis rem repellat in.
         name:
           type: string
-          example: 5uh
+          example: 4mc
           pattern: \S
           maxLength: 256
         password:
           type: string
-          example: c43
+          example: kjt
           minLength: 10
         tncAccept:
           type: boolean
-          example: false
+          example: true
       example:
-        email: 9zn
-        invite_token: Esse beatae.
-        name: rsq
-        password: "997"
+        email: "997"
+        invite_token: Provident maiores.
+        name: 9zn
+        password: n4n
         tncAccept: false
       required:
       - name
@@ -22710,7 +22713,7 @@ components:
       properties:
         hidden:
           type: boolean
-          example: true
+          example: false
         location:
           $ref: '#/components/schemas/AssociatedViaLocation'
         manual:
@@ -22724,7 +22727,8 @@ components:
         location:
           distance: 0.8127633
         manual:
-          priority: 398059248
+          otherStationID: 398059248
+          priority: 526893759
         project:
           id: 362101268
         station:
@@ -24264,24 +24268,24 @@ components:
           example: true
         invited:
           type: boolean
-          example: true
+          example: false
         membership:
           type: string
-          example: Laboriosam beatae.
+          example: Aut et iusto.
         rejected:
           type: boolean
           example: true
         role:
           type: string
-          example: Consequatur qui veniam omnis consequuntur at.
+          example: At quia laboriosam.
         user:
           $ref: '#/components/schemas/User'
       example:
         accepted: true
         invited: false
-        membership: Doloribus ea alias aut fuga nostrum eveniet.
+        membership: Eveniet voluptatem expedita sunt ut.
         rejected: true
-        role: Sed eligendi pariatur.
+        role: Labore doloribus ea alias aut fuga.
         user:
           admin: false
           bio: Consequatur consequatur.
@@ -24573,24 +24577,24 @@ components:
       properties:
         completedAt:
           type: integer
-          example: 5136499251017536482
+          example: 8579908573142818756
           format: int64
         progress:
           type: number
-          example: 0.8322227
+          example: 0.61638945
           format: float
         startedAt:
           type: integer
-          example: 6767767981253704642
+          example: 3155417540688939752
           format: int64
         title:
           type: string
-          example: Officia est reprehenderit non voluptatibus.
+          example: Ad sunt numquam voluptates.
       example:
-        completedAt: 8327566245092116278
-        progress: 0.676487
-        startedAt: 1560762037189268236
-        title: Numquam voluptates rerum iste accusantium voluptatem.
+        completedAt: 723273381703019857
+        progress: 0.21734266
+        startedAt: 648024128213028381
+        title: Natus fuga ut aut itaque fugit corporis.
       required:
       - startedAt
       - progress
@@ -24604,7 +24608,8 @@ components:
         location:
           distance: 0.92781854
         manual:
-          priority: 1471390124
+          otherStationID: 1471390124
+          priority: 55010764
         project:
           id: 151703630
         station:
@@ -25533,7 +25538,8 @@ components:
         location:
           distance: 0.92781854
         manual:
-          priority: 1471390124
+          otherStationID: 1471390124
+          priority: 55010764
         project:
           id: 151703630
         station:
@@ -26462,936 +26468,8 @@ components:
         location:
           distance: 0.92781854
         manual:
-          priority: 1471390124
-        project:
-          id: 151703630
-        station:
-          attributes:
-            attributes:
-            - attribute_id: 8513020880351236940
-              name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
-              name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-          battery: 0.14262307
-          configurations:
-            all:
-            - id: 266882248004888436
-              metaRecordId: 6499369823915271116
-              modules:
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              provisionId: 398542638628489237
-              sourceId: 1417959581
-              time: 7507773581556103248
-            - id: 266882248004888436
-              metaRecordId: 6499369823915271116
-              modules:
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              provisionId: 398542638628489237
-              sourceId: 1417959581
-              time: 7507773581556103248
-            - id: 266882248004888436
-              metaRecordId: 6499369823915271116
-              modules:
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              provisionId: 398542638628489237
-              sourceId: 1417959581
-              time: 7507773581556103248
-            - id: 266882248004888436
-              metaRecordId: 6499369823915271116
-              modules:
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              - flags: 1784930076
-                fullKey: Tempora ullam.
-                hardwareId: Velit id quam nulla nihil qui aut.
-                id: 6917247266854229379
-                internal: true
-                meta:
-                  A quasi fugit possimus.: Aliquid eum odio animi ea.
-                metaRecordId: 2594112919068366228
-                name: Aperiam labore nemo corrupti et non suscipit.
-                position: 1255376967
-                sensors:
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-                - fullKey: Facilis earum ut non accusantium tenetur.
-                  key: Amet sint hic accusamus repudiandae temporibus.
-                  meta:
-                    Et omnis delectus sed.: Est et natus maiores perferendis id.
-                    Id corrupti consectetur tempora nihil.: Dolor aut non magni dignissimos.
-                    Saepe facere atque quam.: Recusandae autem exercitationem explicabo.
-                  name: Vel in.
-                  ranges:
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  - maximum: 0.3205197
-                    minimum: 0.93461114
-                  reading:
-                    last: 0.59077585
-                    time: 3754812235908571093
-                  unitOfMeasure: Et enim labore.
-              provisionId: 398542638628489237
-              sourceId: 1417959581
-              time: 7507773581556103248
-          data:
-            end: 346811034453362382
-            numberOfSamples: 7610860023129243077
-            start: 1572630737197674529
-          deviceId: Eos nihil commodi expedita nostrum officia.
-          firmwareNumber: 263087653
-          firmwareTime: 6084456305611401150
-          id: 202805179
-          ingestionAt: 3688754423013210562
-          interestingness:
-            windows:
-            - interestingness: 0.29297509217353773
-              seconds: 682132310
-              time: 6048857292912681597
-              value: 0.887311852540038
-            - interestingness: 0.29297509217353773
-              seconds: 682132310
-              time: 6048857292912681597
-              value: 0.887311852540038
-            - interestingness: 0.29297509217353773
-              seconds: 682132310
-              time: 6048857292912681597
-              value: 0.887311852540038
-          location:
-            precise:
-            - 0.5154093133128477
-            - 0.3921972508216477
-            - 0.20843411866609862
-            - 0.6423042299284808
-            regions:
-            - name: Et quo.
-              shape:
-              - - - 0.29452359053510063
-                  - 0.175309343811875
-                  - 0.5543930567156058
-                  - 0.7406539099122382
-                - - 0.06446603583482392
-                  - 0.9879424357633158
-                  - 0.5129071450766951
-              - - - 0.6060420954177108
-                  - 0.09749896577549745
-                  - 0.76876611446512
-                  - 0.8136220046777057
-                - - 0.09021219440561899
-                  - 0.8863863483607707
-                  - 0.40887434261843797
-                - - 0.19690531620681148
-                  - 0.7785323251515598
-                  - 0.007218094734778362
-                  - 0.6299142764886345
-                - - 0.2297545509074573
-                  - 0.7619331154816638
-                  - 0.5372944411277311
-            - name: Et quo.
-              shape:
-              - - - 0.29452359053510063
-                  - 0.175309343811875
-                  - 0.5543930567156058
-                  - 0.7406539099122382
-                - - 0.06446603583482392
-                  - 0.9879424357633158
-                  - 0.5129071450766951
-              - - - 0.6060420954177108
-                  - 0.09749896577549745
-                  - 0.76876611446512
-                  - 0.8136220046777057
-                - - 0.09021219440561899
-                  - 0.8863863483607707
-                  - 0.40887434261843797
-                - - 0.19690531620681148
-                  - 0.7785323251515598
-                  - 0.007218094734778362
-                  - 0.6299142764886345
-                - - 0.2297545509074573
-                  - 0.7619331154816638
-                  - 0.5372944411277311
-            url: Quia similique similique vel.
-          locationName: Natus recusandae accusantium voluptatem iure et est.
-          memoryAvailable: 1480841153
-          memoryUsed: 1044863711
-          model:
-            name: Sequi distinctio unde.
-            only_visible_via_association: true
-          name: Laborum laudantium.
-          owner:
-            id: 1494502958
-            name: Vel quia aut fuga ut.
-          photos:
-            small: Perferendis beatae pariatur sed et.
-          placeNameNative: Molestiae quia aut fugiat aspernatur dolor asperiores.
-          placeNameOther: Veritatis beatae molestiae dolor est.
-          readOnly: true
-          recordingStartedAt: 5059386992904759163
-          syncedAt: 1256516182942579004
-          updatedAt: 1048566332588791601
-          uploads:
-          - blocks:
-            - 6051206716108862392
-            - 7426291495652559897
-            id: 2639356127164582147
-            size: 4620046524694472666
-            time: 1495585167778480127
-            type: Atque fuga ea quasi suscipit.
-            uploadId: Consectetur non.
-            url: Unde sed.
-          - blocks:
-            - 6051206716108862392
-            - 7426291495652559897
-            id: 2639356127164582147
-            size: 4620046524694472666
-            time: 1495585167778480127
-            type: Atque fuga ea quasi suscipit.
-            uploadId: Consectetur non.
-            url: Unde sed.
-          - blocks:
-            - 6051206716108862392
-            - 7426291495652559897
-            id: 2639356127164582147
-            size: 4620046524694472666
-            time: 1495585167778480127
-            type: Atque fuga ea quasi suscipit.
-            uploadId: Consectetur non.
-            url: Unde sed.
-          - blocks:
-            - 6051206716108862392
-            - 7426291495652559897
-            id: 2639356127164582147
-            size: 4620046524694472666
-            time: 1495585167778480127
-            type: Atque fuga ea quasi suscipit.
-            uploadId: Consectetur non.
-            url: Unde sed.
-      - hidden: false
-        location:
-          distance: 0.92781854
-        manual:
-          priority: 1471390124
+          otherStationID: 1471390124
+          priority: 55010764
         project:
           id: 151703630
         station:
@@ -28327,7 +27405,8 @@ components:
           location:
             distance: 0.92781854
           manual:
-            priority: 1471390124
+            otherStationID: 1471390124
+            priority: 55010764
           project:
             id: 151703630
           station:
@@ -29256,7 +28335,8 @@ components:
           location:
             distance: 0.92781854
           manual:
-            priority: 1471390124
+            otherStationID: 1471390124
+            priority: 55010764
           project:
             id: 151703630
           station:
@@ -30185,7 +29265,8 @@ components:
           location:
             distance: 0.92781854
           manual:
-            priority: 1471390124
+            otherStationID: 1471390124
+            priority: 55010764
           project:
             id: 151703630
           station:
@@ -31126,13 +30207,19 @@ components:
     AssociatedViaManual:
       type: object
       properties:
-        priority:
+        otherStationID:
           type: integer
           example: 474642055
           format: int32
+        priority:
+          type: integer
+          example: 1183711772
+          format: int32
       example:
-        priority: 1183711772
+        otherStationID: 762153785
+        priority: 1818665376
       required:
+      - otherStationID
       - priority
     AssociatedViaProject:
       type: object
@@ -31211,12 +30298,12 @@ components:
             name: Accusamus voluptatem.
           - id: 1775519172
             name: Accusamus voluptatem.
+          - id: 1775519172
+            name: Accusamus voluptatem.
+          - id: 1775519172
+            name: Accusamus voluptatem.
       example:
         roles:
-        - id: 1775519172
-          name: Accusamus voluptatem.
-        - id: 1775519172
-          name: Accusamus voluptatem.
         - id: 1775519172
           name: Accusamus voluptatem.
         - id: 1775519172
@@ -32622,57 +31709,57 @@ components:
       properties:
         createdAt:
           type: integer
-          example: 4553837899547331736
+          example: 8643262665527369361
           format: int64
         deviceId:
           type: string
-          example: Officiis distinctio.
+          example: Eligendi dignissimos totam ipsam.
         firmwareNumber:
           type: integer
-          example: 1391310668
+          example: 1654221493
           format: int32
         firmwareTime:
           type: integer
-          example: 3351116144877345591
+          example: 5342520595597186113
           format: int64
         id:
           type: integer
-          example: 4124644989129096974
+          example: 4111846572026742930
           format: int64
         lastIngestionAt:
           type: integer
-          example: 6599570071787492628
+          example: 7867228285049282839
           format: int64
         location:
           $ref: '#/components/schemas/AppStationLocation'
         memoryAvailable:
           type: integer
-          example: 2012416409
+          example: 1557575696
           format: int32
         memoryUsed:
           type: integer
-          example: 13434223
+          example: 1536582147
           format: int32
         name:
           type: string
-          example: Dignissimos totam ipsam.
+          example: Sunt suscipit nihil.
         owner:
           $ref: '#/components/schemas/StationOwner'
         recordingStartedAt:
           type: integer
-          example: 8923085279191929145
+          example: 3351116144877345591
           format: int64
         updatedAt:
           type: integer
-          example: 3818315168562670933
+          example: 5975633821460786858
           format: int64
       example:
-        createdAt: 4751025436669769896
-        deviceId: Voluptate quo unde.
-        firmwareNumber: 71763486
-        firmwareTime: 6791703515872575315
-        id: 6689736679406604793
-        lastIngestionAt: 366771651583464927
+        createdAt: 366771651583464927
+        deviceId: Officiis placeat exercitationem laborum laboriosam.
+        firmwareNumber: 1793541303
+        firmwareTime: 6764947137737958601
+        id: 7831613389437695941
+        lastIngestionAt: 3584497807769317157
         location:
           precise:
           - 0.5154093133128477
@@ -32727,14 +31814,14 @@ components:
                 - 0.7619331154816638
                 - 0.5372944411277311
           url: Quia similique similique vel.
-        memoryAvailable: 197273346
-        memoryUsed: 1978310628
-        name: Officiis placeat exercitationem laborum laboriosam.
+        memoryAvailable: 1914353577
+        memoryUsed: 968637915
+        name: Commodi cumque id iusto est atque.
         owner:
           id: 1575270198
           name: Ipsam eos sed nesciunt libero totam facilis.
-        recordingStartedAt: 3948315126124865371
-        updatedAt: 3434717193532845316
+        recordingStartedAt: 3593700547929526958
+        updatedAt: 2641335078752346062
       required:
       - id
       - deviceId
@@ -33206,16 +32293,16 @@ components:
       properties:
         email:
           type: string
-          example: d5l
+          example: 15w
           format: email
           maxLength: 40
         password:
           type: string
-          example: w9t
+          example: i8q
           minLength: 10
       example:
-        email: 5wi
-        password: 8qk
+        email: fqx
+        password: e7g
       required:
       - email
       - password
@@ -33507,77 +32594,9 @@ components:
               name: Ipsam eos sed nesciunt libero totam facilis.
             recordingStartedAt: 4497360918901239942
             updatedAt: 9125477786339482815
-          - createdAt: 8547398357538921216
-            deviceId: Aut sit voluptatem nesciunt eum voluptas nihil.
-            firmwareNumber: 903725847
-            firmwareTime: 1629602076602425163
-            id: 4190948541565015649
-            lastIngestionAt: 490537146336604420
-            location:
-              precise:
-              - 0.5154093133128477
-              - 0.3921972508216477
-              - 0.20843411866609862
-              - 0.6423042299284808
-              regions:
-              - name: Et quo.
-                shape:
-                - - - 0.29452359053510063
-                    - 0.175309343811875
-                    - 0.5543930567156058
-                    - 0.7406539099122382
-                  - - 0.06446603583482392
-                    - 0.9879424357633158
-                    - 0.5129071450766951
-                - - - 0.6060420954177108
-                    - 0.09749896577549745
-                    - 0.76876611446512
-                    - 0.8136220046777057
-                  - - 0.09021219440561899
-                    - 0.8863863483607707
-                    - 0.40887434261843797
-                  - - 0.19690531620681148
-                    - 0.7785323251515598
-                    - 0.007218094734778362
-                    - 0.6299142764886345
-                  - - 0.2297545509074573
-                    - 0.7619331154816638
-                    - 0.5372944411277311
-              - name: Et quo.
-                shape:
-                - - - 0.29452359053510063
-                    - 0.175309343811875
-                    - 0.5543930567156058
-                    - 0.7406539099122382
-                  - - 0.06446603583482392
-                    - 0.9879424357633158
-                    - 0.5129071450766951
-                - - - 0.6060420954177108
-                    - 0.09749896577549745
-                    - 0.76876611446512
-                    - 0.8136220046777057
-                  - - 0.09021219440561899
-                    - 0.8863863483607707
-                    - 0.40887434261843797
-                  - - 0.19690531620681148
-                    - 0.7785323251515598
-                    - 0.007218094734778362
-                    - 0.6299142764886345
-                  - - 0.2297545509074573
-                    - 0.7619331154816638
-                    - 0.5372944411277311
-              url: Quia similique similique vel.
-            memoryAvailable: 332002515
-            memoryUsed: 559227193
-            name: Dolorum ea doloremque sequi quas ipsum mollitia.
-            owner:
-              id: 1575270198
-              name: Ipsam eos sed nesciunt libero totam facilis.
-            recordingStartedAt: 4497360918901239942
-            updatedAt: 9125477786339482815
         total:
           type: integer
-          example: 836723611
+          example: 395327820
           format: int32
       example:
         stations:
@@ -33853,7 +32872,7 @@ components:
             name: Ipsam eos sed nesciunt libero totam facilis.
           recordingStartedAt: 4497360918901239942
           updatedAt: 9125477786339482815
-        total: 1914353577
+        total: 1575743775
       required:
       - stations
       - total
@@ -34330,36 +33349,6 @@ components:
             url: Ea consequuntur nostrum tempora placeat.
           tncDate: 1054200903090287468
           updatedAt: 6980622088162143759
-      - accepted: false
-        invited: true
-        membership: Consequatur nisi eum.
-        rejected: false
-        role: Cupiditate laudantium eligendi cupiditate neque rerum.
-        user:
-          admin: false
-          bio: Consequatur consequatur.
-          email: 22j
-          id: 610952050
-          name: mys
-          photo:
-            url: Ea consequuntur nostrum tempora placeat.
-          tncDate: 1054200903090287468
-          updatedAt: 6980622088162143759
-      - accepted: false
-        invited: true
-        membership: Consequatur nisi eum.
-        rejected: false
-        role: Cupiditate laudantium eligendi cupiditate neque rerum.
-        user:
-          admin: false
-          bio: Consequatur consequatur.
-          email: 22j
-          id: 610952050
-          name: mys
-          photo:
-            url: Ea consequuntur nostrum tempora placeat.
-          tncDate: 1054200903090287468
-          updatedAt: 6980622088162143759
     ProjectUsers:
       type: object
       properties:
@@ -34493,14 +33482,14 @@ components:
       properties:
         password:
           type: string
-          example: 7ge
+          example: fzk
           minLength: 10
         token:
           type: string
-          example: Et et nobis.
+          example: Cumque minima neque error eius distinctio similique.
       example:
-        password: "685"
-        token: Minima neque.
+        password: 7em
+        token: Animi inventore maxime.
       required:
       - token
       - password
@@ -34509,9 +33498,9 @@ components:
       properties:
         refreshToken:
           type: string
-          example: Non ut debitis.
+          example: Veniam minima eum.
       example:
-        refreshToken: Veniam minima eum.
+        refreshToken: Amet consequuntur illum sed itaque.
       required:
       - refreshToken
     RemoveUserFields:
@@ -39554,16 +38543,8 @@ components:
             progress: 0.826822
             startedAt: 3913864092776786931
             title: Omnis sit et alias eveniet.
-          - completedAt: 8500333556018717797
-            progress: 0.826822
-            startedAt: 3913864092776786931
-            title: Omnis sit et alias eveniet.
       example:
         jobs:
-        - completedAt: 8500333556018717797
-          progress: 0.826822
-          startedAt: 3913864092776786931
-          title: Omnis sit et alias eveniet.
         - completedAt: 8500333556018717797
           progress: 0.826822
           startedAt: 3913864092776786931
@@ -43536,12 +42517,12 @@ components:
       properties:
         token:
           type: string
-          example: Et non est quis quam.
+          example: Quam quis aut eum.
         url:
           type: string
-          example: Aut eum perferendis vitae quisquam aliquid vitae.
+          example: Vitae quisquam.
       example:
-        token: Ut sed harum.
+        token: Vitae consequuntur ut sed harum.
         url: Ut harum harum tempore temporibus.
       required:
       - token
@@ -43653,21 +42634,21 @@ components:
       properties:
         bio:
           type: string
-          example: Quis qui odio.
+          example: Sint qui soluta itaque id facilis.
         email:
           type: string
-          example: ou6
+          example: qc5
           format: email
           maxLength: 40
         name:
           type: string
-          example: asd
+          example: 4ou
           pattern: \S
           maxLength: 256
       example:
-        bio: Praesentium vel quia qui dolores omnis.
-        email: 74x
-        name: 3ek
+        bio: Inventore dolores aut id nisi.
+        email: 7sf
+        name: xho
       required:
       - name
       - email
@@ -43678,15 +42659,15 @@ components:
       properties:
         newPassword:
           type: string
-          example: 9wc
+          example: cqt
           minLength: 10
         oldPassword:
           type: string
-          example: 21u
+          example: wcn
           minLength: 10
       example:
-        newPassword: op2
-        oldPassword: qcq
+        newPassword: s90
+        oldPassword: p2k
       required:
       - oldPassword
       - newPassword
@@ -43695,44 +42676,44 @@ components:
       properties:
         admin:
           type: boolean
-          example: true
+          example: false
         bio:
           type: string
-          example: Cupiditate consequatur ut.
+          example: Quam amet.
         email:
           type: string
-          example: omw
+          example: c6u
           format: email
           maxLength: 40
         id:
           type: integer
-          example: 482770176
+          example: 1204389903
           format: int32
         name:
           type: string
-          example: 1vr
+          example: omw
           pattern: \S
           maxLength: 256
         photo:
           $ref: '#/components/schemas/UserPhoto'
         tncDate:
           type: integer
-          example: 733610588979608611
+          example: 4430343135737037907
           format: int64
         updatedAt:
           type: integer
-          example: 5151432612555504963
+          example: 2418035286578100616
           format: int64
       example:
-        admin: false
-        bio: Quis eum est animi itaque molestiae.
-        email: jio
-        id: 939256286
-        name: tlz
+        admin: true
+        bio: Sunt libero.
+        email: api
+        id: 1982749054
+        name: 5ug
         photo:
           url: Voluptatibus voluptas voluptatibus voluptatem beatae placeat deleniti.
-        tncDate: 6231976620338291690
-        updatedAt: 7875432414763851854
+        tncDate: 3006159690001514752
+        updatedAt: 4727651041250586550
       required:
       - id
       - name
@@ -43848,9 +42829,9 @@ components:
       properties:
         url:
           type: string
-          example: Quam amet.
+          example: Voluptatem minus ut blanditiis voluptatibus quia eaque.
       example:
-        url: Voluptatem minus ut blanditiis voluptatibus quia eaque.
+        url: Dolores doloribus animi itaque eum molestias.
   securitySchemes:
     jwt_header_Authorization:
       type: http

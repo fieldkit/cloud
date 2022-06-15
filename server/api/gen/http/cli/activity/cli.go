@@ -3181,7 +3181,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 190201461 --size 2112133785 --if-none-match "Autem corrupti fugit quibusdam reprehenderit sit qui." --auth "Occaecati qui eos et sunt et."
+    `+os.Args[0]+` station download- photo --station-id 2112133785 --size 1322831243 --if-none-match "Corrupti fugit quibusdam reprehenderit sit qui recusandae." --auth "Qui eos et sunt et."
 `, os.Args[0])
 }
 

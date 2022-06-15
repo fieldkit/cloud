@@ -2333,7 +2333,8 @@ func unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualVi
 		return nil
 	}
 	res := &stationviews.AssociatedViaManualView{
-		Priority: v.Priority,
+		OtherStationID: v.OtherStationID,
+		Priority:       v.Priority,
 	}
 
 	return res

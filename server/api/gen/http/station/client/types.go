@@ -1316,7 +1316,8 @@ type AssociatedViaLocationResponseBody struct {
 // AssociatedViaManualResponseBody is used to define fields on response body
 // types.
 type AssociatedViaManualResponseBody struct {
-	Priority *int32 `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
+	OtherStationID *int32 `form:"otherStationID,omitempty" json:"otherStationID,omitempty" xml:"otherStationID,omitempty"`
+	Priority       *int32 `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -4102,6 +4103,9 @@ func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationRespon
 // ValidateAssociatedViaManualResponseBody runs the validations defined on
 // AssociatedViaManualResponseBody
 func ValidateAssociatedViaManualResponseBody(body *AssociatedViaManualResponseBody) (err error) {
+	if body.OtherStationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("otherStationID", "body"))
+	}
 	if body.Priority == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}

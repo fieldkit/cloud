@@ -5643,7 +5643,8 @@ definitions:
       location:
         distance: 0.8127633
       manual:
-        priority: 398059248
+        otherStationID: 398059248
+        priority: 526893759
       project:
         id: 362101268
       station:
@@ -6108,11 +6109,12 @@ definitions:
       $ref: '#/definitions/AssociatedStationResponseBody'
     description: AssociatedStationCollectionResponseBody is the result type for an array of AssociatedStationResponseBody (default view)
     example:
-    - hidden: false
+    - hidden: true
       location:
         distance: 0.8127633
       manual:
-        priority: 398059248
+        otherStationID: 398059248
+        priority: 526893759
       project:
         id: 362101268
       station:
@@ -6567,929 +6569,12 @@ definitions:
           type: Eos laudantium consequuntur eos voluptatibus rerum minima.
           uploadId: Quasi sint.
           url: Molestias dolores atque sint recusandae quo.
-    - hidden: false
+    - hidden: true
       location:
         distance: 0.8127633
       manual:
-        priority: 398059248
-      project:
-        id: 362101268
-      station:
-        attributes:
-          attributes:
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-        battery: 0.7673294
-        configurations:
-          all:
-          - id: 1199571918719106006
-            metaRecordId: 6783442371292563743
-            modules:
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            provisionId: 2064445161482763081
-            sourceId: 1476951614
-            time: 2785462766740754587
-          - id: 1199571918719106006
-            metaRecordId: 6783442371292563743
-            modules:
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            provisionId: 2064445161482763081
-            sourceId: 1476951614
-            time: 2785462766740754587
-        data:
-          end: 4315864360876627575
-          numberOfSamples: 2660373874497683885
-          start: 4905126164574709612
-        deviceId: Eius vero omnis nesciunt delectus unde sunt.
-        firmwareNumber: 704022910
-        firmwareTime: 7351372657780035177
-        id: 76831435
-        ingestionAt: 1716952139686201520
-        interestingness:
-          windows:
-          - interestingness: 0.5378975281963301
-            seconds: 1151584531
-            time: 7094590989413600731
-            value: 0.5302415417204458
-          - interestingness: 0.5378975281963301
-            seconds: 1151584531
-            time: 7094590989413600731
-            value: 0.5302415417204458
-        location:
-          precise:
-          - 0.19140492971467962
-          - 0.09821684482131016
-          regions:
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          url: Magni ut aperiam corporis ut.
-        locationName: Vel consequatur.
-        memoryAvailable: 384974814
-        memoryUsed: 451806285
-        model:
-          name: Harum dolore.
-          only_visible_via_association: true
-        name: Quod provident.
-        owner:
-          id: 1575270198
-          name: Ipsam eos sed nesciunt libero totam facilis.
-        photos:
-          small: Ipsum necessitatibus voluptatem quis.
-        placeNameNative: Est enim ut quo.
-        placeNameOther: Occaecati quae tenetur.
-        readOnly: true
-        recordingStartedAt: 1744909282979253986
-        syncedAt: 6702451495430807622
-        updatedAt: 8536631691780208569
-        uploads:
-        - blocks:
-          - 1898103155583066456
-          - 1103560948581785679
-          id: 8903882248930871778
-          size: 3375305193808902502
-          time: 4527113397684244729
-          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
-          uploadId: Quasi sint.
-          url: Molestias dolores atque sint recusandae quo.
-        - blocks:
-          - 1898103155583066456
-          - 1103560948581785679
-          id: 8903882248930871778
-          size: 3375305193808902502
-          time: 4527113397684244729
-          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
-          uploadId: Quasi sint.
-          url: Molestias dolores atque sint recusandae quo.
-    - hidden: false
-      location:
-        distance: 0.8127633
-      manual:
-        priority: 398059248
-      project:
-        id: 362101268
-      station:
-        attributes:
-          attributes:
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
-            name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-        battery: 0.7673294
-        configurations:
-          all:
-          - id: 1199571918719106006
-            metaRecordId: 6783442371292563743
-            modules:
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            provisionId: 2064445161482763081
-            sourceId: 1476951614
-            time: 2785462766740754587
-          - id: 1199571918719106006
-            metaRecordId: 6783442371292563743
-            modules:
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            - flags: 1977393835
-              fullKey: Voluptas et error eos molestiae.
-              hardwareId: Quo beatae dignissimos incidunt quibusdam corrupti minus.
-              id: 1156881719861355378
-              internal: false
-              meta:
-                Aperiam non corrupti.: Saepe enim.
-                Nostrum officiis aut ex.: Deleniti suscipit nesciunt veniam quos rerum est.
-              metaRecordId: 3888506491729612177
-              name: Excepturi nam non doloribus amet.
-              position: 2075290436
-              sensors:
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-              - fullKey: Praesentium minima molestias sequi id ratione cum.
-                key: Harum animi vel ut repellat consequuntur reiciendis.
-                meta:
-                  Doloribus praesentium possimus ut vel.: Asperiores corrupti accusamus similique architecto quia beatae.
-                name: Voluptatem officia et nulla magni quia ut.
-                ranges:
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                - maximum: 0.69275653
-                  minimum: 0.6246691
-                reading:
-                  last: 0.9369838
-                  time: 6953281521083243039
-                unitOfMeasure: Tenetur aut.
-            provisionId: 2064445161482763081
-            sourceId: 1476951614
-            time: 2785462766740754587
-        data:
-          end: 4315864360876627575
-          numberOfSamples: 2660373874497683885
-          start: 4905126164574709612
-        deviceId: Eius vero omnis nesciunt delectus unde sunt.
-        firmwareNumber: 704022910
-        firmwareTime: 7351372657780035177
-        id: 76831435
-        ingestionAt: 1716952139686201520
-        interestingness:
-          windows:
-          - interestingness: 0.5378975281963301
-            seconds: 1151584531
-            time: 7094590989413600731
-            value: 0.5302415417204458
-          - interestingness: 0.5378975281963301
-            seconds: 1151584531
-            time: 7094590989413600731
-            value: 0.5302415417204458
-        location:
-          precise:
-          - 0.19140492971467962
-          - 0.09821684482131016
-          regions:
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          - name: Eos quis.
-            shape:
-            - - - 0.7397062856045757
-                - 0.5839448648894914
-              - - 0.7644291400051861
-                - 0.20364963248657247
-            - - - 0.9098484963768594
-                - 0.7989659404458161
-              - - 0.024290470972727254
-                - 0.20674085129404673
-                - 0.3454835619814658
-                - 0.2782327432827066
-              - - 0.4000020059726889
-                - 0.8958040593022891
-                - 0.3352281537348182
-                - 0.10498478266928823
-              - - 0.028462277177202663
-                - 0.7050721196094334
-            - - - 0.4120237007452419
-                - 0.49844129850630875
-                - 0.06551659251595354
-                - 0.6754383101180541
-              - - 0.09431242584837447
-                - 0.808660288803971
-                - 0.023536220682771773
-              - - 0.8120452602884417
-                - 0.8462616546855267
-              - - 0.6971637614200277
-                - 0.92373584315049
-            - - - 0.782107318068964
-                - 0.42381773345486373
-                - 0.6496366338633103
-              - - 0.6814676811887991
-                - 0.27159701117092644
-              - - 0.3892529041630197
-                - 0.39889683911193946
-                - 0.6239790777429448
-              - - 0.9292571327946825
-                - 0.8971884856034876
-                - 0.010618819894491519
-          url: Magni ut aperiam corporis ut.
-        locationName: Vel consequatur.
-        memoryAvailable: 384974814
-        memoryUsed: 451806285
-        model:
-          name: Harum dolore.
-          only_visible_via_association: true
-        name: Quod provident.
-        owner:
-          id: 1575270198
-          name: Ipsam eos sed nesciunt libero totam facilis.
-        photos:
-          small: Ipsum necessitatibus voluptatem quis.
-        placeNameNative: Est enim ut quo.
-        placeNameOther: Occaecati quae tenetur.
-        readOnly: true
-        recordingStartedAt: 1744909282979253986
-        syncedAt: 6702451495430807622
-        updatedAt: 8536631691780208569
-        uploads:
-        - blocks:
-          - 1898103155583066456
-          - 1103560948581785679
-          id: 8903882248930871778
-          size: 3375305193808902502
-          time: 4527113397684244729
-          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
-          uploadId: Quasi sint.
-          url: Molestias dolores atque sint recusandae quo.
-        - blocks:
-          - 1898103155583066456
-          - 1103560948581785679
-          id: 8903882248930871778
-          size: 3375305193808902502
-          time: 4527113397684244729
-          type: Eos laudantium consequuntur eos voluptatibus rerum minima.
-          uploadId: Quasi sint.
-          url: Molestias dolores atque sint recusandae quo.
-    - hidden: false
-      location:
-        distance: 0.8127633
-      manual:
-        priority: 398059248
+        otherStationID: 398059248
+        priority: 526893759
       project:
         id: 362101268
       station:
@@ -7960,13 +7045,19 @@ definitions:
     title: AssociatedViaManualResponseBody
     type: object
     properties:
-      priority:
+      otherStationID:
         type: integer
         example: 725668610
         format: int32
+      priority:
+        type: integer
+        example: 1065161924
+        format: int32
     example:
-      priority: 1065161924
+      otherStationID: 1420274773
+      priority: 1216710932
     required:
+    - otherStationID
     - priority
   AssociatedViaProjectResponseBody:
     title: AssociatedViaProjectResponseBody
@@ -26697,20 +25788,7 @@ definitions:
       body:
         type: string
         example:
-        - 78
-        - 101
-        - 109
-        - 111
-        - 32
-        - 102
-        - 97
-        - 99
-        - 105
-        - 108
-        - 105
-        - 115
-        - 32
-        - 99
+        - 67
         - 111
         - 110
         - 115
@@ -26726,17 +25804,39 @@ definitions:
         - 105
         - 110
         - 116
+        - 32
+        - 110
+        - 101
+        - 113
+        - 117
+        - 101
+        - 32
+        - 97
+        - 117
+        - 116
+        - 32
+        - 97
+        - 100
+        - 32
+        - 105
+        - 110
+        - 99
+        - 105
+        - 100
+        - 117
+        - 110
+        - 116
         - 46
         format: byte
       contentType:
         type: string
-        example: Aut ad incidunt fugiat maiores illo.
+        example: Maiores illo.
       etag:
         type: string
         example: Voluptatem in amet blanditiis iusto.
       length:
         type: integer
-        example: 8291979338884193887
+        example: 1654863461982402016
         format: int64
     description: Download PhotoResponseBody result type (default view)
     example:
@@ -30570,7 +29670,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -30597,8 +29697,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
     - name
     - id
@@ -30613,7 +29713,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -30633,10 +29733,10 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: list associated_forbidden_response_body result type (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -30701,11 +29801,12 @@ definitions:
     description: List AssociatedResponseBody result type (default view)
     example:
       stations:
-      - hidden: false
+      - hidden: true
         location:
           distance: 0.8127633
         manual:
-          priority: 398059248
+          otherStationID: 398059248
+          priority: 526893759
         project:
           id: 362101268
         station:
@@ -31160,11 +30261,12 @@ definitions:
             type: Eos laudantium consequuntur eos voluptatibus rerum minima.
             uploadId: Quasi sint.
             url: Molestias dolores atque sint recusandae quo.
-      - hidden: false
+      - hidden: true
         location:
           distance: 0.8127633
         manual:
-          priority: 398059248
+          otherStationID: 398059248
+          priority: 526893759
         project:
           id: 362101268
         station:
@@ -31628,7 +30730,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -31644,7 +30746,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -31656,7 +30758,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
     - name
     - id

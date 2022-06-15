@@ -469,7 +469,8 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 			for id, priority := range associatedWithFirst {
 				if associated, ok := byID[id]; ok {
 					associated.Manual = &station.AssociatedViaManual{
-						Priority: priority,
+						OtherStationID: payload.ID,
+						Priority:       priority,
 					}
 					visible[id] = true
 				} else {

@@ -2008,7 +2008,8 @@ func marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody
 		return nil
 	}
 	res := &AssociatedViaManualResponseBody{
-		Priority: *v.Priority,
+		OtherStationID: *v.OtherStationID,
+		Priority:       *v.Priority,
 	}
 
 	return res

@@ -348,7 +348,8 @@ type AssociatedViaLocation struct {
 }
 
 type AssociatedViaManual struct {
-	Priority int32
+	OtherStationID int32
+	Priority       int32
 }
 
 type EssentialStation struct {
@@ -1504,7 +1505,8 @@ func transformStationviewsAssociatedViaManualViewToAssociatedViaManual(v *statio
 		return nil
 	}
 	res := &AssociatedViaManual{
-		Priority: *v.Priority,
+		OtherStationID: *v.OtherStationID,
+		Priority:       *v.Priority,
 	}
 
 	return res
@@ -1546,7 +1548,8 @@ func transformAssociatedViaManualToStationviewsAssociatedViaManualView(v *Associ
 		return nil
 	}
 	res := &stationviews.AssociatedViaManualView{
-		Priority: &v.Priority,
+		OtherStationID: &v.OtherStationID,
+		Priority:       &v.Priority,
 	}
 
 	return res

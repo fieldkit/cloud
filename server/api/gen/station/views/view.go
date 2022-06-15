@@ -260,7 +260,8 @@ type AssociatedViaLocationView struct {
 
 // AssociatedViaManualView is a type that runs validations on a projected type.
 type AssociatedViaManualView struct {
-	Priority *int32
+	OtherStationID *int32
+	Priority       *int32
 }
 
 // DownloadedPhotoView is a type that runs validations on a projected type.
@@ -1001,6 +1002,9 @@ func ValidateAssociatedViaLocationView(result *AssociatedViaLocationView) (err e
 // ValidateAssociatedViaManualView runs the validations defined on
 // AssociatedViaManualView.
 func ValidateAssociatedViaManualView(result *AssociatedViaManualView) (err error) {
+	if result.OtherStationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("otherStationID", "result"))
+	}
 	if result.Priority == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
 	}
