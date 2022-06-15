@@ -195,7 +195,7 @@
         "readyToDeploy": "Ready to deploy",
         "lastSynced": "Last Synced",
         "firmwareVersion": "Firmware version:",
-        "modules": "Modules:",
+        "modules": "Modules",
         "nativeLand": "Native Land:",
         "latitude": "Latitude",
         "longitude": "Longitude",

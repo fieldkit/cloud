@@ -46,12 +46,6 @@ export default Vue.extend({
     margin-right: 15px;
 }
 
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
-    font-family: var(--font-family-light);
-}
-
 .station-battery-container {
     display: flex;
 }
