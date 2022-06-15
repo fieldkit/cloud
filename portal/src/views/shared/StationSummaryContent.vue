@@ -11,9 +11,11 @@
 
             <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
                 <div class="location-container">
-                    <div v-if="station.locationName ? station.locationName : station.placeNameOther">
+                    <div v-if="station.locationName || station.placeNameOther">
                         <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                        <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
+                        <template>
+                            {{ station.locationName ? partnerCustomization().stationLocationName(station) : station.placeNameOther }}
+                        </template>
                     </div>
                     <div v-if="station.placeNameNative">
                         <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
@@ -41,6 +43,7 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import * as utils from "@/utilities";
 import { DisplayStation } from "@/store";
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationSummaryContent",
@@ -62,6 +65,9 @@ export default Vue.extend({
         },
         getModuleIcon(module) {
             return this.$loadAsset(utils.getModuleImg(module));
+        },
+        partnerCustomization() {
+            return getPartnerCustomizationWithDefault();
         },
     },
 });
