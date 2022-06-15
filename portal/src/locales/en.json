@@ -200,7 +200,9 @@
         "latitude": "Latitude",
         "longitude": "Longitude",
         "managePhotos": "Manage photos",
-        "navigateToStation": "Navigate to Station"
+        "navigateToStation": "Navigate to Station",
+        "lastSeen": "Last Seen",
+        "batteryLevel": "Battery Level"
     },
     "user": {
         "profile": {

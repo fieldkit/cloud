@@ -35,8 +35,22 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
+
                 <div class="station-summary" v-if="selectedStation">
-                    <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
+                    <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content">
+                        <template #extra-detail>
+                            <StationBattery :station="selectedStation" />
+                        </template>
+                        <template #top-right-actions>
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                src="@/assets/tooltip-blue.svg"
+                                @click="openStationPageTab"
+                            />
+                        </template>
+                    </StationSummaryContent>
+
                     <div class="pagination" v-if="workspace && !workspace.empty">
                         <PaginationControls
                             :page="selectedIndex"
@@ -69,14 +83,15 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { Station, ActionTypes } from "@/store";
+import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-
+import * as utils from "@/utilities";
 import Comments from "../comments/Comments.vue";
+import StationBattery from "@/views/station/StationBattery.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
@@ -89,6 +104,7 @@ export default Vue.extend({
         Comments,
         StationSummaryContent,
         PaginationControls,
+        StationBattery,
     },
     props: {
         token: {
@@ -149,7 +165,7 @@ export default Vue.extend({
         selectedId(): number {
             return Number(_.flattenDeep(this.bookmark.g)[0]);
         },
-        selectedStation(): Station | null {
+        selectedStation(): DisplayStation | null {
             if (this.workspace) {
                 return this.workspace.getStation(this.selectedId);
             }
@@ -354,6 +370,13 @@ export default Vue.extend({
             const stations = this.getValidStations();
             this.showStation(stations[evt]);
             this.selectedIndex = evt;
+        },
+        openStationPageTab() {
+            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.selectedStation.id } });
+            window.open(routeData.href, "_blank");
+        },
+        getBatteryIcon() {
+            return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
         },
     },
 });
@@ -766,15 +789,30 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
 
-    .summary-content {
-        align-items: center;
-    }
     @include bp-down($sm) {
         flex-direction: column;
 
         .pagination {
             margin-top: 0.5em;
         }
+    }
+
+    .summary-content {
+        .image-container {
+            flex-basis: 86px;
+        }
+    }
+
+    .station-details {
+        padding: 0;
+    }
+
+    .station-modules {
+        margin-top: 3px;
+    }
+
+    .station-battery-container {
+        margin-top: 8px;
     }
 }
 .pagination {

@@ -4,47 +4,43 @@
             <StationPhoto :station="station" />
         </div>
         <div class="station-details">
-            <div class="station-name">{{ station.name }}</div>
+            <div class="station-name">
+                {{ station.name }}
+                <slot name="top-right-actions"></slot>
+            </div>
 
             <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
-                <div class="location-container" v-if="station.locationName ? station.locationName : station.placeNameOther">
-                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                    <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
-                </div>
-                <div class="location-container" v-if="station.placeNameNative">
-                    <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                    <span>
-                        Native Lands:
-                        <span class="bold">{{ station.placeNameNative }}</span>
-                    </span>
+                <div class="location-container">
+                    <div v-if="station.locationName ? station.locationName : station.placeNameOther">
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <template>{{ station.locationName ? station.locationName : station.placeNameOther }}</template>
+                    </div>
+                    <div v-if="station.placeNameNative">
+                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <span>
+                            Native Lands:
+                            <span class="bold">{{ station.placeNameNative }}</span>
+                        </span>
+                    </div>
                 </div>
 
-                <div class="flex">
+                <div class="station-modules">
                     <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
                         <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                     </div>
                 </div>
-
-                <div v-if="station.location" class="coordinates-row">
-                    <div class="coordinate latitude">
-                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
-                        <div>Latitude</div>
-                    </div>
-                    <div class="coordinate longitude">
-                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
-                        <div>Longitude</div>
-                    </div>
-                </div>
             </div>
+
+            <slot name="extra-detail"></slot>
         </div>
-        <slot></slot>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import * as utils from "@/utilities";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationSummaryContent",
@@ -56,7 +52,7 @@ export default Vue.extend({
     },
     props: {
         station: {
-            type: Object,
+            type: Object as PropType<DisplayStation>,
             default: null,
         },
     },
@@ -68,12 +64,6 @@ export default Vue.extend({
             return this.$loadAsset(utils.getModuleImg(module));
         },
     },
-    filters: {
-        integer: (value) => {
-            if (!value) return "";
-            return Math.round(value);
-        },
-    },
 });
 </script>
 
@@ -81,35 +71,25 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .image-container {
-    width: 93px;
+    flex: 0 0 93px;
     text-align: center;
-    padding-right: 11px;
+    margin-right: 11px;
 }
 
 .image-container img {
     width: 100%;
+    border-radius: 3px;
 }
 
 .station-name {
     font-size: 18px;
     font-family: var(--font-family-bold);
-    margin-bottom: 5px;
+    margin-bottom: 3px;
+    padding-right: 45px;
 }
 
 .station-synced {
     font-size: 14px;
-}
-
-.station-battery {
-    margin: 5px 0 0;
-    display: flex;
-    line-height: 13px;
-}
-
-.battery {
-    width: 20px;
-    height: 11px;
-    padding-right: 5px;
 }
 
 .module-icon-container {
@@ -131,20 +111,36 @@ export default Vue.extend({
 
 .station-details {
     text-align: left;
-    padding-right: 15px;
+}
+
+.location-container {
+    flex-direction: column;
+    display: flex;
+    margin-top: 2px;
+
+    .summary-content & {
+        flex-direction: row;
+    }
+
+    > div {
+        @include flex(center);
+        margin-bottom: 5px;
+
+        &:first-of-type {
+            .summary-content & {
+                margin-right: 10px;
+            }
+        }
+    }
 }
 
 .icon {
-    padding-right: 6px;
+    padding-right: 5px;
 }
 
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
-}
-
-.station-seen {
-    font-size: 12px;
+.station-modules {
+    @include flex();
+    margin-left: -2px;
 }
 
 .coordinates-row {
@@ -159,11 +155,7 @@ export default Vue.extend({
     flex-direction: column;
     text-align: left;
     font-size: 14px;
-    color: #2c3e50;
-}
-
-.where-row > div {
     padding-bottom: 5px;
-    @include flex(flex-start);
+    color: var(--color-dark);
 }
 </style>
