@@ -28,6 +28,7 @@ export * from "./common";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
+import { DisplayStation } from "@/store";
 
 type SensorReadAtType = string;
 
@@ -656,11 +657,11 @@ export class Workspace implements VizInfoFactory {
     private readonly stations: { [index: number]: StationMeta } = {};
     public version = 0;
 
-    public getStation(id: number): Station | null {
+    public getStation(id: number): DisplayStation | null {
         if (this.stationsFull) {
             const found = this.stationsFull.filter((d) => d.id === id);
             if (found.length > 0) {
-                return found[0];
+                return new DisplayStation(found[0]);
             }
         }
         return null;

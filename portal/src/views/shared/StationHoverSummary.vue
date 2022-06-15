@@ -1,8 +1,15 @@
 <template>
     <div class="station-hover-summary" v-if="viewingSummary && station">
         <StationSummaryContent :station="station">
-            <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
-            <img :alt="$tc('station.navigateToStation')" class="navigate-button" src="@/assets/tooltip-blue.svg" @click="openStationPageTab" />
+            <template #top-right-actions>
+                <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
+                <img
+                    :alt="$tc('station.navigateToStation')"
+                    class="navigate-button"
+                    src="@/assets/tooltip-blue.svg"
+                    @click="openStationPageTab"
+                />
+            </template>
         </StationSummaryContent>
 
         <div class="readings-container" v-if="readings">
@@ -12,33 +19,24 @@
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 
-        <div class="flex">
-            <div class="station-seen" v-if="station.updatedAt">
-                Last Seen
-                <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
-            </div>
-
-            <div class="station-battery" v-if="station.battery">
-                <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                <span class="small-light">{{ station.battery | integer }}%</span>
-            </div>
-        </div>
+        <StationBattery :station="station" />
     </div>
 </template>
 
 <script lang="ts">
-import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StationSummaryContent from "./StationSummaryContent.vue";
 import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
 import * as utils from "@/utilities";
+import StationBattery from "@/views/station/StationBattery.vue";
 
 export default Vue.extend({
     name: "StationHoverSummary",
     components: {
         ...CommonComponents,
         StationSummaryContent,
+        StationBattery,
     },
     data: () => {
         return {
@@ -63,6 +61,12 @@ export default Vue.extend({
             default: () => {
                 return new ExploreContext();
             },
+        },
+    },
+    filters: {
+        integer: (value) => {
+            if (!value) return "";
+            return Math.round(value);
         },
     },
     methods: {
@@ -184,7 +188,7 @@ export default Vue.extend({
     color: #ffffff;
     text-align: center;
     padding: 10px;
-    margin: 24px 0 0 0px;
+    margin: 24px 0 14px 0px;
     background-color: var(--color-secondary);
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
@@ -200,30 +204,6 @@ export default Vue.extend({
 
     .name {
         font-size: 11px;
-    }
-}
-
-.small-light {
-    font-size: 12px;
-    color: #6a6d71;
-}
-
-.station-seen {
-    font-size: 14px;
-    font-family: var(--font-family-bold);
-    align-self: flex-start;
-    margin-right: 15px;
-}
-
-.station-battery {
-    display: flex;
-    align-items: center;
-    line-height: 13px;
-
-    .battery {
-        width: 22px;
-        margin-top: -2px;
-        margin-right: 3px;
     }
 }
 </style>
