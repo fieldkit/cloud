@@ -122,7 +122,7 @@ export default Vue.extend({
                 Document,
                 Paragraph,
                 Text,
-                Placeholder,
+                Placeholder.configure({ placeholder: this.placeholder }),
                 ModifyEnter,
                 Mention.configure({
                     HTMLAttributes: {

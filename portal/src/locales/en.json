@@ -346,7 +346,7 @@
         "loginToComment": {
             "part1": "You need to",
             "part2": "Log in",
-            "part3": "in order to leave comments"
+            "part3": "in order to log events or leave comments"
         }
     },
     "seeMore": "See more",

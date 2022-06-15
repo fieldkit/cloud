@@ -2,7 +2,7 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <SectionToggle leftLabel="Log an event" rightLabel="Comment" @toggle="onSectionToggle" default="right" v-if="viewType === 'data'">
+        <SectionToggle leftLabel="Log an event" rightLabel="Comment" @toggle="onSectionToggle" :default="logMode === 'event' ? 'left' : 'right'" v-if="viewType === 'data'">
             <template #left>
                 <div class="event-sensor-selector">
                     <label for="allProjectRadio">
@@ -309,7 +309,7 @@ export default Vue.extend({
                 title: "",
             },
             errorMessage: null,
-            logMode: "comment",
+            logMode: "event",
         };
     },
     watch: {
@@ -558,7 +558,7 @@ export default Vue.extend({
             }
         },
         sortRecent(a, b) {
-            return a.createdAt - b.createdAt;
+            return b.createdAt - a.createdAt;
         },
     },
 });
