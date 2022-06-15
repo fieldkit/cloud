@@ -161,6 +161,8 @@ export default Vue.extend({
             console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
+            } else {
+                await this.createWorkspaceIfNecessary();
             }
         },
         async selectedId(newValue: number, oldValue: number): Promise<void> {
@@ -284,56 +286,55 @@ export default Vue.extend({
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
 
-            return await this.createWorkspaceIfNecessary()
-                .then(async (workspace) => {
-                    return await this.$services.api.getQuickSensors([stationId]).then(async (quickSensors) => {
-                        console.log("viz: quick-sensors", quickSensors);
-                        if (quickSensors.stations[stationId].length == 0) {
-                            console.log("viz: no sensors TODO: FIX");
-                            this.showNoSensors = true;
-                            return Promise.delay(5000).then(() => {
-                                this.showNoSensors = false;
-                            });
-                        }
+            return await this.$services.api
+                .getQuickSensors([stationId])
+                .then(async (quickSensors) => {
+                    console.log("viz: quick-sensors", quickSensors);
+                    if (quickSensors.stations[stationId].length == 0) {
+                        console.log("viz: no sensors TODO: FIX");
+                        this.showNoSensors = true;
+                        return Promise.delay(5000).then(() => {
+                            this.showNoSensors = false;
+                        });
+                    }
 
-                        const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
-                        const sensorId = quickSensors.stations[stationId][0].sensorId;
-                        const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
+                    const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
+                    const sensorId = quickSensors.stations[stationId][0].sensorId;
+                    const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
-                        const associated = await this.$services.api.getAssociatedStations(stationId);
-                        const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
-                        console.log(`viz: show-station-associated`, associated, stationIds);
+                    const associated = await this.$services.api.getAssociatedStations(stationId);
+                    const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
+                    console.log(`viz: show-station-associated`, { associated, stationIds });
 
-                        const getInitialBookmark = () => {
-                            const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
-                            if (quickSensor.length == 1) {
-                                const end = new Date(quickSensor[0].sensorReadAt);
-                                const start = new Date(end);
+                    const getInitialBookmark = () => {
+                        const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
+                        if (quickSensor.length == 1) {
+                            const end = new Date(quickSensor[0].sensorReadAt);
+                            const start = new Date(end);
 
-                                start.setDate(end.getDate() - 14); // TODO Use getFastTime
-
-                                return new Bookmark(
-                                    this.bookmark.v,
-                                    [[[[[vizSensor], [start.getTime(), end.getTime()], [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
-                                    stationIds,
-                                    this.bookmark.p,
-                                    this.bookmark.c
-                                );
-                            }
-
-                            console.log("viz: ERROR missing expected quick row, default to FastTime.All");
+                            start.setDate(end.getDate() - 14); // TODO Use getFastTime
 
                             return new Bookmark(
                                 this.bookmark.v,
-                                [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                                [[[[[vizSensor], [start.getTime(), end.getTime()], [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
                                 stationIds,
                                 this.bookmark.p,
                                 this.bookmark.c
                             );
-                        };
+                        }
 
-                        this.$emit("open-bookmark", getInitialBookmark());
-                    });
+                        console.log("viz: ERROR missing expected quick row, default to FastTime.All");
+
+                        return new Bookmark(
+                            this.bookmark.v,
+                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                            stationIds,
+                            this.bookmark.p,
+                            this.bookmark.c
+                        );
+                    };
+
+                    this.$emit("open-bookmark", getInitialBookmark());
                 })
                 .catch(async (e) => {
                     if (e.name === "ForbiddenError") {

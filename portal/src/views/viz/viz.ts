@@ -943,6 +943,10 @@ export class Workspace implements VizInfoFactory {
             throw new Error(`viz: No station: ${stationId}`);
         }
 
+        if (this.associated.length == 0) {
+            throw new Error("viz: Associated required for sensor-options");
+        }
+
         const allSensors = station.sensors;
         const allModules = _.groupBy(allSensors, (s) => s.moduleId);
         const keysById = _.fromPairs(allSensors.map((row) => [row.moduleId, row.moduleKey]));
