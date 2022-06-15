@@ -1,3 +1,5 @@
+import { DisplayStation } from "@/store";
+
 export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
@@ -22,6 +24,7 @@ export interface PartnerCustomization {
         text: string;
         url: string;
     }[];
+    stationLocationName: (station: DisplayStation) => string;
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -55,6 +58,11 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                     url: "https://www.floodnet.nyc/",
                 },
             ],
+            stationLocationName: (station: DisplayStation) => {
+                const neighborhoodAttr = station.attributes.find((attr) => attr.name === "Neighborhood");
+                if (neighborhoodAttr) return neighborhoodAttr.stringValue;
+                return station.locationName;
+            },
         };
     }
     return null;
@@ -89,6 +97,9 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             subject: "sharePanel.emailSubject.fieldkit",
         },
         links: [],
+        stationLocationName: (station: DisplayStation) => {
+            return station.locationName;
+        },
     };
 }
 

@@ -18,9 +18,9 @@
                             <div>
                                 <div class="station-name">{{ station.name }}</div>
 
-                                <div v-if="station.locationName" class="flex flex-al-center station-location">
+                                <div v-if="partnerCustomization().stationLocationName(station)" class="flex flex-al-center station-location">
                                     <i class="icon icon-location"></i>
-                                    <span>{{ station.locationName }}</span>
+                                    <span>{{ partnerCustomization().stationLocationName(station) }}</span>
                                 </div>
                                 <div v-if="station.placeNameNative" class="station-location">
                                     <i class="icon icon-location"></i>
@@ -152,6 +152,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import { mapGetters } from "vuex";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationView",
@@ -261,6 +262,9 @@ export default Vue.extend({
         },
         getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
+        },
+        partnerCustomization() {
+            return getPartnerCustomizationWithDefault();
         },
     },
 });
