@@ -212,10 +212,6 @@ export default Vue.extend({
     margin: 190px 0 60px 119px;
     max-width: calc(100vw - 20px);
 
-    .explore-button {
-        margin-bottom: 14px;
-    }
-
     @include bp-down($sm) {
         margin: 129px auto 60px auto;
     }

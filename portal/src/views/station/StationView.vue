@@ -17,47 +17,33 @@
                             <StationPhoto :station="station" />
                             <div>
                                 <div class="station-name">{{ station.name }}</div>
-                                <div>
-                                    {{ $tc("station.lastSynced") }}
-                                    <span class="small-light">{{ station.updatedAt | prettyDate }}</span>
+
+                                <div v-if="partnerCustomization().stationLocationName(station)" class="flex flex-al-center station-location">
+                                    <i class="icon icon-location"></i>
+                                    <span>{{ partnerCustomization().stationLocationName(station) }}</span>
                                 </div>
-                                <div class="station-battery" v-if="station.battery">
-                                    <img class="battery" alt="Battery Level" :src="getBatteryIcon()" />
-                                    <span class="small-light">{{ station.battery.toFixed() }} %</span>
+                                <div v-if="station.placeNameNative" class="station-location">
+                                    <i class="icon icon-location"></i>
+                                    <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
+                                </div>
+
+                                <div v-if="station.location" class="flex">
+                                    <div class="station-coordinate">
+                                        <span class="bold">{{ $tc("station.latitude") }}</span>
+                                        <span>{{ station.location.latitude | prettyCoordinate }}</span>
+                                    </div>
+
+                                    <div class="station-coordinate">
+                                        <span class="bold">{{ $tc("station.longitude") }}</span>
+                                        <span>{{ station.location.longitude | prettyCoordinate }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <div class="station-row flex flex-space-between">
-                                <div v-if="station.locationName" class="flex flex-al-center station-location">
-                                    <i class="icon icon-location"></i>
-                                    <span>{{ station.locationName }}</span>
-                                </div>
-                                <div v-if="station.location" class="flex">
-                                    <div class="station-coordinate" :style="station.location ? { 'padding-left': 0 } : ''">
-                                        <div>{{ station.location.latitude | prettyCoordinate }}</div>
-                                        <div>{{ $tc("station.latitude") }}</div>
-                                    </div>
-                                    <div class="station-coordinate">
-                                        <div>{{ station.location.longitude | prettyCoordinate }}</div>
-                                        <div>{{ $tc("station.longitude") }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="station.placeNameNative" class="station-row">
-                                <i class="icon icon-location"></i>
-                                <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
-                            </div>
-
-                            <div v-if="station.firmwareNumber" class="station-row">
-                                <span>{{ $tc("station.firmwareVersion") }}</span>
-                                <span class="ml-10">{{ station.firmwareNumber }}</span>
-                            </div>
-
                             <div class="station-row">
-                                <span>{{ $tc("station.modules") }}</span>
+                                <span class="bold">{{ $tc("station.modules") }}</span>
                                 <div class="station-modules ml-10">
                                     <img
                                         v-for="module in station.modules"
@@ -66,6 +52,15 @@
                                         :src="getModuleImg(module)"
                                     />
                                 </div>
+                            </div>
+
+                            <div class="station-row">
+                                <StationBattery :station="station" />
+                            </div>
+
+                            <div v-if="station.firmwareNumber" class="station-row">
+                                <span class="bold">{{ $tc("station.firmwareVersion") }}</span>
+                                <span class="ml-10 small-light">{{ station.firmwareNumber }}</span>
                             </div>
                         </div>
                     </div>
@@ -156,10 +151,13 @@ import NotesForm from "@/views/notes/NotesForm.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import { mapGetters } from "vuex";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
+import StationBattery from "@/views/station/StationBattery.vue";
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationView",
     components: {
+        StationBattery,
         StandardLayout,
         DoubleHeader,
         StationPhoto,
@@ -265,6 +263,9 @@ export default Vue.extend({
         getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
         },
+        partnerCustomization() {
+            return getPartnerCustomizationWithDefault();
+        },
     },
 });
 </script>
@@ -356,7 +357,7 @@ export default Vue.extend({
     &-name {
         font-size: 18px;
         font-weight: 900;
-        margin-bottom: 2px;
+        margin-bottom: 8px;
     }
     &-battery {
         margin-top: 5px;
@@ -367,31 +368,30 @@ export default Vue.extend({
         }
     }
     &-modules {
-        margin-left: 18px;
+        margin-left: 10px;
         flex-wrap: wrap;
         @include flex;
 
         img {
-            margin-right: 10px;
+            margin-right: 8px;
             margin-bottom: 5px;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
         }
     }
     &-coordinate {
-        padding: 0 15px;
+        font-size: 12px;
 
         @include bp-down($xs) {
             display: flex;
         }
 
         &:last-of-type {
-            padding-right: 0;
+            margin-left: 15px;
         }
 
-        div:nth-of-type(2) {
-            font-size: 12px;
-            margin-top: 2px;
+        span:nth-of-type(2) {
+            margin-left: 2px;
 
             @include bp-down($xs) {
                 order: -1;
@@ -401,29 +401,19 @@ export default Vue.extend({
     }
     &-location {
         align-self: flex-start;
-        padding-right: 10px;
-
-        @include bp-down($xs) {
-            flex: 0 0 100%;
-            border-top: 1px solid var(--color-border);
-            padding-top: 15px;
-            margin-top: 15px;
-            order: 3;
-        }
+        margin-bottom: 7px;
     }
     &-row {
         padding: 15px 0;
         max-width: 350px;
         @include flex(center);
 
-        &:first-of-type {
-            @include bp-down($xs) {
-                padding-top: 30px;
-            }
-        }
-
         &:not(:last-of-type) {
             border-bottom: solid 1px var(--color-border);
+        }
+
+        &:last-of-type {
+            padding-bottom: 0;
         }
 
         @include bp-down($sm) {
@@ -609,6 +599,7 @@ section {
 
 .icon-location {
     margin-top: 1px;
+    margin-right: 8px;
 }
 
 .photo-placeholder {
