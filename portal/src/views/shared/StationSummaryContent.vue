@@ -25,11 +25,11 @@
                         </span>
                     </div>
                 </div>
+            </div>
 
-                <div class="station-modules">
-                    <div v-for="module in station.modules" v-bind:key="module.id" class="module-icon-container">
-                        <img v-if="!module.internal" alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
-                    </div>
+            <div class="station-modules">
+                <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
+                    <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
             </div>
 
