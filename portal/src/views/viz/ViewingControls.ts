@@ -106,7 +106,7 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
-            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" />
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
             <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="3" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,

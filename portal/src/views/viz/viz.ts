@@ -1015,7 +1015,7 @@ export class Workspace implements VizInfoFactory {
                 if (!options || options.length != 1 || !options[0].children) {
                     console.log("viz: unexpected options", options);
                 } else {
-                    options[0].children[0].children = [relatedOption];
+                    options[0].children = [...options[0].children, relatedOption];
                 }
             }
         }
