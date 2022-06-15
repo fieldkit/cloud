@@ -27,8 +27,8 @@
                                     <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
                                 </div>
 
-                                <template v-if="station.location">
-                                    <div class="flex station-coordinate">
+                                <div v-if="station.location" class="flex">
+                                    <div class="station-coordinate">
                                         <span class="bold">{{ $tc("station.latitude") }}</span>
                                         <span>{{ station.location.latitude | prettyCoordinate }}</span>
                                     </div>
@@ -37,7 +37,7 @@
                                         <span class="bold">{{ $tc("station.longitude") }}</span>
                                         <span>{{ station.location.longitude | prettyCoordinate }}</span>
                                     </div>
-                                </template>
+                                </div>
                             </div>
                         </div>
 
