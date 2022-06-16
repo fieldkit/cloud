@@ -895,7 +895,7 @@ export class ScrubberSpecFactory {
                     scale: "x",
                     orient: "bottom",
                     grid: false,
-                    title: "Time",
+                    //title: "Time",
                     formatType: "time",
                     labelPadding: -14,
                     tickCount: 8,

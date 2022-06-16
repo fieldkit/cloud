@@ -35,6 +35,7 @@ type UpdateRequestBody struct {
 type AddResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -64,6 +65,7 @@ type AddResponseBody struct {
 type GetResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -93,6 +95,7 @@ type GetResponseBody struct {
 type UpdateResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -132,7 +135,7 @@ type ListProjectResponseBody struct {
 // ListAssociatedResponseBody is the type of the "station" service "list
 // associated" endpoint HTTP response body.
 type ListAssociatedResponseBody struct {
-	Stations StationFullResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+	Stations AssociatedStationResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
 // DownloadPhotoResponseBody is the type of the "station" service "download
@@ -1118,6 +1121,12 @@ type ProgressBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// StationFullModelResponseBody is used to define fields on response body types.
+type StationFullModelResponseBody struct {
+	Name                      string `form:"name" json:"name" xml:"name"`
+	OnlyVisibleViaAssociation bool   `form:"only_visible_via_association" json:"only_visible_via_association" xml:"only_visible_via_association"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   int32  `form:"id" json:"id" xml:"id"`
@@ -1148,10 +1157,10 @@ type StationProjectAttributesResponseBody struct {
 // StationProjectAttributeResponseBody is used to define fields on response
 // body types.
 type StationProjectAttributeResponseBody struct {
-	ProjectID   int32  `form:"project_id" json:"project_id" xml:"project_id"`
-	AttributeID int64  `form:"attribute_id" json:"attribute_id" xml:"attribute_id"`
+	ProjectID   int32  `form:"projectId" json:"projectId" xml:"projectId"`
+	AttributeID int64  `form:"attributeId" json:"attributeId" xml:"attributeId"`
 	Name        string `form:"name" json:"name" xml:"name"`
-	StringValue string `form:"string_value" json:"string_value" xml:"string_value"`
+	StringValue string `form:"stringValue" json:"stringValue" xml:"stringValue"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -1253,6 +1262,7 @@ type StationFullResponseBodyCollection []*StationFullResponseBody
 type StationFullResponseBody struct {
 	ID                 int32                                 `form:"id" json:"id" xml:"id"`
 	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
 	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
 	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
@@ -1275,6 +1285,39 @@ type StationFullResponseBody struct {
 	SyncedAt           *int64                                `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
 	IngestionAt        *int64                                `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody       `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+}
+
+// AssociatedStationResponseBodyCollection is used to define fields on response
+// body types.
+type AssociatedStationResponseBodyCollection []*AssociatedStationResponseBody
+
+// AssociatedStationResponseBody is used to define fields on response body
+// types.
+type AssociatedStationResponseBody struct {
+	Station  *StationFullResponseBody           `form:"station" json:"station" xml:"station"`
+	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   bool                               `form:"hidden" json:"hidden" xml:"hidden"`
+}
+
+// AssociatedViaProjectResponseBody is used to define fields on response body
+// types.
+type AssociatedViaProjectResponseBody struct {
+	ID int32 `form:"id" json:"id" xml:"id"`
+}
+
+// AssociatedViaLocationResponseBody is used to define fields on response body
+// types.
+type AssociatedViaLocationResponseBody struct {
+	Distance float32 `form:"distance" json:"distance" xml:"distance"`
+}
+
+// AssociatedViaManualResponseBody is used to define fields on response body
+// types.
+type AssociatedViaManualResponseBody struct {
+	OtherStationID int32 `form:"otherStationID" json:"otherStationID" xml:"otherStationID"`
+	Priority       int32 `form:"priority" json:"priority" xml:"priority"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -1322,6 +1365,9 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		PlaceNameNative:    res.PlaceNameNative,
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -1374,6 +1420,9 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
 	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
+	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
 	}
@@ -1424,6 +1473,9 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		PlaceNameNative:    res.PlaceNameNative,
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
 	}
 	if res.Owner != nil {
 		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
@@ -1483,12 +1535,12 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 
 // NewListAssociatedResponseBody builds the HTTP response body from the result
 // of the "list associated" endpoint of the "station" service.
-func NewListAssociatedResponseBody(res *stationviews.StationsFullView) *ListAssociatedResponseBody {
+func NewListAssociatedResponseBody(res *stationviews.AssociatedStationsView) *ListAssociatedResponseBody {
 	body := &ListAssociatedResponseBody{}
 	if res.Stations != nil {
-		body.Stations = make([]*StationFullResponseBody, len(res.Stations))
+		body.Stations = make([]*AssociatedStationResponseBody, len(res.Stations))
 		for i, val := range res.Stations {
-			body.Stations[i] = marshalStationviewsStationFullViewToStationFullResponseBody(val)
+			body.Stations[i] = marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(val)
 		}
 	}
 	return body
@@ -2356,9 +2408,10 @@ func NewListMinePayload(auth string) *station.ListMinePayload {
 }
 
 // NewListProjectPayload builds a station service list project endpoint payload.
-func NewListProjectPayload(id int32, auth *string) *station.ListProjectPayload {
+func NewListProjectPayload(id int32, disableFiltering *bool, auth *string) *station.ListProjectPayload {
 	v := &station.ListProjectPayload{}
 	v.ID = id
+	v.DisableFiltering = disableFiltering
 	v.Auth = auth
 
 	return v

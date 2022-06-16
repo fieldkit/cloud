@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 type MessageSchemaRepository struct {
@@ -68,4 +68,12 @@ func (rr *MessageSchemaRepository) QuerySchemas(ctx context.Context, batch *Mess
 	}
 
 	return batch.Schemas, nil
+}
+
+func (rr *MessageSchemaRepository) QueryAllSchemas(ctx context.Context) ([]*MessageSchemaRegistration, error) {
+	schemas := []*MessageSchemaRegistration{}
+	if err := rr.db.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema`); err != nil {
+		return nil, err
+	}
+	return schemas, nil
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/common/logging"

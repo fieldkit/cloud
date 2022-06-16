@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"

@@ -190,6 +190,9 @@ func EncodeDataRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 		if p.Tail != nil {
 			values.Add("tail", fmt.Sprintf("%v", *p.Tail))
 		}
+		if p.InfluxDB != nil {
+			values.Add("InfluxDB", fmt.Sprintf("%v", *p.InfluxDB))
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

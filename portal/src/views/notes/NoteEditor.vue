@@ -68,29 +68,6 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import "../../scss/mixins";
 
-.note-editor {
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    margin-top: 0;
-    margin-bottom: 20px;
-    padding: 15px 20px 5px;
-
-    @include bp-down($xs) {
-        border: 0;
-        padding: 0;
-    }
-}
-
-.field {
-    margin-top: 10px;
-    margin-bottom: 10px;
-
-    @include bp-down($xs) {
-        margin-top: 0;
-        margin-bottom: 4px;
-    }
-}
-
 .attached-audio {
     display: flex;
     flex-wrap: wrap;
