@@ -44,18 +44,19 @@ timestamps {
 
 				sshagent (credentials: ['ssh-fkdev-deploy']) {
 					for (def server in ws.servers.value) {
-						print(server.sshAt)
+						println(server.sshAt)
 						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${server.ip}"
 						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} whoami"
+						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo rm -f ${stackName}.tar"
 					}
 
 					for (def server in ws.servers.value) {
-						print(server.sshAt)
+						println(server.sshAt)
 						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${servver.sshAt}:"
 					}
 
 					for (def server in ws.servers.value) {
-						print(server.sshAt)
+						println(server.sshAt)
 						sh "ssh -o StrictHostKeyChecking=no ${servver.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
 					}
 				}
