@@ -8,7 +8,9 @@
                 <div class="detail-container">
                     <p class="detail-title">{{ project.name }}</p>
                     <div class="detail-description">{{ project.description }}</div>
-                    <router-link v-if="!isPartnerCustomisationEnabled()" :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
+                    <router-link v-if="!isPartnerCustomisationEnabled()" :to="{ name: 'viewProject', params: { id: id } }" class="link">
+                        Project Dashboard >
+                    </router-link>
                     <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
                         {{ $t(link.text) }} >
                     </a>
@@ -85,6 +87,7 @@ import StandardLayout from "../StandardLayout.vue";
 
 import { ExploreContext } from "@/views/viz/common";
 import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault } from "../shared/partners";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -174,7 +177,7 @@ export default Vue.extend({
             }
         },
         partnerCustomization() {
-            return getPartnerCustomization();
+            return getPartnerCustomizationWithDefault();
         },
     },
     watch: {
