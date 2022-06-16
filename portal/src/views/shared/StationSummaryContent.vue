@@ -9,7 +9,10 @@
                 <slot name="top-right-actions"></slot>
             </div>
 
-            <div class="row where-row" v-if="station.placeNameNative || station.placeNameOther || station.placeNameNative">
+            <div
+                class="row where-row"
+                v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
+            >
                 <div class="location-container">
                     <div v-if="stationLocationName || station.placeNameOther">
                         <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
