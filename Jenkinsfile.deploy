@@ -52,12 +52,12 @@ timestamps {
 
 					for (def server in ws.servers.value) {
 						println(server.sshAt)
-						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${servver.sshAt}:"
+						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${server.sshAt}:"
 					}
 
 					for (def server in ws.servers.value) {
 						println(server.sshAt)
-						sh "ssh -o StrictHostKeyChecking=no ${servver.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
+						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
 					}
 				}
 
