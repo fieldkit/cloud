@@ -5650,18 +5650,18 @@ definitions:
       station:
         attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -6120,18 +6120,18 @@ definitions:
       station:
         attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -6580,18 +6580,18 @@ definitions:
       station:
         attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -23397,18 +23397,18 @@ definitions:
     example:
       attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.5032912
       configurations:
         all:
@@ -26023,18 +26023,18 @@ definitions:
     example:
       attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.844399
       configurations:
         all:
@@ -26494,18 +26494,18 @@ definitions:
     example:
     - attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.7673294
       configurations:
         all:
@@ -26945,18 +26945,18 @@ definitions:
         url: Molestias dolores atque sint recusandae quo.
     - attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.7673294
       configurations:
         all:
@@ -27396,18 +27396,18 @@ definitions:
         url: Molestias dolores atque sint recusandae quo.
     - attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.7673294
       configurations:
         all:
@@ -27847,18 +27847,18 @@ definitions:
         url: Molestias dolores atque sint recusandae quo.
     - attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.7673294
       configurations:
         all:
@@ -28539,18 +28539,18 @@ definitions:
     example:
       attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.6084601
       configurations:
         all:
@@ -29812,18 +29812,18 @@ definitions:
         station:
           attributes:
             attributes:
-            - attribute_id: 4107830224581333359
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
-            - attribute_id: 4107830224581333359
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
-            - attribute_id: 4107830224581333359
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
           battery: 0.7673294
           configurations:
             all:
@@ -30272,18 +30272,18 @@ definitions:
         station:
           attributes:
             attributes:
-            - attribute_id: 4107830224581333359
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
-            - attribute_id: 4107830224581333359
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
-            - attribute_id: 4107830224581333359
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
+            - attributeId: 4107830224581333359
               name: Ratione libero fugiat vitae illum.
-              project_id: 2125141991
-              string_value: Quae eum est architecto.
+              projectId: 2125141991
+              stringValue: Quae eum est architecto.
           battery: 0.7673294
           configurations:
             all:
@@ -30906,18 +30906,18 @@ definitions:
       stations:
       - attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -31357,18 +31357,18 @@ definitions:
           url: Molestias dolores atque sint recusandae quo.
       - attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -31991,18 +31991,18 @@ definitions:
       stations:
       - attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -32442,18 +32442,18 @@ definitions:
           url: Molestias dolores atque sint recusandae quo.
       - attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.7673294
         configurations:
           all:
@@ -33622,30 +33622,30 @@ definitions:
     title: StationProjectAttributeResponseBody
     type: object
     properties:
-      attribute_id:
+      attributeId:
         type: integer
         example: 6283543257087789505
         format: int64
       name:
         type: string
         example: Minus voluptatibus consequatur.
-      project_id:
+      projectId:
         type: integer
         example: 923591902
         format: int32
-      string_value:
+      stringValue:
         type: string
         example: Et explicabo rerum unde.
     example:
-      attribute_id: 7750507608366465073
+      attributeId: 7750507608366465073
       name: Eligendi aut quo vero vel.
-      project_id: 142559809
-      string_value: Sit labore et incidunt.
+      projectId: 142559809
+      stringValue: Sit labore et incidunt.
     required:
-    - project_id
-    - attribute_id
+    - projectId
+    - attributeId
     - name
-    - string_value
+    - stringValue
   StationProjectAttributesResponseBody:
     title: StationProjectAttributesResponseBody
     type: object
@@ -33655,36 +33655,36 @@ definitions:
         items:
           $ref: '#/definitions/StationProjectAttributeResponseBody'
         example:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
     example:
       attributes:
-      - attribute_id: 4107830224581333359
+      - attributeId: 4107830224581333359
         name: Ratione libero fugiat vitae illum.
-        project_id: 2125141991
-        string_value: Quae eum est architecto.
-      - attribute_id: 4107830224581333359
+        projectId: 2125141991
+        stringValue: Quae eum est architecto.
+      - attributeId: 4107830224581333359
         name: Ratione libero fugiat vitae illum.
-        project_id: 2125141991
-        string_value: Quae eum est architecto.
-      - attribute_id: 4107830224581333359
+        projectId: 2125141991
+        stringValue: Quae eum est architecto.
+      - attributeId: 4107830224581333359
         name: Ratione libero fugiat vitae illum.
-        project_id: 2125141991
-        string_value: Quae eum est architecto.
-      - attribute_id: 4107830224581333359
+        projectId: 2125141991
+        stringValue: Quae eum est architecto.
+      - attributeId: 4107830224581333359
         name: Ratione libero fugiat vitae illum.
-        project_id: 2125141991
-        string_value: Quae eum est architecto.
+        projectId: 2125141991
+        stringValue: Quae eum est architecto.
     required:
     - attributes
   StationRegionResponseBody:
@@ -34288,18 +34288,18 @@ definitions:
     example:
       attributes:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       battery: 0.47607735
       configurations:
         all:

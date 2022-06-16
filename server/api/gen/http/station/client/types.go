@@ -1157,10 +1157,10 @@ type StationProjectAttributesResponseBody struct {
 // StationProjectAttributeResponseBody is used to define fields on response
 // body types.
 type StationProjectAttributeResponseBody struct {
-	ProjectID   *int32  `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
-	AttributeID *int64  `form:"attribute_id,omitempty" json:"attribute_id,omitempty" xml:"attribute_id,omitempty"`
+	ProjectID   *int32  `form:"projectId,omitempty" json:"projectId,omitempty" xml:"projectId,omitempty"`
+	AttributeID *int64  `form:"attributeId,omitempty" json:"attributeId,omitempty" xml:"attributeId,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	StringValue *string `form:"string_value,omitempty" json:"string_value,omitempty" xml:"string_value,omitempty"`
+	StringValue *string `form:"stringValue,omitempty" json:"stringValue,omitempty" xml:"stringValue,omitempty"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -3713,16 +3713,16 @@ func ValidateStationProjectAttributesResponseBody(body *StationProjectAttributes
 // StationProjectAttributeResponseBody
 func ValidateStationProjectAttributeResponseBody(body *StationProjectAttributeResponseBody) (err error) {
 	if body.ProjectID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("project_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("projectId", "body"))
 	}
 	if body.AttributeID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("attribute_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("attributeId", "body"))
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	if body.StringValue == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("string_value", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "body"))
 	}
 	return
 }
