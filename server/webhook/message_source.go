@@ -17,13 +17,15 @@ type DatabaseMessageSource struct {
 	started   bool
 	schemaID  int32
 	messageID int64
+	resume    bool
 }
 
-func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32, messageID int64) *DatabaseMessageSource {
+func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32, messageID int64, resume bool) *DatabaseMessageSource {
 	return &DatabaseMessageSource{
 		db:        db,
 		schemaID:  schemaID,
 		messageID: messageID,
+		resume:    resume,
 	}
 }
 
@@ -37,19 +39,26 @@ func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBat
 		return fmt.Errorf("schema_id is required")
 	}
 
+	if s.messageID > 0 && !s.resume {
+		return messages.QueryMessageForProcessing(ctx, batch, s.messageID)
+	}
+
 	if !s.started {
-		log.Infow("initializing", "schema_id", s.schemaID)
+		log.Infow("initializing", "schema_id", s.schemaID, "message_id", s.messageID, "resume", s.resume)
 
 		if err := schemas.StartProcessingSchema(ctx, s.schemaID); err != nil {
 			return err
 		}
-		s.started = true
+
+		if s.messageID > 0 && s.resume {
+			if err := messages.ResumeOnMessage(ctx, batch, s.messageID); err != nil {
+				return err
+			}
+		}
 
 		log.Infow("ready", "schema_id", s.schemaID)
-	}
 
-	if s.messageID > 0 {
-		return messages.QueryMessageForProcessing(ctx, batch, s.messageID)
+		s.started = true
 	}
 
 	return messages.QueryBatchBySchemaIDForProcessing(ctx, batch, s.schemaID)

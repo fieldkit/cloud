@@ -29,6 +29,7 @@ export * from "./common";
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation } from "@/store";
+import { getPartnerCustomizationWithDefault } from "../shared/partners";
 
 type SensorReadAtType = string;
 
@@ -935,7 +936,53 @@ export class Workspace implements VizInfoFactory {
             return new StationTreeOption(station.id, station.name, station.sensors.length == 0);
         });
 
-        return [...manually, ...nearby, ...regular];
+        const partnerCustomization = getPartnerCustomizationWithDefault();
+
+        const grouped = _(regular)
+            .filter((option) => _.isNumber(option.id))
+            .map((stationOption) => {
+                const station = this.getStation(Number(stationOption.id));
+                if (station) {
+                    return [
+                        {
+                            option: stationOption,
+                            station: station,
+                        },
+                    ];
+                }
+                return [];
+            })
+            .flatten()
+            .map((row) => {
+                return {
+                    option: row.option,
+                    group: partnerCustomization.viz.groupStation(row.station),
+                };
+            })
+            .value();
+
+        const ungrouped = grouped.filter((row) => row.group == null).map((row) => row.option);
+
+        const groupOptions = _(grouped)
+            .filter((row) => row.group != null)
+            .groupBy((row) => row.group)
+            .map((group, name) => {
+                return new StationTreeOption(
+                    `group-${name}`,
+                    name,
+                    false,
+                    group.map((child) => child.option)
+                );
+            })
+            .value();
+
+        const allOptions = [...groupOptions, ...ungrouped];
+        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, allOptions)] : [];
+
+        console.log("viz: ungrouped", ungrouped);
+        console.log("viz: all", all);
+
+        return [...manually, ...nearby, ...all];
     }
 
     public sensorOptions(stationId: number, flatten = false): SensorTreeOption[] {

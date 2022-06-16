@@ -691,16 +691,16 @@ func ValidateStationProjectAttributesView(result *StationProjectAttributesView) 
 // StationProjectAttributeView.
 func ValidateStationProjectAttributeView(result *StationProjectAttributeView) (err error) {
 	if result.ProjectID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("project_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("projectId", "result"))
 	}
 	if result.AttributeID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("attribute_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("attributeId", "result"))
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	if result.StringValue == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("string_value", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "result"))
 	}
 	return
 }

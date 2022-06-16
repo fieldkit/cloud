@@ -5260,14 +5260,14 @@ paths:
                 stations:
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -6181,14 +6181,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -7102,14 +7102,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -8023,14 +8023,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -11632,18 +11632,18 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attribute_id: 4107830224581333359
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
                 battery: 0.21543044
                 configurations:
                   all:
@@ -12091,18 +12091,18 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attribute_id: 4107830224581333359
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
                 battery: 0.28986692
                 configurations:
                   all:
@@ -12559,18 +12559,18 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attribute_id: 4107830224581333359
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
-                  - attribute_id: 4107830224581333359
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
+                  - attributeId: 4107830224581333359
                     name: Ratione libero fugiat vitae illum.
-                    project_id: 2125141991
-                    string_value: Quae eum est architecto.
+                    projectId: 2125141991
+                    stringValue: Quae eum est architecto.
                 battery: 0.37590542
                 configurations:
                   all:
@@ -13172,14 +13172,14 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attribute_id: 8513020880351236940
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
-                      - attribute_id: 8513020880351236940
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
                     battery: 0.14262307
                     configurations:
                       all:
@@ -14102,14 +14102,14 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attribute_id: 8513020880351236940
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
-                      - attribute_id: 8513020880351236940
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
                     battery: 0.14262307
                     configurations:
                       all:
@@ -15032,14 +15032,14 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attribute_id: 8513020880351236940
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
-                      - attribute_id: 8513020880351236940
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
+                      - attributeId: 8513020880351236940
                         name: Explicabo quis similique nisi et voluptates mollitia.
-                        project_id: 261761713
-                        string_value: Sed distinctio accusamus.
+                        projectId: 261761713
+                        stringValue: Sed distinctio accusamus.
                     battery: 0.14262307
                     configurations:
                       all:
@@ -17890,14 +17890,14 @@ paths:
                 stations:
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -18811,14 +18811,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -19732,14 +19732,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -20653,14 +20653,14 @@ paths:
                     url: Unde sed.
                 - attributes:
                     attributes:
-                    - attribute_id: 8513020880351236940
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
-                    - attribute_id: 8513020880351236940
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
+                    - attributeId: 8513020880351236940
                       name: Explicabo quis similique nisi et voluptates mollitia.
-                      project_id: 261761713
-                      string_value: Sed distinctio accusamus.
+                      projectId: 261761713
+                      stringValue: Sed distinctio accusamus.
                   battery: 0.14262307
                   configurations:
                     all:
@@ -22734,14 +22734,14 @@ components:
         station:
           attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -24615,14 +24615,14 @@ components:
         station:
           attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -25545,14 +25545,14 @@ components:
         station:
           attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -26475,14 +26475,14 @@ components:
         station:
           attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -27412,14 +27412,14 @@ components:
           station:
             attributes:
               attributes:
-              - attribute_id: 8513020880351236940
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
-              - attribute_id: 8513020880351236940
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
             battery: 0.14262307
             configurations:
               all:
@@ -28342,14 +28342,14 @@ components:
           station:
             attributes:
               attributes:
-              - attribute_id: 8513020880351236940
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
-              - attribute_id: 8513020880351236940
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
             battery: 0.14262307
             configurations:
               all:
@@ -29272,14 +29272,14 @@ components:
           station:
             attributes:
               attributes:
-              - attribute_id: 8513020880351236940
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
-              - attribute_id: 8513020880351236940
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
+              - attributeId: 8513020880351236940
                 name: Explicabo quis similique nisi et voluptates mollitia.
-                project_id: 261761713
-                string_value: Sed distinctio accusamus.
+                projectId: 261761713
+                stringValue: Sed distinctio accusamus.
             battery: 0.14262307
             configurations:
               all:
@@ -35088,18 +35088,18 @@ components:
       example:
         attributes:
           attributes:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
         battery: 0.86582994
         configurations:
           all:
@@ -35494,14 +35494,14 @@ components:
       example:
       - attributes:
           attributes:
-          - attribute_id: 8513020880351236940
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
-          - attribute_id: 8513020880351236940
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
         battery: 0.14262307
         configurations:
           all:
@@ -36415,14 +36415,14 @@ components:
           url: Unde sed.
       - attributes:
           attributes:
-          - attribute_id: 8513020880351236940
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
-          - attribute_id: 8513020880351236940
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
         battery: 0.14262307
         configurations:
           all:
@@ -37336,14 +37336,14 @@ components:
           url: Unde sed.
       - attributes:
           attributes:
-          - attribute_id: 8513020880351236940
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
-          - attribute_id: 8513020880351236940
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
+          - attributeId: 8513020880351236940
             name: Explicabo quis similique nisi et voluptates mollitia.
-            project_id: 261761713
-            string_value: Sed distinctio accusamus.
+            projectId: 261761713
+            stringValue: Sed distinctio accusamus.
         battery: 0.14262307
         configurations:
           all:
@@ -38562,30 +38562,30 @@ components:
     StationProjectAttribute:
       type: object
       properties:
-        attribute_id:
+        attributeId:
           type: integer
           example: 72486813450461315
           format: int64
         name:
           type: string
           example: Quidem fugiat.
-        project_id:
+        projectId:
           type: integer
           example: 32148317
           format: int32
-        string_value:
+        stringValue:
           type: string
           example: Fugiat nihil est.
       example:
-        attribute_id: 6324767957911750932
+        attributeId: 6324767957911750932
         name: Aut unde amet error.
-        project_id: 1191454489
-        string_value: Voluptate aut repudiandae corporis est.
+        projectId: 1191454489
+        stringValue: Voluptate aut repudiandae corporis est.
       required:
-      - project_id
-      - attribute_id
+      - projectId
+      - attributeId
       - name
-      - string_value
+      - stringValue
     StationProjectAttributes:
       type: object
       properties:
@@ -38594,28 +38594,28 @@ components:
           items:
             $ref: '#/components/schemas/StationProjectAttribute'
           example:
-          - attribute_id: 4107830224581333359
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
-          - attribute_id: 4107830224581333359
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
+          - attributeId: 4107830224581333359
             name: Ratione libero fugiat vitae illum.
-            project_id: 2125141991
-            string_value: Quae eum est architecto.
+            projectId: 2125141991
+            stringValue: Quae eum est architecto.
       example:
         attributes:
-        - attribute_id: 4107830224581333359
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
-        - attribute_id: 4107830224581333359
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
+        - attributeId: 4107830224581333359
           name: Ratione libero fugiat vitae illum.
-          project_id: 2125141991
-          string_value: Quae eum est architecto.
+          projectId: 2125141991
+          stringValue: Quae eum est architecto.
       required:
       - attributes
     StationRegion:
@@ -38828,14 +38828,14 @@ components:
         stations:
         - attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -39749,14 +39749,14 @@ components:
             url: Unde sed.
         - attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -40670,14 +40670,14 @@ components:
             url: Unde sed.
         - attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:
@@ -41591,14 +41591,14 @@ components:
             url: Unde sed.
         - attributes:
             attributes:
-            - attribute_id: 8513020880351236940
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
-            - attribute_id: 8513020880351236940
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
+            - attributeId: 8513020880351236940
               name: Explicabo quis similique nisi et voluptates mollitia.
-              project_id: 261761713
-              string_value: Sed distinctio accusamus.
+              projectId: 261761713
+              stringValue: Sed distinctio accusamus.
           battery: 0.14262307
           configurations:
             all:

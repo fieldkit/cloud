@@ -133,11 +133,11 @@ var StationInterestingness = Type("StationInterestingness", func() {
 })
 
 var StationProjectAttribute = Type("StationProjectAttribute", func() {
-	Attribute("project_id", Int32)
-	Attribute("attribute_id", Int64)
+	Attribute("projectId", Int32)
+	Attribute("attributeId", Int64)
 	Attribute("name", String)
-	Attribute("string_value", String)
-	Required("project_id", "attribute_id", "name", "string_value")
+	Attribute("stringValue", String)
+	Required("projectId", "attributeId", "name", "stringValue")
 })
 
 var StationProjectAttributes = Type("StationProjectAttributes", func() {

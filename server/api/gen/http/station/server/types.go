@@ -1157,10 +1157,10 @@ type StationProjectAttributesResponseBody struct {
 // StationProjectAttributeResponseBody is used to define fields on response
 // body types.
 type StationProjectAttributeResponseBody struct {
-	ProjectID   int32  `form:"project_id" json:"project_id" xml:"project_id"`
-	AttributeID int64  `form:"attribute_id" json:"attribute_id" xml:"attribute_id"`
+	ProjectID   int32  `form:"projectId" json:"projectId" xml:"projectId"`
+	AttributeID int64  `form:"attributeId" json:"attributeId" xml:"attributeId"`
 	Name        string `form:"name" json:"name" xml:"name"`
-	StringValue string `form:"string_value" json:"string_value" xml:"string_value"`
+	StringValue string `form:"stringValue" json:"stringValue" xml:"stringValue"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.

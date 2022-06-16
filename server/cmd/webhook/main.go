@@ -20,6 +20,7 @@ type Options struct {
 	File        string
 	SchemaID    int
 	MessageID   int
+	Resume      bool
 	Verbose     bool
 }
 
@@ -44,9 +45,9 @@ func process(ctx context.Context, options *Options) error {
 		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID), options.Verbose)
 	} else {
 		if options.MessageID == 0 {
-			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0)
+			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0, true)
 		} else {
-			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), int64(options.MessageID))
+			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), int64(options.MessageID), options.Resume)
 		}
 	}
 
@@ -68,6 +69,7 @@ func main() {
 	flag.StringVar(&options.File, "file", "", "csv file")
 	flag.IntVar(&options.SchemaID, "schema-id", 0, "schema id to process")
 	flag.IntVar(&options.MessageID, "message-id", 0, "message id to process")
+	flag.BoolVar(&options.Resume, "resume", false, "resume on message id")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increased verbosity")
 
 	flag.Parse()
