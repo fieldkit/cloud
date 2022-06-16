@@ -235,8 +235,36 @@ export class QueriedData {
         return this.sdr.data;
     }
 
+    private getAverageTimeBetweenSample(): number | null {
+        if (this.sdr.data.length <= 1) {
+            return null;
+        }
+
+        const deltas = this.sdr.data
+            .map((row) => row.time)
+            .reduce((diffs, time, index) => {
+                if (diffs.length == 0) {
+                    return [time];
+                }
+                const head = diffs.slice(0, diffs.length - 1);
+                const diff = time - diffs[diffs.length - 1];
+                const extra = [...head, diff];
+                if (index == this.sdr.data.length - 1) {
+                    return extra;
+                }
+                return [...extra, time];
+            }, []);
+
+        return _.mean(deltas);
+    }
+
     get shouldIgnoreMissing(): boolean {
-        return false; // TODO this.sdr.aggregate.interval <= 60;
+        const averageMs = this.getAverageTimeBetweenSample();
+        console.log("viz: average-delta", averageMs);
+        if (averageMs) {
+            return averageMs - 1000 < 5; // Was this.sdr.aggregate.interval <= 60;
+        }
+        return true;
     }
 
     public sorted(): QueriedData {
