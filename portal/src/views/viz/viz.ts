@@ -979,8 +979,8 @@ export class Workspace implements VizInfoFactory {
         const allOptions = [...groupOptions, ...ungrouped];
         const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, allOptions)] : [];
 
-        console.log("viz: ungrouped", ungrouped);
-        console.log("viz: all", all);
+        console.log("viz: ungrouped", { ungrouped });
+        console.log("viz: all", { all });
 
         return [...manually, ...nearby, ...all];
     }

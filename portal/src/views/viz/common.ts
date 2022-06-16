@@ -100,6 +100,10 @@ export class SensorParams {
     }
 }
 
+function isInfluxEnabled(): boolean {
+    return window.location.hostname.indexOf("127.") >= 0;
+}
+
 export class DataQueryParams {
     constructor(public readonly when: TimeRange, public readonly sensors: VizSensor[]) {}
 
@@ -115,6 +119,7 @@ export class DataQueryParams {
         queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
+        queryParams.append("influx", isInfluxEnabled() ? "true" : "false");
         return queryParams;
     }
 
@@ -230,14 +235,40 @@ export class QueriedData {
         return this.sdr.data;
     }
 
-    get aggregate() {
-        return this.sdr.aggregate;
+    private getAverageTimeBetweenSample(): number | null {
+        if (this.sdr.data.length <= 1) {
+            return null;
+        }
+
+        const deltas = this.sdr.data
+            .map((row) => row.time)
+            .reduce((diffs, time, index) => {
+                if (diffs.length == 0) {
+                    return [time];
+                }
+                const head = diffs.slice(0, diffs.length - 1);
+                const diff = time - diffs[diffs.length - 1];
+                const extra = [...head, diff];
+                if (index == this.sdr.data.length - 1) {
+                    return extra;
+                }
+                return [...extra, time];
+            }, []);
+
+        return _.mean(deltas);
+    }
+
+    get shouldIgnoreMissing(): boolean {
+        const averageMs = this.getAverageTimeBetweenSample();
+        console.log("viz: average-delta", averageMs);
+        if (averageMs) {
+            return averageMs - 1000 < 5; // Was this.sdr.aggregate.interval <= 60;
+        }
+        return true;
     }
 
     public sorted(): QueriedData {
         const sorted = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortBy(this.sdr.data, (d) => d.time),
         };
         return new QueriedData(this.key, this.timeRangeQueried, sorted);
@@ -245,8 +276,6 @@ export class QueriedData {
 
     public removeMalformed(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: this.sdr.data.filter((d) => d.sensorId),
         };
         console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
@@ -255,8 +284,6 @@ export class QueriedData {
 
     public removeDuplicates(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
         console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);

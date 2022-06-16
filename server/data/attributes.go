@@ -4,6 +4,7 @@ type ProjectAttribute struct {
 	ID        int64  `db:"id"`
 	ProjectID int32  `db:"project_id"`
 	Name      string `db:"name"`
+	Priority  int32  `db:"priority"`
 }
 
 type StationProjectAttribute struct {
@@ -20,6 +21,7 @@ type StationProjectNamedAttribute struct {
 	StringValue string `db:"string_value"`
 	ProjectID   int32  `db:"project_id"`
 	Name        string `db:"name"`
+	Priority    int32  `db:"priority"`
 }
 
 type StationAttributeSlot struct {

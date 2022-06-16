@@ -51,6 +51,7 @@ type QueryParams struct {
 	Aggregate  string            `json:"aggregate"`
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
+	InfluxDB   bool              `json:"influxdb"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
@@ -128,6 +129,11 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 
 	complete := raw.Complete != nil && *raw.Complete
 
+	influxDB := false
+	if raw.InfluxDB != nil {
+		influxDB = *raw.InfluxDB
+	}
+
 	qp = &QueryParams{
 		Start:      start,
 		End:        end,
@@ -137,6 +143,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Aggregate:  aggregate,
 		Tail:       tail,
 		Complete:   complete,
+		InfluxDB:   influxDB,
 	}
 
 	return
@@ -318,13 +325,15 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) (*sens
 
 type DataRow struct {
 	Time      data.NumericWireTime `db:"time" json:"time"`
-	ID        *int64               `db:"id" json:"-"`
 	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
 	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
-	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
+	ModuleID  *string              `db:"module_id" json:"moduleId,omitempty"`
 	Location  *data.Location       `db:"location" json:"location,omitempty"`
 	Value     *float64             `db:"value" json:"value,omitempty"`
-	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
+
+	// Deprecated
+	id        *int64 `db:"id" json:"-"`
+	timeGroup *int32 `db:"time_group" json:"-"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
@@ -400,7 +409,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 		index += 1
 	}
 
-	if index == 1 && *rows[0].TimeGroup > 0 {
+	if index == 1 && *rows[0].timeGroup > 0 {
 		rows[1] = rows[0]
 		rows[1] = nil
 	}

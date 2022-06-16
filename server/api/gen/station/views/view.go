@@ -129,6 +129,7 @@ type StationProjectAttributeView struct {
 	AttributeID *int64
 	Name        *string
 	StringValue *string
+	Priority    *int32
 }
 
 // StationUploadView is a type that runs validations on a projected type.
@@ -701,6 +702,9 @@ func ValidateStationProjectAttributeView(result *StationProjectAttributeView) (e
 	}
 	if result.StringValue == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "result"))
+	}
+	if result.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
 	}
 	return
 }
