@@ -100,6 +100,10 @@ export class SensorParams {
     }
 }
 
+function isInfluxEnabled(): boolean {
+    return window.location.hostname.indexOf("127.") >= 0;
+}
+
 export class DataQueryParams {
     constructor(public readonly when: TimeRange, public readonly sensors: VizSensor[]) {}
 
@@ -115,7 +119,7 @@ export class DataQueryParams {
         queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
-        queryParams.append("influx", "true");
+        queryParams.append("influx", isInfluxEnabled() ? "true" : "false");
         return queryParams;
     }
 
