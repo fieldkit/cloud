@@ -36,17 +36,21 @@ func NewStationRepository(db *sqlxcache.DB) (rr *StationRepository) {
 
 func (r *StationRepository) FindOrCreateStationModel(ctx context.Context, ttnSchemaID int32, name string) (model *data.StationModel, err error) {
 	model = &data.StationModel{}
-	if err := r.db.GetContext(ctx, model, `SELECT id, name FROM fieldkit.station_model WHERE ttn_schema_id = $1`, ttnSchemaID); err != nil {
-		if err == sql.ErrNoRows {
-			model = &data.StationModel{}
-			model.Name = name
-			model.SchemaID = &ttnSchemaID
-			if err := r.db.NamedGetContext(ctx, model, `INSERT INTO fieldkit.station_model (ttn_schema_id, name) VALUES (:ttn_schema_id, :name) RETURNING id`, model); err != nil {
-				return nil, err
-			}
-			return model, nil
+	if err := r.db.GetContext(ctx, model, `SELECT id, name FROM fieldkit.station_model WHERE ttn_schema_id = $1 AND name = $2`, ttnSchemaID, name); err != nil {
+		if err != sql.ErrNoRows {
+			return nil, err
 		}
-		return nil, err
+
+		model = &data.StationModel{}
+		model.Name = name
+		model.SchemaID = &ttnSchemaID
+		if err := r.db.NamedGetContext(ctx, model, `
+				INSERT INTO fieldkit.station_model (ttn_schema_id, name, only_visible_via_association)
+				VALUES (:ttn_schema_id, :name, false) RETURNING id
+			`, model); err != nil {
+			return nil, err
+		}
+		return model, nil
 	}
 	return model, nil
 }
@@ -67,6 +71,9 @@ func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station
 }
 
 func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Station) (err error) {
+	if station.ModelID == 0 {
+		panic("WTF")
+	}
 	if _, err := r.db.NamedExecContext(ctx, `
 		UPDATE fieldkit.station SET
 			   name = :name,
@@ -82,7 +89,8 @@ func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Sta
 			   firmware_time = :firmware_time,
 			   updated_at = :updated_at,
 			   synced_at = :synced_at,
-			   ingestion_at = :ingestion_at
+			   ingestion_at = :ingestion_at,
+			   model_id = :model_id
 		WHERE id = :id
 		`, station); err != nil {
 		return err
@@ -112,7 +120,7 @@ func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (sta
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
@@ -125,7 +133,7 @@ func (r *StationRepository) QueryStationsByDeviceID(ctx context.Context, deviceI
 	stations = []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -138,7 +146,7 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -151,7 +159,7 @@ func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, devic
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
 			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE device_id = $1
 		`, deviceIdBytes); err != nil {
@@ -168,7 +176,7 @@ func (r *StationRepository) QueryStationByPhotoID(ctx context.Context, id int32)
 
 	if err := r.db.GetContext(ctx, station, `
         SELECT
-            id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
+            id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native,
             recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
         FROM fieldkit.station WHERE id IN (SELECT station_id FROM notes_media WHERE id = $1)
         `, id); err != nil {
@@ -498,7 +506,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
 			memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE id = $1
 		`, id); err != nil {
@@ -507,6 +515,15 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 
 	if len(stations) != 1 {
 		return nil, fmt.Errorf("no such station: %v", id)
+	}
+
+	models := []*data.StationModel{}
+	if err := r.db.SelectContext(ctx, &models, `
+		SELECT *
+		FROM fieldkit.station_model
+		WHERE id IN (SELECT model_id FROM fieldkit.station WHERE id = $1)
+		`, id); err != nil {
+		return nil, err
 	}
 
 	owners := []*data.User{}
@@ -623,7 +640,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	all, err := r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -635,9 +652,18 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
 			memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
 		FROM fieldkit.station WHERE owner_id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+
+	models := []*data.StationModel{}
+	if err := r.db.SelectContext(ctx, &models, `
+		SELECT *
+		FROM fieldkit.station_model
+		WHERE id IN (SELECT model_id FROM fieldkit.station WHERE id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))
 		`, id); err != nil {
 		return nil, err
 	}
@@ -775,16 +801,26 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
 		SELECT
-			id, name, device_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
 			memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location
-		FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		FROM fieldkit.station
+		WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		`, id); err != nil {
+		return nil, err
+	}
+
+	models := []*data.StationModel{}
+	if err := r.db.SelectContext(ctx, &models, `
+		SELECT *
+		FROM fieldkit.station_model
+		WHERE id IN (SELECT model_id FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1))
 		`, id); err != nil {
 		return nil, err
 	}
@@ -941,16 +977,19 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
+	return r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors)
 }
 
-func (r *StationRepository) toStationFull(stations []*data.Station, owners []*data.User, iness []*data.StationInterestingness,
+func (r *StationRepository) toStationFull(stations []*data.Station,
+	models []*data.StationModel, owners []*data.User,
+	iness []*data.StationInterestingness,
 	attributes []*data.StationProjectNamedAttribute, areas []*data.StationArea,
 	dataSummaries []*data.AggregatedDataSummary,
 	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision,
 	configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor) ([]*data.StationFull, error) {
 
+	modelsByID := make(map[int32]*data.StationModel)
 	ownersByID := make(map[int32]*data.User)
 	inessByID := make(map[int32][]*data.StationInterestingness)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
@@ -972,6 +1011,10 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 		inessByID[station.ID] = make([]*data.StationInterestingness, 0)
 		attributesByStationID[station.ID] = make([]*data.StationProjectNamedAttribute, 0)
 		stationIDsByDeviceID[key] = station.ID
+	}
+
+	for _, v := range models {
+		modelsByID[v.ID] = v
 	}
 
 	for _, v := range owners {
@@ -1040,6 +1083,7 @@ func (r *StationRepository) toStationFull(stations []*data.Station, owners []*da
 	for _, station := range stations {
 		all = append(all, &data.StationFull{
 			Station:         station,
+			Model:           modelsByID[station.ModelID],
 			Owner:           ownersByID[station.OwnerID],
 			Areas:           areasByStationID[station.ID],
 			Interestingness: inessByID[station.ID],

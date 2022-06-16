@@ -344,9 +344,10 @@ export interface StationsResponse {
 
 export interface AssociatedStation {
     station: Station;
-    manual?: { priority: number };
+    manual?: { otherStationID: number; priority: number };
     location?: { distance: number };
     project?: { id: number };
+    hidden: boolean;
 }
 
 export interface AssociatedStationsResponse {

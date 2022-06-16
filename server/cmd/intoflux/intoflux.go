@@ -423,7 +423,7 @@ func toFloat(x interface{}) (float64, bool) {
 }
 
 func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver, schemaID int32) error {
-	source := webhook.NewDatabaseMessageSource(db, schemaID, 0)
+	source := webhook.NewDatabaseMessageSource(db, schemaID, 0, false)
 
 	jqCache := &webhook.JqCache{}
 

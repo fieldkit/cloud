@@ -346,6 +346,20 @@ const routes = [
         },
     },
     {
+        path: "/station/:stationId",
+        name: "viewStationFromMap",
+        component: StationView,
+        props: (route) => {
+            return {
+                stationId: Number(route.params.stationId),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
         path: "/dashboard/projects/:projectId/station/:stationId",
         name: "viewStation",
         component: StationView,
@@ -548,7 +562,7 @@ export default function routerFactory(store) {
             if (to.name == from.name) {
                 return null;
             }
-            console.log("scrolling-to-top");
+            // console.log("scrolling-to-top");
             return { x: 0, y: 0 };
         },
     });

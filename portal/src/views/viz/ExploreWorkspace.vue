@@ -35,8 +35,22 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
+
                 <div class="station-summary" v-if="selectedStation">
-                    <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content" />
+                    <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content">
+                        <template #extra-detail>
+                            <StationBattery :station="selectedStation" />
+                        </template>
+                        <template #top-right-actions>
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                src="@/assets/tooltip-blue.svg"
+                                @click="openStationPageTab"
+                            />
+                        </template>
+                    </StationSummaryContent>
+
                     <div class="pagination" v-if="workspace && !workspace.empty">
                         <PaginationControls
                             :page="selectedIndex"
@@ -69,14 +83,15 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { Station, ActionTypes } from "@/store";
+import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-
+import * as utils from "@/utilities";
 import Comments from "../comments/Comments.vue";
+import StationBattery from "@/views/station/StationBattery.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
@@ -89,6 +104,7 @@ export default Vue.extend({
         Comments,
         StationSummaryContent,
         PaginationControls,
+        StationBattery,
     },
     props: {
         token: {
@@ -149,7 +165,7 @@ export default Vue.extend({
         selectedId(): number {
             return Number(_.flattenDeep(this.bookmark.g)[0]);
         },
-        selectedStation(): Station | null {
+        selectedStation(): DisplayStation | null {
             if (this.workspace) {
                 return this.workspace.getStation(this.selectedId);
             }
@@ -161,6 +177,8 @@ export default Vue.extend({
             console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
+            } else {
+                await this.createWorkspaceIfNecessary();
             }
         },
         async selectedId(newValue: number, oldValue: number): Promise<void> {
@@ -284,56 +302,55 @@ export default Vue.extend({
         async showStation(stationId: number): Promise<void> {
             console.log("viz: show-station", stationId);
 
-            return await this.createWorkspaceIfNecessary()
-                .then(async (workspace) => {
-                    return await this.$services.api.getQuickSensors([stationId]).then(async (quickSensors) => {
-                        console.log("viz: quick-sensors", quickSensors);
-                        if (quickSensors.stations[stationId].length == 0) {
-                            console.log("viz: no sensors TODO: FIX");
-                            this.showNoSensors = true;
-                            return Promise.delay(5000).then(() => {
-                                this.showNoSensors = false;
-                            });
-                        }
+            return await this.$services.api
+                .getQuickSensors([stationId])
+                .then(async (quickSensors) => {
+                    console.log("viz: quick-sensors", quickSensors);
+                    if (quickSensors.stations[stationId].length == 0) {
+                        console.log("viz: no sensors TODO: FIX");
+                        this.showNoSensors = true;
+                        return Promise.delay(5000).then(() => {
+                            this.showNoSensors = false;
+                        });
+                    }
 
-                        const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
-                        const sensorId = quickSensors.stations[stationId][0].sensorId;
-                        const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
+                    const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
+                    const sensorId = quickSensors.stations[stationId][0].sensorId;
+                    const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
-                        const associated = await this.$services.api.getAssociatedStations(stationId);
-                        const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
-                        console.log(`viz: show-station-associated`, associated, stationIds);
+                    const associated = await this.$services.api.getAssociatedStations(stationId);
+                    const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
+                    console.log(`viz: show-station-associated`, { associated, stationIds });
 
-                        const getInitialBookmark = () => {
-                            const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
-                            if (quickSensor.length == 1) {
-                                const end = new Date(quickSensor[0].sensorReadAt);
-                                const start = new Date(end);
+                    const getInitialBookmark = () => {
+                        const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
+                        if (quickSensor.length == 1) {
+                            const end = new Date(quickSensor[0].sensorReadAt);
+                            const start = new Date(end);
 
-                                start.setDate(end.getDate() - 14); // TODO Use getFastTime
-
-                                return new Bookmark(
-                                    this.bookmark.v,
-                                    [[[[[vizSensor], [start.getTime(), end.getTime()], [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
-                                    stationIds,
-                                    this.bookmark.p,
-                                    this.bookmark.c
-                                );
-                            }
-
-                            console.log("viz: ERROR missing expected quick row, default to FastTime.All");
+                            start.setDate(end.getDate() - 14); // TODO Use getFastTime
 
                             return new Bookmark(
                                 this.bookmark.v,
-                                [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                                [[[[[vizSensor], [start.getTime(), end.getTime()], [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
                                 stationIds,
                                 this.bookmark.p,
                                 this.bookmark.c
                             );
-                        };
+                        }
 
-                        this.$emit("open-bookmark", getInitialBookmark());
-                    });
+                        console.log("viz: ERROR missing expected quick row, default to FastTime.All");
+
+                        return new Bookmark(
+                            this.bookmark.v,
+                            [[[[[vizSensor], [Time.Min, Time.Max], [], ChartType.TimeSeries, FastTime.All]]]],
+                            stationIds,
+                            this.bookmark.p,
+                            this.bookmark.c
+                        );
+                    };
+
+                    this.$emit("open-bookmark", getInitialBookmark());
                 })
                 .catch(async (e) => {
                     if (e.name === "ForbiddenError") {
@@ -354,6 +371,13 @@ export default Vue.extend({
             const stations = this.getValidStations();
             this.showStation(stations[evt]);
             this.selectedIndex = evt;
+        },
+        openStationPageTab() {
+            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.selectedStation.id } });
+            window.open(routeData.href, "_blank");
+        },
+        getBatteryIcon() {
+            return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
         },
     },
 });
@@ -766,15 +790,30 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
 
-    .summary-content {
-        align-items: center;
-    }
     @include bp-down($sm) {
         flex-direction: column;
 
         .pagination {
             margin-top: 0.5em;
         }
+    }
+
+    .summary-content {
+        .image-container {
+            flex-basis: 86px;
+        }
+    }
+
+    .station-details {
+        padding: 0;
+    }
+
+    .station-modules {
+        margin-top: 3px;
+    }
+
+    .station-battery-container {
+        margin-top: 8px;
     }
 }
 .pagination {

@@ -64,6 +64,7 @@ type StationProgress struct {
 type StationFullView struct {
 	ID                 *int32
 	Name               *string
+	Model              *StationFullModelView
 	Owner              *StationOwnerView
 	DeviceID           *string
 	Interestingness    *StationInterestingnessView
@@ -86,6 +87,12 @@ type StationFullView struct {
 	SyncedAt           *int64
 	IngestionAt        *int64
 	Data               *StationDataSummaryView
+}
+
+// StationFullModelView is a type that runs validations on a projected type.
+type StationFullModelView struct {
+	Name                      *string
+	OnlyVisibleViaAssociation *bool
 }
 
 // StationOwnerView is a type that runs validations on a projected type.
@@ -237,6 +244,7 @@ type AssociatedStationView struct {
 	Project  *AssociatedViaProjectView
 	Location *AssociatedViaLocationView
 	Manual   *AssociatedViaManualView
+	Hidden   *bool
 }
 
 // AssociatedViaProjectView is a type that runs validations on a projected type.
@@ -252,7 +260,8 @@ type AssociatedViaLocationView struct {
 
 // AssociatedViaManualView is a type that runs validations on a projected type.
 type AssociatedViaManualView struct {
-	Priority *int32
+	OtherStationID *int32
+	Priority       *int32
 }
 
 // DownloadedPhotoView is a type that runs validations on a projected type.
@@ -306,6 +315,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"model",
 			"owner",
 			"deviceId",
 			"interestingness",
@@ -384,6 +394,7 @@ var (
 		"default": []string{
 			"id",
 			"name",
+			"model",
 			"owner",
 			"deviceId",
 			"interestingness",
@@ -416,6 +427,7 @@ var (
 			"project",
 			"location",
 			"manual",
+			"hidden",
 		},
 	}
 	// AssociatedStationMap is a map of attribute names in result type
@@ -426,6 +438,7 @@ var (
 			"project",
 			"location",
 			"manual",
+			"hidden",
 		},
 	}
 	// StationJobMap is a map of attribute names in result type StationJob indexed
@@ -521,6 +534,9 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
+	if result.Model == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("model", "result"))
+	}
 	if result.Owner == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "result"))
 	}
@@ -547,6 +563,11 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 	}
 	if result.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "result"))
+	}
+	if result.Model != nil {
+		if err2 := ValidateStationFullModelView(result.Model); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if result.Owner != nil {
 		if err2 := ValidateStationOwnerView(result.Owner); err2 != nil {
@@ -589,6 +610,18 @@ func ValidateStationFullView(result *StationFullView) (err error) {
 		if err2 := ValidateStationLocationView(result.Location); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateStationFullModelView runs the validations defined on
+// StationFullModelView.
+func ValidateStationFullModelView(result *StationFullModelView) (err error) {
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
+	}
+	if result.OnlyVisibleViaAssociation == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("only_visible_via_association", "result"))
 	}
 	return
 }
@@ -658,16 +691,16 @@ func ValidateStationProjectAttributesView(result *StationProjectAttributesView) 
 // StationProjectAttributeView.
 func ValidateStationProjectAttributeView(result *StationProjectAttributeView) (err error) {
 	if result.ProjectID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("project_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("projectId", "result"))
 	}
 	if result.AttributeID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("attribute_id", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("attributeId", "result"))
 	}
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	if result.StringValue == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("string_value", "result"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "result"))
 	}
 	return
 }
@@ -922,6 +955,9 @@ func ValidateAssociatedStationCollectionView(result AssociatedStationCollectionV
 // ValidateAssociatedStationView runs the validations defined on
 // AssociatedStationView using the "default" view.
 func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
+	if result.Hidden == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("hidden", "result"))
+	}
 	if result.Project != nil {
 		if err2 := ValidateAssociatedViaProjectView(result.Project); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -966,6 +1002,9 @@ func ValidateAssociatedViaLocationView(result *AssociatedViaLocationView) (err e
 // ValidateAssociatedViaManualView runs the validations defined on
 // AssociatedViaManualView.
 func ValidateAssociatedViaManualView(result *AssociatedViaManualView) (err error) {
+	if result.OtherStationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("otherStationID", "result"))
+	}
 	if result.Priority == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
 	}

@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -32,6 +33,7 @@ type MessageBatch struct {
 	Messages  []*WebHookMessage
 	Schemas   map[int32]*MessageSchemaRegistration
 	StartTime time.Time
+	started   bool
 	maximumID int64
 	totalRows int64
 	rows      int64
@@ -89,20 +91,29 @@ func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, bat
 	return rr.processQuery(ctx, batch, messages)
 }
 
+func (rr *MessagesRepository) ResumeOnMessage(ctx context.Context, batch *MessageBatch, messageID int64) error {
+	if batch.started {
+		return fmt.Errorf("resume unsupported on started batch")
+	}
+	batch.id = messageID
+	return nil
+}
+
 func (rr *MessagesRepository) QueryBatchBySchemaIDForProcessing(ctx context.Context, batch *MessageBatch, schemaID int32) error {
 	log := Logger(ctx).Sugar()
 
-	if batch.id == 0 {
+	if !batch.started {
 		log.Infow("counting")
 
 		summary := &batchSummary{}
 		if err := rr.db.GetContext(ctx, summary, `
 			SELECT MAX(id) AS maximum_id, COUNT(id) AS total, MIN(created_at) AS start, MAX(created_at) AS end
-			FROM fieldkit.ttn_messages WHERE (schema_id = $1) AND (created_at >= $2) AND NOT ignored
-			`, schemaID, batch.StartTime); err != nil {
+			FROM fieldkit.ttn_messages WHERE (id > $1) AND (schema_id = $2) AND (created_at >= $3) AND NOT ignored
+			`, batch.id, schemaID, batch.StartTime); err != nil {
 			return err
 		}
 
+		batch.started = true
 		batch.totalRows = summary.Total
 
 		if summary.MaximumID != nil {

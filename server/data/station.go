@@ -56,9 +56,10 @@ func (l *MultiPolygon) Scan(data interface{}) error {
 }
 
 type StationModel struct {
-	ID       int32  `db:"id,omitempty"`
-	Name     string `db:"name"`
-	SchemaID *int32 `db:"ttn_schema_id"`
+	ID                        int32  `db:"id,omitempty"`
+	Name                      string `db:"name"`
+	SchemaID                  *int32 `db:"ttn_schema_id"`
+	OnlyVisibleViaAssociation bool   `db:"only_visible_via_association"`
 }
 
 type Station struct {
@@ -215,6 +216,7 @@ type AggregatedDataSummary struct {
 
 type StationFull struct {
 	Station         *Station
+	Model           *StationModel
 	Owner           *User
 	Interestingness []*StationInterestingness
 	Attributes      []*StationProjectNamedAttribute

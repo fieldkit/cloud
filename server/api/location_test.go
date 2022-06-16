@@ -56,6 +56,7 @@ func TestLocation_PublicProject(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -152,6 +153,7 @@ func TestLocation_PrivateProject_MemberGet(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",

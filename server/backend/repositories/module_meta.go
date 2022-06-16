@@ -68,7 +68,7 @@ func (r *ModuleMetaRepository) FindByFullKey(ctx context.Context, fullKey string
 		return mm, nil
 	}
 
-	return nil, fmt.Errorf("unknown sensor: %s", fullKey)
+	return nil, fmt.Errorf("(module-meta) unknown sensor: %s", fullKey)
 }
 
 func (r *ModuleMetaRepository) FindModuleMeta(ctx context.Context, m *HeaderFields) (mm *ModuleMeta, err error) {

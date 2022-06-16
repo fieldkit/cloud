@@ -74,6 +74,7 @@ type AddPayload struct {
 type StationFull struct {
 	ID                 int32
 	Name               string
+	Model              *StationFullModel
 	Owner              *StationOwner
 	DeviceID           string
 	Interestingness    *StationInterestingness
@@ -141,8 +142,9 @@ type StationsFull struct {
 // ListProjectPayload is the payload type of the station service list project
 // method.
 type ListProjectPayload struct {
-	Auth *string
-	ID   int32
+	Auth             *string
+	ID               int32
+	DisableFiltering *bool
 }
 
 // ListAssociatedPayload is the payload type of the station service list
@@ -214,6 +216,11 @@ type ProgressPayload struct {
 // StationProgress is the result type of the station service progress method.
 type StationProgress struct {
 	Jobs []*StationJob
+}
+
+type StationFullModel struct {
+	Name                      string
+	OnlyVisibleViaAssociation bool
 }
 
 type StationOwner struct {
@@ -329,6 +336,7 @@ type AssociatedStation struct {
 	Project  *AssociatedViaProject
 	Location *AssociatedViaLocation
 	Manual   *AssociatedViaManual
+	Hidden   bool
 }
 
 type AssociatedViaProject struct {
@@ -340,7 +348,8 @@ type AssociatedViaLocation struct {
 }
 
 type AssociatedViaManual struct {
-	Priority int32
+	OtherStationID int32
+	Priority       int32
 }
 
 type EssentialStation struct {
@@ -520,6 +529,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.UpdatedAt != nil {
 		res.UpdatedAt = *vres.UpdatedAt
 	}
+	if vres.Model != nil {
+		res.Model = transformStationviewsStationFullModelViewToStationFullModel(vres.Model)
+	}
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
 	}
@@ -570,6 +582,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		PlaceNameNative:    res.PlaceNameNative,
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		vres.Model = transformStationFullModelToStationviewsStationFullModelView(res.Model)
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
@@ -728,6 +743,9 @@ func newAssociatedStationCollectionView(res AssociatedStationCollection) station
 // type AssociatedStation.
 func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedStation {
 	res := &AssociatedStation{}
+	if vres.Hidden != nil {
+		res.Hidden = *vres.Hidden
+	}
 	if vres.Project != nil {
 		res.Project = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(vres.Project)
 	}
@@ -746,7 +764,9 @@ func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedS
 // newAssociatedStationView projects result type AssociatedStation to projected
 // type AssociatedStationView using the "default" view.
 func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedStationView {
-	vres := &stationviews.AssociatedStationView{}
+	vres := &stationviews.AssociatedStationView{
+		Hidden: &res.Hidden,
+	}
 	if res.Project != nil {
 		vres.Project = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(res.Project)
 	}
@@ -876,6 +896,21 @@ func newStationJobView(res *StationJob) *stationviews.StationJobView {
 		Progress:    &res.Progress,
 	}
 	return vres
+}
+
+// transformStationviewsStationFullModelViewToStationFullModel builds a value
+// of type *StationFullModel from a value of type
+// *stationviews.StationFullModelView.
+func transformStationviewsStationFullModelViewToStationFullModel(v *stationviews.StationFullModelView) *StationFullModel {
+	if v == nil {
+		return nil
+	}
+	res := &StationFullModel{
+		Name:                      *v.Name,
+		OnlyVisibleViaAssociation: *v.OnlyVisibleViaAssociation,
+	}
+
+	return res
 }
 
 // transformStationviewsStationOwnerViewToStationOwner builds a value of type
@@ -1129,6 +1164,18 @@ func transformStationviewsStationDataSummaryViewToStationDataSummary(v *stationv
 		Start:           *v.Start,
 		End:             *v.End,
 		NumberOfSamples: *v.NumberOfSamples,
+	}
+
+	return res
+}
+
+// transformStationFullModelToStationviewsStationFullModelView builds a value
+// of type *stationviews.StationFullModelView from a value of type
+// *StationFullModel.
+func transformStationFullModelToStationviewsStationFullModelView(v *StationFullModel) *stationviews.StationFullModelView {
+	res := &stationviews.StationFullModelView{
+		Name:                      &v.Name,
+		OnlyVisibleViaAssociation: &v.OnlyVisibleViaAssociation,
 	}
 
 	return res
@@ -1458,7 +1505,8 @@ func transformStationviewsAssociatedViaManualViewToAssociatedViaManual(v *statio
 		return nil
 	}
 	res := &AssociatedViaManual{
-		Priority: *v.Priority,
+		OtherStationID: *v.OtherStationID,
+		Priority:       *v.Priority,
 	}
 
 	return res
@@ -1500,7 +1548,8 @@ func transformAssociatedViaManualToStationviewsAssociatedViaManualView(v *Associ
 		return nil
 	}
 	res := &stationviews.AssociatedViaManualView{
-		Priority: &v.Priority,
+		OtherStationID: &v.OtherStationID,
+		Priority:       &v.Priority,
 	}
 
 	return res
