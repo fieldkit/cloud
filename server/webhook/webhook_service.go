@@ -40,26 +40,28 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 	if payload.Token != nil {
 		token, err := data.DecodeBinaryString(*payload.Token)
 		if err != nil {
+			log.Warnw("webhook:token-bad", "error", err)
 			return whService.MakeBadRequest(err)
 		}
 
-		schemas := []*MessageSchemaRegistration{}
-		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT
-			id, owner_id, project_id, name, token, body, received_at, processed_at, process_interval
-			FROM fieldkit.ttn_schema WHERE token = $1`, token); err != nil {
+		ids := []int32{}
+		if err := c.options.DB.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.ttn_schema WHERE token = $1`, token); err != nil {
+			log.Warnw("webhook:error", "error", err)
 			return whService.MakeBadRequest(err)
 		}
 
-		if len(schemas) != 1 {
+		if len(ids) != 1 {
+			log.Warnw("webhook:token-unknown")
 			return whService.MakeBadRequest(fmt.Errorf("invalid schema token"))
 		}
 
-		message.SchemaID = &schemas[0].ID
+		message.SchemaID = &ids[0]
 	}
 
 	if err := c.options.DB.NamedGetContext(ctx, &message, `
 		INSERT INTO fieldkit.ttn_messages (created_at, headers, body, schema_id) VALUES (:created_at, :headers, :body, :schema_id) RETURNING id
 		`, &message); err != nil {
+		log.Warnw("webhook:error", "error", err)
 		return err
 	}
 
