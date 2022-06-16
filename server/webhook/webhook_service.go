@@ -44,7 +44,9 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 		}
 
 		schemas := []*MessageSchemaRegistration{}
-		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE token = $1`, token); err != nil {
+		if err := c.options.DB.SelectContext(ctx, &schemas, `SELECT
+			id, owner_id, project_id, name, token, body, received_at, processed_at, process_interval
+			FROM fieldkit.ttn_schema WHERE token = $1`, token); err != nil {
 			return whService.MakeBadRequest(err)
 		}
 
