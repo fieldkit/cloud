@@ -31,9 +31,11 @@
                     <button @click="copyUrlToClipboard()">
                         {{ $t("sharePanel.copyBtn") }}
                     </button>
-                    <span :class="{ visible: showCopiedLink }" class="url-copied">
-                        {{ $t("sharePanel.linkCopied") }}
-                    </span>
+                    <div class="url-copied-wrap" :class="{ visible: showCopiedLink }">
+                        <span class="url-copied">
+                            {{ $t("sharePanel.linkCopied") }}
+                        </span>
+                    </div>
                 </div>
             </a>
         </div>
@@ -231,21 +233,27 @@ export default Vue.extend({
         }
     }
 
-    .url-copied {
-        background-color: rgba(160, 219, 225, 0.1);
+    .url-copied-wrap {
+        background-color: #fff;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
         opacity: 0;
         visibility: hidden;
-        font-size: 14px;
-        padding: 5px 10px;
-        border-radius: 4px;
         transition: opacity 0.25s;
-        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        display: flex;
         @include position(absolute, null 0 -35px null);
 
         &.visible {
             opacity: 1;
             visibility: visible;
         }
+    }
+
+    .url-copied {
+        background-color: rgba(160, 219, 225, 0.1);
+        border-radius: 4px;
+        font-size: 14px;
+        padding: 5px 10px;
     }
 }
 </style>

@@ -1161,6 +1161,7 @@ type StationProjectAttributeResponseBody struct {
 	AttributeID *int64  `form:"attributeId,omitempty" json:"attributeId,omitempty" xml:"attributeId,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	StringValue *string `form:"stringValue,omitempty" json:"stringValue,omitempty" xml:"stringValue,omitempty"`
+	Priority    *int32  `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -3723,6 +3724,9 @@ func ValidateStationProjectAttributeResponseBody(body *StationProjectAttributeRe
 	}
 	if body.StringValue == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "body"))
+	}
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }

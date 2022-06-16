@@ -248,6 +248,7 @@ type StationProjectAttribute struct {
 	AttributeID int64
 	Name        string
 	StringValue string
+	Priority    int32
 }
 
 type StationUpload struct {
@@ -986,6 +987,7 @@ func transformStationviewsStationProjectAttributeViewToStationProjectAttribute(v
 		AttributeID: *v.AttributeID,
 		Name:        *v.Name,
 		StringValue: *v.StringValue,
+		Priority:    *v.Priority,
 	}
 
 	return res
@@ -1245,6 +1247,7 @@ func transformStationProjectAttributeToStationviewsStationProjectAttributeView(v
 		AttributeID: &v.AttributeID,
 		Name:        &v.Name,
 		StringValue: &v.StringValue,
+		Priority:    &v.Priority,
 	}
 
 	return res

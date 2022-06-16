@@ -546,7 +546,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id = $1
@@ -688,7 +688,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
@@ -847,7 +847,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)

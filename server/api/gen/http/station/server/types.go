@@ -1161,6 +1161,7 @@ type StationProjectAttributeResponseBody struct {
 	AttributeID int64  `form:"attributeId" json:"attributeId" xml:"attributeId"`
 	Name        string `form:"name" json:"name" xml:"name"`
 	StringValue string `form:"stringValue" json:"stringValue" xml:"stringValue"`
+	Priority    int32  `form:"priority" json:"priority" xml:"priority"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.

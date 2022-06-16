@@ -310,6 +310,7 @@ export interface ProjectAttribute {
     projectId: number;
     name: string;
     stringValue: string;
+    priority: number;
 }
 
 export interface Station {
