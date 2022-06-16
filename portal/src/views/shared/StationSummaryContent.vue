@@ -15,7 +15,7 @@
             >
                 <div class="location-container">
                     <div v-if="stationLocationName || station.placeNameOther">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <i class="icon icon-location" />
                         <template>
                             {{ stationLocationName ? stationLocationName : station.placeNameOther }}
                         </template>
@@ -137,7 +137,7 @@ export default Vue.extend({
     }
 
     > div {
-        @include flex(center);
+        @include flex(flex-start);
         margin-bottom: 5px;
 
         &:first-of-type {

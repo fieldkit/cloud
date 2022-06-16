@@ -18,7 +18,7 @@
                             <div>
                                 <div class="station-name">{{ station.name }}</div>
 
-                                <div v-if="partnerCustomization().stationLocationName(station)" class="flex flex-al-center station-location">
+                                <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                     <i class="icon icon-location"></i>
                                     <span>{{ partnerCustomization().stationLocationName(station) }}</span>
                                 </div>
@@ -400,7 +400,7 @@ export default Vue.extend({
         }
     }
     &-location {
-        align-self: flex-start;
+        align-items: flex-start;
         margin-bottom: 7px;
     }
     &-row {

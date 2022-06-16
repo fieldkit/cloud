@@ -109,7 +109,7 @@ export default Vue.extend({
     margin-right: 10px;
 
     .textual & {
-        margin-right: 10px;
+        margin-right: 7px;
         line-height: 10px;
     }
 }
@@ -117,11 +117,11 @@ export default Vue.extend({
     margin-left: 10px;
 
     .textual & {
-        margin-left: 10px;
+        margin-left: 7px;
     }
 }
 .pagination .textual {
-    font-size: 18px;
+    font-size: 12px;
     font-family: var(--font-family-bold);
     align-items: center;
 }
@@ -130,7 +130,7 @@ export default Vue.extend({
     border: 0;
     margin-bottom: 0;
     user-select: none;
-    font-size: 17px;
+    font-size: 12px;
     color: #d8d8d8;
     justify-content: center;
     align-items: center;
