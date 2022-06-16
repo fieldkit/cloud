@@ -76,6 +76,8 @@ type Config struct {
 	StatsdAddress         string   `split_words:"true" default:""`
 	Production            bool     `envconfig:"production"`
 	LoggingFull           bool     `envconfig:"logging_full"`
+	Workers               int      `split_words:"true" default:"1"`
+	Live                  bool     `split_words:"true"`
 }
 
 func getBucketNames(config *Config) *api.BucketNames {
@@ -259,6 +261,8 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
+	log.Infow("starting", "workers", config.Workers, "live", config.Live)
+
 	qc := que.NewClient(pgxpool)
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, &backend.FileArchives{
@@ -266,7 +270,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
 	}, qc))
-	workers := que.NewWorkerPool(qc, workMap, 1)
+	workers := que.NewWorkerPool(qc, workMap, config.Workers)
 
 	go workers.Start()
 
