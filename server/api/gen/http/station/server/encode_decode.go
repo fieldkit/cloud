@@ -1661,6 +1661,7 @@ func marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResp
 		AttributeID: *v.AttributeID,
 		Name:        *v.Name,
 		StringValue: *v.StringValue,
+		Priority:    *v.Priority,
 	}
 
 	return res

@@ -137,7 +137,8 @@ var StationProjectAttribute = Type("StationProjectAttribute", func() {
 	Attribute("attributeId", Int64)
 	Attribute("name", String)
 	Attribute("stringValue", String)
-	Required("projectId", "attributeId", "name", "stringValue")
+	Attribute("priority", Int32)
+	Required("projectId", "attributeId", "name", "stringValue", "priority")
 })
 
 var StationProjectAttributes = Type("StationProjectAttributes", func() {

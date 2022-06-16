@@ -1005,6 +1005,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			AttributeID: attribute.AttributeID,
 			Name:        attribute.Name,
 			StringValue: attribute.StringValue,
+			Priority:    attribute.Priority,
 		})
 	}
 
