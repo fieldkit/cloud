@@ -21,7 +21,7 @@
                         </template>
                     </div>
                     <div v-if="station.placeNameNative">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
+                        <i class="icon icon-location" />
                         <span>
                             Native Lands:
                             <span class="bold">{{ station.placeNameNative }}</span>
@@ -150,6 +150,7 @@ export default Vue.extend({
 
 .icon {
     padding-right: 5px;
+    transform: translateY(1px);
 }
 
 .station-modules {
