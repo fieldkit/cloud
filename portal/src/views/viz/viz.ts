@@ -1,4 +1,4 @@
-import _, { map } from "lodash";
+import _ from "lodash";
 import moment, { Moment } from "moment";
 import {
     SensorsResponse,
@@ -584,7 +584,7 @@ export class Querier {
 
         const key = queryParams.toString();
 
-        console.log(`vis: query-info`, key);
+        // console.log(`vis: query-info`, key);
 
         if (this.info[key]) {
             // iq.howBusy(1);
@@ -619,7 +619,7 @@ export class Querier {
         const queryParams = params.queryParams();
         const key = queryParams.toString();
 
-        console.log(`viz: query-data`, key);
+        // console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
             // vq.howBusy(1);
@@ -656,13 +656,35 @@ export class Querier {
 }
 
 export class Workspace implements VizInfoFactory {
+    public version = 0;
     private stationIds: StationID[] = [];
     private stationsFull: Station[] = [];
     private associated: AssociatedStation[] = [];
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     private readonly showInternalSensors = false;
-    public version = 0;
+
+    constructor(
+        private readonly meta: SensorsResponse,
+        private groups: Group[] = [],
+        public readonly projects: number[] = [],
+        public readonly context: ExploreContext | null = null
+    ) {
+        this.refreshStationIds();
+    }
+
+    public get selectedStationId(): number {
+        const firstVizSensor = _(this.groups)
+            .map((g) => g.vizes.map((v) => v.bookmark()[0]))
+            .flatten()
+            .flatten()
+            .first();
+        if (!firstVizSensor) {
+            throw new Error();
+        }
+        console.log("viz: first-viz-sensor", firstVizSensor);
+        return this.findStationOverride(firstVizSensor) || firstVizSensor[0];
+    }
 
     public findStationOverride(sensor: VizSensor): number | null {
         const moduleId = sensor[1][0];
@@ -700,15 +722,6 @@ export class Workspace implements VizInfoFactory {
 
     public get allStations(): Station[] {
         return this.stationsFull;
-    }
-
-    constructor(
-        private readonly meta: SensorsResponse,
-        private groups: Group[] = [],
-        public readonly projects: number[] = [],
-        public readonly context: ExploreContext | null = null
-    ) {
-        this.refreshStationIds();
     }
 
     public getStation(id: number): DisplayStation | null {
@@ -848,11 +861,11 @@ export class Workspace implements VizInfoFactory {
 
     public async addStationIds(ids: number[]): Promise<Workspace> {
         if (_.difference(ids, this.stationIds).length == 0) {
-            console.log("viz: workspace-add-station-ids(ignored)", ids);
+            console.log("viz: workspace-add-station-ids(ignored)", { ids });
             return this;
         }
         this.stationIds = [...this.stationIds, ...ids];
-        console.log("viz: workspace-add-station-ids", this.stationIds);
+        console.log("viz: workspace-add-station-ids", { ids: this.stationIds });
         return this;
     }
 
@@ -985,7 +998,7 @@ export class Workspace implements VizInfoFactory {
         return [...manually, ...nearby, ...all];
     }
 
-    public sensorOptions(stationId: number, flatten = false): SensorTreeOption[] {
+    public sensorOptions(stationId: number, flatten = false, depth = 0): SensorTreeOption[] {
         const station = this.stations[stationId];
         if (!station) {
             throw new Error(`viz: No station: ${stationId}`);
@@ -1036,7 +1049,7 @@ export class Workspace implements VizInfoFactory {
                     throw new Error(`viz: Expected module age: no sensors?`);
                 }
 
-                const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
+                const label = i18n.tc(moduleKey);
 
                 if (flatten) {
                     return children[0];
@@ -1046,33 +1059,31 @@ export class Workspace implements VizInfoFactory {
             }
         );
 
-        if (_.flatten(options.map((o) => o.children)).length == 1) {
-            const associatedWithStation = this.associated.filter((assoc) => assoc.manual && assoc.manual.otherStationID == stationId);
-            if (associatedWithStation.length) {
-                const associatedSensorOptions = _.flatten(
-                    associatedWithStation.map((associated) => {
-                        const moduleOptions = this.sensorOptions(associated.station.id);
-                        console.log("debug-viz-station", moduleOptions);
-                        return _.flatten(moduleOptions.map((option) => option.children || []));
-                    })
-                );
-
-                const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
-
-                if (!options || options.length != 1 || !options[0].children) {
-                    console.log("viz: unexpected options", options);
-                } else {
-                    options[0].children = [...options[0].children, relatedOption];
-                }
-            }
-        }
-
         const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
             if (option.age) {
                 return -option.age.valueOf();
             }
             return 0;
         });
+
+        const associatedWithStation = this.associated.filter((assoc) => assoc.manual && assoc.manual.otherStationID == stationId);
+        if (associatedWithStation.length > 0) {
+            const associatedSensorOptions = _(
+                associatedWithStation.map((associated) => {
+                    const moduleOptions = this.sensorOptions(associated.station.id, false, depth + 1);
+                    console.log("viz: debug-associated", depth, moduleOptions);
+                    return _.flatten(moduleOptions.map((option) => option.children || []));
+                })
+            )
+                .flatten()
+                .sortBy((o) => o.label)
+                .value();
+
+            if (associatedSensorOptions.length > 0) {
+                const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
+                sorted.push(relatedOption);
+            }
+        }
 
         return sorted;
     }

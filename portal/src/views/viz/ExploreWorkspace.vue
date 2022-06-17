@@ -167,7 +167,7 @@ export default Vue.extend({
         },
         selectedStation(): DisplayStation | null {
             if (this.workspace) {
-                return this.workspace.getStation(this.selectedId);
+                return this.workspace.getStation(this.workspace.selectedStationId);
             }
             return null;
         },
