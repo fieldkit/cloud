@@ -328,12 +328,6 @@ export default Vue.extend({
     height: 0;
 }
 
-.ProseMirror p {
-    /*&:not(.is-editor-empty) {
-        margin: 28px 0;
-    }*/
-}
-
 .tiptap-reading {
     border: 1px solid transparent;
 

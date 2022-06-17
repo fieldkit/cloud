@@ -529,7 +529,6 @@ header {
         width: 100%;
         position: relative;
         background-color: #fff;
-        min-height: 47px;
     }
 }
 
