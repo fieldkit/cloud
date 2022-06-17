@@ -25,3 +25,10 @@
     }
 }
 
+.icon-location {
+    &:before {
+        body.floodnet & {
+            color: var(--color-dark);
+        }
+    }
+}
