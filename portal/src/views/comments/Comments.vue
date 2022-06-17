@@ -529,6 +529,7 @@ header {
         width: 100%;
         position: relative;
         background-color: #fff;
+        min-height: 47px;
     }
 }
 
@@ -678,6 +679,7 @@ header {
 
 .post-header {
     display: flex;
+    margin-bottom: 5px;
 }
 
 .need-login-msg {

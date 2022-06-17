@@ -286,14 +286,6 @@ export default Vue.extend({
     }
 }
 
-.tiptap-reading {
-    border: 1px solid transparent;
-
-    p {
-        margin: 0em;
-    }
-}
-
 /* Basic editor styles */
 .ProseMirror-focused {
     outline: none;
@@ -315,6 +307,15 @@ export default Vue.extend({
 
     p {
         word-break: break-all;
+        margin: 28px 0;
+
+        &:first-of-type {
+            margin-top: 14px;
+        }
+
+        &:last-of-type {
+            margin-bottom: 14px;
+        }
     }
 }
 
@@ -325,6 +326,26 @@ export default Vue.extend({
     color: #ced4da;
     pointer-events: none;
     height: 0;
+}
+
+.ProseMirror p {
+    /*&:not(.is-editor-empty) {
+        margin: 28px 0;
+    }*/
+}
+
+.tiptap-reading {
+    border: 1px solid transparent;
+
+    p {
+        &:first-of-type {
+            margin-top: 0;
+        }
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
 }
 
 .mention {
