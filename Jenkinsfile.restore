@@ -27,23 +27,24 @@ timestamps {
 
 					def pgDbUrl = "postgres://${ws.database_username.value}:${ws.database_password.value}@${ws.database_address.value}/postgres"
 
-					writeFile(file: "setup.sql", text: """
-
-SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fk';
-ALTER DATABASE fk RENAME TO "fk-${stamp}";
-
-					""")
+					def pgTemporaryDbUrl = "postgres://${ws.database_username.value}:${ws.database_password.value}@${ws.database_address.value}/fk-restore"
 
 					writeFile(file: "create.sql", text: """
-CREATE DATABASE fk;
-ALTER DATABASE fk SET search_path TO fieldkit, public;
+CREATE DATABASE "fk-restore";
+ALTER DATABASE "fk-restore" SET search_path TO fieldkit, public;
 					""")
 
-					sh "docker run --rm -i postgres psql '${pgDbUrl}' < setup.sql"
-					
 					sh "docker run --rm -i postgres psql '${pgDbUrl}' < create.sql"
     				
-					sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${ws.database_url.value}'"
+					sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${pgTemporaryDbUrl}'"
+
+					writeFile(file: "swap.sql", text: """
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fk';
+ALTER DATABASE fk RENAME TO "fk-${stamp}";
+ALTER DATABASE "fk-restore" RENAME TO "fk";
+					""")
+
+					sh "docker run --rm -i postgres psql '${pgDbUrl}' < swap.sql"
 
 					notifySuccess()
 				}
