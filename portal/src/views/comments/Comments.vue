@@ -678,6 +678,7 @@ header {
 
 .post-header {
     display: flex;
+    margin-bottom: 5px;
 }
 
 .need-login-msg {
