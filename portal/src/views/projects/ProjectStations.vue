@@ -46,7 +46,14 @@
                         @selected="showSummary(station)"
                     >
                         <div class="station-links">
-                            <i v-on:click="openNotes(station)" class="icon icon-field-notes"></i>
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                src="@/assets/tooltip-blue.svg"
+                                width="24px"
+                                height="24px"
+                                @click="openNotes(station)"
+                            />
                         </div>
                     </TinyStation>
                 </div>
@@ -409,8 +416,14 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    align-items: center;
     border-left: 1px solid var(--color-border);
     text-align: center;
+    cursor: initial;
+
+    img {
+        cursor: pointer;
+    }
 }
 
 .station-links .remove {
@@ -429,21 +442,6 @@ export default Vue.extend({
     left: 122px;
 }
 
-.icon-field-notes {
-    font-size: 20px;
-    cursor: pointer;
-    margin: auto;
-
-    &:before {
-        color: var(--color-primary);
-    }
-
-    body.floodnet & {
-        &:before {
-            color: var(--color-dark);
-        }
-    }
-}
 .map-expand {
     background-color: #ffffff;
     z-index: $z-index-top;
