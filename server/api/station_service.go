@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -881,17 +882,19 @@ func transformModules(from *data.StationFull, configurationID int64, mm []*repos
 		}
 
 		hardwareID := hex.EncodeToString(v.HardwareID)
+		hardwareIDBase64 := base64.StdEncoding.EncodeToString(v.HardwareID)
 
 		to = append(to, &station.StationModule{
-			ID:         v.ID,
-			FullKey:    moduleKey,
-			HardwareID: &hardwareID,
-			Name:       translatedName,
-			Position:   int32(v.Position),
-			Flags:      int32(v.Flags),
-			Internal:   v.Flags > 0 || v.Position == 255,
-			Meta:       serializedModuleMeta,
-			Sensors:    sensorsWm,
+			ID:               v.ID,
+			FullKey:          moduleKey,
+			HardwareID:       &hardwareID,
+			HardwareIDBase64: &hardwareIDBase64,
+			Name:             translatedName,
+			Position:         int32(v.Position),
+			Flags:            int32(v.Flags),
+			Internal:         v.Flags > 0 || v.Position == 255,
+			Meta:             serializedModuleMeta,
+			Sensors:          sensorsWm,
 		})
 
 	}

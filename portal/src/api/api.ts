@@ -278,6 +278,7 @@ export interface StationModule {
     id: number;
     name: string;
     hardwareId: string;
+    hardwareIdBase64: string;
     position: number;
     internal: boolean;
     flags: number;

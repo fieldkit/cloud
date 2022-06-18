@@ -75,16 +75,17 @@ type StationConfiguration struct {
 }
 
 type StationModule struct {
-	ID           int64
-	HardwareID   *string
-	MetaRecordID *int64
-	Name         string
-	Position     int32
-	Flags        int32
-	Internal     bool
-	FullKey      string
-	Sensors      []*StationSensor
-	Meta         map[string]interface{}
+	ID               int64
+	HardwareID       *string
+	HardwareIDBase64 *string
+	MetaRecordID     *int64
+	Name             string
+	Position         int32
+	Flags            int32
+	Internal         bool
+	FullKey          string
+	Sensors          []*StationSensor
+	Meta             map[string]interface{}
 }
 
 type StationSensor struct {
@@ -233,14 +234,15 @@ func transformInformationviewsStationConfigurationViewToStationConfiguration(v *
 // type *StationModule from a value of type *informationviews.StationModuleView.
 func transformInformationviewsStationModuleViewToStationModule(v *informationviews.StationModuleView) *StationModule {
 	res := &StationModule{
-		ID:           *v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         *v.Name,
-		Position:     *v.Position,
-		Flags:        *v.Flags,
-		Internal:     *v.Internal,
-		FullKey:      *v.FullKey,
+		ID:               *v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             *v.Name,
+		Position:         *v.Position,
+		Flags:            *v.Flags,
+		Internal:         *v.Internal,
+		FullKey:          *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -340,14 +342,15 @@ func transformStationConfigurationToInformationviewsStationConfigurationView(v *
 // type *informationviews.StationModuleView from a value of type *StationModule.
 func transformStationModuleToInformationviewsStationModuleView(v *StationModule) *informationviews.StationModuleView {
 	res := &informationviews.StationModuleView{
-		ID:           &v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         &v.Name,
-		Position:     &v.Position,
-		Flags:        &v.Flags,
-		Internal:     &v.Internal,
-		FullKey:      &v.FullKey,
+		ID:               &v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             &v.Name,
+		Position:         &v.Position,
+		Flags:            &v.Flags,
+		Internal:         &v.Internal,
+		FullKey:          &v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*informationviews.StationSensorView, len(v.Sensors))
