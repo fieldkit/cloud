@@ -211,7 +211,7 @@ export default Vue.extend({
     methods: {
         async includeAssociated(ws: Workspace): Promise<Workspace> {
             const allStationIds = ws.allStationIds;
-            console.log("viz: include-associated(0)", allStationIds);
+            console.log("viz: include-associated(0)", { allStationIds });
 
             if (allStationIds.length > 0) {
                 const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
@@ -225,7 +225,7 @@ export default Vue.extend({
                 });
                 if (associated) {
                     const ids = associated.stations.map((s) => s.station.id);
-                    console.log(`viz: include-associated(0)`, associated);
+                    console.log(`viz: include-associated(0)`, { associated });
                     console.log(
                         `viz: include-associated(0)`,
                         associated.stations
@@ -291,7 +291,7 @@ export default Vue.extend({
             const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
             const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
 
-            console.log(`viz: workspace-created`);
+            // console.log(`viz: workspace-created`);
 
             await this.includeAssociated(ws);
 

@@ -663,14 +663,20 @@ export class Workspace implements VizInfoFactory {
     private readonly querier = new Querier();
     private readonly stations: { [index: number]: StationMeta } = {};
     private readonly showInternalSensors = false;
+    private ready = false;
 
     constructor(
         private readonly meta: SensorsResponse,
         private groups: Group[] = [],
         public readonly projects: number[] = [],
+        public readonly bookmarkStations: number[] | null = null,
         public readonly context: ExploreContext | null = null
     ) {
-        this.refreshStationIds();
+        if (bookmarkStations) {
+            this.stationIds = bookmarkStations;
+        } else {
+            this.refreshStationIds();
+        }
     }
 
     public get selectedStationId(): number {
@@ -687,10 +693,20 @@ export class Workspace implements VizInfoFactory {
     }
 
     public findStationOverride(sensor: VizSensor): number | null {
-        const moduleId = sensor[1][0];
-        const moduleIdToStationId = _.fromPairs(
+        const fromStations = _.fromPairs(
             _.flatten(Object.values(this.stations).map((row) => row.sensors.map((sensor) => [sensor.moduleId, row.id])))
         );
+        const moduleIdToStationId = _(this.associated)
+            .map((a) => {
+                return a.station.configurations.all[0].modules.map((m) => {
+                    return [m.hardwareIdBase64, a.station.id];
+                });
+            })
+            .flatten()
+            .fromPairs()
+            .merge(fromStations)
+            .value();
+        const moduleId = sensor[1][0];
         const sensorStationId = moduleIdToStationId[moduleId];
         return this.stationOverrides[sensorStationId];
     }
@@ -850,6 +866,7 @@ export class Workspace implements VizInfoFactory {
     }
 
     public async addAssociatedStations(associated: AssociatedStation[]): Promise<Workspace> {
+        // console.log("viz: associated-add", { associated });
         this.associated = associated;
         return this;
     }
@@ -886,7 +903,8 @@ export class Workspace implements VizInfoFactory {
     }
 
     private refreshStationIds() {
-        this.stationIds = _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
+        const vizStationIds = _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
+        this.stationIds = vizStationIds;
     }
 
     public addStandardGraph(vizSensor: VizSensor): Workspace {
@@ -992,8 +1010,8 @@ export class Workspace implements VizInfoFactory {
         const allOptions = [...groupOptions, ...ungrouped];
         const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, allOptions)] : [];
 
-        console.log("viz: ungrouped", { ungrouped });
-        console.log("viz: all", { all });
+        // console.log("viz: ungrouped", { ungrouped });
+        // console.log("viz: all", { all });
 
         return [...manually, ...nearby, ...all];
     }
@@ -1191,6 +1209,7 @@ export class Workspace implements VizInfoFactory {
             meta,
             bm.g.map((gm) => Group.fromBookmark(gm)),
             bm.p,
+            bm.s,
             bm.c
         );
     }
