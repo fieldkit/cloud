@@ -194,6 +194,9 @@ export default Vue.extend({
         parentData(): Promise<void> {
             return this.getComments();
         },
+        $route() {
+            this.highlightComment();
+        },
     },
     mounted(): Promise<void> {
         this.placeholder = this.getNewCommentPlaceholder();
@@ -403,7 +406,7 @@ button {
 
 .container {
     margin-top: 20px;
-    padding: 0 20px 30px 20px;
+    padding: 0 0 30px 0;
     background: #fff;
     border-radius: 1px;
     border: 1px solid $color-border;
@@ -411,7 +414,7 @@ button {
 
     @include bp-down($xs) {
         margin: 20px -10px 0;
-        padding: 0 10px 30px 10px;
+        padding: 0 0 30px 0;
     }
 
     &.data-view {
@@ -424,10 +427,14 @@ button {
 
 header {
     @include flex(center, space-between);
-    padding: 13px 0;
+    padding: 13px 20px;
     border-bottom: 1px solid $color-border;
     font-size: 20px;
     font-weight: 500;
+
+    @include bp-down($xs) {
+        padding: 13px 10px;
+    }
 
     .data-view & {
         font-size: 18px;
@@ -444,7 +451,11 @@ header {
     @include flex(center, space-between);
     border-top: 1px solid $color-border;
     border-bottom: 1px solid $color-border;
-    padding: 15px 0;
+    padding: 15px 20px;
+
+    @include bp-down($xs) {
+        padding: 15px 10px;
+    }
 
     .data-view & {
         border-top: none;
@@ -465,12 +476,12 @@ header {
 
 ::v-deep .new-comment {
     @include flex(flex-end);
-    padding: 22px 0;
+    padding: 22px 20px;
     position: relative;
 
     @include bp-down($xs) {
         margin: 0 -10px;
-        padding: 15px 10px 15px 10px;
+        padding: 15px 10px;
     }
 
     @media screen and (max-width: 320px) {
@@ -567,9 +578,13 @@ header {
 .comment {
     @include flex(flex-start);
     flex: 100%;
-    padding: 15px 0 0;
+    padding: 15px 20px 0 20px;
     position: relative;
     flex-wrap: wrap;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 0 10px;
+    }
 
     &-first-level {
         border-bottom: 1px solid $color-border;
@@ -587,8 +602,8 @@ header {
         }
     }
 
-    &.highlight > div {
-        background-color: #a0dbe1;
+    &.highlight {
+        background-color: #f5fbfc;
     }
 }
 
