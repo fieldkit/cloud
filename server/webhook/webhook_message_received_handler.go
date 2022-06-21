@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -25,7 +25,7 @@ func (h *WebHookMessageRececivedHandler) Handle(ctx context.Context, m *WebHookM
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 
-	source := NewDatabaseMessageSource(h.db, m.SchemaID)
+	source := NewDatabaseMessageSource(h.db, m.SchemaID, 0, false)
 
 	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err

@@ -71,7 +71,13 @@ const mutations = {
         state.send = send;
     },
     [NOTIFIED]: (state: NotificationsState, payload: Notification) => {
-        state.notifications.push(payload);
+        if (
+            !state.notifications.find((notification) => {
+                return notification.notificationId === payload.notificationId;
+            })
+        ) {
+            state.notifications.push(payload);
+        }
     },
     [SEEN]: (state: NotificationsState) => {
         Vue.set(state, "notifications", []);

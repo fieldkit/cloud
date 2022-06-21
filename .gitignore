@@ -24,3 +24,4 @@ coverage.data
 fk-saml.cert
 fk-saml.key
 fkserver.json
+influxdb

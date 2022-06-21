@@ -305,6 +305,13 @@ export interface StationLocation {
     readonly regions: StationRegion[] | null;
 }
 
+export interface ProjectAttribute {
+    attributeId: number;
+    projectId: number;
+    name: string;
+    stringValue: string;
+}
+
 export interface Station {
     id: number;
     name: string;
@@ -322,6 +329,9 @@ export interface Station {
     placeNameNative: string | null;
     recordingStartedAt: Date | null;
     firmwareNumber: number | null;
+    attributes: {
+        attributes: ProjectAttribute[];
+    };
 }
 
 export interface ProjectsResponse {
@@ -330,6 +340,18 @@ export interface ProjectsResponse {
 
 export interface StationsResponse {
     stations: Station[];
+}
+
+export interface AssociatedStation {
+    station: Station;
+    manual?: { otherStationID: number; priority: number };
+    location?: { distance: number };
+    project?: { id: number };
+    hidden: boolean;
+}
+
+export interface AssociatedStationsResponse {
+    stations: AssociatedStation[];
 }
 
 export type SendFunction = (message: unknown) => Promise<void>;
@@ -696,7 +718,7 @@ class FKApi {
 
     getStation(id): Promise<Station> {
         return this.invoke({
-            auth: Auth.Required,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/stations/" + id,
         });
@@ -713,13 +735,14 @@ class FKApi {
         });
     }
 
-    getAssociatedStations(id: number): Promise<StationsResponse> {
+    getAssociatedStations(id: number): Promise<AssociatedStationsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + `/stations/${id}/associated`,
         });
     }
+
     getCurrentUser(): Promise<CurrentUser> {
         return this.invoke({
             auth: Auth.Required,

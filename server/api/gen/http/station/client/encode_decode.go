@@ -940,6 +940,11 @@ func EncodeListProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(
 				req.Header.Set("Authorization", head)
 			}
 		}
+		values := req.URL.Query()
+		if p.DisableFiltering != nil {
+			values.Add("disable_filtering", fmt.Sprintf("%v", *p.DisableFiltering))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -1126,13 +1131,13 @@ func DecodeListAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, 
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("station", "list associated", err)
 			}
-			p := NewListAssociatedStationsFullOK(&body)
+			p := NewListAssociatedAssociatedStationsOK(&body)
 			view := "default"
-			vres := &stationviews.StationsFull{Projected: p, View: view}
-			if err = stationviews.ValidateStationsFull(vres); err != nil {
+			vres := &stationviews.AssociatedStations{Projected: p, View: view}
+			if err = stationviews.ValidateAssociatedStations(vres); err != nil {
 				return nil, goahttp.ErrValidationError("station", "list associated", err)
 			}
-			res := station.NewStationsFull(vres)
+			res := station.NewAssociatedStations(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -1936,6 +1941,18 @@ func DecodeProgressResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView
+// builds a value of type *stationviews.StationFullModelView from a value of
+// type *StationFullModelResponseBody.
+func unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v *StationFullModelResponseBody) *stationviews.StationFullModelView {
+	res := &stationviews.StationFullModelView{
+		Name:                      v.Name,
+		OnlyVisibleViaAssociation: v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -2239,6 +2256,7 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		SyncedAt:           v.SyncedAt,
 		IngestionAt:        v.IngestionAt,
 	}
+	res.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v.Model)
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	res.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v.Interestingness)
 	res.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(v.Attributes)
@@ -2253,6 +2271,70 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	}
 	if v.Data != nil {
 		res.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(v.Data)
+	}
+
+	return res
+}
+
+// unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView
+// builds a value of type *stationviews.AssociatedStationView from a value of
+// type *AssociatedStationResponseBody.
+func unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(v *AssociatedStationResponseBody) *stationviews.AssociatedStationView {
+	res := &stationviews.AssociatedStationView{
+		Hidden: v.Hidden,
+	}
+	res.Station = unmarshalStationFullResponseBodyToStationviewsStationFullView(v.Station)
+	if v.Project != nil {
+		res.Project = unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v.Project)
+	}
+	if v.Location != nil {
+		res.Location = unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(v.Location)
+	}
+	if v.Manual != nil {
+		res.Manual = unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView(v.Manual)
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView
+// builds a value of type *stationviews.AssociatedViaProjectView from a value
+// of type *AssociatedViaProjectResponseBody.
+func unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v *AssociatedViaProjectResponseBody) *stationviews.AssociatedViaProjectView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaProjectView{
+		ID: v.ID,
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView
+// builds a value of type *stationviews.AssociatedViaLocationView from a value
+// of type *AssociatedViaLocationResponseBody.
+func unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(v *AssociatedViaLocationResponseBody) *stationviews.AssociatedViaLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaLocationView{
+		Distance: v.Distance,
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView
+// builds a value of type *stationviews.AssociatedViaManualView from a value of
+// type *AssociatedViaManualResponseBody.
+func unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView(v *AssociatedViaManualResponseBody) *stationviews.AssociatedViaManualView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaManualView{
+		OtherStationID: v.OtherStationID,
+		Priority:       v.Priority,
 	}
 
 	return res

@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Dolor soluta neque cupiditate deleniti animi.\",\n      \"locationName\": \"Qui tempora atque cupiditate sequi quaerat.\",\n      \"name\": \"Quibusdam delectus expedita eum rem nesciunt.\",\n      \"statusPb\": \"Omnis voluptatibus voluptas occaecati dolore quam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Dolores in ut.\",\n      \"locationName\": \"Ut laudantium eius praesentium ratione sapiente repellendus.\",\n      \"name\": \"Aut nihil nam repellendus dolor temporibus voluptatem.\",\n      \"statusPb\": \"Ratione eum.\"\n   }'")
 		}
 	}
 	var auth string
@@ -145,7 +145,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Consequatur magnam.\",\n      \"name\": \"Qui dolorem pariatur numquam molestiae eligendi.\",\n      \"statusPb\": \"Quaerat pariatur est sint repudiandae exercitationem.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Ut eum illo corrupti ea.\",\n      \"name\": \"Culpa eum.\",\n      \"statusPb\": \"Impedit eum.\"\n   }'")
 		}
 	}
 	var id int32
@@ -187,7 +187,7 @@ func BuildListMinePayload(stationListMineAuth string) (*station.ListMinePayload,
 
 // BuildListProjectPayload builds the payload for the station list project
 // endpoint from CLI flags.
-func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth string) (*station.ListProjectPayload, error) {
+func BuildListProjectPayload(stationListProjectID string, stationListProjectDisableFiltering string, stationListProjectAuth string) (*station.ListProjectPayload, error) {
 	var err error
 	var id int32
 	{
@@ -198,6 +198,17 @@ func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
+	var disableFiltering *bool
+	{
+		if stationListProjectDisableFiltering != "" {
+			var val bool
+			val, err = strconv.ParseBool(stationListProjectDisableFiltering)
+			disableFiltering = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for disableFiltering, must be BOOL")
+			}
+		}
+	}
 	var auth *string
 	{
 		if stationListProjectAuth != "" {
@@ -206,6 +217,7 @@ func BuildListProjectPayload(stationListProjectID string, stationListProjectAuth
 	}
 	v := &station.ListProjectPayload{}
 	v.ID = id
+	v.DisableFiltering = disableFiltering
 	v.Auth = auth
 
 	return v, nil

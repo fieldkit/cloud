@@ -42,6 +42,7 @@ func TestGetStationsMine(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -56,6 +57,7 @@ func TestGetStationsMine(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -70,6 +72,7 @@ func TestGetStationsMine(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -84,6 +87,7 @@ func TestGetStationsMine(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -98,6 +102,7 @@ func TestGetStationsMine(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -135,6 +140,7 @@ func TestGetStationAsOwner(t *testing.T) {
 	{
 		"id": "<<PRESENCE>>",
 		"updatedAt": "<<PRESENCE>>",
+		"model": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
 		"deviceId": "<<PRESENCE>>",
 		"interestingness": "<<PRESENCE>>",
@@ -229,6 +235,7 @@ func TestGetStationPrivateProjectAsMember(t *testing.T) {
 	{
 		"id": "<<PRESENCE>>",
 		"updatedAt": "<<PRESENCE>>",
+		"model": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
 		"deviceId": "<<PRESENCE>>",
 		"interestingness": "<<PRESENCE>>",
@@ -339,6 +346,7 @@ func TestGetStationsPrivateProjectAsMember(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -383,6 +391,7 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -397,6 +406,7 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -411,6 +421,7 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -425,6 +436,7 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -439,6 +451,7 @@ func TestGetStationsPublicProjectAsAnonymous(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -490,6 +503,7 @@ func TestGetStationsPublicProjectAsMember(t *testing.T) {
             {
                 "id": "<<PRESENCE>>",
                 "updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
                 "owner": "<<PRESENCE>>",
                 "deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -504,6 +518,7 @@ func TestGetStationsPublicProjectAsMember(t *testing.T) {
             {
                 "id": "<<PRESENCE>>",
                 "updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
                 "owner": "<<PRESENCE>>",
                 "deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -782,6 +797,7 @@ func TestGetStationUpdatedWithProtobufStatus(t *testing.T) {
 	{
 		"id": "<<PRESENCE>>",
 		"updatedAt": "<<PRESENCE>>",
+		"model": "<<PRESENCE>>",
 		"owner": "<<PRESENCE>>",
 		"deviceId": "<<PRESENCE>>",
 		"interestingness": "<<PRESENCE>>",

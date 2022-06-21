@@ -1,3 +1,6 @@
+import { DisplayStation } from "@/store";
+import _ from "lodash";
+
 export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
@@ -18,6 +21,22 @@ export interface PartnerCustomization {
     email: {
         subject: string;
     };
+    links: {
+        text: string;
+        url: string;
+    }[];
+    stationLocationName: (station: DisplayStation) => string;
+    viz: {
+        groupStation: (station: unknown) => string | null;
+    };
+}
+
+function getNeighborhood(station: DisplayStation): string | null {
+    if (station.attributes) {
+        const maybeAttribute = station.attributes.find((attr) => attr.name === "Neighborhood");
+        if (maybeAttribute) return maybeAttribute.stringValue;
+    }
+    return null;
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -44,6 +63,20 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             email: {
                 subject: "sharePanel.emailSubject.floodnet",
+            },
+            links: [
+                {
+                    text: "linkToFloodnet",
+                    url: "https://www.floodnet.nyc/",
+                },
+            ],
+            stationLocationName: (station: DisplayStation) => {
+                return getNeighborhood(station) || station.locationName;
+            },
+            viz: {
+                groupStation: (station: DisplayStation): string | null => {
+                    return getNeighborhood(station) || null;
+                },
             },
         };
     }
@@ -77,6 +110,15 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         },
         email: {
             subject: "sharePanel.emailSubject.fieldkit",
+        },
+        links: [],
+        stationLocationName: (station: DisplayStation) => {
+            return station.locationName;
+        },
+        viz: {
+            groupStation: (station: DisplayStation): string | null => {
+                return null;
+            },
         },
     };
 }
