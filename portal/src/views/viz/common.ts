@@ -260,7 +260,7 @@ export class QueriedData {
 
     get shouldIgnoreMissing(): boolean {
         const averageMs = this.getAverageTimeBetweenSample();
-        console.log("viz: average-delta", averageMs);
+        // console.log("viz: average-delta", averageMs);
         if (averageMs) {
             return averageMs - 1000 < 5; // Was this.sdr.aggregate.interval <= 60;
         }
@@ -278,7 +278,7 @@ export class QueriedData {
         const filtered = {
             data: this.sdr.data.filter((d) => d.sensorId),
         };
-        console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
+        // console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 
@@ -286,7 +286,7 @@ export class QueriedData {
         const filtered = {
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
-        console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
+        // console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 }

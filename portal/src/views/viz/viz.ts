@@ -812,7 +812,7 @@ export class Workspace implements VizInfoFactory {
         const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
         return Promise.all([...pendingInfo, ...pendingData]).then(() => {
             // Update options here if doing so lazily.
-            console.log("viz: workspace: query done ");
+            // console.log("viz: workspace: query done ");
             this.version++;
         });
     }
@@ -1089,7 +1089,7 @@ export class Workspace implements VizInfoFactory {
             const associatedSensorOptions = _(
                 associatedWithStation.map((associated) => {
                     const moduleOptions = this.sensorOptions(associated.station.id, false, depth + 1);
-                    console.log("viz: debug-associated", depth, moduleOptions);
+                    // console.log("viz: debug-associated", depth, moduleOptions);
                     return _.flatten(moduleOptions.map((option) => option.children || []));
                 })
             )

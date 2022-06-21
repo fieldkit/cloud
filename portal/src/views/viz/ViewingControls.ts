@@ -152,12 +152,14 @@ export const SelectionControls = Vue.extend({
             const maybePartner = getPartnerCustomization();
             const flatten = maybePartner != null && maybePartner.projectId != null && this.workspace.projects[0] === maybePartner.projectId;
             const sensorOptions = this.workspace.sensorOptions(stationId, flatten);
-            this.viz.log("viz-sensor-options", {
-                vizSensor: vizSensor,
-                originalStationId: originalStationId,
-                stationId: stationId,
-                options: sensorOptions,
-            });
+            /*
+                this.viz.log("viz-sensor-options", {
+                    vizSensor: vizSensor,
+                    originalStationId: originalStationId,
+                    stationId: stationId,
+                    options: sensorOptions,
+                });
+            */
             return sensorOptions;
         },
         raiseChangeSeries(index: number, newSeries: DataSetSeries): void {
