@@ -215,11 +215,17 @@ export const ViewingControls = Vue.extend({
     computed: {
         chartTypes(): { label: string; id: ChartType }[] {
             const vizInfo = this.workspace.vizInfo(this.viz);
+            // TODO Need to remove the D3 from these names but they're referencecd in vizInfo.
             const allTypes = [
                 {
                     label: "Time Series",
                     id: ChartType.TimeSeries,
                     vueName: "D3TimeSeriesGraph",
+                },
+                {
+                    label: "Bar",
+                    id: ChartType.Bar,
+                    vueName: "D3BarChart",
                 },
                 {
                     label: "Histogram",

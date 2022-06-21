@@ -10,6 +10,7 @@ import { DebuggingPanel } from "./DebuggingPanel";
 import { VegaTimeSeriesGraph as TimeSeriesGraph } from "./VegaTimeSeriesGraph";
 import { VegaHistogram as Histogram } from "./VegaHistogram";
 import { VegaRange as Range } from "./VegaRange";
+import { VegaBarChart as BarChart } from "./VegaBarChart";
 
 import { D3Map as Map } from "./D3Map";
 
@@ -31,6 +32,7 @@ export const VizGraph = Vue.extend({
         Histogram,
         Range,
         Map,
+        BarChart,
     },
     data(): {} {
         return {};
@@ -92,6 +94,8 @@ export const VizGraph = Vue.extend({
                     return "Range";
                 case ChartType.Map:
                     return "Map";
+                case ChartType.Bar:
+                    return "BarChart";
             }
 
             this.viz.log("unknown chart type");

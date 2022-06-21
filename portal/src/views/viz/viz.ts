@@ -105,6 +105,7 @@ export enum ChartType {
     Histogram,
     Range,
     Map,
+    Bar,
 }
 
 type VizBookmark = [VizSensor[], [number, number], [[number, number], [number, number]] | [], ChartType, FastTime];
