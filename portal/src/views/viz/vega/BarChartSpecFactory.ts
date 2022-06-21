@@ -11,6 +11,7 @@ export class BarChartSpecFactory {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
+        const makeBarDataName = (i: number) => `table${i + 1}Bar`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
@@ -32,8 +33,6 @@ export class BarChartSpecFactory {
 
         // Always showing hovering state.
         const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
-        // Early hovering behavior.
-        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
         const ifHovering = alwaysShowHovering;
 
         const makeSeriesThresholds = (series: SeriesData) => {
@@ -44,102 +43,6 @@ export class BarChartSpecFactory {
         };
 
         const filteredData = mapSeries((series, i) => {
-            function removeOutliersHack(rows: DataRow[]): DataRow[] {
-                // TODO HACK
-                if (series.vizInfo.firmwareKey == "wh.floodnet.depth") {
-                    return rows.map((row) => {
-                        if (!row) throw new Error();
-                        if (_.isNumber(row.value) && row.value >= 38) {
-                            return {
-                                time: row.time,
-                                stationId: null,
-                                sensorId: null,
-                                moduleId: null,
-                                location: null,
-                                value: null,
-                            };
-                        }
-                        return row;
-                    });
-                }
-
-                return rows;
-            }
-
-            function calculateTimeDeltas(rows: DataRow[]) {
-                const initial: { prev: DataRow | null; deltas: number[] } = {
-                    prev: null,
-                    deltas: [] as number[],
-                };
-                return _.reduce(
-                    rows,
-                    (state, datum) => {
-                        if (state.prev != null) {
-                            state.deltas.push(datum.time - state.prev.time);
-                        }
-                        return _.extend(state, { prev: datum });
-                    },
-                    initial
-                ).deltas;
-            }
-
-            function calculateGaps(rows: DataRow[]) {
-                const initial: { prev: DataRow | null; gaps: number[] } = {
-                    prev: null,
-                    gaps: [0] as number[],
-                };
-                return _.reduce(
-                    rows,
-                    (state, datum) => {
-                        if (_.isNumber(datum.value)) {
-                            if (state.gaps[state.gaps.length - 1] > 0) {
-                                state.gaps.push(0);
-                            }
-                        } else {
-                            state.gaps[state.gaps.length - 1]++;
-                        }
-                        return state;
-                    },
-                    initial
-                ).gaps;
-            }
-
-            function rebin(rows: DataRow[], interval: number): DataRow[] {
-                const grouped = _(rows)
-                    .groupBy((datum) => {
-                        return Math.floor(datum.time / interval) * interval;
-                    })
-                    .mapValues((bin, time) => {
-                        const valid = bin.filter((datum) => _.isNumber(datum.value));
-                        if (valid.length == 1) {
-                            return valid[0];
-                        }
-                        if (valid.length > 1) {
-                            // TODO HACK
-                            const aggregateFunction = series.vizInfo.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean;
-                            return {
-                                time: Number(time),
-                                stationId: valid[0].stationId,
-                                moduleId: valid[0].moduleId,
-                                sensorId: valid[0].sensorId,
-                                location: valid[0].location,
-                                value: aggregateFunction(valid.map((v) => v.value)) || null,
-                            };
-                        }
-                        return {
-                            time: Number(time),
-                            stationId: null,
-                            moduleId: null,
-                            sensorId: null,
-                            location: null,
-                            value: null,
-                        };
-                    })
-                    .value();
-
-                return _.values(grouped);
-            }
-
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
             const properties = { name: hoverName, vizInfo: series.vizInfo };
@@ -182,7 +85,9 @@ export class BarChartSpecFactory {
                 return original;
             }
 
-            return sanitize(removeOutliersHack(original)).map((datum) => _.extend(datum, properties));
+            return sanitize(/*removeOutliersHack(original)*/ original).map((datum) =>
+                _.extend(datum, properties, { timeDate: new Date(datum.time) })
+            );
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -277,6 +182,28 @@ export class BarChartSpecFactory {
                                         type: "formula",
                                         expr: `scale('${scales.y}', datum.value)`,
                                         as: "layout_y",
+                                    },
+                                ],
+                            },
+                            {
+                                name: makeBarDataName(i),
+                                source: makeValidDataName(i),
+                                transform: [
+                                    {
+                                        field: "timeDate",
+                                        type: "timeunit",
+                                        units: ["year", "month", "date", "hours"],
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barEndDate)",
+                                        as: "barEnd",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStartDate)",
+                                        as: "barStart",
                                     },
                                 ],
                             },
@@ -548,105 +475,20 @@ export class BarChartSpecFactory {
             mapSeries((series, i) => {
                 const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
-                const thresholds = makeSeriesThresholds(series);
-
-                const firstLineMark = {
-                    type: "line",
-                    from: {
-                        data: makeValidDataName(i),
-                    },
-                    encode: {
-                        enter: {
-                            interpolate: {
-                                value: "cardinal",
-                            },
-                            tension: {
-                                value: 0.9,
-                            },
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: "#cccccc",
-                            },
-                            strokeWidth: {
-                                value: 1,
-                            },
-                            strokeDash: {
-                                value: [4, 4],
-                            },
-                        },
-                        update: {
-                            strokeOpacity: {
-                                signal: hoverCheck,
-                            },
-                        },
-                    },
-                };
-
-                const symbolMark = {
-                    type: "symbol",
-                    from: {
-                        data: makeValidDataName(i),
-                    },
-                    encode: {
-                        enter: {
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: null,
-                            },
-                            strokeWidth: {
-                                value: 2,
-                            },
-                            size: {
-                                value: 100,
-                            },
-                            fill: {
-                                value: "blue",
-                            },
-                            fillOpacity: {
-                                value: 0.5,
-                            },
-                        },
-                        update: {
-                            fillOpacity: {
-                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
-                            },
-                        },
-                    },
-                };
-
-                if (thresholds) {
-                    const hoverCheck = ifHovering(i, 1, 0.1);
-                    const thresholdsMarks = thresholds.levels
-                        .map((level, l: number) => {
-                            const alias = makeThresholdLevelAlias(i, l);
-                            const strokeWidth = 2 + (thresholds.levels.length - l) / thresholds.levels.length;
-
-                            return {
-                                type: "line",
-                                from: { data: makeDataName(i) },
+                return [
+                    {
+                        type: "group",
+                        marks: [
+                            {
+                                type: "rect",
+                                style: i === 0 ? "primaryBar" : "secondaryBar",
+                                from: { data: makeBarDataName(i) },
                                 encode: {
                                     enter: {
-                                        interpolate: { value: "cardinal" },
-                                        tension: { value: 0.9 },
-                                        strokeCap: { value: "round" },
-                                        x: { scale: scales.x, field: "time" },
-                                        y: { scale: scales.y, field: alias },
-                                        strokeWidth: { value: strokeWidth },
-                                        defined: { signal: `isValid(datum.${alias})` },
+                                        x2: { scale: scales.x, field: "barStart", offset: 1 },
+                                        x: { scale: scales.x, field: "barEnd" },
+                                        y: { scale: scales.y, field: "value" },
+                                        y2: { scale: scales.y, value: 0 },
                                     },
                                     update: {
                                         strokeOpacity: {
@@ -654,128 +496,14 @@ export class BarChartSpecFactory {
                                         },
                                     },
                                 },
-                            };
-                        })
-                        .reverse();
-
-                    return [
-                        {
-                            type: "group",
-                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
-                        },
-                    ];
-                } else {
-                    const hoverCheck = ifHovering(i, 1, 0.1);
-                    const lineMark = {
-                        type: "line",
-                        style: i === 0 ? "primaryLine" : "secondaryLine",
-                        from: { data: makeDataName(i) },
-                        encode: {
-                            enter: {
-                                interpolate: { value: "cardinal" },
-                                tension: { value: 0.9 },
-                                strokeCap: { value: "round" },
-                                x: { scale: scales.x, field: "time" },
-                                y: { scale: scales.y, field: "value" },
-                                strokeWidth: { value: 2 },
-                                defined: { signal: "isValid(datum.value)" },
                             },
-                            update: {
-                                strokeOpacity: {
-                                    signal: hoverCheck,
-                                },
-                            },
-                        },
-                    };
-                    return [
-                        {
-                            type: "group",
-                            marks: [firstLineMark, lineMark, symbolMark],
-                        },
-                    ];
-                }
+                        ],
+                    },
+                ];
             })
         );
 
-        // TODO Unique by thresholds and perhaps y value?
-        const ruleMarks = _.flatten(
-            mapSeries((series, i) => {
-                const domain = makeSeriesDomain(series, i);
-                const scales = makeScales(i);
-                const thresholds = getSeriesThresholds(series);
-                if (thresholds) {
-                    return thresholds.levels
-                        .filter((level) => level.label != null && !level.hidden)
-                        .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
-                        .map((level) => {
-                            return {
-                                type: "rule",
-                                from: { data: makeDataName(i) },
-                                encode: {
-                                    enter: {
-                                        x: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[0],
-                                        },
-                                        x2: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[1],
-                                        },
-                                        y: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        y2: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        stroke: { value: level.color },
-                                        strokeDash: { value: [1, 4] },
-                                        strokeCap: { value: "round" },
-                                        opacity: { value: 0.1 },
-                                        strokeOpacity: { value: 0.1 },
-                                        strokeWidth: {
-                                            value: 1.5,
-                                        },
-                                    },
-                                },
-                            };
-                        });
-                }
-
-                return [];
-            })
-        );
-
-        const cellMarks = () => {
-            return [
-                {
-                    name: "cell",
-                    type: "path",
-                    from: {
-                        data: "all_layouts",
-                    },
-                    encode: {
-                        enter: {
-                            path: { field: "layout_path" },
-                            fill: { value: "transparent" },
-                            // strokeWidth: { value: 0.35 },
-                            // stroke: { value: "red" },
-                            tooltip: {
-                                signal: `{
-                                title: datum.vizInfo.label,
-                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
-                                time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
-                                name: datum.name
-                            }`,
-                            },
-                        },
-                    },
-                },
-            ];
-        };
-
-        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks];
+        const marks = [...brushMarks, ...seriesMarks];
 
         const interactiveSignals = [
             {
@@ -1091,63 +819,5 @@ export class BarChartSpecFactory {
             axes: axes,
             marks: marks,
         });
-    }
-
-    private defaultStroke() {
-        return {
-            value: {
-                x1: 1,
-                y1: 1,
-                x2: 1,
-                y2: 0,
-                gradient: "linear",
-                stops: [
-                    {
-                        offset: 0,
-                        color: "#000004",
-                    },
-                    {
-                        offset: 0.1,
-                        color: "#170C3A",
-                    },
-                    {
-                        offset: 0.2,
-                        color: "#420A68",
-                    },
-                    {
-                        offset: 0.3,
-                        color: "#6B186E",
-                    },
-                    {
-                        offset: 0.4,
-                        color: "#932667",
-                    },
-                    {
-                        offset: 0.5,
-                        color: "#BB3754",
-                    },
-                    {
-                        offset: 0.6,
-                        color: "#DD513A",
-                    },
-                    {
-                        offset: 0.7,
-                        color: "#F3771A",
-                    },
-                    {
-                        offset: 0.8,
-                        color: "#FCA50A",
-                    },
-                    {
-                        offset: 0.9,
-                        color: "#F6D645",
-                    },
-                    {
-                        offset: 1,
-                        color: "#FCFFA4",
-                    },
-                ],
-            },
-        };
     }
 }
