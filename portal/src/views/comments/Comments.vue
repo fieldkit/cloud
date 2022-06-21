@@ -2,8 +2,41 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <SectionToggle leftLabel="Log an event" rightLabel="Comment" @toggle="onSectionToggle" :default="logMode === 'event' ? 'left' : 'right'" v-if="viewType === 'data'">
+        <SectionToggle class="comment-toggle" leftLabel="Comment" rightLabel="Log an Event" @toggle="onSectionToggle" :default="logMode === 'comment' ? 'left' : 'right'" v-if="viewType === 'data'">
             <template #left>
+                <div class="new-comment" :class="{ 'align-center': !user }">
+                    <UserPhoto :user="user"></UserPhoto>
+                    <template v-if="user">
+                        <div class="new-comment-wrap">
+                            <Tiptap
+                                v-model="newComment.body"
+                                placeholder="Join the discussion!"
+                                saveLabel="Post"
+                                @save="save(newComment)"
+                            />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="need-login-msg" @click="test()">
+                            {{ $tc("comments.loginToComment.part1") }}
+                            <router-link
+                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                                class="link"
+                            >
+                                {{ $tc("comments.loginToComment.part2") }}
+                            </router-link>
+                            {{ $tc("comments.loginToComment.part3") }}
+                        </p>
+                        <router-link
+                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                            class="button-submit"
+                        >
+                            {{ $t("login.loginButton") }}
+                        </router-link>
+                    </template>
+                </div>
+            </template>
+            <template #right>
                 <div class="event-sensor-selector">
                     <label for="allProjectRadio">
                         <div class="event-sensor-radio">
@@ -35,39 +68,6 @@
                                 placeholder="Event Description"
                                 saveLabel="Post"
                                 @save="saveDataEvent(newDataEvent)"
-                            />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <p class="need-login-msg" @click="test()">
-                            {{ $tc("comments.loginToComment.part1") }}
-                            <router-link
-                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
-                                class="link"
-                            >
-                                {{ $tc("comments.loginToComment.part2") }}
-                            </router-link>
-                            {{ $tc("comments.loginToComment.part3") }}
-                        </p>
-                        <router-link
-                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
-                            class="button-submit"
-                        >
-                            {{ $t("login.loginButton") }}
-                        </router-link>
-                    </template>
-                </div>
-            </template>
-            <template #right>
-                <div class="new-comment" :class="{ 'align-center': !user }">
-                    <UserPhoto :user="user"></UserPhoto>
-                    <template v-if="user">
-                        <div class="new-comment-wrap">
-                            <Tiptap
-                                v-model="newComment.body"
-                                placeholder="Join the discussion!"
-                                saveLabel="Post"
-                                @save="save(newComment)"
                             />
                         </div>
                     </template>
@@ -309,7 +309,7 @@ export default Vue.extend({
                 title: "",
             },
             errorMessage: null,
-            logMode: "event",
+            logMode: "comment",
         };
     },
     watch: {
@@ -550,10 +550,10 @@ export default Vue.extend({
             });
         },
         onSectionToggle(evt) {
-            if (evt === "right") {
+            if (evt === "left") {
                 this.logMode = "comment";
             }
-            if (evt === "left") {
+            if (evt === "right") {
                 this.logMode = "event";
             }
         },
@@ -942,5 +942,8 @@ header {
     /* (RADIO CHECKED) DIV STYLES */
     background-color: #ffd6bb;
     border: 1px solid #ff6600;
+}
+.comment-toggle {
+    margin-top: 20px;
 }
 </style>

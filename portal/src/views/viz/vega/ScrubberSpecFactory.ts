@@ -187,7 +187,27 @@ export class ScrubberSpecFactory {
                                 ]
                                 
                             },
-                            update: "event.item.datum.bookmark"
+                            update: "event.item.datum.id"
+                        }
+                    ]
+                },
+                {
+                    name: "event_hover",
+                    init: "[0,0]",
+                    on:
+                    [
+                        {
+                            events:
+                            {
+                                source: "scope",
+                                type: "mouseover",
+                                filter:
+                                [
+                                    "event.item.mark.name === \"de_circle\""
+                                ]
+                                
+                            },
+                            update: "[event.item.datum.start, event.item.datum.end]"
                         }
                     ]
                 },
@@ -759,7 +779,65 @@ export class ScrubberSpecFactory {
                       }
                     }
                 },
-
+                {
+                    type: "rect",
+                    interactive: false,
+                    name: "de_highlight",
+                    encode: {
+                      enter: {
+                        fill: {value: "#999"},
+                        opacity: {value: 0.5},
+                        y: {value: 0},
+                        height: {value: 50},
+                        width: {value: 100},
+                      },
+                      update: {
+                        x: {signal: "event_hover[0]"}
+                      }
+                    }
+                },
+                {
+                    type: "rect",
+                    interactive: false,
+                    name: "de_highlight_start",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        fill: {value: "#999"},
+                        opacity: {value: 0.5},
+                        y: {value: 0},
+                        height: {value: 50},
+                        width: {value: 2},
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "start"}
+                      }
+                    }
+                },
+                {
+                    type: "rect",
+                    interactive: false,
+                    name: "de_highlight_end",
+                    from:
+                    {
+                        data: "data_events"
+                    },
+                    encode: {
+                      enter: {
+                        fill: {value: "#999"},
+                        opacity: {value: 0.5},
+                        y: {value: 0},
+                        height: {value: 50},
+                        width: {value: 2},
+                      },
+                      update: {
+                        "x": {"scale": "x", "field": "end"}
+                      }
+                    }
+                },
                 {
                     type: "symbol",
                     interactive: true,
