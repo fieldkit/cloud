@@ -332,8 +332,8 @@ type DataRow struct {
 	Value     *float64             `db:"value" json:"value,omitempty"`
 
 	// Deprecated
-	id        *int64 `db:"id" json:"-"`
-	timeGroup *int32 `db:"time_group" json:"-"`
+	Id        *int64 `db:"id" json:"-"`
+	TimeGroup *int32 `db:"time_group" json:"-"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
@@ -409,7 +409,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 		index += 1
 	}
 
-	if index == 1 && *rows[0].timeGroup > 0 {
+	if index == 1 && *rows[0].TimeGroup > 0 {
 		rows[1] = rows[0]
 		rows[1] = nil
 	}
