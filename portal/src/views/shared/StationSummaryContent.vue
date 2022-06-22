@@ -9,6 +9,21 @@
                 <slot name="top-right-actions"></slot>
             </div>
 
+            <template v-if="isCustomisationEnabled()">
+                <div class="location-container">
+                    <template v-if="getAttributeValue('Neighborhood')">{{ getAttributeValue("Neighborhood") }}</template>
+                    ,
+                    <template v-if="getAttributeValue('Borough')">{{ getAttributeValue("Borough") }}</template>
+                </div>
+                <div v-if="getAttributeValue('Deployment Date')" class="location-container">
+                    <template v-if="getAttributeValue('Deployment Date')">
+                        {{ $t("station.deployedOn") }} {{ getAttributeValue("Deployment Date") }} ,
+                    </template>
+
+                    <template v-if="getAttributeValue('Built By')">{{ $t("station.by") }} {{ getAttributeValue("Built By") }}</template>
+                </div>
+            </template>
+
             <div
                 class="row where-row"
                 v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
@@ -30,7 +45,7 @@
                 </div>
             </div>
 
-            <div v-if="!isCustomisationEnabled" class="station-modules">
+            <div v-if="!isCustomisationEnabled()" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
                     <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
@@ -79,8 +94,14 @@ export default Vue.extend({
             return getPartnerCustomizationWithDefault();
         },
         isCustomisationEnabled(): boolean {
-          console.log("radoi", isCustomisationEnabled());
             return isCustomisationEnabled();
+        },
+        getAttributeValue(attrName: string): any {
+            if (this.station) {
+                console.log("raoi", this.station);
+                const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
+                return value ? value : null;
+            }
         },
     },
 });
@@ -136,6 +157,7 @@ export default Vue.extend({
     flex-direction: column;
     display: flex;
     margin-top: 2px;
+    font-size: 14px;
 
     .summary-content & {
         flex-direction: row;
@@ -176,6 +198,7 @@ export default Vue.extend({
     text-align: left;
     font-size: 14px;
     padding-bottom: 5px;
+    margin-top: 5px;
     color: var(--color-dark);
 }
 </style>
