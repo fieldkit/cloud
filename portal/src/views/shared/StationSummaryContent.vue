@@ -79,7 +79,6 @@ export default Vue.extend({
     },
     computed: {
         stationLocationName(): string {
-            console.log("radoi ba");
             return this.partnerCustomization().stationLocationName(this.station);
         },
     },
@@ -98,7 +97,6 @@ export default Vue.extend({
         },
         getAttributeValue(attrName: string): any {
             if (this.station) {
-                console.log("raoi", this.station);
                 const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
                 return value ? value : null;
             }
