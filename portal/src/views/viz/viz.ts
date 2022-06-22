@@ -818,6 +818,25 @@ export class Workspace implements VizInfoFactory {
         });
     }
 
+    public availableChartTypes(viz: Graph, ds: DataSetSeries | undefined = undefined): ChartType[] {
+        const vizInfo = this.vizInfo(viz, ds);
+        const specifiedNames = vizInfo.viz.map((row) => row.name);
+        if (specifiedNames.length == 0) {
+            return [ChartType.TimeSeries, ChartType.Histogram, ChartType.Range, ChartType.Bar, ChartType.Map];
+        }
+
+        const knownNames = {
+            TimeSeriesChart: ChartType.TimeSeries,
+            HistogramChart: ChartType.Histogram,
+            BarChart: ChartType.Bar,
+            RangeChart: ChartType.Range,
+            Map: ChartType.Map,
+        };
+
+        const migratedNames = specifiedNames.map((name) => name.replace("D3", "").replace("Graph", "Chart"));
+        return migratedNames.map((row) => knownNames[row]);
+    }
+
     public vizInfo(viz: Graph, ds: DataSetSeries | undefined = undefined): VizInfo {
         // if (viz.chartParams.stations.length != 1) throw new Error("expected 1 station per graph, for now");
         // if (viz.chartParams.sensors.length != 1) throw new Error("expected 1 sensor per graph, for now");

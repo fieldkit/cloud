@@ -214,40 +214,33 @@ export const ViewingControls = Vue.extend({
     },
     computed: {
         chartTypes(): { label: string; id: ChartType }[] {
-            const vizInfo = this.workspace.vizInfo(this.viz);
-            // TODO Need to remove the D3 from these names but they're referencecd in vizInfo.
             const allTypes = [
                 {
                     label: "Time Series",
                     id: ChartType.TimeSeries,
-                    vueName: "D3TimeSeriesGraph",
                 },
                 {
                     label: "Bar",
                     id: ChartType.Bar,
-                    vueName: "D3BarChart",
                 },
                 {
                     label: "Histogram",
                     id: ChartType.Histogram,
-                    vueName: "D3Histogram",
                 },
                 {
                     label: "Range",
                     id: ChartType.Range,
-                    vueName: "D3Range",
                 },
                 {
                     label: "Map",
                     id: ChartType.Map,
-                    vueName: "D3Map",
                 },
             ];
-            if (vizInfo.viz.length == 0) {
-                return allTypes;
-            }
-            const names = vizInfo.viz.map((vc) => vc.name);
-            return allTypes.filter((type) => _.some(names, (name) => name == type.vueName));
+            const availableTypes = this.workspace.availableChartTypes(this.viz);
+            return allTypes.filter((type) => _.some(availableTypes, (row) => row == type.id));
+        },
+        selectedChartType(): ChartType {
+            return this.viz.chartType;
         },
         manualRangeValue(): { start: Date; end: Date } | null {
             if (!this.viz.visibleTimeRange || this.viz.visibleTimeRange.isExtreme()) {
@@ -404,7 +397,7 @@ export const ViewingControls = Vue.extend({
 
 				<div class="right half" v-if="chartTypes.length > 1">
                     <div class="chart-type">
-                        <treeselect :disabled="viz.busy" :options="chartTypes" :value="viz.chartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
+                        <treeselect :disabled="viz.busy" :options="chartTypes" :value="selectedChartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>
 			</div>
