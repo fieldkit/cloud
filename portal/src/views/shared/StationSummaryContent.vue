@@ -30,7 +30,7 @@
                 </div>
             </div>
 
-            <div class="station-modules">
+            <div v-if="!isCustomisationEnabled" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
                     <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
@@ -46,7 +46,7 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import * as utils from "@/utilities";
 import { DisplayStation } from "@/store";
-import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationSummaryContent",
@@ -64,6 +64,7 @@ export default Vue.extend({
     },
     computed: {
         stationLocationName(): string {
+            console.log("radoi ba");
             return this.partnerCustomization().stationLocationName(this.station);
         },
     },
@@ -76,6 +77,10 @@ export default Vue.extend({
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
+        },
+        isCustomisationEnabled(): boolean {
+          console.log("radoi", isCustomisationEnabled());
+            return isCustomisationEnabled();
         },
     },
 });

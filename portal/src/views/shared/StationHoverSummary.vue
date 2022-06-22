@@ -84,9 +84,6 @@ export default Vue.extend({
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleIcon(module) {
-            return this.$loadAsset(utils.getModuleImg(module));
-        },
         wantCloseSummary() {
             this.$emit("close");
         },
