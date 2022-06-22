@@ -46,6 +46,7 @@ export default Vue.extend({
 
             const vegaInfo = await vegaEmbed(this.$el, spec, {
                 renderer: "svg",
+                downloadFileName: this.getFilename(this.series[0]),
                 tooltip: {
                     offsetX: -50,
                     offsetY: 50,
@@ -97,16 +98,22 @@ export default Vue.extend({
             // From https://vega.github.io/vega/docs/api/view/#view_toImageURL
             await this.vega.view
                 .toImageURL(fileFormat, 2)
-                .then(function(url) {
+                .then(function (url) {
                     const link = document.createElement("a");
                     link.setAttribute("href", url);
                     link.setAttribute("target", "_blank");
                     link.setAttribute("download", "vega-export." + fileFormat);
                     link.dispatchEvent(new MouseEvent("click"));
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.log(error);
                 });
+        },
+        getFilename(series) {
+            const stationName = series.vizInfo.station.name;
+            const sensorName = series.vizInfo.name;
+
+            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
         },
         getTooltipColor(name) {
             if (name === "LEFT") {
