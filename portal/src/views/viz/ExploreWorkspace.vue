@@ -45,7 +45,7 @@
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
-                                src="@/assets/tooltip-blue.svg"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 @click="openStationPageTab"
                             />
                         </template>
@@ -81,7 +81,7 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization } from "../shared/partners";
+import { getPartnerCustomization, interpolatePartner } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
@@ -378,6 +378,9 @@ export default Vue.extend({
         },
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
+        },
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
         },
     },
 });

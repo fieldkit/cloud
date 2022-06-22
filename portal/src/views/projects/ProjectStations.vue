@@ -49,7 +49,7 @@
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
-                                src="@/assets/tooltip-blue.svg"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 width="24px"
                                 height="24px"
                                 @click="openNotes(station)"
@@ -106,6 +106,7 @@ import TinyStation from "@/views/shared/TinyStation.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
+import { interpolatePartner } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -270,6 +271,9 @@ export default Vue.extend({
         },
         onNewPage(page: number): void {
             this.page = page;
+        },
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
         },
     },
 });
