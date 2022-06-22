@@ -491,7 +491,8 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
 			FROM fieldkit.project_station AS ps
 			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
-			WHERE ps.project_id = $1 AND s.location IS NOT NULL
+			JOIN fieldkit.station_model AS m ON (s.model_id = m.id)
+			WHERE NOT m.only_visible_via_association AND ps.project_id = $1 AND s.location IS NOT NULL
 			ORDER BY distance
 		)
 		SELECT * FROM distances WHERE distance > 0 LIMIT 5
