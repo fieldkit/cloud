@@ -428,24 +428,14 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 	log := Logger(ctx).Sugar()
 
-	var dailySummary *AggregateSummary
-
 	for _, name := range handlers.AggregateNames {
 		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
 
 		getQueryFn := func() (query string, args []interface{}, err error) {
-			if dailySummary == nil {
-				return sqlx.In(fmt.Sprintf(`
-					SELECT
-					MIN(time) AS start,
-					MAX(time) AS end,
-					COUNT(*) AS number_records
-					FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-				`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
-			}
-
 			return sqlx.In(fmt.Sprintf(`
 				SELECT
+				MIN(time) AS start,
+				MAX(time) AS end,
 				COUNT(*) AS number_records
 				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
 			`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
@@ -459,13 +449,6 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 		summary := &AggregateSummary{}
 		if err := dq.db.GetContext(ctx, summary, dq.db.Rebind(query), args...); err != nil {
 			return nil, "", err
-		}
-
-		if dailySummary == nil {
-			dailySummary = summary
-		} else {
-			summary.Start = dailySummary.Start
-			summary.End = dailySummary.End
 		}
 
 		// Queried records depends on if we're doing a complete query,
