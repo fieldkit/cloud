@@ -430,15 +430,16 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 	for _, name := range handlers.AggregateNames {
 		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
+		interval := handlers.AggregateIntervals[name]
 
 		getQueryFn := func() (query string, args []interface{}, err error) {
 			return sqlx.In(fmt.Sprintf(`
 				SELECT
 				MIN(time) AS start,
-				MAX(time) AS end,
+				MAX(time) + (? * interval '1 sec') AS end,
 				COUNT(*) AS number_records
 				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-			`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
+			`, table), interval, qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
 		}
 
 		query, args, err := getQueryFn()
@@ -460,7 +461,6 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 		if qp.Complete {
 			if summary.Start != nil && summary.End != nil {
-				interval := handlers.AggregateIntervals[name]
 				duration := summary.End.Time().Sub(summary.Start.Time())
 				queriedRecords = int64(duration.Seconds()) / int64(interval)
 
