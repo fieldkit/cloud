@@ -126,7 +126,7 @@ export class TimeSeriesSpecFactory {
 
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
-            const properties = { name: hoverName, vizInfo: series.vizInfo };
+            const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
             const original = series.queried.data;
 
             function sanitize(original: DataRow[]): DataRow[] {
@@ -276,7 +276,17 @@ export class TimeSeriesSpecFactory {
                                         field: "time",
                                         type: "timeunit",
                                         units: ["year", "month", "date", "hours"],
-                                        as: ["barStart", "barEnd"],
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStartDate)",
+                                        as: "barStart",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barEndDate)",
+                                        as: "barEnd",
                                     },
                                     {
                                         type: "aggregate",
@@ -285,6 +295,12 @@ export class TimeSeriesSpecFactory {
                                         fields: ["value"],
                                         as: ["value"],
                                     },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
+                                        as: "barMiddle",
+                                    },
+                                    { type: "formula", expr: i, as: "series" },
                                 ],
                             },
                         ];
@@ -557,6 +573,72 @@ export class TimeSeriesSpecFactory {
                 const scales = makeScales(i);
                 const thresholds = makeSeriesThresholds(series);
 
+                if (isBarChart(series)) {
+                    return [
+                        {
+                            type: "symbol",
+                            from: {
+                                data: makeBarDataName(i),
+                            },
+                            encode: {
+                                enter: {
+                                    x: {
+                                        scale: scales.x,
+                                        field: "barMiddle",
+                                    },
+                                    y: {
+                                        scale: scales.y,
+                                        field: "value",
+                                    },
+                                    stroke: {
+                                        value: null,
+                                    },
+                                    strokeWidth: {
+                                        value: 2,
+                                    },
+                                    size: {
+                                        value: 100,
+                                    },
+                                    fill: {
+                                        value: "blue",
+                                    },
+                                    fillOpacity: {
+                                        value: 0.5,
+                                    },
+                                },
+                                update: {
+                                    fillOpacity: {
+                                        signal: `hover && hover.series == datum.series && hover.time >= datum.barStart && hover.time <= datum.barEnd ? 1 : 0`,
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            type: "group",
+                            marks: [
+                                {
+                                    type: "rect",
+                                    style: i === 0 ? "primaryBar" : "secondaryBar",
+                                    from: { data: makeBarDataName(i) },
+                                    encode: {
+                                        enter: {
+                                            x: { scale: scales.x, field: "barStart" },
+                                            x2: { scale: scales.x, field: "barEnd" },
+                                            y: { scale: scales.y, field: "value" },
+                                            y2: { scale: scales.y, value: 0 },
+                                        },
+                                        update: {
+                                            strokeOpacity: {
+                                                signal: hoverCheck,
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    ];
+                }
+
                 const symbolMark = {
                     type: "symbol",
                     from: {
@@ -595,35 +677,6 @@ export class TimeSeriesSpecFactory {
                         },
                     },
                 };
-
-                if (isBarChart(series)) {
-                    return [
-                        symbolMark,
-                        {
-                            type: "group",
-                            marks: [
-                                {
-                                    type: "rect",
-                                    style: i === 0 ? "primaryBar" : "secondaryBar",
-                                    from: { data: makeBarDataName(i) },
-                                    encode: {
-                                        enter: {
-                                            x: { scale: scales.x, field: "barStart" },
-                                            x2: { scale: scales.x, field: "barEnd" },
-                                            y: { scale: scales.y, field: "value" },
-                                            y2: { scale: scales.y, value: 0 },
-                                        },
-                                        update: {
-                                            strokeOpacity: {
-                                                signal: hoverCheck,
-                                            },
-                                        },
-                                    },
-                                },
-                            ],
-                        },
-                    ];
-                }
 
                 const firstLineMark = {
                     type: "line",

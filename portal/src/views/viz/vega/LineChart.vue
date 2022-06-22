@@ -63,9 +63,6 @@ export default Vue.extend({
             this.vega = vegaInfo;
 
             /*
-            vegaInfo.view.addSignalListener("unit", (_, value) => {
-                console.log("unit", value);
-            });
             vegaInfo.view.addSignalListener("hover", (_, value) => {
                 console.log("hover", value);
             });
@@ -80,10 +77,11 @@ export default Vue.extend({
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
+
             // Watch for brush drag outside the window
             vegaInfo.view.addEventListener("mousedown", (e) => {
                 window.addEventListener("mouseup", (e) => {
-                    if (scrubbed.length == 2 && e.target.nodeName !== "path") {
+                    if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
                         this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                     }
                 });
