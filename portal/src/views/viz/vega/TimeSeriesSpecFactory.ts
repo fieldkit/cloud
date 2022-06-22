@@ -49,28 +49,7 @@ export class TimeSeriesSpecFactory {
         };
 
         const filteredData = mapSeries((series, i) => {
-            function removeOutliersHack(rows: DataRow[]): DataRow[] {
-                // TODO HACK
-                if (series.vizInfo.firmwareKey == "wh.floodnet.depth") {
-                    return rows.map((row) => {
-                        if (!row) throw new Error();
-                        if (_.isNumber(row.value) && row.value >= 38) {
-                            return {
-                                time: row.time,
-                                stationId: null,
-                                sensorId: null,
-                                moduleId: null,
-                                location: null,
-                                value: null,
-                            };
-                        }
-                        return row;
-                    });
-                }
-
-                return rows;
-            }
-
+            /*
             function calculateTimeDeltas(rows: DataRow[]) {
                 const initial: { prev: DataRow | null; deltas: number[] } = {
                     prev: null,
@@ -143,6 +122,7 @@ export class TimeSeriesSpecFactory {
 
                 return _.values(grouped);
             }
+            */
 
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
@@ -155,24 +135,24 @@ export class TimeSeriesSpecFactory {
                 // distracting graphs of too many valid data
                 // islands.
                 /*
-                    const valid = original.filter((datum) => _.isNumber(datum.value));
-                    const deltas = calculateTimeDeltas(valid);
+                const valid = original.filter((datum) => _.isNumber(datum.value));
+                const deltas = calculateTimeDeltas(valid);
 
-                    // console.log("viz: gaps", calculateGaps(original));
-                    // console.log("viz: deltas", _.mean(deltas) / 60000);
+                // console.log("viz: gaps", calculateGaps(original));
+                // console.log("viz: deltas", _.mean(deltas) / 60000);
 
-                    // Very simple heuristic for enabling re-bin. We
-                    // basically rebin to the average interval if more
-                    // of the data is invalid than valid. I think we can
-                    // do better.
-                    if (original.length - valid.length > valid.length) {
-                        const meanBetweenValid = _.mean(deltas);
-                        const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
-                        console.log("viz: rebin", interval);
-                        return rebin(original, interval);
-                    } else {
-                        console.log("viz: rebin-skip", original.length - valid.length, valid.length);
-                    }
+                // Very simple heuristic for enabling re-bin. We
+                // basically rebin to the average interval if more
+                // of the data is invalid than valid. I think we can
+                // do better.
+                if (original.length - valid.length > valid.length) {
+                    const meanBetweenValid = _.mean(deltas);
+                    const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
+                    console.log("viz: rebin", interval);
+                    return rebin(original, interval);
+                } else {
+                    console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+                }
                 */
 
                 // This is the another approach we're trying,
@@ -186,7 +166,11 @@ export class TimeSeriesSpecFactory {
                 return original;
             }
 
-            return sanitize(removeOutliersHack(original)).map((datum) => _.extend(datum, properties));
+            function applyCustomFilter(rows: DataRow[]): DataRow[] {
+                return series.vizInfo.applyCustomFilter(rows);
+            }
+
+            return sanitize(applyCustomFilter(original)).map((datum) => _.extend(datum, properties));
         });
 
         // This returns the domain for a single series. Primarily responsible

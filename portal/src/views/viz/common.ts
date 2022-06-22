@@ -181,10 +181,6 @@ export class VizInfo {
         public readonly ranges: SensorRange[]
     ) {}
 
-    public get aggregationFunction() {
-        return this.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean; // HACK
-    }
-
     public get constrainedRanges(): SensorRange[] {
         return this.ranges.filter((r) => r.constrained === true);
     }
@@ -194,6 +190,32 @@ export class VizInfo {
             return this.name + " (" + _.capitalize(this.unitOfMeasure) + ")";
         }
         return this.name;
+    }
+
+    public get aggregationFunction() {
+        return this.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean; // HACK
+    }
+
+    public applyCustomFilter(rows: DataRow[]): DataRow[] {
+        if (this.firmwareKey == "wh.floodnet.depth") {
+            // HACK
+            return rows.map((row) => {
+                if (!row) throw new Error();
+                if (_.isNumber(row.value) && row.value >= 38) {
+                    // HACK
+                    return {
+                        time: row.time,
+                        stationId: null,
+                        sensorId: null,
+                        moduleId: null,
+                        location: null,
+                        value: null,
+                    };
+                }
+                return row;
+            });
+        }
+        return rows;
     }
 }
 
