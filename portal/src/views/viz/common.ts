@@ -187,6 +187,9 @@ export class VizInfo {
 
     public get label(): string {
         if (this.unitOfMeasure) {
+            if (this.unitOfMeasure.indexOf(" ") > 0) {
+                return this.name + " (" + this.unitOfMeasure + ")";
+            }
             return this.name + " (" + _.capitalize(this.unitOfMeasure) + ")";
         }
         return this.name;
