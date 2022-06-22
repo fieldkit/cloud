@@ -1,0 +1,1 @@
+UPDATE fieldkit.sensor_meta SET viz = '[{"name":"TimeSeriesChart","disabled":false,"y_zero":true}]' WHERE id IN (80);

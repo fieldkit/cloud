@@ -11,6 +11,7 @@ export class TimeSeriesSpecFactory {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
+        const makeBarDataName = (i: number) => `table${i + 1}Bar`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
@@ -26,6 +27,10 @@ export class TimeSeriesSpecFactory {
                     y: "y2",
                 };
             }
+        };
+
+        const isBarChart = (series: SeriesData): boolean => {
+            return series.vizInfo.viz.length == 1;
         };
 
         const solidColors = true;
@@ -277,6 +282,28 @@ export class TimeSeriesSpecFactory {
                                         type: "formula",
                                         expr: `scale('${scales.y}', datum.value)`,
                                         as: "layout_y",
+                                    },
+                                ],
+                            },
+                            {
+                                name: makeBarDataName(i),
+                                source: makeValidDataName(i),
+                                transform: [
+                                    {
+                                        field: "time",
+                                        type: "timeunit",
+                                        units: ["year", "month", "date", "hours"],
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barEndDate)",
+                                        as: "barEnd",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStartDate)",
+                                        as: "barStart",
                                     },
                                 ],
                             },
@@ -549,6 +576,34 @@ export class TimeSeriesSpecFactory {
                 const hoverCheck = ifHovering(i, 1, 0.3);
                 const scales = makeScales(i);
                 const thresholds = makeSeriesThresholds(series);
+
+                if (isBarChart(series)) {
+                    return [
+                        {
+                            type: "group",
+                            marks: [
+                                {
+                                    type: "rect",
+                                    style: i === 0 ? "primaryBar" : "secondaryBar",
+                                    from: { data: makeBarDataName(i) },
+                                    encode: {
+                                        enter: {
+                                            x2: { scale: scales.x, field: "barStart", offset: 1 },
+                                            x: { scale: scales.x, field: "barEnd" },
+                                            y: { scale: scales.y, field: "value" },
+                                            y2: { scale: scales.y, value: 0 },
+                                        },
+                                        update: {
+                                            strokeOpacity: {
+                                                signal: hoverCheck,
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    ];
+                }
 
                 const firstLineMark = {
                     type: "line",
@@ -1091,63 +1146,5 @@ export class TimeSeriesSpecFactory {
             axes: axes,
             marks: marks,
         });
-    }
-
-    private defaultStroke() {
-        return {
-            value: {
-                x1: 1,
-                y1: 1,
-                x2: 1,
-                y2: 0,
-                gradient: "linear",
-                stops: [
-                    {
-                        offset: 0,
-                        color: "#000004",
-                    },
-                    {
-                        offset: 0.1,
-                        color: "#170C3A",
-                    },
-                    {
-                        offset: 0.2,
-                        color: "#420A68",
-                    },
-                    {
-                        offset: 0.3,
-                        color: "#6B186E",
-                    },
-                    {
-                        offset: 0.4,
-                        color: "#932667",
-                    },
-                    {
-                        offset: 0.5,
-                        color: "#BB3754",
-                    },
-                    {
-                        offset: 0.6,
-                        color: "#DD513A",
-                    },
-                    {
-                        offset: 0.7,
-                        color: "#F3771A",
-                    },
-                    {
-                        offset: 0.8,
-                        color: "#FCA50A",
-                    },
-                    {
-                        offset: 0.9,
-                        color: "#F6D645",
-                    },
-                    {
-                        offset: 1,
-                        color: "#FCFFA4",
-                    },
-                ],
-            },
-        };
     }
 }
