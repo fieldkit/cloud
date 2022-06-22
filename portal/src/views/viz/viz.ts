@@ -966,7 +966,7 @@ export class Workspace implements VizInfoFactory {
         const hiddenById = _.fromPairs(this.associated.map((assoc) => [assoc.station.id, assoc.hidden]));
         const associatedById = _.groupBy(this.associated, (assoc) => assoc.station.id);
         const nearby = this.nearbyStationOptions();
-        const manually = this.manuallyAssociatedStationOptions();
+        const manually = []; // this.manuallyAssociatedStationOptions();
 
         // This is for removing stations that already have an option because of
         // they're associated. Not a fan of this approach.
