@@ -110,6 +110,7 @@ export class TimeSeriesSpecFactory {
             }
 
             function rebin(rows: DataRow[], interval: number): DataRow[] {
+                const aggregateFunction = series.vizInfo.aggregationFunction;
                 const grouped = _(rows)
                     .groupBy((datum) => {
                         return Math.floor(datum.time / interval) * interval;
@@ -120,8 +121,6 @@ export class TimeSeriesSpecFactory {
                             return valid[0];
                         }
                         if (valid.length > 1) {
-                            // TODO HACK
-                            const aggregateFunction = series.vizInfo.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean;
                             return {
                                 time: Number(time),
                                 stationId: valid[0].stationId,
@@ -293,17 +292,14 @@ export class TimeSeriesSpecFactory {
                                         field: "time",
                                         type: "timeunit",
                                         units: ["year", "month", "date", "hours"],
-                                        as: ["barStartDate", "barEndDate"],
+                                        as: ["barStart", "barEnd"],
                                     },
                                     {
-                                        type: "formula",
-                                        expr: "time(datum.barEndDate)",
-                                        as: "barEnd",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: "time(datum.barStartDate)",
-                                        as: "barStart",
+                                        type: "aggregate",
+                                        groupby: ["barStart", "barEnd"],
+                                        ops: ["mean"],
+                                        fields: ["value"],
+                                        as: ["value"],
                                     },
                                 ],
                             },
@@ -314,7 +310,7 @@ export class TimeSeriesSpecFactory {
             .concat([
                 {
                     name: "all_layouts",
-                    source: this.allSeries.map((series, i) => makeValidDataName(i)),
+                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
                     transform: [
                         {
                             type: "voronoi",
@@ -577,8 +573,48 @@ export class TimeSeriesSpecFactory {
                 const scales = makeScales(i);
                 const thresholds = makeSeriesThresholds(series);
 
+                const symbolMark = {
+                    type: "symbol",
+                    from: {
+                        data: makeValidDataName(i),
+                    },
+                    encode: {
+                        enter: {
+                            x: {
+                                scale: scales.x,
+                                field: "time",
+                            },
+                            y: {
+                                scale: scales.y,
+                                field: "value",
+                            },
+                            stroke: {
+                                value: null,
+                            },
+                            strokeWidth: {
+                                value: 2,
+                            },
+                            size: {
+                                value: 100,
+                            },
+                            fill: {
+                                value: "blue",
+                            },
+                            fillOpacity: {
+                                value: 0.5,
+                            },
+                        },
+                        update: {
+                            fillOpacity: {
+                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                            },
+                        },
+                    },
+                };
+
                 if (isBarChart(series)) {
                     return [
+                        symbolMark,
                         {
                             type: "group",
                             marks: [
@@ -588,8 +624,8 @@ export class TimeSeriesSpecFactory {
                                     from: { data: makeBarDataName(i) },
                                     encode: {
                                         enter: {
-                                            x2: { scale: scales.x, field: "barStart", offset: 1 },
-                                            x: { scale: scales.x, field: "barEnd" },
+                                            x: { scale: scales.x, field: "barStart" },
+                                            x2: { scale: scales.x, field: "barEnd" },
                                             y: { scale: scales.y, field: "value" },
                                             y2: { scale: scales.y, value: 0 },
                                         },
@@ -639,45 +675,6 @@ export class TimeSeriesSpecFactory {
                         update: {
                             strokeOpacity: {
                                 signal: hoverCheck,
-                            },
-                        },
-                    },
-                };
-
-                const symbolMark = {
-                    type: "symbol",
-                    from: {
-                        data: makeValidDataName(i),
-                    },
-                    encode: {
-                        enter: {
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: null,
-                            },
-                            strokeWidth: {
-                                value: 2,
-                            },
-                            size: {
-                                value: 100,
-                            },
-                            fill: {
-                                value: "blue",
-                            },
-                            fillOpacity: {
-                                value: 0.5,
-                            },
-                        },
-                        update: {
-                            fillOpacity: {
-                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
                             },
                         },
                     },

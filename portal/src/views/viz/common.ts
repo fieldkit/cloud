@@ -181,6 +181,10 @@ export class VizInfo {
         public readonly ranges: SensorRange[]
     ) {}
 
+    public get aggregationFunction() {
+        return this.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean; // HACK
+    }
+
     public get constrainedRanges(): SensorRange[] {
         return this.ranges.filter((r) => r.constrained === true);
     }
