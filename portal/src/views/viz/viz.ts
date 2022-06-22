@@ -69,6 +69,7 @@ export class StationTreeOption {
         public readonly id: string | number,
         public readonly label: string,
         public readonly isDisabled: boolean,
+        public readonly isDefaultExpanded: boolean = false,
         public readonly children: StationTreeOption[] | undefined = undefined
     ) {}
 }
@@ -944,7 +945,7 @@ export class Workspace implements VizInfoFactory {
             return new StationTreeOption(station.id, station.name, false);
         });
 
-        return [new StationTreeOption(`nearby`, "Nearby", false, options)];
+        return [new StationTreeOption(`nearby`, "Nearby", false, true, options)];
     }
 
     private manuallyAssociatedStationOptions(): StationTreeOption[] {
@@ -959,7 +960,7 @@ export class Workspace implements VizInfoFactory {
             return new StationTreeOption(station.id, station.name, false);
         });
 
-        return [new StationTreeOption(`manual`, "Associated", false, options)];
+        return [new StationTreeOption(`manual`, "Associated", false, false, options)];
     }
 
     public get stationOptions(): StationTreeOption[] {
@@ -1022,13 +1023,14 @@ export class Workspace implements VizInfoFactory {
                     `group-${name}`,
                     name,
                     false,
+                    false,
                     group.map((child) => child.option)
                 );
             })
             .value();
 
         const allOptions = [...groupOptions, ...ungrouped];
-        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, allOptions)] : [];
+        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, false, allOptions)] : [];
 
         // console.log("viz: ungrouped", { ungrouped });
         // console.log("viz: all", { all });
