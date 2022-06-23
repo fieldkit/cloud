@@ -894,12 +894,10 @@ export class TimeSeriesSpecFactory {
                         events: "@cell:mouseover",
                         update: "datum",
                     },
-                    /*
                     {
                         events: "@cell:mouseout",
                         update: "null",
                     },
-                    */
                 ],
             },
             {
