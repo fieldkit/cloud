@@ -31,12 +31,20 @@ export interface PartnerCustomization {
     };
 }
 
-function getNeighborhood(station: DisplayStation): string | null {
+function getAttribute(station: DisplayStation, name: string): string | null {
     if (station.attributes) {
-        const maybeAttribute = station.attributes.find((attr) => attr.name === "Neighborhood");
+        const maybeAttribute = station.attributes.find((attr) => attr.name === name);
         if (maybeAttribute) return maybeAttribute.stringValue;
     }
     return null;
+}
+
+function getNeighborhood(station: DisplayStation): string | null {
+    return getAttribute(station, "Neighborhood");
+}
+
+function getBorough(station: DisplayStation): string | null {
+    return getAttribute(station, "Borough");
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -75,7 +83,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             viz: {
                 groupStation: (station: DisplayStation): string | null => {
-                    return getNeighborhood(station) || null;
+                    return getBorough(station) || null;
                 },
             },
         };
