@@ -62,20 +62,27 @@ export default Vue.extend({
 
             this.vega = vegaInfo;
 
+            const saveButtons = document.querySelectorAll("summary");
+
+            saveButtons.forEach((button) => {
+                if (button.querySelectorAll("span").length === 0) {
+                    const saveAs = document.createElement("svg");
+                    const svg = button.querySelector("svg");
+                    svg.setAttribute("viewBox", "0 0 20 20");
+                    svg.innerHTML =
+                        '<g id="icon_SaveAs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">' +
+                        '<line x1="7.96030045" y1="1" x2="7.96030045" y2="11" id="Path-2" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round"></line>' +
+                        '<polyline id="Path-9" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="bevel" points="12.8961983 6.50366211 8.05585126 11 2.92245537 6.50366211"></polyline>' +
+                        '<polyline id="Path-10" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round" points="1 12.5363846 1 16.5 15.1181831 16.5 15.1181831 12.5363846"></polyline>' +
+                        "</g>";
+                    const saveLabel = document.createElement("span");
+                    saveLabel.setAttribute("class", "save-label");
+                    saveLabel.innerHTML = "Save As";
+                    button.appendChild(saveLabel);
+                }
+            });
+
             // Replace vega-embed save as icon with custom button
-            const saveAs = document.createElement("svg");
-            const summary = document.querySelector("summary");
-            const svg = summary.querySelector("svg");
-            svg.setAttribute("viewBox", "0 0 20 20");
-            svg.innerHTML = '<g id="icon_SaveAs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">' +
-                                '<line x1="7.96030045" y1="1" x2="7.96030045" y2="11" id="Path-2" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round"></line>' +
-                                '<polyline id="Path-9" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="bevel" points="12.8961983 6.50366211 8.05585126 11 2.92245537 6.50366211"></polyline>' +
-                                '<polyline id="Path-10" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round" points="1 12.5363846 1 16.5 15.1181831 16.5 15.1181831 12.5363846"></polyline>' +
-                            '</g>';
-            const saveLabel = document.createElement("span");
-            saveLabel.setAttribute("class", "save-label");
-            saveLabel.innerHTML = "Save As";
-            summary.appendChild(saveLabel);
 
             /*
             vegaInfo.view.addSignalListener("hover", (_, value) => {
@@ -131,7 +138,7 @@ export default Vue.extend({
 .viz {
     width: 100%;
 }
-.vega-embed summary{
+.vega-embed summary {
     border-radius: 0px !important;
     width: 60px;
     height: 1em;
@@ -151,5 +158,4 @@ export default Vue.extend({
 .vega-embed .vega-actions {
     right: 3em !important;
 }
-
 </style>
