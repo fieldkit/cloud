@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"math/big"
 	"strconv"
 	"time"
@@ -18,11 +17,6 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
-	pb "github.com/fieldkit/data-protocol"
-
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
-	"github.com/influxdata/influxdb-client-go/v2/api/write"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -30,126 +24,18 @@ import (
 )
 
 type Options struct {
-	PostgresURL          string `split_words:"true" required:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable"`
-	InfluxDbURL          string `split_words:"true" required:"true" default:"http://127.0.0.1:8086"`
-	InfluxDbToken        string `split_words:"true" required:"true"`
-	InfluxDbOrg          string `split_words:"true" required:"true" default:"fk"`
-	InfluxDbBucket       string `split_words:"true" required:"true" default:"sensors"`
-	SchemaID             int
-	Verbose              bool
+	PostgresURL string `split_words:"true" required:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable"`
+
 	BinaryRecords        bool
 	JsonRecords          bool
+	SchemaID             int
+	Verbose              bool
 	FailOnMissingSensors bool
-}
 
-type Influx struct {
-	url    string
-	token  string
-	org    string
-	bucket string
-	cli    influxdb2.Client
-	write  api.WriteAPI
-}
-
-type InfluxReading struct {
-	Time      time.Time
-	StationID int32
-	DeviceID  []byte
-	ModuleID  []byte
-	SensorID  int64
-	SensorKey string
-	Value     float64
-	Longitude *float64
-	Latitude  *float64
-	Altitude  *float64
-	Tags      map[string]string
-}
-
-func (r *InfluxReading) ToPoint() *write.Point {
-	tags := make(map[string]string)
-	tags["device_id"] = hex.EncodeToString(r.DeviceID)
-	tags["module_id"] = hex.EncodeToString(r.ModuleID)
-	tags["station_id"] = fmt.Sprintf("%v", r.StationID)
-	tags["sensor_id"] = fmt.Sprintf("%v", r.SensorID)
-	tags["sensor_key"] = r.SensorKey
-
-	fields := make(map[string]interface{})
-	fields["value"] = r.Value
-
-	if r.Longitude != nil && r.Latitude != nil {
-		fields["lon"] = *r.Longitude
-		fields["lat"] = *r.Latitude
-	}
-
-	if r.Altitude != nil {
-		fields["altitude"] = *r.Altitude
-	}
-
-	return influxdb2.NewPoint("reading", tags, fields, r.Time)
-}
-
-func NewInflux(url, token, org, bucket string, db *sqlxcache.DB) (h *Influx) {
-	cli := influxdb2.NewClient(url, token)
-
-	// Use blocking write client for writes to desired bucket
-	write := cli.WriteAPI(org, bucket)
-
-	return &Influx{
-		url:    url,
-		token:  token,
-		org:    org,
-		bucket: bucket,
-		cli:    cli,
-		write:  write,
-	}
-}
-
-func (h *Influx) Open(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
-
-	log.Infow("opening")
-
-	if health, err := h.cli.Health(ctx); err != nil {
-		return err
-	} else {
-		log.Infow("health", "heatlh", health)
-	}
-
-	return nil
-}
-
-func (h *Influx) Close() error {
-	h.write.Flush()
-
-	h.cli.Close()
-
-	return nil
-}
-
-func (h *Influx) DoesStationHaveData(ctx context.Context, stationID int32) (bool, error) {
-	queryAPI := h.cli.QueryAPI(h.org)
-
-	query := fmt.Sprintf(`
-		from(bucket:"%s")
-		|> range(start: -10y, stop: now())
-		|> filter(fn: (r) => r._measurement == "reading")
-		|> filter(fn: (r) => r._field == "value")
-		|> filter(fn: (r) => r.station_id == "%v")
-	`, h.bucket, stationID)
-	rows, err := queryAPI.Query(ctx, query)
-	if err != nil {
-		return false, err
-	}
-
-	for rows.Next() {
-		return true, nil
-	}
-
-	if rows.Err() != nil {
-		return false, rows.Err()
-	}
-
-	return false, nil
+	InfluxDbURL    string `split_words:"true" required:"true" default:"http://127.0.0.1:8086"`
+	InfluxDbToken  string `split_words:"true" required:"true"`
+	InfluxDbOrg    string `split_words:"true" required:"true" default:"fk"`
+	InfluxDbBucket string `split_words:"true" required:"true" default:"sensors"`
 }
 
 type Resolver struct {
@@ -196,168 +82,26 @@ func (r *Resolver) LookupStationID(ctx context.Context, deviceID []byte) (int32,
 	return station.ID, nil
 }
 
-type stationInfo struct {
-	provision *data.Provision
-	meta      *data.MetaRecord
-	station   *data.Station
+type MovedReading struct {
+	Time      time.Time
+	StationID int32
+	DeviceID  []byte
+	ModuleID  []byte
+	SensorID  int64
+	SensorKey string
+	Value     float64
+	Longitude *float64
+	Latitude  *float64
+	Altitude  *float64
+	Tags      map[string]string
 }
 
-type importErrors struct {
-	ValueNaN      map[string]int64
-	MissingMeta   map[string]int64
-	MalformedMeta map[string]int64
+type MoveDataHandler interface {
+	MoveReadings(ctx context.Context, readings []*MovedReading) error
+	Close(ctx context.Context) error
 }
 
-type InfluxDbHandler struct {
-	influx       *Influx
-	resolve      *Resolver
-	metaFactory  *repositories.MetaFactory
-	stations     *repositories.StationRepository
-	querySensors *repositories.SensorsRepository
-	byProvision  map[int64]*stationInfo
-	skipping     map[int64]bool
-	errors       *importErrors
-}
-
-func NewInfluxDbHandler(influx *Influx, resolve *Resolver, db *sqlxcache.DB) (h *InfluxDbHandler) {
-	return &InfluxDbHandler{
-		influx:       influx,
-		resolve:      resolve,
-		metaFactory:  repositories.NewMetaFactory(db),
-		stations:     repositories.NewStationRepository(db),
-		querySensors: repositories.NewSensorsRepository(db),
-		byProvision:  make(map[int64]*stationInfo),
-		skipping:     make(map[int64]bool),
-		errors: &importErrors{
-			ValueNaN:      make(map[string]int64),
-			MissingMeta:   make(map[string]int64),
-			MalformedMeta: make(map[string]int64),
-		},
-	}
-}
-
-func (h *InfluxDbHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
-	if v, ok := h.skipping[p.ID]; ok && v {
-		return nil
-	}
-
-	log := logging.Logger(ctx).Sugar()
-
-	if _, ok := h.byProvision[p.ID]; !ok {
-		station, err := h.stations.QueryStationByDeviceID(ctx, p.DeviceID)
-		if err != nil {
-			return err
-		}
-
-		h.byProvision[p.ID] = &stationInfo{
-			meta:      meta,
-			provision: p,
-			station:   station,
-		}
-	}
-
-	_, err := h.metaFactory.Add(ctx, meta, true)
-	if err != nil {
-		if _, ok := err.(*repositories.MissingSensorMetaError); ok {
-			log.Infow("missing-meta", "meta_record_id", meta.ID)
-			h.skipping[p.ID] = true
-			return nil
-		}
-		if _, ok := err.(*repositories.MalformedMetaError); ok {
-			log.Infow("malformed-meta", "meta_record_id", meta.ID)
-			h.skipping[p.ID] = true
-			return nil
-		}
-		return err
-	}
-
-	_ = log
-
-	return nil
-}
-
-func (h *InfluxDbHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
-	if v, ok := h.skipping[p.ID]; ok && v {
-		return nil
-	}
-
-	log := logging.Logger(ctx).Sugar()
-
-	stationInfo := h.byProvision[p.ID]
-	if stationInfo == nil {
-		panic("ASSERT: missing station in data handler")
-	}
-
-	filtered, err := h.metaFactory.Resolve(ctx, db, false, true)
-	if err != nil {
-		return fmt.Errorf("resolving: %v", err)
-	}
-	if filtered == nil {
-		return nil
-	}
-
-	for key, rv := range filtered.Record.Readings {
-		if math.IsNaN(rv.Value) {
-			h.errors.ValueNaN[key.SensorKey] += 1
-			continue
-		}
-
-		sensorID, ok := h.resolve.sensors[key.SensorKey]
-		if !ok {
-			h.errors.MissingMeta[key.SensorKey] += 1
-			continue
-		}
-
-		moduleID, err := hex.DecodeString(rv.Module.ID)
-		if err != nil {
-			return err
-		}
-
-		var latitude *float64
-		var longitude *float64
-		var altitude *float64
-
-		if len(filtered.Record.Location) >= 2 {
-			longitude = &filtered.Record.Location[0]
-			latitude = &filtered.Record.Location[1]
-			if len(filtered.Record.Location) >= 3 {
-				altitude = &filtered.Record.Location[2]
-			}
-		}
-
-		// TODO Should/can we reuse maps for this?
-		tags := make(map[string]string)
-		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
-
-		reading := InfluxReading{
-			Time:      time.Unix(filtered.Record.Time, 0),
-			DeviceID:  p.DeviceID,
-			ModuleID:  moduleID,
-			StationID: stationInfo.station.ID,
-			SensorID:  sensorID,
-			SensorKey: key.SensorKey,
-			Value:     rv.Value,
-			Tags:      tags,
-			Longitude: longitude,
-			Latitude:  latitude,
-			Altitude:  altitude,
-		}
-
-		dp := reading.ToPoint()
-
-		h.influx.write.WritePoint(dp)
-	}
-
-	_ = log
-
-	return nil
-}
-
-func (h *InfluxDbHandler) OnDone(ctx context.Context) error {
-	return nil
-}
-
-func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver) error {
+func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, handler backend.RecordHandler) error {
 	log := logging.Logger(ctx).Sugar()
 
 	allStationIDs := []int32{}
@@ -365,18 +109,7 @@ func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, infl
 		return err
 	}
 
-	stationIds := allStationIDs
-
-	handler := NewInfluxDbHandler(influx, resolver, db)
-
-	for _, id := range stationIds {
-		if yes, err := influx.DoesStationHaveData(ctx, id); err != nil {
-			return err
-		} else if yes {
-			log.Infow("skipping:has-data", "station_id", id)
-			continue
-		}
-
+	for _, id := range allStationIDs {
 		walkParams := &backend.WalkParameters{
 			Start:      time.Time{},
 			End:        time.Now(),
@@ -389,40 +122,12 @@ func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, infl
 		}
 	}
 
+	_ = log
+
 	return nil
 }
 
-func toFloatArray(x interface{}) ([]float64, bool) {
-	if arrayValue, ok := x.([]interface{}); ok {
-		values := make([]float64, 0)
-		for _, opaque := range arrayValue {
-			if v, ok := toFloat(opaque); ok {
-				values = append(values, v)
-			}
-		}
-		return values, true
-	}
-	return nil, false
-}
-
-func toFloat(x interface{}) (float64, bool) {
-	switch x := x.(type) {
-	case int:
-		return float64(x), true
-	case float64:
-		return x, true
-	case string:
-		f, err := strconv.ParseFloat(x, 64)
-		return f, err == nil
-	case *big.Int:
-		f, err := strconv.ParseFloat(x.String(), 64)
-		return f, err == nil
-	default:
-		return 0.0, false
-	}
-}
-
-func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, influx *Influx, resolver *Resolver, schemaID int32) error {
+func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, schemaID int32, resolver *Resolver, handler MoveDataHandler) error {
 	source := webhook.NewDatabaseMessageSource(db, schemaID, 0, false)
 
 	jqCache := &webhook.JqCache{}
@@ -495,7 +200,7 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 									tags := make(map[string]string)
 									tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
 
-									reading := InfluxReading{
+									reading := &MovedReading{
 										Time:      *parsed.ReceivedAt,
 										DeviceID:  parsed.DeviceID,
 										ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
@@ -508,9 +213,9 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 										Tags:      tags,
 									}
 
-									dp := reading.ToPoint()
-
-									influx.write.WritePoint(dp)
+									if err := handler.MoveReadings(ctx, []*MovedReading{reading}); err != nil {
+										return err
+									}
 
 									if options.Verbose {
 										rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
@@ -523,7 +228,42 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 			}
 		}
 	}
+
 	return nil
+}
+
+func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler) error {
+	ids := make([]int32, 0)
+	if options.SchemaID == -1 {
+		msr := webhook.NewMessageSchemaRepository(db)
+		if schemas, err := msr.QueryAllSchemas(ctx); err != nil {
+			return err
+		} else {
+			for _, schema := range schemas {
+				ids = append(ids, schema.ID)
+			}
+		}
+	} else {
+		ids = append(ids, int32(options.SchemaID))
+	}
+
+	for _, schemaID := range ids {
+		if err := processJsonSchema(ctx, options, db, schemaID, resolver, handler); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
+	influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket)
+	if err := influx.Open(ctx); err != nil {
+		return nil, err
+	}
+
+	handler := NewMoveDataIntoInfluxHandler(influx)
+
+	return handler, nil
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -536,48 +276,30 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
-	influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket, db)
-
-	if err := influx.Open(ctx); err != nil {
-		return err
-	}
-
 	resolver := NewResolver(db)
-
 	if err := resolver.Open(ctx); err != nil {
 		return err
 	}
 
+	destination, err := options.createDestinationHandler(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer destination.Close(ctx)
+
+	handler := NewMoveBinaryDataHandler(resolver, db, destination)
+
 	if options.BinaryRecords {
-		if err := processBinary(ctx, options, db, influx, resolver); err != nil {
+		if err := processBinary(ctx, options, db, handler); err != nil {
 			return err
 		}
 	}
 
 	if options.JsonRecords {
-		ids := make([]int32, 0)
-		if options.SchemaID == -1 {
-			msr := webhook.NewMessageSchemaRepository(db)
-			if schemas, err := msr.QueryAllSchemas(ctx); err != nil {
-				return err
-			} else {
-				for _, schema := range schemas {
-					ids = append(ids, schema.ID)
-				}
-			}
-		} else {
-			ids = append(ids, int32(options.SchemaID))
+		if err := processJson(ctx, options, db, resolver, destination); err != nil {
+			return err
 		}
-
-		for _, schemaID := range ids {
-			if err := processJsonSchema(ctx, options, db, influx, resolver, schemaID); err != nil {
-				return err
-			}
-		}
-	}
-
-	if err := influx.Close(); err != nil {
-		return err
 	}
 
 	return nil
@@ -589,12 +311,12 @@ func main() {
 
 	flag.BoolVar(&options.BinaryRecords, "binary", false, "process binary records")
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
-	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
 	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
+	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
 
 	flag.Parse()
 
-	logging.Configure(false, "influx")
+	logging.Configure(false, "move-data")
 
 	log := logging.Logger(ctx).Sugar()
 
@@ -607,4 +329,34 @@ func main() {
 	}
 
 	log.Infow("done")
+}
+
+func toFloatArray(x interface{}) ([]float64, bool) {
+	if arrayValue, ok := x.([]interface{}); ok {
+		values := make([]float64, 0)
+		for _, opaque := range arrayValue {
+			if v, ok := toFloat(opaque); ok {
+				values = append(values, v)
+			}
+		}
+		return values, true
+	}
+	return nil, false
+}
+
+func toFloat(x interface{}) (float64, bool) {
+	switch x := x.(type) {
+	case int:
+		return float64(x), true
+	case float64:
+		return x, true
+	case string:
+		f, err := strconv.ParseFloat(x, 64)
+		return f, err == nil
+	case *big.Int:
+		f, err := strconv.ParseFloat(x.String(), 64)
+		return f, err == nil
+	default:
+		return 0.0, false
+	}
 }
