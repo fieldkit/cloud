@@ -377,5 +377,13 @@
     "attributes": {
         "title": "Attributes",
         "noValueYet": "Nothing added yet"
+    },
+    "map": {
+        "toggle": {
+            "list": "List",
+            "map": "Map",
+            "recent": "Recent",
+            "current": "Current"
+        }
     }
 }
