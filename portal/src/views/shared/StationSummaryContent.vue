@@ -10,40 +10,42 @@
             </div>
 
             <template v-if="isCustomisationEnabled()">
-                <div class="location-container">
-                    <template v-if="getAttributeValue('Neighborhood')">{{ getAttributeValue("Neighborhood") }}</template>
-                    ,
-                    <template v-if="getAttributeValue('Borough')">{{ getAttributeValue("Borough") }}</template>
-                </div>
-                <div v-if="getAttributeValue('Deployment Date')" class="location-container">
-                    <template v-if="getAttributeValue('Deployment Date')">
-                        {{ $t("station.deployedOn") }} {{ getAttributeValue("Deployment Date") }} ,
-                    </template>
-
-                    <template v-if="getAttributeValue('Built By')">{{ $t("station.by") }} {{ getAttributeValue("Built By") }}</template>
+                <div class="row where-row">
+                    <div v-if="neighborhood || borough" class="location-container">
+                        <i class="icon icon-location" />
+                        <template v-if="neighborhood">{{ neighborhood }}</template>
+                        <template v-if="neighborhood && borough">{{ ", " }}</template>
+                        <template v-if="borough">{{ borough }}</template>
+                    </div>
+                    <div v-if="deploymentDate || builtBy" class="location-container">
+                        <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
+                        <template v-if="builtBy">{{ $t("station.by") }} {{ builtBy }}</template>
+                    </div>
                 </div>
             </template>
 
-            <div
-                class="row where-row"
-                v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
-            >
-                <div class="location-container">
-                    <div v-if="stationLocationName || station.placeNameOther">
-                        <i class="icon icon-location" />
-                        <template>
-                            {{ stationLocationName ? stationLocationName : station.placeNameOther }}
-                        </template>
-                    </div>
-                    <div v-if="station.placeNameNative">
-                        <i class="icon icon-location" />
-                        <span>
-                            Native Lands:
-                            <span class="bold">{{ station.placeNameNative }}</span>
-                        </span>
+            <template v-else>
+                <div
+                    class="row where-row"
+                    v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
+                >
+                    <div class="location-container">
+                        <div v-if="stationLocationName || station.placeNameOther">
+                            <i class="icon icon-location" />
+                            <template>
+                                {{ stationLocationName ? stationLocationName : station.placeNameOther }}
+                            </template>
+                        </div>
+                        <div v-if="station.placeNameNative">
+                            <i class="icon icon-location" />
+                            <span>
+                                Native Lands:
+                                <span class="bold">{{ station.placeNameNative }}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
 
             <div v-if="!isCustomisationEnabled()" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
@@ -69,7 +71,12 @@ export default Vue.extend({
         ...CommonComponents,
     },
     data: () => {
-        return {};
+        return {
+            neighborhood: null,
+            borough: null,
+            builtBy: null,
+            deploymentDate: null,
+        };
     },
     props: {
         station: {
@@ -81,6 +88,9 @@ export default Vue.extend({
         stationLocationName(): string {
             return this.partnerCustomization().stationLocationName(this.station);
         },
+    },
+    mounted(): void {
+        this.setPartnerAttributes();
     },
     methods: {
         getBatteryIcon() {
@@ -100,6 +110,12 @@ export default Vue.extend({
                 const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
                 return value ? value : null;
             }
+        },
+        setPartnerAttributes(): void {
+            this.neighborhood = this.getAttributeValue("Neighborhood");
+            this.borough = this.getAttributeValue("Borough");
+            this.deploymentDate = this.getAttributeValue("Deployment Date");
+            this.builtBy = this.getAttributeValue("Built By");
         },
     },
 });
@@ -152,14 +168,9 @@ export default Vue.extend({
 }
 
 .location-container {
-    flex-direction: column;
     display: flex;
-    margin-top: 2px;
+    margin-bottom: 2px;
     font-size: 14px;
-
-    .summary-content & {
-        flex-direction: row;
-    }
 
     > div {
         @include flex(flex-start);
