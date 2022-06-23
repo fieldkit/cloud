@@ -192,6 +192,8 @@
             "empty": "There are no stations in this project."
         },
         "deployed": "Deployed",
+        "deployedOn": "Deployed on",
+        "by": "by",
         "readyToDeploy": "Ready to deploy",
         "lastSynced": "Last Synced",
         "firmwareVersion": "Firmware version:",

@@ -6,7 +6,7 @@
                 <img
                     :alt="$tc('station.navigateToStation')"
                     class="navigate-button"
-                    src="@/assets/tooltip-blue.svg"
+                    :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                     @click="openStationPageTab"
                 />
             </template>
@@ -30,6 +30,7 @@ import StationSummaryContent from "./StationSummaryContent.vue";
 import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
 import * as utils from "@/utilities";
 import StationBattery from "@/views/station/StationBattery.vue";
+import { interpolatePartner } from "./partners";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -83,9 +84,6 @@ export default Vue.extend({
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleIcon(module) {
-            return this.$loadAsset(utils.getModuleImg(module));
-        },
         wantCloseSummary() {
             this.$emit("close");
         },
@@ -95,6 +93,9 @@ export default Vue.extend({
         openStationPageTab() {
             const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
             window.open(routeData.href, "_blank");
+        },
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
         },
     },
 });

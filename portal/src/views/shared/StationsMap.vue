@@ -29,8 +29,8 @@ import ValueMarker from "./ValueMarker.vue";
 
 import * as d3 from "d3";
 import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 export interface ProtectedData {
     map: any;
@@ -52,7 +52,7 @@ export default Vue.extend({
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
-            hasGeocoder: false
+            hasGeocoder: false,
         };
     },
     props: {
@@ -152,18 +152,19 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
-            if(!this.hasGeocoder){
+            if (!this.hasGeocoder) {
                 map.addControl(
                     new MapboxGeocoder({
                         accessToken: this.mapbox.token,
                         mapboxgl: mapboxgl,
                         collapsed: true,
-                        marker: false
-                    })
-                , 'top-left');
+                        marker: false,
+                    }),
+                    "top-left"
+                );
                 this.hasGeocoder = true;
             }
-            
+
             // Marker color scale
             const appendColor = (features) => {
                 return features.map((d) => {
@@ -239,8 +240,9 @@ export default Vue.extend({
 
             //Generate custom map markers
             const valueMarker = Vue.extend(ValueMarker);
+            const sorted = this.mapped.features.sort((a, b) => a.properties.value - b.properties.value);
 
-            for (const feature of this.mapped.features) {
+            for (const feature of sorted) {
                 const instance = new valueMarker({
                     propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },
                 });

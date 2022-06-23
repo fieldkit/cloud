@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -412,11 +413,22 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
+	mmr := repositories.NewModuleMetaRepository(c.options.Database)
+	mm, err := mmr.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	sr := repositories.NewStationRepository(c.options.Database)
 
 	pr := repositories.NewProjectRepository(c.options.Database)
 
-	firstStation, err := sr.QueryStationByID(ctx, payload.ID)
+	firstStation, err := sr.QueryStationFull(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	first, err := transformStationFull(c.options.signer, p, firstStation, false, false, mm)
 	if err != nil {
 		return nil, err
 	}
@@ -432,6 +444,10 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 	}
 
 	stations := make([]*station.AssociatedStation, 0)
+
+	stations = append(stations, &station.AssociatedStation{
+		Station: first,
+	})
 
 	for _, project := range projects {
 		including := false
@@ -478,8 +494,8 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 				}
 			}
 
-			if firstStation.Location != nil {
-				if nearby, err := sr.QueryNearbyProjectStations(ctx, project.ID, firstStation.Location); err != nil {
+			if firstStation.Station.Location != nil {
+				if nearby, err := sr.QueryNearbyProjectStations(ctx, project.ID, firstStation.Station.Location); err != nil {
 					return nil, err
 				} else {
 					for _, ns := range nearby {
@@ -881,17 +897,19 @@ func transformModules(from *data.StationFull, configurationID int64, mm []*repos
 		}
 
 		hardwareID := hex.EncodeToString(v.HardwareID)
+		hardwareIDBase64 := base64.StdEncoding.EncodeToString(v.HardwareID)
 
 		to = append(to, &station.StationModule{
-			ID:         v.ID,
-			FullKey:    moduleKey,
-			HardwareID: &hardwareID,
-			Name:       translatedName,
-			Position:   int32(v.Position),
-			Flags:      int32(v.Flags),
-			Internal:   v.Flags > 0 || v.Position == 255,
-			Meta:       serializedModuleMeta,
-			Sensors:    sensorsWm,
+			ID:               v.ID,
+			FullKey:          moduleKey,
+			HardwareID:       &hardwareID,
+			HardwareIDBase64: &hardwareIDBase64,
+			Name:             translatedName,
+			Position:         int32(v.Position),
+			Flags:            int32(v.Flags),
+			Internal:         v.Flags > 0 || v.Position == 255,
+			Meta:             serializedModuleMeta,
+			Sensors:          sensorsWm,
 		})
 
 	}
@@ -1005,6 +1023,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			AttributeID: attribute.AttributeID,
 			Name:        attribute.Name,
 			StringValue: attribute.StringValue,
+			Priority:    attribute.Priority,
 		})
 	}
 

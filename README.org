@@ -16,7 +16,7 @@
    In order to build this project and be able to run it yourself you'll need the following dependencies:
 
    - Docker (19.03.12) (https://docs.docker.com/get-docker/)
-   - Golang 1.15 (https://golang.org/dl/)
+   - Golang 1.17 (https://golang.org/dl/)
    - nodejs (12.18.1) (https://nodejs.org/en/download/)
    - yarn (1.22.4)
 

@@ -129,6 +129,7 @@ type StationProjectAttributeView struct {
 	AttributeID *int64
 	Name        *string
 	StringValue *string
+	Priority    *int32
 }
 
 // StationUploadView is a type that runs validations on a projected type.
@@ -165,16 +166,17 @@ type StationConfigurationView struct {
 
 // StationModuleView is a type that runs validations on a projected type.
 type StationModuleView struct {
-	ID           *int64
-	HardwareID   *string
-	MetaRecordID *int64
-	Name         *string
-	Position     *int32
-	Flags        *int32
-	Internal     *bool
-	FullKey      *string
-	Sensors      []*StationSensorView
-	Meta         map[string]interface{}
+	ID               *int64
+	HardwareID       *string
+	HardwareIDBase64 *string
+	MetaRecordID     *int64
+	Name             *string
+	Position         *int32
+	Flags            *int32
+	Internal         *bool
+	FullKey          *string
+	Sensors          []*StationSensorView
+	Meta             map[string]interface{}
 }
 
 // StationSensorView is a type that runs validations on a projected type.
@@ -701,6 +703,9 @@ func ValidateStationProjectAttributeView(result *StationProjectAttributeView) (e
 	}
 	if result.StringValue == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "result"))
+	}
+	if result.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
 	}
 	return
 }

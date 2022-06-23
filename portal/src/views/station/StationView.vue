@@ -3,11 +3,10 @@
         <StandardLayout v-if="station">
             <div class="container-wrap">
                 <DoubleHeader
-                    v-if="projectId"
                     backRoute="viewProject"
                     :title="station.name"
                     :subtitle="headerSubtitle"
-                    :backTitle="$tc('layout.backProjectDashboard')"
+                    :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
                     :backRouteParams="{ id: projectId }"
                 />
 

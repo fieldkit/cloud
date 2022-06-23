@@ -1161,6 +1161,7 @@ type StationProjectAttributeResponseBody struct {
 	AttributeID *int64  `form:"attributeId,omitempty" json:"attributeId,omitempty" xml:"attributeId,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	StringValue *string `form:"stringValue,omitempty" json:"stringValue,omitempty" xml:"stringValue,omitempty"`
+	Priority    *int32  `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -1198,16 +1199,17 @@ type StationConfigurationResponseBody struct {
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
-	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
-	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
-	Name         *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
-	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
-	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
-	FullKey      *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
-	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
-	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	ID               *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	HardwareID       *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
+	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	Name             *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Position         *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Flags            *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
+	Internal         *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
+	FullKey          *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
+	Sensors          []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+	Meta             map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -3723,6 +3725,9 @@ func ValidateStationProjectAttributeResponseBody(body *StationProjectAttributeRe
 	}
 	if body.StringValue == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "body"))
+	}
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }

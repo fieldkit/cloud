@@ -1161,6 +1161,7 @@ type StationProjectAttributeResponseBody struct {
 	AttributeID int64  `form:"attributeId" json:"attributeId" xml:"attributeId"`
 	Name        string `form:"name" json:"name" xml:"name"`
 	StringValue string `form:"stringValue" json:"stringValue" xml:"stringValue"`
+	Priority    int32  `form:"priority" json:"priority" xml:"priority"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -1198,16 +1199,17 @@ type StationConfigurationResponseBody struct {
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
-	ID           int64                        `form:"id" json:"id" xml:"id"`
-	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
-	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
-	Name         string                       `form:"name" json:"name" xml:"name"`
-	Position     int32                        `form:"position" json:"position" xml:"position"`
-	Flags        int32                        `form:"flags" json:"flags" xml:"flags"`
-	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
-	FullKey      string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
-	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
-	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	ID               int64                        `form:"id" json:"id" xml:"id"`
+	HardwareID       *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
+	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	Name             string                       `form:"name" json:"name" xml:"name"`
+	Position         int32                        `form:"position" json:"position" xml:"position"`
+	Flags            int32                        `form:"flags" json:"flags" xml:"flags"`
+	Internal         bool                         `form:"internal" json:"internal" xml:"internal"`
+	FullKey          string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
+	Sensors          []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+	Meta             map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.

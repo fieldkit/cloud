@@ -51,6 +51,7 @@ type QueryParams struct {
 	Aggregate  string            `json:"aggregate"`
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
+	InfluxDB   bool              `json:"influxdb"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
@@ -128,6 +129,11 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 
 	complete := raw.Complete != nil && *raw.Complete
 
+	influxDB := false
+	if raw.InfluxDB != nil {
+		influxDB = *raw.InfluxDB
+	}
+
 	qp = &QueryParams{
 		Start:      start,
 		End:        end,
@@ -137,6 +143,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Aggregate:  aggregate,
 		Tail:       tail,
 		Complete:   complete,
+		InfluxDB:   influxDB,
 	}
 
 	return
@@ -318,13 +325,15 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) (*sens
 
 type DataRow struct {
 	Time      data.NumericWireTime `db:"time" json:"time"`
-	ID        *int64               `db:"id" json:"-"`
 	StationID *int32               `db:"station_id" json:"stationId,omitempty"`
 	SensorID  *int64               `db:"sensor_id" json:"sensorId,omitempty"`
-	ModuleID  *int64               `db:"module_id" json:"moduleId,omitempty"`
+	ModuleID  *string              `db:"module_id" json:"moduleId,omitempty"`
 	Location  *data.Location       `db:"location" json:"location,omitempty"`
 	Value     *float64             `db:"value" json:"value,omitempty"`
-	TimeGroup *int32               `db:"time_group" json:"tg,omitempty"`
+
+	// Deprecated
+	Id        *int64 `db:"id" json:"-"`
+	TimeGroup *int32 `db:"time_group" json:"-"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
@@ -419,27 +428,18 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 	log := Logger(ctx).Sugar()
 
-	var dailySummary *AggregateSummary
-
 	for _, name := range handlers.AggregateNames {
 		table := handlers.MakeAggregateTableName(dq.tableSuffix, name)
+		interval := handlers.AggregateIntervals[name]
 
 		getQueryFn := func() (query string, args []interface{}, err error) {
-			if dailySummary == nil {
-				return sqlx.In(fmt.Sprintf(`
-					SELECT
-					MIN(time) AS start,
-					MAX(time) AS end,
-					COUNT(*) AS number_records
-					FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-				`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
-			}
-
 			return sqlx.In(fmt.Sprintf(`
 				SELECT
+				MIN(time) AS start,
+				MAX(time) + (? * interval '1 sec') AS end,
 				COUNT(*) AS number_records
 				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-			`, table), qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
+			`, table), interval, qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
 		}
 
 		query, args, err := getQueryFn()
@@ -452,13 +452,6 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 			return nil, "", err
 		}
 
-		if dailySummary == nil {
-			dailySummary = summary
-		} else {
-			summary.Start = dailySummary.Start
-			summary.End = dailySummary.End
-		}
-
 		// Queried records depends on if we're doing a complete query,
 		// filling in missing samples.
 		queriedRecords := int64(0)
@@ -468,7 +461,6 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 
 		if qp.Complete {
 			if summary.Start != nil && summary.End != nil {
-				interval := handlers.AggregateIntervals[name]
 				duration := summary.End.Time().Sub(summary.Start.Time())
 				queriedRecords = int64(duration.Seconds()) / int64(interval)
 

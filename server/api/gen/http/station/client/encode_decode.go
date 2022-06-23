@@ -2014,6 +2014,7 @@ func unmarshalStationProjectAttributeResponseBodyToStationviewsStationProjectAtt
 		AttributeID: v.AttributeID,
 		Name:        v.Name,
 		StringValue: v.StringValue,
+		Priority:    v.Priority,
 	}
 
 	return res
@@ -2087,14 +2088,15 @@ func unmarshalStationConfigurationResponseBodyToStationviewsStationConfiguration
 // *StationModuleResponseBody.
 func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *StationModuleResponseBody) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:           v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         v.Name,
-		Position:     v.Position,
-		Flags:        v.Flags,
-		Internal:     v.Internal,
-		FullKey:      v.FullKey,
+		ID:               v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             v.Name,
+		Position:         v.Position,
+		Flags:            v.Flags,
+		Internal:         v.Internal,
+		FullKey:          v.FullKey,
 	}
 	res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
 	for i, val := range v.Sensors {

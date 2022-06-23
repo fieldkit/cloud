@@ -50,6 +50,7 @@ type WebHookStation struct {
 	SensorPrefix        string
 	Attributes          map[string]*data.StationAttributeSlot
 	AssociatedDeviceIDs map[string]int32
+	LastReadingTime     *time.Time
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
@@ -161,7 +162,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	sensors := make([]*data.ModuleSensor, 0)
 
 	for _, moduleSchema := range pm.Schema.Modules {
-		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
+		modulePrefix := moduleSchema.KeyPrefix()
 
 		// Add or create the station module..
 		module := &data.StationModule{
@@ -270,6 +271,9 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 				}
 			}
 		}
+		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
+			station.LastReadingTime = pm.ReceivedAt
+		}
 	}
 
 	if pm.Attributes != nil {
@@ -317,7 +321,7 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
 
-		log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name)
+		log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name, "last_reading_time", cacheEntry.station.LastReadingTime)
 
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
 			return fmt.Errorf("error saving station: %v", err)

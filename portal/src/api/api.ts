@@ -278,6 +278,7 @@ export interface StationModule {
     id: number;
     name: string;
     hardwareId: string;
+    hardwareIdBase64: string;
     position: number;
     internal: boolean;
     flags: number;
@@ -310,6 +311,7 @@ export interface ProjectAttribute {
     projectId: number;
     name: string;
     stringValue: string;
+    priority: number;
 }
 
 export interface Station {

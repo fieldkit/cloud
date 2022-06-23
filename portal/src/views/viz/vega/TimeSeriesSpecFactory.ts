@@ -11,6 +11,7 @@ export class TimeSeriesSpecFactory {
         const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
+        const makeBarDataName = (i: number) => `table${i + 1}Bar`;
         const makeStrokeName = (i: number) => `color${i ? "Right" : "Left"}`;
         const makeHoverName = (i: number) => `${i ? "RIGHT" : "LEFT"}`;
         const makeThresholdLevelAlias = (i: number, l: number) => `${i ? "right" : "left"}${l}`;
@@ -26,6 +27,10 @@ export class TimeSeriesSpecFactory {
                     y: "y2",
                 };
             }
+        };
+
+        const isBarChart = (series: SeriesData): boolean => {
+            return series.vizInfo.viz.length == 1;
         };
 
         const solidColors = true;
@@ -44,28 +49,7 @@ export class TimeSeriesSpecFactory {
         };
 
         const filteredData = mapSeries((series, i) => {
-            function removeOutliersHack(rows: DataRow[]): DataRow[] {
-                // TODO HACK
-                if (series.vizInfo.firmwareKey == "wh.floodnet.depth") {
-                    return rows.map((row) => {
-                        if (!row) throw new Error();
-                        if (_.isNumber(row.value) && row.value >= 38) {
-                            return {
-                                time: row.time,
-                                stationId: null,
-                                sensorId: null,
-                                moduleId: null,
-                                location: null,
-                                value: null,
-                            };
-                        }
-                        return row;
-                    });
-                }
-
-                return rows;
-            }
-
+            /*
             function calculateTimeDeltas(rows: DataRow[]) {
                 const initial: { prev: DataRow | null; deltas: number[] } = {
                     prev: null,
@@ -105,6 +89,7 @@ export class TimeSeriesSpecFactory {
             }
 
             function rebin(rows: DataRow[], interval: number): DataRow[] {
+                const aggregateFunction = series.vizInfo.aggregationFunction;
                 const grouped = _(rows)
                     .groupBy((datum) => {
                         return Math.floor(datum.time / interval) * interval;
@@ -115,8 +100,6 @@ export class TimeSeriesSpecFactory {
                             return valid[0];
                         }
                         if (valid.length > 1) {
-                            // TODO HACK
-                            const aggregateFunction = series.vizInfo.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean;
                             return {
                                 time: Number(time),
                                 stationId: valid[0].stationId,
@@ -139,10 +122,11 @@ export class TimeSeriesSpecFactory {
 
                 return _.values(grouped);
             }
+            */
 
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
-            const properties = { name: hoverName, vizInfo: series.vizInfo };
+            const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
             const original = series.queried.data;
 
             function sanitize(original: DataRow[]): DataRow[] {
@@ -151,39 +135,42 @@ export class TimeSeriesSpecFactory {
                 // distracting graphs of too many valid data
                 // islands.
                 /*
-                    const valid = original.filter((datum) => _.isNumber(datum.value));
-                    const deltas = calculateTimeDeltas(valid);
+                const valid = original.filter((datum) => _.isNumber(datum.value));
+                const deltas = calculateTimeDeltas(valid);
 
-                    // console.log("viz: gaps", calculateGaps(original));
-                    // console.log("viz: deltas", _.mean(deltas) / 60000);
+                // console.log("viz: gaps", calculateGaps(original));
+                // console.log("viz: deltas", _.mean(deltas) / 60000);
 
-                    // Very simple heuristic for enabling re-bin. We
-                    // basically rebin to the average interval if more
-                    // of the data is invalid than valid. I think we can
-                    // do better.
-                    if (original.length - valid.length > valid.length) {
-                        const meanBetweenValid = _.mean(deltas);
-                        const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
-                        console.log("viz: rebin", interval);
-                        return rebin(original, interval);
-                    } else {
-                        console.log("viz: rebin-skip", original.length - valid.length, valid.length);
-                    }
+                // Very simple heuristic for enabling re-bin. We
+                // basically rebin to the average interval if more
+                // of the data is invalid than valid. I think we can
+                // do better.
+                if (original.length - valid.length > valid.length) {
+                    const meanBetweenValid = _.mean(deltas);
+                    const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
+                    console.log("viz: rebin", interval);
+                    return rebin(original, interval);
+                } else {
+                    console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+                }
                 */
 
                 // This is the another approach we're trying,
                 // basically remove missing data if the queried
                 // resolution is finer than the expected sensor
                 // data's resolution.
-                const queriedAggregate = series.queried.aggregate;
-                if (queriedAggregate.interval <= 60) {
+                if (series.queried.shouldIgnoreMissing) {
                     return original.filter((datum) => _.isNumber(datum.value));
                 }
 
                 return original;
             }
 
-            return sanitize(removeOutliersHack(original)).map((datum) => _.extend(datum, properties));
+            function applyCustomFilter(rows: DataRow[]): DataRow[] {
+                return series.vizInfo.applyCustomFilter(rows);
+            }
+
+            return sanitize(applyCustomFilter(original)).map((datum) => _.extend(datum, properties));
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -281,6 +268,41 @@ export class TimeSeriesSpecFactory {
                                     },
                                 ],
                             },
+                            {
+                                name: makeBarDataName(i),
+                                source: makeValidDataName(i),
+                                transform: [
+                                    {
+                                        field: "time",
+                                        type: "timeunit",
+                                        units: ["year", "month", "date", "hours"],
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStartDate)",
+                                        as: "barStart",
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barEndDate)",
+                                        as: "barEnd",
+                                    },
+                                    {
+                                        type: "aggregate",
+                                        groupby: ["barStart", "barEnd"],
+                                        ops: ["mean"],
+                                        fields: ["value"],
+                                        as: ["value"],
+                                    },
+                                    {
+                                        type: "formula",
+                                        expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
+                                        as: "barMiddle",
+                                    },
+                                    { type: "formula", expr: i, as: "series" },
+                                ],
+                            },
                         ];
                     })
                 )
@@ -288,7 +310,7 @@ export class TimeSeriesSpecFactory {
             .concat([
                 {
                     name: "all_layouts",
-                    source: this.allSeries.map((series, i) => makeValidDataName(i)),
+                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
                     transform: [
                         {
                             type: "voronoi",
@@ -551,44 +573,71 @@ export class TimeSeriesSpecFactory {
                 const scales = makeScales(i);
                 const thresholds = makeSeriesThresholds(series);
 
-                const firstLineMark = {
-                    type: "line",
-                    from: {
-                        data: makeValidDataName(i),
-                    },
-                    encode: {
-                        enter: {
-                            interpolate: {
-                                value: "cardinal",
+                if (isBarChart(series)) {
+                    return [
+                        {
+                            type: "symbol",
+                            from: {
+                                data: makeBarDataName(i),
                             },
-                            tension: {
-                                value: 0.9,
-                            },
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: "#cccccc",
-                            },
-                            strokeWidth: {
-                                value: 1,
-                            },
-                            strokeDash: {
-                                value: [4, 4],
+                            encode: {
+                                enter: {
+                                    x: {
+                                        scale: scales.x,
+                                        field: "barMiddle",
+                                    },
+                                    y: {
+                                        scale: scales.y,
+                                        field: "value",
+                                    },
+                                    stroke: {
+                                        value: null,
+                                    },
+                                    strokeWidth: {
+                                        value: 2,
+                                    },
+                                    size: {
+                                        value: 100,
+                                    },
+                                    fill: {
+                                        value: "blue",
+                                    },
+                                    fillOpacity: {
+                                        value: 0.5,
+                                    },
+                                },
+                                update: {
+                                    fillOpacity: {
+                                        signal: `hover && hover.series == datum.series && hover.time >= datum.barStart && hover.time <= datum.barEnd ? 1 : 0`,
+                                    },
+                                },
                             },
                         },
-                        update: {
-                            strokeOpacity: {
-                                signal: hoverCheck,
-                            },
+                        {
+                            type: "group",
+                            marks: [
+                                {
+                                    type: "rect",
+                                    style: i === 0 ? "primaryBar" : "secondaryBar",
+                                    from: { data: makeBarDataName(i) },
+                                    encode: {
+                                        enter: {
+                                            x: { scale: scales.x, field: "barStart" },
+                                            x2: { scale: scales.x, field: "barEnd" },
+                                            y: { scale: scales.y, field: "value" },
+                                            y2: { scale: scales.y, value: 0 },
+                                        },
+                                        update: {
+                                            strokeOpacity: {
+                                                signal: hoverCheck,
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
                         },
-                    },
-                };
+                    ];
+                }
 
                 const symbolMark = {
                     type: "symbol",
@@ -624,6 +673,45 @@ export class TimeSeriesSpecFactory {
                         update: {
                             fillOpacity: {
                                 signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                            },
+                        },
+                    },
+                };
+
+                const firstLineMark = {
+                    type: "line",
+                    from: {
+                        data: makeValidDataName(i),
+                    },
+                    encode: {
+                        enter: {
+                            interpolate: {
+                                value: "cardinal",
+                            },
+                            tension: {
+                                value: 0.9,
+                            },
+                            x: {
+                                scale: scales.x,
+                                field: "time",
+                            },
+                            y: {
+                                scale: scales.y,
+                                field: "value",
+                            },
+                            stroke: {
+                                value: "#cccccc",
+                            },
+                            strokeWidth: {
+                                value: 1,
+                            },
+                            strokeDash: {
+                                value: [4, 4],
+                            },
+                        },
+                        update: {
+                            strokeOpacity: {
+                                signal: hoverCheck,
                             },
                         },
                     },
@@ -1092,63 +1180,5 @@ export class TimeSeriesSpecFactory {
             axes: axes,
             marks: marks,
         });
-    }
-
-    private defaultStroke() {
-        return {
-            value: {
-                x1: 1,
-                y1: 1,
-                x2: 1,
-                y2: 0,
-                gradient: "linear",
-                stops: [
-                    {
-                        offset: 0,
-                        color: "#000004",
-                    },
-                    {
-                        offset: 0.1,
-                        color: "#170C3A",
-                    },
-                    {
-                        offset: 0.2,
-                        color: "#420A68",
-                    },
-                    {
-                        offset: 0.3,
-                        color: "#6B186E",
-                    },
-                    {
-                        offset: 0.4,
-                        color: "#932667",
-                    },
-                    {
-                        offset: 0.5,
-                        color: "#BB3754",
-                    },
-                    {
-                        offset: 0.6,
-                        color: "#DD513A",
-                    },
-                    {
-                        offset: 0.7,
-                        color: "#F3771A",
-                    },
-                    {
-                        offset: 0.8,
-                        color: "#FCA50A",
-                    },
-                    {
-                        offset: 0.9,
-                        color: "#F6D645",
-                    },
-                    {
-                        offset: 1,
-                        color: "#FCFFA4",
-                    },
-                ],
-            },
-        };
     }
 }

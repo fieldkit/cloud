@@ -45,7 +45,7 @@
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
-                                src="@/assets/tooltip-blue.svg"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 @click="openStationPageTab"
                             />
                         </template>
@@ -81,11 +81,11 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization } from "../shared/partners";
+import { getPartnerCustomization, interpolatePartner } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-import { SensorsResponse } from "./api";
+import { SensorsResponse, AssociatedStation } from "./api";
 import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
@@ -167,7 +167,7 @@ export default Vue.extend({
         },
         selectedStation(): DisplayStation | null {
             if (this.workspace) {
-                return this.workspace.getStation(this.selectedId);
+                return this.workspace.getStation(this.workspace.selectedStationId);
             }
             return null;
         },
@@ -210,38 +210,37 @@ export default Vue.extend({
     },
     methods: {
         async includeAssociated(ws: Workspace): Promise<Workspace> {
-            const allStationIds = ws.allStationIds;
-            console.log("viz: include-associated(0)", allStationIds);
+            try {
+                const targetId = ws.selectedStationId;
+                console.log(`viz: include-associated(${targetId})`, { allStationIds: ws.allStationIds });
 
-            if (allStationIds.length > 0) {
-                const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
-                    if (ForbiddenError.isInstance(e)) {
-                        await this.$router.push({
-                            name: "login",
-                            params: { errorMessage: String(this.$t("login.privateStation")) },
-                            query: { after: this.$route.path },
-                        });
-                    }
-                });
-                if (associated) {
-                    const ids = associated.stations.map((s) => s.station.id);
-                    console.log(`viz: include-associated(0)`, associated);
-                    console.log(
-                        `viz: include-associated(0)`,
-                        associated.stations
-                            .filter((row) => row.manual)
-                            .map((row) => {
-                                return { station: row.station, manual: row.manual };
-                            }),
-                        associated.stations
-                            .filter((row) => row.location)
-                            .map((row) => {
-                                return { station: row.station, location: row.location };
-                            })
-                    );
-                    await ws.addStationIds(ids);
-                    await ws.addFullStations(associated.stations.map((s) => s.station));
-                    await ws.addAssociatedStations(associated.stations);
+                const associated = await this.$services.api.getAssociatedStations(targetId);
+                const ids = associated.stations.map((s: AssociatedStation) => s.station.id);
+                console.log(`viz: include-associated(${targetId})`, { associated });
+                console.log(
+                    `viz: include-associated(${targetId})`,
+                    associated.stations
+                        .filter((row) => row.manual)
+                        .map((row) => {
+                            return { station: row.station, manual: row.manual };
+                        }),
+                    associated.stations
+                        .filter((row) => row.location)
+                        .map((row) => {
+                            return { station: row.station, location: row.location };
+                        })
+                );
+
+                await ws.addStationIds(ids);
+                await ws.addFullStations(associated.stations.map((s) => s.station));
+                await ws.addAssociatedStations(associated.stations);
+            } catch (e) {
+                if (ForbiddenError.isInstance(e)) {
+                    await this.$router.push({
+                        name: "login",
+                        params: { errorMessage: String(this.$t("login.privateStation")) },
+                        query: { after: this.$route.path },
+                    });
                 }
             }
 
@@ -291,7 +290,7 @@ export default Vue.extend({
             const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
             const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
 
-            console.log(`viz: workspace-created`);
+            // console.log(`viz: workspace-created`);
 
             await this.includeAssociated(ws);
 
@@ -378,6 +377,9 @@ export default Vue.extend({
         },
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
+        },
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
         },
     },
 });

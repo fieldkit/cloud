@@ -248,6 +248,7 @@ type StationProjectAttribute struct {
 	AttributeID int64
 	Name        string
 	StringValue string
+	Priority    int32
 }
 
 type StationUpload struct {
@@ -278,16 +279,17 @@ type StationConfiguration struct {
 }
 
 type StationModule struct {
-	ID           int64
-	HardwareID   *string
-	MetaRecordID *int64
-	Name         string
-	Position     int32
-	Flags        int32
-	Internal     bool
-	FullKey      string
-	Sensors      []*StationSensor
-	Meta         map[string]interface{}
+	ID               int64
+	HardwareID       *string
+	HardwareIDBase64 *string
+	MetaRecordID     *int64
+	Name             string
+	Position         int32
+	Flags            int32
+	Internal         bool
+	FullKey          string
+	Sensors          []*StationSensor
+	Meta             map[string]interface{}
 }
 
 type StationSensor struct {
@@ -986,6 +988,7 @@ func transformStationviewsStationProjectAttributeViewToStationProjectAttribute(v
 		AttributeID: *v.AttributeID,
 		Name:        *v.Name,
 		StringValue: *v.StringValue,
+		Priority:    *v.Priority,
 	}
 
 	return res
@@ -1071,14 +1074,15 @@ func transformStationviewsStationConfigurationViewToStationConfiguration(v *stat
 // *StationModule from a value of type *stationviews.StationModuleView.
 func transformStationviewsStationModuleViewToStationModule(v *stationviews.StationModuleView) *StationModule {
 	res := &StationModule{
-		ID:           *v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         *v.Name,
-		Position:     *v.Position,
-		Flags:        *v.Flags,
-		Internal:     *v.Internal,
-		FullKey:      *v.FullKey,
+		ID:               *v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             *v.Name,
+		Position:         *v.Position,
+		Flags:            *v.Flags,
+		Internal:         *v.Internal,
+		FullKey:          *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -1245,6 +1249,7 @@ func transformStationProjectAttributeToStationviewsStationProjectAttributeView(v
 		AttributeID: &v.AttributeID,
 		Name:        &v.Name,
 		StringValue: &v.StringValue,
+		Priority:    &v.Priority,
 	}
 
 	return res
@@ -1321,14 +1326,15 @@ func transformStationConfigurationToStationviewsStationConfigurationView(v *Stat
 // *stationviews.StationModuleView from a value of type *StationModule.
 func transformStationModuleToStationviewsStationModuleView(v *StationModule) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:           &v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         &v.Name,
-		Position:     &v.Position,
-		Flags:        &v.Flags,
-		Internal:     &v.Internal,
-		FullKey:      &v.FullKey,
+		ID:               &v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             &v.Name,
+		Position:         &v.Position,
+		Flags:            &v.Flags,
+		Internal:         &v.Internal,
+		FullKey:          &v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))

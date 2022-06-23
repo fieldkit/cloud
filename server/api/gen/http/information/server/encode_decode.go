@@ -252,14 +252,15 @@ func marshalInformationviewsStationConfigurationViewToStationConfigurationRespon
 // *informationviews.StationModuleView.
 func marshalInformationviewsStationModuleViewToStationModuleResponseBody(v *informationviews.StationModuleView) *StationModuleResponseBody {
 	res := &StationModuleResponseBody{
-		ID:           *v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         *v.Name,
-		Position:     *v.Position,
-		Flags:        *v.Flags,
-		Internal:     *v.Internal,
-		FullKey:      *v.FullKey,
+		ID:               *v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             *v.Name,
+		Position:         *v.Position,
+		Flags:            *v.Flags,
+		Internal:         *v.Internal,
+		FullKey:          *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))

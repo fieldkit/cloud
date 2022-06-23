@@ -26,7 +26,7 @@ export * from "./modules/notes";
 
 import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
-import {notes} from '@/store/modules/notes';
+import { notes } from "@/store/modules/notes";
 
 export { MutationTypes, ActionTypes };
 
@@ -64,7 +64,9 @@ function customizeLogger() {
 
 export default function(services: Services) {
     return new Vuex.Store({
-        plugins: [customizeLogger()],
+        plugins: [
+            /*customizeLogger()*/
+        ],
         modules: {
             clock: clock(services),
             exporting: exporting(services),

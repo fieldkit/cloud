@@ -491,7 +491,8 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
 			FROM fieldkit.project_station AS ps
 			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
-			WHERE ps.project_id = $1 AND s.location IS NOT NULL
+			JOIN fieldkit.station_model AS m ON (s.model_id = m.id)
+			WHERE NOT m.only_visible_via_association AND ps.project_id = $1 AND s.location IS NOT NULL
 			ORDER BY distance
 		)
 		SELECT * FROM distances WHERE distance > 0 LIMIT 5
@@ -546,7 +547,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id = $1
@@ -688,7 +689,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
@@ -847,7 +848,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	attributes := []*data.StationProjectNamedAttribute{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name
+			spa.id, spa.station_id, spa.attribute_id, spa.string_value, pa.project_id, pa.name, pa.priority
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
