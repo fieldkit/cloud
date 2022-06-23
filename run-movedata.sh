@@ -7,5 +7,5 @@ export FIELDKIT_INFLUX_DB_URL="http://127.0.0.1:8086"
 export FIELDKIT_INFLUX_DB_ORG="fk"
 export FIELDKIT_INFLUX_DB_BUCKET="sensors"
 
-make intoflux && time build/intoflux "$@"
+make movedata && time build/movedata "$@"
 
