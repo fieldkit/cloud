@@ -312,7 +312,9 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 			} else {
 				if attribute := station.FindAttribute(name); attribute != nil {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
-						attribute.StringValue = &stringValue
+						if stringValue != "" {
+							attribute.StringValue = &stringValue
+						}
 					} else {
 						if false {
 							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
