@@ -34,7 +34,7 @@ type RawQueryParams struct {
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
-	InfluxDB   *bool   `json:"influxdb"`
+	Backend    *string `json:"backend"`
 }
 
 type ModuleAndSensor struct {
@@ -51,7 +51,7 @@ type QueryParams struct {
 	Aggregate  string            `json:"aggregate"`
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
-	InfluxDB   bool              `json:"influxdb"`
+	Backend    string            `json:"backend"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
@@ -129,9 +129,9 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 
 	complete := raw.Complete != nil && *raw.Complete
 
-	influxDB := false
-	if raw.InfluxDB != nil {
-		influxDB = *raw.InfluxDB
+	backend := "pg"
+	if raw.Backend != nil {
+		backend = *raw.Backend
 	}
 
 	qp = &QueryParams{
@@ -143,7 +143,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Aggregate:  aggregate,
 		Tail:       tail,
 		Complete:   complete,
-		InfluxDB:   influxDB,
+		Backend:    backend,
 	}
 
 	return

@@ -31,26 +31,36 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 		Aggregate:  payload.Aggregate,
 		Tail:       payload.Tail,
 		Complete:   payload.Complete,
-		InfluxDB:   payload.Influx,
+		Backend:    payload.Backend,
 	}, nil
 }
 
 type SensorService struct {
-	options      *ControllerOptions
-	influxConfig *querying.InfluxDBConfig
-	db           *sqlxcache.DB
+	options         *ControllerOptions
+	influxConfig    *querying.InfluxDBConfig
+	timeScaleConfig *querying.TimeScaleDBConfig
+	db              *sqlxcache.DB
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) *SensorService {
 	return &SensorService{
-		options:      options,
-		influxConfig: influxConfig,
-		db:           options.Database,
+		options:         options,
+		influxConfig:    influxConfig,
+		timeScaleConfig: timeScaleConfig,
+		db:              options.Database,
 	}
 }
 
 func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (querying.DataBackend, error) {
-	if qp.InfluxDB {
+	if qp.Backend == "tsdb" {
+		if c.timeScaleConfig == nil {
+			log := Logger(ctx).Sugar()
+			log.Errorw("fatal: Missing TsDB configuration")
+		} else {
+			return querying.NewTimeScaleDBBackend(c.timeScaleConfig)
+		}
+	}
+	if qp.Backend == "influxdb" {
 		if c.influxConfig == nil {
 			log := Logger(ctx).Sugar()
 			log.Errorw("fatal: Missing InfluxDB configuration")

@@ -95,6 +95,12 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 }
 
+func (c *Config) timeScaleConfig() *querying.TimeScaleDBConfig {
+	return &querying.TimeScaleDBConfig{
+		Url: c.PostgresURL,
+	}
+}
+
 func (c *Config) influxConfig() *querying.InfluxDBConfig {
 	if c.InfluxDbToken == "" || c.InfluxDbUrl == "" || c.InfluxDbBucket == "" || c.InfluxDbOrg == "" {
 		return nil
@@ -216,6 +222,7 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 			},
 		}
 	}
+
 	log.Infow("using aws credentials")
 	return session.Options{
 		Profile: config.AWSProfile,
@@ -320,7 +327,12 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		log.Infow("influxdb-config-missing")
 	}
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig)
+	timeScaleConfig := config.timeScaleConfig()
+	if timeScaleConfig == nil {
+		log.Infow("timescaledb-config-missing")
+	}
+
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig, timeScaleConfig)
 	if err != nil {
 		return nil, err
 	}
