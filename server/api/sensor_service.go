@@ -57,7 +57,7 @@ func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryPara
 			log := Logger(ctx).Sugar()
 			log.Errorw("fatal: Missing TsDB configuration")
 		} else {
-			return querying.NewTimeScaleDBBackend(c.timeScaleConfig)
+			return querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db)
 		}
 	}
 	if qp.Backend == "influxdb" {

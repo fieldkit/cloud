@@ -52,8 +52,9 @@ type Options struct {
 }
 
 type Config struct {
-	Addr        string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
-	PostgresURL string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	Addr         string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	TimeScaleURL string `split_words:"true"`
 
 	// Tip, using required can help decipher the expected env name.
 	InfluxDbUrl      string `split_words:"true" requied:"false"`
@@ -96,9 +97,12 @@ type Config struct {
 }
 
 func (c *Config) timeScaleConfig() *querying.TimeScaleDBConfig {
-	return &querying.TimeScaleDBConfig{
-		Url: c.PostgresURL,
+	if c.TimeScaleURL != "" {
+		return &querying.TimeScaleDBConfig{
+			Url: c.TimeScaleURL,
+		}
 	}
+	return nil
 }
 
 func (c *Config) influxConfig() *querying.InfluxDBConfig {
