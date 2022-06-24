@@ -100,10 +100,6 @@ export class SensorParams {
     }
 }
 
-function isInfluxEnabled(): boolean {
-    return window.location.hostname.indexOf("127.") >= 0;
-}
-
 export class DataQueryParams {
     constructor(public readonly when: TimeRange, public readonly sensors: VizSensor[]) {}
 
@@ -111,7 +107,7 @@ export class DataQueryParams {
         return _.isEqual(this, o);
     }
 
-    public queryParams(): URLSearchParams {
+    public queryParams(backend: string | null): URLSearchParams {
         const queryParams = new URLSearchParams();
         queryParams.append("start", this.when.start.toString());
         queryParams.append("end", this.when.end.toString());
@@ -119,7 +115,9 @@ export class DataQueryParams {
         queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
-        // queryParams.append("influx", isInfluxEnabled() ? "true" : "false");
+        if (backend) {
+            queryParams.append("backend", backend);
+        }
         return queryParams;
     }
 
