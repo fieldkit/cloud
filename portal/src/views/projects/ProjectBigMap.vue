@@ -537,4 +537,13 @@ export default Vue.extend({
 .toggle-btn input:checked + i::after {
     transform: translate3d(13px, 2px, 0);
 }
+
+::v-deep .mapboxgl-ctrl {
+    margin: 35px 0 0 30px;
+
+    .mapboxgl-ctrl-geocoder {
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+        border: solid 1px #f4f5f7;
+    }
+}
 </style>
