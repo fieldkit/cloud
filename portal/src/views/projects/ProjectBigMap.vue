@@ -496,6 +496,7 @@ export default Vue.extend({
     border-radius: 20px;
     vertical-align: text-bottom;
     transition: all 0.3s linear;
+    user-select: none;
 }
 .toggle-btn i::before {
     content: "";
@@ -528,7 +529,7 @@ export default Vue.extend({
 .toggle-btn input {
     display: none;
 }
-.toggle-btn input:checked + i {
+.toggle-btn input + i {
     background-color: $color-primary;
 }
 .toggle-btn input:checked + i::before {
