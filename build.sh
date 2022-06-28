@@ -26,6 +26,8 @@ banner() {
 set -xe
 cd `dirname $0`
 
+make binaries
+
 rm -rf build-containers
 
 banner "NODE-BASE"
@@ -40,6 +42,12 @@ docker build -t fk-portal-build portal
 banner "BUILDING"
 
 mkdir build-containers
+
+cp -ar build/server build-containers
+cp -ar build/ingester build-containers
+cp -ar build/fktool build-containers
+cp -ar build/movedata build-containers
+cp -ar build/webhook build-containers
 
 mkdir build-containers/tmp
 
