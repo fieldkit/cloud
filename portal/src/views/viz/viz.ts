@@ -865,10 +865,12 @@ export class Workspace implements VizInfoFactory {
         // console.log(`viz:vizInfo:sensor`, details);
 
         const strings = getString(details.strings);
+        const chartLabel = (strings.chartLabel) ? strings.chartLabel : strings.label;
+        const axisLabel = (strings.axisLabel) ? strings.axisLabel : strings.label;
 
         // console.log(`viz:vizInfo:sensor`, strings);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges, chartLabel, axisLabel);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

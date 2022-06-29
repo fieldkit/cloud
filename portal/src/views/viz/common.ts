@@ -178,7 +178,9 @@ export class VizInfo {
         public readonly firmwareKey: string,
         public readonly name: string,
         public readonly viz: VizConfig[],
-        public readonly ranges: SensorRange[]
+        public readonly ranges: SensorRange[],
+        public readonly chartLabel: string,
+        public readonly axisLabel: string,
     ) {}
 
     public get constrainedRanges(): SensorRange[] {
