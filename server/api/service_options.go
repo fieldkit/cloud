@@ -46,11 +46,13 @@ type ControllerOptions struct {
 	// Subscribed listeners
 	subscriptions *Subscriptions
 
-	influxConfig *querying.InfluxDBConfig
+	influxConfig    *querying.InfluxDBConfig
+	timeScaleConfig *querying.TimeScaleDBConfig
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err
@@ -64,23 +66,24 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	locations := data.NewDescribeLocations(config.MapboxToken)
 
 	controllerOptions = &ControllerOptions{
-		Session:       awsSession,
-		Database:      database,
-		Querier:       data.NewQuerier(database),
-		Backend:       be,
-		Emailer:       emailer,
-		JWTHMACKey:    jwtHMACKey,
-		Domain:        config.Domain,
-		PortalDomain:  config.PortalDomain,
-		Metrics:       metrics,
-		Config:        config,
-		Publisher:     publisher,
-		MediaFiles:    mediaFiles,
-		signer:        NewSigner(jwtHMACKey),
-		locations:     locations,
-		que:           que,
-		subscriptions: NewSubscriptions(),
-		influxConfig:  influxConfig,
+		Session:         awsSession,
+		Database:        database,
+		Querier:         data.NewQuerier(database),
+		Backend:         be,
+		Emailer:         emailer,
+		JWTHMACKey:      jwtHMACKey,
+		Domain:          config.Domain,
+		PortalDomain:    config.PortalDomain,
+		Metrics:         metrics,
+		Config:          config,
+		Publisher:       publisher,
+		MediaFiles:      mediaFiles,
+		signer:          NewSigner(jwtHMACKey),
+		locations:       locations,
+		que:             que,
+		subscriptions:   NewSubscriptions(),
+		influxConfig:    influxConfig,
+		timeScaleConfig: timeScaleConfig,
 	}
 
 	return

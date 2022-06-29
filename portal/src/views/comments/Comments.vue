@@ -108,14 +108,14 @@
                             </div>
                         </transition>
 
-                        <div v-if="user" class="actions">
-                            <button @click="addReply(post)">
+                        <div class="actions">
+                            <button v-if="user" @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
-                                Reply
+                                {{ $t("comments.actions.reply") }}
                             </button>
                             <button v-if="viewType === 'data'" @click="viewDataClick(post)">
                                 <i class="icon icon-view-data"></i>
-                                View Data
+                                {{ $t("comments.actions.viewData") }}
                             </button>
                         </div>
                     </div>
@@ -722,6 +722,6 @@ header {
 }
 
 .no-comments {
-    margin-top: 20px;
+    margin-left: 20px;
 }
 </style>

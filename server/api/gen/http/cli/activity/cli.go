@@ -428,7 +428,7 @@ func ParseEndpoint(
 		sensorDataAggregateFlag  = sensorDataFlags.String("aggregate", "", "")
 		sensorDataCompleteFlag   = sensorDataFlags.String("complete", "", "")
 		sensorDataTailFlag       = sensorDataFlags.String("tail", "", "")
-		sensorDataInfluxFlag     = sensorDataFlags.String("influx", "", "")
+		sensorDataBackendFlag    = sensorDataFlags.String("backend", "", "")
 		sensorDataAuthFlag       = sensorDataFlags.String("auth", "", "")
 
 		sensorBookmarkFlags        = flag.NewFlagSet("bookmark", flag.ExitOnError)
@@ -1559,7 +1559,7 @@ func ParseEndpoint(
 				data = nil
 			case "data":
 				endpoint = c.Data()
-				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataCompleteFlag, *sensorDataTailFlag, *sensorDataInfluxFlag, *sensorDataAuthFlag)
+				data, err = sensorc.BuildDataPayload(*sensorDataStartFlag, *sensorDataEndFlag, *sensorDataStationsFlag, *sensorDataSensorsFlag, *sensorDataResolutionFlag, *sensorDataAggregateFlag, *sensorDataCompleteFlag, *sensorDataTailFlag, *sensorDataBackendFlag, *sensorDataAuthFlag)
 			case "bookmark":
 				endpoint = c.Bookmark()
 				data, err = sensorc.BuildBookmarkPayload(*sensorBookmarkBookmarkFlag, *sensorBookmarkAuthFlag)
@@ -2960,7 +2960,7 @@ Example:
 }
 
 func sensorDataUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -complete BOOL -tail INT32 -influx BOOL -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] sensor data -start INT64 -end INT64 -stations STRING -sensors STRING -resolution INT32 -aggregate STRING -complete BOOL -tail INT32 -backend STRING -auth STRING
 
 Data implements data.
     -start INT64: 
@@ -2971,11 +2971,11 @@ Data implements data.
     -aggregate STRING: 
     -complete BOOL: 
     -tail INT32: 
-    -influx BOOL: 
+    -backend STRING: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 1999588192183223863 --end 3055223049374107517 --stations "Omnis ratione." --sensors "Inventore iure sed fuga facere." --resolution 335114312 --aggregate "Rerum excepturi eum modi fugiat ullam." --complete false --tail 330917538 --influx true --auth "Laborum doloremque delectus consequatur dicta."
+    `+os.Args[0]+` sensor data --start 1999588192183223863 --end 3055223049374107517 --stations "Omnis ratione." --sensors "Inventore iure sed fuga facere." --resolution 335114312 --aggregate "Rerum excepturi eum modi fugiat ullam." --complete false --tail 330917538 --backend "Aut laborum doloremque delectus consequatur." --auth "Magni consequuntur."
 `, os.Args[0])
 }
 

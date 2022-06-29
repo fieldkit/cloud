@@ -307,15 +307,7 @@ export default Vue.extend({
 
     p {
         word-break: break-all;
-        margin: 28px 0;
-
-        &:first-of-type {
-            margin-top: 14px;
-        }
-
-        &:last-of-type {
-            margin-bottom: 14px;
-        }
+        margin: 14px 0;
     }
 }
 

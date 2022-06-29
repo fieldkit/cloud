@@ -59,9 +59,10 @@ timestamps {
 			}
 
 			stage ('archive') {
-				archiveArtifacts artifacts: 'build/fktool, dev-ops/amis/build/*.tar'
+				archiveArtifacts artifacts: 'build/fktool, build/sanitizer, build/movedata, build/webhook, dev-ops/amis/build/*.tar'
 				print("fktool binary needs to be updated manually")
 			}
+
 			notifySuccess()
 		}
 		catch (Exception e) {

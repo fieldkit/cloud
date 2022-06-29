@@ -3572,10 +3572,10 @@ paths:
         required: false
         type: integer
         format: int32
-      - name: influx
+      - name: backend
         in: query
         required: false
-        type: boolean
+        type: string
       - name: Authorization
         in: header
         description: authentication token
