@@ -1,8 +1,9 @@
 import _ from "lodash";
-import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
+import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds, getAxisLabel} from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { DataRow } from "../api";
 import { makeRange } from "../common";
+import { getPartnerCustomization } from "@/views/shared/partners";
 
 export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
@@ -436,7 +437,7 @@ export class TimeSeriesSpecFactory {
                     return {
                         name: strokeName,
                         type: "ordinal",
-                        domain: thresholds.levels.filter((d) => d.label).map((d) => getString(d.label)),
+                        domain: thresholds.levels.filter((d) => d.label).map((d) => getAxisLabel(d)),
                         range: thresholds.levels.map((d) => d.color),
                     };
                 } else {
