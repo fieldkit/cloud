@@ -62,6 +62,7 @@ export default Vue.extend({
 
             this.vega = vegaInfo;
 
+            // Replace vega-embed save as icon with custom button
             const saveButtons = document.querySelectorAll("summary");
 
             saveButtons.forEach((button) => {
@@ -82,7 +83,7 @@ export default Vue.extend({
                 }
             });
 
-            // Replace vega-embed save as icon with custom button
+            
 
             /*
             vegaInfo.view.addSignalListener("hover", (_, value) => {

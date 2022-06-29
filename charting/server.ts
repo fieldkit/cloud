@@ -41,7 +41,9 @@ class Chart {
                 sensor.key,
                 name,
                 sensor.viz || [],
-                sensor.ranges
+                sensor.ranges,
+                chartLabel,
+                axisLabel
             );
 
             return new SeriesData(data.key, new DataSetSeries(vizSensor, data), data, vizInfo);
