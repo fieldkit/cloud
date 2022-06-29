@@ -32,15 +32,22 @@
 
             <template v-if="viewType === 'map'">
                 <!-- fixme: currently restricted to floodnet project -->
-                <div class="map-legend" v-if="id === 174 && levels.length > 0">
-                    <h4>Current {{ keyTitle }}</h4>
-                    <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
-                        <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                        <span>{{ item.label["enUS"] }}</span>
-                    </div>
-                    <div class="legend-item" v-if="hasStationsWithoutData">
-                        <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
-                        <span>No Data</span>
+                <div class="map-legend" v-if="id === 174 && levels.length > 0" :class="{ collapsed: legendCollapsed }">
+                    <a class="legend-toggle" @click="legendCollapsed = !legendCollapsed">
+                        <i class="icon icon-chevron-right"></i>
+                    </a>
+                    <div class="legend-content">
+                        <div class="legend-content-wrap">
+                            <h4>Current {{ keyTitle }}</h4>
+                            <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
+                                <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
+                                <span>{{ item.label["enUS"] }}</span>
+                            </div>
+                            <div class="legend-item" v-if="hasStationsWithoutData">
+                                <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
+                                <span>No Data</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="container-map">
@@ -64,10 +71,10 @@
         </div>
         <div class="view-type-container">
             <label class="toggle-btn">
-                <input type="checkbox" />
-                {{ $t("map.toggle.current") }}
+                <input type="checkbox" v-model="recentMapMode" />
+                <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
                 <i></i>
-                {{ $t("map.toggle.recent") }}
+                <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
             </label>
             <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
@@ -109,11 +116,15 @@ export default Vue.extend({
         layoutChanges: number;
         activeStationId: number | null;
         viewType: string;
+        recentMapMode: boolean;
+        legendCollapsed: boolean;
     } {
         return {
             layoutChanges: 0,
             activeStationId: null,
             viewType: "map",
+            recentMapMode: false,
+            legendCollapsed: false,
         };
     },
     props: {
@@ -336,23 +347,62 @@ export default Vue.extend({
 .map-legend {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--color-border);
+    border: 1px solid #f4f5f7;
     border-radius: 3px;
-    position: relative;
     z-index: $z-index-top;
     position: absolute;
-    bottom: 37px;
-    left: 65px;
+    bottom: 80px;
+    right: 0;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color: #fcfcfc;
     text-align: left;
-    padding: 15px;
-    padding-right: 30px;
     font-family: $font-family-medium;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
 
     h4 {
         margin: 0 0 0.5em 0;
         font-family: $font-family-bold;
+    }
+
+    &.collapsed {
+        .legend-toggle {
+            left: -25px;
+        }
+
+        .legend-content {
+            max-width: 0;
+        }
+
+        .icon-chevron-right {
+            transform: rotate(180deg) translateX(0);
+        }
+    }
+
+    .icon-chevron-right {
+        transform: translateX(2px);
+    }
+
+    .legend-content {
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 230px;
+        transition: all 0.25s ease-in-out;
+    }
+
+    .legend-content-wrap {
+        padding: 15px 20px 15px 15px;
+    }
+
+    .legend-toggle {
+        @include position(absolute, 11px null null -24px);
+        @include flex(center, center);
+        height: 35px;
+        width: 24px;
+        font-size: 22px;
+        color: #979797;
+        background-color: #fcfcfc;
+        box-shadow: -1px 2px 2px 0 rgb(0 0 0 / 13%);
+        cursor: pointer;
     }
 
     .legend-item {
@@ -485,6 +535,15 @@ export default Vue.extend({
     * {
         font-family: $font-family-medium !important;
     }
+
+    span {
+        opacity: 0.5;
+
+        &.active {
+            opacity: 1;
+            color: $color-fieldkit-primary;
+        }
+    }
 }
 .toggle-btn i {
     position: relative;
@@ -523,19 +582,19 @@ export default Vue.extend({
     width: 28px;
     transform: translate3d(2px, 2px, 0);
 }
-.toggle-btn:active input:checked + i::after {
+.toggle-btn:active input:checked ~ i::after {
     transform: translate3d(16px, 2px, 0);
 }
 .toggle-btn input {
     display: none;
 }
-.toggle-btn input + i {
+.toggle-btn input ~ i {
     background-color: $color-primary;
 }
-.toggle-btn input:checked + i::before {
+.toggle-btn input:checked ~ i::before {
     transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0);
 }
-.toggle-btn input:checked + i::after {
+.toggle-btn input:checked ~ i::after {
     transform: translate3d(13px, 2px, 0);
 }
 
