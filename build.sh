@@ -43,22 +43,16 @@ banner "BUILDING"
 
 mkdir build-containers
 
-cp -ar build/server build-containers
-cp -ar build/ingester build-containers
-cp -ar build/fktool build-containers
-cp -ar build/movedata build-containers
-cp -ar build/webhook build-containers
-
 mkdir build-containers/tmp
 
 mkdir build-containers/api
 docker rm -f fk-server-build > /dev/null 2>&1 || true
-docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build:/build fk-server-build \
+docker run --rm --name fk-server-build -v $WORKING_DIRECTORY/build-containers:/build fk-server-build \
        sh -c "cp -r /app/build/* /build && cp -r api/public /build/api/ && chown -R $USER_ID.$GROUP_ID /build"
 
 mkdir build-containers/portal
 docker rm -f fk-portal-build > /dev/null 2>&1 || true
-docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build/portal:/build fk-portal-build \
+docker run --rm --name fk-portal-build -v $WORKING_DIRECTORY/build-containers/portal:/build fk-portal-build \
        sh -c "cp -r /usr/app/build/* /build/ && chown -R $USER_ID.$GROUP_ID /build"
 
 docker rm -f fk-server-build > /dev/null 2>&1 || true
