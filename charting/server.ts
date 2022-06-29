@@ -33,6 +33,8 @@ class Chart {
             const name = sensor.strings["en-us"]["label"] || "Unknown";
             const data = dataResponses[index][0];
             const scale = [];
+            const chartLabel = "";
+            const axisLabel = "";
             const vizInfo = new VizInfo(
                 sensor.key,
                 scale,
