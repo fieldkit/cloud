@@ -161,6 +161,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     position: relative;
+    flex: 1;
 }
 
 .station-details {
