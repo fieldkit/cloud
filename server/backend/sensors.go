@@ -34,7 +34,7 @@ type RawQueryParams struct {
 	Aggregate  *string `json:"aggregate"`
 	Tail       *int32  `json:"tail"`
 	Complete   *bool   `json:"complete"`
-	InfluxDB   *bool   `json:"influxdb"`
+	Backend    *string `json:"backend"`
 }
 
 type ModuleAndSensor struct {
@@ -51,7 +51,7 @@ type QueryParams struct {
 	Aggregate  string            `json:"aggregate"`
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
-	InfluxDB   bool              `json:"influxdb"`
+	Backend    string            `json:"backend"`
 }
 
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
@@ -129,9 +129,9 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 
 	complete := raw.Complete != nil && *raw.Complete
 
-	influxDB := false
-	if raw.InfluxDB != nil {
-		influxDB = *raw.InfluxDB
+	backend := "pg"
+	if raw.Backend != nil {
+		backend = *raw.Backend
 	}
 
 	qp = &QueryParams{
@@ -143,7 +143,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Aggregate:  aggregate,
 		Tail:       tail,
 		Complete:   complete,
-		InfluxDB:   influxDB,
+		Backend:    backend,
 	}
 
 	return
@@ -261,45 +261,47 @@ func (dq *DataQuerier) QueryMeta(ctx context.Context, qp *QueryParams) (qm *Quer
 	}, nil
 }
 
-type QueriedModuleId struct {
-	ModuleID int64 `db:"module_id"`
+type QueriedModuleID struct {
+	ModuleID   int64  `db:"module_id"`
+	HardwareID []byte `db:"hardware_id"`
 }
 
-type sensorDatabaseIds struct {
-	moduleIds []int64
-	sensorIds []int64
+type SensorDatabaseIDs struct {
+	ModuleIDs       []int64
+	SensorIDs       []int64
+	KeyToHardwareID map[int64]string
 }
 
-func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) (*sensorDatabaseIds, error) {
-	moduleHardwareIds := make([][]byte, 0)
-	sensorIds := make([]int64, 0)
+func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*SensorDatabaseIDs, error) {
+	moduleHardwareIDs := make([][]byte, 0)
+	sensorIDs := make([]int64, 0)
 
 	for _, mAndS := range mas {
-		sensorIds = append(sensorIds, mAndS.SensorID)
+		sensorIDs = append(sensorIDs, mAndS.SensorID)
 
-		rawId, err := base64.StdEncoding.DecodeString(mAndS.ModuleID)
+		rawID, err := base64.StdEncoding.DecodeString(mAndS.ModuleID)
 		if err != nil {
 			return nil, fmt.Errorf("error decoding: '%v'", mAndS.ModuleID)
 		}
 
-		moduleHardwareIds = append(moduleHardwareIds, rawId)
+		moduleHardwareIDs = append(moduleHardwareIDs, rawID)
 	}
 
-	moduleIds := make([]int64, 0)
+	moduleIDs := make([]int64, 0)
 
-	if len(moduleHardwareIds) == 0 {
-		return &sensorDatabaseIds{
-			moduleIds: moduleIds,
-			sensorIds: sensorIds,
+	if len(moduleHardwareIDs) == 0 {
+		return &SensorDatabaseIDs{
+			ModuleIDs: moduleIDs,
+			SensorIDs: sensorIDs,
 		}, nil
 	}
 
-	query, args, err := sqlx.In(`SELECT id AS module_id FROM fieldkit.station_module WHERE hardware_id IN (?)`, moduleHardwareIds)
+	query, args, err := sqlx.In(`SELECT id AS module_id, hardware_id FROM fieldkit.station_module WHERE hardware_id IN (?)`, moduleHardwareIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	rows := []*QueriedModuleId{}
+	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
 		return nil, err
 	}
@@ -307,19 +309,23 @@ func (dq *DataQuerier) getIds(ctx context.Context, mas []ModuleAndSensor) (*sens
 	log := Logger(ctx).Sugar()
 
 	if len(rows) == 0 {
-		log.Infow("modules-none", "module_hardware_ids", moduleHardwareIds)
+		log.Infow("modules-none", "module_hardware_ids", moduleHardwareIDs)
 		return nil, fmt.Errorf("no-modules")
 	}
 
+	keyToHardwareID := make(map[int64]string)
+
 	for _, row := range rows {
-		moduleIds = append(moduleIds, row.ModuleID)
+		moduleIDs = append(moduleIDs, row.ModuleID)
+		keyToHardwareID[row.ModuleID] = base64.StdEncoding.EncodeToString(row.HardwareID)
 	}
 
-	log.Infow("modules", "module_hardware_ids", moduleHardwareIds, "module_ids", moduleIds)
+	log.Infow("modules", "module_hardware_ids", moduleHardwareIDs, "module_ids", moduleIDs)
 
-	return &sensorDatabaseIds{
-		moduleIds: moduleIds,
-		sensorIds: sensorIds,
+	return &SensorDatabaseIDs{
+		ModuleIDs:       moduleIDs,
+		SensorIDs:       sensorIDs,
+		KeyToHardwareID: keyToHardwareID,
 	}, nil
 }
 
@@ -349,7 +355,7 @@ func scanRow(queried *sqlx.Rows, row *DataRow) error {
 }
 
 func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQueryParams) (rr []*DataRow, err error) {
-	databaseIds, err := dq.getIds(ctx, aqp.Sensors)
+	databaseIds, err := dq.GetIDs(ctx, aqp.Sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +387,7 @@ func (dq *DataQuerier) QueryOuterValues(ctx context.Context, aqp *AggregateQuery
 			ORDER BY time ASC
 			LIMIT 1)
 		) AS q ORDER BY q.time
-	`, aggregate, aggregate), aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Start, aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.End)
+	`, aggregate, aggregate), aqp.Stations, databaseIds.ModuleIDs, databaseIds.SensorIDs, aqp.Start, aqp.Stations, databaseIds.ModuleIDs, databaseIds.SensorIDs, aqp.End)
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +427,7 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 	summaries = make(map[string]*AggregateSummary)
 	selectedAggregateName := qp.Aggregate
 
-	databaseIds, err := dq.getIds(ctx, qp.Sensors)
+	databaseIds, err := dq.GetIDs(ctx, qp.Sensors)
 	if err != nil {
 		return nil, "", err
 	}
@@ -439,7 +445,7 @@ func (dq *DataQuerier) SelectAggregate(ctx context.Context, qp *QueryParams) (su
 				MAX(time) + (? * interval '1 sec') AS end,
 				COUNT(*) AS number_records
 				FROM %s WHERE station_id IN (?) AND module_id IN (?) AND sensor_id IN (?) AND time >= ? AND time < ?;
-			`, table), interval, qp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, qp.Start, qp.End)
+			`, table), interval, qp.Stations, databaseIds.ModuleIDs, databaseIds.SensorIDs, qp.Start, qp.End)
 		}
 
 		query, args, err := getQueryFn()
@@ -488,7 +494,7 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 
 	tableName := handlers.MakeAggregateTableName(dq.tableSuffix, aqp.AggregateName)
 
-	databaseIds, err := dq.getIds(ctx, aqp.Sensors)
+	databaseIds, err := dq.GetIDs(ctx, aqp.Sensors)
 	if err != nil {
 		return nil, err
 	}
@@ -589,14 +595,14 @@ func (dq *DataQuerier) QueryAggregate(ctx context.Context, aqp *AggregateQueryPa
 		FROM complete
 		`, tableName)
 
-	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "module_ids", databaseIds.moduleIds, "sensors_ids", databaseIds.sensorIds, "stations", aqp.Stations,
+	log.Infow("querying", "aggregate", aqp.AggregateName, "expected_records", aqp.ExpectedRecords, "module_ids", databaseIds.ModuleIDs, "sensors_ids", databaseIds.SensorIDs, "stations", aqp.Stations,
 		"start", aqp.Start, "end", aqp.End, "interval", aqp.Interval, "tgs", aqp.TimeGroupThreshold)
 
 	buildQuery := func() (query string, args []interface{}, err error) {
 		if aqp.Complete {
-			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Stations, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Start, aqp.End, aqp.TimeGroupThreshold)
+			return sqlx.In(sqlQueryComplete, aqp.Start, aqp.End, aqp.Interval, aqp.Stations, databaseIds.ModuleIDs, databaseIds.SensorIDs, aqp.Start, aqp.End, aqp.TimeGroupThreshold)
 		}
-		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, databaseIds.moduleIds, databaseIds.sensorIds, aqp.Stations, aqp.TimeGroupThreshold)
+		return sqlx.In(sqlQueryIncomplete, aqp.Start, aqp.End, databaseIds.ModuleIDs, databaseIds.SensorIDs, aqp.Stations, aqp.TimeGroupThreshold)
 	}
 
 	query, args, err := buildQuery()

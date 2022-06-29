@@ -1,0 +1,1 @@
+UPDATE fieldkit.sensor_meta SET strings = '{"en-us":{"label":"Flood Depth", "chartLabel":"Current Flood Depth", "axisLabel": "Flood Depth (Inches/Hour)"}}' WHERE id = 70;

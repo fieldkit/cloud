@@ -332,7 +332,7 @@ export class TimeSeriesSpecFactory {
                     {
                         titleColor: "#2c3e50",
                         labelColor: "#2c3e50",
-                        title: series.vizInfo.label,
+                        title: series.vizInfo.chartLabel,
                         stroke: makeStrokeName(i),
                         orient: "top",
                         direction: "horizontal",
@@ -375,7 +375,7 @@ export class TimeSeriesSpecFactory {
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
 
                     return {
-                        title: series.vizInfo.label,
+                        title: series.vizInfo.axisLabel,
                         orient: makeOrientation(i),
                         scale: makeAxisScale(i),
                         domain: makeDomainY(i, series),
@@ -894,12 +894,10 @@ export class TimeSeriesSpecFactory {
                         events: "@cell:mouseover",
                         update: "datum",
                     },
-                    /*
                     {
                         events: "@cell:mouseout",
                         update: "null",
                     },
-                    */
                 ],
             },
             {

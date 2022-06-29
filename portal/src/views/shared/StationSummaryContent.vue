@@ -17,9 +17,9 @@
                         <template v-if="neighborhood && borough">{{ ", " }}</template>
                         <template v-if="borough">{{ borough }}</template>
                     </div>
-                    <div v-if="deploymentDate || builtBy" class="location-container">
+                    <div v-if="deploymentDate || deployedBy" class="location-container">
                         <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
-                        <template v-if="builtBy">{{ $t("station.by") }} {{ builtBy }}</template>
+                        <template v-if="deployedBy">{{ $t("station.by") }} {{ deployedBy }}</template>
                     </div>
                 </div>
             </template>
@@ -74,7 +74,7 @@ export default Vue.extend({
         return {
             neighborhood: null,
             borough: null,
-            builtBy: null,
+            deployedBy: null,
             deploymentDate: null,
         };
     },
@@ -115,7 +115,7 @@ export default Vue.extend({
             this.neighborhood = this.getAttributeValue("Neighborhood");
             this.borough = this.getAttributeValue("Borough");
             this.deploymentDate = this.getAttributeValue("Deployment Date");
-            this.builtBy = this.getAttributeValue("Built By");
+            this.deployedBy = this.getAttributeValue("Deployed By");
         },
     },
 });
@@ -161,6 +161,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     position: relative;
+    flex: 1;
 }
 
 .station-details {

@@ -41,16 +41,28 @@ func NewModelAdapter(db *sqlxcache.DB) (m *ModelAdapter) {
 	}
 }
 
+type AssociatedAttribute struct {
+	Priority  int32
+	Attribute *data.StationAttributeSlot
+}
+
 type WebHookStation struct {
-	Provision           *data.Provision
-	Configuration       *data.StationConfiguration
-	Station             *data.Station
-	Module              *data.StationModule
-	Sensors             []*data.ModuleSensor
-	SensorPrefix        string
-	Attributes          map[string]*data.StationAttributeSlot
-	AssociatedDeviceIDs map[string]int32
-	LastReadingTime     *time.Time
+	Provision       *data.Provision
+	Configuration   *data.StationConfiguration
+	Station         *data.Station
+	Module          *data.StationModule
+	Sensors         []*data.ModuleSensor
+	SensorPrefix    string
+	Attributes      map[string]*data.StationAttributeSlot
+	Associated      map[string]*AssociatedAttribute
+	LastReadingTime *time.Time
+}
+
+func (s *WebHookStation) FindAttribute(name string) *data.StationAttributeSlot {
+	if attribute, ok := s.Attributes[name]; ok {
+		return attribute
+	}
+	return nil
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
@@ -217,14 +229,14 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 
 		whStation := &WebHookStation{
-			SensorPrefix:        modulePrefix,
-			Provision:           provision,
-			Configuration:       configuration,
-			Station:             station,
-			Module:              module,
-			Sensors:             sensors,
-			Attributes:          attributes,
-			AssociatedDeviceIDs: make(map[string]int32),
+			SensorPrefix:  modulePrefix,
+			Provision:     provision,
+			Configuration: configuration,
+			Station:       station,
+			Module:        module,
+			Sensors:       sensors,
+			Attributes:    attributes,
+			Associated:    make(map[string]*AssociatedAttribute),
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
@@ -290,14 +302,19 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 					ids := strings.Split(stringValue, ",")
 					for index, id := range ids {
 						if id != "" {
-							station.AssociatedDeviceIDs[id] = int32(index)
+							station.Associated[id] = &AssociatedAttribute{
+								Priority:  int32(index),
+								Attribute: station.FindAttribute(name),
+							}
 						}
 					}
 				}
 			} else {
-				if attribute, ok := station.Attributes[name]; ok {
+				if attribute := station.FindAttribute(name); attribute != nil {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
-						attribute.StringValue = &stringValue
+						if stringValue != "" {
+							attribute.StringValue = &stringValue
+						}
 					} else {
 						if false {
 							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
@@ -321,7 +338,11 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
 
-		log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name, "last_reading_time", cacheEntry.station.LastReadingTime)
+		if cacheEntry.station.LastReadingTime != nil {
+			log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name, "last_reading_time", cacheEntry.station.LastReadingTime)
+		} else {
+			log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name)
+		}
 
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
 			return fmt.Errorf("error saving station: %v", err)
@@ -335,7 +356,7 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 			}
 		}
 
-		for deviceIDString, priority := range cacheEntry.station.AssociatedDeviceIDs {
+		for deviceIDString, associated := range cacheEntry.station.Associated {
 			deviceID, err := hex.DecodeString(deviceIDString)
 			if err != nil {
 				deviceID = []byte(deviceIDString)
@@ -348,8 +369,12 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 					log.Infow("saving:unknown-associated", "device_id", deviceIDString)
 				}
 			} else if associating != nil {
-				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, priority); err != nil {
+				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, associated.Priority); err != nil {
 					return fmt.Errorf("associated station: %v", err)
+				}
+
+				if associated.Attribute != nil {
+					associated.Attribute.StringValue = &associating.Name
 				}
 			} else {
 				log.Infow("saving:unknown-associated", "device_id", deviceIDString)

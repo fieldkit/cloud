@@ -25,6 +25,7 @@ import FKApi, { Station, AssociatedStation } from "@/api/api";
 import i18n from "@/i18n";
 
 export * from "./common";
+import Config from "@/secrets";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
@@ -618,7 +619,7 @@ export class Querier {
         if (!vq.params) throw new Error("no params");
 
         const params = vq.params;
-        const queryParams = params.queryParams();
+        const queryParams = params.queryParams(Config.backend);
         const key = queryParams.toString();
 
         // console.log(`viz: query-data`, key);
@@ -783,7 +784,7 @@ export class Workspace implements VizInfoFactory {
         // query. Lots of room here.
         const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
-            .groupBy((q) => q.params.queryParams().toString())
+            .groupBy((q) => q.params.queryParams(Config.backend).toString())
             .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
@@ -865,10 +866,12 @@ export class Workspace implements VizInfoFactory {
         // console.log(`viz:vizInfo:sensor`, details);
 
         const strings = getString(details.strings);
+        const chartLabel = (strings.chartLabel) ? strings.chartLabel : strings.label;
+        const axisLabel = (strings.axisLabel) ? strings.axisLabel : strings.label;
 
         // console.log(`viz:vizInfo:sensor`, strings);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges);
+        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges, chartLabel, axisLabel);
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {

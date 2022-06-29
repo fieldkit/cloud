@@ -120,7 +120,7 @@ func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 			aggregate  *string
 			complete   *bool
 			tail       *int32
-			influx     *bool
+			backend    *string
 			auth       *string
 			err        error
 		)
@@ -188,15 +188,9 @@ func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 				tail = &pv
 			}
 		}
-		{
-			influxRaw := r.URL.Query().Get("influx")
-			if influxRaw != "" {
-				v, err2 := strconv.ParseBool(influxRaw)
-				if err2 != nil {
-					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("influx", influxRaw, "boolean"))
-				}
-				influx = &v
-			}
+		backendRaw := r.URL.Query().Get("backend")
+		if backendRaw != "" {
+			backend = &backendRaw
 		}
 		authRaw := r.Header.Get("Authorization")
 		if authRaw != "" {
@@ -205,7 +199,7 @@ func DecodeDataRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDataPayload(start, end, stations, sensors, resolution, aggregate, complete, tail, influx, auth)
+		payload := NewDataPayload(start, end, stations, sensors, resolution, aggregate, complete, tail, backend, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

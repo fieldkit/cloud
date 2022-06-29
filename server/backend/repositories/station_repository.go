@@ -551,6 +551,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id = $1
+		ORDER BY pa.priority
 		`, id); err != nil {
 		return nil, err
 	}
@@ -693,6 +694,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
+		ORDER BY pa.priority
 		`, id); err != nil {
 		return nil, err
 	}
@@ -852,6 +854,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		FROM fieldkit.station_project_attribute AS spa
 		JOIN fieldkit.project_attribute AS pa ON (spa.attribute_id = pa.id)
 		WHERE spa.station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		ORDER BY pa.priority
 		`, id); err != nil {
 		return nil, err
 	}

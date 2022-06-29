@@ -290,7 +290,9 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		for _, attribute := range stationSchema.Attributes {
 			jsonValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
 			if err != nil {
-				return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
+				if _, ok := err.(*EvaluationError); !ok {
+					return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
+				}
 			}
 
 			attributes[attribute.Name] = &ParsedAttribute{

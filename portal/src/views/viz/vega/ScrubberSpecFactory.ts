@@ -231,8 +231,7 @@ export class ScrubberSpecFactory {
                                 type: "mousedown",
                                 filter:
                                 [
-                                    //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
-                                    "!event.item || event.item.mark.name !== \"brush_brush\""
+                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
                                 ]
                             },
                             update: "[x(unit), x(unit)]"
@@ -253,8 +252,8 @@ export class ScrubberSpecFactory {
                                         filter:
                                         [
                                             //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
-                                            "!event.item || event.item.mark.name !== \"brush_brush\""
-                                        ]
+                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"left_scrub\")"
+                                        ],
                                     },
                                     {
                                         source: "window",
@@ -263,6 +262,31 @@ export class ScrubberSpecFactory {
                                 ]
                             },
                             update: "[brush_x[0], clamp(x(unit), 0, width)]"
+                        },
+                        {
+                            //Update left extent of brush on mouse down
+                            events:
+                            {
+                                source: "window",
+                                type: "mousemove",
+                                consume: true,
+                                between:
+                                [
+                                    {
+                                        source: "scope",
+                                        type: "mousedown",
+                                        filter:
+                                        [
+                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
+                                        ],
+                                    },
+                                    {
+                                        source: "window",
+                                        type: "mouseup"
+                                    }
+                                ]
+                            },
+                            update: "[clamp(x(unit), 0, width), brush_x[1]]"
                         },
                         {
                             events:

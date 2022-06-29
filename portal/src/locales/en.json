@@ -352,6 +352,10 @@
             "part1": "You need to",
             "part2": "Log in",
             "part3": "in order to leave comments"
+        },
+        "actions": {
+            "reply": "Reply",
+            "viewData": "View Data"
         }
     },
     "seeMore": "See more",
@@ -377,5 +381,13 @@
     "attributes": {
         "title": "Attributes",
         "noValueYet": "Nothing added yet"
+    },
+    "map": {
+        "toggle": {
+            "list": "List",
+            "map": "Map",
+            "recent": "Recent",
+            "current": "Current"
+        }
     }
 }
