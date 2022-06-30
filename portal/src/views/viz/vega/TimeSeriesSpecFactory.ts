@@ -9,7 +9,7 @@ export class TimeSeriesSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
 
     create() {
-        const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
+        const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.reverse().map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
         const makeBarDataName = (i: number) => `table${i + 1}Bar`;
