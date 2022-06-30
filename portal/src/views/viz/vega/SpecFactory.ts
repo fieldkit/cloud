@@ -1,8 +1,8 @@
-import { getString, getSeriesThresholds } from "./customizations";
+import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
 import { SeriesData, TimeRange } from "../common";
 import _ from "lodash";
 
-export { getString, getSeriesThresholds, SeriesData };
+export { getAxisLabel, getString, getSeriesThresholds, SeriesData };
 
 export type MapFunction<T> = (series: SeriesData, i: number) => T;
 
