@@ -279,12 +279,20 @@ export default Vue.extend({
         justify-content: center;
     }
 
+    body.floodnet & {
+        background-color: #f6f9f8;
+    }
+
     .link {
         color: $color-primary;
         font-size: 12px;
         display: block;
         letter-spacing: 0.07px;
         text-decoration: initial;
+
+        body.floodnet & {
+            color: $color-dark;
+        }
     }
 }
 .detail-title {
@@ -542,6 +550,10 @@ export default Vue.extend({
         &.active {
             opacity: 1;
             color: $color-fieldkit-primary;
+
+            body.floodnet & {
+                color: $color-dark;
+            }
         }
     }
 }
