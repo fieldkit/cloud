@@ -32,3 +32,11 @@
         }
     }
 }
+
+.icon-calendar {
+    &:before {
+        body.floodnet & {
+            color: var(--color-dark);
+        }
+    }
+}
