@@ -38,6 +38,13 @@ function getString(d) {
     return d["enUS"] || d["enUs"] || d["en-US"]; // HACK
 }
 
+function getBackend(): string | null {
+    if (Config.backend) {
+        return Config.backend;
+    }
+    return window.localStorage["fk:backend"] || null;
+}
+
 export class SensorMeta {
     constructor(
         public readonly moduleId: ModuleID,
@@ -619,7 +626,7 @@ export class Querier {
         if (!vq.params) throw new Error("no params");
 
         const params = vq.params;
-        const queryParams = params.queryParams(Config.backend);
+        const queryParams = params.queryParams(getBackend());
         const key = queryParams.toString();
 
         // console.log(`viz: query-data`, key);
@@ -784,7 +791,7 @@ export class Workspace implements VizInfoFactory {
         // query. Lots of room here.
         const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
-            .groupBy((q) => q.params.queryParams(Config.backend).toString())
+            .groupBy((q) => q.params.queryParams(getBackend()).toString())
             .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
@@ -866,12 +873,23 @@ export class Workspace implements VizInfoFactory {
         // console.log(`viz:vizInfo:sensor`, details);
 
         const strings = getString(details.strings);
-        const chartLabel = (strings.chartLabel) ? strings.chartLabel : strings.label;
-        const axisLabel = (strings.axisLabel) ? strings.axisLabel : strings.label;
+        const chartLabel = strings.chartLabel ? strings.chartLabel : strings.label;
+        const axisLabel = strings.axisLabel ? strings.axisLabel : strings.label;
 
         // console.log(`viz:vizInfo:sensor`, strings);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges, chartLabel, axisLabel);
+        return new VizInfo(
+            key,
+            scale,
+            station,
+            details.unitOfMeasure,
+            key,
+            strings.label,
+            details.viz || [],
+            details.ranges,
+            chartLabel,
+            axisLabel
+        );
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
