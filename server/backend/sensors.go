@@ -340,6 +340,12 @@ type DataRow struct {
 	// Deprecated
 	Id        *int64 `db:"id" json:"-"`
 	TimeGroup *int32 `db:"time_group" json:"-"`
+
+	// TSDB
+	AverageValue *float64 `json:"avg,omitempty"`
+	MinimumValue *float64 `json:"min,omitempty"`
+	MaximumValue *float64 `json:"max,omitempty"`
+	LastValue    *float64 `json:"last,omitempty"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
