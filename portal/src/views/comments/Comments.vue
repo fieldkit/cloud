@@ -302,6 +302,7 @@ export default Vue.extend({
         viewDataClick(post: Comment) {
             if (post.bookmark) {
                 this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }
         },
         deleteComment(commentID: number) {
