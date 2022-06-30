@@ -1,0 +1,1 @@
+DROP TABLE fieldkit.sensor_data CASCADE;

@@ -9,3 +9,7 @@ CREATE TABLE fieldkit.sensor_data (
 SELECT create_hypertable('fieldkit.sensor_data', 'time');
 
 CREATE INDEX sensor_data_idx ON fieldkit.sensor_data (station_id, module_id, sensor_id, time DESC);
+
+/*
+INSERT INTO fieldkit.sensor_data SELECT time, station_id, module_id, sensor_id, value FROM fieldkit.aggregated_10s;
+*/
