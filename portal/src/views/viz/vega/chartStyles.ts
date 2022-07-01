@@ -3,14 +3,14 @@ export default {
         stroke: "#003F5C",
     },
     secondaryLine: {
-        stroke: "#A05195",
+        stroke: "#6ef0da",
     },
     primaryBar: {
         stroke: "#003F5C",
         fill: "#003F5C",
     },
     secondaryBar: {
-        stroke: "#A05195",
-        fill: "#A05195",
+        stroke: "#6ef0da",
+        fill: "#6ef0da",
     },
 };

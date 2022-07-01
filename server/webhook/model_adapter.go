@@ -262,16 +262,17 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		}
 	}
 
-	now := time.Now()
-
 	// These changes to station are saved once in Close.
 
 	// Give integrators the option to just skip this. Could become a nil check.
 	if pm.DeviceName != nil {
 		station.Station.Name = *pm.DeviceName
 	}
-	station.Station.IngestionAt = &now
-	station.Station.UpdatedAt = now
+
+	if station.LastReadingTime != nil {
+		station.Station.IngestionAt = station.LastReadingTime
+		station.Station.UpdatedAt = *station.LastReadingTime
+	}
 
 	if pm.ReceivedAt != nil {
 		for _, moduleSensor := range station.Sensors {

@@ -328,12 +328,16 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	influxConfig := config.influxConfig()
 	if influxConfig == nil {
-		log.Infow("influxdb-config-missing")
+		log.Infow("influxdb-disabled")
+	} else {
+		log.Infow("influxdb-enabled")
 	}
 
 	timeScaleConfig := config.timeScaleConfig()
 	if timeScaleConfig == nil {
-		log.Infow("timescaledb-config-missing")
+		log.Infow("timescaledb-disabled")
+	} else {
+		log.Infow("timescaledb-enabled")
 	}
 
 	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig, timeScaleConfig)

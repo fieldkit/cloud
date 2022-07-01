@@ -35,7 +35,7 @@ require (
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
 	github.com/elgs/gosplitargs v0.0.0-20161028071935-a491c5eeb3c8 // indirect
 	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
-	github.com/fieldkit/data-protocol v0.0.0-20200825203301-d452c6499956
+	github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2
 	github.com/go-ini/ini v1.26.0
 	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.5.0
@@ -45,7 +45,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.2
 	github.com/google/go-querystring v1.0.0
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0
@@ -117,6 +117,7 @@ require (
 	google.golang.org/appengine v1.6.7
 	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
 	google.golang.org/grpc v1.33.0 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0

@@ -21,6 +21,10 @@ export function getString(d: VizStrings | null): string | null {
     return null;
 }
 
+export function getAxisLabel(level: VizThresholdLevel): string | null {
+    return (level.keyLabel) ? getString(level.keyLabel) : getString(level.label);
+}
+
 export function getSeriesThresholds(series: SeriesData): VizThresholds | null {
     if (series.vizInfo.viz.length > 0) {
         const vizConfig = series.vizInfo.viz[0];
