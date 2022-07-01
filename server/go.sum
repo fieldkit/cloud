@@ -226,6 +226,12 @@ github.com/fieldkit/data-protocol v0.0.0-20200123020042-8ddcca534acd h1:DJiq2reE
 github.com/fieldkit/data-protocol v0.0.0-20200123020042-8ddcca534acd/go.mod h1:V84PpA6hUIiJoEDtWPaIGG5asd6cfYTJvSWHThD4YQE=
 github.com/fieldkit/data-protocol v0.0.0-20200825203301-d452c6499956 h1:QpJ93C1Gfygb/DcQd5JS4DP7AtNX5y9bWX8vPrCCpFc=
 github.com/fieldkit/data-protocol v0.0.0-20200825203301-d452c6499956/go.mod h1:QnsenDZGe94rSCufkztTwWjv4lfxthv5Klto6VnBQqE=
+github.com/fieldkit/data-protocol v0.0.0-20220309214828-8d5368ab0773 h1:Rv0clWr08GquOe/DiGSLIODSq1mfo26gFoLezAvo74Q=
+github.com/fieldkit/data-protocol v0.0.0-20220309214828-8d5368ab0773/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
+github.com/fieldkit/data-protocol v0.0.0-20220701185954-a061af7fd466 h1:F0rUkQ9cgZ1PwXpSYkrpqsEcK24FFQ5SJV9pV6EVudo=
+github.com/fieldkit/data-protocol v0.0.0-20220701185954-a061af7fd466/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
+github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2 h1:aBLv7DiEvHzaZNlPdFUfOMfXHGS77OwIxBViTuuFYF8=
+github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
@@ -358,6 +364,9 @@ github.com/golang/protobuf v1.4.2 h1:+Z5KGCizgyZCbGh1KZqA0fcLLkwbsjIzS4aV2v7wJX0
 github.com/golang/protobuf v1.4.2/go.mod h1:oDoupMAO8OvCJWAcko0GGGIgR6R6ocIYbsSw735rRwI=
 github.com/golang/protobuf v1.4.3 h1:JjCZWpVbqXDqFVmTfYWEVTMIYrL/NPdPSCHPJ0T/raM=
 github.com/golang/protobuf v1.4.3/go.mod h1:oDoupMAO8OvCJWAcko0GGGIgR6R6ocIYbsSw735rRwI=
+github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
+github.com/golang/protobuf v1.5.2 h1:ROPKBNFfQgOUMifHyP+KYbvpjbdoFNs+aK7DXlji0Tw=
+github.com/golang/protobuf v1.5.2/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/golang/snappy v0.0.0-20170215233205-553a64147049/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
@@ -1237,6 +1246,12 @@ google.golang.org/protobuf v1.23.1-0.20200526195155-81db48ad09cc/go.mod h1:EGpAD
 google.golang.org/protobuf v1.24.0/go.mod h1:r/3tXBNzIEhYS9I1OUVjXDlt8tc493IdKGjtUeSXeh4=
 google.golang.org/protobuf v1.25.0 h1:Ejskq+SyPohKW+1uil0JJMtmHCgJPJ/qWTxr8qp+R4c=
 google.golang.org/protobuf v1.25.0/go.mod h1:9JNX74DMeImyA3h4bdi1ymwjUzf21/xIlbajtzgsN7c=
+google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
+google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
+google.golang.org/protobuf v1.27.1 h1:SnqbnDw1V7RiZcXPx5MEeqPv2s79L9i7BJUlG/+RurQ=
+google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
+google.golang.org/protobuf v1.28.0 h1:w43yiav+6bVFTBQFZX0r7ipe9JQ1QsbMgHwbBziscLw=
+google.golang.org/protobuf v1.28.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
 gopkg.in/AlecAivazis/survey.v1 v1.8.7/go.mod h1:iBNOmqKz/NUbZx3bA+4hAGLRC7fSK7tgtVDT4tB22XA=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=
 gopkg.in/alexcesaro/statsd.v2 v2.0.0 h1:FXkZSCZIH17vLCO5sO2UucTHsH9pc+17F6pl3JVCwMc=
