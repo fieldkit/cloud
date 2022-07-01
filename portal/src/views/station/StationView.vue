@@ -112,7 +112,7 @@
                     </div>
                 </section>
 
-                <section v-if="notes" class="section-notes container-box">
+                <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
                     <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
                 </section>
             </div>
@@ -151,7 +151,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import { mapGetters } from "vuex";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
-import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationView",
@@ -264,6 +264,9 @@ export default Vue.extend({
         },
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
+        },
+        isCustomizationEnabled() {
+            return isCustomisationEnabled();
         },
     },
 });
