@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div v-show="user" class="button-submit" @click="openExports">
+                        <div v-if="user || (displayProject && displayProject.public)" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -83,7 +83,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization, interpolatePartner } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { Station, ActionTypes, DisplayStation } from "@/store";
+import { Station, ActionTypes, DisplayStation, DisplayProject } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse, AssociatedStation } from "./api";
 import { ForbiddenError } from "@/api";
@@ -171,6 +171,12 @@ export default Vue.extend({
             }
             return null;
         },
+        displayProject(): DisplayProject | null {
+            if (this.bookmark.c && this.bookmark.c.project) {
+                return this.$getters.projectsById[this.bookmark.c.project];
+            }
+            return null;
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
@@ -206,6 +212,10 @@ export default Vue.extend({
                         await this.$router.push({ name: "login", params: { errorMessage: String(this.$t("login.privateStation")) } });
                     }
                 });
+
+            if (!this.user && (this.bookmark.c && this.bookmark.c.project)) {
+                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.bookmark.c.project });
+            }
         }
     },
     methods: {

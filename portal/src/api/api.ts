@@ -224,7 +224,7 @@ export interface Project {
     id: number;
     location: string;
     name: string;
-    private: boolean;
+    privacy: boolean;
     readOnly: boolean;
     slug: string;
     tags: string;
