@@ -173,7 +173,6 @@ export default Vue.extend({
         },
         displayProject(): DisplayProject | null {
             if (this.bookmark.c && this.bookmark.c.project) {
-                console.log("radoi getter project", this.$getters.projectsById[this.bookmark.c.project]);
                 return this.$getters.projectsById[this.bookmark.c.project];
             }
             return null;

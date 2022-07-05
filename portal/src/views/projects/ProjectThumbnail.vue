@@ -71,9 +71,6 @@ export default {
             accepted: false,
         };
     },
-    mounted() {
-        console.log("radoi proj thumb", this.project);
-    },
     methods: {
         getImageUrl(this: any, project) {
             return this.$config.baseUrl + project.photo;
