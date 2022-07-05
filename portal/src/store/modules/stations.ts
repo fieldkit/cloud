@@ -273,7 +273,6 @@ export class DisplayProject {
     public readonly mapped: MappedStations;
     public readonly places: { native: string | null } = { native: null };
     public readonly bounds?: BoundingRectangle;
-    public readonly public: boolean;
 
     constructor(public readonly project: Project, public readonly users: ProjectUser[], public readonly stations: DisplayStation[]) {
         this.id = project.id;
@@ -298,7 +297,6 @@ export class DisplayProject {
             .filter((n) => n != null && n.length > 0)
             .uniq()
             .join(", ");
-        this.public = project.privacy ? this.public = true : this.public = false;
     }
 }
 

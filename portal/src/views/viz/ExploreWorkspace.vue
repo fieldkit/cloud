@@ -21,7 +21,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div v-if="user || (displayProject && displayProject.public)" class="button-submit" @click="openExports">
+                        <div v-if="user || (displayProject && displayProject.project.privacy)" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -173,6 +173,7 @@ export default Vue.extend({
         },
         displayProject(): DisplayProject | null {
             if (this.bookmark.c && this.bookmark.c.project) {
+                console.log("radoi getter project", this.$getters.projectsById[this.bookmark.c.project]);
                 return this.$getters.projectsById[this.bookmark.c.project];
             }
             return null;
