@@ -85,6 +85,7 @@ export class DisplayStation {
     public readonly firmwareNumber: number | null;
     public readonly primarySensor: ModuleSensor | null;
     public readonly attributes: ProjectAttribute[];
+    public readonly readOnly: boolean;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -100,6 +101,7 @@ export class DisplayStation {
         this.updatedAt = new Date(station.updatedAt);
         this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
         this.attributes = station.attributes.attributes;
+        this.readOnly = station.readOnly;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);

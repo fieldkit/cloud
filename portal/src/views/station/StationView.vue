@@ -1,5 +1,6 @@
 <template>
     <div v-if="!isBusy">
+        <vue-confirm-dialog />
         <StandardLayout v-if="station">
             <div class="container-wrap">
                 <DoubleHeader
@@ -118,7 +119,13 @@
                 </section>
 
                 <section v-if="notes" class="section-notes container-box">
-                    <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
+                    <NotesForm
+                        v-bind:key="station.id"
+                        :station="station"
+                        :notes="{ notes, media }"
+                        :readonly="station.readOnly"
+                        @change="dirtyNotes = true"
+                    />
                 </section>
             </div>
         </StandardLayout>
@@ -150,7 +157,7 @@ import {
     ProjectModule,
 } from "@/store";
 import * as utils from "@/utilities";
-import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
+import { NoteMedia, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import { mapGetters } from "vuex";
@@ -173,11 +180,13 @@ export default Vue.extend({
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
+        dirtyNotes: boolean;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
+            dirtyNotes: false,
         };
     },
     watch: {
@@ -234,6 +243,25 @@ export default Vue.extend({
 
             return false;
         },
+    },
+    beforeRouteLeave(to: never, from: never, next: any) {
+        if (this.dirtyNotes) {
+            this.$confirm({
+                message: this.$tc("notes.confirmLeavePopupMessage"),
+                button: {
+                    no: this.$tc("no"),
+                    yes: this.$tc("yes"),
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        this.dirtyNotes = false;
+                        next();
+                    }
+                },
+            });
+        } else {
+            next();
+        }
     },
     beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });

@@ -359,7 +359,13 @@
     "notes": {
         "title": "Field Notes",
         "failed": "Oops, there was a problem saving your changes.",
-        "success": "Saved."
+        "success": "Saved.",
+        "confirmLeavePopupMessage": "You may have unsaved changes, are you sure you'd like to leave?",
+        "noFieldData": "Nothing added yet.",
+        "complete": "Complete",
+        "btn": {
+            "save": "Save"
+        }
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",
@@ -377,5 +383,7 @@
     "attributes": {
         "title": "Attributes",
         "noValueYet": "Nothing added yet"
-    }
+    },
+    "yes": "Yes",
+    "no": "No"
 }

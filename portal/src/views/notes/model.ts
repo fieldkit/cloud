@@ -143,7 +143,7 @@ export class Notes {
     }
 
     public static createFrom(portalNotes: PortalStationNotesReply): Notes {
-        return portalNotes.notes.reduce((formNotes, portalNote) => {
+        return portalNotes.notes.reduceRight((formNotes, portalNote) => {
             const key = portalNote.key;
             if (!formNotes[key]) {
                 throw new Error("unexpected note");

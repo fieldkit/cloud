@@ -5,13 +5,9 @@
             <TextAreaField v-model="body" @input="v.$touch()" />
         </div>
         <div class="field" v-if="readonly">
-            <template v-if="note.body">
-                {{ note.body }}
-            </template>
+            <template v-if="note.body">{{ note.body }}</template>
             <template v-if="!note.body">
-                <span class="no-data-yet">
-                    Nothing added yet.
-                </span>
+                <div class="no-data-yet">{{ $t("notes.noFieldData") }}</div>
             </template>
         </div>
         <div class="attached-audio" v-for="audio in note.audio" v-bind:key="audio.key">
@@ -96,5 +92,11 @@ export default Vue.extend({
     @include bp-down($xs) {
         font-size: 14px;
     }
+}
+
+.no-data-yet {
+    color: #6a6d71;
+    font-size: 13px;
+    padding-top: 0.5em;
 }
 </style>

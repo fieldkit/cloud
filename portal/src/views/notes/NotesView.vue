@@ -188,6 +188,7 @@ export default Vue.extend({
         },
         selectedNotes(): PortalStationNotesReply | null {
             if (this.stationId && this.notes) {
+                console.log("radoi notes prop", this.notes[this.stationId]);
                 return this.notes[this.stationId];
             }
             return null;
@@ -482,8 +483,5 @@ export default Vue.extend({
         font-size: 12px !important;
     }
 }
-::v-deep .no-data-yet {
-    color: #6a6d71;
-    font-size: 13px;
-}
+
 </style>
