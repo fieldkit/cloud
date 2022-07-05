@@ -71,7 +71,6 @@
                     </div>
                     <div v-if="photos" class="station-photos">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                            <!-- somehow using v-for like so needs the next v-if -->
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">
                                 <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
@@ -79,7 +78,7 @@
                         </div>
                         <router-link :to="{ name: 'viewStationPhotos' }" class="station-photos-nav">
                             <i class="icon icon-grid"></i>
-                            {{ $t("station.managePhotos") }}
+                            {{ $t("station.btn.linkToPhotos") }}
                         </router-link>
                     </div>
                 </section>

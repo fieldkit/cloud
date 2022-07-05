@@ -8,7 +8,7 @@
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% {{ $t("notes.complete") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button type="submit" class="button" @click="onSave">{ $t('notes.btn.save') }</button>
+                <button type="submit" class="button" @click="onSave">{{ $t("notes.btn.save") }}</button>
             </div>
         </div>
         <div class="site-notes">

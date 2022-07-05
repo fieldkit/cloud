@@ -200,11 +200,13 @@
         "nativeLand": "Native Land:",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "managePhotos": "Manage photos",
         "allPhotos": "All photos",
-        "deletePhoto": "Delete Photo",
-        "setAsStationImage": "Set as Station Image",
-        "addPhotos": "Add photos"
+        "btn": {
+            "addPhotos": "Add photos",
+            "deletePhoto": "Delete Photo",
+            "setAsStationImage": "Set as Station Image",
+            "linkToPhotos": "View all photos"
+        }
     },
     "user": {
         "profile": {

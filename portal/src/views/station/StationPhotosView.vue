@@ -11,7 +11,7 @@
                     <button class="button-social">
                         <label for="imageInput">
                             <i class="icon icon-share"></i>
-                            {{ $tc("station.addPhotos") }}
+                            {{ $tc("station.btn.addPhotos") }}
                         </label>
                     </button>
 
@@ -100,11 +100,11 @@ export default Vue.extend({
     mounted() {
         this.photoOptions = [
             {
-                label: this.$tc("station.setAsStationImage"),
+                label: this.$tc("station.btn.setAsStationImage"),
                 event: "use-as-station-image",
             },
             {
-                label: this.$tc("station.deletePhoto"),
+                label: this.$tc("station.btn.deletePhoto"),
                 event: "delete-image",
             },
         ];
