@@ -12,6 +12,10 @@
             </template>
         </StationSummaryContent>
 
+        <div>
+            <span>{{ station.latestPrimary | prettyNum }}</span>
+        </div>
+
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
             <LatestStationReadings :id="station.id" @layoutChange="layoutChange" />
