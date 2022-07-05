@@ -57,7 +57,7 @@ export default Vue.extend({
         sensors: SensorReading[];
     } {
         return {
-            allSensorsMemoized: _.memoize(() => this.$services.api.getAllSensors()),
+            allSensorsMemoized: this.$services.api.getAllSensorsMemoized(),
             loading: true,
             sensors: [],
         };
