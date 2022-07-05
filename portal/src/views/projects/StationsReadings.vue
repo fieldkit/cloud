@@ -33,18 +33,14 @@ export default Vue.extend({
         LatestStationReadings,
         PaginationControls,
     },
-    data(): { index: number } {
+    data(): {
+        index: number;
+    } {
         return {
             index: 0,
         };
     },
     props: {
-        /*
-        project: {
-            type: Object,
-            required: true,
-        },
-        */
         displayProject: {
             type: Object,
             required: true,

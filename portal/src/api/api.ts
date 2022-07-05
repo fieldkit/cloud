@@ -358,6 +358,18 @@ export interface AssociatedStationsResponse {
 
 export type SendFunction = (message: unknown) => Promise<void>;
 
+export interface TailSensorDataRow {
+    time: number;
+    stationId: number;
+    sensorId: number;
+    moduleId: string;
+    value: number;
+}
+
+export interface TailSensorDataResponse {
+    data: TailSensorDataRow[];
+}
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -1120,7 +1132,7 @@ class FKApi {
         });
     }
 
-    public tailSensorData(params: URLSearchParams): Promise<any> {
+    public tailSensorData(params: URLSearchParams): Promise<TailSensorDataResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

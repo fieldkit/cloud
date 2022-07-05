@@ -8,11 +8,12 @@
                     class="summary-container"
                     @close="closeSummary"
                     :station="station"
+                    :sensorDataQuerier="sensorDataQuerier"
                 />
             </div>
         </template>
 
-      <template v-if="viewType === 'map'">
+        <template v-if="viewType === 'map'">
             <div class="container-map">
                 <StationsMap
                     @show-summary="showSummary"
@@ -60,6 +61,7 @@
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
+import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
 
 import { mapState, mapGetters } from "vuex";
@@ -84,11 +86,18 @@ export default Vue.extend({
             required: false,
         },
     },
-    data(): { showNoStationsMessage: boolean; viewType: string; layoutChanges: number } {
+    data(): {
+        showNoStationsMessage: boolean;
+        viewType: string;
+        layoutChanges: number;
+        sensorDataQuerier: SensorDataQuerier;
+    } {
+        // console.log("stations-view:data", this.stations);
         return {
             showNoStationsMessage: true,
             viewType: "map",
             layoutChanges: 0,
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api, []),
         };
     },
     computed: {
@@ -125,6 +134,13 @@ export default Vue.extend({
         return Promise.resolve();
     },
     watch: {
+        stations() {
+            // console.log("stations-view:stations", this.stations);
+            this.sensorDataQuerier = new SensorDataQuerier(
+                this.$services.api,
+                this.stations.map((s: DisplayStation) => s.id)
+            );
+        },
         id(): Promise<any> {
             if (this.id) {
                 return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });

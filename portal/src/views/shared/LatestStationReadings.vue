@@ -16,8 +16,8 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue from "vue";
-import { SensorsResponse, Module } from "@/api";
+import Vue, { PropType } from "vue";
+import { FKApi, TailSensorDataResponse, SensorsResponse, Module } from "@/api";
 
 export enum TrendType {
     Downward,
@@ -38,6 +38,28 @@ export class SensorReading {
     ) {}
 }
 
+export class SensorDataQuerier {
+    private everything: Promise<TailSensorDataResponse> | null = null;
+
+    constructor(private readonly api: FKApi, private readonly stationIds: number[]) {
+        console.log("sdq:ctor", stationIds);
+    }
+
+    public query(stationId: number): Promise<TailSensorDataResponse> {
+        if (this.everything == null) {
+            const params = new URLSearchParams();
+            params.append("stations", this.stationIds.join(","));
+            params.append("tail", "1");
+            this.everything = this.api.tailSensorData(params);
+        }
+        return this.everything.then((response) => {
+            return {
+                data: response.data.filter((row) => row.stationId == stationId),
+            };
+        });
+    }
+}
+
 export default Vue.extend({
     name: "LatestStationReadings",
     components: {},
@@ -50,16 +72,22 @@ export default Vue.extend({
             type: String,
             required: false,
         },
+        sensorDataQuerier: {
+            type: Object as PropType<SensorDataQuerier>,
+            required: false,
+        },
     },
     data(): {
         allSensorsMemoized: () => Promise<SensorsResponse>;
         loading: boolean;
         sensors: SensorReading[];
+        querier: SensorDataQuerier;
     } {
         return {
             allSensorsMemoized: this.$services.api.getAllSensorsMemoized(),
             loading: true,
             sensors: [],
+            querier: this.sensorDataQuerier || new SensorDataQuerier(this.$services.api, [this.id]),
         };
     },
     watch: {
@@ -76,10 +104,7 @@ export default Vue.extend({
     methods: {
         refresh() {
             const data = () => {
-                const params = new URLSearchParams();
-                params.append("stations", [this.id].join(","));
-                params.append("tail", "1");
-                return this.$services.api.tailSensorData(params);
+                return this.querier.query(this.id);
             };
 
             this.loading = true;
@@ -125,7 +150,7 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            console.log(`sensor:`, sensor);
+                            // console.log(`sensor:`, sensor);
 
                             return new SensorReading(
                                 key,
@@ -146,7 +171,7 @@ export default Vue.extend({
                     );
                 })
                 .then((sensors) => {
-                    console.log(`sensors`, sensors);
+                    // console.log(`sensors`, sensors);
                     if (this.moduleKey) {
                         this.sensors = sensors.filter((sensor) => sensor.sensorModule.key === this.moduleKey);
                     } else {
