@@ -207,9 +207,10 @@ export default Vue.extend({
         },
         headerSubtitle(): string {
             let subtitle;
-            if (this.station && this.station.deployedAt && this.$options.filters?.prettyDate) {
-                if (this.station.deployedAt) {
-                    subtitle = this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(this.station.deployedAt);
+            if (this.station && this.$options.filters?.prettyDate) {
+                const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
+                if (deploymentDate) {
+                    subtitle = this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(deploymentDate);
                 } else {
                     subtitle = this.$tc("station.readyToDeploy");
                 }

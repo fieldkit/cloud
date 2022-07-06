@@ -112,6 +112,7 @@ export default Vue.extend({
                 return value ? value : null;
             }
         },
+        // TODO: refactor using functions from partner.ts
         setPartnerAttributes(): void {
             this.neighborhood = this.getAttributeValue("Neighborhood");
             this.borough = this.getAttributeValue("Borough");
