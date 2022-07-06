@@ -21,6 +21,7 @@
 <script lang="ts">
 /* eslint-disable vue/no-unused-components */
 
+import _ from "lodash";
 import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
@@ -238,9 +239,9 @@ export default Vue.extend({
                 map.fitBounds(this.bounds, { duration: 0 });
             }
 
-            //Generate custom map markers
+            // Generate custom map markers
             const valueMarker = Vue.extend(ValueMarker);
-            const sorted = this.mapped.features.sort((a, b) => a.properties.value - b.properties.value);
+            const sorted = _.cloneDeep(this.mapped.features).sort((a, b) => a.properties.value - b.properties.value);
 
             for (const feature of sorted) {
                 const instance = new valueMarker({

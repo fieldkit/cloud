@@ -25,6 +25,7 @@ import Vue from "vue";
 
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
+import { DisplayProject, DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationsReadings",
@@ -32,38 +33,32 @@ export default Vue.extend({
         LatestStationReadings,
         PaginationControls,
     },
-    data: () => {
+    data(): {
+        index: number;
+    } {
         return {
             index: 0,
         };
     },
     props: {
-        project: {
-            type: Object,
-            required: true,
-        },
         displayProject: {
             type: Object,
             required: true,
         },
     },
     computed: {
-        stations(this: any) {
+        stations(): DisplayStation[] {
             return this.displayProject.stations;
         },
-        visibleStation(this: any) {
+        visibleStation(): DisplayStation | null {
             if (this.displayProject.stations.length > 0) {
                 return this.displayProject.stations[this.index];
             }
             return null;
         },
     },
-    mounted(this: any) {
-        // console.log("display", this.displayProject);
-        // console.log("project", this.project);
-    },
     methods: {
-        onNewStation(this: any, index: number) {
+        onNewStation(index: number): void {
             this.index = index;
         },
     },

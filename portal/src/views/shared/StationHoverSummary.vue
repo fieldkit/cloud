@@ -18,7 +18,7 @@
 
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
-            <LatestStationReadings :id="station.id" @layoutChange="layoutChange" />
+            <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
         </div>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
@@ -28,8 +28,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
+import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
 import * as utils from "@/utilities";
@@ -66,6 +67,10 @@ export default Vue.extend({
             default: () => {
                 return new ExploreContext();
             },
+        },
+        sensorDataQuerier: {
+            type: Object as PropType<SensorDataQuerier>,
+            required: false,
         },
     },
     filters: {
