@@ -205,17 +205,15 @@ export default Vue.extend({
             const station = this.$state.stations.stations[this.$route.params.stationId];
             return station.attributes;
         },
-        headerSubtitle(): string {
-            let subtitle;
+        headerSubtitle(): string | null {
             if (this.station && this.$options.filters?.prettyDate) {
                 const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
                 if (deploymentDate) {
-                    subtitle = this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(deploymentDate);
-                } else {
-                    subtitle = this.$tc("station.readyToDeploy");
+                    return this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(deploymentDate);
                 }
+                return this.$tc("station.readyToDeploy");
             }
-            return subtitle;
+            return null;
         },
         mapBounds(): BoundingRectangle {
             return MappedStations.defaultBounds();
