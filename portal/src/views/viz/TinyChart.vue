@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="tiny-chart">
         <LineChart :series="series" :settings="chartSettings" />
     </div>
 </template>
@@ -76,4 +76,12 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.tiny-chart {
+    height: 150px;
+}
+
+.tiny-chart .fit-y {
+    height: 100%;
+}
+</style>

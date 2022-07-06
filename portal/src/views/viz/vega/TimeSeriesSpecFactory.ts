@@ -210,8 +210,13 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        const xDomainsAll = this.allSeries
+            .filter((series: SeriesData) => series.queried.data.length > 0)
+            .map((series: SeriesData) => series.queried.timeRange);
+        const timeRangeAll =
+            xDomainsAll.length == 0
+                ? null
+                : [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
 
         // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
@@ -343,29 +348,38 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        const axes = [
-            {
-                orient: "bottom",
-                scale: "x",
-                domain: xDomain,
-                tickCount: 6,
-                labelPadding: -24,
-                tickSize: 30,
-                tickDash: [2, 2],
-                title: "Time",
-                format: {
-                    year: "%m/%d/%Y",
-                    quarter: "%m/%d/%Y",
-                    month: "%m/%d/%Y",
-                    week: "%m/%d/%Y",
-                    date: "%m/%d/%Y",
-                    hours: "%m/%d/%Y %H:%M",
-                    minutes: "%m/%d/%Y %H:%M",
-                    seconds: "%m/%d/%Y %H:%M",
-                    milliseconds: "%m/%d/%Y %H:%M",
+        const optionalXAxis = () => {
+            if (!xDomain) {
+                return [];
+            }
+
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain,
+                    tickCount: 6,
+                    labelPadding: -24,
+                    tickSize: 30,
+                    tickDash: [2, 2],
+                    title: "Time",
+                    format: {
+                        year: "%m/%d/%Y",
+                        quarter: "%m/%d/%Y",
+                        month: "%m/%d/%Y",
+                        week: "%m/%d/%Y",
+                        date: "%m/%d/%Y",
+                        hours: "%m/%d/%Y %H:%M",
+                        minutes: "%m/%d/%Y %H:%M",
+                        seconds: "%m/%d/%Y %H:%M",
+                        milliseconds: "%m/%d/%Y %H:%M",
+                    },
                 },
-            },
-        ].concat(
+            ];
+        };
+
+        const axes = _.concat(
+            optionalXAxis(),
             _.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
@@ -802,7 +816,7 @@ export class TimeSeriesSpecFactory {
                 const domain = makeSeriesDomain(series, i);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
-                if (thresholds) {
+                if (thresholds && timeRangeAll) {
                     return thresholds.levels
                         .filter((level) => level.label != null && !level.hidden)
                         .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])

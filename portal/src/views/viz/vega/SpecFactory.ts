@@ -55,5 +55,5 @@ export class ChartSettings {
 
     public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false, false);
     public static Auto = new ChartSettings(TimeRange.eternity, 0, 0, true, false);
-    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, false, true);
+    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, true, true);
 }
