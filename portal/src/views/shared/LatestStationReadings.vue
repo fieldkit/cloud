@@ -18,6 +18,7 @@
 import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { FKApi, TailSensorDataResponse, SensorsResponse, Module } from "@/api";
+import Config from "@/secrets";
 
 export enum TrendType {
     Downward,
@@ -45,11 +46,22 @@ export class SensorDataQuerier {
         console.log("sdq:ctor", stationIds);
     }
 
+    private getBackend(): string | null {
+        if (Config.backend) {
+            return Config.backend;
+        }
+        return window.localStorage["fk:backend"] || null;
+    }
+
     public async query(stationId: number): Promise<[TailSensorDataResponse, SensorsResponse]> {
         if (this.everything == null) {
             const params = new URLSearchParams();
             params.append("stations", this.stationIds.join(","));
             params.append("tail", "1");
+            const backend = this.getBackend();
+            if (backend) {
+                params.append("backend", backend);
+            }
             this.everything = this.api.tailSensorData(params);
         }
 
