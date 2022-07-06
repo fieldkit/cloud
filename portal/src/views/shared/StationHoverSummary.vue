@@ -21,10 +21,6 @@
             <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
         </div>
 
-        <div class="readings-container" v-if="readings">
-            <div class="title">Latest Readings</div>
-            <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
-        </div>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 

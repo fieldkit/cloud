@@ -45,18 +45,21 @@ export class SensorDataQuerier {
         console.log("sdq:ctor", stationIds);
     }
 
-    public query(stationId: number): Promise<TailSensorDataResponse> {
+    public async query(stationId: number): Promise<[TailSensorDataResponse, SensorsResponse]> {
         if (this.everything == null) {
             const params = new URLSearchParams();
             params.append("stations", this.stationIds.join(","));
             params.append("tail", "1");
             this.everything = this.api.tailSensorData(params);
         }
-        return this.everything.then((response) => {
+
+        const dataQuery = this.everything.then((response) => {
             return {
                 data: response.data.filter((row) => row.stationId == stationId),
             };
         });
+
+        return await Promise.all([dataQuery, this.api.getAllSensorsMemoized()()]);
     }
 }
 
@@ -78,13 +81,11 @@ export default Vue.extend({
         },
     },
     data(): {
-        allSensorsMemoized: () => Promise<SensorsResponse>;
         loading: boolean;
         sensors: SensorReading[];
         querier: SensorDataQuerier;
     } {
         return {
-            allSensorsMemoized: this.$services.api.getAllSensorsMemoized(),
             loading: true,
             sensors: [],
             querier: this.sensorDataQuerier || new SensorDataQuerier(this.$services.api, [this.id]),
@@ -103,13 +104,10 @@ export default Vue.extend({
     },
     methods: {
         refresh() {
-            const data = () => {
-                return this.querier.query(this.id);
-            };
-
             this.loading = true;
 
-            return Promise.all([data(), this.allSensorsMemoized()])
+            return this.querier
+                .query(this.id)
                 .then(([data, meta]) => {
                     const sensorsToModule = _.fromPairs(
                         _.flatten(

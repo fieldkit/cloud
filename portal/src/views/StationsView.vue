@@ -2,14 +2,17 @@
     <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="layoutChanges++">
         <template v-if="viewType === 'list'">
             <div class="stations-list" v-if="stations && stations.length > 0">
-                <StationHoverSummary
-                    v-for="station in stations"
-                    v-bind:key="station.id"
-                    class="summary-container"
-                    @close="closeSummary"
-                    :station="station"
-                    :sensorDataQuerier="sensorDataQuerier"
-                />
+                <div v-for="station in stations" v-bind:key="station.id">
+                    <StationHoverSummary
+                        class="summary-container"
+                        @close="closeSummary"
+                        :station="station"
+                        :sensorDataQuerier="sensorDataQuerier"
+                        v-slot="{ sensorDataQuerier, station }"
+                    >
+                        <TinyChart :stationId="station.id" :querier="sensorDataQuerier" />
+                    </StationHoverSummary>
+                </div>
             </div>
         </template>
 
@@ -69,12 +72,15 @@ import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
 
+import TinyChart from "@/views/viz/TinyChart.vue";
+
 export default Vue.extend({
     name: "StationsView",
     components: {
         StandardLayout,
         StationsMap,
         StationHoverSummary,
+        TinyChart,
     },
     props: {
         id: {
