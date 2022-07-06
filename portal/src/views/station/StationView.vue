@@ -139,7 +139,6 @@ import * as utils from "@/utilities";
 import { NoteMedia, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
-import { mapGetters } from "vuex";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
@@ -160,22 +159,18 @@ export default Vue.extend({
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
-        loading: boolean;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
-            loading: true,
         };
     },
     watch: {
         station() {
-            this.loading = false;
             this.selectedModule = this.station.modules[0];
         },
     },
     computed: {
-        ...mapGetters({ isBusy: "isBusy" }),
         projectId(): string {
             return this.$route.params.projectId;
         },
