@@ -26,6 +26,7 @@ export interface PartnerCustomization {
         url: string;
     }[];
     stationLocationName: (station: DisplayStation) => string;
+    getStationDeploymentDate: (station: DisplayStation) => string | Date | null;
     viz: {
         groupStation: (station: unknown) => string | null;
     };
@@ -45,6 +46,10 @@ function getNeighborhood(station: DisplayStation): string | null {
 
 function getBorough(station: DisplayStation): string | null {
     return getAttribute(station, "Borough");
+}
+
+function getDeploymentDate(station: DisplayStation): string | null {
+    return getAttribute(station, "Deployment Date");
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -80,6 +85,9 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             ],
             stationLocationName: (station: DisplayStation) => {
                 return getNeighborhood(station) || station.locationName;
+            },
+            getStationDeploymentDate: (station: DisplayStation) => {
+                return getDeploymentDate(station) || station.deployedAt;
             },
             viz: {
                 groupStation: (station: DisplayStation): string | null => {
@@ -122,6 +130,9 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         links: [],
         stationLocationName: (station: DisplayStation) => {
             return station.locationName;
+        },
+        getStationDeploymentDate: (station: DisplayStation) => {
+            return station.deployedAt;
         },
         viz: {
             groupStation: (station: DisplayStation): string | null => {
