@@ -185,6 +185,8 @@ export default Vue.extend({
                 });
             };
 
+            console.log("features radoi", JSON.parse(JSON.stringify(this.mapped.features)));
+
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
 
@@ -195,6 +197,8 @@ export default Vue.extend({
                         features: appendColor(this.mapped.features),
                     },
                 });
+
+                console.log("radoi featuresWColors", appendColor(this.mapped.features));
 
                 map.addLayer({
                     id: "regions",

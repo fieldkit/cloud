@@ -102,6 +102,10 @@
                     </div>
                 </section>
 
+                <div>
+                    <span>{{ station.latestPrimary | prettyNum }}</span>
+                </div>
+
                 <section v-if="attributes.length > 0" class="section-notes container-box">
                     <ProjectAttributes :attributes="attributes" />
                 </section>
@@ -225,7 +229,7 @@ export default Vue.extend({
             }
 
             const mapped = MappedStations.make([this.station]);
-
+            console.log("Radoi mapped", mapped);
             return mapped.focusOn(this.station.id);
         },
         showMap(): boolean {

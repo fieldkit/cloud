@@ -18,10 +18,13 @@ import {
     Activity,
     Configurations,
     Photos,
-    VizThresholds, ProjectAttribute,
+    VizThresholds,
+    ProjectAttribute,
 } from "@/api";
 
 import { VizConfig } from "@/views/viz/viz";
+
+import * as d3 from "d3";
 
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
@@ -117,8 +120,7 @@ export class DisplayStation {
         const prioritizedSensors = _.flatten(this.modules.map((m) => m.sensors));
         if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
             this.latestPrimary = prioritizedSensors[0].reading;
-        }
-        else {
+        } else {
             this.latestPrimary = null;
         }
 
@@ -148,7 +150,7 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null } | null = null;
+    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null; color: string } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -159,12 +161,30 @@ export class MapFeature {
         if (station.primarySensor && station.primarySensor.meta && station.primarySensor.meta.viz.length > 0) {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
+
+        let color;
+        // Marker color scale
+
+        if (thresholds) {
+            const markerScale = d3.scaleThreshold()
+                .domain(thresholds.levels.map((d) => d.value))
+                .range(thresholds.levels.map((d) => d.color));
+
+            color = markerScale(station.latestPrimary);
+        } else {
+            // default color
+            color = "#00CCFF";
+        }
+
         this.properties = {
             id: station.id,
             value: station.latestPrimary,
             icon: "marker",
             thresholds: thresholds,
+            color,
         };
+
+        console.log("radoi prps", this.properties);
     }
 
     public static makeFeatures(station: DisplayStation): MapFeature[] {
