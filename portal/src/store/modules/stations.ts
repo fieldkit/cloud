@@ -183,8 +183,6 @@ export class MapFeature {
             thresholds: thresholds,
             color,
         };
-
-        console.log("radoi prps", this.properties);
     }
 
     public static makeFeatures(station: DisplayStation): MapFeature[] {

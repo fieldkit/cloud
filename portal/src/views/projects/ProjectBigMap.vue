@@ -146,7 +146,7 @@ export default Vue.extend({
             return this.displayProject.project;
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.id].stations;
+            return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);
         },
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.id].mapped;
@@ -486,6 +486,10 @@ export default Vue.extend({
 
         .close-button {
             display: none;
+        }
+
+        .navigate-button {
+            right: 0;
         }
     }
 }
