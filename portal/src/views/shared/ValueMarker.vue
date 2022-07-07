@@ -30,15 +30,6 @@ export default Vue.extend({
             this.$emit("marker-click", { id: this.id });
         },
     },
-    filters: {
-        prettyNum: function(value) {
-            if (!isNaN(value)) {
-                if (value % 1 === 0) {
-                    return value;
-                } else return d3.format(".2s")(value);
-            } else return value;
-        },
-    },
 });
 </script>
 
