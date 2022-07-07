@@ -3,6 +3,7 @@ package querying
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/fieldkit/cloud/server/backend"
@@ -64,6 +65,17 @@ func NewTimeScaleDBBackend(config *TimeScaleDBConfig, db *sqlxcache.DB) (*TimeSc
 		config: config,
 		db:     db,
 	}, nil
+}
+
+func (tsdb *TimeScaleDBBackend) queryIDsForStation(ctx context.Context, stationID int32) (*backend.SensorDatabaseIDs, error) {
+	dq := backend.NewDataQuerier(tsdb.db)
+
+	ids, err := dq.GetStationIDs(ctx, []int32{stationID})
+	if err != nil {
+		return nil, err
+	}
+
+	return ids, nil
 }
 
 func (tsdb *TimeScaleDBBackend) queryIDs(ctx context.Context, qp *backend.QueryParams) (*backend.SensorDatabaseIDs, error) {
@@ -221,10 +233,6 @@ func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.Que
 func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	log := Logger(ctx).Sugar()
 
-	if len(qp.Stations) != 1 {
-		return nil, fmt.Errorf("multiple stations unsupported")
-	}
-
 	ids, err := tsdb.queryIDs(ctx, qp)
 	if err != nil {
 		return nil, err
@@ -300,8 +308,146 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	return queriedData, nil
 }
 
-func (tddb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+type LastTimeRow struct {
+	StationID int32     `json:"station_id"`
+	LastTime  time.Time `json:"last_time"`
+}
+
+func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeRow) ([]*backend.DataRow, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime)
+
+	ids, err := tsdb.queryIDsForStation(ctx, last.StationID)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = ids
+
+	conn, err := pgx.Connect(ctx, tsdb.config.Url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer conn.Close(ctx)
+
+	dataSql := `
+		SELECT
+			sd.time, sd.station_id, sd.module_id, sd.sensor_id, sd.value
+		FROM fieldkit.sensor_data AS sd
+		WHERE sd.station_id = $1
+		AND sd.time > ($2::TIMESTAMP + interval '-48 hours')
+	`
+	pgRows, err := conn.Query(ctx, dataSql, last.StationID, last.LastTime)
+	if err != nil {
+		return nil, fmt.Errorf("(tail-station) %v", err)
+	}
+
+	defer pgRows.Close()
+
+	rows := make([]*backend.DataRow, 0)
+
+	for pgRows.Next() {
+		var moduleID int64
+
+		row := &backend.DataRow{}
+
+		if err := pgRows.Scan(&row.Time, &row.StationID, &moduleID, &row.SensorID, &row.Value); err != nil {
+			return nil, err
+		}
+
+		hardwareID := ids.KeyToHardwareID[moduleID]
+
+		row.ModuleID = &hardwareID
+
+		rows = append(rows, row)
+	}
+
+	if pgRows.Err() != nil {
+		return nil, pgRows.Err()
+	}
+
+	return rows, nil
+}
+
+func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
+
+	// TODO Use pgxpool
+	conn, err := pgx.Connect(ctx, tsdb.config.Url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer conn.Close(ctx)
+
+	lastTimesSql := `
+		SELECT station_id, MAX(data_end) AS last_time
+		FROM fieldkit.sensor_data_365d
+		WHERE station_id = ANY($1)
+		GROUP BY station_id
+	`
+	lastTimeRows, err := conn.Query(ctx, lastTimesSql, qp.Stations)
+	if err != nil {
+		return nil, fmt.Errorf("(last-times) %v", err)
+	}
+
+	defer lastTimeRows.Close()
+
+	lastTimes := make(map[int32]*LastTimeRow)
+
+	for lastTimeRows.Next() {
+		row := &LastTimeRow{}
+
+		if err := lastTimeRows.Scan(&row.StationID, &row.LastTime); err != nil {
+			return nil, err
+		}
+
+		lastTimes[row.StationID] = row
+	}
+
+	if lastTimeRows.Err() != nil {
+		return nil, lastTimeRows.Err()
+	}
+
+	log.Infow("tsdb:query:last", "times", lastTimes)
+
+	byStation := make([][]*backend.DataRow, len(qp.Stations))
+	wg := new(sync.WaitGroup)
+
+	for index, stationID := range qp.Stations {
+		if last, ok := lastTimes[stationID]; ok {
+			wg.Add(1)
+
+			go func(index int, stationID int32) {
+				log.Infow("tsdb:query:go-tail", "station_id", stationID)
+
+				tailed, err := tsdb.tailStation(ctx, last)
+				if err != nil {
+					log.Errorw("tsdb:error", "error", err, "stationi_id", stationID)
+				} else {
+					byStation[index] = tailed
+				}
+				wg.Done()
+			}(index, stationID)
+		} else {
+			log.Infow("tsdb:query:empty", "station_id", stationID)
+		}
+	}
+
+	wg.Wait()
+
+	allRows := make([]*backend.DataRow, 0)
+	for _, tailed := range byStation {
+		allRows = append(allRows, tailed...)
+	}
+
+	log.Infow("tsdb:query:tailed")
+
 	return &SensorTailData{
-		Data: make([]*backend.DataRow, 0),
+		Data: allRows,
 	}, nil
 }
