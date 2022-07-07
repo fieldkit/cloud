@@ -55,7 +55,7 @@ export class SensorDataQuerier {
 
     public async query(stationId: number): Promise<[TailSensorDataResponse, SensorsResponse]> {
         if (this.stationIds.length == 0) {
-            return await Promise.all([Promise.resolve({ data: [] }), this.api.getAllSensorsMemoized()()]);
+            return await Promise.all([Promise.resolve({ data: [] }), this.api.getAllSensorsMemoized()]);
         }
 
         if (this.everything == null) {
@@ -75,7 +75,7 @@ export class SensorDataQuerier {
             };
         });
 
-        return await Promise.all([dataQuery, this.api.getAllSensorsMemoized()()]);
+        return await Promise.all([dataQuery, this.api.getAllSensorsMemoized()]);
     }
 }
 

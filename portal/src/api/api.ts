@@ -403,7 +403,7 @@ class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
-    private allSensorsMemoized = _.memoize(() => this.getAllSensors());
+    public allSensorsMemoized = _.memoize(() => this.getAllSensors());
 
     authenticated() {
         return this.token.authenticated();
