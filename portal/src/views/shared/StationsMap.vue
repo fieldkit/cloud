@@ -166,25 +166,6 @@ export default Vue.extend({
                 this.hasGeocoder = true;
             }
 
-            // Marker color scale
-            const appendColor = (features) => {
-                return features.map((d) => {
-                    if (d.properties.thresholds) {
-                        const markerScale = d3
-                            .scaleThreshold()
-                            .domain(d.properties.thresholds.levels.map((d) => d.value))
-                            .range(d.properties.thresholds.levels.map((d) => d.color));
-
-                        d.properties.color = markerScale(d.properties.value);
-                    } else {
-                        //default color
-                        d.properties.color = "#00CCFF";
-                    }
-
-                    return d;
-                });
-            };
-
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
 
