@@ -286,9 +286,12 @@ func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*
 	}
 
 	query, args, err := sqlx.In(`
-		SELECT c.station_id, m.id AS module_id, m.hardware_id
-		FROM fieldkit.visible_configuration AS c LEFT JOIN fieldkit.station_module AS m ON (c.configuration_id = m.configuration_id)
-		WHERE c.station_id IN (?)
+		SELECT s.id AS station_id, m.id AS module_id, m.hardware_id
+		FROM fieldkit.station AS s
+		RIGHT JOIN fieldkit.provision AS p ON (s.device_id = p.device_id)
+		RIGHT JOIN fieldkit.station_configuration AS c ON (c.provision_id = p.id)
+		RIGHT JOIN fieldkit.station_module AS m ON (c.id = m.configuration_id)
+		WHERE s.id IN (?)
 	`, stationIDs)
 	if err != nil {
 		return nil, fmt.Errorf("(station-ids) %v", err)

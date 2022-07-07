@@ -323,8 +323,6 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 		return nil, err
 	}
 
-	_ = ids
-
 	conn, err := pgx.Connect(ctx, tsdb.config.Url)
 	if err != nil {
 		return nil, err
@@ -357,9 +355,9 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 			return nil, err
 		}
 
-		hardwareID := ids.KeyToHardwareID[moduleID]
-
-		row.ModuleID = &hardwareID
+		if hardwareID, ok := ids.KeyToHardwareID[moduleID]; ok {
+			row.ModuleID = &hardwareID
+		}
 
 		rows = append(rows, row)
 	}
