@@ -16,9 +16,11 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue, { PropType } from "vue";
-import { FKApi, TailSensorDataResponse, SensorInfoResponse, SensorsResponse, Module } from "@/api";
 import Config from "@/secrets";
+
+import Vue, { PropType } from "vue";
+
+import { FKApi, TailSensorDataResponse, StationInfoResponse, SensorInfoResponse, SensorsResponse, Module } from "@/api";
 
 export enum TrendType {
     Downward,
@@ -39,6 +41,10 @@ export class SensorReading {
     ) {}
 }
 
+export interface StationQuickSensors {
+    station: StationInfoResponse[];
+}
+
 export class SensorDataQuerier {
     private data: Promise<TailSensorDataResponse> | null = null;
     private quickSensors: Promise<SensorInfoResponse> | null = null;
@@ -54,9 +60,9 @@ export class SensorDataQuerier {
         return window.localStorage["fk:backend"] || null;
     }
 
-    public async query(stationId: number): Promise<[TailSensorDataResponse, SensorInfoResponse, SensorsResponse]> {
+    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorsResponse]> {
         if (this.stationIds.length == 0) {
-            return await Promise.all([Promise.resolve({ data: [] }), { stations: {} }, this.api.getAllSensorsMemoized()]);
+            return await Promise.all([Promise.resolve({ data: [] }), { station: [] }, this.api.getAllSensorsMemoized()]);
         }
 
         if (this.data == null || this.quickSensors == null) {
@@ -81,9 +87,7 @@ export class SensorDataQuerier {
 
         const quickSensorsQuery = this.quickSensors.then((response) => {
             return {
-                stations: {
-                    [stationId]: response.stations[stationId],
-                },
+                station: response.stations[stationId],
             };
         });
 

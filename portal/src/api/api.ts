@@ -1,14 +1,21 @@
 import _ from "lodash";
 import axios from "axios";
-import TokenStorage from "./tokens";
+
 import Config from "../secrets";
+import TokenStorage from "./tokens";
+import Backoff from "backoff";
+
 import { keysToCamel } from "@/json-tools";
+
 import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
+
+import { SensorInfoResponse } from "@/views/viz/api";
+
+// Ew
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
-import Backoff from "backoff";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -367,21 +374,6 @@ export interface TailSensorDataRow {
 
 export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
-}
-
-interface StationInfoResponse {
-    stationId: number;
-    stationName: string;
-    stationLocation: [number, number];
-    moduleId: ModuleID;
-    moduleKey: string;
-    sensorId: number;
-    sensorKey: string;
-    sensorReadAt: string;
-}
-
-export interface SensorInfoResponse {
-    stations: { [index: string]: StationInfoResponse[] };
 }
 
 // Intentionally keeping this synchronous since it'll get used in

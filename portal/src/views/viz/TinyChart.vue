@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue, { PropType } from "vue";
 
 import {
@@ -47,12 +48,20 @@ export default Vue.extend({
     },
     async mounted() {
         const [data, quickSensors, meta] = await this.querier.query(this.stationId);
+        if (quickSensors.station.filter((r) => r.moduleId != null).length == 0) {
+            return;
+        }
+
+        const sensorModuleId = quickSensors.station[0].moduleId;
+        const sensorId = quickSensors.station[0].sensorId;
+        const vizSensor: VizSensor = [this.stationId, [sensorModuleId, sensorId]];
+
+        const sensorData = data.data.filter((datum) => datum.sensorId == sensorId);
 
         const sdr: SensorDataResponse = {
-            data: [],
+            data: _.cloneDeep(sensorData),
         };
         const queried = new QueriedData("key", TimeRange.eternity, sdr);
-        const vizSensor: VizSensor = [];
         const vizInfo = new VizInfo(
             "key",
             [],
@@ -66,7 +75,7 @@ export default Vue.extend({
             "axisLabel"
         );
 
-        console.log("tiny-chart", data, quickSensors, meta);
+        console.log("tiny-chart", { stationId: this.stationId, vizSensor, quickSensors, meta, sensorData });
 
         this.series = [new SeriesData("key", new DataSetSeries(vizSensor, queried, queried), queried, vizInfo)];
     },
