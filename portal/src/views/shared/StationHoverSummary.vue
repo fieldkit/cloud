@@ -33,7 +33,9 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue, { PropType } from "vue";
+import { mapState, mapGetters } from "vuex";
 import CommonComponents from "@/views/shared";
 import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
@@ -85,10 +87,16 @@ export default Vue.extend({
         },
     },
     computed: {
-        stationFeature(): any {
-            return this.$getters.projectsById[this.$route.params.id].mapped.features.find(
-                (feature) => feature.properties?.id === this.station.id
+        ...mapGetters({ projectsById: "projectsById" }),
+        allProjectFeatures() {
+            return _.flatten(
+                Object.values(this.projectsById)
+                    .filter((p) => p != null)
+                    .map((p) => p.mapped.features)
             );
+        },
+        stationFeature(): any {
+            return this.allProjectFeatures.find((feature) => feature.properties?.id === this.station.id);
         },
         latestPrimaryLevel(): any {
             if (this.stationFeature && this.stationFeature.properties) {
