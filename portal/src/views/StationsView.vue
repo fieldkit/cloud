@@ -61,17 +61,16 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import StandardLayout from "./StandardLayout.vue";
-import StationHoverSummary from "./shared/StationHoverSummary.vue";
-import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
-import StationsMap from "./shared/StationsMap.vue";
-
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
 
+import Vue, { PropType } from "vue";
+import StandardLayout from "./StandardLayout.vue";
+import StationHoverSummary from "./shared/StationHoverSummary.vue";
+import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
+import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 
 export default Vue.extend({
