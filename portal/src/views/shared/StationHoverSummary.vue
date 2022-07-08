@@ -21,6 +21,12 @@
             <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
         </div>
 
+        <slot :station="station" :sensorDataQuerier="sensorDataQuerier">
+            <div class="readings-container" v-if="readings">
+                <div class="title">Latest Readings</div>
+                <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
+            </div>
+        </slot>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 
@@ -30,14 +36,17 @@
 
 <script lang="ts">
 import _ from "lodash";
+
 import Vue, { PropType } from "vue";
 import { mapState, mapGetters } from "vuex";
+
 import CommonComponents from "@/views/shared";
+import StationBattery from "@/views/station/StationBattery.vue";
 import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
-import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
+
 import * as utils from "@/utilities";
-import StationBattery from "@/views/station/StationBattery.vue";
+import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
 
 export default Vue.extend({
