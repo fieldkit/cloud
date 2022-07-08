@@ -799,15 +799,14 @@ export class TimeSeriesSpecFactory {
                 }
             }).reverse()
         );
-        
+
         // define mark stacking priority
-        const getMarkSortIndex = (d) =>  {
-            if(d['marks']) {
-                if (d['marks'][0].type === "line") return 1;
-                if (d['marks'][0].type === "rect") return 2;
+        const getMarkSortIndex = (d) => {
+            if (d["marks"]) {
+                if (d["marks"][0].type === "line") return 1;
+                if (d["marks"][0].type === "rect") return 2;
                 else return 0;
-            }
-            else return 0;
+            } else return 0;
         };
 
         // TODO Unique by thresholds and perhaps y value?
@@ -888,13 +887,20 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
+        /*
         console.log(seriesMarks.sort((a,b) => {
             return getMarkSortIndex(a) - getMarkSortIndex(b);
         }))
+        */
 
-        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks.sort((a,b) => {
-            return getMarkSortIndex(b) - getMarkSortIndex(a);
-        })];
+        const marks = [
+            ...cellMarks(),
+            ...brushMarks,
+            ...ruleMarks,
+            ...seriesMarks.sort((a, b) => {
+                return getMarkSortIndex(b) - getMarkSortIndex(a);
+            }),
+        ];
 
         const interactiveSignals = [
             {
