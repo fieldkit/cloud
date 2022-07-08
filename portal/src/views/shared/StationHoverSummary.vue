@@ -12,6 +12,15 @@
             </template>
         </StationSummaryContent>
 
+        <div
+            v-if="isPartnerCustomisationEnabled() && station.latestPrimary !== null"
+            class="latest-primary"
+            :style="{ color: latestPrimaryColor }"
+        >
+            {{ latestPrimaryLevel }}
+            <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
+        </div>
+
         <div class="readings-container" v-if="readings">
             <div class="title">Latest Readings</div>
             <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
@@ -28,10 +37,10 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
-import { BookmarkFactory, serializeBookmark, ExploreContext } from "@/views/viz/viz";
+import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import * as utils from "@/utilities";
 import StationBattery from "@/views/station/StationBattery.vue";
-import { interpolatePartner } from "./partners";
+import { interpolatePartner, isCustomisationEnabled } from "./partners";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -75,6 +84,29 @@ export default Vue.extend({
             return Math.round(value);
         },
     },
+    computed: {
+        stationFeature(): any {
+            return this.$getters.projectsById[this.$route.params.id].mapped.features.find(
+                (feature) => feature.properties?.id === this.station.id
+            );
+        },
+        latestPrimaryLevel(): any {
+            if (this.stationFeature && this.stationFeature.properties) {
+                const primaryValue = this.stationFeature.properties.value;
+                const level = this.stationFeature.properties.thresholds?.levels.find(
+                    (level) => level.start < primaryValue && level.value > primaryValue
+                );
+                return level?.label["enUS"];
+            }
+            return null;
+        },
+        latestPrimaryColor(): string {
+            if (this.stationFeature && this.stationFeature.properties) {
+                return this.stationFeature.properties.color;
+            }
+            return "#00CCFF";
+        },
+    },
     methods: {
         viewSummary() {
             this.viewingSummary = true;
@@ -101,6 +133,9 @@ export default Vue.extend({
         },
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);
+        },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
         },
     },
 });
@@ -210,6 +245,23 @@ export default Vue.extend({
 
     .name {
         font-size: 11px;
+    }
+}
+
+.latest-primary {
+    font-size: 12px;
+    font-family: $font-family-bold;
+    @include flex(center, flex-end);
+
+    i {
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 900;
+        border-radius: 50%;
+        padding: 5px;
+        color: #fff;
+        margin-left: 5px;
+        min-width: 1.2em;
     }
 }
 </style>

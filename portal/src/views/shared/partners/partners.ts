@@ -80,7 +80,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             links: [
                 {
                     text: "linkToFloodnet",
-                    url: "https://www.floodnet.nyc/",
+                    url: "https://www.floodnet.nyc/methodology",
                 },
             ],
             stationLocationName: (station: DisplayStation) => {
