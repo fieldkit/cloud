@@ -41,7 +41,7 @@
                             <h4>Current {{ keyTitle }}</h4>
                             <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                                <span>{{ item.label["enUS"] }}</span>
+                                <span>{{ fnKeyLabels[idx] }}</span>
                             </div>
                             <div class="legend-item" v-if="hasStationsWithoutData">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
@@ -118,6 +118,7 @@ export default Vue.extend({
         viewType: string;
         recentMapMode: boolean;
         legendCollapsed: boolean;
+        fnKeyLabels: string [];
     } {
         return {
             layoutChanges: 0,
@@ -125,6 +126,7 @@ export default Vue.extend({
             viewType: "map",
             recentMapMode: false,
             legendCollapsed: false,
+            fnKeyLabels: ["None or Minimal", "Minor (4\"-12\")", "Moderate (12\"-24\")", "Major (> 24\")"]
         };
     },
     props: {
