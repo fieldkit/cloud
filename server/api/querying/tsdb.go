@@ -334,8 +334,8 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 		SELECT
 			sd.time, sd.station_id, sd.module_id, sd.sensor_id, sd.value
 		FROM fieldkit.sensor_data AS sd
-		WHERE sd.station_id = $1
-		AND sd.time > ($2::TIMESTAMP + interval '-48 hours')
+		WHERE sd.station_id = $1 AND sd.time > ($2::TIMESTAMP + interval '-48 hours')
+		ORDER BY sd.time
 	`
 	pgRows, err := conn.Query(ctx, dataSql, last.StationID, last.LastTime)
 	if err != nil {
@@ -387,6 +387,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 		FROM fieldkit.sensor_data_365d
 		WHERE station_id = ANY($1)
 		GROUP BY station_id
+		ORDER BY last_time
 	`
 	lastTimeRows, err := conn.Query(ctx, lastTimesSql, qp.Stations)
 	if err != nil {
