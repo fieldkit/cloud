@@ -17,7 +17,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue, { PropType } from "vue";
-import { FKApi, TailSensorDataResponse, SensorsResponse, Module } from "@/api";
+import { FKApi, TailSensorDataResponse, SensorInfoResponse, SensorsResponse, Module } from "@/api";
 import Config from "@/secrets";
 
 export enum TrendType {
@@ -40,7 +40,8 @@ export class SensorReading {
 }
 
 export class SensorDataQuerier {
-    private everything: Promise<TailSensorDataResponse> | null = null;
+    private data: Promise<TailSensorDataResponse> | null = null;
+    private quickSensors: Promise<SensorInfoResponse> | null = null;
 
     constructor(private readonly api: FKApi, private readonly stationIds: number[]) {
         console.log("sdq:ctor", stationIds);
@@ -53,12 +54,14 @@ export class SensorDataQuerier {
         return window.localStorage["fk:backend"] || null;
     }
 
-    public async query(stationId: number): Promise<[TailSensorDataResponse, SensorsResponse]> {
+    public async query(stationId: number): Promise<[TailSensorDataResponse, SensorInfoResponse, SensorsResponse]> {
         if (this.stationIds.length == 0) {
-            return await Promise.all([Promise.resolve({ data: [] }), this.api.getAllSensorsMemoized()]);
+            return await Promise.all([Promise.resolve({ data: [] }), { stations: {} }, this.api.getAllSensorsMemoized()]);
         }
 
-        if (this.everything == null) {
+        if (this.data == null || this.quickSensors == null) {
+            this.quickSensors = this.api.getQuickSensors(this.stationIds);
+
             const params = new URLSearchParams();
             params.append("stations", this.stationIds.join(","));
             params.append("tail", "1");
@@ -66,16 +69,25 @@ export class SensorDataQuerier {
             if (backend) {
                 params.append("backend", backend);
             }
-            this.everything = this.api.tailSensorData(params);
+
+            this.data = this.api.tailSensorData(params);
         }
 
-        const dataQuery = this.everything.then((response) => {
+        const dataQuery = this.data.then((response) => {
             return {
                 data: response.data.filter((row) => row.stationId == stationId),
             };
         });
 
-        return await Promise.all([dataQuery, this.api.getAllSensorsMemoized()]);
+        const quickSensorsQuery = this.quickSensors.then((response) => {
+            return {
+                stations: {
+                    [stationId]: response.stations[stationId],
+                },
+            };
+        });
+
+        return await Promise.all([dataQuery, quickSensorsQuery, this.api.getAllSensorsMemoized()]);
     }
 }
 
@@ -124,7 +136,7 @@ export default Vue.extend({
 
             return this.querier
                 .query(this.id)
-                .then(([data, meta]) => {
+                .then(([data, quickSensors, meta]) => {
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {

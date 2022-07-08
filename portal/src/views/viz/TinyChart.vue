@@ -46,7 +46,7 @@ export default Vue.extend({
         };
     },
     async mounted() {
-        const [data, meta] = await this.querier.query(this.stationId);
+        const [data, quickSensors, meta] = await this.querier.query(this.stationId);
 
         const sdr: SensorDataResponse = {
             data: [],
@@ -66,7 +66,7 @@ export default Vue.extend({
             "axisLabel"
         );
 
-        console.log("tiny-chart", data, meta);
+        console.log("tiny-chart", data, quickSensors, meta);
 
         this.series = [new SeriesData("key", new DataSetSeries(vizSensor, queried, queried), queried, vizInfo)];
     },

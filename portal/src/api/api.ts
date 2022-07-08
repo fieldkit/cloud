@@ -369,6 +369,21 @@ export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
 }
 
+interface StationInfoResponse {
+    stationId: number;
+    stationName: string;
+    stationLocation: [number, number];
+    moduleId: ModuleID;
+    moduleKey: string;
+    sensorId: number;
+    sensorKey: string;
+    sensorReadAt: string;
+}
+
+export interface SensorInfoResponse {
+    stations: { [index: string]: StationInfoResponse[] };
+}
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -1139,7 +1154,7 @@ class FKApi {
         });
     }
 
-    public getQuickSensors(stations: number[]) {
+    public getQuickSensors(stations: number[]): Promise<SensorInfoResponse> {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
