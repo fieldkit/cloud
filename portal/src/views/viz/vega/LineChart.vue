@@ -94,34 +94,32 @@ export default Vue.extend({
                 });
             }
 
-            /*
-            vegaInfo.view.addSignalListener("hover", (_, value) => {
-                console.log("hover", value);
-            });
-            */
+            if (!this.settings.tiny) {
+                let scrubbed = [];
 
-            let scrubbed = [];
-            vegaInfo.view.addSignalListener("brush", (_, value) => {
-                scrubbed = value.time;
-            });
-            vegaInfo.view.addEventListener("mouseup", () => {
-                if (scrubbed.length == 2) {
-                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
-                }
-            });
+                vegaInfo.view.addSignalListener("brush", (_, value) => {
+                    scrubbed = value.time;
+                });
 
-            // Watch for brush drag outside the window
-            vegaInfo.view.addEventListener("mousedown", (e) => {
-                window.addEventListener("mouseup", (e) => {
-                    if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                vegaInfo.view.addEventListener("mouseup", () => {
+                    if (scrubbed.length == 2) {
                         this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                     }
                 });
-            });
+
+                // Watch for brush drag outside the window
+                vegaInfo.view.addEventListener("mousedown", (e) => {
+                    window.addEventListener("mouseup", (e) => {
+                        if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                            this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                        }
+                    });
+                });
+            }
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
-                layouts: vegaInfo.view.data("all_layouts"),
+                // layouts: vegaInfo.view.data("all_layouts"),
             });
         },
         getFileName(series): string {

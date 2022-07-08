@@ -49,6 +49,7 @@ export default Vue.extend({
     async mounted() {
         const [data, quickSensors, meta] = await this.querier.query(this.stationId);
         if (quickSensors.station.filter((r) => r.moduleId != null).length == 0) {
+            console.log("tiny-chart:empty");
             return;
         }
 
@@ -87,7 +88,14 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .tiny-chart {
-    height: 150px;
+    margin-top: 10px;
+    width: 100%;
+    height: 200px;
+    border: solid 1px #d8dce0;
+}
+
+.tiny-chart .fit-x {
+    width: 100%;
 }
 
 .tiny-chart .fit-y {

@@ -13,4 +13,7 @@ export default {
         stroke: "#6ef0da",
         fill: "#6ef0da",
     },
+    tinyLine: {
+        stroke: "#f78c3b"
+    }
 };

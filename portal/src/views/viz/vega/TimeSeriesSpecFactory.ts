@@ -312,24 +312,31 @@ export class TimeSeriesSpecFactory {
                     })
                 )
             )
-            .concat([
-                {
-                    name: "all_layouts",
-                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
-                    transform: [
-                        {
-                            type: "voronoi",
-                            x: "layout_x",
-                            y: "layout_y",
-                            size: [{ signal: "width" }, { signal: "height" }],
-                            as: "layout_path",
-                        },
-                    ],
-                },
-            ] as any[]);
+            .concat(
+                this.settings.tiny
+                    ? []
+                    : ([
+                          {
+                              name: "all_layouts",
+                              source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
+                              transform: [
+                                  {
+                                      type: "voronoi",
+                                      x: "layout_x",
+                                      y: "layout_y",
+                                      size: [{ signal: "width" }, { signal: "height" }],
+                                      as: "layout_path",
+                                  },
+                              ],
+                          },
+                      ] as any[])
+            );
 
         const legends = _.flatten(
             mapSeries((series, i) => {
+                if (this.settings.tiny) {
+                    return [];
+                }
                 if (sameSensors && i > 0) {
                     return [];
                 }
@@ -347,6 +354,21 @@ export class TimeSeriesSpecFactory {
                 ];
             })
         );
+
+        const tinyXAxis = () => {
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain,
+                    tickCount: 0,
+                    labelPadding: 0,
+                    tickSize: 0,
+                    tickDash: [2, 2],
+                    title: null,
+                },
+            ];
+        };
 
         const optionalXAxis = () => {
             if (!xDomain) {
@@ -378,15 +400,29 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
-        const axes = _.concat(
-            optionalXAxis(),
-            _.flatten(
+        const axes = [
+            ...(this.settings.tiny ? tinyXAxis() : optionalXAxis()),
+            ..._.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
                     const hoverCheck = ifHovering(i, 1, 0.2);
                     const hoverCheckGrid = ifHovering(i, 0.5, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
+
+                    if (this.settings.tiny) {
+                        return {
+                            title: null,
+                            orient: makeOrientation(i),
+                            scale: makeAxisScale(i),
+                            domain: makeDomainY(i, series),
+                            gridDash: [],
+                            tickCount: 5,
+                            domainOpacity: 0,
+                            titleOpacity: 0,
+                            gridOpacity: 0,
+                        };
+                    }
 
                     return {
                         title: series.vizInfo.axisLabel,
@@ -408,8 +444,8 @@ export class TimeSeriesSpecFactory {
                         },
                     };
                 })
-            )
-        );
+            ),
+        ];
 
         const scales = _.flatten(
             mapSeries((series, i) => {
@@ -771,7 +807,7 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: i === 0 ? "primaryLine" : "secondaryLine",
+                        style: this.settings.tiny ? "tinyLine" : i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -860,6 +896,10 @@ export class TimeSeriesSpecFactory {
         );
 
         const cellMarks = () => {
+            if (this.settings.tiny) {
+                return [];
+            }
+
             return [
                 {
                     name: "cell",
@@ -1162,7 +1202,31 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const allSignals = this.settings.w == 0 ? interactiveSignals : staticSignals;
+        const tinySignals = [
+            {
+                name: "width",
+                init: "containerSize()[0]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[0]",
+                    },
+                ],
+            },
+            {
+                name: "height",
+                init: "containerSize()[1]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[1]",
+                    },
+                ],
+            },
+            ...staticSignals,
+        ];
+
+        const allSignals = this.settings.tiny ? tinySignals : this.settings.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],

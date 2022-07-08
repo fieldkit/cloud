@@ -32,6 +32,7 @@ export class ChartSettings {
                 autosize: {
                     type: "fit",
                     contains: "padding",
+                    resize: this.tiny,
                 },
             };
             return _.extend(spec, autoSize);
