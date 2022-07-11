@@ -378,6 +378,10 @@
         }
     },
     "linkToFloodnet": "Project Info, Methodology & Data Sources",
+    "floodnetDescription": {
+        "text": "To report a flood in your neighborhood, please use the ",
+        "link": "Community Flood Watch Project Survey"
+    },
     "attributes": {
         "title": "Attributes",
         "noValueYet": "Nothing added yet"

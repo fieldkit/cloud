@@ -16,6 +16,12 @@
                         </a>
                     </div>
                     <div class="detail-description">{{ project.description }}</div>
+                    <div v-if="isPartnerCustomisationEnabled()" class="detail-description">
+                        {{ $t("floodnetDescription.text") }}
+                        <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" class="link">
+                            {{ $t("floodnetDescription.link") }}
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -41,7 +47,7 @@
                             <h4>Current {{ keyTitle }}</h4>
                             <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                                <span>{{ (item.mapKeyLabel) ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
+                                <span>{{ item.mapKeyLabel ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
                             </div>
                             <div class="legend-item" v-if="hasStationsWithoutData">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
@@ -286,7 +292,6 @@ export default Vue.extend({
     .link {
         color: $color-primary;
         font-size: 12px;
-        display: block;
         letter-spacing: 0.07px;
         text-decoration: initial;
 
