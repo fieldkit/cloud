@@ -197,8 +197,8 @@ export class TimeSeriesSpecFactory {
 
         // Are the sensors being charted the same? If they are then we should
         // use the same axis domain for both, and pick one that covers both.
-        const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
-        const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
+        const uniqueSensorUnits = _.uniq(this.allSeries.map((series) => series.vizInfo.unitOfMeasure));
+        const sameSensors = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
