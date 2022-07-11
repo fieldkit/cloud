@@ -30,6 +30,7 @@ export interface PartnerCustomization {
     viz: {
         groupStation: (station: unknown) => string | null;
     };
+    routeAfterLogin: string;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -94,6 +95,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                     return getBorough(station) || null;
                 },
             },
+            routeAfterLogin: "root",
         };
     }
     return null;
@@ -139,6 +141,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
                 return null;
             },
         },
+        routeAfterLogin: "projects",
     };
 }
 
