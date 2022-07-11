@@ -72,12 +72,7 @@ export default Vue.extend({
         ...CommonComponents,
     },
     data: () => {
-        return {
-            neighborhood: null,
-            borough: null,
-            deployedBy: null,
-            deploymentDate: null,
-        };
+        return {};
     },
     props: {
         station: {
@@ -89,9 +84,19 @@ export default Vue.extend({
         stationLocationName(): string {
             return this.partnerCustomization().stationLocationName(this.station);
         },
-    },
-    mounted(): void {
-        this.setPartnerAttributes();
+        // TODO: refactor using functions from partner.ts
+        neighborhood(): string {
+            return this.getAttributeValue("Neighborhood");
+        },
+        borough(): string {
+            return this.getAttributeValue("Borough");
+        },
+        deploymentDate(): string {
+            return this.getAttributeValue("Deployment Date");
+        },
+        deployedBy(): string {
+            return this.getAttributeValue("Deployed By");
+        },
     },
     methods: {
         getBatteryIcon() {
@@ -111,13 +116,6 @@ export default Vue.extend({
                 const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
                 return value ? value : null;
             }
-        },
-        // TODO: refactor using functions from partner.ts
-        setPartnerAttributes(): void {
-            this.neighborhood = this.getAttributeValue("Neighborhood");
-            this.borough = this.getAttributeValue("Borough");
-            this.deploymentDate = this.getAttributeValue("Deployment Date");
-            this.deployedBy = this.getAttributeValue("Deployed By");
         },
     },
 });
