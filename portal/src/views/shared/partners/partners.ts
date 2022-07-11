@@ -31,6 +31,7 @@ export interface PartnerCustomization {
         groupStation: (station: unknown) => string | null;
     };
     routeAfterLogin: string;
+    sidebarNarrow: boolean;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -55,7 +56,7 @@ function getDeploymentDate(station: DisplayStation): string | null {
 
 export function getPartnerCustomization(): PartnerCustomization | null {
     // dataviz.floodnet.nyc, floodnet.fieldkit.org
-    if (window.location.hostname.indexOf("floodnet.") >= 0) {
+    if (window.location.hostname.indexOf("floodnet.") < 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
@@ -96,6 +97,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 },
             },
             routeAfterLogin: "root",
+            sidebarNarrow: true,
         };
     }
     return null;
@@ -142,6 +144,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             },
         },
         routeAfterLogin: "projects",
+        sidebarNarrow: false,
     };
 }
 

@@ -5,7 +5,7 @@
                 <Logo />
             </router-link>
         </div>
-        <a class="sidebar-trigger" v-on:click="toggleSidebar">
+        <a v-if="!partnerCustomization().sidebarNarrow" class="sidebar-trigger" v-on:click="toggleSidebar">
             <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22" />
         </a>
         <div id="inner-nav">
@@ -69,7 +69,12 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import { StationOrSensor, interpolatePartner, isCustomisationEnabled } from "./partners";
+import {
+  StationOrSensor,
+  interpolatePartner,
+  isCustomisationEnabled,
+  getPartnerCustomizationWithDefault
+} from "./partners";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -178,6 +183,9 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        partnerCustomization() {
+            return getPartnerCustomizationWithDefault();
+        }
     },
 });
 </script>
@@ -217,6 +225,7 @@ export default Vue.extend({
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
     transition: 0.25s all;
+    overflow: hidden;
     @include flex(center, center);
 
     @at-root .container-side.active & {
