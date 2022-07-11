@@ -12,10 +12,11 @@ import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
 import Logo from "../shared/Logo.vue";
 
-import FKApi, { LoginPayload } from "@/api/api";
+import { LoginPayload } from "@/api/api";
 import { ActionTypes } from "@/store";
 import { toSingleValue } from "@/utilities";
 import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 
 export default Vue.extend({
     components: {
@@ -99,10 +100,13 @@ export default Vue.extend({
                     console.log(e);
                 });
             } else {
-                await this.$router.push({ name: "projects" }).catch((e) => {
+                await this.$router.push({ name: this.partnerCustomization().routeAfterLogin }).catch((e) => {
                     console.log(e);
                 });
             }
+        },
+        partnerCustomization() {
+            return getPartnerCustomizationWithDefault();
         },
     },
 });
