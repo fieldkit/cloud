@@ -974,6 +974,121 @@ func EncodeListAssociatedError(encoder func(context.Context, http.ResponseWriter
 	}
 }
 
+// EncodeListProjectAssociatedResponse returns an encoder for responses
+// returned by the station list project associated endpoint.
+func EncodeListProjectAssociatedResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.AssociatedStations)
+		enc := encoder(ctx, w)
+		body := NewListProjectAssociatedResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListProjectAssociatedRequest returns a decoder for requests sent to
+// the station list project associated endpoint.
+func DecodeListProjectAssociatedRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			projectID int32
+			auth      *string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		{
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+			}
+			projectID = int32(v)
+		}
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListProjectAssociatedPayload(projectID, auth)
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListProjectAssociatedError returns an encoder for errors returned by
+// the list project associated station endpoint.
+func EncodeListProjectAssociatedError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeDownloadPhotoResponse returns an encoder for responses returned by the
 // station download photo endpoint.
 func EncodeDownloadPhotoResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -1962,13 +2077,22 @@ func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *
 		res.Station = marshalStationviewsStationFullViewToStationFullResponseBody(v.Station)
 	}
 	if v.Project != nil {
-		res.Project = marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(v.Project)
+		res.Project = make([]*AssociatedViaProjectResponseBody, len(v.Project))
+		for i, val := range v.Project {
+			res.Project[i] = marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(val)
+		}
 	}
 	if v.Location != nil {
-		res.Location = marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(v.Location)
+		res.Location = make([]*AssociatedViaLocationResponseBody, len(v.Location))
+		for i, val := range v.Location {
+			res.Location[i] = marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(val)
+		}
 	}
 	if v.Manual != nil {
-		res.Manual = marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(v.Manual)
+		res.Manual = make([]*AssociatedViaManualResponseBody, len(v.Manual))
+		for i, val := range v.Manual {
+			res.Manual[i] = marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(val)
+		}
 	}
 
 	return res
@@ -1996,7 +2120,8 @@ func marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponse
 		return nil
 	}
 	res := &AssociatedViaLocationResponseBody{
-		Distance: *v.Distance,
+		StationID: *v.StationID,
+		Distance:  *v.Distance,
 	}
 
 	return res

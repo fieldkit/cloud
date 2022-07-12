@@ -8,7 +8,6 @@ import { BoundingRectangle } from "@/store/map-types";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
-import { promiseAfter } from "@/utilities";
 import Backoff from "backoff";
 
 export interface PortalDeployStatus {
@@ -346,8 +345,8 @@ export interface StationsResponse {
 
 export interface AssociatedStation {
     station: Station;
-    manual?: { otherStationID: number; priority: number };
-    location?: { distance: number };
+    manual?: { otherStationID: number; priority: number }[];
+    location?: { stationID: number; distance: number }[];
     project?: { id: number };
     hidden: boolean;
 }
@@ -1082,11 +1081,11 @@ class FKApi {
         });
     }
 
-    getAllSensorsMemoized(): () => Promise<SensorsResponse> {
+    public getAllSensorsMemoized(): () => Promise<SensorsResponse> {
         return this.allSensorsMemoized;
     }
 
-    getAllSensors(): Promise<SensorsResponse> {
+    private getAllSensors(): Promise<SensorsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

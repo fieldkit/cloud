@@ -183,23 +183,21 @@ export default Vue.extend({
         },
         async selectedId(newValue: number, oldValue: number): Promise<void> {
             console.log("viz: selected-changed-associated", newValue);
-            if (this.workspace) {
-                await this.includeAssociated(this.workspace);
-            }
         },
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
             await this.$services.api
-                .getAllSensors()
-                .then(async (sensorKeys) => {
+                .getAllSensorsMemoized()() // TODO No need to make this call.
+                .then(async () => {
                     // Check for a bookmark that is just to a station with no groups.
                     if (this.bookmark.s.length > 0 && this.bookmark.g.length == 0) {
                         console.log("viz: before-show-station", this.bookmark);
                         return this.showStation(this.bookmark.s[0]);
                     }
+
                     console.log("viz: before-create-workspace", this.bookmark);
-                    const ws = await this.createWorkspaceIfNecessary();
+                    await this.createWorkspaceIfNecessary();
                 })
                 .catch(async (e) => {
                     if (e.name === "ForbiddenError") {
@@ -209,43 +207,6 @@ export default Vue.extend({
         }
     },
     methods: {
-        async includeAssociated(ws: Workspace): Promise<Workspace> {
-            try {
-                const targetId = ws.selectedStationId;
-                console.log(`viz: include-associated(${targetId})`, { allStationIds: ws.allStationIds });
-
-                const associated = await this.$services.api.getAssociatedStations(targetId);
-                const ids = associated.stations.map((s: AssociatedStation) => s.station.id);
-                console.log(`viz: include-associated(${targetId})`, { associated });
-                console.log(
-                    `viz: include-associated(${targetId})`,
-                    associated.stations
-                        .filter((row) => row.manual)
-                        .map((row) => {
-                            return { station: row.station, manual: row.manual };
-                        }),
-                    associated.stations
-                        .filter((row) => row.location)
-                        .map((row) => {
-                            return { station: row.station, location: row.location };
-                        })
-                );
-
-                await ws.addStationIds(ids);
-                await ws.addFullStations(associated.stations.map((s) => s.station));
-                await ws.addAssociatedStations(associated.stations);
-            } catch (e) {
-                if (ForbiddenError.isInstance(e)) {
-                    await this.$router.push({
-                        name: "login",
-                        params: { errorMessage: String(this.$t("login.privateStation")) },
-                        query: { after: this.$route.path },
-                    });
-                }
-            }
-
-            return ws;
-        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -287,14 +248,14 @@ export default Vue.extend({
                 return this.workspace;
             }
 
-            const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
+            console.log("viz: workspace-creating");
+
+            const allSensors: SensorsResponse = await this.$services.api.getAllSensorsMemoized()();
             const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
 
-            // console.log(`viz: workspace-created`);
+            this.workspace = await ws.initialize();
 
-            await this.includeAssociated(ws);
-
-            this.workspace = ws;
+            console.log(`viz: workspace-created`);
 
             return ws;
         },
