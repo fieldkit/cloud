@@ -1,5 +1,5 @@
 import { DisplayStation } from "@/store";
-import _ from "lodash";
+import moment from "moment";
 
 export interface PartnerCustomization {
     title: string; // TODO i18n
@@ -89,7 +89,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 return getNeighborhood(station) || station.locationName;
             },
             getStationDeploymentDate: (station: DisplayStation) => {
-                return getDeploymentDate(station) || station.deployedAt;
+                return getDeploymentDate(station) || (station.deployedAt ? moment(station.deployedAt).format("M/D/YYYY") : "N/A");
             },
             viz: {
                 groupStation: (station: DisplayStation): string | null => {
@@ -136,7 +136,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             return station.locationName;
         },
         getStationDeploymentDate: (station: DisplayStation) => {
-            return station.deployedAt;
+            return station.deployedAt ? moment(station.deployedAt).format("M/D/YYYY") : "N/A";
         },
         viz: {
             groupStation: (station: DisplayStation): string | null => {
