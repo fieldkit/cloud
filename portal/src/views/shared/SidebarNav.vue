@@ -73,7 +73,7 @@ import {
   StationOrSensor,
   interpolatePartner,
   isCustomisationEnabled,
-  getPartnerCustomizationWithDefault
+  getPartnerCustomizationWithDefault, PartnerCustomization
 } from "./partners";
 
 export default Vue.extend({
@@ -179,7 +179,7 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
-        partnerCustomization() {
+        partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
         },
     },
