@@ -31,6 +31,7 @@ export interface PartnerCustomization {
         groupStation: (station: unknown) => string | null;
     };
     routeAfterLogin: string;
+    sidebarNarrow: boolean;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -96,6 +97,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 },
             },
             routeAfterLogin: "root",
+            sidebarNarrow: true,
         };
     }
     return null;
@@ -142,6 +144,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             },
         },
         routeAfterLogin: "projects",
+        sidebarNarrow: false,
     };
 }
 

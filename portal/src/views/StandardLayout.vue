@@ -32,6 +32,7 @@ import SidebarNav from "./shared/SidebarNav.vue";
 import Zoho from "./shared/Zoho.vue";
 import { mapState, mapGetters } from "vuex";
 import { GlobalState, DisplayStation } from "@/store";
+import {getPartnerCustomizationWithDefault} from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StandardLayout",
@@ -67,12 +68,12 @@ export default Vue.extend({
         },
         sidebarNarrow: {
             type: Boolean,
-            default: false
+            default: getPartnerCustomizationWithDefault().sidebarNarrow,
         },
         clipStations: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy", mapped: "mapped" }),
