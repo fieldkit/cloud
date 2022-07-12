@@ -115,10 +115,6 @@ export default Vue.extend({
         });
 
         resizeObserver.observe(document.querySelector("body"));
-
-        if (this.narrow) {
-            this.toggleSidebar();
-        }
     },
     data(): {
         sidebar: {
@@ -129,7 +125,7 @@ export default Vue.extend({
     } {
         return {
             sidebar: {
-                narrow: window.screen.availWidth <= 1040,
+                narrow: window.screen.availWidth <= 1040 || this.narrow,
             },
             narrowSidebarLogoIconClass: interpolatePartner("icon-logo-narrow-"),
             narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
@@ -185,7 +181,7 @@ export default Vue.extend({
         },
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
-        }
+        },
     },
 });
 </script>
