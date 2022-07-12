@@ -70,10 +70,11 @@
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
 import {
-  StationOrSensor,
-  interpolatePartner,
-  isCustomisationEnabled,
-  getPartnerCustomizationWithDefault, PartnerCustomization
+    StationOrSensor,
+    interpolatePartner,
+    isCustomisationEnabled,
+    getPartnerCustomizationWithDefault,
+    PartnerCustomization,
 } from "./partners";
 
 export default Vue.extend({
@@ -101,7 +102,7 @@ export default Vue.extend({
         clipStations: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     mounted(): void {
         const desktopBreakpoint = 1040;
@@ -146,13 +147,12 @@ export default Vue.extend({
     },
     computed: {
         clippedStations() {
-            if(this.clipStations){
+            if (this.clipStations) {
                 return this.stations.slice(0, 10);
-            }
-            else {
+            } else {
                 return this.stations;
             }
-        }
+        },
     },
     methods: {
         showStation(station: unknown): void {
