@@ -194,7 +194,7 @@ export default Vue.extend({
             if (this.station && this.$options.filters?.prettyDate) {
                 const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
                 if (deploymentDate) {
-                    return this.$tc("station.deployed") + " " + this.$options.filters.prettyDate(deploymentDate);
+                    return this.$tc("station.deployed") + " " + deploymentDate;
                 }
                 return this.$tc("station.readyToDeploy");
             }
