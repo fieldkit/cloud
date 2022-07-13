@@ -1086,9 +1086,12 @@ export class Workspace implements VizInfoFactory {
             return 0;
         });
 
-        const selected = this.selectedAssociated;
-        if (depth == 0 && selected.manual && selected.manual.length > 0) {
-            const otherStations = _.flatten(selected.manual.map((ma) => this.associated.filter((a) => a.station.id == ma.otherStationID)));
+        const associated = this.associated.find((a) => a.station.id == stationId);
+        if (depth == 0 && associated && associated.manual && associated.manual.length > 0) {
+            console.log("sensor-options", stationId, associated);
+            const otherStations = _.flatten(
+                associated.manual.map((ma) => this.associated.filter((a) => a.station.id == ma.otherStationID))
+            );
             const associatedSensorOptions = _(
                 otherStations.map((associated) => {
                     const moduleOptions = this.sensorOptions(associated.station.id, false, depth + 1);
@@ -1100,7 +1103,7 @@ export class Workspace implements VizInfoFactory {
                         // station id that owns the sensor here but that would
                         // lose the context. Now we replace the station id when
                         // querying for data.
-                        _.extend(option, { stationId: selected.station.id })
+                        _.extend(option, { stationId: stationId })
                     );
                 })
             )
