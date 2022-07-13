@@ -7,7 +7,13 @@
                 :subtitle="headerSubtitle"
                 :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
                 :backRouteParams="{ id: projectId }"
-            />
+            >
+                <template v-slot:default>
+                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank">
+                        {{ $t(link.text) }} >
+                    </a>
+                </template>
+            </DoubleHeader>
 
             <section class="section-station">
                 <div class="container-box">
@@ -607,5 +613,16 @@ section {
 
 .message-container {
     margin: 0 auto;
+}
+
+.double-header {
+    .actions {
+        a {
+            font-size: 12px;
+            letter-spacing: 0.07px;
+            color: #000;
+            font-family: $font-family-medium;
+        }
+    }
 }
 </style>
