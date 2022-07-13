@@ -135,6 +135,7 @@ import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
+import { deserializeBookmark } from "../viz/viz";
 
 export default Vue.extend({
     name: "Comments",
@@ -301,7 +302,7 @@ export default Vue.extend({
         },
         viewDataClick(post: Comment) {
             if (post.bookmark) {
-                this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+                this.$emit("viewDataClicked", deserializeBookmark(post.bookmark));
                 window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }
         },
