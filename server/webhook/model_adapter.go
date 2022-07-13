@@ -193,20 +193,20 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		if pm.ReceivedAt != nil {
-			for index, sensorSchema := range moduleSchema.Sensors {
-				// Transient sensors aren't saved.
-				if !sensorSchema.Transient {
-					// Add or create the sensor..
-					sensor := &data.ModuleSensor{
-						ConfigurationID: configuration.ID,
-						ModuleID:        module.ID,
-						Index:           uint32(index),
-						Name:            sensorSchema.Key,
-						ReadingValue:    nil,
-						ReadingTime:     nil,
-					}
+		for index, sensorSchema := range moduleSchema.Sensors {
+			// Transient sensors aren't saved.
+			if !sensorSchema.Transient {
+				// Add or create the sensor..
+				sensor := &data.ModuleSensor{
+					ConfigurationID: configuration.ID,
+					ModuleID:        module.ID,
+					Index:           uint32(index),
+					Name:            sensorSchema.Key,
+					ReadingValue:    nil,
+					ReadingTime:     nil,
+				}
 
+				if pm.ReceivedAt != nil {
 					for _, pr := range pm.Data {
 						if pr.Key == sensorSchema.Key {
 							sensor.ReadingValue = &pr.Value
@@ -214,17 +214,17 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 							break
 						}
 					}
-
-					if sensorSchema.UnitOfMeasure != nil {
-						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-					}
-
-					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-						return nil, err
-					}
-
-					sensors = append(sensors, sensor)
 				}
+
+				if sensorSchema.UnitOfMeasure != nil {
+					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+				}
+
+				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+					return nil, err
+				}
+
+				sensors = append(sensors, sensor)
 			}
 		}
 
