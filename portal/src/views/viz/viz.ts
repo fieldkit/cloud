@@ -1118,7 +1118,19 @@ export class Workspace implements VizInfoFactory {
     }
 
     public makeSeries(stationId: number, sensorAndModule: SensorSpec): DataSetSeries {
-        return new DataSetSeries([stationId, sensorAndModule]);
+        // We're called in response to UI changes to return an appropriate
+        // series to chart, so we can be passed combinations that aren't valid,
+        // changing a station from one to another for example.
+        const station = this.stations[stationId];
+        if (!station) throw new Error(`viz: No station with id: ${stationId}`);
+        const sensors = station.sensors;
+        if (sensors.length == 0) throw new Error(`viz: No sensors on station with id: ${stationId}`);
+        const moduleIds = sensors.map((s) => s.moduleId);
+        if (moduleIds.includes(sensorAndModule[0])) {
+            return new DataSetSeries([stationId, sensorAndModule]);
+        }
+        const fallbackSensorAndModule: SensorSpec = [sensors[0].moduleId, sensors[0].sensorId];
+        return new DataSetSeries([stationId, fallbackSensorAndModule]);
     }
 
     public remove(viz: Viz): Workspace {
