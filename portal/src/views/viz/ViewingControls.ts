@@ -89,7 +89,7 @@ export const SensorSelectionRow = Vue.extend({
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
-                const newSeries = this.workspace.makeSeries(Number(node.id), this.ds.sensorAndModule);
+                const newSeries = this.workspace.makeSeries(Number(node.id), null);
                 console.log("raising viz-change-series", newSeries);
                 this.$emit("viz-change-series", newSeries);
             });

@@ -1117,7 +1117,13 @@ export class Workspace implements VizInfoFactory {
         return sorted;
     }
 
-    public makeSeries(stationId: number, sensorAndModule: SensorSpec): DataSetSeries {
+    public makeSeries(stationId: number, sensorAndModule: SensorSpec | null): DataSetSeries {
+        // If we're given a sensor and module then use that one, otherwise we're
+        // being told to pick one for the station.
+        if (sensorAndModule) {
+            return new DataSetSeries([stationId, sensorAndModule]);
+        }
+
         // We're called in response to UI changes to return an appropriate
         // series to chart, so we can be passed combinations that aren't valid,
         // changing a station from one to another for example.
@@ -1125,10 +1131,6 @@ export class Workspace implements VizInfoFactory {
         if (!station) throw new Error(`viz: No station with id: ${stationId}`);
         const sensors = station.sensors;
         if (sensors.length == 0) throw new Error(`viz: No sensors on station with id: ${stationId}`);
-        const moduleIds = sensors.map((s) => s.moduleId);
-        if (moduleIds.includes(sensorAndModule[0])) {
-            return new DataSetSeries([stationId, sensorAndModule]);
-        }
         const fallbackSensorAndModule: SensorSpec = [sensors[0].moduleId, sensors[0].sensorId];
         return new DataSetSeries([stationId, fallbackSensorAndModule]);
     }
