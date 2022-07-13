@@ -147,7 +147,7 @@ import NotesForm from "@/views/notes/NotesForm.vue";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
-import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationView",
@@ -252,10 +252,10 @@ export default Vue.extend({
         getModuleName(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
         },
-        partnerCustomization() {
+        partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
         },
-        isCustomizationEnabled() {
+        isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
     },
