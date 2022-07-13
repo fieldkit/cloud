@@ -1,3 +1,4 @@
+"
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
@@ -6,6 +7,11 @@
 
         <div class="explore-view">
             <div class="explore-header">
+                <div class="explore-links">
+                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank">
+                        {{ $t(link.text) }} >
+                    </a>
+                </div>
                 <DoubleHeader :backTitle="$t(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
@@ -81,7 +87,7 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization, interpolatePartner } from "../shared/partners";
+import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
@@ -342,6 +348,9 @@ export default Vue.extend({
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);
         },
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
+        },
     },
 });
 </script>
@@ -405,6 +414,7 @@ export default Vue.extend({
 }
 .explore-header {
     margin-bottom: 1em;
+    position: relative;
 }
 .explore-header .button {
     margin-left: 20px;
@@ -414,6 +424,17 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+}
+
+.explore-links {
+    @include position(absolute, 0 0 null null);
+
+    a {
+        font-size: 12px;
+        letter-spacing: 0.07px;
+        color: #000;
+        font-family: $font-family-medium;
+    }
 }
 
 .workspace-container {
@@ -785,3 +806,4 @@ export default Vue.extend({
     justify-content: center;
 }
 </style>
+"
