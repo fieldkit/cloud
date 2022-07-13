@@ -488,7 +488,7 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 	    WITH distances AS (
 			SELECT
 				s.id AS station_id,
-				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
+				ST_DistanceSpheroid(s.location, ST_SetSRID(ST_GeomFromText($2), 4326), 'SPHEROID["WGS 84", 6378137, 298.257223563]') AS distance
 			FROM fieldkit.project_station AS ps
 			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
 			JOIN fieldkit.station_model AS m ON (s.model_id = m.id)

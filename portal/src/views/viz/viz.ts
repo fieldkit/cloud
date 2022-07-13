@@ -933,7 +933,10 @@ export class Workspace implements VizInfoFactory {
             return [];
         }
 
-        const nearby = selected.location.map((l) => this.stationsFull.find((s) => s.id == l.stationID));
+        const OneMileInMeters = (5280 * 12 * 2.54) / 100;
+        const nearby = selected.location
+            .filter((l) => l.distance < OneMileInMeters)
+            .map((l) => this.stationsFull.find((s) => s.id == l.stationID));
         console.log("viz: nearby", nearby);
 
         const options = nearby.map((station: Station) => {
