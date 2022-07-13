@@ -28,7 +28,7 @@
                             :sensorDataQuerier="sensorDataQuerier"
                             v-slot="{ sensorDataQuerier }"
                         >
-                            <TinyChart :station-id="station.id" :querier="sensorDataQuerier" />
+                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
                         </StationHoverSummary>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                             <h4>Current {{ keyTitle }}</h4>
                             <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                                <span>{{ (item.mapKeyLabel) ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
+                                <span>{{ item.mapKeyLabel ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
                             </div>
                             <div class="legend-item" v-if="hasStationsWithoutData">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>

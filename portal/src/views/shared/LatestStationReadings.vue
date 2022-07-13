@@ -20,7 +20,16 @@ import Config from "@/secrets";
 
 import Vue, { PropType } from "vue";
 
-import { FKApi, TailSensorDataResponse, StationInfoResponse, SensorInfoResponse, SensorsResponse, Module } from "@/api";
+import {
+    FKApi,
+    TailSensorDataResponse,
+    VizSensor,
+    StationInfoResponse,
+    ModuleSensorMeta,
+    SensorInfoResponse,
+    SensorsResponse,
+    Module,
+} from "@/api";
 
 export enum TrendType {
     Downward,
@@ -45,6 +54,49 @@ export interface StationQuickSensors {
     station: StationInfoResponse[];
 }
 
+export class SensorMeta {
+    constructor(private readonly meta: SensorsResponse) {}
+
+    public get sensors() {
+        return this.meta.sensors;
+    }
+
+    public get modules() {
+        return this.meta.modules;
+    }
+
+    public findSensorByKey(sensorKey: string): ModuleSensorMeta {
+        const sensors = _(this.meta.modules)
+            .map((m) => m.sensors)
+            .flatten()
+            .groupBy((s) => s.fullKey)
+            .value();
+
+        const byKey = sensors[sensorKey];
+        if (byKey.length == 0) {
+            throw new Error(`viz: Missing sensor meta: ${sensorKey}`);
+        }
+
+        return byKey[0];
+    }
+
+    public findSensor(vizSensor: VizSensor): ModuleSensorMeta {
+        const sensorId = vizSensor[1][1];
+
+        const sensorKeysById = _(this.meta.sensors)
+            .groupBy((r) => r.id)
+            .value();
+
+        if (!sensorKeysById[String(sensorId)]) {
+            console.log(`viz: sensors: ${JSON.stringify(_.keys(sensorKeysById))}`);
+            throw new Error(`viz: Missing sensor: ${sensorId}`);
+        }
+
+        const sensorKey = sensorKeysById[String(sensorId)][0].key;
+        return this.findSensorByKey(sensorKey);
+    }
+}
+
 export class SensorDataQuerier {
     private data: Promise<TailSensorDataResponse> | null = null;
     private quickSensors: Promise<SensorInfoResponse> | null = null;
@@ -60,9 +112,13 @@ export class SensorDataQuerier {
         return window.localStorage["fk:backend"] || null;
     }
 
-    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorsResponse]> {
+    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
+        const sensorMeta = this.api
+            .getAllSensorsMemoized()()
+            .then((meta) => new SensorMeta(meta));
+
         if (this.stationIds.length == 0) {
-            return await Promise.all([Promise.resolve({ data: [] }), { station: [] }, this.api.getAllSensorsMemoized()]);
+            return await Promise.all([Promise.resolve({ data: [] }), { station: [] }, sensorMeta]);
         }
 
         if (this.data == null || this.quickSensors == null) {
@@ -91,7 +147,7 @@ export class SensorDataQuerier {
             };
         });
 
-        return await Promise.all([dataQuery, quickSensorsQuery, this.api.getAllSensorsMemoized()]);
+        return await Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
     }
 }
 

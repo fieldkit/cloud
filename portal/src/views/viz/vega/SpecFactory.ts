@@ -1,5 +1,15 @@
 import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
-import { SeriesData, DataSetSeries, TimeRange, VizInfo, QueriedData, SensorDataResponse, VizSensor } from "../common";
+import {
+    SeriesData,
+    DataSetSeries,
+    TimeRange,
+    VizInfo,
+    QueriedData,
+    SensorDataResponse,
+    VizSensor,
+    SensorsResponse,
+    ModuleSensorMeta,
+} from "../common";
 import _ from "lodash";
 
 export {
@@ -12,6 +22,8 @@ export {
     VizInfo,
     QueriedData,
     SensorDataResponse,
+    SensorsResponse,
+    ModuleSensorMeta,
     VizSensor,
 };
 

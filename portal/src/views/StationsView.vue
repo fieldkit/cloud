@@ -10,7 +10,7 @@
                         :sensorDataQuerier="sensorDataQuerier"
                         v-slot="{ sensorDataQuerier, station }"
                     >
-                        <TinyChart :station-id="station.id" :querier="sensorDataQuerier" />
+                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
                     </StationHoverSummary>
                 </div>
             </div>

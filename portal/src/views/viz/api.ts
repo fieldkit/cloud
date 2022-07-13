@@ -82,7 +82,7 @@ export interface SensorDataResponse {
     data: DataRow[];
 }
 
-interface StationInfoResponse {
+export interface StationInfoResponse {
     stationId: number;
     stationName: string;
     stationLocation: [number, number];
