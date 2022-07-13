@@ -51,6 +51,11 @@ func ListAssociatedStationPath(id int32) string {
 	return fmt.Sprintf("/stations/%v/associated", id)
 }
 
+// ListProjectAssociatedStationPath returns the URL path to the station service list project associated HTTP endpoint.
+func ListProjectAssociatedStationPath(projectID int32) string {
+	return fmt.Sprintf("/projects/%v/associated", projectID)
+}
+
 // DownloadPhotoStationPath returns the URL path to the station service download photo HTTP endpoint.
 func DownloadPhotoStationPath(stationID int32) string {
 	return fmt.Sprintf("/stations/%v/photo", stationID)

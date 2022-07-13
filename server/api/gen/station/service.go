@@ -33,6 +33,8 @@ type Service interface {
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
 	// ListAssociated implements list associated.
 	ListAssociated(context.Context, *ListAssociatedPayload) (res *AssociatedStations, err error)
+	// ListProjectAssociated implements list project associated.
+	ListProjectAssociated(context.Context, *ListProjectAssociatedPayload) (res *AssociatedStations, err error)
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// ListAll implements list all.
@@ -59,7 +61,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [13]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "download photo", "list all", "delete", "admin search", "progress"}
+var MethodNames = [14]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "list project associated", "download photo", "list all", "delete", "admin search", "progress"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -158,6 +160,13 @@ type ListAssociatedPayload struct {
 // method.
 type AssociatedStations struct {
 	Stations AssociatedStationCollection
+}
+
+// ListProjectAssociatedPayload is the payload type of the station service list
+// project associated method.
+type ListProjectAssociatedPayload struct {
+	Auth      *string
+	ProjectID int32
 }
 
 // DownloadPhotoPayload is the payload type of the station service download
@@ -335,9 +344,9 @@ type AssociatedStationCollection []*AssociatedStation
 
 type AssociatedStation struct {
 	Station  *StationFull
-	Project  *AssociatedViaProject
-	Location *AssociatedViaLocation
-	Manual   *AssociatedViaManual
+	Project  []*AssociatedViaProject
+	Location []*AssociatedViaLocation
+	Manual   []*AssociatedViaManual
 	Hidden   bool
 }
 
@@ -346,7 +355,8 @@ type AssociatedViaProject struct {
 }
 
 type AssociatedViaLocation struct {
-	Distance float32
+	StationID int32
+	Distance  float32
 }
 
 type AssociatedViaManual struct {
@@ -749,13 +759,22 @@ func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedS
 		res.Hidden = *vres.Hidden
 	}
 	if vres.Project != nil {
-		res.Project = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(vres.Project)
+		res.Project = make([]*AssociatedViaProject, len(vres.Project))
+		for i, val := range vres.Project {
+			res.Project[i] = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(val)
+		}
 	}
 	if vres.Location != nil {
-		res.Location = transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(vres.Location)
+		res.Location = make([]*AssociatedViaLocation, len(vres.Location))
+		for i, val := range vres.Location {
+			res.Location[i] = transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(val)
+		}
 	}
 	if vres.Manual != nil {
-		res.Manual = transformStationviewsAssociatedViaManualViewToAssociatedViaManual(vres.Manual)
+		res.Manual = make([]*AssociatedViaManual, len(vres.Manual))
+		for i, val := range vres.Manual {
+			res.Manual[i] = transformStationviewsAssociatedViaManualViewToAssociatedViaManual(val)
+		}
 	}
 	if vres.Station != nil {
 		res.Station = newStationFull(vres.Station)
@@ -770,13 +789,22 @@ func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedSt
 		Hidden: &res.Hidden,
 	}
 	if res.Project != nil {
-		vres.Project = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(res.Project)
+		vres.Project = make([]*stationviews.AssociatedViaProjectView, len(res.Project))
+		for i, val := range res.Project {
+			vres.Project[i] = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(val)
+		}
 	}
 	if res.Location != nil {
-		vres.Location = transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(res.Location)
+		vres.Location = make([]*stationviews.AssociatedViaLocationView, len(res.Location))
+		for i, val := range res.Location {
+			vres.Location[i] = transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(val)
+		}
 	}
 	if res.Manual != nil {
-		vres.Manual = transformAssociatedViaManualToStationviewsAssociatedViaManualView(res.Manual)
+		vres.Manual = make([]*stationviews.AssociatedViaManualView, len(res.Manual))
+		for i, val := range res.Manual {
+			vres.Manual[i] = transformAssociatedViaManualToStationviewsAssociatedViaManualView(val)
+		}
 	}
 	if res.Station != nil {
 		vres.Station = newStationFullView(res.Station)
@@ -1497,7 +1525,8 @@ func transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(v *st
 		return nil
 	}
 	res := &AssociatedViaLocation{
-		Distance: *v.Distance,
+		StationID: *v.StationID,
+		Distance:  *v.Distance,
 	}
 
 	return res
@@ -1540,7 +1569,8 @@ func transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(v *As
 		return nil
 	}
 	res := &stationviews.AssociatedViaLocationView{
-		Distance: &v.Distance,
+		StationID: &v.StationID,
+		Distance:  &v.Distance,
 	}
 
 	return res

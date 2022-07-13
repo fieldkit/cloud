@@ -1,5 +1,5 @@
 import { DisplayStation } from "@/store";
-import _ from "lodash";
+import moment from "moment";
 
 export interface PartnerCustomization {
     title: string; // TODO i18n
@@ -26,9 +26,12 @@ export interface PartnerCustomization {
         url: string;
     }[];
     stationLocationName: (station: DisplayStation) => string;
+    getStationDeploymentDate: (station: DisplayStation) => string | Date | null;
     viz: {
         groupStation: (station: unknown) => string | null;
     };
+    routeAfterLogin: string;
+    sidebarNarrow: boolean;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -45,6 +48,10 @@ function getNeighborhood(station: DisplayStation): string | null {
 
 function getBorough(station: DisplayStation): string | null {
     return getAttribute(station, "Borough");
+}
+
+function getDeploymentDate(station: DisplayStation): string | null {
+    return getAttribute(station, "Deployment Date");
 }
 
 export function getPartnerCustomization(): PartnerCustomization | null {
@@ -75,17 +82,22 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             links: [
                 {
                     text: "linkToFloodnet",
-                    url: "https://www.floodnet.nyc/",
+                    url: "https://www.floodnet.nyc/methodology",
                 },
             ],
             stationLocationName: (station: DisplayStation) => {
                 return getNeighborhood(station) || station.locationName;
+            },
+            getStationDeploymentDate: (station: DisplayStation) => {
+                return getDeploymentDate(station) || (station.deployedAt ? moment(station.deployedAt).format("M/D/YYYY") : "N/A");
             },
             viz: {
                 groupStation: (station: DisplayStation): string | null => {
                     return getBorough(station) || null;
                 },
             },
+            routeAfterLogin: "root",
+            sidebarNarrow: true,
         };
     }
     return null;
@@ -123,11 +135,16 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         stationLocationName: (station: DisplayStation) => {
             return station.locationName;
         },
+        getStationDeploymentDate: (station: DisplayStation) => {
+            return station.deployedAt ? moment(station.deployedAt).format("M/D/YYYY") : "N/A";
+        },
         viz: {
             groupStation: (station: DisplayStation): string | null => {
                 return null;
             },
         },
+        routeAfterLogin: "projects",
+        sidebarNarrow: false,
     };
 }
 

@@ -138,6 +138,12 @@ type ListAssociatedResponseBody struct {
 	Stations AssociatedStationCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
+// ListProjectAssociatedResponseBody is the type of the "station" service "list
+// project associated" endpoint HTTP response body.
+type ListProjectAssociatedResponseBody struct {
+	Stations AssociatedStationCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
 // DownloadPhotoResponseBody is the type of the "station" service "download
 // photo" endpoint HTTP response body.
 type DownloadPhotoResponseBody struct {
@@ -761,6 +767,82 @@ type ListAssociatedBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// ListProjectAssociatedUnauthorizedResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "unauthorized" error.
+type ListProjectAssociatedUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedForbiddenResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "forbidden" error.
+type ListProjectAssociatedForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedNotFoundResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "not-found" error.
+type ListProjectAssociatedNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedBadRequestResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "bad-request" error.
+type ListProjectAssociatedBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // DownloadPhotoUnauthorizedResponseBody is the type of the "station" service
 // "download photo" endpoint HTTP response body for the "unauthorized" error.
 type DownloadPhotoUnauthorizedResponseBody struct {
@@ -1296,11 +1378,11 @@ type AssociatedStationCollectionResponseBody []*AssociatedStationResponseBody
 // AssociatedStationResponseBody is used to define fields on response body
 // types.
 type AssociatedStationResponseBody struct {
-	Station  *StationFullResponseBody           `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
-	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
-	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
-	Hidden   *bool                              `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Station  *StationFullResponseBody             `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
+	Project  []*AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location []*AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   []*AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   *bool                                `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body
@@ -1312,7 +1394,8 @@ type AssociatedViaProjectResponseBody struct {
 // AssociatedViaLocationResponseBody is used to define fields on response body
 // types.
 type AssociatedViaLocationResponseBody struct {
-	Distance *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
+	StationID *int32   `form:"stationID,omitempty" json:"stationID,omitempty" xml:"stationID,omitempty"`
+	Distance  *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
 }
 
 // AssociatedViaManualResponseBody is used to define fields on response body
@@ -2002,6 +2085,78 @@ func NewListAssociatedNotFound(body *ListAssociatedNotFoundResponseBody) *goa.Se
 // NewListAssociatedBadRequest builds a station service list associated
 // endpoint bad-request error.
 func NewListAssociatedBadRequest(body *ListAssociatedBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedAssociatedStationsOK builds a "station" service
+// "list project associated" endpoint result from a HTTP "OK" response.
+func NewListProjectAssociatedAssociatedStationsOK(body *ListProjectAssociatedResponseBody) *stationviews.AssociatedStationsView {
+	v := &stationviews.AssociatedStationsView{}
+	v.Stations = make([]*stationviews.AssociatedStationView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(val)
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedUnauthorized builds a station service list project
+// associated endpoint unauthorized error.
+func NewListProjectAssociatedUnauthorized(body *ListProjectAssociatedUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedForbidden builds a station service list project
+// associated endpoint forbidden error.
+func NewListProjectAssociatedForbidden(body *ListProjectAssociatedForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedNotFound builds a station service list project
+// associated endpoint not-found error.
+func NewListProjectAssociatedNotFound(body *ListProjectAssociatedNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedBadRequest builds a station service list project
+// associated endpoint bad-request error.
+func NewListProjectAssociatedBadRequest(body *ListProjectAssociatedBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3157,6 +3312,102 @@ func ValidateListAssociatedBadRequestResponseBody(body *ListAssociatedBadRequest
 	return
 }
 
+// ValidateListProjectAssociatedUnauthorizedResponseBody runs the validations
+// defined on list project associated_unauthorized_response_body
+func ValidateListProjectAssociatedUnauthorizedResponseBody(body *ListProjectAssociatedUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedForbiddenResponseBody runs the validations
+// defined on list project associated_forbidden_response_body
+func ValidateListProjectAssociatedForbiddenResponseBody(body *ListProjectAssociatedForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedNotFoundResponseBody runs the validations
+// defined on list project associated_not-found_response_body
+func ValidateListProjectAssociatedNotFoundResponseBody(body *ListProjectAssociatedNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedBadRequestResponseBody runs the validations
+// defined on list project associated_bad-request_response_body
+func ValidateListProjectAssociatedBadRequestResponseBody(body *ListProjectAssociatedBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateDownloadPhotoUnauthorizedResponseBody runs the validations defined
 // on download photo_unauthorized_response_body
 func ValidateDownloadPhotoUnauthorizedResponseBody(body *DownloadPhotoUnauthorizedResponseBody) (err error) {
@@ -4069,19 +4320,25 @@ func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) 
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if body.Project != nil {
-		if err2 := ValidateAssociatedViaProjectResponseBody(body.Project); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range body.Project {
+		if e != nil {
+			if err2 := ValidateAssociatedViaProjectResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
-	if body.Location != nil {
-		if err2 := ValidateAssociatedViaLocationResponseBody(body.Location); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range body.Location {
+		if e != nil {
+			if err2 := ValidateAssociatedViaLocationResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
-	if body.Manual != nil {
-		if err2 := ValidateAssociatedViaManualResponseBody(body.Manual); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range body.Manual {
+		if e != nil {
+			if err2 := ValidateAssociatedViaManualResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -4099,6 +4356,9 @@ func ValidateAssociatedViaProjectResponseBody(body *AssociatedViaProjectResponse
 // ValidateAssociatedViaLocationResponseBody runs the validations defined on
 // AssociatedViaLocationResponseBody
 func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationResponseBody) (err error) {
+	if body.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("stationID", "body"))
+	}
 	if body.Distance == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "body"))
 	}

@@ -105,7 +105,8 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, conn *pgx.Conn,
 
 	pgRows, err := conn.Query(ctx, `
 		SELECT bucket_time, station_id, module_id, sensor_id, bucket_samples, data_start, data_end, avg_value, min_value, max_value, last_value FROM fieldkit.sensor_data_365d
-		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3) AND bucket_time >= $4 AND bucket_time < $5
+		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3)
+		AND (bucket_time, bucket_time + interval '1 year') OVERLAPS ($4, $5)
 		`, qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End)
 	if err != nil {
 		return nil, err
@@ -131,6 +132,11 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn
 
 	dataStart := MaxTime
 	dataEnd := MinTime
+
+	if len(ranges) == 0 {
+		log.Infow("tsdb:empty")
+		return "", nil, "", nil
+	}
 
 	for _, row := range ranges {
 		log.Infow("tsdb:range", "row", row, "verbose", true)
@@ -195,6 +201,23 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn
 	return sql, args, aggregateSpecifier, nil
 }
 
+func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
+	queriedData := &QueriedData{
+		Summaries: make(map[string]*backend.AggregateSummary),
+		Aggregate: AggregateInfo{
+			Name:     "",
+			Interval: 0,
+			Complete: qp.Complete,
+			Start:    qp.Start,
+			End:      qp.End,
+		},
+		Data:  make([]*backend.DataRow, 0),
+		Outer: make([]*backend.DataRow, 0),
+	}
+
+	return queriedData, nil
+}
+
 func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	log := Logger(ctx).Sugar()
 
@@ -202,12 +225,12 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return nil, fmt.Errorf("multiple stations unsupported")
 	}
 
-	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
-
 	ids, err := tsdb.queryIDs(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
 
 	conn, err := pgx.Connect(ctx, tsdb.config.Url)
 	if err != nil {
@@ -216,13 +239,19 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 
 	defer conn.Close(ctx)
 
-	log.Infow("tsdb:query:data", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
-
+	// Determine the query we'll use to get the actual data we'll be returning.
 	dataQuerySql, dataQueryArgs, aggregateSpecifier, err := tsdb.getDataQuery(ctx, conn, qp, ids)
 	if err != nil {
 		return nil, err
 	}
 
+	// Special case for there just being no data so we bail early. May want to
+	// consider a custom error for this?
+	if dataQueryArgs == nil {
+		return tsdb.createEmpty(ctx, qp)
+	}
+
+	// Query for the data, transform into backend.* types and return.
 	pgRows, err := conn.Query(ctx, dataQuerySql, dataQueryArgs...)
 	if err != nil {
 		return nil, err
@@ -235,7 +264,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return nil, err
 	}
 
-	log.Infow("tsdb:query:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors, "rows", len(dataRows), "aggregate", aggregateSpecifier)
+	log.Infow("tsdb:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors, "rows", len(dataRows), "aggregate", aggregateSpecifier)
 
 	backendRows := make([]*backend.DataRow, 0)
 	for _, row := range dataRows {

@@ -488,7 +488,7 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 	    WITH distances AS (
 			SELECT
 				s.id AS station_id,
-				s.location <-> ST_SetSRID(ST_GeomFromText($2), 4326) AS distance
+				ST_DistanceSpheroid(s.location, ST_SetSRID(ST_GeomFromText($2), 4326), 'SPHEROID["WGS 84", 6378137, 298.257223563]') AS distance
 			FROM fieldkit.project_station AS ps
 			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
 			JOIN fieldkit.station_model AS m ON (s.model_id = m.id)
@@ -1479,23 +1479,33 @@ func (r *StationRepository) AssociateStations(ctx context.Context, stationID, as
 	return nil
 }
 
-type associatedStation struct {
+type AssociatedStation struct {
+	StationID           int32 `db:"station_id"`
 	AssociatedStationID int32 `db:"associated_station_id"`
 	Priority            int32 `db:"priority"`
 }
 
-func (r *StationRepository) QueryAssociatedStations(ctx context.Context, stationID int32) (map[int32]int32, error) {
-	flatStations := make([]*associatedStation, 0)
-	if err := r.db.SelectContext(ctx, &flatStations, `
-		SELECT associated_station_id, priority FROM fieldkit.associated_station WHERE station_id = $1
-		`, stationID); err != nil {
+func (r *StationRepository) QueryAssociatedStations(ctx context.Context, stationIDs []int32) (map[int32][]*AssociatedStation, error) {
+	if query, args, err := sqlx.In(`
+		SELECT station_id, associated_station_id, priority FROM fieldkit.associated_station WHERE station_id IN (?)
+		`, stationIDs); err != nil {
 		return nil, err
-	}
+	} else {
+		flatStations := make([]*AssociatedStation, 0)
+		if err := r.db.SelectContext(ctx, &flatStations, r.db.Rebind(query), args...); err != nil {
+			return nil, err
+		}
 
-	byID := make(map[int32]int32)
-	for _, s := range flatStations {
-		byID[s.AssociatedStationID] = s.Priority
-	}
+		byID := make(map[int32][]*AssociatedStation)
 
-	return byID, nil
+		for _, id := range stationIDs {
+			byID[id] = make([]*AssociatedStation, 0)
+		}
+
+		for _, s := range flatStations {
+			byID[s.StationID] = append(byID[s.StationID], s)
+		}
+
+		return byID, nil
+	}
 }

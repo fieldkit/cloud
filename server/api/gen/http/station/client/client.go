@@ -46,6 +46,10 @@ type Client struct {
 	// associated endpoint.
 	ListAssociatedDoer goahttp.Doer
 
+	// ListProjectAssociated Doer is the HTTP client used to make requests to the
+	// list project associated endpoint.
+	ListProjectAssociatedDoer goahttp.Doer
+
 	// DownloadPhoto Doer is the HTTP client used to make requests to the download
 	// photo endpoint.
 	DownloadPhotoDoer goahttp.Doer
@@ -88,25 +92,26 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		AddDoer:             doer,
-		GetDoer:             doer,
-		TransferDoer:        doer,
-		DefaultPhotoDoer:    doer,
-		UpdateDoer:          doer,
-		ListMineDoer:        doer,
-		ListProjectDoer:     doer,
-		ListAssociatedDoer:  doer,
-		DownloadPhotoDoer:   doer,
-		ListAllDoer:         doer,
-		DeleteDoer:          doer,
-		AdminSearchDoer:     doer,
-		ProgressDoer:        doer,
-		CORSDoer:            doer,
-		RestoreResponseBody: restoreBody,
-		scheme:              scheme,
-		host:                host,
-		decoder:             dec,
-		encoder:             enc,
+		AddDoer:                   doer,
+		GetDoer:                   doer,
+		TransferDoer:              doer,
+		DefaultPhotoDoer:          doer,
+		UpdateDoer:                doer,
+		ListMineDoer:              doer,
+		ListProjectDoer:           doer,
+		ListAssociatedDoer:        doer,
+		ListProjectAssociatedDoer: doer,
+		DownloadPhotoDoer:         doer,
+		ListAllDoer:               doer,
+		DeleteDoer:                doer,
+		AdminSearchDoer:           doer,
+		ProgressDoer:              doer,
+		CORSDoer:                  doer,
+		RestoreResponseBody:       restoreBody,
+		scheme:                    scheme,
+		host:                      host,
+		decoder:                   dec,
+		encoder:                   enc,
 	}
 }
 
@@ -297,6 +302,30 @@ func (c *Client) ListAssociated() goa.Endpoint {
 		resp, err := c.ListAssociatedDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "list associated", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListProjectAssociated returns an endpoint that makes HTTP requests to the
+// station service list project associated server.
+func (c *Client) ListProjectAssociated() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListProjectAssociatedRequest(c.encoder)
+		decodeResponse = DecodeListProjectAssociatedResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListProjectAssociatedRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListProjectAssociatedDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "list project associated", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -70,7 +70,7 @@ export const SensorSelectionRow = Vue.extend({
                 return null;
             }
             const originalStationId = this.ds.vizSensor[0]; // TODO VizSensor
-            return this.workspace.findStationOverride(this.ds.vizSensor) || originalStationId;
+            return originalStationId;
         },
         selectedSensor(): string | null {
             if (this.disabled) {
@@ -89,7 +89,7 @@ export const SensorSelectionRow = Vue.extend({
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
-                const newSeries = this.workspace.makeSeries(Number(node.id), this.ds.sensorAndModule);
+                const newSeries = this.workspace.makeSeries(Number(node.id), null);
                 console.log("raising viz-change-series", newSeries);
                 this.$emit("viz-change-series", newSeries);
             });
@@ -148,7 +148,7 @@ export const SelectionControls = Vue.extend({
                 return [];
             }
             const originalStationId = vizSensor[0]; // TODO VizSensor
-            const stationId = this.workspace.findStationOverride(vizSensor) || originalStationId;
+            const stationId = originalStationId;
             const maybePartner = getPartnerCustomization();
             const flatten = maybePartner != null && maybePartner.projectId != null && this.workspace.projects[0] === maybePartner.projectId;
             const sensorOptions = this.workspace.sensorOptions(stationId, flatten);

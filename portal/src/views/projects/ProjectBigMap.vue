@@ -41,7 +41,7 @@
                             <h4>Current {{ keyTitle }}</h4>
                             <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                                <span>{{ item.label["enUS"] }}</span>
+                                <span>{{ (item.mapKeyLabel) ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
                             </div>
                             <div class="legend-item" v-if="hasStationsWithoutData">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
@@ -146,7 +146,7 @@ export default Vue.extend({
             return this.displayProject.project;
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.id].stations;
+            return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);
         },
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.id].mapped;
@@ -486,6 +486,10 @@ export default Vue.extend({
 
         .close-button {
             display: none;
+        }
+
+        .navigate-button {
+            right: 0;
         }
     }
 }

@@ -140,6 +140,19 @@ export class DataQueryParams {
     public get sensorAndModules(): SensorSpec[] {
         return this.sensorParams.sensorAndModules;
     }
+
+    public remapStationsFromModules(map: { [index: string]: number }): DataQueryParams {
+        return new DataQueryParams(
+            this.when,
+            this.sensors.map((vizSensor) => {
+                const vizSensorModule = vizSensor[1][0];
+                if (map[vizSensorModule]) {
+                    return [map[vizSensorModule], vizSensor[1]];
+                }
+                return vizSensor;
+            })
+        );
+    }
 }
 
 export interface MarginsLike {
@@ -178,7 +191,7 @@ export class VizInfo {
         public readonly viz: VizConfig[],
         public readonly ranges: SensorRange[],
         public readonly chartLabel: string,
-        public readonly axisLabel: string,
+        public readonly axisLabel: string
     ) {}
 
     public get constrainedRanges(): SensorRange[] {

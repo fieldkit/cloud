@@ -15,6 +15,7 @@ export interface SensorRange {
 export interface VizThresholdLevel {
     label: { [index: string]: string };
     keyLabel: { [index: string]: string };
+    mapKeyLabel: { [index: string]: string };
     value: number;
     color: string;
     hidden: boolean;
