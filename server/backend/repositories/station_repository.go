@@ -495,7 +495,7 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 			WHERE NOT m.only_visible_via_association AND ps.project_id = $1 AND s.location IS NOT NULL
 			ORDER BY distance
 		)
-		SELECT * FROM distances WHERE distance > 0 LIMIT 5
+		SELECT * FROM distances WHERE distance >= 0 LIMIT 5
 		`, projectID, location); err != nil {
 		return nil, err
 	}
