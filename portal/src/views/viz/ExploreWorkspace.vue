@@ -8,7 +8,7 @@
         <div class="explore-view">
             <div class="explore-header">
                 <div class="explore-links">
-                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank">
+                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
                         {{ $t(link.text) }} >
                     </a>
                 </div>
@@ -429,11 +429,17 @@ export default Vue.extend({
 .explore-links {
     @include position(absolute, 0 0 null null);
 
-    a {
+    .link {
+        color: $color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
-        color: #000;
-        font-family: $font-family-medium;
+        text-decoration: initial;
+        transform: translateY(-4px);
+        display: block;
+
+        body.floodnet & {
+            color: $color-dark;
+        }
     }
 }
 
