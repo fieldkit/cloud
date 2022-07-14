@@ -6,11 +6,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v4"
+
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
-
-	"github.com/jackc/pgx/v4"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 type TimeScaleDBWindow struct {
@@ -42,12 +43,8 @@ type LastTimeRow struct {
 	LastTime  time.Time `json:"last_time"`
 }
 
-type TimeScaleDBConfig struct {
-	Url string
-}
-
 type TimeScaleDBBackend struct {
-	config *TimeScaleDBConfig
+	config *storage.TimeScaleDBConfig
 	db     *sqlxcache.DB
 }
 
@@ -65,7 +62,7 @@ type DataRow struct {
 	LastValue     float64   `json:"last"`
 }
 
-func NewTimeScaleDBBackend(config *TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
+func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
 		config: config,
 		db:     db,

@@ -13,6 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/storage"
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
@@ -97,7 +98,7 @@ func webHookMessageReceived(ctx context.Context, j *que.Job, services *Backgroun
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher)
+	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 
@@ -131,17 +132,19 @@ type FileArchives struct {
 }
 
 type BackgroundServices struct {
-	database     *sqlxcache.DB
-	metrics      *logging.Metrics
-	fileArchives *FileArchives
-	que          *que.Client
+	database        *sqlxcache.DB
+	metrics         *logging.Metrics
+	fileArchives    *FileArchives
+	que             *que.Client
+	timeScaleConfig *storage.TimeScaleDBConfig
 }
 
-func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client) *BackgroundServices {
+func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client, timeScaleConfig *storage.TimeScaleDBConfig) *BackgroundServices {
 	return &BackgroundServices{
-		database:     database,
-		fileArchives: fileArchives,
-		metrics:      metrics,
-		que:          que,
+		database:        database,
+		fileArchives:    fileArchives,
+		metrics:         metrics,
+		que:             que,
+		timeScaleConfig: timeScaleConfig,
 	}
 }

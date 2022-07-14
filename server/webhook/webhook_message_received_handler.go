@@ -4,28 +4,57 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fieldkit/cloud/server/data"
+	"github.com/jackc/pgx/v4"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+
+	"github.com/fieldkit/cloud/server/data"
+
+	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 type WebHookMessageReceivedHandler struct {
-	db      *sqlxcache.DB
-	model   *ModelAdapter
-	jqCache *JqCache
-	batch   *MessageBatch
-	verbose bool
+	db       *sqlxcache.DB
+	model    *ModelAdapter
+	jqCache  *JqCache
+	batch    *MessageBatch
+	tsConfig *storage.TimeScaleDBConfig
+	verbose  bool
 }
 
-func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher) *WebHookMessageReceivedHandler {
+func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *WebHookMessageReceivedHandler {
 	return &WebHookMessageReceivedHandler{
-		db:      db,
-		model:   NewModelAdapter(db),
-		jqCache: &JqCache{},
-		batch:   &MessageBatch{},
+		db:       db,
+		model:    NewModelAdapter(db),
+		tsConfig: tsConfig,
+		jqCache:  &JqCache{},
+		batch:    &MessageBatch{},
 	}
+}
+
+func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMessageReceived) error {
+	mr := NewMessagesRepository(h.db)
+
+	if err := mr.QueryMessageForProcessing(ctx, h.batch, m.MessageID); err != nil {
+		return err
+	}
+
+	for _, row := range h.batch.Messages {
+		if ir, err := h.parseMessage(ctx, row); err != nil {
+			return err
+		} else {
+			if h.tsConfig != nil {
+				if err := h.saveMessage(ctx, ir); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *WebHookMessage) (*data.IncomingReading, error) {
@@ -53,10 +82,10 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 						sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
 
 						ir := &data.IncomingReading{
+							Time:      *parsed.ReceivedAt,
 							StationID: saved.Station.ID,
 							ModuleID:  saved.Module.ID,
 							SensorKey: sensorKey,
-							Time:      *parsed.ReceivedAt,
 							Value:     parsedSensor.Value,
 						}
 
@@ -71,24 +100,32 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 }
 
 func (h *WebHookMessageReceivedHandler) saveMessage(ctx context.Context, ir *data.IncomingReading) error {
-	return nil
-}
+	sr := repositories.NewSensorsRepository(h.db)
 
-func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMessageReceived) error {
-	mr := NewMessagesRepository(h.db)
-
-	if err := mr.QueryMessageForProcessing(ctx, h.batch, m.MessageID); err != nil {
+	sensors, err := sr.QueryAllSensors(ctx)
+	if err != nil {
 		return err
 	}
 
-	for _, row := range h.batch.Messages {
-		if ir, err := h.parseMessage(ctx, row); err != nil {
-			return err
-		} else {
-			if err := h.saveMessage(ctx, ir); err != nil {
-				return err
-			}
-		}
+	meta := sensors[ir.SensorKey]
+	if meta == nil {
+		return fmt.Errorf("unknown sensor: '%s'", ir.SensorKey)
+	}
+
+	pgConn, err := pgx.Connect(ctx, h.tsConfig.Url)
+	if err != nil {
+		return err
+	}
+
+	defer pgConn.Close(ctx)
+
+	// TODO location
+	_, err = pgConn.Exec(ctx, `
+		INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+		VALUES ($1, $2, $3, $4, $5)
+	`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)
+	if err != nil {
+		return err
 	}
 
 	return nil
