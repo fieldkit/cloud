@@ -60,7 +60,7 @@ func ingestionReceived(ctx context.Context, j *que.Job, services *BackgroundServ
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher)
+	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 
@@ -69,7 +69,7 @@ func refreshStation(ctx context.Context, j *que.Job, services *BackgroundService
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	handler := NewRefreshStationHandler(services.database)
+	handler := NewRefreshStationHandler(services.database, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 
@@ -88,7 +88,7 @@ func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher)
+	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 

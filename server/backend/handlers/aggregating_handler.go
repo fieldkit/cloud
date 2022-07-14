@@ -3,7 +3,9 @@ package handlers
 import (
 	"context"
 	"fmt"
-	_ "strings"
+	"time"
+
+	"github.com/jackc/pgx/v4"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
@@ -11,30 +13,36 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 type AggregatingHandler struct {
 	db                *sqlxcache.DB
 	metaFactory       *repositories.MetaFactory
 	stationRepository *repositories.StationRepository
+	tsConfig          *storage.TimeScaleDBConfig
 	provisionID       int64
 	metaID            int64
 	stations          map[int64]*Aggregator
 	seen              map[int32]*data.Station
+	stationIDs        map[int64]int32
 	stationConfig     *data.StationConfiguration
 	stationModules    map[uint32]*data.StationModule
 	aggregator        *Aggregator
+	sensors           map[string]*data.Sensor
 	tableSuffix       string
 	completely        bool
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string, completely bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:                db,
 		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
+		tsConfig:          tsConfig,
 		stations:          make(map[int64]*Aggregator),
 		seen:              make(map[int32]*data.Station),
+		stationIDs:        make(map[int64]int32),
 		stationConfig:     nil,
 		tableSuffix:       tableSuffix,
 		completely:        completely,
@@ -68,6 +76,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		}
 
 		v.stations[p.ID] = aggregator
+		v.stationIDs[p.ID] = station.ID
 	}
 
 	if v.metaID != meta.ID {
@@ -140,8 +149,55 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 				if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
 					return fmt.Errorf("error adding: %v", err)
 				}
+
+				if v.tsConfig != nil {
+					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
+						return fmt.Errorf("error saving: %v", err)
+					}
+				}
 			}
 		}
+	}
+
+	return nil
+}
+
+func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time, location []float64, sensorKey *AggregateSensorKey, value float64) error {
+	stationID, ok := v.stationIDs[v.provisionID]
+	if !ok {
+		return fmt.Errorf("missing station id")
+	}
+
+	if v.sensors == nil {
+		sr := repositories.NewSensorsRepository(v.db)
+
+		sensors, err := sr.QueryAllSensors(ctx)
+		if err != nil {
+			return err
+		}
+
+		v.sensors = sensors
+	}
+
+	meta := v.sensors[sensorKey.SensorKey]
+	if meta == nil {
+		return fmt.Errorf("unknown sensor: '%s'", sensorKey.SensorKey)
+	}
+
+	pgConn, err := pgx.Connect(ctx, v.tsConfig.Url)
+	if err != nil {
+		return err
+	}
+
+	defer pgConn.Close(ctx)
+
+	// TODO location
+	_, err = pgConn.Exec(ctx, `
+		INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+		VALUES ($1, $2, $3, $4, $5)
+	`, sampled, stationID, sensorKey.ModuleID, meta.ID, value)
+	if err != nil {
+		return err
 	}
 
 	return nil

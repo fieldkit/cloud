@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/storage"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -12,12 +13,14 @@ import (
 
 type StationRefresher struct {
 	db          *sqlxcache.DB
+	tsConfig    *storage.TimeScaleDBConfig
 	tableSuffix string
 }
 
-func NewStationRefresher(db *sqlxcache.DB, tableSuffix string) (sr *StationRefresher, err error) {
+func NewStationRefresher(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string) (sr *StationRefresher, err error) {
 	return &StationRefresher{
 		db:          db,
+		tsConfig:    tsConfig,
 		tableSuffix: tableSuffix,
 	}, nil
 }
@@ -53,7 +56,7 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 
 func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely bool) error {
 	rw := NewRecordWalker(sr.db)
-	handler := handlers.NewAggregatingHandler(sr.db, sr.tableSuffix, completely)
+	handler := handlers.NewAggregatingHandler(sr.db, sr.tsConfig, sr.tableSuffix, completely)
 	if err := rw.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 		return err
 	}

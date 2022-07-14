@@ -161,7 +161,7 @@ func main() {
 		qc := que.NewClient(pgxpool)
 		publisher := jobs.NewQueMessagePublisher(metrics, qc)
 
-		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher)
+		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, nil)
 
 		process := func(ctx context.Context, id int32) error {
 			return isHandler.Handle(ctx, &messages.IngestStation{
@@ -232,7 +232,7 @@ func main() {
 }
 
 func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db, "")
+	sr, err := backend.NewStationRefresher(db, nil, "")
 	if err != nil {
 		return err
 	}
