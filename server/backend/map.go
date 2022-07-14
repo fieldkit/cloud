@@ -91,13 +91,13 @@ func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
-func thingsNetworkMessageRececived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func webHookMessageReceived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &webhook.WebHookMessageReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := webhook.NewWebHookMessageRececivedHandler(services.database, services.metrics, publisher)
+	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher)
 	return handler.Handle(ctx, message)
 }
 
@@ -113,14 +113,14 @@ func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices
 
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
-		"Example":                      wrapContext(wrapTransportMessage(services, exampleJob)),
-		"WalkEverything":               wrapContext(wrapTransportMessage(services, walkEverything)),
-		"IngestionReceived":            wrapContext(wrapTransportMessage(services, ingestionReceived)),
-		"RefreshStation":               wrapContext(wrapTransportMessage(services, refreshStation)),
-		"ExportData":                   wrapContext(wrapTransportMessage(services, exportData)),
-		"IngestStation":                wrapContext(wrapTransportMessage(services, ingestStation)),
-		"ThingsNetworkMessageReceived": wrapContext(wrapTransportMessage(services, thingsNetworkMessageRececived)),
-		"ProcessSchema":                wrapContext(wrapTransportMessage(services, processSchema)),
+		"Example":                wrapContext(wrapTransportMessage(services, exampleJob)),
+		"WalkEverything":         wrapContext(wrapTransportMessage(services, walkEverything)),
+		"IngestionReceived":      wrapContext(wrapTransportMessage(services, ingestionReceived)),
+		"RefreshStation":         wrapContext(wrapTransportMessage(services, refreshStation)),
+		"ExportData":             wrapContext(wrapTransportMessage(services, exportData)),
+		"IngestStation":          wrapContext(wrapTransportMessage(services, ingestStation)),
+		"WebHookMessageReceived": wrapContext(wrapTransportMessage(services, webHookMessageReceived)),
+		"ProcessSchema":          wrapContext(wrapTransportMessage(services, processSchema)),
 	}
 }
 

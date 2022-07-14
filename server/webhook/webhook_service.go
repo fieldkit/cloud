@@ -76,16 +76,11 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 			return err
 		}
 
-		// TODO If the process_interval of the schema is 0 then we can use that
-		// to indicate we should process this as they come in. For now, we'll be
-		// doing the intervals for everything.
-		if false {
-			if err := c.options.Publisher.Publish(ctx, &WebHookMessageReceived{
-				MessageID: message.ID,
-				SchemaID:  *message.SchemaID,
-			}); err != nil {
-				return err
-			}
+		if err := c.options.Publisher.Publish(ctx, &WebHookMessageReceived{
+			MessageID: message.ID,
+			SchemaID:  *message.SchemaID,
+		}); err != nil {
+			return err
 		}
 	}
 
