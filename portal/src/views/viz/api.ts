@@ -12,15 +12,19 @@ export interface SensorRange {
     constrained: boolean | null;
 }
 
+export interface VizThresholdLevel {
+    label: { [index: string]: string };
+    keyLabel: { [index: string]: string };
+    mapKeyLabel: { [index: string]: string };
+    value: number;
+    color: string;
+    hidden: boolean;
+    start: number;
+}
+
 export interface VizThresholds {
     label: { [index: string]: string };
-    levels: {
-        label: { [index: string]: string };
-        value: number;
-        color: string;
-        hidden: boolean;
-        start: number;
-    }[];
+    levels: VizThresholdLevel[];
 }
 
 export interface VizConfig {
@@ -75,8 +79,6 @@ export interface DataRow {
 }
 
 export interface SensorDataResponse {
-    summaries: { [index: string]: Summary };
-    aggregate: { name: string; interval: number };
     data: DataRow[];
 }
 

@@ -1,6 +1,7 @@
 .DS_Store
 fieldkit.env
 build
+build-containers
 sanitize-data
 schema-production
 active-schema

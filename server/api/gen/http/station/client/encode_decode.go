@@ -940,6 +940,11 @@ func EncodeListProjectRequest(encoder func(*http.Request) goahttp.Encoder) func(
 				req.Header.Set("Authorization", head)
 			}
 		}
+		values := req.URL.Query()
+		if p.DisableFiltering != nil {
+			values.Add("disable_filtering", fmt.Sprintf("%v", *p.DisableFiltering))
+		}
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -1126,13 +1131,13 @@ func DecodeListAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, 
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("station", "list associated", err)
 			}
-			p := NewListAssociatedStationsFullOK(&body)
+			p := NewListAssociatedAssociatedStationsOK(&body)
 			view := "default"
-			vres := &stationviews.StationsFull{Projected: p, View: view}
-			if err = stationviews.ValidateStationsFull(vres); err != nil {
+			vres := &stationviews.AssociatedStations{Projected: p, View: view}
+			if err = stationviews.ValidateAssociatedStations(vres); err != nil {
 				return nil, goahttp.ErrValidationError("station", "list associated", err)
 			}
-			res := station.NewStationsFull(vres)
+			res := station.NewAssociatedStations(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -1193,6 +1198,156 @@ func DecodeListAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, 
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("station", "list associated", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildListProjectAssociatedRequest instantiates a HTTP request object with
+// method and path set to call the "station" service "list project associated"
+// endpoint
+func (c *Client) BuildListProjectAssociatedRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		projectID int32
+	)
+	{
+		p, ok := v.(*station.ListProjectAssociatedPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "list project associated", "*station.ListProjectAssociatedPayload", v)
+		}
+		projectID = p.ProjectID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListProjectAssociatedStationPath(projectID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "list project associated", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListProjectAssociatedRequest returns an encoder for requests sent to
+// the station list project associated server.
+func EncodeListProjectAssociatedRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.ListProjectAssociatedPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "list project associated", "*station.ListProjectAssociatedPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeListProjectAssociatedResponse returns a decoder for responses returned
+// by the station list project associated endpoint. restoreBody controls
+// whether the response body should be restored after having been read.
+// DecodeListProjectAssociatedResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeListProjectAssociatedResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListProjectAssociatedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project associated", err)
+			}
+			p := NewListProjectAssociatedAssociatedStationsOK(&body)
+			view := "default"
+			vres := &stationviews.AssociatedStations{Projected: p, View: view}
+			if err = stationviews.ValidateAssociatedStations(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project associated", err)
+			}
+			res := station.NewAssociatedStations(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListProjectAssociatedUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project associated", err)
+			}
+			err = ValidateListProjectAssociatedUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project associated", err)
+			}
+			return nil, NewListProjectAssociatedUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListProjectAssociatedForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project associated", err)
+			}
+			err = ValidateListProjectAssociatedForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project associated", err)
+			}
+			return nil, NewListProjectAssociatedForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ListProjectAssociatedNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project associated", err)
+			}
+			err = ValidateListProjectAssociatedNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project associated", err)
+			}
+			return nil, NewListProjectAssociatedNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ListProjectAssociatedBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "list project associated", err)
+			}
+			err = ValidateListProjectAssociatedBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "list project associated", err)
+			}
+			return nil, NewListProjectAssociatedBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "list project associated", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -1936,6 +2091,18 @@ func DecodeProgressResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView
+// builds a value of type *stationviews.StationFullModelView from a value of
+// type *StationFullModelResponseBody.
+func unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v *StationFullModelResponseBody) *stationviews.StationFullModelView {
+	res := &stationviews.StationFullModelView{
+		Name:                      v.Name,
+		OnlyVisibleViaAssociation: v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView builds a
 // value of type *stationviews.StationOwnerView from a value of type
 // *StationOwnerResponseBody.
@@ -1997,6 +2164,7 @@ func unmarshalStationProjectAttributeResponseBodyToStationviewsStationProjectAtt
 		AttributeID: v.AttributeID,
 		Name:        v.Name,
 		StringValue: v.StringValue,
+		Priority:    v.Priority,
 	}
 
 	return res
@@ -2070,14 +2238,15 @@ func unmarshalStationConfigurationResponseBodyToStationviewsStationConfiguration
 // *StationModuleResponseBody.
 func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *StationModuleResponseBody) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:           v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         v.Name,
-		Position:     v.Position,
-		Flags:        v.Flags,
-		Internal:     v.Internal,
-		FullKey:      v.FullKey,
+		ID:               v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             v.Name,
+		Position:         v.Position,
+		Flags:            v.Flags,
+		Internal:         v.Internal,
+		FullKey:          v.FullKey,
 	}
 	res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
 	for i, val := range v.Sensors {
@@ -2239,6 +2408,7 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		SyncedAt:           v.SyncedAt,
 		IngestionAt:        v.IngestionAt,
 	}
+	res.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v.Model)
 	res.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v.Owner)
 	res.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(v.Interestingness)
 	res.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(v.Attributes)
@@ -2253,6 +2423,80 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 	}
 	if v.Data != nil {
 		res.Data = unmarshalStationDataSummaryResponseBodyToStationviewsStationDataSummaryView(v.Data)
+	}
+
+	return res
+}
+
+// unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView
+// builds a value of type *stationviews.AssociatedStationView from a value of
+// type *AssociatedStationResponseBody.
+func unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(v *AssociatedStationResponseBody) *stationviews.AssociatedStationView {
+	res := &stationviews.AssociatedStationView{
+		Hidden: v.Hidden,
+	}
+	res.Station = unmarshalStationFullResponseBodyToStationviewsStationFullView(v.Station)
+	if v.Project != nil {
+		res.Project = make([]*stationviews.AssociatedViaProjectView, len(v.Project))
+		for i, val := range v.Project {
+			res.Project[i] = unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(val)
+		}
+	}
+	if v.Location != nil {
+		res.Location = make([]*stationviews.AssociatedViaLocationView, len(v.Location))
+		for i, val := range v.Location {
+			res.Location[i] = unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(val)
+		}
+	}
+	if v.Manual != nil {
+		res.Manual = make([]*stationviews.AssociatedViaManualView, len(v.Manual))
+		for i, val := range v.Manual {
+			res.Manual[i] = unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView(val)
+		}
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView
+// builds a value of type *stationviews.AssociatedViaProjectView from a value
+// of type *AssociatedViaProjectResponseBody.
+func unmarshalAssociatedViaProjectResponseBodyToStationviewsAssociatedViaProjectView(v *AssociatedViaProjectResponseBody) *stationviews.AssociatedViaProjectView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaProjectView{
+		ID: v.ID,
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView
+// builds a value of type *stationviews.AssociatedViaLocationView from a value
+// of type *AssociatedViaLocationResponseBody.
+func unmarshalAssociatedViaLocationResponseBodyToStationviewsAssociatedViaLocationView(v *AssociatedViaLocationResponseBody) *stationviews.AssociatedViaLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaLocationView{
+		StationID: v.StationID,
+		Distance:  v.Distance,
+	}
+
+	return res
+}
+
+// unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView
+// builds a value of type *stationviews.AssociatedViaManualView from a value of
+// type *AssociatedViaManualResponseBody.
+func unmarshalAssociatedViaManualResponseBodyToStationviewsAssociatedViaManualView(v *AssociatedViaManualResponseBody) *stationviews.AssociatedViaManualView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaManualView{
+		OtherStationID: v.OtherStationID,
+		Priority:       v.Priority,
 	}
 
 	return res

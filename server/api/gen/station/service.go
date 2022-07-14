@@ -32,7 +32,9 @@ type Service interface {
 	// ListProject implements list project.
 	ListProject(context.Context, *ListProjectPayload) (res *StationsFull, err error)
 	// ListAssociated implements list associated.
-	ListAssociated(context.Context, *ListAssociatedPayload) (res *StationsFull, err error)
+	ListAssociated(context.Context, *ListAssociatedPayload) (res *AssociatedStations, err error)
+	// ListProjectAssociated implements list project associated.
+	ListProjectAssociated(context.Context, *ListProjectAssociatedPayload) (res *AssociatedStations, err error)
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// ListAll implements list all.
@@ -59,7 +61,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [13]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "download photo", "list all", "delete", "admin search", "progress"}
+var MethodNames = [14]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "list project associated", "download photo", "list all", "delete", "admin search", "progress"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -74,6 +76,7 @@ type AddPayload struct {
 type StationFull struct {
 	ID                 int32
 	Name               string
+	Model              *StationFullModel
 	Owner              *StationOwner
 	DeviceID           string
 	Interestingness    *StationInterestingness
@@ -141,8 +144,9 @@ type StationsFull struct {
 // ListProjectPayload is the payload type of the station service list project
 // method.
 type ListProjectPayload struct {
-	Auth *string
-	ID   int32
+	Auth             *string
+	ID               int32
+	DisableFiltering *bool
 }
 
 // ListAssociatedPayload is the payload type of the station service list
@@ -150,6 +154,19 @@ type ListProjectPayload struct {
 type ListAssociatedPayload struct {
 	Auth *string
 	ID   int32
+}
+
+// AssociatedStations is the result type of the station service list associated
+// method.
+type AssociatedStations struct {
+	Stations AssociatedStationCollection
+}
+
+// ListProjectAssociatedPayload is the payload type of the station service list
+// project associated method.
+type ListProjectAssociatedPayload struct {
+	Auth      *string
+	ProjectID int32
 }
 
 // DownloadPhotoPayload is the payload type of the station service download
@@ -210,6 +227,11 @@ type StationProgress struct {
 	Jobs []*StationJob
 }
 
+type StationFullModel struct {
+	Name                      string
+	OnlyVisibleViaAssociation bool
+}
+
 type StationOwner struct {
 	ID   int32
 	Name string
@@ -235,6 +257,7 @@ type StationProjectAttribute struct {
 	AttributeID int64
 	Name        string
 	StringValue string
+	Priority    int32
 }
 
 type StationUpload struct {
@@ -265,16 +288,17 @@ type StationConfiguration struct {
 }
 
 type StationModule struct {
-	ID           int64
-	HardwareID   *string
-	MetaRecordID *int64
-	Name         string
-	Position     int32
-	Flags        int32
-	Internal     bool
-	FullKey      string
-	Sensors      []*StationSensor
-	Meta         map[string]interface{}
+	ID               int64
+	HardwareID       *string
+	HardwareIDBase64 *string
+	MetaRecordID     *int64
+	Name             string
+	Position         int32
+	Flags            int32
+	Internal         bool
+	FullKey          string
+	Sensors          []*StationSensor
+	Meta             map[string]interface{}
 }
 
 type StationSensor struct {
@@ -315,6 +339,30 @@ type StationDataSummary struct {
 }
 
 type StationFullCollection []*StationFull
+
+type AssociatedStationCollection []*AssociatedStation
+
+type AssociatedStation struct {
+	Station  *StationFull
+	Project  []*AssociatedViaProject
+	Location []*AssociatedViaLocation
+	Manual   []*AssociatedViaManual
+	Hidden   bool
+}
+
+type AssociatedViaProject struct {
+	ID int32
+}
+
+type AssociatedViaLocation struct {
+	StationID int32
+	Distance  float32
+}
+
+type AssociatedViaManual struct {
+	OtherStationID int32
+	Priority       int32
+}
 
 type EssentialStation struct {
 	ID                 int64
@@ -410,6 +458,19 @@ func NewViewedStationsFull(res *StationsFull, view string) *stationviews.Station
 	return &stationviews.StationsFull{Projected: p, View: "default"}
 }
 
+// NewAssociatedStations initializes result type AssociatedStations from viewed
+// result type AssociatedStations.
+func NewAssociatedStations(vres *stationviews.AssociatedStations) *AssociatedStations {
+	return newAssociatedStations(vres.Projected)
+}
+
+// NewViewedAssociatedStations initializes viewed result type
+// AssociatedStations from result type AssociatedStations using the given view.
+func NewViewedAssociatedStations(res *AssociatedStations, view string) *stationviews.AssociatedStations {
+	p := newAssociatedStationsView(res)
+	return &stationviews.AssociatedStations{Projected: p, View: "default"}
+}
+
 // NewDownloadedPhoto initializes result type DownloadedPhoto from viewed
 // result type DownloadedPhoto.
 func NewDownloadedPhoto(vres *stationviews.DownloadedPhoto) *DownloadedPhoto {
@@ -480,6 +541,9 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	if vres.UpdatedAt != nil {
 		res.UpdatedAt = *vres.UpdatedAt
 	}
+	if vres.Model != nil {
+		res.Model = transformStationviewsStationFullModelViewToStationFullModel(vres.Model)
+	}
 	if vres.Owner != nil {
 		res.Owner = transformStationviewsStationOwnerViewToStationOwner(vres.Owner)
 	}
@@ -530,6 +594,9 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		PlaceNameNative:    res.PlaceNameNative,
 		SyncedAt:           res.SyncedAt,
 		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		vres.Model = transformStationFullModelToStationviewsStationFullModelView(res.Model)
 	}
 	if res.Owner != nil {
 		vres.Owner = transformStationOwnerToStationviewsStationOwnerView(res.Owner)
@@ -639,6 +706,108 @@ func newStationFullCollectionView(res StationFullCollection) stationviews.Statio
 	vres := make(stationviews.StationFullCollectionView, len(res))
 	for i, n := range res {
 		vres[i] = newStationFullView(n)
+	}
+	return vres
+}
+
+// newAssociatedStations converts projected type AssociatedStations to service
+// type AssociatedStations.
+func newAssociatedStations(vres *stationviews.AssociatedStationsView) *AssociatedStations {
+	res := &AssociatedStations{}
+	if vres.Stations != nil {
+		res.Stations = newAssociatedStationCollection(vres.Stations)
+	}
+	return res
+}
+
+// newAssociatedStationsView projects result type AssociatedStations to
+// projected type AssociatedStationsView using the "default" view.
+func newAssociatedStationsView(res *AssociatedStations) *stationviews.AssociatedStationsView {
+	vres := &stationviews.AssociatedStationsView{}
+	if res.Stations != nil {
+		vres.Stations = newAssociatedStationCollectionView(res.Stations)
+	}
+	return vres
+}
+
+// newAssociatedStationCollection converts projected type
+// AssociatedStationCollection to service type AssociatedStationCollection.
+func newAssociatedStationCollection(vres stationviews.AssociatedStationCollectionView) AssociatedStationCollection {
+	res := make(AssociatedStationCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newAssociatedStation(n)
+	}
+	return res
+}
+
+// newAssociatedStationCollectionView projects result type
+// AssociatedStationCollection to projected type
+// AssociatedStationCollectionView using the "default" view.
+func newAssociatedStationCollectionView(res AssociatedStationCollection) stationviews.AssociatedStationCollectionView {
+	vres := make(stationviews.AssociatedStationCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newAssociatedStationView(n)
+	}
+	return vres
+}
+
+// newAssociatedStation converts projected type AssociatedStation to service
+// type AssociatedStation.
+func newAssociatedStation(vres *stationviews.AssociatedStationView) *AssociatedStation {
+	res := &AssociatedStation{}
+	if vres.Hidden != nil {
+		res.Hidden = *vres.Hidden
+	}
+	if vres.Project != nil {
+		res.Project = make([]*AssociatedViaProject, len(vres.Project))
+		for i, val := range vres.Project {
+			res.Project[i] = transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(val)
+		}
+	}
+	if vres.Location != nil {
+		res.Location = make([]*AssociatedViaLocation, len(vres.Location))
+		for i, val := range vres.Location {
+			res.Location[i] = transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(val)
+		}
+	}
+	if vres.Manual != nil {
+		res.Manual = make([]*AssociatedViaManual, len(vres.Manual))
+		for i, val := range vres.Manual {
+			res.Manual[i] = transformStationviewsAssociatedViaManualViewToAssociatedViaManual(val)
+		}
+	}
+	if vres.Station != nil {
+		res.Station = newStationFull(vres.Station)
+	}
+	return res
+}
+
+// newAssociatedStationView projects result type AssociatedStation to projected
+// type AssociatedStationView using the "default" view.
+func newAssociatedStationView(res *AssociatedStation) *stationviews.AssociatedStationView {
+	vres := &stationviews.AssociatedStationView{
+		Hidden: &res.Hidden,
+	}
+	if res.Project != nil {
+		vres.Project = make([]*stationviews.AssociatedViaProjectView, len(res.Project))
+		for i, val := range res.Project {
+			vres.Project[i] = transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(val)
+		}
+	}
+	if res.Location != nil {
+		vres.Location = make([]*stationviews.AssociatedViaLocationView, len(res.Location))
+		for i, val := range res.Location {
+			vres.Location[i] = transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(val)
+		}
+	}
+	if res.Manual != nil {
+		vres.Manual = make([]*stationviews.AssociatedViaManualView, len(res.Manual))
+		for i, val := range res.Manual {
+			vres.Manual[i] = transformAssociatedViaManualToStationviewsAssociatedViaManualView(val)
+		}
+	}
+	if res.Station != nil {
+		vres.Station = newStationFullView(res.Station)
 	}
 	return vres
 }
@@ -759,6 +928,21 @@ func newStationJobView(res *StationJob) *stationviews.StationJobView {
 	return vres
 }
 
+// transformStationviewsStationFullModelViewToStationFullModel builds a value
+// of type *StationFullModel from a value of type
+// *stationviews.StationFullModelView.
+func transformStationviewsStationFullModelViewToStationFullModel(v *stationviews.StationFullModelView) *StationFullModel {
+	if v == nil {
+		return nil
+	}
+	res := &StationFullModel{
+		Name:                      *v.Name,
+		OnlyVisibleViaAssociation: *v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // transformStationviewsStationOwnerViewToStationOwner builds a value of type
 // *StationOwner from a value of type *stationviews.StationOwnerView.
 func transformStationviewsStationOwnerViewToStationOwner(v *stationviews.StationOwnerView) *StationOwner {
@@ -832,6 +1016,7 @@ func transformStationviewsStationProjectAttributeViewToStationProjectAttribute(v
 		AttributeID: *v.AttributeID,
 		Name:        *v.Name,
 		StringValue: *v.StringValue,
+		Priority:    *v.Priority,
 	}
 
 	return res
@@ -917,14 +1102,15 @@ func transformStationviewsStationConfigurationViewToStationConfiguration(v *stat
 // *StationModule from a value of type *stationviews.StationModuleView.
 func transformStationviewsStationModuleViewToStationModule(v *stationviews.StationModuleView) *StationModule {
 	res := &StationModule{
-		ID:           *v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         *v.Name,
-		Position:     *v.Position,
-		Flags:        *v.Flags,
-		Internal:     *v.Internal,
-		FullKey:      *v.FullKey,
+		ID:               *v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             *v.Name,
+		Position:         *v.Position,
+		Flags:            *v.Flags,
+		Internal:         *v.Internal,
+		FullKey:          *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensor, len(v.Sensors))
@@ -1015,6 +1201,18 @@ func transformStationviewsStationDataSummaryViewToStationDataSummary(v *stationv
 	return res
 }
 
+// transformStationFullModelToStationviewsStationFullModelView builds a value
+// of type *stationviews.StationFullModelView from a value of type
+// *StationFullModel.
+func transformStationFullModelToStationviewsStationFullModelView(v *StationFullModel) *stationviews.StationFullModelView {
+	res := &stationviews.StationFullModelView{
+		Name:                      &v.Name,
+		OnlyVisibleViaAssociation: &v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // transformStationOwnerToStationviewsStationOwnerView builds a value of type
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
@@ -1079,6 +1277,7 @@ func transformStationProjectAttributeToStationviewsStationProjectAttributeView(v
 		AttributeID: &v.AttributeID,
 		Name:        &v.Name,
 		StringValue: &v.StringValue,
+		Priority:    &v.Priority,
 	}
 
 	return res
@@ -1155,14 +1354,15 @@ func transformStationConfigurationToStationviewsStationConfigurationView(v *Stat
 // *stationviews.StationModuleView from a value of type *StationModule.
 func transformStationModuleToStationviewsStationModuleView(v *StationModule) *stationviews.StationModuleView {
 	res := &stationviews.StationModuleView{
-		ID:           &v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         &v.Name,
-		Position:     &v.Position,
-		Flags:        &v.Flags,
-		Internal:     &v.Internal,
-		FullKey:      &v.FullKey,
+		ID:               &v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             &v.Name,
+		Position:         &v.Position,
+		Flags:            &v.Flags,
+		Internal:         &v.Internal,
+		FullKey:          &v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*stationviews.StationSensorView, len(v.Sensors))
@@ -1298,6 +1498,94 @@ func transformStationRegionToStationviewsStationRegionView(v *StationRegion) *st
 				}
 			}
 		}
+	}
+
+	return res
+}
+
+// transformStationviewsAssociatedViaProjectViewToAssociatedViaProject builds a
+// value of type *AssociatedViaProject from a value of type
+// *stationviews.AssociatedViaProjectView.
+func transformStationviewsAssociatedViaProjectViewToAssociatedViaProject(v *stationviews.AssociatedViaProjectView) *AssociatedViaProject {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaProject{
+		ID: *v.ID,
+	}
+
+	return res
+}
+
+// transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation builds
+// a value of type *AssociatedViaLocation from a value of type
+// *stationviews.AssociatedViaLocationView.
+func transformStationviewsAssociatedViaLocationViewToAssociatedViaLocation(v *stationviews.AssociatedViaLocationView) *AssociatedViaLocation {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaLocation{
+		StationID: *v.StationID,
+		Distance:  *v.Distance,
+	}
+
+	return res
+}
+
+// transformStationviewsAssociatedViaManualViewToAssociatedViaManual builds a
+// value of type *AssociatedViaManual from a value of type
+// *stationviews.AssociatedViaManualView.
+func transformStationviewsAssociatedViaManualViewToAssociatedViaManual(v *stationviews.AssociatedViaManualView) *AssociatedViaManual {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaManual{
+		OtherStationID: *v.OtherStationID,
+		Priority:       *v.Priority,
+	}
+
+	return res
+}
+
+// transformAssociatedViaProjectToStationviewsAssociatedViaProjectView builds a
+// value of type *stationviews.AssociatedViaProjectView from a value of type
+// *AssociatedViaProject.
+func transformAssociatedViaProjectToStationviewsAssociatedViaProjectView(v *AssociatedViaProject) *stationviews.AssociatedViaProjectView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaProjectView{
+		ID: &v.ID,
+	}
+
+	return res
+}
+
+// transformAssociatedViaLocationToStationviewsAssociatedViaLocationView builds
+// a value of type *stationviews.AssociatedViaLocationView from a value of type
+// *AssociatedViaLocation.
+func transformAssociatedViaLocationToStationviewsAssociatedViaLocationView(v *AssociatedViaLocation) *stationviews.AssociatedViaLocationView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaLocationView{
+		StationID: &v.StationID,
+		Distance:  &v.Distance,
+	}
+
+	return res
+}
+
+// transformAssociatedViaManualToStationviewsAssociatedViaManualView builds a
+// value of type *stationviews.AssociatedViaManualView from a value of type
+// *AssociatedViaManual.
+func transformAssociatedViaManualToStationviewsAssociatedViaManualView(v *AssociatedViaManual) *stationviews.AssociatedViaManualView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.AssociatedViaManualView{
+		OtherStationID: &v.OtherStationID,
+		Priority:       &v.Priority,
 	}
 
 	return res

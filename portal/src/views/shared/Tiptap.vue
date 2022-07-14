@@ -93,6 +93,30 @@ export default Vue.extend({
             }
         };
 
+        const CustomNewLine = Extension.create({
+            name: "newline",
+            addCommands() {
+                return {
+                    addNewline: () => ({ state, dispatch }) => {
+                        const { schema, tr } = state;
+                        const paragraph = schema.nodes.paragraph;
+
+                        const transaction = tr
+                            .deleteSelection()
+                            .replaceSelectionWith(paragraph.create(), true)
+                            .scrollIntoView();
+                        if (dispatch) dispatch(transaction);
+                        return true;
+                    },
+                } as never;
+            },
+            addKeyboardShortcuts() {
+                return {
+                    "Shift-Enter": () => (this.editor.commands as any).addNewline(),
+                };
+            },
+        });
+
         const ModifyEnter = Extension.create({
             addKeyboardShortcuts() {
                 return {
@@ -124,6 +148,7 @@ export default Vue.extend({
                 Text,
                 Placeholder,
                 ModifyEnter,
+                CustomNewLine,
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
@@ -261,14 +286,6 @@ export default Vue.extend({
     }
 }
 
-.tiptap-reading {
-    border: 1px solid transparent;
-
-    p {
-        margin: 0em;
-    }
-}
-
 /* Basic editor styles */
 .ProseMirror-focused {
     outline: none;
@@ -290,6 +307,7 @@ export default Vue.extend({
 
     p {
         word-break: break-all;
+        margin: 14px 0;
     }
 }
 
@@ -300,6 +318,20 @@ export default Vue.extend({
     color: #ced4da;
     pointer-events: none;
     height: 0;
+}
+
+.tiptap-reading {
+    border: 1px solid transparent;
+
+    p {
+        &:first-of-type {
+            margin-top: 0;
+        }
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
 }
 
 .mention {

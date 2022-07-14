@@ -3,6 +3,7 @@
 mkdir -p $PWD/influxdb
 
 docker run -d -p 8086:8086 \
+	--name influxdb \
 	-v $PWD/influxdb/data:/var/lib/influxdb2 \
 	-v $PWD/influxdb/config:/etc/influxdb2 \
 	-e DOCKER_INFLUXDB_INIT_MODE=setup \

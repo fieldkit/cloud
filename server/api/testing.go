@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -42,7 +42,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Emailer:    "default",
 	}
 
-	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating service options: %v", err)
 	}

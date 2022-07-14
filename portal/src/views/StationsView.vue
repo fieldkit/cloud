@@ -8,6 +8,7 @@
                     class="summary-container"
                     @close="closeSummary"
                     :station="station"
+                    :sensorDataQuerier="sensorDataQuerier"
                 />
             </div>
         </template>
@@ -60,6 +61,7 @@
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
+import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
 
 import { mapState, mapGetters } from "vuex";
@@ -84,11 +86,18 @@ export default Vue.extend({
             required: false,
         },
     },
-    data(): { showNoStationsMessage: boolean; viewType: string; layoutChanges: number } {
+    data(): {
+        showNoStationsMessage: boolean;
+        viewType: string;
+        layoutChanges: number;
+        sensorDataQuerier: SensorDataQuerier;
+    } {
+        // console.log("stations-view:data", this.stations);
         return {
             showNoStationsMessage: true,
             viewType: "map",
             layoutChanges: 0,
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api, []),
         };
     },
     computed: {
@@ -125,6 +134,13 @@ export default Vue.extend({
         return Promise.resolve();
     },
     watch: {
+        stations() {
+            // console.log("stations-view:stations", this.stations);
+            this.sensorDataQuerier = new SensorDataQuerier(
+                this.$services.api,
+                this.stations.map((s: DisplayStation) => s.id)
+            );
+        },
         id(): Promise<any> {
             if (this.id) {
                 return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.id });
@@ -204,14 +220,13 @@ export default Vue.extend({
 }
 
 ::v-deep .summary-container {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+    border: solid 2px #d8dce0;
+    background-color: #fff;
     position: unset;
     margin: 190px 0 60px 119px;
     max-width: calc(100vw - 20px);
-
-    .explore-button {
-        margin-bottom: 6px;
-    }
 
     @include bp-down($sm) {
         margin: 129px auto 60px auto;
@@ -334,7 +349,6 @@ export default Vue.extend({
         margin: 20px;
         flex-basis: 389px;
         box-sizing: border-box;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
 
         @include bp-down($md) {
             padding: 19px 11px;
@@ -355,6 +369,10 @@ export default Vue.extend({
 
         .close-button {
             display: none;
+        }
+
+        .navigate-button {
+            right: 0;
         }
     }
 }

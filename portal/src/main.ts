@@ -19,6 +19,7 @@ import routerFactory from "./router";
 import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
+import { format as d3format } from "d3-format";
 
 const services = new Services();
 
@@ -90,6 +91,14 @@ Vue.filter("prettyPercentage", (value: number | null) => {
         return "--";
     }
     return value.toFixed(1) + "%";
+});
+
+Vue.filter("prettyNum", (value: number) => {
+    if (!isNaN(value)) {
+        if (value % 1 === 0) {
+            return value;
+        } else return d3format(".2s")(value);
+    } else return value;
 });
 
 export interface ReadingLike {

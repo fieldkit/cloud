@@ -15,27 +15,29 @@
                     Facebook
                 </span>
             </a>
-            <a class="share-button share-button--url">
-                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
-                <span>
-                    {{ $t("sharePanel.copyUrl") }}
-                </span>
-            </a>
             <a class="share-button" @click="openMailClient()">
                 <i class="icon icon-mail"></i>
                 <span>
                     {{ $t("sharePanel.emailUrl") }}
                 </span>
             </a>
-            <div class="url" target="blank">
-                <input readonly ref="url" :value="getCurrentURL()" />
-                <button @click="copyUrlToClipboard()">
-                    {{ $t("sharePanel.copyBtn") }}
-                </button>
-                <span :class="{ visible: showCopiedLink }" class="url-copied">
-                    {{ $t("sharePanel.linkCopied") }}
+            <a class="share-button share-button--url">
+                <i class="icon icon-copy" :aria-label="$t('sharePanel.copyUrl')"></i>
+                <span>
+                    {{ $t("sharePanel.copyUrl") }}
                 </span>
-            </div>
+                <div class="url" target="blank">
+                    <input readonly ref="url" :value="getCurrentURL()" />
+                    <button @click="copyUrlToClipboard()">
+                        {{ $t("sharePanel.copyBtn") }}
+                    </button>
+                    <div class="url-copied-wrap" :class="{ visible: showCopiedLink }">
+                        <span class="url-copied">
+                            {{ $t("sharePanel.linkCopied") }}
+                        </span>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </template>
@@ -113,7 +115,9 @@ export default Vue.extend({
             console.log("ok");
         },
         getCurrentURL(): string {
-            return window.location.href;
+            const path = this.$route.path.split("/")[2];
+            const fullPath = window.location.href.replace("/" + path, "");
+            return fullPath;
         },
         copyUrlToClipboard(): void {
             const inputEl = this.$refs["url"] as HTMLInputElement;
@@ -180,10 +184,7 @@ export default Vue.extend({
 
         &--url {
             cursor: initial;
-
-            &:hover {
-                background-color: initial;
-            }
+            flex-wrap: wrap;
         }
     }
 
@@ -197,19 +198,20 @@ export default Vue.extend({
     }
 
     .url {
-        margin: 0 20px;
+        margin-left: 32px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         position: relative;
+        flex: 1 1 100%;
 
         input {
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
             font-size: 14px;
-            margin-left: 30px;
             width: 100%;
-            height: 21px;
+            height: 32px;
             padding-left: 5px;
             color: var(--color-dark);
             border: 1px solid var(--color-border);
@@ -223,7 +225,7 @@ export default Vue.extend({
         button {
             margin-left: 10px;
             font-size: 12px;
-            padding: 5px 10px;
+            padding: 6px 10px;
             background-color: #ffffff;
             border: 1px solid #d7dce1;
             border-radius: 4px;
@@ -231,21 +233,27 @@ export default Vue.extend({
         }
     }
 
-    .url-copied {
-        background-color: rgba(160, 219, 225, 0.1);
+    .url-copied-wrap {
+        background-color: #fff;
+        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
         opacity: 0;
         visibility: hidden;
-        font-size: 14px;
-        padding: 5px 10px;
-        border-radius: 4px;
         transition: opacity 0.25s;
-        box-shadow: 0 0px 4px 0 rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        display: flex;
         @include position(absolute, null 0 -35px null);
 
         &.visible {
             opacity: 1;
             visibility: visible;
         }
+    }
+
+    .url-copied {
+        background-color: rgba(160, 219, 225, 0.1);
+        border-radius: 4px;
+        font-size: 14px;
+        padding: 5px 10px;
     }
 }
 </style>

@@ -39,7 +39,7 @@ export default Vue.extend({
     },
     methods: {
         async refresh(): Promise<void> {
-            console.log(`loading-photo:`, this.station);
+            // console.log(`loading-photo:`, this.station);
             if (this.station.photos) {
                 this.loading = true;
                 try {

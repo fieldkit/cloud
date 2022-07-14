@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"

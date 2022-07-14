@@ -35,6 +35,7 @@ type UpdateRequestBody struct {
 type AddResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -64,6 +65,7 @@ type AddResponseBody struct {
 type GetResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -93,6 +95,7 @@ type GetResponseBody struct {
 type UpdateResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -132,7 +135,13 @@ type ListProjectResponseBody struct {
 // ListAssociatedResponseBody is the type of the "station" service "list
 // associated" endpoint HTTP response body.
 type ListAssociatedResponseBody struct {
-	Stations StationFullCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+	Stations AssociatedStationCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
+}
+
+// ListProjectAssociatedResponseBody is the type of the "station" service "list
+// project associated" endpoint HTTP response body.
+type ListProjectAssociatedResponseBody struct {
+	Stations AssociatedStationCollectionResponseBody `form:"stations,omitempty" json:"stations,omitempty" xml:"stations,omitempty"`
 }
 
 // DownloadPhotoResponseBody is the type of the "station" service "download
@@ -758,6 +767,82 @@ type ListAssociatedBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// ListProjectAssociatedUnauthorizedResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "unauthorized" error.
+type ListProjectAssociatedUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedForbiddenResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "forbidden" error.
+type ListProjectAssociatedForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedNotFoundResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "not-found" error.
+type ListProjectAssociatedNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListProjectAssociatedBadRequestResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "bad-request" error.
+type ListProjectAssociatedBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // DownloadPhotoUnauthorizedResponseBody is the type of the "station" service
 // "download photo" endpoint HTTP response body for the "unauthorized" error.
 type DownloadPhotoUnauthorizedResponseBody struct {
@@ -1118,6 +1203,12 @@ type ProgressBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// StationFullModelResponseBody is used to define fields on response body types.
+type StationFullModelResponseBody struct {
+	Name                      *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	OnlyVisibleViaAssociation *bool   `form:"only_visible_via_association,omitempty" json:"only_visible_via_association,omitempty" xml:"only_visible_via_association,omitempty"`
+}
+
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
 	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -1148,10 +1239,11 @@ type StationProjectAttributesResponseBody struct {
 // StationProjectAttributeResponseBody is used to define fields on response
 // body types.
 type StationProjectAttributeResponseBody struct {
-	ProjectID   *int32  `form:"project_id,omitempty" json:"project_id,omitempty" xml:"project_id,omitempty"`
-	AttributeID *int64  `form:"attribute_id,omitempty" json:"attribute_id,omitempty" xml:"attribute_id,omitempty"`
+	ProjectID   *int32  `form:"projectId,omitempty" json:"projectId,omitempty" xml:"projectId,omitempty"`
+	AttributeID *int64  `form:"attributeId,omitempty" json:"attributeId,omitempty" xml:"attributeId,omitempty"`
 	Name        *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	StringValue *string `form:"string_value,omitempty" json:"string_value,omitempty" xml:"string_value,omitempty"`
+	StringValue *string `form:"stringValue,omitempty" json:"stringValue,omitempty" xml:"stringValue,omitempty"`
+	Priority    *int32  `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -1189,16 +1281,17 @@ type StationConfigurationResponseBody struct {
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
-	ID           *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
-	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
-	Name         *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Position     *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
-	Flags        *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
-	Internal     *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
-	FullKey      *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
-	Sensors      []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
-	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	ID               *int64                       `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	HardwareID       *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
+	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	Name             *string                      `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Position         *int32                       `form:"position,omitempty" json:"position,omitempty" xml:"position,omitempty"`
+	Flags            *int32                       `form:"flags,omitempty" json:"flags,omitempty" xml:"flags,omitempty"`
+	Internal         *bool                        `form:"internal,omitempty" json:"internal,omitempty" xml:"internal,omitempty"`
+	FullKey          *string                      `form:"fullKey,omitempty" json:"fullKey,omitempty" xml:"fullKey,omitempty"`
+	Sensors          []*StationSensorResponseBody `form:"sensors,omitempty" json:"sensors,omitempty" xml:"sensors,omitempty"`
+	Meta             map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -1253,6 +1346,7 @@ type StationFullCollectionResponseBody []*StationFullResponseBody
 type StationFullResponseBody struct {
 	ID                 *int32                                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name               *string                               `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Model              *StationFullModelResponseBody         `form:"model,omitempty" json:"model,omitempty" xml:"model,omitempty"`
 	Owner              *StationOwnerResponseBody             `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	DeviceID           *string                               `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness,omitempty" json:"interestingness,omitempty" xml:"interestingness,omitempty"`
@@ -1275,6 +1369,40 @@ type StationFullResponseBody struct {
 	SyncedAt           *int64                                `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
 	IngestionAt        *int64                                `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
 	Data               *StationDataSummaryResponseBody       `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
+}
+
+// AssociatedStationCollectionResponseBody is used to define fields on response
+// body types.
+type AssociatedStationCollectionResponseBody []*AssociatedStationResponseBody
+
+// AssociatedStationResponseBody is used to define fields on response body
+// types.
+type AssociatedStationResponseBody struct {
+	Station  *StationFullResponseBody             `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
+	Project  []*AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location []*AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   []*AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   *bool                                `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+}
+
+// AssociatedViaProjectResponseBody is used to define fields on response body
+// types.
+type AssociatedViaProjectResponseBody struct {
+	ID *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+}
+
+// AssociatedViaLocationResponseBody is used to define fields on response body
+// types.
+type AssociatedViaLocationResponseBody struct {
+	StationID *int32   `form:"stationID,omitempty" json:"stationID,omitempty" xml:"stationID,omitempty"`
+	Distance  *float32 `form:"distance,omitempty" json:"distance,omitempty" xml:"distance,omitempty"`
+}
+
+// AssociatedViaManualResponseBody is used to define fields on response body
+// types.
+type AssociatedViaManualResponseBody struct {
+	OtherStationID *int32 `form:"otherStationID,omitempty" json:"otherStationID,omitempty" xml:"otherStationID,omitempty"`
+	Priority       *int32 `form:"priority,omitempty" json:"priority,omitempty" xml:"priority,omitempty"`
 }
 
 // EssentialStationResponseBody is used to define fields on response body types.
@@ -1346,6 +1474,7 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -1457,6 +1586,7 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -1673,6 +1803,7 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		SyncedAt:           body.SyncedAt,
 		IngestionAt:        body.IngestionAt,
 	}
+	v.Model = unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(body.Model)
 	v.Owner = unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(body.Owner)
 	v.Interestingness = unmarshalStationInterestingnessResponseBodyToStationviewsStationInterestingnessView(body.Interestingness)
 	v.Attributes = unmarshalStationProjectAttributesResponseBodyToStationviewsStationProjectAttributesView(body.Attributes)
@@ -1894,13 +2025,13 @@ func NewListProjectBadRequest(body *ListProjectBadRequestResponseBody) *goa.Serv
 	return v
 }
 
-// NewListAssociatedStationsFullOK builds a "station" service "list associated"
-// endpoint result from a HTTP "OK" response.
-func NewListAssociatedStationsFullOK(body *ListAssociatedResponseBody) *stationviews.StationsFullView {
-	v := &stationviews.StationsFullView{}
-	v.Stations = make([]*stationviews.StationFullView, len(body.Stations))
+// NewListAssociatedAssociatedStationsOK builds a "station" service "list
+// associated" endpoint result from a HTTP "OK" response.
+func NewListAssociatedAssociatedStationsOK(body *ListAssociatedResponseBody) *stationviews.AssociatedStationsView {
+	v := &stationviews.AssociatedStationsView{}
+	v.Stations = make([]*stationviews.AssociatedStationView, len(body.Stations))
 	for i, val := range body.Stations {
-		v.Stations[i] = unmarshalStationFullResponseBodyToStationviewsStationFullView(val)
+		v.Stations[i] = unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(val)
 	}
 
 	return v
@@ -1954,6 +2085,78 @@ func NewListAssociatedNotFound(body *ListAssociatedNotFoundResponseBody) *goa.Se
 // NewListAssociatedBadRequest builds a station service list associated
 // endpoint bad-request error.
 func NewListAssociatedBadRequest(body *ListAssociatedBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedAssociatedStationsOK builds a "station" service
+// "list project associated" endpoint result from a HTTP "OK" response.
+func NewListProjectAssociatedAssociatedStationsOK(body *ListProjectAssociatedResponseBody) *stationviews.AssociatedStationsView {
+	v := &stationviews.AssociatedStationsView{}
+	v.Stations = make([]*stationviews.AssociatedStationView, len(body.Stations))
+	for i, val := range body.Stations {
+		v.Stations[i] = unmarshalAssociatedStationResponseBodyToStationviewsAssociatedStationView(val)
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedUnauthorized builds a station service list project
+// associated endpoint unauthorized error.
+func NewListProjectAssociatedUnauthorized(body *ListProjectAssociatedUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedForbidden builds a station service list project
+// associated endpoint forbidden error.
+func NewListProjectAssociatedForbidden(body *ListProjectAssociatedForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedNotFound builds a station service list project
+// associated endpoint not-found error.
+func NewListProjectAssociatedNotFound(body *ListProjectAssociatedNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListProjectAssociatedBadRequest builds a station service list project
+// associated endpoint bad-request error.
+func NewListProjectAssociatedBadRequest(body *ListProjectAssociatedBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3109,6 +3312,102 @@ func ValidateListAssociatedBadRequestResponseBody(body *ListAssociatedBadRequest
 	return
 }
 
+// ValidateListProjectAssociatedUnauthorizedResponseBody runs the validations
+// defined on list project associated_unauthorized_response_body
+func ValidateListProjectAssociatedUnauthorizedResponseBody(body *ListProjectAssociatedUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedForbiddenResponseBody runs the validations
+// defined on list project associated_forbidden_response_body
+func ValidateListProjectAssociatedForbiddenResponseBody(body *ListProjectAssociatedForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedNotFoundResponseBody runs the validations
+// defined on list project associated_not-found_response_body
+func ValidateListProjectAssociatedNotFoundResponseBody(body *ListProjectAssociatedNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListProjectAssociatedBadRequestResponseBody runs the validations
+// defined on list project associated_bad-request_response_body
+func ValidateListProjectAssociatedBadRequestResponseBody(body *ListProjectAssociatedBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateDownloadPhotoUnauthorizedResponseBody runs the validations defined
 // on download photo_unauthorized_response_body
 func ValidateDownloadPhotoUnauthorizedResponseBody(body *DownloadPhotoUnauthorizedResponseBody) (err error) {
@@ -3589,6 +3888,18 @@ func ValidateProgressBadRequestResponseBody(body *ProgressBadRequestResponseBody
 	return
 }
 
+// ValidateStationFullModelResponseBody runs the validations defined on
+// StationFullModelResponseBody
+func ValidateStationFullModelResponseBody(body *StationFullModelResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.OnlyVisibleViaAssociation == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("only_visible_via_association", "body"))
+	}
+	return
+}
+
 // ValidateStationOwnerResponseBody runs the validations defined on
 // StationOwnerResponseBody
 func ValidateStationOwnerResponseBody(body *StationOwnerResponseBody) (err error) {
@@ -3655,16 +3966,19 @@ func ValidateStationProjectAttributesResponseBody(body *StationProjectAttributes
 // StationProjectAttributeResponseBody
 func ValidateStationProjectAttributeResponseBody(body *StationProjectAttributeResponseBody) (err error) {
 	if body.ProjectID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("project_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("projectId", "body"))
 	}
 	if body.AttributeID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("attribute_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("attributeId", "body"))
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	if body.StringValue == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("string_value", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "body"))
+	}
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }
@@ -3899,6 +4213,9 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
+	if body.Model == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("model", "body"))
+	}
 	if body.Owner == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
 	}
@@ -3925,6 +4242,11 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 	}
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updatedAt", "body"))
+	}
+	if body.Model != nil {
+		if err2 := ValidateStationFullModelResponseBody(body.Model); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if body.Owner != nil {
 		if err2 := ValidateStationOwnerResponseBody(body.Owner); err2 != nil {
@@ -3967,6 +4289,90 @@ func ValidateStationFullResponseBody(body *StationFullResponseBody) (err error) 
 		if err2 := ValidateStationDataSummaryResponseBody(body.Data); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateAssociatedStationCollectionResponseBody runs the validations defined
+// on AssociatedStationCollectionResponseBody
+func ValidateAssociatedStationCollectionResponseBody(body AssociatedStationCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateAssociatedStationResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateAssociatedStationResponseBody runs the validations defined on
+// AssociatedStationResponseBody
+func ValidateAssociatedStationResponseBody(body *AssociatedStationResponseBody) (err error) {
+	if body.Station == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("station", "body"))
+	}
+	if body.Hidden == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("hidden", "body"))
+	}
+	if body.Station != nil {
+		if err2 := ValidateStationFullResponseBody(body.Station); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Project {
+		if e != nil {
+			if err2 := ValidateAssociatedViaProjectResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Location {
+		if e != nil {
+			if err2 := ValidateAssociatedViaLocationResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Manual {
+		if e != nil {
+			if err2 := ValidateAssociatedViaManualResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateAssociatedViaProjectResponseBody runs the validations defined on
+// AssociatedViaProjectResponseBody
+func ValidateAssociatedViaProjectResponseBody(body *AssociatedViaProjectResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaLocationResponseBody runs the validations defined on
+// AssociatedViaLocationResponseBody
+func ValidateAssociatedViaLocationResponseBody(body *AssociatedViaLocationResponseBody) (err error) {
+	if body.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("stationID", "body"))
+	}
+	if body.Distance == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "body"))
+	}
+	return
+}
+
+// ValidateAssociatedViaManualResponseBody runs the validations defined on
+// AssociatedViaManualResponseBody
+func ValidateAssociatedViaManualResponseBody(body *AssociatedViaManualResponseBody) (err error) {
+	if body.OtherStationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("otherStationID", "body"))
+	}
+	if body.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "body"))
 	}
 	return
 }

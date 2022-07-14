@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -12,6 +13,7 @@ import (
 	"image/jpeg"
 	"io"
 	"math"
+	"sort"
 	"strings"
 	"time"
 
@@ -181,20 +183,31 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 
 	pr := repositories.NewProjectRepository(c.options.Database)
 
-	preciseLocation := false
-	if !p.Anonymous() {
-		if p.UserID() == sf.Owner.ID {
-			preciseLocation = true
-		} else {
-			relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
-			if err != nil {
-				return nil, err
-			}
-			if row, ok := relationships[payload.ID]; ok {
-				preciseLocation = row.MemberRole >= 0
-			}
-		}
-	}
+    projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+    if err != nil {
+        return nil, err
+    }
+
+    preciseLocation := false
+    for _, project := range projects {
+        if project.Privacy == data.Public {
+            preciseLocation = true
+        }
+    }
+
+    if !p.Anonymous() && !preciseLocation {
+        if p.UserID() == sf.Owner.ID {
+            preciseLocation = true
+        } else {
+            relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
+            if err != nil {
+                return nil, err
+            }
+            if row, ok := relationships[payload.ID]; ok {
+                preciseLocation = row.MemberRole >= 0
+            }
+        }
+    }
 
 	mmr := repositories.NewModuleMetaRepository(c.options.Database)
 	mm, err := mmr.FindAllModulesMeta(ctx)
@@ -320,7 +333,7 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false, mm)
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, true, false, mm, true)
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +389,12 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false, mm)
+	disableFiltering := false
+	if payload.DisableFiltering != nil {
+		disableFiltering = *payload.DisableFiltering
+	}
+
+	stations, err := transformAllStationFull(c.options.signer, p, sfs, preciseLocation, false, mm, !disableFiltering)
 	if err != nil {
 		return nil, err
 	}
@@ -395,7 +413,114 @@ func isForbidden(err error) bool {
 	return false
 }
 
-func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.StationsFull, err error) {
+type associatedStationSorter struct {
+	stations         []*station.AssociatedStation
+	queriedStationID int32
+}
+
+func (a associatedStationSorter) Len() int { return len(a.stations) }
+func (a associatedStationSorter) Less(i, j int) bool {
+	if a.stations[i].Station.ID == a.queriedStationID {
+		return true
+	}
+	return false // a[i].Order < a[j].Order
+}
+func (a associatedStationSorter) Swap(i, j int) {
+	a.stations[i], a.stations[j] = a.stations[j], a.stations[i]
+}
+
+func (c *StationService) ListProjectAssociated(ctx context.Context, payload *station.ListProjectAssociatedPayload) (response *station.AssociatedStations, err error) {
+	byID := make(map[int32]*station.AssociatedStation)
+
+	stationIDs := make([]int32, 0)
+	disableFiltering := true
+	projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
+		ID:               payload.ProjectID,
+		DisableFiltering: &disableFiltering,
+	})
+	if err != nil {
+		if isForbidden(err) {
+			return nil, err
+		}
+		return nil, err
+	} else {
+		for _, fullStation := range projectStations.Stations {
+			stationIDs = append(stationIDs, fullStation.ID)
+
+			associated := &station.AssociatedStation{
+				Station: fullStation,
+				Hidden:  fullStation.Model.OnlyVisibleViaAssociation,
+				Project: []*station.AssociatedViaProject{&station.AssociatedViaProject{
+					ID: payload.ProjectID,
+				},
+				},
+			}
+
+			byID[fullStation.ID] = associated
+		}
+	}
+
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	associations, err := sr.QueryAssociatedStations(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	associated := make([]*station.AssociatedStation, 0)
+
+	for _, associatedStation := range byID {
+		associated = append(associated, associatedStation)
+
+		for _, association := range associations[associatedStation.Station.ID] {
+			if associatedStation.Manual == nil {
+				associatedStation.Manual = make([]*station.AssociatedViaManual, 0)
+			}
+
+			associatedStation.Manual = append(associatedStation.Manual, &station.AssociatedViaManual{
+				OtherStationID: association.AssociatedStationID,
+				Priority:       association.Priority,
+			})
+
+			associatedStation.Hidden = false
+		}
+
+		if associatedStation.Station.Location != nil && associatedStation.Station.Location.Precise != nil {
+			for _, projectAssociation := range associatedStation.Project {
+				location := data.NewLocation(associatedStation.Station.Location.Precise)
+				if nearby, err := sr.QueryNearbyProjectStations(ctx, projectAssociation.ID, location); err != nil {
+					return nil, err
+				} else {
+					for _, ns := range nearby {
+						if associatedStation.Location == nil {
+							associatedStation.Location = make([]*station.AssociatedViaLocation, 0)
+						}
+
+						associatedStation.Location = append(associatedStation.Location, &station.AssociatedViaLocation{
+							StationID: ns.StationID,
+							Distance:  ns.Distance,
+						})
+					}
+				}
+			}
+		}
+	}
+
+	sort.Sort(associatedStationSorter{
+		stations:         associated,
+		queriedStationID: 0, // TODO Remove this when we remove ListAssociated (maybe)
+	})
+
+	response = &station.AssociatedStations{
+		Stations: associated,
+	}
+
+	return
+}
+
+func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.AssociatedStations, err error) {
+	log := Logger(ctx).Sugar()
+
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -412,34 +537,19 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
-	stations := make([]*station.StationFull, 0)
-
-	for _, project := range projects {
-		including := false
-		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
-			ID: project.ID,
-		})
-		if err != nil {
-			if isForbidden(err) {
-				continue
-			}
-			return nil, err
-		} else {
-			including = true
-		}
-
-		if including {
-			for _, s := range projectStations.Stations {
-				stations = append(stations, s)
-			}
-		}
+	if len(projects) == 0 {
+		return &station.AssociatedStations{
+			Stations: make([]*station.AssociatedStation, 0),
+		}, nil
 	}
 
-	response = &station.StationsFull{
-		Stations: stations,
+	if len(projects) > 1 {
+		log.Warnw("associated:ambiguous-projects", "station_id", payload.ID, "projects", len(projects))
 	}
 
-	return
+	return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
+		ProjectID: projects[0].ID,
+	})
 }
 
 func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {
@@ -817,17 +927,19 @@ func transformModules(from *data.StationFull, configurationID int64, mm []*repos
 		}
 
 		hardwareID := hex.EncodeToString(v.HardwareID)
+		hardwareIDBase64 := base64.StdEncoding.EncodeToString(v.HardwareID)
 
 		to = append(to, &station.StationModule{
-			ID:         v.ID,
-			FullKey:    moduleKey,
-			HardwareID: &hardwareID,
-			Name:       translatedName,
-			Position:   int32(v.Position),
-			Flags:      int32(v.Flags),
-			Internal:   v.Flags > 0 || v.Position == 255,
-			Meta:       serializedModuleMeta,
-			Sensors:    sensorsWm,
+			ID:               v.ID,
+			FullKey:          moduleKey,
+			HardwareID:       &hardwareID,
+			HardwareIDBase64: &hardwareIDBase64,
+			Name:             translatedName,
+			Position:         int32(v.Position),
+			Flags:            int32(v.Flags),
+			Internal:         v.Flags > 0 || v.Position == 255,
+			Meta:             serializedModuleMeta,
+			Sensors:          sensorsWm,
 		})
 
 	}
@@ -941,6 +1053,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			AttributeID: attribute.AttributeID,
 			Name:        attribute.Name,
 			StringValue: attribute.StringValue,
+			Priority:    attribute.Priority,
 		})
 	}
 
@@ -973,6 +1086,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		PlaceNameNative:    sf.Station.PlaceNative,
 		Location:           location,
 		Data:               dataSummary,
+		Model: &station.StationFullModel{
+			Name:                      sf.Model.Name,
+			OnlyVisibleViaAssociation: sf.Model.OnlyVisibleViaAssociation,
+		},
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
@@ -1003,7 +1120,7 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta, filtering bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
@@ -1012,7 +1129,9 @@ func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationF
 			return nil, err
 		}
 
-		stations = append(stations, after)
+		if !filtering || !after.Model.OnlyVisibleViaAssociation {
+			stations = append(stations, after)
+		}
 	}
 
 	return stations, nil

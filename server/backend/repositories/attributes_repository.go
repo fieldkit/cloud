@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -20,11 +20,10 @@ func (r *AttributesRepository) QueryStationProjectAttributes(ctx context.Context
 	attributes := []*data.StationAttributeSlot{}
 	if err := r.db.SelectContext(ctx, &attributes, `
 		SELECT
-			pa.id AS attribute_id, pa.project_id, pa.name,  spa.string_value
+			pa.id AS attribute_id, pa.project_id, pa.name,
+		(SELECT string_value FROM fieldkit.station_project_attribute WHERE (attribute_id = pa.id) AND (station_id = $1))
 		FROM fieldkit.project_attribute AS pa
-		LEFT JOIN fieldkit.station_project_attribute AS spa ON (spa.attribute_id = pa.id)
 		WHERE pa.project_id IN (SELECT project_id FROM fieldkit.project_station WHERE station_id = $1)
-		AND spa.station_id = $1 OR station_id IS NULL
 		`, stationID); err != nil {
 		return nil, err
 	}

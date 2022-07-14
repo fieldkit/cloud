@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"go.uber.org/zap"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -40,14 +41,28 @@ func NewModelAdapter(db *sqlxcache.DB) (m *ModelAdapter) {
 	}
 }
 
+type AssociatedAttribute struct {
+	Priority  int32
+	Attribute *data.StationAttributeSlot
+}
+
 type WebHookStation struct {
-	Provision     *data.Provision
-	Configuration *data.StationConfiguration
-	Station       *data.Station
-	Module        *data.StationModule
-	Sensors       []*data.ModuleSensor
-	SensorPrefix  string
-	Attributes    map[string]*data.StationAttributeSlot
+	Provision       *data.Provision
+	Configuration   *data.StationConfiguration
+	Station         *data.Station
+	Module          *data.StationModule
+	Sensors         []*data.ModuleSensor
+	SensorPrefix    string
+	Attributes      map[string]*data.StationAttributeSlot
+	Associated      map[string]*AssociatedAttribute
+	LastReadingTime *time.Time
+}
+
+func (s *WebHookStation) FindAttribute(name string) *data.StationAttributeSlot {
+	if attribute, ok := s.Attributes[name]; ok {
+		return attribute
+	}
+	return nil
 }
 
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
@@ -72,17 +87,24 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		}
 	}
 
-	// Add or create the station, this may also mean creating the station model for this schema.
+	// Add or create station model, we use this during creation and updating.
+	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add or create the station.
 	station := updating
 	if updating == nil {
-		model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
-		if err != nil {
-			return nil, err
+		deviceName := string(pm.DeviceID)
+
+		if pm.DeviceName != nil {
+			deviceName = *pm.DeviceName
 		}
 
 		updating = &data.Station{
 			DeviceID:  pm.DeviceID,
-			Name:      pm.DeviceName,
+			Name:      deviceName,
 			OwnerID:   pm.OwnerID,
 			ModelID:   model.ID,
 			CreatedAt: time.Now(),
@@ -94,10 +116,19 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
+		if pm.ProjectID != nil {
+			pr := repositories.NewProjectRepository(m.db)
+
+			if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
+				return nil, err
+			}
+		}
+
 		station = added
 	} else {
-		if pm.DeviceName != "" {
-			station.Name = pm.DeviceName
+		station.ModelID = model.ID
+		if pm.DeviceName != nil {
+			station.Name = *pm.DeviceName
 		}
 	}
 
@@ -143,7 +174,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	sensors := make([]*data.ModuleSensor, 0)
 
 	for _, moduleSchema := range pm.Schema.Modules {
-		modulePrefix := fmt.Sprintf("%s.%s", WebHookSensorPrefix, moduleSchema.Key)
+		modulePrefix := moduleSchema.KeyPrefix()
 
 		// Add or create the station module..
 		module := &data.StationModule{
@@ -162,36 +193,38 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		for index, sensorSchema := range moduleSchema.Sensors {
-			// Transient sensors aren't saved.
-			if !sensorSchema.Transient {
-				// Add or create the sensor..
-				sensor := &data.ModuleSensor{
-					ConfigurationID: configuration.ID,
-					ModuleID:        module.ID,
-					Index:           uint32(index),
-					Name:            sensorSchema.Key,
-					ReadingValue:    nil,
-					ReadingTime:     nil,
-				}
-
-				for _, pr := range pm.Data {
-					if pr.Key == sensorSchema.Key {
-						sensor.ReadingValue = &pr.Value
-						sensor.ReadingTime = &pm.ReceivedAt
-						break
+		if pm.ReceivedAt != nil {
+			for index, sensorSchema := range moduleSchema.Sensors {
+				// Transient sensors aren't saved.
+				if !sensorSchema.Transient {
+					// Add or create the sensor..
+					sensor := &data.ModuleSensor{
+						ConfigurationID: configuration.ID,
+						ModuleID:        module.ID,
+						Index:           uint32(index),
+						Name:            sensorSchema.Key,
+						ReadingValue:    nil,
+						ReadingTime:     nil,
 					}
-				}
 
-				if sensorSchema.UnitOfMeasure != nil {
-					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-				}
+					for _, pr := range pm.Data {
+						if pr.Key == sensorSchema.Key {
+							sensor.ReadingValue = &pr.Value
+							sensor.ReadingTime = pm.ReceivedAt
+							break
+						}
+					}
 
-				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-					return nil, err
-				}
+					if sensorSchema.UnitOfMeasure != nil {
+						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+					}
 
-				sensors = append(sensors, sensor)
+					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+						return nil, err
+					}
+
+					sensors = append(sensors, sensor)
+				}
 			}
 		}
 
@@ -203,6 +236,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			Module:        module,
 			Sensors:       sensors,
 			Attributes:    attributes,
+			Associated:    make(map[string]*AssociatedAttribute),
 		}
 
 		m.cache[deviceKey] = &cacheEntry{
@@ -228,48 +262,68 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		}
 	}
 
-	now := time.Now()
-
 	// These changes to station are saved once in Close.
 
 	// Give integrators the option to just skip this. Could become a nil check.
-	if len(pm.DeviceName) != 0 {
-		station.Station.Name = pm.DeviceName
+	if pm.DeviceName != nil {
+		station.Station.Name = *pm.DeviceName
 	}
-	station.Station.IngestionAt = &now
-	station.Station.UpdatedAt = now
 
-	for _, moduleSensor := range station.Sensors {
-		for _, pr := range pm.Data {
-			if pr.Key == moduleSensor.Name {
-				moduleSensor.ReadingValue = &pr.Value
-				moduleSensor.ReadingTime = &pm.ReceivedAt
-				break
+	if station.LastReadingTime != nil {
+		station.Station.IngestionAt = station.LastReadingTime
+		station.Station.UpdatedAt = *station.LastReadingTime
+	}
+
+	if pm.ReceivedAt != nil {
+		for _, moduleSensor := range station.Sensors {
+			for _, pr := range pm.Data {
+				if pr.Key == moduleSensor.Name {
+					moduleSensor.ReadingValue = &pr.Value
+					moduleSensor.ReadingTime = pm.ReceivedAt
+					break
+				}
 			}
+		}
+		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
+			station.LastReadingTime = pm.ReceivedAt
 		}
 	}
 
 	if pm.Attributes != nil {
 		for name, parsed := range pm.Attributes {
-			if attribute, ok := station.Attributes[name]; ok {
-				if parsed.Location {
-					if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
-						// Either has altitude or it doesn't.
-						if len(coordinates) == 2 || len(coordinates) == 3 {
-							station.Station.Location = data.NewLocation(coordinates)
+			if parsed.Location {
+				if coordinates, ok := toFloatArray(parsed.JSONValue); ok {
+					// Either has altitude or it doesn't.
+					if len(coordinates) == 2 || len(coordinates) == 3 {
+						station.Station.Location = data.NewLocation(coordinates)
+					}
+				}
+			} else if parsed.Associated {
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					ids := strings.Split(stringValue, ",")
+					for index, id := range ids {
+						if id != "" {
+							station.Associated[id] = &AssociatedAttribute{
+								Priority:  int32(index),
+								Attribute: station.FindAttribute(name),
+							}
 						}
 					}
-				} else {
+				}
+			} else {
+				if attribute := station.FindAttribute(name); attribute != nil {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
-						attribute.StringValue = &stringValue
+						if stringValue != "" {
+							attribute.StringValue = &stringValue
+						}
 					} else {
 						if false {
 							log.Warnw("wh:unexepected-attribute-type", "attribute_name", name, "value", parsed.JSONValue)
 						}
 					}
+				} else {
+					log.Warnw("wh:unknown-attribute", "attribute_name", name)
 				}
-			} else {
-				log.Warnw("wh:unknown-attribute", "attribute_name", name)
 			}
 		}
 	}
@@ -285,7 +339,11 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	for _, cacheEntry := range m.cache {
 		station := cacheEntry.station.Station
 
-		log.Infow("saving:station", "station_id", station.ID)
+		if cacheEntry.station.LastReadingTime != nil {
+			log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name, "last_reading_time", cacheEntry.station.LastReadingTime)
+		} else {
+			log.Infow("saving:station", "station_id", station.ID, "name", cacheEntry.station.Station.Name)
+		}
 
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
 			return fmt.Errorf("error saving station: %v", err)
@@ -296,6 +354,31 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 
 			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
 				return err
+			}
+		}
+
+		for deviceIDString, associated := range cacheEntry.station.Associated {
+			deviceID, err := hex.DecodeString(deviceIDString)
+			if err != nil {
+				deviceID = []byte(deviceIDString)
+			}
+
+			if associating, err := m.sr.QueryStationByDeviceID(ctx, deviceID); err != nil {
+				if err != sql.ErrNoRows {
+					return fmt.Errorf("querying associated station: %v", err)
+				} else {
+					log.Infow("saving:unknown-associated", "device_id", deviceIDString)
+				}
+			} else if associating != nil {
+				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, associated.Priority); err != nil {
+					return fmt.Errorf("associated station: %v", err)
+				}
+
+				if associated.Attribute != nil {
+					associated.Attribute.StringValue = &associating.Name
+				}
+			} else {
+				log.Infow("saving:unknown-associated", "device_id", deviceIDString)
 			}
 		}
 

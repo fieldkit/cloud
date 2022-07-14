@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -19,35 +19,41 @@ type Options struct {
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 	File        string
 	SchemaID    int
+	MessageID   int
+	Resume      bool
 	Verbose     bool
 }
 
 func process(ctx context.Context, options *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
-	log.Infow("starting")
+	log.Infow("opening database")
 
 	db, err := sqlxcache.Open("postgres", options.PostgresURL)
 	if err != nil {
 		return err
 	}
 
+	log.Infow("opened, preparing source")
+
 	aggregator := webhook.NewSourceAggregator(db)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
 
-	if options.File != "" && options.SchemaID > 0 {
+	if options.File != "" {
 		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID), options.Verbose)
 	} else {
-		if options.SchemaID > 0 {
-			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID))
+		if options.MessageID == 0 {
+			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0, true)
 		} else {
-			source = webhook.NewDatabaseMessageSource(db, int32(-1))
+			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), int64(options.MessageID), options.Resume)
 		}
 	}
 
 	if source != nil {
+		log.Infow("processing")
+
 		if err := aggregator.ProcessSource(ctx, source, startTime); err != nil {
 			return err
 		}
@@ -62,11 +68,13 @@ func main() {
 
 	flag.StringVar(&options.File, "file", "", "csv file")
 	flag.IntVar(&options.SchemaID, "schema-id", 0, "schema id to process")
+	flag.IntVar(&options.MessageID, "message-id", 0, "message id to process")
+	flag.BoolVar(&options.Resume, "resume", false, "resume on message id")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increased verbosity")
 
 	flag.Parse()
 
-	if options.File != "" && options.SchemaID == 0 {
+	if options.MessageID == 0 && options.SchemaID == 0 {
 		flag.PrintDefaults()
 		return
 	}

@@ -750,9 +750,10 @@ func EncodeListProjectResponse(encoder func(context.Context, http.ResponseWriter
 func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id   int32
-			auth *string
-			err  error
+			id               int32
+			disableFiltering *bool
+			auth             *string
+			err              error
 
 			params = mux.Vars(r)
 		)
@@ -764,6 +765,16 @@ func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 			}
 			id = int32(v)
 		}
+		{
+			disableFilteringRaw := r.URL.Query().Get("disable_filtering")
+			if disableFilteringRaw != "" {
+				v, err2 := strconv.ParseBool(disableFilteringRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("disableFiltering", disableFilteringRaw, "boolean"))
+				}
+				disableFiltering = &v
+			}
+		}
 		authRaw := r.Header.Get("Authorization")
 		if authRaw != "" {
 			auth = &authRaw
@@ -771,7 +782,7 @@ func DecodeListProjectRequest(mux goahttp.Muxer, decoder func(*http.Request) goa
 		if err != nil {
 			return nil, err
 		}
-		payload := NewListProjectPayload(id, auth)
+		payload := NewListProjectPayload(id, disableFiltering, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
@@ -852,7 +863,7 @@ func EncodeListProjectError(encoder func(context.Context, http.ResponseWriter) g
 // the station list associated endpoint.
 func EncodeListAssociatedResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*stationviews.StationsFull)
+		res := v.(*stationviews.AssociatedStations)
 		enc := encoder(ctx, w)
 		body := NewListAssociatedResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
@@ -953,6 +964,121 @@ func EncodeListAssociatedError(encoder func(context.Context, http.ResponseWriter
 				body = formatter(res)
 			} else {
 				body = NewListAssociatedBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeListProjectAssociatedResponse returns an encoder for responses
+// returned by the station list project associated endpoint.
+func EncodeListProjectAssociatedResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*stationviews.AssociatedStations)
+		enc := encoder(ctx, w)
+		body := NewListProjectAssociatedResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeListProjectAssociatedRequest returns a decoder for requests sent to
+// the station list project associated endpoint.
+func DecodeListProjectAssociatedRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			projectID int32
+			auth      *string
+			err       error
+
+			params = mux.Vars(r)
+		)
+		{
+			projectIDRaw := params["projectId"]
+			v, err2 := strconv.ParseInt(projectIDRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("projectID", projectIDRaw, "integer"))
+			}
+			projectID = int32(v)
+		}
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewListProjectAssociatedPayload(projectID, auth)
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeListProjectAssociatedError returns an encoder for errors returned by
+// the list project associated station endpoint.
+func EncodeListProjectAssociatedError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewListProjectAssociatedBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -1573,6 +1699,18 @@ func EncodeProgressError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
+// marshalStationviewsStationFullModelViewToStationFullModelResponseBody builds
+// a value of type *StationFullModelResponseBody from a value of type
+// *stationviews.StationFullModelView.
+func marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v *stationviews.StationFullModelView) *StationFullModelResponseBody {
+	res := &StationFullModelResponseBody{
+		Name:                      *v.Name,
+		OnlyVisibleViaAssociation: *v.OnlyVisibleViaAssociation,
+	}
+
+	return res
+}
+
 // marshalStationviewsStationOwnerViewToStationOwnerResponseBody builds a value
 // of type *StationOwnerResponseBody from a value of type
 // *stationviews.StationOwnerView.
@@ -1638,6 +1776,7 @@ func marshalStationviewsStationProjectAttributeViewToStationProjectAttributeResp
 		AttributeID: *v.AttributeID,
 		Name:        *v.Name,
 		StringValue: *v.StringValue,
+		Priority:    *v.Priority,
 	}
 
 	return res
@@ -1717,14 +1856,15 @@ func marshalStationviewsStationConfigurationViewToStationConfigurationResponseBo
 // *stationviews.StationModuleView.
 func marshalStationviewsStationModuleViewToStationModuleResponseBody(v *stationviews.StationModuleView) *StationModuleResponseBody {
 	res := &StationModuleResponseBody{
-		ID:           *v.ID,
-		HardwareID:   v.HardwareID,
-		MetaRecordID: v.MetaRecordID,
-		Name:         *v.Name,
-		Position:     *v.Position,
-		Flags:        *v.Flags,
-		Internal:     *v.Internal,
-		FullKey:      *v.FullKey,
+		ID:               *v.ID,
+		HardwareID:       v.HardwareID,
+		HardwareIDBase64: v.HardwareIDBase64,
+		MetaRecordID:     v.MetaRecordID,
+		Name:             *v.Name,
+		Position:         *v.Position,
+		Flags:            *v.Flags,
+		Internal:         *v.Internal,
+		FullKey:          *v.FullKey,
 	}
 	if v.Sensors != nil {
 		res.Sensors = make([]*StationSensorResponseBody, len(v.Sensors))
@@ -1892,6 +2032,9 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		SyncedAt:           v.SyncedAt,
 		IngestionAt:        v.IngestionAt,
 	}
+	if v.Model != nil {
+		res.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v.Model)
+	}
 	if v.Owner != nil {
 		res.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v.Owner)
 	}
@@ -1918,6 +2061,82 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 	}
 	if v.Data != nil {
 		res.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(v.Data)
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody
+// builds a value of type *AssociatedStationResponseBody from a value of type
+// *stationviews.AssociatedStationView.
+func marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(v *stationviews.AssociatedStationView) *AssociatedStationResponseBody {
+	res := &AssociatedStationResponseBody{
+		Hidden: *v.Hidden,
+	}
+	if v.Station != nil {
+		res.Station = marshalStationviewsStationFullViewToStationFullResponseBody(v.Station)
+	}
+	if v.Project != nil {
+		res.Project = make([]*AssociatedViaProjectResponseBody, len(v.Project))
+		for i, val := range v.Project {
+			res.Project[i] = marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(val)
+		}
+	}
+	if v.Location != nil {
+		res.Location = make([]*AssociatedViaLocationResponseBody, len(v.Location))
+		for i, val := range v.Location {
+			res.Location[i] = marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(val)
+		}
+	}
+	if v.Manual != nil {
+		res.Manual = make([]*AssociatedViaManualResponseBody, len(v.Manual))
+		for i, val := range v.Manual {
+			res.Manual[i] = marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(val)
+		}
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody
+// builds a value of type *AssociatedViaProjectResponseBody from a value of
+// type *stationviews.AssociatedViaProjectView.
+func marshalStationviewsAssociatedViaProjectViewToAssociatedViaProjectResponseBody(v *stationviews.AssociatedViaProjectView) *AssociatedViaProjectResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaProjectResponseBody{
+		ID: *v.ID,
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody
+// builds a value of type *AssociatedViaLocationResponseBody from a value of
+// type *stationviews.AssociatedViaLocationView.
+func marshalStationviewsAssociatedViaLocationViewToAssociatedViaLocationResponseBody(v *stationviews.AssociatedViaLocationView) *AssociatedViaLocationResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaLocationResponseBody{
+		StationID: *v.StationID,
+		Distance:  *v.Distance,
+	}
+
+	return res
+}
+
+// marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody
+// builds a value of type *AssociatedViaManualResponseBody from a value of type
+// *stationviews.AssociatedViaManualView.
+func marshalStationviewsAssociatedViaManualViewToAssociatedViaManualResponseBody(v *stationviews.AssociatedViaManualView) *AssociatedViaManualResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &AssociatedViaManualResponseBody{
+		OtherStationID: *v.OtherStationID,
+		Priority:       *v.Priority,
 	}
 
 	return res

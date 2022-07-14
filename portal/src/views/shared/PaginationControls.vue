@@ -109,7 +109,7 @@ export default Vue.extend({
     margin-right: 10px;
 
     .textual & {
-        margin-right: 5px;
+        margin-right: 7px;
         line-height: 10px;
     }
 }
@@ -117,11 +117,12 @@ export default Vue.extend({
     margin-left: 10px;
 
     .textual & {
-        margin-left: 5px;
+        margin-left: 7px;
     }
 }
 .pagination .textual {
     font-size: 12px;
+    font-family: var(--font-family-bold);
     align-items: center;
 }
 .pagination .textual .button {

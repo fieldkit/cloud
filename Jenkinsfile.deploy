@@ -25,14 +25,12 @@ def getStackURL(user, password, branch, stackName) {
 timestamps {
 	node ("main") {
 		try {
-			def isDev = params.DeployFrom.indexOf("fkdev.org") >= 0
+			def isDev = params.WorkEnv.indexOf("dev") >= 0
 			def stackName = params.DeployStack ?: "portal-stack"
 			def branchName = params.DeployBranch ?: "main"
 			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
-
-			print(stackName)
 
 			stage ('prepare') {
 				def job = getCopyArtifactsJob(stackName, branchName)
@@ -42,10 +40,25 @@ timestamps {
 			}
 
 			stage ('deploy') {
+				def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+
 				sshagent (credentials: ['ssh-fkdev-deploy']) {
-					sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${params.DeployFrom}"
-					sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ubuntu@${params.DeployFrom}:"
-					sh "ssh -o StrictHostKeyChecking=no ubuntu@${params.DeployFrom} sudo mv ${stackName}.tar /tmp/incoming-stacks"
+					for (def server in ws.servers.value) {
+						println(server.sshAt)
+						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${server.ip}"
+						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} whoami"
+						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo rm -f ${stackName}.tar"
+					}
+
+					for (def server in ws.servers.value) {
+						println(server.sshAt)
+						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${server.sshAt}:"
+					}
+
+					for (def server in ws.servers.value) {
+						println(server.sshAt)
+						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
+					}
 				}
 
 				if (stackName == "portal-stack") {

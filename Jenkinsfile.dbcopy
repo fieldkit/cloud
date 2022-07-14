@@ -6,7 +6,7 @@ properties([
 ])
 
 timestamps {
-	node ("main") {
+    node ("jenkins-aws-ubuntu") {
 		try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 

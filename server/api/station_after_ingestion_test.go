@@ -90,6 +90,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 			{
 				"id": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"model": "<<PRESENCE>>",
 				"owner": "<<PRESENCE>>",
 				"deviceId": "<<PRESENCE>>",
 				"interestingness": "<<PRESENCE>>",
@@ -111,6 +112,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 									"flags": "<<PRESENCE>>",
 									"fullKey": "<<PRESENCE>>",
 									"hardwareId": "<<PRESENCE>>",
+									"hardwareIdBase64": "<<PRESENCE>>",
 									"internal": "<<PRESENCE>>",
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",
@@ -127,6 +129,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 									"flags": "<<PRESENCE>>",
 									"fullKey": "<<PRESENCE>>",
 									"hardwareId": "<<PRESENCE>>",
+									"hardwareIdBase64": "<<PRESENCE>>",
 									"internal": "<<PRESENCE>>",
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",

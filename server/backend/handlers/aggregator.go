@@ -7,7 +7,7 @@ import (
 
 	"github.com/montanaflynn/stats"
 
-	"github.com/conservify/sqlxcache"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
@@ -288,7 +288,7 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 		row := &data.AggregatedReading{
 			StationID:     v.stationID,
 			SensorID:      v.sensors[key.SensorKey].ID,
-			ModuleID:      &key.ModuleID,
+			ModuleID:      key.ModuleID,
 			Time:          data.NumericWireTime(d.Time),
 			Location:      location,
 			Value:         value,

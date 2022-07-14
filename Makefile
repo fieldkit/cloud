@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_PATCH = 39
+VERSION_PATCH = 48
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -46,7 +46,7 @@ charting-tests: charting-setup
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/intoflux
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/movedata
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -83,7 +83,7 @@ sanitizer: $(BUILD)/sanitizer
 
 webhook: $(BUILD)/webhook
 
-intoflux: $(BUILD)/intoflux
+movedata: $(BUILD)/movedata
 
 scratch: $(BUILD)/scratch
 
@@ -105,8 +105,8 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 	cd server/cmd/webhook && $(GO) build -o $@ *.go
 
-$(BUILD)/intoflux: server/cmd/intoflux/*.go $(SERVER_SOURCES)
-	cd server/cmd/intoflux && $(GO) build -o $@ *.go
+$(BUILD)/movedata: server/cmd/movedata/*.go $(SERVER_SOURCES)
+	cd server/cmd/movedata && $(GO) build -o $@ *.go
 
 $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go

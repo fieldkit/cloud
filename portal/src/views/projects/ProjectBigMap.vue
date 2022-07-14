@@ -6,12 +6,16 @@
                     <ProjectPhoto :project="project" :image-size="150" />
                 </div>
                 <div class="detail-container">
-                    <p class="detail-title">{{ project.name }}</p>
+                    <div class="flex flex-al-center">
+                        <h1 class="detail-title">{{ project.name }}</h1>
+                        <router-link v-if="!isPartnerCustomisationEnabled()" :to="{ name: 'viewProject', params: { id: id } }" class="link">
+                            Project Dashboard >
+                        </router-link>
+                        <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
+                            {{ $t(link.text) }} >
+                        </a>
+                    </div>
                     <div class="detail-description">{{ project.description }}</div>
-                    <router-link :to="{ name: 'viewProject', params: { id: id } }" class="link">Project Dashboard ></router-link>
-                    <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
-                        {{ $t(link.text) }} >
-                    </a>
                 </div>
             </div>
 
@@ -28,15 +32,22 @@
 
             <template v-if="viewType === 'map'">
                 <!-- fixme: currently restricted to floodnet project -->
-                <div class="map-legend" v-if="id === 174 && levels.length > 0">
-                    <h4>Current {{ keyTitle }}</h4>
-                    <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
-                        <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
-                        <span>{{ item.label["enUS"] }}</span>
-                    </div>
-                    <div class="legend-item" v-if="hasStationsWithoutData">
-                        <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
-                        <span>No Data</span>
+                <div class="map-legend" v-if="id === 174 && levels.length > 0" :class="{ collapsed: legendCollapsed }">
+                    <a class="legend-toggle" @click="legendCollapsed = !legendCollapsed">
+                        <i class="icon icon-chevron-right"></i>
+                    </a>
+                    <div class="legend-content">
+                        <div class="legend-content-wrap">
+                            <h4>Current {{ keyTitle }}</h4>
+                            <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
+                                <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
+                                <span>{{ (item.mapKeyLabel) ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
+                            </div>
+                            <div class="legend-item" v-if="hasStationsWithoutData">
+                                <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
+                                <span>No Data</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="container-map">
@@ -59,12 +70,18 @@
             </template>
         </div>
         <div class="view-type-container">
+            <label class="toggle-btn">
+                <input type="checkbox" v-model="recentMapMode" />
+                <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
+                <i></i>
+                <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
+            </label>
             <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
-                    <i class="icon icon-map"></i>
+                    {{ $t("map.toggle.map") }}
                 </div>
                 <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
-                    <i class="icon icon-list"></i>
+                    {{ $t("map.toggle.list") }}
                 </div>
             </div>
         </div>
@@ -84,7 +101,8 @@ import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 
 import { ExploreContext } from "@/views/viz/common";
-import { getPartnerCustomization } from "@/views/shared/partners";
+import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault } from "../shared/partners";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -98,11 +116,15 @@ export default Vue.extend({
         layoutChanges: number;
         activeStationId: number | null;
         viewType: string;
+        recentMapMode: boolean;
+        legendCollapsed: boolean;
     } {
         return {
             layoutChanges: 0,
             activeStationId: null,
             viewType: "map",
+            recentMapMode: false,
+            legendCollapsed: false,
         };
     },
     props: {
@@ -124,7 +146,7 @@ export default Vue.extend({
             return this.displayProject.project;
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.id].stations;
+            return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);
         },
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.id].mapped;
@@ -174,7 +196,7 @@ export default Vue.extend({
             }
         },
         partnerCustomization() {
-            return getPartnerCustomization();
+            return getPartnerCustomizationWithDefault();
         },
     },
     watch: {
@@ -218,6 +240,9 @@ export default Vue.extend({
                 this.layoutChanges++;
             }, 250);
         },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
     },
 });
 </script>
@@ -229,17 +254,16 @@ export default Vue.extend({
 .project-detail-card {
     display: flex;
     border: 1px solid var(--color-border);
-    padding: 1px;
     border-radius: 3px;
-    position: relative;
     z-index: $z-index-top;
-    width: 349px;
+    width: 100%;
     position: absolute;
-    top: 140px;
-    right: 28px;
+    top: 66px;
+    left: 0;
     box-sizing: border-box;
     background-color: #ffffff;
     text-align: left;
+    padding: 27px 30px;
 
     @include bp-down($sm) {
         width: 100%;
@@ -255,33 +279,34 @@ export default Vue.extend({
         justify-content: center;
     }
 
+    body.floodnet & {
+        background-color: #f6f9f8;
+    }
+
     .link {
-        color: $color-fieldkit-primary;
+        color: $color-primary;
         font-size: 12px;
         display: block;
+        letter-spacing: 0.07px;
+        text-decoration: initial;
 
-        &:not(:last-of-type) {
-            margin-bottom: 10px;
+        body.floodnet & {
+            color: $color-dark;
         }
     }
 }
 .detail-title {
-    font-family: $font-family-bold;
+    font-family: var(--font-family-bold);
     font-size: 18px;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-height: 1em;
-    width: 240px;
+    margin-top: 0;
+    margin-bottom: 2px;
+    margin-right: 10px;
 }
 .detail-container {
     width: 75%;
-    margin-bottom: 10px;
 }
 .detail-description {
-    font-family: $font-family-light;
+    font-family: var(--font-family-light);
     font-size: 14px;
     max-height: 35px;
     display: -webkit-box;
@@ -289,7 +314,6 @@ export default Vue.extend({
     -webkit-box-orient: vertical;
     max-height: 35px;
     overflow: hidden;
-    margin-bottom: 10px;
     margin-right: 10px;
 }
 
@@ -301,10 +325,13 @@ export default Vue.extend({
 }
 
 .photo-container {
-    width: 75px;
-    height: 75px;
-    margin: 10px;
-    float: left;
+    width: 38px;
+    height: 38px;
+    margin: 0 12px 0 0;
+
+    img {
+        border-radius: 2px;
+    }
 
     @include bp-down($sm) {
         display: none;
@@ -312,35 +339,78 @@ export default Vue.extend({
 }
 .container-map {
     width: 100%;
-    height: calc(100% - 33px);
+    height: calc(100% - 157px);
     margin-top: 0;
-    @include position(absolute, 66px null null 0);
+    @include position(absolute, 157px null null 0);
 
     @include bp-down($sm) {
         top: 54px;
         height: calc(100% - 54px);
     }
+
+    ::v-deep .stations-map {
+        height: 100% !important;
+    }
 }
 .map-legend {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--color-border);
+    border: 1px solid #f4f5f7;
     border-radius: 3px;
-    position: relative;
     z-index: $z-index-top;
     position: absolute;
-    bottom: 37px;
-    left: 65px;
+    bottom: 80px;
+    right: 0;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color: #fcfcfc;
     text-align: left;
-    padding: 15px;
-    padding-right: 30px;
     font-family: $font-family-medium;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
 
     h4 {
         margin: 0 0 0.5em 0;
         font-family: $font-family-bold;
+    }
+
+    &.collapsed {
+        .legend-toggle {
+            left: -25px;
+        }
+
+        .legend-content {
+            max-width: 0;
+        }
+
+        .icon-chevron-right {
+            transform: rotate(180deg) translateX(0);
+        }
+    }
+
+    .icon-chevron-right {
+        transform: translateX(2px);
+    }
+
+    .legend-content {
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 230px;
+        transition: all 0.25s ease-in-out;
+    }
+
+    .legend-content-wrap {
+        padding: 15px 20px 15px 15px;
+    }
+
+    .legend-toggle {
+        @include position(absolute, 11px null null -24px);
+        @include flex(center, center);
+        height: 35px;
+        width: 24px;
+        font-size: 22px;
+        color: #979797;
+        background-color: #fcfcfc;
+        box-shadow: -1px 2px 2px 0 rgb(0 0 0 / 13%);
+        cursor: pointer;
     }
 
     .legend-item {
@@ -361,14 +431,14 @@ export default Vue.extend({
 
 ::v-deep .station-hover-summary {
     width: 359px;
-    top: 122px;
-    left: 300px;
+    top: calc(50% - 100px);
+    left: calc(50% - 180px);
 }
 
 ::v-deep .stations-list {
     @include flex();
     flex-wrap: wrap;
-    padding: 100px 70px;
+    padding: 160px 70px;
     margin: -20px;
     width: 100%;
     box-sizing: border-box;
@@ -417,21 +487,27 @@ export default Vue.extend({
         .close-button {
             display: none;
         }
+
+        .navigate-button {
+            right: 0;
+        }
     }
 }
 
 .view-type {
-    width: 100px;
+    width: 115px;
     height: 39px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
     border: solid 1px #f4f5f7;
     background-color: #ffffff;
     cursor: pointer;
+    margin-left: 30px;
     @include flex(center, center);
 
     &-container {
         z-index: $z-index-top;
         margin: 0;
+        @include flex(center, center);
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($sm) {
@@ -441,24 +517,109 @@ export default Vue.extend({
 
     > div {
         flex-basis: 50%;
+        height: 100%;
+        @include flex(center, center);
 
         &.active {
-            i:before {
-                color: var(--color-dark);
-            }
+            font-family: $font-family-bold;
         }
-    }
-
-    &-list {
     }
 
     &-map {
         flex-basis: 50%;
-        border-right: solid 1px #f4f5f7;
+        border-right: solid 1px #d8dce0;
     }
 
     .icon {
         font-size: 18px;
+    }
+}
+
+.toggle-btn {
+    display: inline-block;
+    cursor: pointer;
+    z-index: $z-index-top;
+    position: relative;
+    font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
+    font-family: $font-family-medium !important;
+
+    * {
+        font-family: $font-family-medium !important;
+    }
+
+    span {
+        opacity: 0.5;
+
+        &.active {
+            opacity: 1;
+            color: $color-fieldkit-primary;
+
+            body.floodnet & {
+                color: $color-dark;
+            }
+        }
+    }
+}
+.toggle-btn i {
+    position: relative;
+    display: inline-block;
+    margin: 0 10px;
+    width: 27px;
+    height: 16px;
+    background-color: #e6e6e6;
+    border-radius: 20px;
+    vertical-align: text-bottom;
+    transition: all 0.3s linear;
+    user-select: none;
+}
+.toggle-btn i::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 27px;
+    background-color: #fff;
+    border-radius: 11px;
+    transform: translate3d(2px, 2px, 0) scale3d(1, 1, 1);
+    transition: all 0.25s linear;
+}
+.toggle-btn i::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #fff;
+    border-radius: 50%;
+    transform: translate3d(2px, 2px, 0);
+    transition: all 0.2s ease-in-out;
+}
+.toggle-btn:active i::after {
+    width: 28px;
+    transform: translate3d(2px, 2px, 0);
+}
+.toggle-btn:active input:checked ~ i::after {
+    transform: translate3d(16px, 2px, 0);
+}
+.toggle-btn input {
+    display: none;
+}
+.toggle-btn input ~ i {
+    background-color: $color-primary;
+}
+.toggle-btn input:checked ~ i::before {
+    transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0);
+}
+.toggle-btn input:checked ~ i::after {
+    transform: translate3d(13px, 2px, 0);
+}
+
+::v-deep .mapboxgl-ctrl {
+    margin: 35px 0 0 30px;
+
+    .mapboxgl-ctrl-geocoder {
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+        border: solid 1px #f4f5f7;
     }
 }
 </style>
