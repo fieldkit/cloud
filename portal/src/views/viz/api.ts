@@ -73,7 +73,7 @@ export interface DataRow {
     time: number;
     stationId: number | null;
     sensorId: number | null;
-    moduleId: number | null;
+    moduleId: string | null;
     location: [number, number] | null;
     value: number | null;
 }

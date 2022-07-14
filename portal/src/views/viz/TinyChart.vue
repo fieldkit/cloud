@@ -71,14 +71,12 @@ export default Vue.extend({
             station: DisplayStation
         ): { vizSensor: VizSensor; sensor: ModuleSensorMeta; data: TailSensorDataRow[] } | null {
             if (quickSensors.station.filter((r) => r.moduleId != null).length == 0) {
-                const moduleSensor: ModuleSensor | undefined = _.first(
-                    _.flattenDeep(station.configurations.all.map((c) => c.modules.map((m) => m.sensors)))
-                );
-                if (!moduleSensor) {
+                const moduleSensor: ModuleSensor[] = _.flattenDeep(station.configurations.all.map((c) => c.modules.map((m) => m.sensors)));
+                if (moduleSensor.length == 0) {
                     return null;
                 }
 
-                const sensor = meta.findSensorByKey(moduleSensor.fullKey);
+                const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
                 return { vizSensor: [station.id, ["", 0]], sensor, data: [] };
             }
 
@@ -98,14 +96,24 @@ export default Vue.extend({
         const { vizSensor, sensor, data } = maybeSensorMetaAndData;
 
         const sdr: SensorDataResponse = {
-            data: _.cloneDeep(data) as DataRow[],
+            data: data.map((row: TailSensorDataRow) => {
+                return {
+                    time: row.time,
+                    stationId: row.stationId,
+                    moduleId: row.moduleId,
+                    sensorId: row.sensorId,
+                    value: row.max,
+                    location: null,
+                };
+            }),
         };
         const queried = new QueriedData("key", TimeRange.eternity, sdr);
         const name = sensor.strings["enUs"]["label"] || "Unknown";
+        const station = { name: this.station.name, location: null };
         const vizInfo = new VizInfo(
             sensor.key,
             [], // Scale
-            { name: "", location: null }, // Station
+            station, // Station
             sensor.unitOfMeasure,
             sensor.key,
             name,

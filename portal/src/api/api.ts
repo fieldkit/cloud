@@ -270,6 +270,7 @@ export interface SensorReading {
 }
 
 export interface ModuleSensor {
+    fullKey: string;
     name: string;
     unitOfMeasure: string;
     key: string;
@@ -369,8 +370,9 @@ export interface TailSensorDataRow {
     stationId: number;
     sensorId: number;
     moduleId: string;
-    value: number;
-    location: [number, number] | null;
+    avg: number;
+    min: number;
+    max: number;
 }
 
 export interface TailSensorDataResponse {
