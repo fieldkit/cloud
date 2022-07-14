@@ -7,17 +7,19 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue, { PropType } from "vue";
-import { ModuleSensor, DisplayStation } from "@/store";
+import { ModuleSensor, DisplayStation, TailSensorDataRow } from "@/store";
 
 import {
     ChartSettings,
     SeriesData,
+    DataRow,
     DataSetSeries,
     QueriedData,
     VizInfo,
     VizSensor,
     TimeRange,
     SensorDataResponse,
+    ModuleSensorMeta,
 } from "./vega/SpecFactory";
 
 import LineChart from "./vega/LineChart.vue";
@@ -65,7 +67,9 @@ export default Vue.extend({
         // has no data and so to properly show a blank chart in that case we gotta
         // resolve the sensor to show. This uses the DisplayStation configuration data
         // to fill that in, by choosing the first one and then making up a fake vizSensor.
-        function getSensorMetaAndData(station: DisplayStation) {
+        function getSensorMetaAndData(
+            station: DisplayStation
+        ): { vizSensor: VizSensor; sensor: ModuleSensorMeta; data: TailSensorDataRow[] } | null {
             if (quickSensors.station.filter((r) => r.moduleId != null).length == 0) {
                 const moduleSensor: ModuleSensor | undefined = _.first(
                     _.flattenDeep(station.configurations.all.map((c) => c.modules.map((m) => m.sensors)))
@@ -94,7 +98,7 @@ export default Vue.extend({
         const { vizSensor, sensor, data } = maybeSensorMetaAndData;
 
         const sdr: SensorDataResponse = {
-            data: [], // _.cloneDeep(data),
+            data: _.cloneDeep(data) as DataRow[],
         };
         const queried = new QueriedData("key", TimeRange.eternity, sdr);
         const name = sensor.strings["enUs"]["label"] || "Unknown";
@@ -127,6 +131,7 @@ export default Vue.extend({
     width: 100%;
     height: 200px;
     border: solid 1px #d8dce0;
+    padding: 5px;
 }
 
 .tiny-chart .fit-x {

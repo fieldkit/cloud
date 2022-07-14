@@ -370,6 +370,7 @@ export interface TailSensorDataRow {
     sensorId: number;
     moduleId: string;
     value: number;
+    location: [number, number] | null;
 }
 
 export interface TailSensorDataResponse {
