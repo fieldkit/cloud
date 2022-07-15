@@ -25,3 +25,18 @@
     }
 }
 
+.icon-location {
+    &:before {
+        body.floodnet & {
+            color: var(--color-dark);
+        }
+    }
+}
+
+.icon-calendar {
+    &:before {
+        body.floodnet & {
+            color: var(--color-dark);
+        }
+    }
+}

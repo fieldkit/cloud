@@ -107,7 +107,7 @@ export class DataQueryParams {
         return _.isEqual(this, o);
     }
 
-    public queryParams(): URLSearchParams {
+    public queryParams(backend: string | null): URLSearchParams {
         const queryParams = new URLSearchParams();
         queryParams.append("start", this.when.start.toString());
         queryParams.append("end", this.when.end.toString());
@@ -115,6 +115,9 @@ export class DataQueryParams {
         queryParams.append("sensors", this.sensorAndModules.join(","));
         queryParams.append("resolution", "1000");
         queryParams.append("complete", "true");
+        if (backend) {
+            queryParams.append("backend", backend);
+        }
         return queryParams;
     }
 
@@ -136,6 +139,19 @@ export class DataQueryParams {
 
     public get sensorAndModules(): SensorSpec[] {
         return this.sensorParams.sensorAndModules;
+    }
+
+    public remapStationsFromModules(map: { [index: string]: number }): DataQueryParams {
+        return new DataQueryParams(
+            this.when,
+            this.sensors.map((vizSensor) => {
+                const vizSensorModule = vizSensor[1][0];
+                if (map[vizSensorModule]) {
+                    return [map[vizSensorModule], vizSensor[1]];
+                }
+                return vizSensor;
+            })
+        );
     }
 }
 
@@ -173,7 +189,9 @@ export class VizInfo {
         public readonly firmwareKey: string,
         public readonly name: string,
         public readonly viz: VizConfig[],
-        public readonly ranges: SensorRange[]
+        public readonly ranges: SensorRange[],
+        public readonly chartLabel: string,
+        public readonly axisLabel: string
     ) {}
 
     public get constrainedRanges(): SensorRange[] {
@@ -182,9 +200,38 @@ export class VizInfo {
 
     public get label(): string {
         if (this.unitOfMeasure) {
+            if (this.unitOfMeasure.indexOf(" ") > 0) {
+                return this.name + " (" + this.unitOfMeasure + ")";
+            }
             return this.name + " (" + _.capitalize(this.unitOfMeasure) + ")";
         }
         return this.name;
+    }
+
+    public get aggregationFunction() {
+        return this.firmwareKey == "wh.floodnet.depth" ? _.max : _.mean; // HACK
+    }
+
+    public applyCustomFilter(rows: DataRow[]): DataRow[] {
+        if (this.firmwareKey == "wh.floodnet.depth") {
+            // HACK
+            return rows.map((row) => {
+                if (!row) throw new Error();
+                if (_.isNumber(row.value) && row.value >= 38) {
+                    // HACK
+                    return {
+                        time: row.time,
+                        stationId: null,
+                        sensorId: null,
+                        moduleId: null,
+                        location: null,
+                        value: null,
+                    };
+                }
+                return row;
+            });
+        }
+        return rows;
     }
 }
 
@@ -230,14 +277,40 @@ export class QueriedData {
         return this.sdr.data;
     }
 
-    get aggregate() {
-        return this.sdr.aggregate;
+    private getAverageTimeBetweenSample(): number | null {
+        if (this.sdr.data.length <= 1) {
+            return null;
+        }
+
+        const deltas = this.sdr.data
+            .map((row) => row.time)
+            .reduce((diffs, time, index) => {
+                if (diffs.length == 0) {
+                    return [time];
+                }
+                const head = diffs.slice(0, diffs.length - 1);
+                const diff = time - diffs[diffs.length - 1];
+                const extra = [...head, diff];
+                if (index == this.sdr.data.length - 1) {
+                    return extra;
+                }
+                return [...extra, time];
+            }, []);
+
+        return _.mean(deltas);
+    }
+
+    get shouldIgnoreMissing(): boolean {
+        const averageMs = this.getAverageTimeBetweenSample();
+        // console.log("viz: average-delta", averageMs);
+        if (averageMs) {
+            return averageMs - 1000 < 5; // Was this.sdr.aggregate.interval <= 60;
+        }
+        return true;
     }
 
     public sorted(): QueriedData {
         const sorted = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortBy(this.sdr.data, (d) => d.time),
         };
         return new QueriedData(this.key, this.timeRangeQueried, sorted);
@@ -245,21 +318,17 @@ export class QueriedData {
 
     public removeMalformed(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: this.sdr.data.filter((d) => d.sensorId),
         };
-        console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
+        // console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 
     public removeDuplicates(): QueriedData {
         const filtered = {
-            summaries: this.sdr.summaries,
-            aggregate: this.sdr.aggregate,
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
         };
-        console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
+        // console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
     }
 }

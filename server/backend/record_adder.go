@@ -33,7 +33,6 @@ type ParsedRecord struct {
 	SignedRecord *pb.SignedRecord
 	DataRecord   *pb.DataRecord
 	Bytes        []byte
-	RecordNumber int64
 }
 
 func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
@@ -108,7 +107,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Metadata != nil {
-			metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, pr.RecordNumber, pr.DataRecord, pr.Bytes)
+			metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, int64(pr.DataRecord.Metadata.Record), pr.DataRecord, pr.Bytes)
 			if err != nil {
 				return nil, err
 			}
@@ -215,9 +214,8 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 					}
 				} else {
 					warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
-						RecordNumber: recordNumber,
-						DataRecord:   &dataRecord,
-						Bytes:        b,
+						DataRecord: &dataRecord,
+						Bytes:      b,
 					})
 					if fatal != nil {
 						return nil, fatal
@@ -256,7 +254,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 				}
 
 				warning, fatal := ra.Handle(ctx, i, &ParsedRecord{
-					RecordNumber: recordNumber, // This will never be used but we fill this in to be thorough until we can nuke this code path.
 					SignedRecord: &signedRecord,
 					DataRecord:   &dataRecord,
 					Bytes:        bytes,

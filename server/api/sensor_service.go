@@ -4,13 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
-	"time"
 
 	_ "github.com/lib/pq"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/jmoiron/sqlx"
 
 	"goa.design/goa/v3/security"
 
@@ -20,6 +17,8 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+
+	"github.com/fieldkit/cloud/server/api/querying"
 )
 
 func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQueryParams, error) {
@@ -32,116 +31,63 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 		Aggregate:  payload.Aggregate,
 		Tail:       payload.Tail,
 		Complete:   payload.Complete,
-		InfluxDB:   payload.InfluxDB,
+		Backend:    payload.Backend,
 	}, nil
 }
 
 type SensorService struct {
-	options *ControllerOptions
-	db      *sqlxcache.DB
+	options         *ControllerOptions
+	influxConfig    *querying.InfluxDBConfig
+	timeScaleConfig *querying.TimeScaleDBConfig
+	db              *sqlxcache.DB
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) *SensorService {
 	return &SensorService{
-		options: options,
-		db:      options.Database,
+		options:         options,
+		influxConfig:    influxConfig,
+		timeScaleConfig: timeScaleConfig,
+		db:              options.Database,
 	}
 }
 
-func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
-	if err := queried.StructScan(row); err != nil {
-		return fmt.Errorf("error scanning row: %v", err)
+func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (querying.DataBackend, error) {
+	if qp.Backend == "tsdb" {
+		if c.timeScaleConfig == nil {
+			log := Logger(ctx).Sugar()
+			log.Errorw("fatal: Missing TsDB configuration")
+		} else {
+			return querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db)
+		}
 	}
-
-	if row.Value != nil && math.IsNaN(*row.Value) {
-		row.Value = nil
+	if qp.Backend == "influxdb" {
+		if c.influxConfig == nil {
+			log := Logger(ctx).Sugar()
+			log.Errorw("fatal: Missing InfluxDB configuration")
+		} else {
+			return querying.NewInfluxDBBackend(c.influxConfig)
+		}
 	}
-
-	return nil
+	return querying.NewPostgresBackend(c.db), nil
 }
 
 func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
-	query, args, err := sqlx.In(fmt.Sprintf(`
-		SELECT
-		id,
-		time,
-		station_id,
-		sensor_id,
-		module_id,
-		value
-		FROM (
-			SELECT
-				ROW_NUMBER() OVER (PARTITION BY agg.sensor_id ORDER BY time DESC) AS r,
-				agg.*
-			FROM %s AS agg
-			WHERE agg.station_id IN (?)
-		) AS q
-		WHERE
-		q.r <= ?
-		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
+	be, err := c.chooseBackend(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
 
-	queried, err := c.db.QueryxContext(ctx, c.db.Rebind(query), args...)
+	data, err := be.QueryTail(ctx, qp)
 	if err != nil {
 		return nil, err
-	}
-
-	defer queried.Close()
-
-	rows := make([]*backend.DataRow, 0)
-
-	for queried.Next() {
-		row := &backend.DataRow{}
-		if err = scanRow(queried, row); err != nil {
-			return nil, err
-		}
-
-		rows = append(rows, row)
-	}
-
-	data := struct {
-		Data interface{} `json:"data"`
-	}{
-		rows,
 	}
 
 	return &sensor.DataResult{
 		Object: data,
 	}, nil
-}
-
-func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
-	sr := repositories.NewStationRepository(c.db)
-
-	byStation, err := sr.QueryStationSensors(ctx, stations)
-	if err != nil {
-		return nil, err
-	}
-
-	data := struct {
-		Stations map[int32][]*repositories.StationSensor `json:"stations"`
-	}{
-		byStation,
-	}
-
-	return &sensor.DataResult{
-		Object: data,
-	}, nil
-}
-
-type AggregateInfo struct {
-	Name     string    `json:"name"`
-	Interval int32     `json:"interval"`
-	Complete bool      `json:"complete"`
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
 }
 
 func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (*sensor.DataResult, error) {
-	log := Logger(ctx).Sugar()
-
 	rawParams, err := NewRawQueryParamsFromSensorData(payload)
 	if err != nil {
 		return nil, err
@@ -152,6 +98,8 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.MakeBadRequest(err)
 	}
 
+	log := Logger(ctx).Sugar()
+
 	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
 
 	if qp.Tail > 0 {
@@ -160,77 +108,35 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return c.stationsMeta(ctx, qp.Stations)
 	}
 
-	dq := backend.NewDataQuerier(c.db)
-
-	summaries, selectedAggregateName, err := dq.SelectAggregate(ctx, qp)
+	be, err := c.chooseBackend(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
 
-	aqp, err := backend.NewAggregateQueryParams(qp, selectedAggregateName, summaries[selectedAggregateName])
+	data, err := be.QueryData(ctx, qp)
 	if err != nil {
 		return nil, err
 	}
 
-	rows := make([]*backend.DataRow, 0)
-	if aqp.ExpectedRecords > 0 {
-		queried, err := dq.QueryAggregate(ctx, aqp)
-		if err != nil {
-			return nil, err
-		}
+	return &sensor.DataResult{
+		Object: data,
+	}, nil
+}
 
-		defer queried.Close()
+type StationsMeta struct {
+	Stations map[int32][]*repositories.StationSensor `json:"stations"`
+}
 
-		for queried.Next() {
-			row := &backend.DataRow{}
-			if err = scanRow(queried, row); err != nil {
-				return nil, err
-			}
+func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
+	sr := repositories.NewStationRepository(c.db)
 
-			rows = append(rows, row)
-		}
-	} else {
-		log.Infow("empty summary")
-	}
-
-	outerRows, err := dq.QueryOuterValues(ctx, aqp)
+	byStation, err := sr.QueryStationSensors(ctx, stations)
 	if err != nil {
 		return nil, err
 	}
 
-	if qp.Complete {
-		hackedRows := make([]*backend.DataRow, 0, len(rows)+len(outerRows))
-		if outerRows[0] != nil {
-			outerRows[0].Time = data.NumericWireTime(aqp.Start)
-			hackedRows = append(hackedRows, outerRows[0])
-		}
-		for i := 0; i < len(rows); i += 1 {
-			hackedRows = append(hackedRows, rows[i])
-		}
-		if outerRows[1] != nil {
-			outerRows[1].Time = data.NumericWireTime(aqp.End)
-			hackedRows = append(hackedRows, outerRows[1])
-		}
-
-		rows = hackedRows
-	}
-
-	data := struct {
-		Summaries map[string]*backend.AggregateSummary `json:"summaries"`
-		Aggregate AggregateInfo                        `json:"aggregate"`
-		Data      interface{}                          `json:"data"`
-		Outer     interface{}                          `json:"outer"`
-	}{
-		summaries,
-		AggregateInfo{
-			Name:     aqp.AggregateName,
-			Interval: aqp.Interval,
-			Complete: aqp.Complete,
-			Start:    aqp.Start,
-			End:      aqp.End,
-		},
-		rows,
-		outerRows,
+	data := &StationsMeta{
+		Stations: byStation,
 	}
 
 	return &sensor.DataResult{
@@ -241,6 +147,11 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 type SensorMeta struct {
 	ID  int64  `json:"id"`
 	Key string `json:"key"`
+}
+
+type MetaResult struct {
+	Sensors []*SensorMeta `json:"sensors"`
+	Modules interface{}   `json:"modules"`
 }
 
 func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
@@ -263,12 +174,9 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 		return nil, err
 	}
 
-	data := struct {
-		Sensors []*SensorMeta `json:"sensors"`
-		Modules interface{}   `json:"modules"`
-	}{
-		sensors,
-		modules,
+	data := &MetaResult{
+		Sensors: sensors,
+		Modules: modules,
 	}
 
 	return &sensor.MetaResult{

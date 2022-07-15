@@ -15,37 +15,39 @@ import (
 
 // Client is the "station" service client.
 type Client struct {
-	AddEndpoint            goa.Endpoint
-	GetEndpoint            goa.Endpoint
-	TransferEndpoint       goa.Endpoint
-	DefaultPhotoEndpoint   goa.Endpoint
-	UpdateEndpoint         goa.Endpoint
-	ListMineEndpoint       goa.Endpoint
-	ListProjectEndpoint    goa.Endpoint
-	ListAssociatedEndpoint goa.Endpoint
-	DownloadPhotoEndpoint  goa.Endpoint
-	ListAllEndpoint        goa.Endpoint
-	DeleteEndpoint         goa.Endpoint
-	AdminSearchEndpoint    goa.Endpoint
-	ProgressEndpoint       goa.Endpoint
+	AddEndpoint                   goa.Endpoint
+	GetEndpoint                   goa.Endpoint
+	TransferEndpoint              goa.Endpoint
+	DefaultPhotoEndpoint          goa.Endpoint
+	UpdateEndpoint                goa.Endpoint
+	ListMineEndpoint              goa.Endpoint
+	ListProjectEndpoint           goa.Endpoint
+	ListAssociatedEndpoint        goa.Endpoint
+	ListProjectAssociatedEndpoint goa.Endpoint
+	DownloadPhotoEndpoint         goa.Endpoint
+	ListAllEndpoint               goa.Endpoint
+	DeleteEndpoint                goa.Endpoint
+	AdminSearchEndpoint           goa.Endpoint
+	ProgressEndpoint              goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, listAssociated, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
+func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, listAssociated, listProjectAssociated, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint:            add,
-		GetEndpoint:            get,
-		TransferEndpoint:       transfer,
-		DefaultPhotoEndpoint:   defaultPhoto,
-		UpdateEndpoint:         update,
-		ListMineEndpoint:       listMine,
-		ListProjectEndpoint:    listProject,
-		ListAssociatedEndpoint: listAssociated,
-		DownloadPhotoEndpoint:  downloadPhoto,
-		ListAllEndpoint:        listAll,
-		DeleteEndpoint:         delete_,
-		AdminSearchEndpoint:    adminSearch,
-		ProgressEndpoint:       progress,
+		AddEndpoint:                   add,
+		GetEndpoint:                   get,
+		TransferEndpoint:              transfer,
+		DefaultPhotoEndpoint:          defaultPhoto,
+		UpdateEndpoint:                update,
+		ListMineEndpoint:              listMine,
+		ListProjectEndpoint:           listProject,
+		ListAssociatedEndpoint:        listAssociated,
+		ListProjectAssociatedEndpoint: listProjectAssociated,
+		DownloadPhotoEndpoint:         downloadPhoto,
+		ListAllEndpoint:               listAll,
+		DeleteEndpoint:                delete_,
+		AdminSearchEndpoint:           adminSearch,
+		ProgressEndpoint:              progress,
 	}
 }
 
@@ -115,6 +117,17 @@ func (c *Client) ListProject(ctx context.Context, p *ListProjectPayload) (res *S
 func (c *Client) ListAssociated(ctx context.Context, p *ListAssociatedPayload) (res *AssociatedStations, err error) {
 	var ires interface{}
 	ires, err = c.ListAssociatedEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*AssociatedStations), nil
+}
+
+// ListProjectAssociated calls the "list project associated" endpoint of the
+// "station" service.
+func (c *Client) ListProjectAssociated(ctx context.Context, p *ListProjectAssociatedPayload) (res *AssociatedStations, err error) {
+	var ires interface{}
+	ires, err = c.ListProjectAssociatedEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Dolores in ut.\",\n      \"locationName\": \"Ut laudantium eius praesentium ratione sapiente repellendus.\",\n      \"name\": \"Aut nihil nam repellendus dolor temporibus voluptatem.\",\n      \"statusPb\": \"Ratione eum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Temporibus et eos provident deleniti iste eos.\",\n      \"locationName\": \"Dicta autem nemo quibusdam delectus expedita eum.\",\n      \"name\": \"Illum fuga ipsum necessitatibus voluptatem.\",\n      \"statusPb\": \"Nesciunt cupiditate dolor soluta neque.\"\n   }'")
 		}
 	}
 	var auth string
@@ -145,7 +145,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Ut eum illo corrupti ea.\",\n      \"name\": \"Culpa eum.\",\n      \"statusPb\": \"Impedit eum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Excepturi corrupti sit dolores sint.\",\n      \"name\": \"Voluptatem est.\",\n      \"statusPb\": \"Nam nihil esse adipisci quod.\"\n   }'")
 		}
 	}
 	var id int32
@@ -244,6 +244,32 @@ func BuildListAssociatedPayload(stationListAssociatedID string, stationListAssoc
 	}
 	v := &station.ListAssociatedPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListProjectAssociatedPayload builds the payload for the station list
+// project associated endpoint from CLI flags.
+func BuildListProjectAssociatedPayload(stationListProjectAssociatedProjectID string, stationListProjectAssociatedAuth string) (*station.ListProjectAssociatedPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationListProjectAssociatedProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth *string
+	{
+		if stationListProjectAssociatedAuth != "" {
+			auth = &stationListProjectAssociatedAuth
+		}
+	}
+	v := &station.ListProjectAssociatedPayload{}
+	v.ProjectID = projectID
 	v.Auth = auth
 
 	return v, nil

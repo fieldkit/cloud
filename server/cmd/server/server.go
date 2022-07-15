@@ -33,11 +33,13 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/api"
+	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
-	_ "github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/social"
+
+	_ "github.com/fieldkit/cloud/server/messages"
 
 	"github.com/govau/que-go"
 	"github.com/jackc/pgx"
@@ -50,32 +52,71 @@ type Options struct {
 }
 
 type Config struct {
-	Addr                  string   `split_words:"true" default:"127.0.0.1:8080" required:"true"`
-	PostgresURL           string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	SessionKey            string   `split_words:"true"`
-	MapboxToken           string   `split_words:"true"`
-	TwitterConsumerKey    string   `split_words:"true"`
-	TwitterConsumerSecret string   `split_words:"true"`
-	AWSProfile            string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	Emailer               string   `split_words:"true" default:"default" required:"true"`
-	EmailOverride         string   `split_words:"true" default:""`
-	Archiver              string   `split_words:"true" default:"default" required:"true"`
-	PortalRoot            string   `split_words:"true"`
-	WellKnownRoot         string   `split_words:"true"`
-	Domain                string   `split_words:"true" default:"fklocal.org:8080" required:"true"`
-	HttpScheme            string   `split_words:"true" default:"https"`
-	ApiDomain             string   `split_words:"true" default:""`
-	PortalDomain          string   `split_words:"true" default:""`
-	ApiHost               string   `split_words:"true" default:""`
-	MediaBucketName       string   `split_words:"true" default:""` // Deprecated
-	StreamsBucketName     string   `split_words:"true" default:""` // Deprecated
-	MediaBuckets          []string `split_words:"true" default:""`
-	StreamsBuckets        []string `split_words:"true" default:""`
-	AwsId                 string   `split_words:"true" default:""`
-	AwsSecret             string   `split_words:"true" default:""`
-	StatsdAddress         string   `split_words:"true" default:""`
-	Production            bool     `envconfig:"production"`
-	LoggingFull           bool     `envconfig:"logging_full"`
+	Addr         string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
+	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	TimeScaleURL string `split_words:"true"`
+
+	// Tip, using required can help decipher the expected env name.
+	InfluxDbUrl      string `split_words:"true" requied:"false"`
+	InfluxDbToken    string `split_words:"true" requied:"false"`
+	InfluxDbUsername string `split_words:"true" requied:"false"`
+	InfluxDbPassword string `split_words:"true" requied:"false"`
+	InfluxDbOrg      string `split_words:"true" requied:"false"`
+	InfluxDbBucket   string `split_words:"true" requied:"false"`
+
+	SessionKey  string `split_words:"true"`
+	MapboxToken string `split_words:"true"`
+
+	PortalRoot    string `split_words:"true"`
+	WellKnownRoot string `split_words:"true"`
+	Domain        string `split_words:"true" default:"fklocal.org:8080" required:"true"`
+	HttpScheme    string `split_words:"true" default:"https"`
+	ApiDomain     string `split_words:"true" default:""`
+	PortalDomain  string `split_words:"true" default:""`
+	ApiHost       string `split_words:"true" default:""`
+
+	StatsdAddress string `split_words:"true" default:""`
+	Production    bool   `envconfig:"production"`
+	LoggingFull   bool   `envconfig:"logging_full"`
+	Workers       int    `split_words:"true" default:"1"`
+	Live          bool   `split_words:"true"`
+
+	AWSProfile        string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	Emailer           string   `split_words:"true" default:"default" required:"true"`
+	EmailOverride     string   `split_words:"true" default:""`
+	Archiver          string   `split_words:"true" default:"default" required:"true"`
+	MediaBucketName   string   `split_words:"true" default:""` // Deprecated
+	StreamsBucketName string   `split_words:"true" default:""` // Deprecated
+	MediaBuckets      []string `split_words:"true" default:""`
+	StreamsBuckets    []string `split_words:"true" default:""`
+	AwsId             string   `split_words:"true" default:""`
+	AwsSecret         string   `split_words:"true" default:""`
+
+	TwitterConsumerKey    string `split_words:"true"`
+	TwitterConsumerSecret string `split_words:"true"`
+}
+
+func (c *Config) timeScaleConfig() *querying.TimeScaleDBConfig {
+	if c.TimeScaleURL != "" {
+		return &querying.TimeScaleDBConfig{
+			Url: c.TimeScaleURL,
+		}
+	}
+	return nil
+}
+
+func (c *Config) influxConfig() *querying.InfluxDBConfig {
+	if c.InfluxDbToken == "" || c.InfluxDbUrl == "" || c.InfluxDbBucket == "" || c.InfluxDbOrg == "" {
+		return nil
+	}
+	return &querying.InfluxDBConfig{
+		Url:      c.InfluxDbUrl,
+		Token:    c.InfluxDbToken,
+		Username: c.InfluxDbUsername,
+		Password: c.InfluxDbPassword,
+		Org:      c.InfluxDbOrg,
+		Bucket:   c.InfluxDbBucket,
+	}
 }
 
 func getBucketNames(config *Config) *api.BucketNames {
@@ -185,6 +226,7 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 			},
 		}
 	}
+
 	log.Infow("using aws credentials")
 	return session.Options{
 		Profile: config.AWSProfile,
@@ -259,6 +301,8 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
+	log.Infow("starting", "workers", config.Workers, "live", config.Live)
+
 	qc := que.NewClient(pgxpool)
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, &backend.FileArchives{
@@ -266,7 +310,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
 	}, qc))
-	workers := que.NewWorkerPool(qc, workMap, 1)
+	workers := que.NewWorkerPool(qc, workMap, config.Workers)
 
 	go workers.Start()
 
@@ -282,7 +326,21 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Buckets:       bucketNames,
 	}
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc)
+	influxConfig := config.influxConfig()
+	if influxConfig == nil {
+		log.Infow("influxdb-disabled")
+	} else {
+		log.Infow("influxdb-enabled")
+	}
+
+	timeScaleConfig := config.timeScaleConfig()
+	if timeScaleConfig == nil {
+		log.Infow("timescaledb-disabled")
+	} else {
+		log.Infow("timescaledb-enabled")
+	}
+
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig, timeScaleConfig)
 	if err != nil {
 		return nil, err
 	}

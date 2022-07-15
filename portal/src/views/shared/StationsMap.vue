@@ -21,6 +21,7 @@
 <script lang="ts">
 /* eslint-disable vue/no-unused-components */
 
+import _ from "lodash";
 import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
@@ -29,8 +30,8 @@ import ValueMarker from "./ValueMarker.vue";
 
 import * as d3 from "d3";
 import mapboxgl from "mapbox-gl";
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 export interface ProtectedData {
     map: any;
@@ -52,7 +53,7 @@ export default Vue.extend({
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
-            hasGeocoder: false
+            hasGeocoder: false,
         };
     },
     props: {
@@ -152,36 +153,18 @@ export default Vue.extend({
 
             const map = this.protectedData.map;
 
-            if(!this.hasGeocoder){
+            if (!this.hasGeocoder) {
                 map.addControl(
                     new MapboxGeocoder({
                         accessToken: this.mapbox.token,
                         mapboxgl: mapboxgl,
                         collapsed: true,
-                        marker: false
-                    })
-                , 'top-left');
+                        marker: false,
+                    }),
+                    "top-left"
+                );
                 this.hasGeocoder = true;
             }
-            
-            // Marker color scale
-            const appendColor = (features) => {
-                return features.map((d) => {
-                    if (d.properties.thresholds) {
-                        const markerScale = d3
-                            .scaleThreshold()
-                            .domain(d.properties.thresholds.levels.map((d) => d.value))
-                            .range(d.properties.thresholds.levels.map((d) => d.color));
-
-                        d.properties.color = markerScale(d.properties.value);
-                    } else {
-                        //default color
-                        d.properties.color = "#00CCFF";
-                    }
-
-                    return d;
-                });
-            };
 
             if (!map.getLayer("station-markers") && this.showStations) {
                 console.log("map: updating", this.mapped);
@@ -190,7 +173,7 @@ export default Vue.extend({
                     type: "geojson",
                     data: {
                         type: "FeatureCollection",
-                        features: appendColor(this.mapped.features),
+                        features: this.mapped.features,
                     },
                 });
 
@@ -237,10 +220,11 @@ export default Vue.extend({
                 map.fitBounds(this.bounds, { duration: 0 });
             }
 
-            //Generate custom map markers
+            // Generate custom map markers
             const valueMarker = Vue.extend(ValueMarker);
+            const sorted = _.cloneDeep(this.mapped.features).sort((a, b) => a.properties.value - b.properties.value);
 
-            for (const feature of this.mapped.features) {
+            for (const feature of sorted) {
                 const instance = new valueMarker({
                     propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },
                 });

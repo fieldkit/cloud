@@ -209,14 +209,14 @@
                             </div>
                         </transition>
 
-                        <div v-if="user" class="actions">
-                            <button v-if="post.body" @click="addReply(post)">
+                        <div class="actions">
+                            <button v-if="user" @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
-                                Reply
+                                {{ $t("comments.actions.reply") }}
                             </button>
                             <button v-if="viewType === 'data'" @click="viewDataClick(post)">
                                 <i class="icon icon-view-data"></i>
-                                View Data
+                                {{ $t("comments.actions.viewData") }}
                             </button>
                         </div>
                     </div>
@@ -236,6 +236,7 @@ import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
+import { deserializeBookmark } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
@@ -315,6 +316,9 @@ export default Vue.extend({
     watch: {
         parentData(): Promise<void> {
             return this.getComments();
+        },
+        $route() {
+            this.highlightComment();
         },
     },
     mounted(): Promise<void> {
@@ -471,7 +475,8 @@ export default Vue.extend({
         },
         viewDataClick(post: Comment) {
             if (post.bookmark) {
-                this.$emit("viewDataClicked", JSON.parse(post.bookmark));
+                this.$emit("viewDataClicked", deserializeBookmark(post.bookmark));
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }
         },
         deleteComment(commentID: number) {
@@ -587,7 +592,7 @@ button {
 
 .container {
     margin-top: 20px;
-    padding: 0 20px 30px 20px;
+    padding: 0 0 30px 0;
     background: #fff;
     border-radius: 1px;
     border: 1px solid $color-border;
@@ -595,7 +600,7 @@ button {
 
     @include bp-down($xs) {
         margin: 20px -10px 0;
-        padding: 0 10px 30px 10px;
+        padding: 0 0 30px 0;
     }
 
     &.data-view {
@@ -608,10 +613,14 @@ button {
 
 header {
     @include flex(center, space-between);
-    padding: 13px 0;
+    padding: 13px 20px;
     border-bottom: 1px solid $color-border;
     font-size: 20px;
     font-weight: 500;
+
+    @include bp-down($xs) {
+        padding: 13px 10px;
+    }
 
     .data-view & {
         font-size: 18px;
@@ -628,7 +637,11 @@ header {
     @include flex(center, space-between);
     border-top: 1px solid $color-border;
     border-bottom: 1px solid $color-border;
-    padding: 15px 0;
+    padding: 15px 20px;
+
+    @include bp-down($xs) {
+        padding: 15px 10px;
+    }
 
     .data-view & {
         border-top: none;
@@ -649,12 +662,12 @@ header {
 
 ::v-deep .new-comment {
     @include flex(flex-end);
-    padding: 22px 0;
+    padding: 22px 20px;
     position: relative;
 
     @include bp-down($xs) {
         margin: 0 -10px;
-        padding: 15px 10px 15px 10px;
+        padding: 15px 10px;
     }
 
     @media screen and (max-width: 320px) {
@@ -765,9 +778,13 @@ header {
 .comment {
     @include flex(flex-start);
     flex: 100%;
-    padding: 15px 0 0;
+    padding: 15px 20px 0 20px;
     position: relative;
     flex-wrap: wrap;
+
+    @include bp-down($xs) {
+        padding: 15px 10px 0 10px;
+    }
 
     &-first-level {
         border-bottom: 1px solid $color-border;
@@ -785,8 +802,8 @@ header {
         }
     }
 
-    &.highlight > div {
-        background-color: #a0dbe1;
+    &.highlight {
+        background-color: #f5fbfc;
     }
 }
 
@@ -876,6 +893,7 @@ header {
 
 .post-header {
     display: flex;
+    margin-bottom: 5px;
 }
 
 .need-login-msg {
@@ -904,7 +922,7 @@ header {
 }
 
 .no-comments {
-    margin-top: 20px;
+    margin-left: 20px;
 }
 .event-sensor-selector {
     display: flex;
@@ -945,5 +963,6 @@ header {
 }
 .comment-toggle {
     margin-top: 20px;
+    margin-left: 20px;
 }
 </style>

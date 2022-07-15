@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
+	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/govau/que-go"
@@ -44,10 +45,14 @@ type ControllerOptions struct {
 
 	// Subscribed listeners
 	subscriptions *Subscriptions
+
+	influxConfig    *querying.InfluxDBConfig
+	timeScaleConfig *querying.TimeScaleDBConfig
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
 		return nil, err
@@ -61,22 +66,24 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 	locations := data.NewDescribeLocations(config.MapboxToken)
 
 	controllerOptions = &ControllerOptions{
-		Session:       awsSession,
-		Database:      database,
-		Querier:       data.NewQuerier(database),
-		Backend:       be,
-		Emailer:       emailer,
-		JWTHMACKey:    jwtHMACKey,
-		Domain:        config.Domain,
-		PortalDomain:  config.PortalDomain,
-		Metrics:       metrics,
-		Config:        config,
-		Publisher:     publisher,
-		MediaFiles:    mediaFiles,
-		signer:        NewSigner(jwtHMACKey),
-		locations:     locations,
-		que:           que,
-		subscriptions: NewSubscriptions(),
+		Session:         awsSession,
+		Database:        database,
+		Querier:         data.NewQuerier(database),
+		Backend:         be,
+		Emailer:         emailer,
+		JWTHMACKey:      jwtHMACKey,
+		Domain:          config.Domain,
+		PortalDomain:    config.PortalDomain,
+		Metrics:         metrics,
+		Config:          config,
+		Publisher:       publisher,
+		MediaFiles:      mediaFiles,
+		signer:          NewSigner(jwtHMACKey),
+		locations:       locations,
+		que:             que,
+		subscriptions:   NewSubscriptions(),
+		influxConfig:    influxConfig,
+		timeScaleConfig: timeScaleConfig,
 	}
 
 	return

@@ -138,6 +138,12 @@ type ListAssociatedResponseBody struct {
 	Stations AssociatedStationResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
 }
 
+// ListProjectAssociatedResponseBody is the type of the "station" service "list
+// project associated" endpoint HTTP response body.
+type ListProjectAssociatedResponseBody struct {
+	Stations AssociatedStationResponseBodyCollection `form:"stations" json:"stations" xml:"stations"`
+}
+
 // DownloadPhotoResponseBody is the type of the "station" service "download
 // photo" endpoint HTTP response body.
 type DownloadPhotoResponseBody struct {
@@ -761,6 +767,82 @@ type ListAssociatedBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ListProjectAssociatedUnauthorizedResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "unauthorized" error.
+type ListProjectAssociatedUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListProjectAssociatedForbiddenResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "forbidden" error.
+type ListProjectAssociatedForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListProjectAssociatedNotFoundResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "not-found" error.
+type ListProjectAssociatedNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListProjectAssociatedBadRequestResponseBody is the type of the "station"
+// service "list project associated" endpoint HTTP response body for the
+// "bad-request" error.
+type ListProjectAssociatedBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // DownloadPhotoUnauthorizedResponseBody is the type of the "station" service
 // "download photo" endpoint HTTP response body for the "unauthorized" error.
 type DownloadPhotoUnauthorizedResponseBody struct {
@@ -1161,6 +1243,7 @@ type StationProjectAttributeResponseBody struct {
 	AttributeID int64  `form:"attributeId" json:"attributeId" xml:"attributeId"`
 	Name        string `form:"name" json:"name" xml:"name"`
 	StringValue string `form:"stringValue" json:"stringValue" xml:"stringValue"`
+	Priority    int32  `form:"priority" json:"priority" xml:"priority"`
 }
 
 // StationUploadResponseBody is used to define fields on response body types.
@@ -1198,16 +1281,17 @@ type StationConfigurationResponseBody struct {
 
 // StationModuleResponseBody is used to define fields on response body types.
 type StationModuleResponseBody struct {
-	ID           int64                        `form:"id" json:"id" xml:"id"`
-	HardwareID   *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
-	MetaRecordID *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
-	Name         string                       `form:"name" json:"name" xml:"name"`
-	Position     int32                        `form:"position" json:"position" xml:"position"`
-	Flags        int32                        `form:"flags" json:"flags" xml:"flags"`
-	Internal     bool                         `form:"internal" json:"internal" xml:"internal"`
-	FullKey      string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
-	Sensors      []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
-	Meta         map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
+	ID               int64                        `form:"id" json:"id" xml:"id"`
+	HardwareID       *string                      `form:"hardwareId,omitempty" json:"hardwareId,omitempty" xml:"hardwareId,omitempty"`
+	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
+	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
+	Name             string                       `form:"name" json:"name" xml:"name"`
+	Position         int32                        `form:"position" json:"position" xml:"position"`
+	Flags            int32                        `form:"flags" json:"flags" xml:"flags"`
+	Internal         bool                         `form:"internal" json:"internal" xml:"internal"`
+	FullKey          string                       `form:"fullKey" json:"fullKey" xml:"fullKey"`
+	Sensors          []*StationSensorResponseBody `form:"sensors" json:"sensors" xml:"sensors"`
+	Meta             map[string]interface{}       `form:"meta,omitempty" json:"meta,omitempty" xml:"meta,omitempty"`
 }
 
 // StationSensorResponseBody is used to define fields on response body types.
@@ -1294,11 +1378,11 @@ type AssociatedStationResponseBodyCollection []*AssociatedStationResponseBody
 // AssociatedStationResponseBody is used to define fields on response body
 // types.
 type AssociatedStationResponseBody struct {
-	Station  *StationFullResponseBody           `form:"station" json:"station" xml:"station"`
-	Project  *AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
-	Location *AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Manual   *AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
-	Hidden   bool                               `form:"hidden" json:"hidden" xml:"hidden"`
+	Station  *StationFullResponseBody             `form:"station" json:"station" xml:"station"`
+	Project  []*AssociatedViaProjectResponseBody  `form:"project,omitempty" json:"project,omitempty" xml:"project,omitempty"`
+	Location []*AssociatedViaLocationResponseBody `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Manual   []*AssociatedViaManualResponseBody   `form:"manual,omitempty" json:"manual,omitempty" xml:"manual,omitempty"`
+	Hidden   bool                                 `form:"hidden" json:"hidden" xml:"hidden"`
 }
 
 // AssociatedViaProjectResponseBody is used to define fields on response body
@@ -1310,7 +1394,8 @@ type AssociatedViaProjectResponseBody struct {
 // AssociatedViaLocationResponseBody is used to define fields on response body
 // types.
 type AssociatedViaLocationResponseBody struct {
-	Distance float32 `form:"distance" json:"distance" xml:"distance"`
+	StationID int32   `form:"stationID" json:"stationID" xml:"stationID"`
+	Distance  float32 `form:"distance" json:"distance" xml:"distance"`
 }
 
 // AssociatedViaManualResponseBody is used to define fields on response body
@@ -1537,6 +1622,19 @@ func NewListProjectResponseBody(res *stationviews.StationsFullView) *ListProject
 // of the "list associated" endpoint of the "station" service.
 func NewListAssociatedResponseBody(res *stationviews.AssociatedStationsView) *ListAssociatedResponseBody {
 	body := &ListAssociatedResponseBody{}
+	if res.Stations != nil {
+		body.Stations = make([]*AssociatedStationResponseBody, len(res.Stations))
+		for i, val := range res.Stations {
+			body.Stations[i] = marshalStationviewsAssociatedStationViewToAssociatedStationResponseBody(val)
+		}
+	}
+	return body
+}
+
+// NewListProjectAssociatedResponseBody builds the HTTP response body from the
+// result of the "list project associated" endpoint of the "station" service.
+func NewListProjectAssociatedResponseBody(res *stationviews.AssociatedStationsView) *ListProjectAssociatedResponseBody {
+	body := &ListProjectAssociatedResponseBody{}
 	if res.Stations != nil {
 		body.Stations = make([]*AssociatedStationResponseBody, len(res.Stations))
 		for i, val := range res.Stations {
@@ -2063,6 +2161,66 @@ func NewListAssociatedBadRequestResponseBody(res *goa.ServiceError) *ListAssocia
 	return body
 }
 
+// NewListProjectAssociatedUnauthorizedResponseBody builds the HTTP response
+// body from the result of the "list project associated" endpoint of the
+// "station" service.
+func NewListProjectAssociatedUnauthorizedResponseBody(res *goa.ServiceError) *ListProjectAssociatedUnauthorizedResponseBody {
+	body := &ListProjectAssociatedUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListProjectAssociatedForbiddenResponseBody builds the HTTP response body
+// from the result of the "list project associated" endpoint of the "station"
+// service.
+func NewListProjectAssociatedForbiddenResponseBody(res *goa.ServiceError) *ListProjectAssociatedForbiddenResponseBody {
+	body := &ListProjectAssociatedForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListProjectAssociatedNotFoundResponseBody builds the HTTP response body
+// from the result of the "list project associated" endpoint of the "station"
+// service.
+func NewListProjectAssociatedNotFoundResponseBody(res *goa.ServiceError) *ListProjectAssociatedNotFoundResponseBody {
+	body := &ListProjectAssociatedNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListProjectAssociatedBadRequestResponseBody builds the HTTP response body
+// from the result of the "list project associated" endpoint of the "station"
+// service.
+func NewListProjectAssociatedBadRequestResponseBody(res *goa.ServiceError) *ListProjectAssociatedBadRequestResponseBody {
+	body := &ListProjectAssociatedBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewDownloadPhotoUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "download photo" endpoint of the "station" service.
 func NewDownloadPhotoUnauthorizedResponseBody(res *goa.ServiceError) *DownloadPhotoUnauthorizedResponseBody {
@@ -2422,6 +2580,16 @@ func NewListProjectPayload(id int32, disableFiltering *bool, auth *string) *stat
 func NewListAssociatedPayload(id int32, auth *string) *station.ListAssociatedPayload {
 	v := &station.ListAssociatedPayload{}
 	v.ID = id
+	v.Auth = auth
+
+	return v
+}
+
+// NewListProjectAssociatedPayload builds a station service list project
+// associated endpoint payload.
+func NewListProjectAssociatedPayload(projectID int32, auth *string) *station.ListProjectAssociatedPayload {
+	v := &station.ListProjectAssociatedPayload{}
+	v.ProjectID = projectID
 	v.Auth = auth
 
 	return v

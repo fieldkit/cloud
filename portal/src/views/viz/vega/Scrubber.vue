@@ -127,14 +127,7 @@ export default {
         async pickRange(timeRange: number[]): Promise<void> {
             const first = this.series[0];
             if (first.ds) {
-                const xDomainsAll = this.series.map((series: SeriesData) => series.queried.timeRange);
-                const allRanges = [...xDomainsAll, this.visible];
-                const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
-                if (_.isEqual(timeRangeAll, timeRange)) {
-                    await this.brush([]);
-                } else {
-                    await this.brush(timeRange);
-                }
+                await this.brush(timeRange);
             }
         },
 

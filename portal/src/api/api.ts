@@ -8,7 +8,6 @@ import { BoundingRectangle } from "@/store/map-types";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
-import { promiseAfter } from "@/utilities";
 import Backoff from "backoff";
 
 export interface PortalDeployStatus {
@@ -278,6 +277,7 @@ export interface StationModule {
     id: number;
     name: string;
     hardwareId: string;
+    hardwareIdBase64: string;
     position: number;
     internal: boolean;
     flags: number;
@@ -310,6 +310,7 @@ export interface ProjectAttribute {
     projectId: number;
     name: string;
     stringValue: string;
+    priority: number;
 }
 
 export interface Station {
@@ -344,8 +345,8 @@ export interface StationsResponse {
 
 export interface AssociatedStation {
     station: Station;
-    manual?: { otherStationID: number; priority: number };
-    location?: { distance: number };
+    manual?: { otherStationID: number; priority: number }[];
+    location?: { stationID: number; distance: number }[];
     project?: { id: number };
     hidden: boolean;
 }
@@ -355,6 +356,18 @@ export interface AssociatedStationsResponse {
 }
 
 export type SendFunction = (message: unknown) => Promise<void>;
+
+export interface TailSensorDataRow {
+    time: number;
+    stationId: number;
+    sensorId: number;
+    moduleId: string;
+    value: number;
+}
+
+export interface TailSensorDataResponse {
+    data: TailSensorDataRow[];
+}
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
@@ -390,6 +403,7 @@ class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
+    private allSensorsMemoized = _.memoize(() => this.getAllSensors());
 
     authenticated() {
         return this.token.authenticated();
@@ -1068,7 +1082,11 @@ class FKApi {
         });
     }
 
-    getAllSensors(): Promise<SensorsResponse> {
+    public getAllSensorsMemoized(): () => Promise<SensorsResponse> {
+        return this.allSensorsMemoized;
+    }
+
+    private getAllSensors(): Promise<SensorsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -1114,7 +1132,7 @@ class FKApi {
         });
     }
 
-    public tailSensorData(params: URLSearchParams): Promise<any> {
+    public tailSensorData(params: URLSearchParams): Promise<TailSensorDataResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

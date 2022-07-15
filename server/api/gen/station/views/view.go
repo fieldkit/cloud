@@ -129,6 +129,7 @@ type StationProjectAttributeView struct {
 	AttributeID *int64
 	Name        *string
 	StringValue *string
+	Priority    *int32
 }
 
 // StationUploadView is a type that runs validations on a projected type.
@@ -165,16 +166,17 @@ type StationConfigurationView struct {
 
 // StationModuleView is a type that runs validations on a projected type.
 type StationModuleView struct {
-	ID           *int64
-	HardwareID   *string
-	MetaRecordID *int64
-	Name         *string
-	Position     *int32
-	Flags        *int32
-	Internal     *bool
-	FullKey      *string
-	Sensors      []*StationSensorView
-	Meta         map[string]interface{}
+	ID               *int64
+	HardwareID       *string
+	HardwareIDBase64 *string
+	MetaRecordID     *int64
+	Name             *string
+	Position         *int32
+	Flags            *int32
+	Internal         *bool
+	FullKey          *string
+	Sensors          []*StationSensorView
+	Meta             map[string]interface{}
 }
 
 // StationSensorView is a type that runs validations on a projected type.
@@ -241,9 +243,9 @@ type AssociatedStationCollectionView []*AssociatedStationView
 // AssociatedStationView is a type that runs validations on a projected type.
 type AssociatedStationView struct {
 	Station  *StationFullView
-	Project  *AssociatedViaProjectView
-	Location *AssociatedViaLocationView
-	Manual   *AssociatedViaManualView
+	Project  []*AssociatedViaProjectView
+	Location []*AssociatedViaLocationView
+	Manual   []*AssociatedViaManualView
 	Hidden   *bool
 }
 
@@ -255,7 +257,8 @@ type AssociatedViaProjectView struct {
 // AssociatedViaLocationView is a type that runs validations on a projected
 // type.
 type AssociatedViaLocationView struct {
-	Distance *float32
+	StationID *int32
+	Distance  *float32
 }
 
 // AssociatedViaManualView is a type that runs validations on a projected type.
@@ -702,6 +705,9 @@ func ValidateStationProjectAttributeView(result *StationProjectAttributeView) (e
 	if result.StringValue == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("stringValue", "result"))
 	}
+	if result.Priority == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("priority", "result"))
+	}
 	return
 }
 
@@ -958,19 +964,25 @@ func ValidateAssociatedStationView(result *AssociatedStationView) (err error) {
 	if result.Hidden == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("hidden", "result"))
 	}
-	if result.Project != nil {
-		if err2 := ValidateAssociatedViaProjectView(result.Project); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range result.Project {
+		if e != nil {
+			if err2 := ValidateAssociatedViaProjectView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
-	if result.Location != nil {
-		if err2 := ValidateAssociatedViaLocationView(result.Location); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range result.Location {
+		if e != nil {
+			if err2 := ValidateAssociatedViaLocationView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
-	if result.Manual != nil {
-		if err2 := ValidateAssociatedViaManualView(result.Manual); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range result.Manual {
+		if e != nil {
+			if err2 := ValidateAssociatedViaManualView(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	if result.Station != nil {
@@ -993,6 +1005,9 @@ func ValidateAssociatedViaProjectView(result *AssociatedViaProjectView) (err err
 // ValidateAssociatedViaLocationView runs the validations defined on
 // AssociatedViaLocationView.
 func ValidateAssociatedViaLocationView(result *AssociatedViaLocationView) (err error) {
+	if result.StationID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("stationID", "result"))
+	}
 	if result.Distance == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("distance", "result"))
 	}

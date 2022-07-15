@@ -9,28 +9,46 @@
                 <slot name="top-right-actions"></slot>
             </div>
 
-            <div
-                class="row where-row"
-                v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
-            >
-                <div class="location-container">
-                    <div v-if="stationLocationName || station.placeNameOther">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                        <template>
-                            {{ stationLocationName ? stationLocationName : station.placeNameOther }}
-                        </template>
+            <template v-if="isCustomisationEnabled()">
+                <div class="row where-row">
+                    <div v-if="neighborhood || borough" class="location-container">
+                        <i class="icon icon-location" />
+                        <template v-if="neighborhood">{{ neighborhood }}</template>
+                        <template v-if="neighborhood && borough">{{ ", " }}</template>
+                        <template v-if="borough">{{ borough }}</template>
                     </div>
-                    <div v-if="station.placeNameNative">
-                        <img alt="Location" src="@/assets/icon-location.svg" class="icon" />
-                        <span>
-                            Native Lands:
-                            <span class="bold">{{ station.placeNameNative }}</span>
-                        </span>
+                    <div v-if="deploymentDate || deployedBy" class="location-container">
+                        <i class="icon icon-calendar" />
+                        <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
+                        <template v-if="deployedBy">{{ $t("station.by") }} {{ deployedBy }}</template>
                     </div>
                 </div>
-            </div>
+            </template>
 
-            <div class="station-modules">
+            <template v-else>
+                <div
+                    class="row where-row"
+                    v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
+                >
+                    <div class="location-container">
+                        <div v-if="stationLocationName || station.placeNameOther">
+                            <i class="icon icon-location" />
+                            <template>
+                                {{ stationLocationName ? stationLocationName : station.placeNameOther }}
+                            </template>
+                        </div>
+                        <div v-if="station.placeNameNative">
+                            <i class="icon icon-location" />
+                            <span>
+                                Native Lands:
+                                <span class="bold">{{ station.placeNameNative }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <div v-if="!isCustomisationEnabled()" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
                     <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
@@ -46,7 +64,7 @@ import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import * as utils from "@/utilities";
 import { DisplayStation } from "@/store";
-import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationSummaryContent",
@@ -66,6 +84,19 @@ export default Vue.extend({
         stationLocationName(): string {
             return this.partnerCustomization().stationLocationName(this.station);
         },
+        // TODO: refactor using functions from partner.ts
+        neighborhood(): string {
+            return this.getAttributeValue("Neighborhood");
+        },
+        borough(): string {
+            return this.getAttributeValue("Borough");
+        },
+        deploymentDate(): string {
+            return this.getAttributeValue("Deployment Date");
+        },
+        deployedBy(): string {
+            return this.getAttributeValue("Deployed By");
+        },
     },
     methods: {
         getBatteryIcon() {
@@ -76,6 +107,15 @@ export default Vue.extend({
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
+        },
+        isCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
+        getAttributeValue(attrName: string): any {
+            if (this.station) {
+                const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
+                return value ? value : null;
+            }
         },
     },
 });
@@ -121,6 +161,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     position: relative;
+    flex: 1;
 }
 
 .station-details {
@@ -128,16 +169,12 @@ export default Vue.extend({
 }
 
 .location-container {
-    flex-direction: column;
     display: flex;
-    margin-top: 2px;
-
-    .summary-content & {
-        flex-direction: row;
-    }
+    margin-bottom: 2px;
+    font-size: 14px;
 
     > div {
-        @include flex(center);
+        @include flex(flex-start);
         margin-bottom: 5px;
 
         &:first-of-type {
@@ -150,6 +187,11 @@ export default Vue.extend({
 
 .icon {
     padding-right: 5px;
+    transform: translateY(2px);
+}
+
+.icon-calendar {
+    font-size: 12px;
 }
 
 .station-modules {
@@ -170,6 +212,7 @@ export default Vue.extend({
     text-align: left;
     font-size: 14px;
     padding-bottom: 5px;
+    margin-top: 5px;
     color: var(--color-dark);
 }
 </style>

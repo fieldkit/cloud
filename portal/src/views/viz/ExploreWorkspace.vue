@@ -1,3 +1,4 @@
+"
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
@@ -6,6 +7,11 @@
 
         <div class="explore-view">
             <div class="explore-header">
+                <div class="explore-links">
+                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank">
+                        {{ $t(link.text) }} >
+                    </a>
+                </div>
                 <DoubleHeader :backTitle="$t(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
@@ -21,7 +27,7 @@
                             <i class="icon icon-share"></i>
                             Share
                         </div>
-                        <div v-show="user" class="button-submit" @click="openExports">
+                        <div v-if="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             Export
                         </div>
@@ -45,7 +51,7 @@
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
-                                src="@/assets/tooltip-blue.svg"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 @click="openStationPageTab"
                             />
                         </template>
@@ -80,11 +86,11 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization } from "../shared/partners";
+import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { Station, ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-import { SensorsResponse } from "./api";
+import { SensorsResponse, AssociatedStation } from "./api";
 import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
@@ -166,7 +172,7 @@ export default Vue.extend({
         },
         selectedStation(): DisplayStation | null {
             if (this.workspace) {
-                return this.workspace.getStation(this.selectedId);
+                return this.workspace.getStation(this.workspace.selectedStationId);
             }
             return null;
         },
@@ -182,23 +188,21 @@ export default Vue.extend({
         },
         async selectedId(newValue: number, oldValue: number): Promise<void> {
             console.log("viz: selected-changed-associated", newValue);
-            if (this.workspace) {
-                await this.includeAssociated(this.workspace);
-            }
         },
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
             await this.$services.api
-                .getAllSensors()
-                .then(async (sensorKeys) => {
+                .getAllSensorsMemoized()() // TODO No need to make this call.
+                .then(async () => {
                     // Check for a bookmark that is just to a station with no groups.
                     if (this.bookmark.s.length > 0 && this.bookmark.g.length == 0) {
                         console.log("viz: before-show-station", this.bookmark);
                         return this.showStation(this.bookmark.s[0]);
                     }
+
                     console.log("viz: before-create-workspace", this.bookmark);
-                    const ws = await this.createWorkspaceIfNecessary();
+                    await this.createWorkspaceIfNecessary();
                 })
                 .catch(async (e) => {
                     if (e.name === "ForbiddenError") {
@@ -208,44 +212,6 @@ export default Vue.extend({
         }
     },
     methods: {
-        async includeAssociated(ws: Workspace): Promise<Workspace> {
-            const allStationIds = ws.allStationIds;
-            console.log("viz: include-associated(0)", allStationIds);
-
-            if (allStationIds.length > 0) {
-                const associated = await this.$services.api.getAssociatedStations(allStationIds[0]).catch(async (e) => {
-                    if (ForbiddenError.isInstance(e)) {
-                        await this.$router.push({
-                            name: "login",
-                            params: { errorMessage: String(this.$t("login.privateStation")) },
-                            query: { after: this.$route.path },
-                        });
-                    }
-                });
-                if (associated) {
-                    const ids = associated.stations.map((s) => s.station.id);
-                    console.log(`viz: include-associated(0)`, associated);
-                    console.log(
-                        `viz: include-associated(0)`,
-                        associated.stations
-                            .filter((row) => row.manual)
-                            .map((row) => {
-                                return { station: row.station, manual: row.manual };
-                            }),
-                        associated.stations
-                            .filter((row) => row.location)
-                            .map((row) => {
-                                return { station: row.station, location: row.location };
-                            })
-                    );
-                    await ws.addStationIds(ids);
-                    await ws.addFullStations(associated.stations.map((s) => s.station));
-                    await ws.addAssociatedStations(associated.stations);
-                }
-            }
-
-            return ws;
-        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -287,14 +253,14 @@ export default Vue.extend({
                 return this.workspace;
             }
 
-            const allSensors: SensorsResponse = await this.$services.api.getAllSensors();
+            console.log("viz: workspace-creating");
+
+            const allSensors: SensorsResponse = await this.$services.api.getAllSensorsMemoized()();
             const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
 
+            this.workspace = await ws.initialize();
+
             console.log(`viz: workspace-created`);
-
-            await this.includeAssociated(ws);
-
-            this.workspace = ws;
 
             return ws;
         },
@@ -378,6 +344,12 @@ export default Vue.extend({
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
         },
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
+        },
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
+        },
     },
 });
 </script>
@@ -441,6 +413,7 @@ export default Vue.extend({
 }
 .explore-header {
     margin-bottom: 1em;
+    position: relative;
 }
 .explore-header .button {
     margin-left: 20px;
@@ -450,6 +423,17 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
+}
+
+.explore-links {
+    @include position(absolute, 0 0 null null);
+
+    a {
+        font-size: 12px;
+        letter-spacing: 0.07px;
+        color: #000;
+        font-family: $font-family-medium;
+    }
 }
 
 .workspace-container {
@@ -821,3 +805,4 @@ export default Vue.extend({
     justify-content: center;
 }
 </style>
+"

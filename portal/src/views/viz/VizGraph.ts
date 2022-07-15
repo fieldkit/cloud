@@ -7,11 +7,6 @@ import Spinner from "@/views/shared/Spinner.vue";
 import { ViewingControls } from "./ViewingControls";
 import { DebuggingPanel } from "./DebuggingPanel";
 
-/*
-import { D3TimeSeriesGraph as TimeSeriesGraph } from "./D3TimeSeriesGraph";
-import { D3Histogram as Histogram } from "./D3Histogram";
-import { D3Range as Range } from "./D3Range";
-*/
 import { VegaTimeSeriesGraph as TimeSeriesGraph } from "./VegaTimeSeriesGraph";
 import { VegaHistogram as Histogram } from "./VegaHistogram";
 import { VegaRange as Range } from "./VegaRange";
@@ -97,6 +92,8 @@ export const VizGraph = Vue.extend({
                     return "Range";
                 case ChartType.Map:
                     return "Map";
+                case ChartType.Bar:
+                    return "BarChart";
             }
 
             this.viz.log("unknown chart type");

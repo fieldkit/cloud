@@ -1,4 +1,4 @@
-import _, { map } from "lodash";
+import _ from "lodash";
 import moment, { Moment } from "moment";
 import {
     SensorsResponse,
@@ -21,20 +21,28 @@ import {
     QueriedData,
     ExploreContext,
 } from "./common";
-import FKApi, { Station, AssociatedStation } from "@/api/api";
+import FKApi, { Station, AssociatedStation, AssociatedStationsResponse } from "@/api/api";
 import i18n from "@/i18n";
 
 export * from "./common";
+import Config from "@/secrets";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
-import { DisplayStation } from "@/store";
+import { DisplayStation, stations } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
 
 type SensorReadAtType = string;
 
 function getString(d) {
     return d["enUS"] || d["enUs"] || d["en-US"]; // HACK
+}
+
+function getBackend(): string | null {
+    if (Config.backend) {
+        return Config.backend;
+    }
+    return window.localStorage["fk:backend"] || null;
 }
 
 export class SensorMeta {
@@ -69,6 +77,7 @@ export class StationTreeOption {
         public readonly id: string | number,
         public readonly label: string,
         public readonly isDisabled: boolean,
+        public readonly isDefaultExpanded: boolean = false,
         public readonly children: StationTreeOption[] | undefined = undefined
     ) {}
 }
@@ -105,6 +114,7 @@ export enum ChartType {
     Histogram,
     Range,
     Map,
+    Bar,
 }
 
 type VizBookmark = [VizSensor[], [number, number], [[number, number], [number, number]] | [], ChartType, FastTime];
@@ -148,6 +158,10 @@ class VizQuery {
 
     public resolve(qd: QueriedData) {
         return this.r(qd);
+    }
+
+    public remapStationsFromModules(map: { [index: string]: number }): VizQuery {
+        return new VizQuery(this.params.remapStationsFromModules(map), this.vizes, this.r);
     }
 }
 
@@ -571,55 +585,18 @@ export class Group {
     }
 }
 
-export class Querier {
-    private info: { [index: string]: SensorInfoResponse } = {};
+class DataQuerier {
+    // private info: { [index: string]: SensorInfoResponse } = {};
     private data: { [index: string]: QueriedData } = {};
-
-    public queryInfo(iq: InfoQuery): Promise<SensorInfoResponse> {
-        if (!iq.params) throw new Error("no params");
-
-        const params = iq.params;
-        const queryParams = new URLSearchParams();
-        queryParams.append("stations", params.join(","));
-
-        const key = queryParams.toString();
-
-        console.log(`vis: query-info`, key);
-
-        if (this.info[key]) {
-            // iq.howBusy(1);
-
-            return promiseAfter(1).then(() => {
-                // iq.howBusy(-1);
-                return this.info[key];
-            });
-        }
-
-        return Promise.resolve()
-            .then(() => {
-                iq.howBusy(1);
-            })
-            .then(() => {
-                return new FKApi()
-                    .sensorData(queryParams)
-                    .then((info: SensorInfoResponse) => {
-                        this.info[key] = info;
-                        return info;
-                    })
-                    .finally(() => {
-                        iq.howBusy(-1);
-                    });
-            });
-    }
 
     public queryData(vq: VizQuery): Promise<QueriedData> {
         if (!vq.params) throw new Error("no params");
 
         const params = vq.params;
-        const queryParams = params.queryParams();
+        const queryParams = params.queryParams(getBackend());
         const key = queryParams.toString();
 
-        console.log(`viz: query-data`, key);
+        // console.log(`viz: query-data`, key);
 
         if (this.data[key]) {
             // vq.howBusy(1);
@@ -655,35 +632,59 @@ export class Querier {
     }
 }
 
+class VizMeta {
+    constructor(public readonly stationSensors: SensorInfoResponse, public readonly associated: AssociatedStationsResponse) {}
+}
+
+class MetaQuerier {
+    private readonly api = new FKApi();
+
+    public async query(stationIds: number[]): Promise<VizMeta> {
+        if (stationIds.length == 0) throw new Error("viz: No stations");
+
+        const queryParams = new URLSearchParams();
+        queryParams.append("stations", stationIds.join(","));
+
+        const stationSensors = await this.api.sensorData(queryParams);
+        const associated = await this.api.getAssociatedStations(stationIds[0]);
+
+        console.log("viz: meta", { stationSensors, associated });
+        return new VizMeta(stationSensors, associated);
+    }
+}
+
 export class Workspace implements VizInfoFactory {
+    public version = 0;
+    private readonly dataQuerier = new DataQuerier();
+    private readonly metaQuerier = new MetaQuerier();
+    private readonly showInternalSensors = false;
+
     private stationIds: StationID[] = [];
     private stationsFull: Station[] = [];
     private associated: AssociatedStation[] = [];
-    private readonly querier = new Querier();
-    private readonly stations: { [index: number]: StationMeta } = {};
-    private readonly showInternalSensors = false;
-    public version = 0;
+    private stations: { [index: number]: StationMeta } = {};
 
-    public findStationOverride(sensor: VizSensor): number | null {
-        const moduleId = sensor[1][0];
-        const moduleIdToStationId = _.fromPairs(
-            _.flatten(Object.values(this.stations).map((row) => row.sensors.map((sensor) => [sensor.moduleId, row.id])))
-        );
-        const sensorStationId = moduleIdToStationId[moduleId];
-        return this.stationOverrides[sensorStationId];
+    constructor(
+        private readonly meta: SensorsResponse,
+        private groups: Group[] = [],
+        public readonly projects: number[] = [],
+        public readonly bookmarkStations: number[] | null = null,
+        public readonly context: ExploreContext | null = null
+    ) {
+        this.stationIds = bookmarkStations || [];
     }
 
-    private get stationOverrides(): { [index: number]: number } {
-        return _.fromPairs(
-            this.associated
-                .map((associated) => {
-                    if (associated.manual) {
-                        return [associated.station.id, associated.manual.otherStationID];
-                    }
-                    return [];
-                })
-                .filter((l) => l.length)
-        );
+    public get selectedStationId(): number {
+        const firstVizSensor = _(this.groups)
+            .map((g) => g.vizes.map((v) => v.bookmark()[0]))
+            .flatten()
+            .flatten()
+            .first();
+        if (!firstVizSensor) {
+            throw new Error();
+        }
+        // console.log("viz: first-viz-sensor", firstVizSensor);
+        return /*this.findStationOverride(firstVizSensor) ||*/ firstVizSensor[0];
     }
 
     public get empty(): boolean {
@@ -702,13 +703,39 @@ export class Workspace implements VizInfoFactory {
         return this.stationsFull;
     }
 
-    constructor(
-        private readonly meta: SensorsResponse,
-        private groups: Group[] = [],
-        public readonly projects: number[] = [],
-        public readonly context: ExploreContext | null = null
-    ) {
-        this.refreshStationIds();
+    public async addAssociatedStations(associated: AssociatedStation[]): Promise<Workspace> {
+        this.associated = associated;
+        return this;
+    }
+
+    public async addFullStations(stations: Station[]): Promise<Workspace> {
+        this.stationsFull = stations;
+        return this;
+    }
+
+    public async addStationIds(ids: number[]): Promise<Workspace> {
+        if (_.difference(ids, this.stationIds).length == 0) {
+            console.log("viz: workspace-add-station-ids(ignored)", { ids });
+            return this;
+        }
+        this.stationIds = [...this.stationIds, ...ids];
+        console.log("viz: workspace-add-station-ids", { ids: this.stationIds });
+        return this;
+    }
+
+    private vizStationIds(): number[] {
+        return _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
+    }
+
+    private get allVizes(): Viz[] {
+        return _(this.groups)
+            .map((g) => g.vizes)
+            .flatten()
+            .value();
+    }
+
+    private findStationOverride(sensor: VizSensor): number | null {
+        return null;
     }
 
     public getStation(id: number): DisplayStation | null {
@@ -721,30 +748,42 @@ export class Workspace implements VizInfoFactory {
         return null;
     }
 
-    private get allVizes(): Viz[] {
-        return _(this.groups)
-            .map((g) => g.vizes)
-            .flatten()
-            .value();
+    public async initialize(): Promise<Workspace> {
+        console.log(`viz: workspace-initializing`, { stationIds: this.stationIds });
+
+        const meta = await this.metaQuerier.query(this.stationIds);
+
+        // TODO Map and assign.
+        const test = _.map(meta.stationSensors.stations, (info, stationId) => {
+            const stationName = info[0].stationName;
+            const stationLocation = info[0].stationLocation;
+            const sensors = info
+                .filter((row) => row.moduleId != null)
+                .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
+            const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
+            this.stations[station.id] = station;
+            return station;
+        });
+
+        this.associated = meta.associated.stations;
+        this.stationsFull = meta.associated.stations.map((as) => as.station);
+
+        return this;
     }
 
     public async query(): Promise<any> {
         const allGraphs = this.allVizes.map((viz) => viz as Graph).filter((viz) => viz);
 
-        // First we may need some data for making the UI useful and
-        // pretty. Filling in labels, building drop downs, etc... This
-        // is especially important to do from here because we may have
-        // been instantiated from a Bookmark. Right now we just query
-        // for information on all the stations involved.
-        const allStationIds = _.uniq(_.flatten(allGraphs.map((viz) => viz.allStationIds)).concat(this.stationIds));
-        const infoQueries = allStationIds.length ? [new InfoQuery(allStationIds, allGraphs)] : [];
-
         // Second step is to query to fill in any required scrubbers. I
         // have tried in previous iterations to be clever about this
         // and just being very explicit is the best way.
-        const scrubberQueries = _.flatten(allGraphs.map((viz: Graph) => viz.scrubberQueries()));
+        const scrubberQueries: VizQuery[] = _.flatten(
+            allGraphs.map((viz: Graph) => viz.scrubberQueries().map(this.dereferenceAssociatedVizQuery.bind(this)))
+        );
         // Now build the queries for the data being viewed.
-        const graphingQueries = _.flatten(allGraphs.map((viz: Graph) => viz.graphingQueries()));
+        const graphingQueries: VizQuery[] = _.flatten(
+            allGraphs.map((viz: Graph) => viz.graphingQueries().map(this.dereferenceAssociatedVizQuery.bind(this)))
+        );
 
         // Combine and make them unique to avoid obvious
         // duplicates. Eventually we can also merge stations/sensors
@@ -752,40 +791,51 @@ export class Workspace implements VizInfoFactory {
         // query. Lots of room here.
         const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
-            .groupBy((q) => q.params.queryParams().toString())
+            .groupBy((q) => q.params.queryParams(getBackend()).toString())
             .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
             .value();
 
-        console.log("viz: workspace: querying", uniqueQueries.length, "data", infoQueries.length, "info");
+        console.log("viz: workspace: querying", uniqueQueries.length, "data");
 
-        // Make all the queries and then give the queried data to the
-        // resolve call for that query. This will end up calling the
-        // above mapped resolve to set the appropriate data.
-        const pendingInfo = infoQueries.map(
-            (iq) =>
-                this.querier.queryInfo(iq).then((info) => {
-                    return _.map(info.stations, (info, stationId) => {
-                        const stationName = info[0].stationName;
-                        const stationLocation = info[0].stationLocation;
-                        const sensors = info
-                            .filter((row) => row.moduleId != null)
-                            .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
-                        const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
-                        this.stations[station.id] = station;
-                        // console.log("viz: station-meta", { station, info });
-                        return station;
-                    });
-                }) as Promise<unknown>
-        );
-
-        await Promise.all([...pendingInfo]);
-
-        const pendingData = uniqueQueries.map((vq) => this.querier.queryData(vq) as Promise<unknown>);
-        return Promise.all([...pendingInfo, ...pendingData]).then(() => {
+        const pendingData = uniqueQueries.map((vq) => this.dataQuerier.queryData(vq) as Promise<unknown>);
+        return Promise.all([...pendingData]).then(() => {
             // Update options here if doing so lazily.
-            console.log("viz: workspace: query done ");
+            // console.log("viz: workspace: query done ");
             this.version++;
         });
+    }
+
+    private mapModulesToStations() {
+        return _(Object.values(this.stations))
+            .map((stationMeta) => stationMeta.sensors.map((sensorMeta) => [sensorMeta.moduleId, stationMeta.id]))
+            .flatten()
+            .fromPairs()
+            .value();
+    }
+
+    private dereferenceAssociatedVizQuery(vq: VizQuery): VizQuery {
+        const modulesToStations = this.mapModulesToStations();
+        console.log("viz: dereference", vq.params.sensors, modulesToStations);
+        return vq.remapStationsFromModules(modulesToStations);
+    }
+
+    public availableChartTypes(viz: Graph, ds: DataSetSeries | undefined = undefined): ChartType[] {
+        const vizInfo = this.vizInfo(viz, ds);
+        const specifiedNames = vizInfo.viz.map((row) => row.name);
+        if (specifiedNames.length == 0) {
+            return [ChartType.TimeSeries, ChartType.Histogram, ChartType.Range, ChartType.Bar, ChartType.Map];
+        }
+
+        const knownNames = {
+            TimeSeriesChart: ChartType.TimeSeries,
+            HistogramChart: ChartType.Histogram,
+            BarChart: ChartType.Bar,
+            RangeChart: ChartType.Range,
+            Map: ChartType.Map,
+        };
+
+        const migratedNames = specifiedNames.map((name) => name.replace("D3", "").replace("Graph", "Chart"));
+        return migratedNames.map((row) => knownNames[row]);
     }
 
     public vizInfo(viz: Graph, ds: DataSetSeries | undefined = undefined): VizInfo {
@@ -808,6 +858,7 @@ export class Workspace implements VizInfoFactory {
         const sensorId = sensor[1];
 
         const station = this.stations[stationId];
+        if (!station) throw new Error(`viz: Missing station ${stationId}`);
         const key = keysById[sensorId].key;
         const details = sensorDetailsByKey[key];
         const scale = createSensorColorScale(details);
@@ -815,10 +866,23 @@ export class Workspace implements VizInfoFactory {
         // console.log(`viz:vizInfo:sensor`, details);
 
         const strings = getString(details.strings);
+        const chartLabel = strings.chartLabel ? strings.chartLabel : strings.label;
+        const axisLabel = strings.axisLabel ? strings.axisLabel : strings.label;
 
         // console.log(`viz:vizInfo:sensor`, strings);
 
-        return new VizInfo(key, scale, station, details.unitOfMeasure, key, strings.label, details.viz || [], details.ranges);
+        return new VizInfo(
+            key,
+            scale,
+            station,
+            details.unitOfMeasure,
+            key,
+            strings.label,
+            details.viz || [],
+            details.ranges,
+            chartLabel,
+            axisLabel
+        );
     }
 
     public graphTimeZoomed(viz: Viz, zoom: TimeZoom): Workspace {
@@ -836,26 +900,6 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
 
-    public async addAssociatedStations(associated: AssociatedStation[]): Promise<Workspace> {
-        this.associated = associated;
-        return this;
-    }
-
-    public async addFullStations(stations: Station[]): Promise<Workspace> {
-        this.stationsFull = stations;
-        return this;
-    }
-
-    public async addStationIds(ids: number[]): Promise<Workspace> {
-        if (_.difference(ids, this.stationIds).length == 0) {
-            console.log("viz: workspace-add-station-ids(ignored)", ids);
-            return this;
-        }
-        this.stationIds = [...this.stationIds, ...ids];
-        console.log("viz: workspace-add-station-ids", this.stationIds);
-        return this;
-    }
-
     private findGroup(viz: Viz): Group {
         const groups = this.groups.filter((g) => g.contains(viz));
         if (groups.length == 1) {
@@ -868,68 +912,52 @@ export class Workspace implements VizInfoFactory {
         const group = new Group();
         group.add(graph);
         this.groups.unshift(group);
-        this.refreshStationIds();
+        // this.refreshStationIds();
         return this;
-    }
-
-    private refreshStationIds() {
-        this.stationIds = _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
     }
 
     public addStandardGraph(vizSensor: VizSensor): Workspace {
         return this.addGraph(new Graph(TimeRange.eternity, [new DataSetSeries(vizSensor)]));
     }
 
-    private nearbyStationOptions(): StationTreeOption[] {
-        // Notice we skip over manually associated stations as that's a stronger association.
-        const nearby = this.associated.filter((assoc) => this.stations[assoc.station.id] && assoc.location && !assoc.manual);
-        console.log("viz: associated-nearby", nearby);
-        if (nearby.length == 0) {
-            return [];
-        }
-
-        const options = nearby.map((associatedStation) => {
-            const station = associatedStation.station;
-            return new StationTreeOption(station.id, station.name, false);
-        });
-
-        return [new StationTreeOption(`nearby`, "Nearby", false, options)];
+    private get selectedAssociated(): AssociatedStation {
+        const found = this.associated.find((a) => a.station.id == this.selectedStationId);
+        if (!found) throw new Error();
+        return found;
     }
 
-    private manuallyAssociatedStationOptions(): StationTreeOption[] {
-        const manuallyAssociated = this.associated.filter((assoc) => this.stations[assoc.station.id] && assoc.manual);
-        console.log("viz: associated-manually", manuallyAssociated);
-        if (manuallyAssociated.length == 0) {
+    private nearbyStationOptions(): StationTreeOption[] {
+        // Notice we skip over manually associated stations as that's a stronger association.
+        const selected = this.selectedAssociated;
+        if (!selected.location || selected.location.length == 0) {
             return [];
         }
 
-        const options = manuallyAssociated.map((associatedStation) => {
-            const station = associatedStation.station;
+        const OneMileInMeters = (5280 * 12 * 2.54) / 100;
+        const nearby = selected.location
+            .filter((l) => l.distance < OneMileInMeters)
+            .map((l) => this.stationsFull.find((s) => s.id == l.stationID));
+        console.log("viz: nearby", nearby);
+
+        const options = nearby.map((station: Station) => {
             return new StationTreeOption(station.id, station.name, false);
         });
 
-        return [new StationTreeOption(`manual`, "Associated", false, options)];
+        return [new StationTreeOption(`nearby`, "Nearby", false, true, options)];
     }
 
     public get stationOptions(): StationTreeOption[] {
-        const hiddenById = _.fromPairs(this.associated.map((assoc) => [assoc.station.id, assoc.hidden]));
-        const associatedById = _.groupBy(this.associated, (assoc) => assoc.station.id);
         const nearby = this.nearbyStationOptions();
-        const manually = this.manuallyAssociatedStationOptions();
 
         // This is for removing stations that already have an option because of
         // they're associated. Not a fan of this approach.
+        const selected = this.selectedAssociated;
+        const hiddenById = _.fromPairs(this.associated.map((assoc) => [assoc.station.id, assoc.hidden]));
         const unassociated = Object.values(this.stations).filter((station) => {
             if (hiddenById[station.id]) {
                 return false;
             }
-
-            const maybeAssociated = associatedById[station.id];
-            if (maybeAssociated && maybeAssociated.length > 0) {
-                return !maybeAssociated[0].location && !maybeAssociated[0].manual;
-            }
-
-            return true;
+            return !selected.location || !selected.location.find((l) => l.stationID == station.id);
         });
 
         const regular = unassociated.map((station) => {
@@ -971,21 +999,29 @@ export class Workspace implements VizInfoFactory {
                     `group-${name}`,
                     name,
                     false,
+                    false,
                     group.map((child) => child.option)
                 );
             })
             .value();
 
         const allOptions = [...groupOptions, ...ungrouped];
-        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, allOptions)] : [];
+        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, false, allOptions)] : [];
 
-        console.log("viz: ungrouped", ungrouped);
-        console.log("viz: all", all);
+        console.log("viz: stations", {
+            stations: this.stations,
+            associated: this.associated,
+            unassociated,
+            nearby,
+            groupOptions,
+            ungrouped,
+            all,
+        });
 
-        return [...manually, ...nearby, ...all];
+        return [...nearby, ...all];
     }
 
-    public sensorOptions(stationId: number, flatten = false): SensorTreeOption[] {
+    public sensorOptions(stationId: number, flatten = false, depth = 0): SensorTreeOption[] {
         const station = this.stations[stationId];
         if (!station) {
             throw new Error(`viz: No station: ${stationId}`);
@@ -1036,7 +1072,7 @@ export class Workspace implements VizInfoFactory {
                     throw new Error(`viz: Expected module age: no sensors?`);
                 }
 
-                const label = i18n.tc(moduleKey); //  + ` (${moduleAge.fromNow()})`;
+                const label = i18n.tc(moduleKey);
 
                 if (flatten) {
                     return children[0];
@@ -1046,27 +1082,6 @@ export class Workspace implements VizInfoFactory {
             }
         );
 
-        if (_.flatten(options.map((o) => o.children)).length == 1) {
-            const associatedWithStation = this.associated.filter((assoc) => assoc.manual && assoc.manual.otherStationID == stationId);
-            if (associatedWithStation.length) {
-                const associatedSensorOptions = _.flatten(
-                    associatedWithStation.map((associated) => {
-                        const moduleOptions = this.sensorOptions(associated.station.id);
-                        console.log("debug-viz-station", moduleOptions);
-                        return _.flatten(moduleOptions.map((option) => option.children || []));
-                    })
-                );
-
-                const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
-
-                if (!options || options.length != 1 || !options[0].children) {
-                    console.log("viz: unexpected options", options);
-                } else {
-                    options[0].children = [...options[0].children, relatedOption];
-                }
-            }
-        }
-
         const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
             if (option.age) {
                 return -option.age.valueOf();
@@ -1074,18 +1089,54 @@ export class Workspace implements VizInfoFactory {
             return 0;
         });
 
+        const associated = this.associated.find((a) => a.station.id == stationId);
+        if (depth == 0 && associated && associated.manual && associated.manual.length > 0) {
+            console.log("sensor-options", stationId, associated);
+            const otherStations = _.flatten(
+                associated.manual.map((ma) => this.associated.filter((a) => a.station.id == ma.otherStationID))
+            );
+            const associatedSensorOptions = _(
+                otherStations.map((associated) => {
+                    const moduleOptions = this.sensorOptions(associated.station.id, false, depth + 1);
+                    // console.log("viz: debug-associated", depth, moduleOptions);
+                    return _.flatten(moduleOptions.map((option) => option.children || [])).map((option) =>
+                        // Force these options to use the original station id,
+                        // so the relationship is many to many we need to
+                        // remember the original. We used to keep the "real"
+                        // station id that owns the sensor here but that would
+                        // lose the context. Now we replace the station id when
+                        // querying for data.
+                        _.extend(option, { stationId: stationId })
+                    );
+                })
+            )
+                .flatten()
+                .sortBy((o) => o.label)
+                .value();
+
+            if (associatedSensorOptions.length > 0) {
+                const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
+                sorted.push(relatedOption);
+            }
+        }
+
         return sorted;
     }
 
-    public makeSeries(stationId: number, sensorAndModule: SensorSpec): DataSetSeries {
+    public makeSeries(stationId: number, sensorAndModule: SensorSpec | null): DataSetSeries {
+        // If we're given a sensor and module then use that one, otherwise we're
+        // being told to pick one for the station.
+        if (sensorAndModule) {
+            return new DataSetSeries([stationId, sensorAndModule]);
+        }
+
+        // We're called in response to UI changes to return an appropriate
+        // series to chart, so we can be passed combinations that aren't valid,
+        // changing a station from one to another for example.
         const station = this.stations[stationId];
         if (!station) throw new Error(`viz: No station with id: ${stationId}`);
         const sensors = station.sensors;
         if (sensors.length == 0) throw new Error(`viz: No sensors on station with id: ${stationId}`);
-        const moduleIds = sensors.map((s) => s.moduleId);
-        if (moduleIds.includes(sensorAndModule[0])) {
-            return new DataSetSeries([stationId, sensorAndModule]);
-        }
         const fallbackSensorAndModule: SensorSpec = [sensors[0].moduleId, sensors[0].sensorId];
         return new DataSetSeries([stationId, fallbackSensorAndModule]);
     }
@@ -1180,6 +1231,7 @@ export class Workspace implements VizInfoFactory {
             meta,
             bm.g.map((gm) => Group.fromBookmark(gm)),
             bm.p,
+            bm.s,
             bm.c
         );
     }
