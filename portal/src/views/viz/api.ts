@@ -45,6 +45,7 @@ export interface ModuleSensorMeta {
     ranges: SensorRange[];
     viz: VizConfig[];
     strings: SensorStrings;
+    aggregationFunction: string;
 }
 
 export interface Module {

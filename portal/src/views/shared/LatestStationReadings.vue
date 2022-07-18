@@ -205,6 +205,12 @@ export default Vue.extend({
                         )
                     );
 
+                    const sensorsByKey = _(meta.modules)
+                        .map((m) => m.sensors)
+                        .flatten()
+                        .keyBy((s) => s.fullKey)
+                        .value();
+
                     const idsToKey = _.mapValues(
                         _.keyBy(meta.sensors, (k) => k.id),
                         (v) => v.key
@@ -212,7 +218,7 @@ export default Vue.extend({
 
                     const idsToValue = _.mapValues(
                         _.keyBy(data.data, (r) => r.sensorId),
-                        (r) => r.max
+                        (r) => r
                     );
 
                     const keysToValue = _(idsToValue)
@@ -220,16 +226,13 @@ export default Vue.extend({
                         .fromPairs()
                         .value();
 
-                    const sensorsByKey = _(meta.modules)
-                        .map((m) => m.sensors)
-                        .flatten()
-                        .keyBy((s) => s.fullKey)
-                        .value();
-
                     const readings = _(keysToValue)
-                        .map((value, key) => {
+                        .map((reading, key) => {
                             const sensor = sensorsByKey[key];
                             if (!sensor) throw new Error("no sensor meta");
+
+                            const value = reading.value || reading[sensor.aggregationFunction];
+
                             const classes = [key.replaceAll(".", "-")];
                             if (sensor.unitOfMeasure == "°") {
                                 classes.push("degrees");
