@@ -28,7 +28,7 @@
                             :sensorDataQuerier="sensorDataQuerier"
                             v-slot="{ sensorDataQuerier }"
                         >
-                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
                         </StationHoverSummary>
                     </div>
                 </div>
@@ -94,6 +94,7 @@
 
 <script lang="ts">
 import * as utils from "../../utilities";
+import { getFeaturesEnabled } from "@/utilities";
 
 import { ActionTypes, GlobalState, ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
 
@@ -149,6 +150,9 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.id];
             },
         }),
+        tinyChartsEnabled(): boolean {
+            return getFeaturesEnabled().tinyCharts;
+        },
         project(): Project {
             return this.displayProject.project;
         },

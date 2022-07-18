@@ -1,5 +1,15 @@
 import _ from "lodash";
 
+interface FeatureFlags {
+    tinyCharts: boolean;
+}
+
+export function getFeaturesEnabled(): FeatureFlags {
+    return {
+        tinyCharts: window.localStorage["fk:tiny-charts"] != null,
+    };
+}
+
 export function serializePromiseChain(all, fn) {
     return all.reduce((accum, value, index) => {
         return accum.then((allValues) => {

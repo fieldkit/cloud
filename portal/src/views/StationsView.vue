@@ -10,7 +10,7 @@
                         :sensorDataQuerier="sensorDataQuerier"
                         v-slot="{ sensorDataQuerier, station }"
                     >
-                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
                     </StationHoverSummary>
                 </div>
             </div>
@@ -65,6 +65,7 @@ import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
+import { getFeaturesEnabled } from "@/utilities";
 
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
@@ -114,6 +115,9 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
+        tinyChartsEnabled(): boolean {
+            return getFeaturesEnabled().tinyCharts;
+        },
         activeStation(): DisplayStation {
             return this.$state.stations.stations[this.id];
         },

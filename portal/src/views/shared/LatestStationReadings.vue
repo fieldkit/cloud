@@ -212,7 +212,7 @@ export default Vue.extend({
 
                     const idsToValue = _.mapValues(
                         _.keyBy(data.data, (r) => r.sensorId),
-                        (r) => r.value
+                        (r) => r.max
                     );
 
                     const keysToValue = _(idsToValue)
@@ -236,7 +236,6 @@ export default Vue.extend({
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            // console.log(`sensor:`, sensor);
 
                             return new SensorReading(
                                 key,
@@ -257,7 +256,6 @@ export default Vue.extend({
                     );
                 })
                 .then((sensors) => {
-                    // console.log(`sensors`, sensors);
                     if (this.moduleKey) {
                         this.sensors = sensors.filter((sensor) => sensor.sensorModule.key === this.moduleKey);
                     } else {
@@ -265,6 +263,7 @@ export default Vue.extend({
                     }
                     this.loading = false;
                     this.$emit("layoutChange");
+
                     return this.sensors;
                 });
         },
