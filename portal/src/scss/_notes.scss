@@ -19,7 +19,7 @@
     border-radius: 4px;
     margin-top: 0;
     margin-bottom: 20px;
-    padding: 15px 20px 5px;
+    padding: 15px 20px 15px;
 
     @include bp-down($xs) {
         border: 0;
@@ -87,7 +87,6 @@
     display: flex;
 }
 
-
 .site-notes {
     margin-top: 30px;
 
@@ -116,3 +115,4 @@
         transform: translateY(8px);
     }
 }
+

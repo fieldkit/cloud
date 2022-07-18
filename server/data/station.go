@@ -83,6 +83,7 @@ type Station struct {
 	PlaceOther         *string    `db:"place_other"`
 	PlaceNative        *string    `db:"place_native"`
 	PhotoID            int32      `db:"photo_id"`
+	Hidden             *bool      `db:"hidden"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
