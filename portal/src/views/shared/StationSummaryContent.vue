@@ -20,7 +20,7 @@
                     <div v-if="deploymentDate || deployedBy" class="location-container">
                         <i class="icon icon-calendar" />
                         <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
-                        <template v-if="deployedBy">{{ $t("station.by") }} {{ deployedBy }}</template>
+                        <template v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</template>
                     </div>
                 </div>
             </template>

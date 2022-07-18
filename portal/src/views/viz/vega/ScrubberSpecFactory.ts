@@ -276,7 +276,6 @@ export class ScrubberSpecFactory {
                                 type: "mousedown",
                                 filter:
                                 [
-                                    //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
                                     "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\" && event.item.mark.name !== \"left_scrub\")"
                                 ]
                             },

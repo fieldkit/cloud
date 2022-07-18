@@ -9,7 +9,7 @@
                 :backRouteParams="{ id: projectId }"
             >
                 <template v-slot:default>
-                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank">
+                    <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
                         {{ $t(link.text) }} >
                     </a>
                 </template>
@@ -616,12 +616,15 @@ section {
 }
 
 .double-header {
-    .actions {
-        a {
-            font-size: 12px;
-            letter-spacing: 0.07px;
-            color: #000;
-            font-family: $font-family-medium;
+    .link {
+        color: $color-primary;
+        font-size: 12px;
+        letter-spacing: 0.07px;
+        text-decoration: initial;
+        transform: translateY(-4px);
+
+        body.floodnet & {
+            color: $color-dark;
         }
     }
 }
