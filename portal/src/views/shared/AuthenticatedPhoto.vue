@@ -37,7 +37,6 @@ export default Vue.extend({
     },
     methods: {
         refresh(this: any) {
-            this.loading = true;
             return this.$services.api.loadMedia(this.url).then((photo) => {
                 this.photo = photo;
             });

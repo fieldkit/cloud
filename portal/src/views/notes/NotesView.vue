@@ -188,7 +188,6 @@ export default Vue.extend({
         },
         selectedNotes(): PortalStationNotesReply | null {
             if (this.stationId && this.notes) {
-                console.log("radoi notes prop", this.notes[this.stationId]);
                 return this.notes[this.stationId];
             }
             return null;

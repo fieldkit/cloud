@@ -1,4 +1,4 @@
-  <template>
+<template>
     <form class="form" @submit.prevent="save">
         <h1 class="form-title">Log In to Your Account</h1>
         <div class="form-group" v-if="spoofing">
