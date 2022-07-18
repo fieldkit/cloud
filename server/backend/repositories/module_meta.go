@@ -132,12 +132,12 @@ func toUint32Array(a []int32) []uint32 {
 
 func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*ModuleMeta, err error) {
 	modules := []*PersistedModuleMeta{}
-	if err := r.db.SelectContext(ctx, &modules, `SELECT * FROM fieldkit.module_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &modules, `SELECT id, key, manufacturer, kinds, version, internal FROM fieldkit.module_meta`); err != nil {
 		return nil, err
 	}
 
 	sensors := []*PersistedSensorMeta{}
-	if err := r.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.sensor_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges FROM fieldkit.sensor_meta`); err != nil {
 		return nil, err
 	}
 
