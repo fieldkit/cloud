@@ -376,8 +376,22 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/projects/:projectId/station/:stationId/photos",
+        path: "/station/:stationId/photos",
         name: "viewStationPhotos",
+        component: StationPhotosView,
+        props: (route) => {
+            return {
+                stationId: Number(route.params.stationId),
+                forcePublic: false,
+            };
+        },
+        meta: {
+            secured: true,
+        },
+    },
+    {
+        path: "/dashboard/projects/:projectId/station/:stationId/photos",
+        name: "viewProjectStationPhotos",
         component: StationPhotosView,
         props: (route) => {
             return {

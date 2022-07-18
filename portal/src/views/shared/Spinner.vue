@@ -1,5 +1,8 @@
 <template>
-    <div class="spinner loader"></div>
+    <div class="spinner loader">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -10,72 +13,54 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "src/scss/_variables.scss";
+
 .spinner {
-    margin-top: 2em;
-    margin-left: auto;
-    margin-right: auto;
-}
-.loader {
-    font-size: 10px;
-    text-indent: -9999em;
-    width: 3em;
-    height: 3em;
-    border-radius: 50%;
-    background: #000000;
-    background: -moz-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -webkit-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -o-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -ms-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: linear-gradient(to right, #000000 10%, rgba(0, 0, 0, 0) 42%);
+    width: 40px;
+    height: 40px;
     position: relative;
-    -webkit-animation: load3 1.4s infinite linear;
-    animation: load3 1.4s infinite linear;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
 }
-.loader:before {
-    width: 50%;
-    height: 50%;
-    background: #000000;
-    border-radius: 100% 0 0 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: "";
-}
-.loader:after {
-    background: #ffffff;
-    width: 75%;
-    height: 75%;
+
+.double-bounce1,
+.double-bounce2 {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    content: "";
-    margin: auto;
+    background-color: $color-dark;
+    opacity: 0.8;
     position: absolute;
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
+
+    -webkit-animation: sk-bounce 2s infinite ease-in-out;
+    animation: sk-bounce 2s infinite ease-in-out;
 }
-@-webkit-keyframes load3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
+
+.double-bounce2 {
+    -webkit-animation-delay: -1s;
+    animation-delay: -1s;
+}
+
+@-webkit-keyframes sk-bounce {
+    0%,
     100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
+        -webkit-transform: scale(0);
+    }
+    50% {
+        -webkit-transform: scale(1);
     }
 }
-@keyframes load3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
+
+@keyframes sk-bounce {
+    0%,
     100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
+        transform: scale(0);
+        -webkit-transform: scale(0);
+    }
+    50% {
+        transform: scale(1);
+        -webkit-transform: scale(1);
     }
 }
 </style>

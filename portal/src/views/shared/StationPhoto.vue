@@ -57,10 +57,5 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.spinner {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: auto;
-    margin-bottom: auto;
-}
+
 </style>

@@ -1,30 +1,33 @@
 <template>
     <StandardLayout>
+        <vue-confirm-dialog />
         <div class="container-wrap">
             <DoubleHeader
-                backRoute="viewStation"
+                :backRoute="projectId ? 'viewStation' : 'viewStationFromMap'"
                 :title="$tc('station.allPhotos')"
                 :backTitle="$tc('layout.backStationDashboard')"
-                :backRouteParams="{ id: $route.params.stationId }"
+                :backRouteParams="{ projectId, stationId }"
             >
                 <template v-slot:default>
                     <button class="button-social">
                         <label for="imageInput">
-                            <i class="icon icon-share"></i>
+                            <i class="icon icon-photo"></i>
                             {{ $tc("station.btn.addPhotos") }}
                         </label>
                     </button>
-
-                    <input id="imageInput" type="file" accept="image/*" @change="upload" />
+                    <input id="imageInput" type="file" accept="image/jpeg, image/png" @change="upload" />
                 </template>
             </DoubleHeader>
 
             <div class="flex flex-wrap flex-space-between" v-if="media">
                 <div class="photo-wrap" v-for="photo in photos" v-bind:key="photo.key">
                     <button class="photo-options">
-                        <ListItemOptions @listItemOptionClick="onPhotoOptionClick($event, photo)" :options="photoOptions"></ListItemOptions>
+                        <ListItemOptions :options="photoOptions" @listItemOptionClick="onPhotoOptionClick($event, photo)"></ListItemOptions>
                     </button>
-                    <AuthenticatedPhoto :url="photo.url" />
+                    <AuthenticatedPhoto :url="photo.url" :loading="photo.id === loadingPhotoId" />
+                </div>
+                <div v-if="photos.length === 0" class="empty-photos">
+                    {{ $t("station.emptyPhotos") }}
                 </div>
             </div>
         </div>
@@ -36,11 +39,9 @@ import Vue from "vue";
 import StandardLayout from "@/views/StandardLayout.vue";
 import DoubleHeader from "@/views/shared/DoubleHeader.vue";
 import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
-import { AddedPhoto, NoteMedia, Notes, PortalNoteMedia } from "@/views/notes/model";
+import { AddedPhoto, NoteMedia, PortalNoteMedia } from "@/views/notes/model";
 import { ActionTypes } from "@/store";
-import ListItemOptions from "@/views/shared/ListItemOptions.vue";
-import NewPhoto from "@/assets/image-placeholder.svg";
-import { UploadedImage } from "@/views/shared/ImageUploader.vue";
+import ListItemOptions, { ListItemOption } from "@/views/shared/ListItemOptions.vue";
 
 export default Vue.extend({
     name: "StationPhotosView",
@@ -51,6 +52,9 @@ export default Vue.extend({
         ListItemOptions,
     },
     computed: {
+        projectId(): number {
+            return parseInt(this.$route.params.projectId, 10);
+        },
         stationId(): number {
             return parseInt(this.$route.params.stationId, 10);
         },
@@ -62,32 +66,62 @@ export default Vue.extend({
         },
     },
     data: (): {
-        photoOptions: {
-            label: string;
-            event: string;
-        }[];
+        photoOptions: ListItemOption[];
+        loadingPhotoId: number | null;
     } => {
         return {
             photoOptions: [],
+            loadingPhotoId: null,
         };
     },
     methods: {
-        onPhotoOptionClick() {
-            console.log("da");
+        async onPhotoOptionClick(event: string, photo: PortalNoteMedia) {
+            if (event === "delete-photo") {
+                await this.$confirm({
+                    message: this.$tc("confirmDeletePhoto"),
+                    button: {
+                        no: this.$tc("cancel"),
+                        yes: this.$tc("delete"),
+                    },
+                    callback: async (confirm) => {
+                        if (confirm) {
+                            this.loadingPhotoId = photo.id;
+                            this.$services.api
+                                .deleteMedia(photo.id)
+                                .then(async () => {
+                                    await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                                })
+                                .finally(() => {
+                                    this.onFinishedPhotoAction();
+                                });
+                        }
+                    },
+                });
+            }
+            if (event === "set-as-station-image") {
+                this.loadingPhotoId = photo.id;
+                this.$services.api
+                    .setStationImage(this.stationId, photo.id)
+                    .then(async () => {
+                        await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                    })
+                    .finally(() => {
+                        this.onFinishedPhotoAction();
+                    });
+            }
+        },
+        onFinishedPhotoAction(): void {
+            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+            this.loadingPhotoId = null;
         },
         upload(this: any, ev) {
-            console.log("upl", ev);
-
             const image = ev.target.files[0];
 
             const reader = new FileReader();
             reader.onload = (ev) => {
                 if (ev?.target?.result) {
                     const photo = new AddedPhoto(image.type, image, ev.target.result);
-                    console.log("photo", photo);
-
-                    this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then((media) => {
-                        console.log(media);
+                    this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then(() => {
                         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.stationId });
                         return [];
                     });
@@ -101,11 +135,13 @@ export default Vue.extend({
         this.photoOptions = [
             {
                 label: this.$tc("station.btn.setAsStationImage"),
-                event: "use-as-station-image",
+                event: "set-as-station-image",
+                icon: "icon-home",
             },
             {
                 label: this.$tc("station.btn.deletePhoto"),
-                event: "delete-image",
+                event: "delete-photo",
+                icon: "icon-trash",
             },
         ];
     },
@@ -122,16 +158,28 @@ export default Vue.extend({
     margin-top: 10px;
     flex: 0 0 calc(50% - 5px);
     position: relative;
+    min-height: 200px;
+    background-color: #e2e4e6;
 
     &:nth-of-type(1) {
         flex: 0 0 100%;
         margin-top: 15px;
     }
 
-    img {
+    @include bp-down($xs) {
+        &:nth-of-type(even) {
+            ::v-deep .options-btns {
+                right: auto;
+            }
+        }
+    }
+
+    ::v-deep img {
         width: 100%;
+        min-height: 200px;
         height: 100%;
         object-fit: cover;
+        border-radius: 2px;
     }
 }
 
@@ -143,6 +191,7 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     padding: 0;
     border-radius: 50px;
+    z-index: $z-index-top;
 
     ::v-deep .options-trigger {
         padding: 0;
@@ -167,5 +216,19 @@ export default Vue.extend({
 
 input[type="file"] {
     display: none;
+}
+
+.button-social {
+    padding: 0 20px;
+
+    label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+}
+
+.empty-photos {
+    margin-top: 10px;
 }
 </style>

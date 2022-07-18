@@ -18,7 +18,9 @@
             <section class="section-station">
                 <div class="container-box">
                     <div class="flex flex-al-center">
-                        <StationPhoto :station="station" />
+                        <div class="station-photo-wrap">
+                            <StationPhoto :station="station" />
+                        </div>
                         <div>
                             <div class="station-name">{{ station.name }}</div>
 
@@ -75,9 +77,15 @@
                             <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                         </div>
                     </div>
-                    <router-link :to="{ name: 'viewStationPhotos' }" class="station-photos-nav">
+                    <router-link
+                        :to="{
+                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                            params: { projectId: projectId, stationId: station.id },
+                        }"
+                        class="station-photos-nav"
+                    >
                         <i class="icon icon-grid"></i>
-                      {{ $t("station.btn.linkToPhotos") }}
+                        {{ $t("station.btn.linkToPhotos") }}
                     </router-link>
                 </div>
             </section>
@@ -117,13 +125,14 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-              <NotesForm
-                  v-bind:key="station.id"
-                  :station="station"
-                  :notes="{ notes, media }"
-                  :readonly="station.readOnly"
-                  @change="dirtyNotes = true"
-              />            </section>
+                <NotesForm
+                    v-bind:key="station.id"
+                    :station="station"
+                    :notes="{ notes, media }"
+                    :readonly="station.readOnly"
+                    @change="dirtyNotes = true"
+                />
+            </section>
         </div>
     </StandardLayout>
 </template>
@@ -176,7 +185,7 @@ export default Vue.extend({
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
-          dirtyNotes: false,
+            dirtyNotes: false,
         };
     },
     watch: {
@@ -342,29 +351,41 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            margin-right: 20px;
             width: 90px;
             height: 90px;
             object-fit: cover;
-            border-radius: 5px;
         }
 
         .photo-container {
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            max-height: 192px;
+            min-height: 192px;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+            background-color: #e2e4e6;
 
             &:nth-of-type(3),
             &:nth-of-type(4) {
                 margin-bottom: 0;
             }
 
-            > img {
+            ::v-deep img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                border-radius: 2px;
+            }
+
+            .photo-placeholder {
+                @include flex(center, center);
+                height: 100%;
+
+                img {
+                    width: 40%;
+                    height: 40%;
+                    object-fit: contain;
+                }
             }
         }
     }
@@ -590,6 +611,24 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
         }
     }
+
+    &-photo-wrap {
+        width: 90px;
+        height: 90px;
+        margin-right: 20px;
+        background-color: #e2e4e6;
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        ::v-deep .spinner {
+            width: 20px;
+            height: 20px;
+        }
+    }
 }
 
 .small-light {
@@ -620,18 +659,6 @@ section {
 .icon-location {
     margin-top: 1px;
     margin-right: 8px;
-}
-
-.photo-placeholder {
-    @include flex(center, center);
-    height: 100%;
-    background-color: var(--color-border);
-    opacity: 0.5;
-
-    img {
-        width: 40%;
-        height: 40%;
-    }
 }
 
 .icon-grid {
