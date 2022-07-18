@@ -18,7 +18,9 @@
             <section class="section-station">
                 <div class="container-box">
                     <div class="flex flex-al-center">
-                        <StationPhoto :station="station" />
+                        <div class="station-photo-wrap">
+                            <StationPhoto :station="station" />
+                        </div>
                         <div>
                             <div class="station-name">{{ station.name }}</div>
 
@@ -70,15 +72,20 @@
                 </div>
                 <div v-if="photos" class="station-photos">
                     <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                        <!-- somehow using v-for like so needs the next v-if -->
                         <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                         <div v-else class="photo-placeholder">
                             <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                         </div>
                     </div>
-                    <router-link :to="{ name: 'test' }" class="station-photos-nav">
+                    <router-link
+                        :to="{
+                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                            params: { projectId: projectId, stationId: station.id },
+                        }"
+                        class="station-photos-nav"
+                    >
                         <i class="icon icon-grid"></i>
-                        {{ $t("station.managePhotos") }}
+                        {{ $t("station.btn.linkToPhotos") }}
                     </router-link>
                 </div>
             </section>
@@ -118,7 +125,13 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm v-bind:key="station.id" :station="station" :notes="{ notes, media }" :readonly="false" />
+                <NotesForm
+                    v-bind:key="station.id"
+                    :station="station"
+                    :notes="{ notes, media }"
+                    :readonly="station.readOnly"
+                    @change="dirtyNotes = true"
+                />
             </section>
         </div>
     </StandardLayout>
@@ -165,14 +178,19 @@ export default Vue.extend({
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
+        loading: boolean;
+        dirtyNotes: boolean;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
+            loading: true,
+            dirtyNotes: false,
         };
     },
     watch: {
         station() {
+            this.loading = false;
             this.selectedModule = this.station.modules[0];
         },
     },
@@ -226,6 +244,25 @@ export default Vue.extend({
             return false;
         },
     },
+    beforeRouteLeave(to: never, from: never, next: any) {
+        if (this.dirtyNotes) {
+            this.$confirm({
+                message: this.$tc("notes.confirmLeavePopupMessage"),
+                button: {
+                    no: this.$tc("no"),
+                    yes: this.$tc("yes"),
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        this.dirtyNotes = false;
+                        next();
+                    }
+                },
+            });
+        } else {
+            next();
+        }
+    },
     beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
 
@@ -263,9 +300,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/layout";
-@import "../../scss/forms.scss";
+@import "src/scss/mixins";
+@import "src/scss/layout";
+@import "src/scss/forms.scss";
 
 * {
     box-sizing: border-box;
@@ -314,29 +351,41 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            margin-right: 20px;
             width: 90px;
             height: 90px;
             object-fit: cover;
-            border-radius: 5px;
         }
 
         .photo-container {
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            max-height: 192px;
+            min-height: 192px;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+            background-color: #e2e4e6;
 
             &:nth-of-type(3),
             &:nth-of-type(4) {
                 margin-bottom: 0;
             }
 
-            > img {
+            ::v-deep img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                border-radius: 2px;
+            }
+
+            .photo-placeholder {
+                @include flex(center, center);
+                height: 100%;
+
+                img {
+                    width: 40%;
+                    height: 40%;
+                    object-fit: contain;
+                }
             }
         }
     }
@@ -562,6 +611,24 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
         }
     }
+
+    &-photo-wrap {
+        width: 90px;
+        height: 90px;
+        margin-right: 20px;
+        background-color: #e2e4e6;
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        ::v-deep .spinner {
+            width: 20px;
+            height: 20px;
+        }
+    }
 }
 
 .small-light {
@@ -592,18 +659,6 @@ section {
 .icon-location {
     margin-top: 1px;
     margin-right: 8px;
-}
-
-.photo-placeholder {
-    @include flex(center, center);
-    height: 100%;
-    background-color: var(--color-border);
-    opacity: 0.5;
-
-    img {
-        width: 40%;
-        height: 40%;
-    }
 }
 
 .icon-grid {
