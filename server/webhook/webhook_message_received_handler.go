@@ -43,11 +43,11 @@ func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMe
 	}
 
 	for _, row := range h.batch.Messages {
-		if ir, err := h.parseMessage(ctx, row); err != nil {
+		if incoming, err := h.parseMessage(ctx, row); err != nil {
 			return err
 		} else {
 			if h.tsConfig != nil {
-				if err := h.saveMessage(ctx, ir); err != nil {
+				if err := h.saveMessages(ctx, incoming); err != nil {
 					return err
 				}
 			}
@@ -57,8 +57,10 @@ func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMe
 	return nil
 }
 
-func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *WebHookMessage) (*data.IncomingReading, error) {
+func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *WebHookMessage) ([]*data.IncomingReading, error) {
 	rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
+
+	incoming := make([]*data.IncomingReading, 0)
 
 	allParsed, err := row.Parse(ctx, h.jqCache, h.batch.Schemas)
 	if err != nil {
@@ -89,27 +91,22 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 							Value:     parsedSensor.Value,
 						}
 
-						return ir, nil
+						incoming = append(incoming, ir)
 					}
 				}
 			}
 		}
 	}
 
-	return nil, nil
+	return incoming, nil
 }
 
-func (h *WebHookMessageReceivedHandler) saveMessage(ctx context.Context, ir *data.IncomingReading) error {
+func (h *WebHookMessageReceivedHandler) saveMessages(ctx context.Context, incoming []*data.IncomingReading) error {
 	sr := repositories.NewSensorsRepository(h.db)
 
 	sensors, err := sr.QueryAllSensors(ctx)
 	if err != nil {
 		return err
-	}
-
-	meta := sensors[ir.SensorKey]
-	if meta == nil {
-		return fmt.Errorf("unknown sensor: '%s'", ir.SensorKey)
 	}
 
 	pgConn, err := pgx.Connect(ctx, h.tsConfig.Url)
@@ -119,13 +116,20 @@ func (h *WebHookMessageReceivedHandler) saveMessage(ctx context.Context, ir *dat
 
 	defer pgConn.Close(ctx)
 
-	// TODO location
-	_, err = pgConn.Exec(ctx, `
-		INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
-		VALUES ($1, $2, $3, $4, $5)
-	`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)
-	if err != nil {
-		return err
+	for _, ir := range incoming {
+		meta := sensors[ir.SensorKey]
+		if meta == nil {
+			return fmt.Errorf("unknown sensor: '%s'", ir.SensorKey)
+		}
+
+		// TODO location
+		_, err = pgConn.Exec(ctx, `
+			INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+			VALUES ($1, $2, $3, $4, $5)
+		`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
