@@ -253,11 +253,11 @@ func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.Tim
 	}
 
 	if recently {
-		if err := sr.Refresh(ctx, stationID, time.Hour*48, false); err != nil {
+		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
 			return fmt.Errorf("recently refresh failed: %v", err)
 		}
 	} else {
-		if err := sr.Refresh(ctx, stationID, 0, true); err != nil {
+		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
 			return fmt.Errorf("complete refresh failed: %v", err)
 		}
 	}

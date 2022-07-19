@@ -98,7 +98,12 @@
                                         <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcessRecords(station)" class="button">Process Recs</button>
+                                        <button v-on:click="onProcessRecords(station, false)" class="button">Process Recs</button>
+                                    </div>
+                                    <div>
+                                        <button v-on:click="onProcessRecords(station, true)" class="button">
+                                            Process Recs (TsDB only)
+                                        </button>
                                     </div>
                                     <div>
                                         <button v-on:click="onExplore(station)" class="button">Explore Data</button>
@@ -225,7 +230,7 @@ export default Vue.extend({
                 },
             });
         },
-        async onProcessRecords(station: EssentialStation): Promise<void> {
+        async onProcessRecords(station: EssentialStation, skipManual: boolean): Promise<void> {
             await this.$confirm({
                 message: `Are you sure? This could take a while for certain stations.`,
                 button: {
@@ -234,7 +239,7 @@ export default Vue.extend({
                 },
                 callback: async (confirm) => {
                     if (confirm) {
-                        await this.$services.api.adminProcessStation(station.id, true);
+                        await this.$services.api.adminProcessStation(station.id, true, skipManual);
                     }
                 },
             });

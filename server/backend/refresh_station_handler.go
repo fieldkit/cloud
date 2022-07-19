@@ -25,14 +25,16 @@ func NewRefreshStationHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBCon
 func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshStation) error {
 	log := Logger(ctx).Sugar().With("station_id", m.StationID)
 
-	log.Infow("refreshing", "completely", m.Completely, "how_recently", m.HowRecently)
+	tsDbConfigured := h.tsConfig != nil
+
+	log.Infow("refreshing", "completely", m.Completely, "how_recently", m.HowRecently, "skip_manual", m.SkipManual, "tsdb_configured", tsDbConfigured)
 
 	sr, err := NewStationRefresher(h.db, h.tsConfig, "")
 	if err != nil {
 		return err
 	}
 
-	if err := sr.Refresh(ctx, m.StationID, m.HowRecently, m.Completely); err != nil {
+	if err := sr.Refresh(ctx, m.StationID, m.HowRecently, m.Completely, m.SkipManual); err != nil {
 		return fmt.Errorf("partial refresh failed: %v", err)
 	}
 

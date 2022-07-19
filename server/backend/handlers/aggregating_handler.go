@@ -30,9 +30,10 @@ type AggregatingHandler struct {
 	sensors           map[string]*data.Sensor
 	tableSuffix       string
 	completely        bool
+	skipManual        bool
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string, completely bool) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string, completely, skipManual bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:                db,
 		metaFactory:       repositories.NewMetaFactory(db),
@@ -44,6 +45,7 @@ func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig
 		stationConfig:     nil,
 		tableSuffix:       tableSuffix,
 		completely:        completely,
+		skipManual:        skipManual,
 	}
 }
 
@@ -62,7 +64,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100, NewDefaultAggregatorConfig())
 
 		if _, ok := v.seen[station.ID]; !ok {
-			if v.completely {
+			if !v.skipManual && v.completely {
 				err = v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 					return aggregator.ClearNumberSamples(txCtx)
 				})
@@ -130,8 +132,10 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 		return nil
 	}
 
-	if err := aggregator.NextTime(ctx, db.Time); err != nil {
-		return fmt.Errorf("error adding: %v", err)
+	if !v.skipManual {
+		if err := aggregator.NextTime(ctx, db.Time); err != nil {
+			return fmt.Errorf("error adding: %v", err)
+		}
 	}
 
 	for key, value := range filtered.Record.Readings {
@@ -144,8 +148,11 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 					SensorKey: key.SensorKey,
 					ModuleID:  sm.ID,
 				}
-				if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
-					return fmt.Errorf("error adding: %v", err)
+
+				if !v.skipManual {
+					if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
+						return fmt.Errorf("error adding: %v", err)
+					}
 				}
 
 				if v.tsConfig != nil {
@@ -200,23 +207,25 @@ func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time,
 }
 
 func (v *AggregatingHandler) OnDone(ctx context.Context) error {
-	for _, aggregator := range v.stations {
-		if err := aggregator.Close(ctx); err != nil {
-			return err
-		}
-	}
-
-	if v.completely {
-		err := v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-			for _, aggregator := range v.stations {
-				if err := aggregator.DeleteEmptyAggregates(txCtx); err != nil {
-					return err
-				}
+	if !v.skipManual {
+		for _, aggregator := range v.stations {
+			if err := aggregator.Close(ctx); err != nil {
+				return err
 			}
-			return nil
-		})
-		if err != nil {
-			return err
+		}
+
+		if v.completely {
+			err := v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+				for _, aggregator := range v.stations {
+					if err := aggregator.DeleteEmptyAggregates(txCtx); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
 		}
 	}
 

@@ -1288,10 +1288,13 @@ class FKApi {
         });
     }
 
-    public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
+    public adminProcessStation(stationId: number, completely: boolean, skipManual: boolean): Promise<void> {
         const qp = new URLSearchParams();
         if (completely) {
             qp.append("completely", "true");
+        }
+        if (skipManual) {
+            qp.append("skipManual", "true");
         }
         return this.invoke({
             auth: Auth.Required,
