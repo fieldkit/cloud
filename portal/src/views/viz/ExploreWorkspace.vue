@@ -434,7 +434,6 @@ export default Vue.extend({
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
-        transform: translateY(-4px);
         display: block;
 
         body.floodnet & {
