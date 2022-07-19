@@ -66,9 +66,9 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 	}
 
 	if message.SchemaID == nil {
-		log.Warnw("webhook", "message_id", message.ID, "schema_missing", true)
+		log.Warnw("wh:saved", "message_id", message.ID, "schema_missing", true)
 	} else {
-		log.Infow("webhook", "message_id", message.ID, "schema_id", message.SchemaID)
+		log.Infow("wh:saved", "message_id", message.ID, "schema_id", message.SchemaID)
 	}
 
 	if message.SchemaID != nil {

@@ -43,8 +43,6 @@ func (rr *MessageSchemaRepository) StartProcessingSchema(ctx context.Context, sc
 }
 
 func (rr *MessageSchemaRepository) QuerySchemas(ctx context.Context, batch *MessageBatch) (map[int32]*MessageSchemaRegistration, error) {
-	log := Logger(ctx).Sugar()
-
 	if batch.Schemas == nil {
 		batch.Schemas = make(map[int32]*MessageSchemaRegistration)
 	}
@@ -62,7 +60,6 @@ func (rr *MessageSchemaRepository) QuerySchemas(ctx context.Context, batch *Mess
 
 			for _, schema := range schemas {
 				batch.Schemas[schema.ID] = schema
-				log.Infow("loading schema", "schema_id", schema.ID)
 			}
 		}
 	}
