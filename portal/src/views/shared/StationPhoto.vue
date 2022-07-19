@@ -1,5 +1,7 @@
 <template>
-    <Spinner v-if="loading" class="spinner" />
+    <div v-if="loading" class="station-photo station-photo--loading">
+        <Spinner class="spinner" />
+    </div>
     <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo" alt="Station Image" />
     <img v-else src="@/assets/station-image-placeholder.png" class="station-photo photo" alt="Default Station Image" />
 </template>
@@ -56,6 +58,17 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.station-photo--loading {
+    background-color: #e2e4e6;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    ::v-deep .spinner {
+        width: 20px;
+        height: 20px;
+    }
+}
 </style>

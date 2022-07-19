@@ -30,9 +30,9 @@
         </div>
         <button class="form-submit" type="submit">
             <div class="loading-spinner-wrap">
-                <Spinner class="loading-spinner" v-if="!busy" />
+                <Spinner class="loading-spinner" v-if="busy" />
             </div>
-            <template v-if="busy">
+            <template v-if="!busy">
                 {{ $t("login.loginButton") }}
             </template>
         </button>
@@ -137,8 +137,6 @@ export default Vue.extend({
 }
 
 .loading-spinner {
-    width: 20px;
-    height: 20px;
 
     &-wrap {
         @include position(absolute, 50% null null 50%);
