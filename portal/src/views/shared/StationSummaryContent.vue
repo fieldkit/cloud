@@ -17,10 +17,10 @@
                         <template v-if="neighborhood && borough">{{ ", " }}</template>
                         <template v-if="borough">{{ borough }}</template>
                     </div>
-                    <div v-if="deploymentDate || deployedBy" class="location-container">
+                    <div v-if="deploymentDate || deployedBy" class="location-container deployment-info">
                         <i class="icon icon-calendar" />
-                        <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
-                        <template v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</template>
+                        <span v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</span>
+                        <span v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</span>
                     </div>
                 </div>
             </template>
@@ -170,6 +170,7 @@ export default Vue.extend({
 
 .location-container {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 2px;
     font-size: 14px;
 
@@ -214,5 +215,20 @@ export default Vue.extend({
     padding-bottom: 5px;
     margin-top: 5px;
     color: var(--color-dark);
+}
+
+.deployment-info {
+    padding-left: 17px;
+    position: relative;
+
+    .icon {
+        @include position(absolute, 0 null null 0);
+    }
+
+    > * {
+        &:nth-of-type(1) {
+            margin-right: 3px;
+        }
+    }
 }
 </style>
