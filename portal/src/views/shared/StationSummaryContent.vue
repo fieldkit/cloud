@@ -20,7 +20,7 @@
                     <div v-if="deploymentDate || deployedBy" class="location-container deployment-info">
                         <i class="icon icon-calendar" />
                         <span v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</span>
-                        <span v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</span>
+                        <span v-if="deployedBy">{{ $t("station.by") }} {{ deployedBy }}</span>
                     </div>
                 </div>
             </template>
@@ -170,7 +170,6 @@ export default Vue.extend({
 
 .location-container {
     display: flex;
-    flex-wrap: wrap;
     margin-bottom: 2px;
     font-size: 14px;
 
@@ -220,6 +219,7 @@ export default Vue.extend({
 .deployment-info {
     padding-left: 17px;
     position: relative;
+    flex-wrap: wrap;
 
     .icon {
         @include position(absolute, 0 null null 0);
