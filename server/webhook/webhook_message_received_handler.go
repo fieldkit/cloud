@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v4"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -109,12 +107,10 @@ func (h *WebHookMessageReceivedHandler) saveMessages(ctx context.Context, incomi
 		return err
 	}
 
-	pgConn, err := pgx.Connect(ctx, h.tsConfig.Url)
+	pgPool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-
-	defer pgConn.Close(ctx)
 
 	for _, ir := range incoming {
 		meta := sensors[ir.SensorKey]
@@ -123,7 +119,7 @@ func (h *WebHookMessageReceivedHandler) saveMessages(ctx context.Context, incomi
 		}
 
 		// TODO location
-		_, err = pgConn.Exec(ctx, `
+		_, err = pgPool.Exec(ctx, `
 			INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
 			VALUES ($1, $2, $3, $4, $5)
 		`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)

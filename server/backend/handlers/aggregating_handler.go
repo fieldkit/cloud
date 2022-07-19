@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	pb "github.com/fieldkit/data-protocol"
@@ -184,15 +182,13 @@ func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time,
 		return fmt.Errorf("unknown sensor: '%s'", sensorKey.SensorKey)
 	}
 
-	pgConn, err := pgx.Connect(ctx, v.tsConfig.Url)
+	pgPool, err := v.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	defer pgConn.Close(ctx)
-
 	// TODO location
-	_, err = pgConn.Exec(ctx, `
+	_, err = pgPool.Exec(ctx, `
 		INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
 		VALUES ($1, $2, $3, $4, $5)
 	`, sampled, stationID, sensorKey.ModuleID, meta.ID, value)
