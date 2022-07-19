@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v4"
+
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	pb "github.com/fieldkit/data-protocol"
@@ -13,6 +15,15 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/storage"
 )
+
+type TimeScaleRecord struct {
+	Time      time.Time
+	StationID int32
+	ModuleID  int64
+	SensorID  int64
+	Location  []float64
+	Value     float64
+}
 
 type AggregatingHandler struct {
 	db                *sqlxcache.DB
@@ -31,6 +42,8 @@ type AggregatingHandler struct {
 	tableSuffix       string
 	completely        bool
 	skipManual        bool
+	tsBatchSize       int
+	tsRecords         [][]interface{}
 }
 
 func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string, completely, skipManual bool) *AggregatingHandler {
@@ -46,6 +59,8 @@ func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig
 		tableSuffix:       tableSuffix,
 		completely:        completely,
 		skipManual:        skipManual,
+		tsBatchSize:       1000,
+		tsRecords:         make([][]interface{}, 0),
 	}
 }
 
@@ -189,20 +204,39 @@ func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time,
 		return fmt.Errorf("unknown sensor: '%s'", sensorKey.SensorKey)
 	}
 
+	// TODO location
+	v.tsRecords = append(v.tsRecords, []interface{}{
+		sampled,
+		stationID,
+		sensorKey.ModuleID,
+		meta.ID,
+		value,
+	})
+
+	if len(v.tsRecords) == v.tsBatchSize {
+		if err := v.flushTs(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (v *AggregatingHandler) flushTs(ctx context.Context) error {
 	pgPool, err := v.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
 	// TODO location
-	_, err = pgPool.Exec(ctx, `
-		INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
-		VALUES ($1, $2, $3, $4, $5)
-	`, sampled, stationID, sensorKey.ModuleID, meta.ID, value)
+	_, err = pgPool.CopyFrom(ctx, pgx.Identifier{"fieldkit", "sensor_data"},
+		[]string{"time", "station_id", "module_id", "sensor_id", "value"},
+		pgx.CopyFromRows(v.tsRecords))
 	if err != nil {
 		return err
 	}
 
+	v.tsRecords = make([][]interface{}, 0)
 	return nil
 }
 
@@ -226,6 +260,12 @@ func (v *AggregatingHandler) OnDone(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	if len(v.tsRecords) > 0 {
+		if err := v.flushTs(ctx); err != nil {
+			return err
 		}
 	}
 
