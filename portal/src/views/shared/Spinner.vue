@@ -1,5 +1,10 @@
 <template>
-    <div class="spinner loader"></div>
+    <div class="spinner loader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -10,71 +15,40 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "src/scss/_variables.scss";
+
 .spinner {
-    margin-top: 2em;
-    margin-left: auto;
-    margin-right: auto;
-}
-.loader {
-    font-size: 10px;
-    text-indent: -9999em;
-    width: 3em;
-    height: 3em;
-    border-radius: 50%;
-    background: #000000;
-    background: -moz-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -webkit-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -o-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: -ms-linear-gradient(left, #000000 10%, rgba(0, 0, 0, 0) 42%);
-    background: linear-gradient(to right, #000000 10%, rgba(0, 0, 0, 0) 42%);
+    display: inline-block;
     position: relative;
-    -webkit-animation: load3 1.4s infinite linear;
-    animation: load3 1.4s infinite linear;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
+    width: 20px;
+    height: 20px;
 }
-.loader:before {
-    width: 50%;
-    height: 50%;
-    background: #000000;
-    border-radius: 100% 0 0 0;
+.spinner div {
+    box-sizing: border-box;
+    display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    content: "";
-}
-.loader:after {
-    background: #ffffff;
-    width: 75%;
-    height: 75%;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #fff;
     border-radius: 50%;
-    content: "";
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
 }
-@-webkit-keyframes load3 {
+.spinner div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.spinner div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.spinner div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes spinner {
     0% {
-        -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
     }
     100% {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-@keyframes load3 {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }

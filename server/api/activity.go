@@ -44,7 +44,7 @@ func (c *ActivityService) Station(ctx context.Context, payload *activity.Station
 
 	total := int32(0)
 	if err = c.options.Database.GetContext(ctx, &total, `
-		SELECT COUNT(a.*) FROM fieldkit.station_activity AS a WHERE a.station_id = $1
+		SELECT COUNT(a.id) FROM fieldkit.station_activity AS a WHERE a.station_id = $1
 		`, payload.ID); err != nil {
 		return nil, err
 	}

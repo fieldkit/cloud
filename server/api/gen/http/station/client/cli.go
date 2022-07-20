@@ -249,6 +249,32 @@ func BuildListAssociatedPayload(stationListAssociatedID string, stationListAssoc
 	return v, nil
 }
 
+// BuildListProjectAssociatedPayload builds the payload for the station list
+// project associated endpoint from CLI flags.
+func BuildListProjectAssociatedPayload(stationListProjectAssociatedProjectID string, stationListProjectAssociatedAuth string) (*station.ListProjectAssociatedPayload, error) {
+	var err error
+	var projectID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationListProjectAssociatedProjectID, 10, 32)
+		projectID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for projectID, must be INT32")
+		}
+	}
+	var auth *string
+	{
+		if stationListProjectAssociatedAuth != "" {
+			auth = &stationListProjectAssociatedAuth
+		}
+	}
+	v := &station.ListProjectAssociatedPayload{}
+	v.ProjectID = projectID
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildDownloadPhotoPayload builds the payload for the station download photo
 // endpoint from CLI flags.
 func BuildDownloadPhotoPayload(stationDownloadPhotoStationID string, stationDownloadPhotoSize string, stationDownloadPhotoIfNoneMatch string, stationDownloadPhotoAuth string) (*station.DownloadPhotoPayload, error) {

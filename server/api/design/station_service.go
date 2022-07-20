@@ -233,8 +233,9 @@ var AssociatedViaProject = Type("AssociatedViaProject", func() {
 })
 
 var AssociatedViaLocation = Type("AssociatedViaLocation", func() {
+	Attribute("stationID", Int32)
 	Attribute("distance", Float32)
-	Required("distance")
+	Required("stationID", "distance")
 })
 
 var AssociatedViaManual = Type("AssociatedViaManual", func() {
@@ -248,9 +249,9 @@ var AssociatedStation = ResultType("application/vnd.app.associated.station", fun
 	Attributes(func() {
 		Attribute("station", StationFull)
 		Required("station")
-		Attribute("project", AssociatedViaProject)
-		Attribute("location", AssociatedViaLocation)
-		Attribute("manual", AssociatedViaManual)
+		Attribute("project", ArrayOf(AssociatedViaProject))
+		Attribute("location", ArrayOf(AssociatedViaLocation))
+		Attribute("manual", ArrayOf(AssociatedViaManual))
 		Attribute("hidden", Boolean)
 		Required("hidden")
 	})
@@ -512,6 +513,26 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			GET("stations/{id}/associated")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("list project associated", func() {
+		Security(JWTAuth, func() {
+			// Optional
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("projectId", Int32)
+			Required("projectId")
+		})
+
+		Result(AssociatedStations)
+
+		HTTP(func() {
+			GET("projects/{projectId}/associated")
 
 			httpAuthentication()
 		})

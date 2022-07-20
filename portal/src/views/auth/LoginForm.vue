@@ -137,23 +137,11 @@ export default Vue.extend({
 }
 
 .loading-spinner {
-    width: 20px; 
-    height: 20px;
-    margin: 0 10px 0;
-    background: linear-gradient(to right, #fff 10%, rgba(0, 0, 0, 0) 42%);
 
     &-wrap {
         @include position(absolute, 50% null null 50%);
         @include flex(center, center);
         transform: translate(-50%, -50%);
-    }
-
-    &:before {
-        background-color: #fff;
-    }
-
-    &:after {
-        background-color: var(--color-secondary);
     }
 }
 </style>

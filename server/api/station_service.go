@@ -13,6 +13,7 @@ import (
 	"image/jpeg"
 	"io"
 	"math"
+	"sort"
 	"strings"
 	"time"
 
@@ -412,6 +413,111 @@ func isForbidden(err error) bool {
 	return false
 }
 
+type associatedStationSorter struct {
+	stations         []*station.AssociatedStation
+	queriedStationID int32
+}
+
+func (a associatedStationSorter) Len() int { return len(a.stations) }
+func (a associatedStationSorter) Less(i, j int) bool {
+	if a.stations[i].Station.ID == a.queriedStationID {
+		return true
+	}
+	return false // a[i].Order < a[j].Order
+}
+func (a associatedStationSorter) Swap(i, j int) {
+	a.stations[i], a.stations[j] = a.stations[j], a.stations[i]
+}
+
+func (c *StationService) ListProjectAssociated(ctx context.Context, payload *station.ListProjectAssociatedPayload) (response *station.AssociatedStations, err error) {
+	byID := make(map[int32]*station.AssociatedStation)
+
+	stationIDs := make([]int32, 0)
+	disableFiltering := true
+	projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
+		ID:               payload.ProjectID,
+		DisableFiltering: &disableFiltering,
+	})
+	if err != nil {
+		if isForbidden(err) {
+			return nil, err
+		}
+		return nil, err
+	} else {
+		for _, fullStation := range projectStations.Stations {
+			stationIDs = append(stationIDs, fullStation.ID)
+
+			associated := &station.AssociatedStation{
+				Station: fullStation,
+				Hidden:  fullStation.Model.OnlyVisibleViaAssociation,
+				Project: []*station.AssociatedViaProject{&station.AssociatedViaProject{
+					ID: payload.ProjectID,
+				},
+				},
+			}
+
+			byID[fullStation.ID] = associated
+		}
+	}
+
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	associations, err := sr.QueryAssociatedStations(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	associated := make([]*station.AssociatedStation, 0)
+
+	for _, associatedStation := range byID {
+		associated = append(associated, associatedStation)
+
+		for _, association := range associations[associatedStation.Station.ID] {
+			if associatedStation.Manual == nil {
+				associatedStation.Manual = make([]*station.AssociatedViaManual, 0)
+			}
+
+			associatedStation.Manual = append(associatedStation.Manual, &station.AssociatedViaManual{
+				OtherStationID: association.AssociatedStationID,
+				Priority:       association.Priority,
+			})
+
+			associatedStation.Hidden = false
+		}
+
+		if associatedStation.Station.Location != nil && associatedStation.Station.Location.Precise != nil {
+			for _, projectAssociation := range associatedStation.Project {
+				location := data.NewLocation(associatedStation.Station.Location.Precise)
+				if nearby, err := sr.QueryNearbyProjectStations(ctx, projectAssociation.ID, location); err != nil {
+					return nil, err
+				} else {
+					for _, ns := range nearby {
+						if associatedStation.Location == nil {
+							associatedStation.Location = make([]*station.AssociatedViaLocation, 0)
+						}
+
+						associatedStation.Location = append(associatedStation.Location, &station.AssociatedViaLocation{
+							StationID: ns.StationID,
+							Distance:  ns.Distance,
+						})
+					}
+				}
+			}
+		}
+	}
+
+	sort.Sort(associatedStationSorter{
+		stations:         associated,
+		queriedStationID: 0, // TODO Remove this when we remove ListAssociated (maybe)
+	})
+
+	response = &station.AssociatedStations{
+		Stations: associated,
+	}
+
+	return
+}
+
 func (c *StationService) ListAssociated(ctx context.Context, payload *station.ListAssociatedPayload) (response *station.AssociatedStations, err error) {
 	log := Logger(ctx).Sugar()
 
@@ -424,113 +530,26 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
-	mmr := repositories.NewModuleMetaRepository(c.options.Database)
-	mm, err := mmr.FindAllModulesMeta(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	sr := repositories.NewStationRepository(c.options.Database)
-
 	pr := repositories.NewProjectRepository(c.options.Database)
-
-	firstStation, err := sr.QueryStationFull(ctx, payload.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	first, err := transformStationFull(c.options.signer, p, firstStation, false, false, mm)
-	if err != nil {
-		return nil, err
-	}
-
-	associatedWithFirst, err := sr.QueryAssociatedStations(ctx, payload.ID)
-	if err != nil {
-		return nil, err
-	}
 
 	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	stations := make([]*station.AssociatedStation, 0)
+	if len(projects) == 0 {
+		return &station.AssociatedStations{
+			Stations: make([]*station.AssociatedStation, 0),
+		}, nil
+	}
 
-	stations = append(stations, &station.AssociatedStation{
-		Station: first,
+	if len(projects) > 1 {
+		log.Warnw("associated:ambiguous-projects", "station_id", payload.ID, "projects", len(projects))
+	}
+
+	return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
+		ProjectID: projects[0].ID,
 	})
-
-	for _, project := range projects {
-		including := false
-
-		disableFiltering := true
-		projectStations, err := c.ListProject(ctx, &station.ListProjectPayload{
-			ID:               project.ID,
-			DisableFiltering: &disableFiltering,
-		})
-		if err != nil {
-			if isForbidden(err) {
-				continue
-			}
-			return nil, err
-		} else {
-			including = true
-		}
-
-		if including {
-			byID := make(map[int32]*station.AssociatedStation)
-			visible := make(map[int32]bool)
-
-			for _, s := range projectStations.Stations {
-				associated := &station.AssociatedStation{
-					Station: s,
-					Project: &station.AssociatedViaProject{
-						ID: project.ID,
-					},
-				}
-
-				byID[s.ID] = associated
-				visible[s.ID] = !s.Model.OnlyVisibleViaAssociation
-			}
-
-			for id, priority := range associatedWithFirst {
-				if associated, ok := byID[id]; ok {
-					associated.Manual = &station.AssociatedViaManual{
-						OtherStationID: payload.ID,
-						Priority:       priority,
-					}
-					visible[id] = true
-				} else {
-					log.Infow("associated:missing", "asociated_station_id", id)
-				}
-			}
-
-			if firstStation.Station.Location != nil {
-				if nearby, err := sr.QueryNearbyProjectStations(ctx, project.ID, firstStation.Station.Location); err != nil {
-					return nil, err
-				} else {
-					for _, ns := range nearby {
-						if associated, ok := byID[ns.StationID]; ok {
-							associated.Location = &station.AssociatedViaLocation{
-								Distance: ns.Distance,
-							}
-						}
-					}
-				}
-			}
-
-			for id, associated := range byID {
-				associated.Hidden = !visible[id]
-				stations = append(stations, associated)
-			}
-		}
-	}
-
-	response = &station.AssociatedStations{
-		Stations: stations,
-	}
-
-	return
 }
 
 func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {

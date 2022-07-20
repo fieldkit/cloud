@@ -5,7 +5,7 @@
                 <Logo />
             </router-link>
         </div>
-        <a class="sidebar-trigger" v-on:click="toggleSidebar">
+        <a v-if="!partnerCustomization().sidebarNarrow" class="sidebar-trigger" v-on:click="toggleSidebar">
             <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22" />
         </a>
         <div id="inner-nav">
@@ -69,7 +69,13 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/views/shared/Logo.vue";
-import { StationOrSensor, interpolatePartner, isCustomisationEnabled } from "./partners";
+import {
+    StationOrSensor,
+    interpolatePartner,
+    isCustomisationEnabled,
+    getPartnerCustomizationWithDefault,
+    PartnerCustomization,
+} from "./partners";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -96,7 +102,7 @@ export default Vue.extend({
         clipStations: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     mounted(): void {
         const desktopBreakpoint = 1040;
@@ -110,10 +116,6 @@ export default Vue.extend({
         });
 
         resizeObserver.observe(document.querySelector("body"));
-
-        if (this.narrow) {
-            this.toggleSidebar();
-        }
     },
     data(): {
         sidebar: {
@@ -124,7 +126,7 @@ export default Vue.extend({
     } {
         return {
             sidebar: {
-                narrow: window.screen.availWidth <= 1040,
+                narrow: window.screen.availWidth <= 1040 || this.narrow,
             },
             narrowSidebarLogoIconClass: interpolatePartner("icon-logo-narrow-"),
             narrowSidebarLogoAlt: interpolatePartner("layout.logo.") + ".alt",
@@ -145,13 +147,12 @@ export default Vue.extend({
     },
     computed: {
         clippedStations() {
-            if(this.clipStations){
+            if (this.clipStations) {
                 return this.stations.slice(0, 10);
-            }
-            else {
+            } else {
                 return this.stations;
             }
-        }
+        },
     },
     methods: {
         showStation(station: unknown): void {
@@ -177,6 +178,9 @@ export default Vue.extend({
         },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
+        },
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
         },
     },
 });
@@ -217,6 +221,7 @@ export default Vue.extend({
     border-bottom: 1px solid rgba(235, 235, 235, 1);
     opacity: 0;
     transition: 0.25s all;
+    overflow: hidden;
     @include flex(center, center);
 
     @at-root .container-side.active & {

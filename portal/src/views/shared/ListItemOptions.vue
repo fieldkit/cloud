@@ -2,6 +2,9 @@
     <i class="icon-ellipsis options-trigger" @click="show($event)">
         <div class="options-btns">
             <button v-for="option in options" v-bind:key="option.event" @click="$emit('listItemOptionClick', option.event)">
+                <span v-if="option.icon" class="options-icon">
+                    <i class="icon" :class="option.icon"></i>
+                </span>
                 {{ option.label }}
             </button>
         </div>
@@ -9,13 +12,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+
+export interface ListItemOption {
+    label: string;
+    event: string;
+    icon?: string;
+}
+
+import Vue, { PropType } from "vue";
 
 export default Vue.extend({
     name: "ListItemOptions",
     props: {
         options: {
-            type: Array,
+            type: Array as PropType<ListItemOption[]>,
             required: true,
         },
     },
@@ -84,12 +94,13 @@ button {
         @include position(absolute, 0 null null null);
         opacity: 0;
         visibility: hidden;
-        padding: 7px 12px;
+        padding: 8px 12px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         background: #fff;
         z-index: $z-index-top;
         transition: opacity 0.33s;
         min-width: 100px;
+        cursor: initial;
 
         &.visible {
             opacity: 1;
@@ -97,13 +108,24 @@ button {
         }
 
         > * {
-            display: block;
+            display: flex;
             white-space: nowrap;
-            font-family: var(--font-family-bold);
+            font-family: var(--font-family-medium);
             cursor: pointer;
             text-align: left;
             width: 100%;
             padding: 7px 0;
+        }
+    }
+
+    &-icon {
+        width: 16px;
+        margin-right: 8px;
+        margin-top: -1px;
+        @include flex(center, center);
+
+        .icon {
+            font-size: 16px;
         }
     }
 }

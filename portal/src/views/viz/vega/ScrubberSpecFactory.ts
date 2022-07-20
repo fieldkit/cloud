@@ -227,18 +227,32 @@ export class ScrubberSpecFactory {
                             // Update brush xy on area mousedown
                             events:
                             {
+
                                 source: "scope",
                                 type: "mousedown",
                                 filter:
                                 [
-                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
+                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\" && event.item.mark.name !== \"left_scrub\")"
                                 ]
                             },
                             update: "[x(unit), x(unit)]"
                         },
                         {
+                            // Update brush xy on area mouseup
+                            events:
+                            {
+
+                                source: "scope",
+                                type: "mouseup",
+                                filter:
+                                [
+                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\" && event.item.mark.name !== \"left_scrub\")"
+                                ]
+                            },
+                            update: "[brush_x[0], x(unit)]"
+                        },
+                        {
                             //Update right extent of brush on mouse down
-                            // TODO: filter does not seem to prevent mousedown on scrubber handle from happening
                             events:
                             {
                                 source: "window",
@@ -251,13 +265,20 @@ export class ScrubberSpecFactory {
                                         type: "mousedown",
                                         filter:
                                         [
-                                            //"!event.item || event.item.mark.name !== \"brush_brush\" || event.item.name !== \"left_scrub\" || event.item.name !== \"right_scrub\""
-                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"left_scrub\")"
+                                            "!event.item || (event.item.mark.name !== \"brush_brush\")"
                                         ],
+                                        markname: "right_scrub"
+
                                     },
                                     {
-                                        source: "window",
-                                        type: "mouseup"
+                                        source: "scope",
+                                        type: "mouseup",
+                                        filter:
+                                        [
+                                            "!event.item || (event.item.mark.name !== \"brush_brush\")"
+                                        ],
+                                        markname: "right_scrub"
+
                                     }
                                 ]
                             },
@@ -281,8 +302,12 @@ export class ScrubberSpecFactory {
                                         ],
                                     },
                                     {
-                                        source: "window",
-                                        type: "mouseup"
+                                        source: "scope",
+                                        type: "mouseup",
+                                        filter:
+                                        [
+                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
+                                        ],
                                     }
                                 ]
                             },
