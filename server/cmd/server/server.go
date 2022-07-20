@@ -33,7 +33,6 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/api"
-	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
@@ -52,18 +51,11 @@ type Options struct {
 	Help          bool
 }
 
+// Tip, using required can help decipher the expected env name.
 type Config struct {
 	Addr         string `split_words:"true" default:"127.0.0.1:8080" required:"true"`
 	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 	TimeScaleURL string `split_words:"true"`
-
-	// Tip, using required can help decipher the expected env name.
-	InfluxDbUrl      string `split_words:"true" requied:"false"`
-	InfluxDbToken    string `split_words:"true" requied:"false"`
-	InfluxDbUsername string `split_words:"true" requied:"false"`
-	InfluxDbPassword string `split_words:"true" requied:"false"`
-	InfluxDbOrg      string `split_words:"true" requied:"false"`
-	InfluxDbBucket   string `split_words:"true" requied:"false"`
 
 	SessionKey  string `split_words:"true"`
 	MapboxToken string `split_words:"true"`
@@ -104,20 +96,6 @@ func (c *Config) timeScaleConfig() *storage.TimeScaleDBConfig {
 		}
 	}
 	return nil
-}
-
-func (c *Config) influxConfig() *querying.InfluxDBConfig {
-	if c.InfluxDbToken == "" || c.InfluxDbUrl == "" || c.InfluxDbBucket == "" || c.InfluxDbOrg == "" {
-		return nil
-	}
-	return &querying.InfluxDBConfig{
-		Url:      c.InfluxDbUrl,
-		Token:    c.InfluxDbToken,
-		Username: c.InfluxDbUsername,
-		Password: c.InfluxDbPassword,
-		Org:      c.InfluxDbOrg,
-		Bucket:   c.InfluxDbBucket,
-	}
 }
 
 func getBucketNames(config *Config) *api.BucketNames {
@@ -289,13 +267,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	influxConfig := config.influxConfig()
-	if influxConfig == nil {
-		log.Infow("influxdb-disabled")
-	} else {
-		log.Infow("influxdb-enabled")
-	}
-
 	timeScaleConfig := config.timeScaleConfig()
 	if timeScaleConfig == nil {
 		log.Infow("timescaledb-disabled")
@@ -341,7 +312,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Buckets:       bucketNames,
 	}
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig, timeScaleConfig)
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, nil, timeScaleConfig)
 	if err != nil {
 		return nil, err
 	}

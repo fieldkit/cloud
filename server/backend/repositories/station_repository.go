@@ -205,6 +205,17 @@ func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, met
 	return modules, nil
 }
 
+func (r *StationRepository) QueryStationModulesByHardwareID(ctx context.Context, hardwareID []byte) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
+		FROM fieldkit.station_module WHERE hardware_id = $1
+		`, hardwareID); err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
 func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
 	if configuration.SourceID != nil && configuration.MetaRecordID == nil {
 		if err := r.db.NamedGetContext(ctx, configuration, `
