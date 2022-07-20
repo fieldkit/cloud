@@ -1,5 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS fieldkit;
 
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
 CREATE TABLE fieldkit.sensor_data (
     time TIMESTAMPTZ NOT NULL,
     station_id INTEGER NOT NULL /* REFERENCES fieldkit.station (id) */,
