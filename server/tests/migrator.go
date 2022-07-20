@@ -19,7 +19,7 @@ var (
 )
 
 func tryMigrate(url string) error {
-	migrationsDir, err := findMigrationsDirectory()
+	migrationsDir, err := findMigrationsDirectory("primary")
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func tryMigrate(url string) error {
 	return nil
 }
 
-func findMigrationsDirectory() (string, error) {
+func findMigrationsDirectory(relative string) (string, error) {
 	path, err := os.Getwd()
 	if err != nil {
 		return "", fmt.Errorf("unable to find migrations directory: %v", err)
@@ -103,7 +103,7 @@ func findMigrationsDirectory() (string, error) {
 	for {
 		test := filepath.Join(path, "migrations")
 		if _, err := os.Stat(test); !os.IsNotExist(err) {
-			return test, nil
+			return filepath.Join(test, relative), nil
 		}
 
 		path = filepath.Dir(path)
