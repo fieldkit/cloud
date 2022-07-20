@@ -33,6 +33,7 @@ type Options struct {
 	SchemaID             int
 	Verbose              bool
 	FailOnMissingSensors bool
+	RefreshViews         bool
 
 	InfluxDbURL    string `split_words:"true"`
 	InfluxDbToken  string `split_words:"true"`
@@ -292,9 +293,53 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolv
 	return nil
 }
 
+func refreshViews(ctx context.Context, options *Options) error {
+	log := logging.Logger(ctx).Sugar()
+
+	tsConfig := options.timeScaleConfig()
+
+	if tsConfig == nil {
+		return fmt.Errorf("refresh-views missing tsdb configuration")
+	}
+
+	views := []string{
+		"fieldkit.sensor_data_365d",
+		"fieldkit.sensor_data_7d",
+		"fieldkit.sensor_data_24h",
+		"fieldkit.sensor_data_6h",
+		"fieldkit.sensor_data_1h",
+		"fieldkit.sensor_data_10m",
+	}
+
+	pgPool, err := tsConfig.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, view := range views {
+		log.Infow("refreshing", "view_name", view)
+
+		_, err := pgPool.Exec(ctx, fmt.Sprintf(`CALL refresh_continuous_aggregate('%s', NULL, NULL)`, view))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
+	if options.TimeScaleURL == "" {
+		return nil
+	}
+
+	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
+}
+
 func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
-	if options.TimeScaleURL != "" {
-		handler := NewMoveDataToTimeScaleDBHandler(&storage.TimeScaleDBConfig{Url: options.TimeScaleURL})
+	tsConfig := options.timeScaleConfig()
+	if tsConfig != nil {
+		handler := NewMoveDataToTimeScaleDBHandler(tsConfig)
 
 		return handler, nil
 	}
@@ -349,6 +394,12 @@ func process(ctx context.Context, options *Options) error {
 		}
 	}
 
+	if options.RefreshViews {
+		if err := refreshViews(ctx, options); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -360,6 +411,7 @@ func main() {
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
 	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
+	flag.BoolVar(&options.RefreshViews, "refresh-views", false, "refresh views")
 
 	flag.Parse()
 
