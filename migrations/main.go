@@ -42,16 +42,21 @@ func main() {
 	}
 
 	url := os.Getenv("MIGRATE_DATABASE_URL")
-	if url != "" {
-		o, err := pg.ParseURL(url)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		options = o
+	if url == "" {
+		log.Fatalln("MIGRATE_DATABASE_URL is requied")
 	}
 
-	directory := "/migrations"
+	o, err := pg.ParseURL(url)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	options = o
+
+	directory := os.Getenv("MIGRATE_PATH")
+	if directory == "" {
+		log.Fatalln("MIGRATE_PATH is requied")
+	}
 
 	log.Printf("Scanning %s...", directory)
 
