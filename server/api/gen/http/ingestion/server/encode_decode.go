@@ -231,6 +231,7 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 		var (
 			stationID  int32
 			completely *bool
+			skipManual *bool
 			auth       string
 			err        error
 
@@ -254,6 +255,16 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 				completely = &v
 			}
 		}
+		{
+			skipManualRaw := r.URL.Query().Get("skipManual")
+			if skipManualRaw != "" {
+				v, err2 := strconv.ParseBool(skipManualRaw)
+				if err2 != nil {
+					err = goa.MergeErrors(err, goa.InvalidFieldTypeError("skipManual", skipManualRaw, "boolean"))
+				}
+				skipManual = &v
+			}
+		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -261,7 +272,7 @@ func DecodeProcessStationRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 		if err != nil {
 			return nil, err
 		}
-		payload := NewProcessStationPayload(stationID, completely, auth)
+		payload := NewProcessStationPayload(stationID, completely, skipManual, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]

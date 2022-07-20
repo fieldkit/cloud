@@ -227,6 +227,7 @@ func ParseEndpoint(
 		ingestionProcessStationFlags          = flag.NewFlagSet("process- station", flag.ExitOnError)
 		ingestionProcessStationStationIDFlag  = ingestionProcessStationFlags.String("station-id", "REQUIRED", "")
 		ingestionProcessStationCompletelyFlag = ingestionProcessStationFlags.String("completely", "", "")
+		ingestionProcessStationSkipManualFlag = ingestionProcessStationFlags.String("skip-manual", "", "")
 		ingestionProcessStationAuthFlag       = ingestionProcessStationFlags.String("auth", "REQUIRED", "")
 
 		ingestionProcessStationIngestionsFlags         = flag.NewFlagSet("process- station- ingestions", flag.ExitOnError)
@@ -1410,7 +1411,7 @@ func ParseEndpoint(
 				data, err = ingestionc.BuildWalkEverythingPayload(*ingestionWalkEverythingAuthFlag)
 			case "process- station":
 				endpoint = c.ProcessStation()
-				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationStationIDFlag, *ingestionProcessStationCompletelyFlag, *ingestionProcessStationAuthFlag)
+				data, err = ingestionc.BuildProcessStationPayload(*ingestionProcessStationStationIDFlag, *ingestionProcessStationCompletelyFlag, *ingestionProcessStationSkipManualFlag, *ingestionProcessStationAuthFlag)
 			case "process- station- ingestions":
 				endpoint = c.ProcessStationIngestions()
 				data, err = ingestionc.BuildProcessStationIngestionsPayload(*ingestionProcessStationIngestionsStationIDFlag, *ingestionProcessStationIngestionsAuthFlag)
@@ -2211,15 +2212,16 @@ Example:
 }
 
 func ingestionProcessStationUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -station-id INT32 -completely BOOL -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion process- station -station-id INT32 -completely BOOL -skip-manual BOOL -auth STRING
 
 ProcessStation implements process station.
     -station-id INT32: 
     -completely BOOL: 
+    -skip-manual BOOL: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --station-id 394787239 --completely false --auth "Et ab."
+    `+os.Args[0]+` ingestion process- station --station-id 394787239 --completely false --skip-manual false --auth "Ab praesentium."
 `, os.Args[0])
 }
 
@@ -2231,7 +2233,7 @@ ProcessStationIngestions implements process station ingestions.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station- ingestions --station-id 7121907825964183449 --auth "Sed libero delectus quibusdam consequuntur nulla."
+    `+os.Args[0]+` ingestion process- station- ingestions --station-id 4853377893992399424 --auth "Libero delectus quibusdam consequuntur."
 `, os.Args[0])
 }
 
@@ -2243,7 +2245,7 @@ ProcessIngestion implements process ingestion.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 2724891130649581318 --auth "Non saepe."
+    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 797380091439512119 --auth "Eaque non saepe ratione aut."
 `, os.Args[0])
 }
 
@@ -2255,7 +2257,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --ingestion-id 9019892868084898580 --auth "Ipsum adipisci et sapiente quam excepturi."
+    `+os.Args[0]+` ingestion delete --ingestion-id 1785372197230477312 --auth "Et sapiente."
 `, os.Args[0])
 }
 
@@ -2385,7 +2387,7 @@ Example:
             }
          ]
       }
-   }' --station-id 1214471284 --auth "Possimus voluptate aut praesentium inventore est nihil."
+   }' --station-id 681270782 --auth "Recusandae rerum voluptatem et."
 `, os.Args[0])
 }
 
@@ -2397,7 +2399,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 2112553263 --auth "Iusto vel debitis sequi."
+    `+os.Args[0]+` notes get --station-id 1809169934 --auth "Ut officiis et necessitatibus iusto vel debitis."
 `, os.Args[0])
 }
 
@@ -2409,7 +2411,7 @@ DownloadMedia implements download media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes download- media --media-id 1441080137 --auth "Labore ut ut."
+    `+os.Args[0]+` notes download- media --media-id 261809623 --auth "Doloremque labore ut ut quo incidunt quibusdam."
 `, os.Args[0])
 }
 
@@ -2425,7 +2427,7 @@ UploadMedia implements upload media.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload- media --station-id 1337771299 --key "Natus sapiente occaecati odit molestiae nostrum et." --content-type "Velit qui labore quis qui fuga." --content-length 1133077941144245298 --auth "Nihil quo ipsam." --stream "goa.png"
+    `+os.Args[0]+` notes upload- media --station-id 1519975656 --key "Velit qui labore quis qui fuga." --content-type "Eos nihil." --content-length 2731223659876462430 --auth "Quis tempore." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -2437,7 +2439,7 @@ DeleteMedia implements delete media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes delete- media --media-id 844367348 --auth "Ea et."
+    `+os.Args[0]+` notes delete- media --media-id 1616609323 --auth "Quidem optio dicta maxime."
 `, os.Args[0])
 }
 

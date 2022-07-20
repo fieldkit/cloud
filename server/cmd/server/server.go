@@ -38,6 +38,7 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/social"
+	"github.com/fieldkit/cloud/server/storage"
 
 	_ "github.com/fieldkit/cloud/server/messages"
 
@@ -96,9 +97,9 @@ type Config struct {
 	TwitterConsumerSecret string `split_words:"true"`
 }
 
-func (c *Config) timeScaleConfig() *querying.TimeScaleDBConfig {
+func (c *Config) timeScaleConfig() *storage.TimeScaleDBConfig {
 	if c.TimeScaleURL != "" {
-		return &querying.TimeScaleDBConfig{
+		return &storage.TimeScaleDBConfig{
 			Url: c.TimeScaleURL,
 		}
 	}
@@ -288,6 +289,20 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
+	influxConfig := config.influxConfig()
+	if influxConfig == nil {
+		log.Infow("influxdb-disabled")
+	} else {
+		log.Infow("influxdb-enabled")
+	}
+
+	timeScaleConfig := config.timeScaleConfig()
+	if timeScaleConfig == nil {
+		log.Infow("timescaledb-disabled")
+	} else {
+		log.Infow("timescaledb-enabled")
+	}
+
 	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
 	if err != nil {
 		return nil, err
@@ -309,7 +324,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Ingestion: ingestionFiles,
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
-	}, qc))
+	}, qc, timeScaleConfig))
 	workers := que.NewWorkerPool(qc, workMap, config.Workers)
 
 	go workers.Start()
@@ -324,20 +339,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		PortalDomain:  config.PortalDomain,
 		EmailOverride: config.EmailOverride,
 		Buckets:       bucketNames,
-	}
-
-	influxConfig := config.influxConfig()
-	if influxConfig == nil {
-		log.Infow("influxdb-disabled")
-	} else {
-		log.Infow("influxdb-enabled")
-	}
-
-	timeScaleConfig := config.timeScaleConfig()
-	if timeScaleConfig == nil {
-		log.Infow("timescaledb-disabled")
-	} else {
-		log.Infow("timescaledb-enabled")
 	}
 
 	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, influxConfig, timeScaleConfig)

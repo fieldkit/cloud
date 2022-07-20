@@ -137,7 +137,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*Mo
 	}
 
 	sensors := []*PersistedSensorMeta{}
-	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges FROM fieldkit.sensor_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aggregation_function FROM fieldkit.sensor_meta`); err != nil {
 		return nil, err
 	}
 
@@ -176,16 +176,22 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*Mo
 				return nil, err
 			}
 
+			function := "avg"
+			if psm.AggregationFunction != nil {
+				function = *psm.AggregationFunction
+			}
+
 			mm.Sensors = append(mm.Sensors, &SensorMeta{
-				Key:           psm.SensorKey,
-				FullKey:       psm.FullKey,
-				FirmwareKey:   psm.FirmwareKey,
-				UnitOfMeasure: psm.UnitOfMeasure,
-				Internal:      psm.Internal,
-				Order:         psm.Ordering,
-				Ranges:        ranges,
-				Strings:       strings,
-				VizConfigs:    viz,
+				Key:                 psm.SensorKey,
+				FullKey:             psm.FullKey,
+				FirmwareKey:         psm.FirmwareKey,
+				UnitOfMeasure:       psm.UnitOfMeasure,
+				Internal:            psm.Internal,
+				Order:               psm.Ordering,
+				Ranges:              ranges,
+				Strings:             strings,
+				VizConfigs:          viz,
+				AggregationFunction: function,
 			})
 		}
 

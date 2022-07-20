@@ -210,8 +210,13 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        const xDomainsAll = this.allSeries
+            .filter((series: SeriesData) => series.queried.data.length > 0)
+            .map((series: SeriesData) => series.queried.timeRange);
+        const timeRangeAll =
+            xDomainsAll.length == 0
+                ? null
+                : [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
 
         // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
@@ -307,24 +312,31 @@ export class TimeSeriesSpecFactory {
                     })
                 )
             )
-            .concat([
-                {
-                    name: "all_layouts",
-                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
-                    transform: [
-                        {
-                            type: "voronoi",
-                            x: "layout_x",
-                            y: "layout_y",
-                            size: [{ signal: "width" }, { signal: "height" }],
-                            as: "layout_path",
-                        },
-                    ],
-                },
-            ] as any[]);
+            .concat(
+                this.settings.tiny
+                    ? []
+                    : ([
+                          {
+                              name: "all_layouts",
+                              source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
+                              transform: [
+                                  {
+                                      type: "voronoi",
+                                      x: "layout_x",
+                                      y: "layout_y",
+                                      size: [{ signal: "width" }, { signal: "height" }],
+                                      as: "layout_path",
+                                  },
+                              ],
+                          },
+                      ] as any[])
+            );
 
         const legends = _.flatten(
             mapSeries((series, i) => {
+                if (this.settings.tiny) {
+                    return [];
+                }
                 if (sameSensors && i > 0) {
                     return [];
                 }
@@ -343,36 +355,74 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        const axes = [
-            {
-                orient: "bottom",
-                scale: "x",
-                domain: xDomain,
-                tickCount: 6,
-                labelPadding: -24,
-                tickSize: 30,
-                tickDash: [2, 2],
-                title: "Time",
-                format: {
-                    year: "%m/%d/%Y",
-                    quarter: "%m/%d/%Y",
-                    month: "%m/%d/%Y",
-                    week: "%m/%d/%Y",
-                    date: "%m/%d/%Y",
-                    hours: "%m/%d/%Y %H:%M",
-                    minutes: "%m/%d/%Y %H:%M",
-                    seconds: "%m/%d/%Y %H:%M",
-                    milliseconds: "%m/%d/%Y %H:%M",
+        const tinyXAxis = () => {
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain,
+                    tickCount: 0,
+                    labelPadding: 0,
+                    tickSize: 0,
+                    tickDash: [2, 2],
+                    title: null,
                 },
-            },
-        ].concat(
-            _.flatten(
+            ];
+        };
+
+        const optionalXAxis = () => {
+            if (!xDomain) {
+                return [];
+            }
+
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain,
+                    tickCount: 6,
+                    labelPadding: -24,
+                    tickSize: 30,
+                    tickDash: [2, 2],
+                    title: "Time",
+                    format: {
+                        year: "%m/%d/%Y",
+                        quarter: "%m/%d/%Y",
+                        month: "%m/%d/%Y",
+                        week: "%m/%d/%Y",
+                        date: "%m/%d/%Y",
+                        hours: "%m/%d/%Y %H:%M",
+                        minutes: "%m/%d/%Y %H:%M",
+                        seconds: "%m/%d/%Y %H:%M",
+                        milliseconds: "%m/%d/%Y %H:%M",
+                    },
+                },
+            ];
+        };
+
+        const axes = [
+            ...(this.settings.tiny ? tinyXAxis() : optionalXAxis()),
+            ..._.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
                     const hoverCheck = ifHovering(i, 1, 0.2);
                     const hoverCheckGrid = ifHovering(i, 0.5, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
+
+                    if (this.settings.tiny) {
+                        return {
+                            title: null,
+                            orient: makeOrientation(i),
+                            scale: makeAxisScale(i),
+                            domain: makeDomainY(i, series),
+                            gridDash: [],
+                            tickCount: 5,
+                            domainOpacity: 0,
+                            titleOpacity: 0,
+                            gridOpacity: 0,
+                        };
+                    }
 
                     return {
                         title: series.vizInfo.axisLabel,
@@ -394,8 +444,8 @@ export class TimeSeriesSpecFactory {
                         },
                     };
                 })
-            )
-        );
+            ),
+        ];
 
         const scales = _.flatten(
             mapSeries((series, i) => {
@@ -757,7 +807,7 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: i === 0 ? "primaryLine" : "secondaryLine",
+                        style: this.settings.tiny ? "tinyLine" : i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -785,15 +835,14 @@ export class TimeSeriesSpecFactory {
                 }
             }).reverse()
         );
-        
+
         // define mark stacking priority
-        const getMarkSortIndex = (d) =>  {
-            if(d['marks']) {
-                if (d['marks'][0].type === "line") return 1;
-                if (d['marks'][0].type === "rect") return 2;
+        const getMarkSortIndex = (d) => {
+            if (d["marks"]) {
+                if (d["marks"][0].type === "line") return 1;
+                if (d["marks"][0].type === "rect") return 2;
                 else return 0;
-            }
-            else return 0;
+            } else return 0;
         };
 
         // TODO Unique by thresholds and perhaps y value?
@@ -802,7 +851,7 @@ export class TimeSeriesSpecFactory {
                 const domain = makeSeriesDomain(series, i);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
-                if (thresholds) {
+                if (thresholds && timeRangeAll) {
                     return thresholds.levels
                         .filter((level) => level.label != null && !level.hidden)
                         .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
@@ -847,6 +896,10 @@ export class TimeSeriesSpecFactory {
         );
 
         const cellMarks = () => {
+            if (this.settings.tiny) {
+                return [];
+            }
+
             return [
                 {
                     name: "cell",
@@ -874,13 +927,20 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
+        /*
         console.log(seriesMarks.sort((a,b) => {
             return getMarkSortIndex(a) - getMarkSortIndex(b);
         }))
+        */
 
-        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks.sort((a,b) => {
-            return getMarkSortIndex(b) - getMarkSortIndex(a);
-        })];
+        const marks = [
+            ...cellMarks(),
+            ...brushMarks,
+            ...ruleMarks,
+            ...seriesMarks.sort((a, b) => {
+                return getMarkSortIndex(b) - getMarkSortIndex(a);
+            }),
+        ];
 
         const interactiveSignals = [
             {
@@ -1142,7 +1202,31 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const allSignals = this.settings.w == 0 ? interactiveSignals : staticSignals;
+        const tinySignals = [
+            {
+                name: "width",
+                init: "containerSize()[0]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[0]",
+                    },
+                ],
+            },
+            {
+                name: "height",
+                init: "containerSize()[1]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[1]",
+                    },
+                ],
+            },
+            ...staticSignals,
+        ];
+
+        const allSignals = this.settings.tiny ? tinySignals : this.settings.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],

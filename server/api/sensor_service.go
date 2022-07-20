@@ -17,6 +17,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/storage"
 
 	"github.com/fieldkit/cloud/server/api/querying"
 )
@@ -38,11 +39,11 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 type SensorService struct {
 	options         *ControllerOptions
 	influxConfig    *querying.InfluxDBConfig
-	timeScaleConfig *querying.TimeScaleDBConfig
+	timeScaleConfig *storage.TimeScaleDBConfig
 	db              *sqlxcache.DB
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
 	return &SensorService{
 		options:         options,
 		influxConfig:    influxConfig,

@@ -42,7 +42,7 @@ func BuildWalkEverythingPayload(ingestionWalkEverythingAuth string) (*ingestion.
 
 // BuildProcessStationPayload builds the payload for the ingestion process
 // station endpoint from CLI flags.
-func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationCompletely string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
+func BuildProcessStationPayload(ingestionProcessStationStationID string, ingestionProcessStationCompletely string, ingestionProcessStationSkipManual string, ingestionProcessStationAuth string) (*ingestion.ProcessStationPayload, error) {
 	var err error
 	var stationID int32
 	{
@@ -64,6 +64,17 @@ func BuildProcessStationPayload(ingestionProcessStationStationID string, ingesti
 			}
 		}
 	}
+	var skipManual *bool
+	{
+		if ingestionProcessStationSkipManual != "" {
+			var val bool
+			val, err = strconv.ParseBool(ingestionProcessStationSkipManual)
+			skipManual = &val
+			if err != nil {
+				return nil, fmt.Errorf("invalid value for skipManual, must be BOOL")
+			}
+		}
+	}
 	var auth string
 	{
 		auth = ingestionProcessStationAuth
@@ -71,6 +82,7 @@ func BuildProcessStationPayload(ingestionProcessStationStationID string, ingesti
 	v := &ingestion.ProcessStationPayload{}
 	v.StationID = stationID
 	v.Completely = completely
+	v.SkipManual = skipManual
 	v.Auth = auth
 
 	return v, nil

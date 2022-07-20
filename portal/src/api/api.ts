@@ -1,14 +1,21 @@
 import _ from "lodash";
 import axios from "axios";
-import TokenStorage from "./tokens";
+
 import Config from "../secrets";
+import TokenStorage from "./tokens";
+import Backoff from "backoff";
+
 import { keysToCamel } from "@/json-tools";
+
 import { ExportParams } from "@/store/typed-actions";
 import { BoundingRectangle } from "@/store/map-types";
+
+import { SensorInfoResponse } from "@/views/viz/api";
+
+// Ew
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
-import Backoff from "backoff";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -263,6 +270,7 @@ export interface SensorReading {
 }
 
 export interface ModuleSensor {
+    fullKey: string;
     name: string;
     unitOfMeasure: string;
     key: string;
@@ -362,7 +370,9 @@ export interface TailSensorDataRow {
     stationId: number;
     sensorId: number;
     moduleId: string;
-    value: number;
+    avg: number;
+    min: number;
+    max: number;
 }
 
 export interface TailSensorDataResponse {
@@ -403,7 +413,7 @@ class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
     private refreshing: Promise<any> | null = null;
-    private allSensorsMemoized = _.memoize(() => this.getAllSensors());
+    public allSensorsMemoized = _.memoize(() => this.getAllSensors());
 
     authenticated() {
         return this.token.authenticated();
@@ -1139,7 +1149,7 @@ class FKApi {
         });
     }
 
-    public getQuickSensors(stations: number[]) {
+    public getQuickSensors(stations: number[]): Promise<SensorInfoResponse> {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
@@ -1278,10 +1288,13 @@ class FKApi {
         });
     }
 
-    public adminProcessStation(stationId: number, completely: boolean): Promise<void> {
+    public adminProcessStation(stationId: number, completely: boolean, skipManual: boolean): Promise<void> {
         const qp = new URLSearchParams();
         if (completely) {
             qp.append("completely", "true");
+        }
+        if (skipManual) {
+            qp.append("skipManual", "true");
         }
         return this.invoke({
             auth: Auth.Required,

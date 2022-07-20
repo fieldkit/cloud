@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/storage"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -24,14 +25,16 @@ type IngestionReceivedHandler struct {
 	files     files.FileArchive
 	metrics   *logging.Metrics
 	publisher jobs.MessagePublisher
+	tsConfig  *storage.TimeScaleDBConfig
 }
 
-func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher) *IngestionReceivedHandler {
+func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestionReceivedHandler {
 	return &IngestionReceivedHandler{
 		db:        db,
 		files:     files,
 		metrics:   metrics,
 		publisher: publisher,
+		tsConfig:  tsConfig,
 	}
 }
 
@@ -62,7 +65,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler, err := NewAllHandlers(h.db)
+	handler, err := NewAllHandlers(h.db, h.tsConfig)
 	if err != nil {
 		return err
 	}

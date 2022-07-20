@@ -153,8 +153,14 @@ veryclean:
 run-server: server
 	./run-server.sh
 
+migrate-image:
+	cd migrations && make image
+
 migrate-up:
-	cd migrations && PGURL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
+	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
+
+migrate-up-tsdb:
+	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL="postgres://postgres:password@127.0.0.1:5433/fk?sslmode=disable" go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 
