@@ -658,7 +658,6 @@ section {
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
-        transform: translateY(-4px);
 
         body.floodnet & {
             color: $color-dark;
