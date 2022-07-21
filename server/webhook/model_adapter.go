@@ -310,6 +310,15 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 						}
 					}
 				}
+			} else if parsed.Hidden {
+				if boolValue, ok := parsed.JSONValue.(bool); ok {
+					station.Station.Hidden = &boolValue
+				}
+			} else if parsed.Status {
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					statusValue := strings.ToLower(stringValue)
+					station.Station.Status = &statusValue
+				}
 			} else {
 				if attribute := station.FindAttribute(name); attribute != nil {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
