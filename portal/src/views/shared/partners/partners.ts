@@ -32,6 +32,7 @@ export interface PartnerCustomization {
     };
     routeAfterLogin: string;
     sidebarNarrow: boolean;
+    templates: { [key: string]: string };
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -98,6 +99,16 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             routeAfterLogin: "root",
             sidebarNarrow: true,
+            templates: {
+                extraProjectDescription: `
+                    <div class="detail-description">
+                        To report a flood in your neighborhood, please use the 
+                        <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" class="link">
+                            Community Flood Watch Project Survey
+                        </a>
+                    </div>
+                `,
+            },
         };
     }
     return null;
@@ -145,6 +156,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         },
         routeAfterLogin: "projects",
         sidebarNarrow: false,
+        templates: {},
     };
 }
 

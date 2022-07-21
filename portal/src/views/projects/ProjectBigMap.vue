@@ -1,23 +1,7 @@
 <template>
     <StandardLayout @sidebar-toggle="sidebarToggle()" :sidebarNarrow="true" :clipStations="true">
         <div class="project-public project-container" v-if="displayProject">
-            <div class="project-detail-card">
-                <div class="photo-container">
-                    <ProjectPhoto :project="project" :image-size="150" />
-                </div>
-                <div class="detail-container">
-                    <div class="flex flex-al-center">
-                        <h1 class="detail-title">{{ project.name }}</h1>
-                        <router-link v-if="!isPartnerCustomisationEnabled()" :to="{ name: 'viewProject', params: { id: id } }" class="link">
-                            Project Dashboard >
-                        </router-link>
-                        <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
-                            {{ $t(link.text) }} >
-                        </a>
-                    </div>
-                    <div class="detail-description">{{ project.description }}</div>
-                </div>
-            </div>
+            <ProjectDetailCard :project="project"></ProjectDetailCard>
 
             <template v-if="viewType === 'list'">
                 <div class="stations-list" v-if="projectStations && projectStations.length > 0">
@@ -108,6 +92,7 @@ import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
 import { ExploreContext } from "@/views/viz/common";
+import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 
@@ -118,6 +103,7 @@ export default Vue.extend({
         StationsMap,
         StationHoverSummary,
         StandardLayout,
+        ProjectDetailCard,
         TinyChart,
     },
     data(): {
@@ -268,92 +254,6 @@ export default Vue.extend({
 @import "../../scss/project";
 @import "../../scss/global";
 
-.project-detail-card {
-    display: flex;
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
-    z-index: $z-index-top;
-    width: 100%;
-    position: absolute;
-    top: 66px;
-    left: 0;
-    box-sizing: border-box;
-    background-color: #ffffff;
-    text-align: left;
-    padding: 27px 30px;
-
-    @include bp-down($sm) {
-        width: 100%;
-        position: fixed;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        bottom: 0px;
-        text-align: center;
-        padding-bottom: 10px;
-        top: auto;
-        right: auto;
-        align-items: center;
-        justify-content: center;
-    }
-
-    body.floodnet & {
-        background-color: #f6f9f8;
-    }
-
-    .link {
-        color: $color-primary;
-        font-size: 12px;
-        display: block;
-        letter-spacing: 0.07px;
-        text-decoration: initial;
-
-        body.floodnet & {
-            color: $color-dark;
-        }
-    }
-}
-.detail-title {
-    font-family: var(--font-family-bold);
-    font-size: 18px;
-    margin-top: 0;
-    margin-bottom: 2px;
-    margin-right: 10px;
-}
-.detail-container {
-    width: 75%;
-}
-.detail-description {
-    font-family: var(--font-family-light);
-    font-size: 14px;
-    max-height: 35px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    max-height: 35px;
-    overflow: hidden;
-    margin-right: 10px;
-}
-
-.details {
-    display: flex;
-    border-radius: 2px;
-    border: solid 1px var(--color-border);
-    background-color: white;
-}
-
-.photo-container {
-    width: 38px;
-    height: 38px;
-    margin: 0 12px 0 0;
-
-    img {
-        border-radius: 2px;
-    }
-
-    @include bp-down($sm) {
-        display: none;
-    }
-}
 .container-map {
     width: 100%;
     height: calc(100% - 157px);
