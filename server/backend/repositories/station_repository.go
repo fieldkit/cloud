@@ -505,7 +505,7 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 			FROM fieldkit.project_station AS ps
 			JOIN fieldkit.station AS s ON (ps.station_id = s.id)
 			JOIN fieldkit.station_model AS m ON (s.model_id = m.id)
-			WHERE NOT m.only_visible_via_association AND ps.project_id = $1 AND s.location IS NOT NULL
+			WHERE (s.hidden IS FALSE OR s.hidden IS NULL) AND NOT m.only_visible_via_association AND ps.project_id = $1 AND s.location IS NOT NULL
 			ORDER BY distance
 		)
 		SELECT * FROM distances WHERE distance >= 0 LIMIT 5
@@ -827,7 +827,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, recording_started_at,
 			memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, status
 		FROM fieldkit.station
-		WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
+		WHERE id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1) AND (hidden IS FALSE OR hidden IS NULL)
 		`, id); err != nil {
 		return nil, err
 	}
