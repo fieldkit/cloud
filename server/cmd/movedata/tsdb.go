@@ -59,14 +59,14 @@ func (h *MoveDataToTimeScaleDBHandler) flush(ctx context.Context) error {
 	}
 
 	// TODO location
-	_, err = pgPool.CopyFrom(ctx, pgx.Identifier{"fieldkit", "sensor_data"},
+	inserted, err = pgPool.CopyFrom(ctx, pgx.Identifier{"fieldkit", "sensor_data"},
 		[]string{"time", "station_id", "module_id", "sensor_id", "value"},
 		pgx.CopyFromRows(h.records))
 	if err != nil {
 		return err
 	}
 
-	log.Infow("tsdb:flush", "records", len(h.records))
+	log.Infow("tsdb:flush", "records", len(h.records), "inserted", inserted)
 
 	h.records = make([][]interface{}, 0)
 
