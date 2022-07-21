@@ -25,7 +25,7 @@ import (
 )
 
 type Options struct {
-	PostgresURL  string `split_words:"true" required:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable"`
+	PostgresURL  string `split_words:"true"`
 	TimeScaleURL string `split_words:"true"`
 
 	BinaryRecords        bool
@@ -99,11 +99,11 @@ func (r *Resolver) LookupModuleID(ctx context.Context, hardwareID []byte) (int64
 	}
 
 	if len(modules) == 0 {
-		return 0, fmt.Errorf("missing module: %v", hardwareID)
+		return 0, fmt.Errorf("module missing: %v", cacheKey)
 	}
 
 	if len(modules) != 1 {
-		return 0, fmt.Errorf("multiple modules: %v", hardwareID)
+		return 0, fmt.Errorf("module ambiguous: %v", cacheKey)
 	}
 
 	r.modules[cacheKey] = modules[0].ID

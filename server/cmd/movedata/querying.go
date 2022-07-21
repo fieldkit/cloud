@@ -73,21 +73,20 @@ func (h *MoveBinaryDataHandler) OnMeta(ctx context.Context, p *data.Provision, r
 			provision: p,
 			station:   station,
 		}
-
-		modules, err := h.stations.QueryStationModulesByMetaID(ctx, meta.ID)
-		if err != nil {
-			return err
-		}
-
-		h.modules = make(map[string]int64)
-
-		for _, module := range modules {
-			h.modules[hex.EncodeToString(module.HardwareID)] = module.ID
-		}
 	}
 
-	_, err := h.metaFactory.Add(ctx, meta, true)
+	modules, err := h.stations.QueryStationModulesByMetaID(ctx, meta.ID)
 	if err != nil {
+		return err
+	}
+
+	h.modules = make(map[string]int64)
+
+	for _, module := range modules {
+		h.modules[hex.EncodeToString(module.HardwareID)] = module.ID
+	}
+
+	if _, err := h.metaFactory.Add(ctx, meta, true); err != nil {
 		if _, ok := err.(*repositories.MissingSensorMetaError); ok {
 			log.Infow("missing-meta", "meta_record_id", meta.ID)
 			h.skipping[p.ID] = true
@@ -143,9 +142,10 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 			return err
 		}
 
-		moduleID, hasModule := h.modules[hex.EncodeToString(moduleHardwareID)]
+		hexModuleID := hex.EncodeToString(moduleHardwareID)
+		moduleID, hasModule := h.modules[hexModuleID]
 		if !hasModule {
-			return fmt.Errorf("missing module: %v", moduleHardwareID)
+			return fmt.Errorf("module missing: %v (%v)", hexModuleID, rv.Module.ID)
 		}
 
 		var latitude *float64
