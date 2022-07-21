@@ -1,12 +1,14 @@
 import _ from "lodash";
 
 interface FeatureFlags {
+    tsdb: boolean;
     tinyCharts: boolean;
 }
 
 export function getFeaturesEnabled(): FeatureFlags {
     return {
-        tinyCharts: window.localStorage["fk:tiny-charts"] != null,
+        tsdb: window.localStorage["fk:backend"] === "tsdb",
+        tinyCharts: window.localStorage["fk:tiny-charts"] === "true",
     };
 }
 

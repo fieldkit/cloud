@@ -16,6 +16,8 @@ import ProjectUpdateEditView from "./views/projects/ProjectUpdateEditView.vue";
 import ProjectView from "./views/projects/ProjectView.vue";
 import ProjectBigMap from "./views/projects/ProjectBigMap.vue";
 
+import FeaturesView from "./views/FeaturesView.vue";
+
 import StationsView from "./views/StationsView.vue";
 import ExploreView from "./views/viz/ExploreView.vue";
 
@@ -35,7 +37,7 @@ import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
 import { getPartnerCustomization } from "@/views/shared/partners";
-import StationPhotosView from '@/views/station/StationPhotosView.vue';
+import StationPhotosView from "@/views/station/StationPhotosView.vue";
 
 Vue.use(Router);
 
@@ -148,6 +150,14 @@ const routes = [
         meta: {
             bodyClass: "blue-background",
             secured: false,
+        },
+    },
+    {
+        path: "/internal/features",
+        name: "features",
+        component: FeaturesView,
+        meta: {
+            secured: true,
         },
     },
     {
