@@ -83,20 +83,20 @@ import StationsMap from "../shared/StationsMap.vue";
 import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
+import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 
 import { ExploreContext } from "@/views/viz/common";
-import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
-import ProjectDetailCard from "@/views/projects/ProjectDetailCard";
 
 export default Vue.extend({
     name: "ProjectBigMap",
     components: {
-        ProjectDetailCard,
         ...CommonComponents,
         StationsMap,
         StationHoverSummary,
         StandardLayout,
+        ProjectDetailCard,
     },
     data(): {
         layoutChanges: number;

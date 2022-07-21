@@ -6,7 +6,7 @@
         <div class="detail-container">
             <div class="flex flex-al-center">
                 <h1 class="detail-title">{{ project.name }}</h1>
-                <router-link v-if="!isPartnerCustomisationEnabled()" :to="{ name: 'viewProject', params: { id: id } }" class="link">
+                <router-link v-if="!isPartnerCustomisationEnabled" :to="{ name: 'viewProject', params: { id: project.id } }" class="link">
                     Project Dashboard >
                 </router-link>
                 <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
@@ -14,19 +14,15 @@
                 </a>
             </div>
             <div class="detail-description">{{ project.description }}</div>
-            <div v-if="isPartnerCustomisationEnabled()" class="detail-description">
-                {{ $t("floodnetDescription.text") }}
-                <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" class="link">
-                    {{ $t("floodnetDescription.link") }}
-                </a>
-            </div>
+
+            <div v-html="partnerCustomization.templates.extraProjectDescription"></div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import { Project } from "@/api/api";
 import ProjectPhoto from "@/views/shared/ProjectPhoto.vue";
 
@@ -41,12 +37,12 @@ export default Vue.extend({
             required: true,
         },
     },
-    methods: {
+    computed: {
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
+        },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
-        },
-        partnerCustomization() {
-            return getPartnerCustomizationWithDefault();
         },
     },
 });
@@ -109,7 +105,7 @@ export default Vue.extend({
 .detail-container {
     width: 75%;
 }
-.detail-description {
+::v-deep .detail-description {
     font-family: var(--font-family-light);
     font-size: 14px;
     max-height: 35px;
