@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/jackc/pgx/v4"
 
 	pb "github.com/fieldkit/data-protocol"
 
@@ -223,20 +222,43 @@ func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time,
 }
 
 func (v *AggregatingHandler) flushTs(ctx context.Context) error {
+	batch := &pgx.Batch{}
+
+	// TODO location
+	for _, row := range v.tsRecords {
+		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+				VALUES ($1, $2, $3, $4, $5)
+				ON CONFLICT (time, station_id, module_id, sensor_id)
+				DO UPDATE SET value = EXCLUDED.value`
+		batch.Queue(sql, row...)
+	}
+
+	v.tsRecords = make([][]interface{}, 0)
+
 	pgPool, err := v.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	// TODO location
-	_, err = pgPool.CopyFrom(ctx, pgx.Identifier{"fieldkit", "sensor_data"},
-		[]string{"time", "station_id", "module_id", "sensor_id", "value"},
-		pgx.CopyFromRows(v.tsRecords))
+	tx, err := pgPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	v.tsRecords = make([][]interface{}, 0)
+	br := tx.SendBatch(ctx, batch)
+
+	if _, err := br.Exec(); err != nil {
+		return fmt.Errorf("(tsdb-exec) %v", err)
+	}
+
+	if err := br.Close(); err != nil {
+		return fmt.Errorf("(tsdb-close) %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("(tsdb-commit) %v", err)
+	}
+
 	return nil
 }
 

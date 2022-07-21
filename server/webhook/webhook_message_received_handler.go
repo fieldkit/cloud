@@ -122,6 +122,8 @@ func (h *WebHookMessageReceivedHandler) saveMessages(ctx context.Context, incomi
 		_, err = pgPool.Exec(ctx, `
 			INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
 			VALUES ($1, $2, $3, $4, $5)
+			ON CONFLICT (time, station_id, module_id, sensor_id)
+			DO UPDATE SET value = EXCLUDED.value
 		`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)
 		if err != nil {
 			return err

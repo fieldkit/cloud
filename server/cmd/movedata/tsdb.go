@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 
@@ -53,22 +54,44 @@ func (h *MoveDataToTimeScaleDBHandler) flush(ctx context.Context) error {
 		return nil
 	}
 
+	batch := &pgx.Batch{}
+
+	// TODO location
+	for _, row := range h.records {
+		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+				VALUES ($1, $2, $3, $4, $5)
+				ON CONFLICT (time, station_id, module_id, sensor_id)
+				DO UPDATE SET value = EXCLUDED.value`
+		batch.Queue(sql, row...)
+	}
+
+	h.records = make([][]interface{}, 0)
+
 	pgPool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	// TODO location
-	_, err = pgPool.CopyFrom(ctx, pgx.Identifier{"fieldkit", "sensor_data"},
-		[]string{"time", "station_id", "module_id", "sensor_id", "value"},
-		pgx.CopyFromRows(h.records))
+	tx, err := pgPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("tsdb:flush", "records", len(h.records))
+	br := tx.SendBatch(ctx, batch)
 
-	h.records = make([][]interface{}, 0)
+	if _, err := br.Exec(); err != nil {
+		return fmt.Errorf("(tsdb-exec) %v", err)
+	}
+
+	if err := br.Close(); err != nil {
+		return fmt.Errorf("(tsdb-close) %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("(tsdb-commit) %v", err)
+	}
+
+	log.Infow("tsdb:flush", "records", len(h.records))
 
 	return nil
 }
