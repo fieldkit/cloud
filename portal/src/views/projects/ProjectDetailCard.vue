@@ -15,7 +15,10 @@
             </div>
             <div class="detail-description">{{ project.description }}</div>
 
-            <div v-html="partnerCustomization.templates.extraProjectDescription"></div>
+            <div
+                v-if="partnerCustomization.templates.extraProjectDescription"
+                v-html="partnerCustomization.templates.extraProjectDescription"
+            ></div>
         </div>
     </div>
 </template>
