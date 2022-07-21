@@ -1480,6 +1480,13 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	return byStation, nil
 }
 
+func (r *StationRepository) ClearAssociatedStations(ctx context.Context, stationID int32) error {
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.associated_station WHERE station_id = $1`, stationID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *StationRepository) AssociateStations(ctx context.Context, stationID, associatedStationID, priority int32) (err error) {
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.associated_station (station_id, associated_station_id, priority)

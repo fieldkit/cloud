@@ -366,6 +366,17 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 			}
 		}
 
+		// This will at least cover changing associated stations for a station.
+		// We need to verify how partners intend to unassociate stations w/o
+		// replacing them, though. Will the key be present, but empty? If it's
+		// missing how can we differentiate between messages that are intending
+		// to update that and those that aren't? TODO
+		if len(cacheEntry.station.Associated) > 0 {
+			if err := m.sr.ClearAssociatedStations(ctx, station.ID); err != nil {
+				return fmt.Errorf("clear associated stations: %v", err)
+			}
+		}
+
 		for deviceIDString, associated := range cacheEntry.station.Associated {
 			deviceID, err := hex.DecodeString(deviceIDString)
 			if err != nil {
