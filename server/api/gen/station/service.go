@@ -84,6 +84,8 @@ type StationFull struct {
 	Uploads            []*StationUpload
 	Photos             *StationPhotos
 	ReadOnly           bool
+	Status             *string
+	Hidden             *bool
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32

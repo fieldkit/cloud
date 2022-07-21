@@ -160,6 +160,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("uploads", ArrayOf(StationUpload))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
+		Attribute("status", String)
+		Attribute("hidden", Boolean)
 		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)

@@ -2395,6 +2395,8 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		Name:               v.Name,
 		DeviceID:           v.DeviceID,
 		ReadOnly:           v.ReadOnly,
+		Status:             v.Status,
+		Hidden:             v.Hidden,
 		Battery:            v.Battery,
 		RecordingStartedAt: v.RecordingStartedAt,
 		MemoryUsed:         v.MemoryUsed,
