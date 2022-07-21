@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/websocket"
 	"goa.design/goa/v3/security"
 
@@ -65,7 +66,12 @@ func (c *NotificationsService) Listen(ctx context.Context, stream notifications.
 				connected = le.Connected
 				log.Warnw("ws:error", "error", err)
 			} else if err != nil {
-				log.Errorw("ws:error", "error", err)
+				v, _ := err.(*jwt.ValidationError)
+				if v.Errors == jwt.ValidationErrorExpired {
+					log.Warnw("ws:error", "error", err)
+				} else {
+					log.Errorw("ws:error", "error", err)
+				}
 			}
 
 			if connected {
