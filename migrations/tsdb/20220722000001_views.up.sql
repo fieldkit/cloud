@@ -13,8 +13,8 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
-
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;
 
 CREATE MATERIALIZED VIEW fieldkit.sensor_data_7d
 WITH (timescaledb.continuous) AS
@@ -31,7 +31,8 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;
 
 
 CREATE MATERIALIZED VIEW fieldkit.sensor_data_24h
@@ -49,7 +50,8 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;
 
 
 CREATE MATERIALIZED VIEW fieldkit.sensor_data_6h
@@ -67,7 +69,8 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;
 
 
 CREATE MATERIALIZED VIEW fieldkit.sensor_data_1h
@@ -85,7 +88,8 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;
 
 
 CREATE MATERIALIZED VIEW fieldkit.sensor_data_10m
@@ -103,4 +107,5 @@ SELECT
     MAX(value) AS max_value,
     LAST(value, time) AS last_value
 FROM fieldkit.sensor_data
-GROUP BY bucket_time, station_id, module_id, sensor_id;
+GROUP BY bucket_time, station_id, module_id, sensor_id
+WITH NO DATA;

@@ -45,6 +45,7 @@ export interface ModuleSensorMeta {
     ranges: SensorRange[];
     viz: VizConfig[];
     strings: SensorStrings;
+    aggregationFunction: string;
 }
 
 export interface Module {
@@ -73,7 +74,7 @@ export interface DataRow {
     time: number;
     stationId: number | null;
     sensorId: number | null;
-    moduleId: number | null;
+    moduleId: string | null;
     location: [number, number] | null;
     value: number | null;
 }
@@ -82,7 +83,7 @@ export interface SensorDataResponse {
     data: DataRow[];
 }
 
-interface StationInfoResponse {
+export interface StationInfoResponse {
     stationId: number;
     stationName: string;
     stationLocation: [number, number];

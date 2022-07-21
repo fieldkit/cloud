@@ -205,6 +205,17 @@ func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, met
 	return modules, nil
 }
 
+func (r *StationRepository) QueryStationModulesByHardwareID(ctx context.Context, hardwareID []byte) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
+		FROM fieldkit.station_module WHERE hardware_id = $1
+		`, hardwareID); err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
 func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
 	if configuration.SourceID != nil && configuration.MetaRecordID == nil {
 		if err := r.db.NamedGetContext(ctx, configuration, `
@@ -592,7 +603,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	ingestions := []*data.Ingestion{}
 	if err := r.db.SelectContext(ctx, &ingestions, `
 		SELECT id, time, upload_id, user_id, device_id, generation, size, url, type, blocks, flags
-		FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 10
+		FROM fieldkit.ingestion WHERE device_id = $1 ORDER BY time DESC LIMIT 50
 		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}

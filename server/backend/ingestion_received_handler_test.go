@@ -23,7 +23,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
@@ -50,7 +50,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	files := tests.NewInMemoryArchive(map[string][]byte{
 		"/file": []byte{},
 	})
-	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
@@ -78,7 +78,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
 	assert.NoError(err)
@@ -109,7 +109,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NotNil(queuedMeta)
@@ -171,7 +171,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -233,7 +233,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)

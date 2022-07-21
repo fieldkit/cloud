@@ -1,8 +1,34 @@
-import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
-import { SeriesData, TimeRange } from "../common";
 import _ from "lodash";
 
-export { getAxisLabel, getString, getSeriesThresholds, SeriesData };
+import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
+import {
+    SeriesData,
+    DataSetSeries,
+    TimeRange,
+    VizInfo,
+    QueriedData,
+    DataRow,
+    SensorDataResponse,
+    VizSensor,
+    SensorsResponse,
+    ModuleSensorMeta,
+} from "../common";
+
+export {
+    getAxisLabel,
+    getString,
+    getSeriesThresholds,
+    SeriesData,
+    TimeRange,
+    DataSetSeries,
+    VizInfo,
+    QueriedData,
+    DataRow,
+    SensorDataResponse,
+    SensorsResponse,
+    ModuleSensorMeta,
+    VizSensor,
+};
 
 export type MapFunction<T> = (series: SeriesData, i: number) => T;
 
@@ -11,7 +37,8 @@ export class ChartSettings {
         public readonly timeRange = TimeRange.eternity,
         public readonly w: number = 0,
         public readonly h: number = 0,
-        public readonly auto = false
+        public readonly auto = false,
+        public readonly tiny = false
     ) {}
 
     public apply(spec: unknown): unknown {
@@ -20,6 +47,7 @@ export class ChartSettings {
                 autosize: {
                     type: "fit",
                     contains: "padding",
+                    resize: this.tiny,
                 },
             };
             return _.extend(spec, autoSize);
@@ -41,6 +69,7 @@ export class ChartSettings {
         return _.extend(spec, containerSize);
     }
 
-    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false);
-    public static Auto = new ChartSettings(TimeRange.eternity, 0, 0, true);
+    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false, false);
+    public static Auto = new ChartSettings(TimeRange.eternity, 0, 0, true, false);
+    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, true, true);
 }

@@ -814,10 +814,11 @@ func NewWalkEverythingPayload(auth string) *ingestion.WalkEverythingPayload {
 
 // NewProcessStationPayload builds a ingestion service process station endpoint
 // payload.
-func NewProcessStationPayload(stationID int32, completely *bool, auth string) *ingestion.ProcessStationPayload {
+func NewProcessStationPayload(stationID int32, completely *bool, skipManual *bool, auth string) *ingestion.ProcessStationPayload {
 	v := &ingestion.ProcessStationPayload{}
 	v.StationID = stationID
 	v.Completely = completely
+	v.SkipManual = skipManual
 	v.Auth = auth
 
 	return v

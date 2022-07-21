@@ -64,6 +64,7 @@ type ProcessStationPayload struct {
 	Auth       string
 	StationID  int32
 	Completely *bool
+	SkipManual *bool
 }
 
 // ProcessStationIngestionsPayload is the payload type of the ingestion service

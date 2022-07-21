@@ -5,12 +5,16 @@
 
             <template v-if="viewType === 'list'">
                 <div class="stations-list" v-if="projectStations && projectStations.length > 0">
-                    <StationHoverSummary
-                        v-for="station in projectStations"
-                        v-bind:key="station.id"
-                        class="summary-container"
-                        :station="station"
-                    />
+                    <div v-for="station in projectStations" v-bind:key="station.id">
+                        <StationHoverSummary
+                            class="summary-container"
+                            :station="station"
+                            :sensorDataQuerier="sensorDataQuerier"
+                            v-slot="{ sensorDataQuerier }"
+                        >
+                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
+                        </StationHoverSummary>
+                    </div>
                 </div>
             </template>
 
@@ -73,21 +77,24 @@
 </template>
 
 <script lang="ts">
+import * as utils from "../../utilities";
+import { getFeaturesEnabled } from "@/utilities";
+
+import { ActionTypes, GlobalState, ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
+
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
-import { GlobalState } from "@/store/modules/global";
-import * as ActionTypes from "@/store/actions";
-import * as utils from "../../utilities";
-import { ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
-import StationsMap from "../shared/StationsMap.vue";
-import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
-import CommonComponents from "@/views/shared";
+
 import StandardLayout from "../StandardLayout.vue";
+import StationsMap from "../shared/StationsMap.vue";
+import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
+import TinyChart from "@/views/viz/TinyChart.vue";
+import CommonComponents from "@/views/shared";
+import { ExploreContext } from "@/views/viz/common";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 
-import { ExploreContext } from "@/views/viz/common";
-import { isCustomisationEnabled } from "@/views/shared/partners";
-import { getPartnerCustomizationWithDefault } from "../shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -97,6 +104,7 @@ export default Vue.extend({
         StationHoverSummary,
         StandardLayout,
         ProjectDetailCard,
+        TinyChart,
     },
     data(): {
         layoutChanges: number;
@@ -128,8 +136,17 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.id];
             },
         }),
+        tinyChartsEnabled(): boolean {
+            return getFeaturesEnabled().tinyCharts;
+        },
         project(): Project {
             return this.displayProject.project;
+        },
+        sensorDataQuerier(): SensorDataQuerier {
+            return new SensorDataQuerier(
+                this.$services.api,
+                this.projectStations.map((s: DisplayStation) => s.id)
+            );
         },
         projectStations(): DisplayStation[] {
             return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);

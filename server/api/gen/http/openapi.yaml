@@ -697,6 +697,10 @@ paths:
         in: query
         required: false
         type: boolean
+      - name: skipManual
+        in: query
+        required: false
+        type: boolean
       - name: stationId
         in: path
         required: true
@@ -11294,9 +11298,9 @@ definitions:
         format: int64
     example:
       author:
-        id: 843859350
-        mediaUrl: Odio at.
-        name: Commodi provident ipsum.
+        id: 15810107
+        mediaUrl: Nihil iusto.
+        name: Praesentium inventore.
       body: Fugiat omnis et et molestiae tempore odio.
       createdAt: 7844370951068890060
       id: 2410786346721437796
@@ -11332,77 +11336,73 @@ definitions:
         items:
           $ref: '#/definitions/NewFieldNoteRequestBody'
         example:
-        - body: Est cumque omnis sed natus.
-          key: Beatae corrupti.
+        - body: Quia non consequatur ipsum quos.
+          key: Cumque omnis sed natus.
           mediaIds:
-          - 6456290587984047055
-          - 5806941928834750319
-        - body: Est cumque omnis sed natus.
-          key: Beatae corrupti.
+          - 3788813970927841853
+          - 6983099646492678638
+        - body: Quia non consequatur ipsum quos.
+          key: Cumque omnis sed natus.
           mediaIds:
-          - 6456290587984047055
-          - 5806941928834750319
+          - 3788813970927841853
+          - 6983099646492678638
       notes:
         type: array
         items:
           $ref: '#/definitions/ExistingFieldNoteRequestBody'
         example:
-        - body: Neque in.
-          id: 3760387336023304562
-          key: Non debitis unde commodi est quo.
+        - body: In quas quasi hic enim velit.
+          id: 4392388670218641121
+          key: Quo molestias.
           mediaIds:
-          - 7287163899198522939
-          - 3762336448727372928
-          - 3386505400453397613
-          - 6451515374695444732
-        - body: Neque in.
-          id: 3760387336023304562
-          key: Non debitis unde commodi est quo.
+          - 8311489732273667289
+          - 7142316324742288369
+          - 1575401870472842998
+        - body: In quas quasi hic enim velit.
+          id: 4392388670218641121
+          key: Quo molestias.
           mediaIds:
-          - 7287163899198522939
-          - 3762336448727372928
-          - 3386505400453397613
-          - 6451515374695444732
+          - 8311489732273667289
+          - 7142316324742288369
+          - 1575401870472842998
     description: FieldNoteUpdateRequestBody result type (default view)
     example:
       creating:
-      - body: Est cumque omnis sed natus.
-        key: Beatae corrupti.
+      - body: Quia non consequatur ipsum quos.
+        key: Cumque omnis sed natus.
         mediaIds:
-        - 6456290587984047055
-        - 5806941928834750319
-      - body: Est cumque omnis sed natus.
-        key: Beatae corrupti.
+        - 3788813970927841853
+        - 6983099646492678638
+      - body: Quia non consequatur ipsum quos.
+        key: Cumque omnis sed natus.
         mediaIds:
-        - 6456290587984047055
-        - 5806941928834750319
-      - body: Est cumque omnis sed natus.
-        key: Beatae corrupti.
+        - 3788813970927841853
+        - 6983099646492678638
+      - body: Quia non consequatur ipsum quos.
+        key: Cumque omnis sed natus.
         mediaIds:
-        - 6456290587984047055
-        - 5806941928834750319
-      - body: Est cumque omnis sed natus.
-        key: Beatae corrupti.
+        - 3788813970927841853
+        - 6983099646492678638
+      - body: Quia non consequatur ipsum quos.
+        key: Cumque omnis sed natus.
         mediaIds:
-        - 6456290587984047055
-        - 5806941928834750319
+        - 3788813970927841853
+        - 6983099646492678638
       notes:
-      - body: Neque in.
-        id: 3760387336023304562
-        key: Non debitis unde commodi est quo.
+      - body: In quas quasi hic enim velit.
+        id: 4392388670218641121
+        key: Quo molestias.
         mediaIds:
-        - 7287163899198522939
-        - 3762336448727372928
-        - 3386505400453397613
-        - 6451515374695444732
-      - body: Neque in.
-        id: 3760387336023304562
-        key: Non debitis unde commodi est quo.
+        - 8311489732273667289
+        - 7142316324742288369
+        - 1575401870472842998
+      - body: In quas quasi hic enim velit.
+        id: 4392388670218641121
+        key: Quo molestias.
         mediaIds:
-        - 7287163899198522939
-        - 3762336448727372928
-        - 3386505400453397613
-        - 6451515374695444732
+        - 8311489732273667289
+        - 7142316324742288369
+        - 1575401870472842998
     required:
     - notes
     - creating
@@ -16083,28 +16083,28 @@ definitions:
         items:
           $ref: '#/definitions/NoteMediaResponseBody'
         example:
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
       notes:
         type: array
         items:
           $ref: '#/definitions/FieldNoteResponseBody'
         example:
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16114,16 +16114,16 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16133,32 +16133,32 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
     description: GetResponseBody result type (default view)
     example:
       media:
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
       notes:
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16168,16 +16168,16 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16187,8 +16187,8 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
     required:
     - notes
     - media
@@ -16434,31 +16434,31 @@ definitions:
         items:
           $ref: '#/definitions/NoteMediaResponseBody'
         example:
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
-        - id: 4885296006210332446
-          key: Nemo fugiat natus eum.
-          url: Sit ab.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
+        - id: 1140726142930368211
+          key: Dolores est nostrum sit ab numquam.
+          url: Quaerat autem quo nihil dicta eum.
       notes:
         type: array
         items:
           $ref: '#/definitions/FieldNoteResponseBody'
         example:
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16468,16 +16468,16 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16487,16 +16487,16 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16506,16 +16506,16 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
         - author:
-            id: 843859350
-            mediaUrl: Odio at.
-            name: Commodi provident ipsum.
-          body: Quo nihil.
-          createdAt: 2933154388109221342
-          id: 7926121356933178772
-          key: Minima aut corporis laborum soluta quaerat.
+            id: 15810107
+            mediaUrl: Nihil iusto.
+            name: Praesentium inventore.
+          body: Odio at.
+          createdAt: 7213264915663072777
+          id: 5216114449302699426
+          key: Alias autem facilis commodi provident ipsum.
           media:
           - contentType: Qui ad iusto molestias cumque rerum labore.
             id: 307690885509477116
@@ -16525,26 +16525,26 @@ definitions:
             id: 307690885509477116
             key: Iusto porro qui.
             url: Corporis possimus eum.
-          updatedAt: 4846700003634446755
-          version: 2876772568956875323
+          updatedAt: 98546059109118784
+          version: 5890543456993763701
     description: UpdateResponseBody result type (default view)
     example:
       media:
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
-      - id: 4885296006210332446
-        key: Nemo fugiat natus eum.
-        url: Sit ab.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
+      - id: 1140726142930368211
+        key: Dolores est nostrum sit ab numquam.
+        url: Quaerat autem quo nihil dicta eum.
       notes:
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16554,16 +16554,16 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16573,16 +16573,16 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16592,16 +16592,16 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
       - author:
-          id: 843859350
-          mediaUrl: Odio at.
-          name: Commodi provident ipsum.
-        body: Quo nihil.
-        createdAt: 2933154388109221342
-        id: 7926121356933178772
-        key: Minima aut corporis laborum soluta quaerat.
+          id: 15810107
+          mediaUrl: Nihil iusto.
+          name: Praesentium inventore.
+        body: Odio at.
+        createdAt: 7213264915663072777
+        id: 5216114449302699426
+        key: Alias autem facilis commodi provident ipsum.
         media:
         - contentType: Qui ad iusto molestias cumque rerum labore.
           id: 307690885509477116
@@ -16611,8 +16611,8 @@ definitions:
           id: 307690885509477116
           key: Iusto porro qui.
           url: Corporis possimus eum.
-        updatedAt: 4846700003634446755
-        version: 2876772568956875323
+        updatedAt: 98546059109118784
+        version: 5890543456993763701
     required:
     - notes
     - media

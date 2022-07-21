@@ -33,6 +33,7 @@ type MoveBinaryDataHandler struct {
 	stations     *repositories.StationRepository
 	querySensors *repositories.SensorsRepository
 	byProvision  map[int64]*stationInfo
+	modules      map[string]int64
 	skipping     map[int64]bool
 	errors       *importErrors
 }
@@ -71,6 +72,17 @@ func (h *MoveBinaryDataHandler) OnMeta(ctx context.Context, p *data.Provision, r
 			meta:      meta,
 			provision: p,
 			station:   station,
+		}
+
+		modules, err := h.stations.QueryStationModulesByMetaID(ctx, meta.ID)
+		if err != nil {
+			return err
+		}
+
+		h.modules = make(map[string]int64)
+
+		for _, module := range modules {
+			h.modules[hex.EncodeToString(module.HardwareID)] = module.ID
 		}
 	}
 
@@ -126,9 +138,14 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 			continue
 		}
 
-		moduleID, err := hex.DecodeString(rv.Module.ID)
+		moduleHardwareID, err := hex.DecodeString(rv.Module.ID)
 		if err != nil {
 			return err
+		}
+
+		moduleID, hasModule := h.modules[hex.EncodeToString(moduleHardwareID)]
+		if !hasModule {
+			return fmt.Errorf("missing module: %v", moduleHardwareID)
 		}
 
 		var latitude *float64
@@ -148,17 +165,18 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
 
 		reading := &MovedReading{
-			Time:      time.Unix(filtered.Record.Time, 0),
-			DeviceID:  p.DeviceID,
-			ModuleID:  moduleID,
-			StationID: stationInfo.station.ID,
-			SensorID:  sensorID,
-			SensorKey: key.SensorKey,
-			Value:     rv.Value,
-			Tags:      tags,
-			Longitude: longitude,
-			Latitude:  latitude,
-			Altitude:  altitude,
+			Time:             time.Unix(filtered.Record.Time, 0),
+			DeviceID:         p.DeviceID,
+			ModuleHardwareID: moduleHardwareID,
+			ModuleID:         moduleID,
+			StationID:        stationInfo.station.ID,
+			SensorID:         sensorID,
+			SensorKey:        key.SensorKey,
+			Value:            rv.Value,
+			Tags:             tags,
+			Longitude:        longitude,
+			Latitude:         latitude,
+			Altitude:         altitude,
 		}
 
 		if err := h.moveHandler.MoveReadings(ctx, []*MovedReading{reading}); err != nil {

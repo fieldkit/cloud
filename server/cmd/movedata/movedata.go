@@ -20,22 +20,25 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/storage"
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
-	PostgresURL string `split_words:"true" required:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable"`
+	PostgresURL  string `split_words:"true" required:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable"`
+	TimeScaleURL string `split_words:"true"`
 
 	BinaryRecords        bool
 	JsonRecords          bool
 	SchemaID             int
 	Verbose              bool
 	FailOnMissingSensors bool
+	RefreshViews         bool
 
-	InfluxDbURL    string `split_words:"true" required:"true" default:"http://127.0.0.1:8086"`
-	InfluxDbToken  string `split_words:"true" required:"true"`
-	InfluxDbOrg    string `split_words:"true" required:"true" default:"fk"`
-	InfluxDbBucket string `split_words:"true" required:"true" default:"sensors"`
+	InfluxDbURL    string `split_words:"true"`
+	InfluxDbToken  string `split_words:"true"`
+	InfluxDbOrg    string `split_words:"true" default:"fk"`
+	InfluxDbBucket string `split_words:"true" default:"sensors"`
 }
 
 type Resolver struct {
@@ -43,6 +46,7 @@ type Resolver struct {
 	querySensors  *repositories.SensorsRepository
 	sensors       map[string]int64
 	stations      map[string]*data.Station
+	modules       map[string]int64
 }
 
 func NewResolver(db *sqlxcache.DB) *Resolver {
@@ -50,6 +54,7 @@ func NewResolver(db *sqlxcache.DB) *Resolver {
 		queryStations: repositories.NewStationRepository(db),
 		querySensors:  repositories.NewSensorsRepository(db),
 		stations:      make(map[string]*data.Station),
+		modules:       make(map[string]int64),
 	}
 }
 
@@ -82,18 +87,43 @@ func (r *Resolver) LookupStationID(ctx context.Context, deviceID []byte) (int32,
 	return station.ID, nil
 }
 
+func (r *Resolver) LookupModuleID(ctx context.Context, hardwareID []byte) (int64, error) {
+	cacheKey := hex.EncodeToString(hardwareID)
+	if moduleID, ok := r.modules[cacheKey]; ok {
+		return moduleID, nil
+	}
+
+	modules, err := r.queryStations.QueryStationModulesByHardwareID(ctx, hardwareID)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(modules) == 0 {
+		return 0, fmt.Errorf("missing module: %v", hardwareID)
+	}
+
+	if len(modules) != 1 {
+		return 0, fmt.Errorf("multiple modules: %v", hardwareID)
+	}
+
+	r.modules[cacheKey] = modules[0].ID
+
+	return modules[0].ID, nil
+}
+
 type MovedReading struct {
-	Time      time.Time
-	StationID int32
-	DeviceID  []byte
-	ModuleID  []byte
-	SensorID  int64
-	SensorKey string
-	Value     float64
-	Longitude *float64
-	Latitude  *float64
-	Altitude  *float64
-	Tags      map[string]string
+	Time             time.Time
+	StationID        int32
+	DeviceID         []byte
+	ModuleHardwareID []byte
+	ModuleID         int64
+	SensorID         int64
+	SensorKey        string
+	Value            float64
+	Longitude        *float64
+	Latitude         *float64
+	Altitude         *float64
+	Tags             map[string]string
 }
 
 type MoveDataHandler interface {
@@ -197,20 +227,28 @@ func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, 
 										return err
 									}
 
+									moduleHardwareID := parsed.DeviceID // HACK This is what we do in model_adapter.go
+
+									moduleID, err := resolver.LookupModuleID(ctx, moduleHardwareID)
+									if err != nil {
+										return err
+									}
+
 									tags := make(map[string]string)
 									tags["schema_id"] = fmt.Sprintf("%v", row.SchemaID)
 
 									reading := &MovedReading{
-										Time:      *parsed.ReceivedAt,
-										DeviceID:  parsed.DeviceID,
-										ModuleID:  parsed.DeviceID, // HACK This is what we do in model_adapter.go
-										StationID: stationID,
-										SensorID:  sensorID,
-										SensorKey: sensorKey,
-										Value:     parsedSensor.Value,
-										Longitude: longitude,
-										Latitude:  latitude,
-										Tags:      tags,
+										Time:             *parsed.ReceivedAt,
+										DeviceID:         parsed.DeviceID,
+										ModuleHardwareID: moduleHardwareID,
+										StationID:        stationID,
+										ModuleID:         moduleID,
+										SensorID:         sensorID,
+										SensorKey:        sensorKey,
+										Value:            parsedSensor.Value,
+										Longitude:        longitude,
+										Latitude:         latitude,
+										Tags:             tags,
 									}
 
 									if err := handler.MoveReadings(ctx, []*MovedReading{reading}); err != nil {
@@ -255,15 +293,69 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolv
 	return nil
 }
 
-func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
-	influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket)
-	if err := influx.Open(ctx); err != nil {
-		return nil, err
+func refreshViews(ctx context.Context, options *Options) error {
+	log := logging.Logger(ctx).Sugar()
+
+	tsConfig := options.timeScaleConfig()
+
+	if tsConfig == nil {
+		return fmt.Errorf("refresh-views missing tsdb configuration")
 	}
 
-	handler := NewMoveDataIntoInfluxHandler(influx)
+	views := []string{
+		"fieldkit.sensor_data_365d",
+		"fieldkit.sensor_data_7d",
+		"fieldkit.sensor_data_24h",
+		"fieldkit.sensor_data_6h",
+		"fieldkit.sensor_data_1h",
+		"fieldkit.sensor_data_10m",
+	}
 
-	return handler, nil
+	pgPool, err := tsConfig.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, view := range views {
+		log.Infow("refreshing", "view_name", view)
+
+		_, err := pgPool.Exec(ctx, fmt.Sprintf(`CALL refresh_continuous_aggregate('%s', NULL, NULL)`, view))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
+	if options.TimeScaleURL == "" {
+		return nil
+	}
+
+	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
+}
+
+func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
+	tsConfig := options.timeScaleConfig()
+	if tsConfig != nil {
+		handler := NewMoveDataToTimeScaleDBHandler(tsConfig)
+
+		return handler, nil
+	}
+
+	if options.InfluxDbURL != "" {
+		influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket)
+		if err := influx.Open(ctx); err != nil {
+			return nil, err
+		}
+
+		handler := NewMoveDataIntoInfluxHandler(influx)
+
+		return handler, nil
+	}
+
+	return nil, fmt.Errorf("invalid destination configuration")
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -302,6 +394,12 @@ func process(ctx context.Context, options *Options) error {
 		}
 	}
 
+	if options.RefreshViews {
+		if err := refreshViews(ctx, options); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -313,6 +411,7 @@ func main() {
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
 	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
+	flag.BoolVar(&options.RefreshViews, "refresh-views", false, "refresh views")
 
 	flag.Parse()
 
