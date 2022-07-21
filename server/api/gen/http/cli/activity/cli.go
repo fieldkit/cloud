@@ -3105,7 +3105,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1307958623 --auth "Aliquid a enim."
+    `+os.Args[0]+` station get --id 1241164898 --auth "Sunt eius."
 `, os.Args[0])
 }
 
@@ -3118,7 +3118,7 @@ Transfer implements transfer.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station transfer --id 389661123 --owner-id 329288449 --auth "Voluptatibus voluptatem distinctio omnis."
+    `+os.Args[0]+` station transfer --id 1327219246 --owner-id 697013280 --auth "Esse maxime nesciunt a."
 `, os.Args[0])
 }
 
@@ -3131,7 +3131,7 @@ DefaultPhoto implements default photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station default- photo --id 270999351 --photo-id 819431737 --auth "Sit dolores sint."
+    `+os.Args[0]+` station default- photo --id 1859378553 --photo-id 436502394 --auth "Esse adipisci."
 `, os.Args[0])
 }
 
@@ -3145,10 +3145,10 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "locationName": "Quaerat pariatur est sint repudiandae exercitationem.",
-      "name": "Quia consequatur magnam.",
-      "statusPb": "Praesentium ut atque exercitationem recusandae et ut."
-   }' --id 1115004655 --auth "Est a."
+      "locationName": "Exercitationem aut praesentium ut.",
+      "name": "Pariatur est sint.",
+      "statusPb": "Exercitationem recusandae et ut nisi."
+   }' --id 899252520 --auth "A sed ut debitis voluptas."
 `, os.Args[0])
 }
 
@@ -3159,7 +3159,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Quaerat voluptas."
+    `+os.Args[0]+` station list- mine --auth "Vero dolorum ab est."
 `, os.Args[0])
 }
 
@@ -3172,7 +3172,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 669843627 --disable-filtering false --auth "Quibusdam similique et doloribus aliquam."
+    `+os.Args[0]+` station list- project --id 1136211897 --disable-filtering true --auth "Consequuntur temporibus optio nulla maxime ex repellendus."
 `, os.Args[0])
 }
 
@@ -3184,7 +3184,7 @@ ListAssociated implements list associated.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- associated --id 975781246 --auth "Aut sit voluptatem nesciunt eum voluptas nihil."
+    `+os.Args[0]+` station list- associated --id 1980910641 --auth "Dolorum ea doloremque sequi quas ipsum mollitia."
 `, os.Args[0])
 }
 
@@ -3196,7 +3196,7 @@ ListProjectAssociated implements list project associated.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project- associated --project-id 1274253674 --auth "Delectus commodi in autem magni."
+    `+os.Args[0]+` station list- project- associated --project-id 1805311434 --auth "Architecto similique distinctio."
 `, os.Args[0])
 }
 
@@ -3210,7 +3210,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 1973090538 --size 1680574422 --if-none-match "Corrupti at molestiae sequi ut voluptatibus voluptatem." --auth "Dolor veritatis ut praesentium doloribus consequuntur."
+    `+os.Args[0]+` station download- photo --station-id 1987323569 --size 589250100 --if-none-match "Voluptatem neque dolor." --auth "Ut praesentium doloribus consequuntur architecto."
 `, os.Args[0])
 }
 
@@ -3226,7 +3226,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 1594471366 --page-size 22111075 --owner-id 1793223065 --query "Autem eligendi nobis suscipit aut." --sort-by "Doloremque sit eius corrupti." --auth "Quos et dolore."
+    `+os.Args[0]+` station list- all --page 22111075 --page-size 1793223065 --owner-id 414812235 --query "Eligendi nobis." --sort-by "Aut tempore doloremque sit eius corrupti eligendi." --auth "Et dolore et nihil omnis ut magnam."
 `, os.Args[0])
 }
 
@@ -3238,7 +3238,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station delete --station-id 970887185 --auth "Tenetur voluptatem."
+    `+os.Args[0]+` station delete --station-id 683407525 --auth "Consectetur dolorem qui dolores a."
 `, os.Args[0])
 }
 
@@ -3250,7 +3250,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station admin- search --query "Itaque minima earum." --auth "Deleniti omnis."
+    `+os.Args[0]+` station admin- search --query "Aperiam eum." --auth "Voluptatem facilis dicta tempora accusamus."
 `, os.Args[0])
 }
 
@@ -3262,7 +3262,7 @@ Progress implements progress.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station progress --station-id 1338120653 --auth "Vero nobis consectetur occaecati eum."
+    `+os.Args[0]+` station progress --station-id 1190035023 --auth "Assumenda inventore atque ratione et reprehenderit quaerat."
 `, os.Args[0])
 }
 
@@ -3311,7 +3311,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 3624163539494421570
+    `+os.Args[0]+` test get --id 7231727233393385138
 `, os.Args[0])
 }
 
@@ -3333,7 +3333,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Iusto aut voluptatum blanditiis molestiae occaecati voluptatem." --auth "Quos labore ducimus."
+    `+os.Args[0]+` test email --address "Sed corrupti atque explicabo dolorem." --auth "Quidem occaecati facere beatae dolore."
 `, os.Args[0])
 }
 
@@ -3361,7 +3361,7 @@ Webhook implements webhook.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` ttn webhook --token "Nam aperiam architecto repudiandae." --content-type "Mollitia quis animi sint exercitationem." --content-length 3913999404570427560 --auth "Repellat sit." --stream "goa.png"
+    `+os.Args[0]+` ttn webhook --token "Repudiandae saepe qui aut modi." --content-type "Cumque quis nobis." --content-length 5642933857586176701 --auth "Rerum omnis voluptas." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3407,7 +3407,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Aut quae quasi praesentium consectetur numquam voluptatem."
+    `+os.Args[0]+` user roles --auth "Eum eos amet eius similique voluptas."
 `, os.Args[0])
 }
 
@@ -3421,7 +3421,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Sed ipsum totam rerum occaecati." --content-length 4860125107881751816 --auth "Sequi earum." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Repellendus quia alias qui." --content-length 4963011081845784855 --auth "Et et laborum soluta harum vero harum." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3434,7 +3434,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 1238521172 --size 445644433 --if-none-match "Vero harum eos."
+    `+os.Args[0]+` user download- photo --user-id 898189084 --size 1239537332 --if-none-match "Deserunt dolorem eum ex ut aperiam eos."
 `, os.Args[0])
 }
 
@@ -3446,8 +3446,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "qdl",
-      "password": "ctv"
+      "email": "kt6",
+      "password": "lv0"
    }'
 `, os.Args[0])
 }
@@ -3460,7 +3460,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Et totam."
+      "email": "Et doloremque nihil nihil."
    }'
 `, os.Args[0])
 }
@@ -3473,8 +3473,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "m0u",
-      "token": "Ipsum voluptatem et."
+      "password": "9cj",
+      "token": "Omnis perspiciatis accusamus voluptatem."
    }'
 `, os.Args[0])
 }
@@ -3487,7 +3487,7 @@ Resume implements resume.
 
 Example:
     `+os.Args[0]+` user resume --body '{
-      "token": "Voluptas voluptatibus voluptatem."
+      "token": "Nostrum error quis sint labore perferendis ut."
    }'
 `, os.Args[0])
 }
@@ -3499,7 +3499,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Error quis sint labore perferendis."
+    `+os.Args[0]+` user logout --auth "Sint facilis sit consectetur sit qui."
 `, os.Args[0])
 }
 
@@ -3511,7 +3511,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Voluptas quia error."
+      "refreshToken": "Aut et quia consequatur minus ut."
    }'
 `, os.Args[0])
 }
@@ -3523,7 +3523,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 811738846
+    `+os.Args[0]+` user send- validation --user-id 162930125
 `, os.Args[0])
 }
 
@@ -3534,7 +3534,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Laborum minima quod voluptatem rerum."
+    `+os.Args[0]+` user validate --token "Harum at neque atque necessitatibus dolores illum."
 `, os.Args[0])
 }
 
@@ -3588,7 +3588,7 @@ Example:
       "showStations": true,
       "startTime": "Quis rerum reiciendis enim reprehenderit.",
       "tags": "Voluptates eaque."
-   }' --user-id 620197939 --auth "Et fugiat iusto qui ut nobis repudiandae."
+   }' --user-id 106899436 --auth "Explicabo eos quia magni at facilis."
 `, os.Args[0])
 }
 
@@ -3602,9 +3602,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "w7r",
-      "oldPassword": "ld2"
-   }' --user-id 1104194310 --auth "Et sed sunt distinctio distinctio."
+      "newPassword": "0qc",
+      "oldPassword": "364"
+   }' --user-id 1682415342 --auth "Illum repellat."
 `, os.Args[0])
 }
 
@@ -3619,7 +3619,7 @@ AcceptTnc implements accept tnc.
 Example:
     `+os.Args[0]+` user accept- tnc --body '{
       "accept": false
-   }' --user-id 995004990 --auth "Possimus et veniam error hic non."
+   }' --user-id 1842590774 --auth "Placeat aliquam sit nihil nostrum necessitatibus."
 `, os.Args[0])
 }
 
@@ -3630,7 +3630,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Vero expedita repellendus quis alias."
+    `+os.Args[0]+` user get- current --auth "Expedita repellendus."
 `, os.Args[0])
 }
 
@@ -3642,7 +3642,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 614597102 --auth "Ducimus perspiciatis suscipit quibusdam reprehenderit veritatis deleniti."
+    `+os.Args[0]+` user list- by- project --project-id 1932037715 --auth "Perspiciatis suscipit quibusdam reprehenderit veritatis."
 `, os.Args[0])
 }
 
@@ -3653,7 +3653,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Quia qui illum at repellat."
+    `+os.Args[0]+` user issue- transmission- token --auth "Est nostrum ut."
 `, os.Args[0])
 }
 
@@ -3677,7 +3677,7 @@ AdminTermsAndConditions implements admin terms and conditions.
 Example:
     `+os.Args[0]+` user admin- terms- and- conditions --body '{
       "email": "Aliquam necessitatibus nesciunt est sit."
-   }' --auth "Et veniam numquam voluptatibus aliquam."
+   }' --auth "Magnam eos fugiat nam."
 `, os.Args[0])
 }
 
@@ -3692,7 +3692,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Commodi laboriosam.",
       "password": "Tempore veritatis et et."
-   }' --auth "Sit amet nobis laborum corrupti et."
+   }' --auth "Rem suscipit unde qui eveniet sit amet."
 `, os.Args[0])
 }
 
@@ -3704,7 +3704,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Exercitationem quod omnis molestiae tempora voluptatem numquam." --auth "Natus harum impedit deleniti qui harum veritatis."
+    `+os.Args[0]+` user admin- search --query "Hic sint aliquid assumenda exercitationem quod." --auth "Molestiae tempora voluptatem numquam."
 `, os.Args[0])
 }
 
@@ -3718,6 +3718,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 603730843 --bookmark "Aut in nihil et culpa." --query "Qui corrupti numquam consequuntur nesciunt id." --auth "Sunt aut qui consequuntur."
+    `+os.Args[0]+` user mentionables --project-id 1970274266 --bookmark "Consequatur quas voluptatem." --query "Perferendis eos eos." --auth "Aut in nihil et culpa."
 `, os.Args[0])
 }

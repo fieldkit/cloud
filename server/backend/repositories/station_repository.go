@@ -1174,7 +1174,7 @@ func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *Ess
 		SELECT q.* FROM
 		(
 			SELECT
-				s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name,
+				s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name, u.email AS owner_email,
 				s.created_at, s.updated_at,
 				s.memory_used, s.memory_available,
 				s.firmware_time, s.firmware_number,

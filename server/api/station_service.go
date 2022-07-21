@@ -581,8 +581,9 @@ func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (
 			Name:     es.Name,
 			DeviceID: hex.EncodeToString(es.DeviceID),
 			Owner: &station.StationOwner{
-				ID:   es.OwnerID,
-				Name: es.OwnerName,
+				ID:    es.OwnerID,
+				Name:  es.OwnerName,
+				Email: &es.OwnerEmail,
 			},
 			CreatedAt:          es.CreatedAt.Unix() * 1000,
 			UpdatedAt:          es.UpdatedAt.Unix() * 1000,

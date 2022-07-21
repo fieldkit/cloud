@@ -145,7 +145,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Quaerat pariatur est sint repudiandae exercitationem.\",\n      \"name\": \"Quia consequatur magnam.\",\n      \"statusPb\": \"Praesentium ut atque exercitationem recusandae et ut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Exercitationem aut praesentium ut.\",\n      \"name\": \"Pariatur est sint.\",\n      \"statusPb\": \"Exercitationem recusandae et ut nisi.\"\n   }'")
 		}
 	}
 	var id int32

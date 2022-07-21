@@ -28,7 +28,7 @@ export interface EssentialStation {
     id: number;
     name: string;
     deviceId: string;
-    owner: { id: number; name: string };
+    owner: { id: number; name: string; email: string };
     uploads: { id: number }[];
 }
 

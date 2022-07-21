@@ -109,6 +109,7 @@
                                         <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
                                     <h3>Transfer</h3>
+                                    <div>Owner: {{ station.owner.name }} ({{ station.owner.email }})</div>
                                     <div>
                                         <TransferStation :station="station" @transferred="(user) => onTransferred(station, user)" />
                                     </div>
