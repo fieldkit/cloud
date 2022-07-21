@@ -28,6 +28,8 @@ type ParsedAttribute struct {
 	JSONValue  interface{} `json:"json_value"`
 	Location   bool        `json:"location"`
 	Associated bool        `json:"associated"`
+	Status     bool        `json:"status"`
+	Hidden     bool        `json:"hidden"`
 }
 
 type ParsedMessage struct {
@@ -298,6 +300,8 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			attributes[attribute.Name] = &ParsedAttribute{
 				Location:   attribute.Location,
 				Associated: attribute.Associated,
+				Hidden:     attribute.Hidden,
+				Status:     attribute.Status,
 				JSONValue:  jsonValue,
 			}
 		}

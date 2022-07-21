@@ -12,10 +12,8 @@ RUN go build -o migrate *.go
 
 FROM ubuntu:18.04
 
-COPY --from=source /work/migrate /migrations/bin/
+COPY --from=source /work/migrate /work/migrate
 
-COPY *.sql /migrations/
+WORKDIR /work
 
-WORKDIR /migrations
-
-ENTRYPOINT [ "/migrations/bin/migrate" ]
+ENTRYPOINT [ "/work/migrate" ]

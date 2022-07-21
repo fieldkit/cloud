@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,27 +14,14 @@ import (
 	migrations "github.com/robinjoseph08/go-pg-migrations/v3"
 )
 
-const directory = "migrations"
-
-type options struct {
-	Path       string
-	SearchPath string
-}
-
 func main() {
-	o := &options{}
-
-	flag.StringVar(&o.Path, "path", "./", "path to migrations")
-
-	flag.Parse()
-
 	options := &pg.Options{
 		Addr:     "",
 		User:     "",
 		Database: "",
 		Password: "",
 		OnConnect: func(ctx context.Context, conn *pg.Conn) error {
-			log.Printf("creating schema...")
+			log.Printf("Creating schema...")
 
 			if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
 				return fmt.Errorf("error creating: %v", err)
@@ -49,26 +35,37 @@ func main() {
 				return fmt.Errorf("error granting: %v", err)
 			}
 
-			log.Printf("done creating schema...")
+			log.Printf("Done creating schema...")
 
 			return nil
 		},
 	}
 
-	url := os.Getenv("PGURL")
-	if url != "" {
-		o, err := pg.ParseURL(url)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		options = o
+	url := os.Getenv("MIGRATE_DATABASE_URL")
+	if url == "" {
+		log.Fatalln("MIGRATE_DATABASE_URL is requied")
 	}
 
-	files, err := filepath.Glob(filepath.Join(o.Path, "*.up.sql"))
+	o, err := pg.ParseURL(url)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	options = o
+
+	directory := os.Getenv("MIGRATE_PATH")
+	if directory == "" {
+		log.Fatalln("MIGRATE_PATH is requied")
+	}
+
+	log.Printf("Scanning %s...", directory)
+
+	files, err := filepath.Glob(filepath.Join(directory, "*.up.sql"))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("Found %d migration(s) in %s...", len(files), directory)
 
 	for _, file := range files {
 		data, err := ioutil.ReadFile(file)
@@ -89,7 +86,9 @@ func main() {
 
 		opts := migrations.MigrationOptions{}
 
-		migrations.Register(file, up, down, opts)
+		_, fileOnly := filepath.Split(file)
+
+		migrations.Register(fileOnly, up, down, opts)
 	}
 
 	db := pg.Connect(options)

@@ -193,20 +193,20 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		if pm.ReceivedAt != nil {
-			for index, sensorSchema := range moduleSchema.Sensors {
-				// Transient sensors aren't saved.
-				if !sensorSchema.Transient {
-					// Add or create the sensor..
-					sensor := &data.ModuleSensor{
-						ConfigurationID: configuration.ID,
-						ModuleID:        module.ID,
-						Index:           uint32(index),
-						Name:            sensorSchema.Key,
-						ReadingValue:    nil,
-						ReadingTime:     nil,
-					}
+		for index, sensorSchema := range moduleSchema.Sensors {
+			// Transient sensors aren't saved.
+			if !sensorSchema.Transient {
+				// Add or create the sensor..
+				sensor := &data.ModuleSensor{
+					ConfigurationID: configuration.ID,
+					ModuleID:        module.ID,
+					Index:           uint32(index),
+					Name:            sensorSchema.Key,
+					ReadingValue:    nil,
+					ReadingTime:     nil,
+				}
 
+				if pm.ReceivedAt != nil {
 					for _, pr := range pm.Data {
 						if pr.Key == sensorSchema.Key {
 							sensor.ReadingValue = &pr.Value
@@ -214,17 +214,17 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 							break
 						}
 					}
-
-					if sensorSchema.UnitOfMeasure != nil {
-						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-					}
-
-					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-						return nil, err
-					}
-
-					sensors = append(sensors, sensor)
 				}
+
+				if sensorSchema.UnitOfMeasure != nil {
+					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+				}
+
+				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+					return nil, err
+				}
+
+				sensors = append(sensors, sensor)
 			}
 		}
 
@@ -310,6 +310,15 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 						}
 					}
 				}
+			} else if parsed.Hidden {
+				if boolValue, ok := parsed.JSONValue.(bool); ok {
+					station.Station.Hidden = &boolValue
+				}
+			} else if parsed.Status {
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					statusValue := strings.ToLower(stringValue)
+					station.Station.Status = &statusValue
+				}
 			} else {
 				if attribute := station.FindAttribute(name); attribute != nil {
 					if stringValue, ok := parsed.JSONValue.(string); ok {
@@ -354,6 +363,17 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 
 			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
 				return err
+			}
+		}
+
+		// This will at least cover changing associated stations for a station.
+		// We need to verify how partners intend to unassociate stations w/o
+		// replacing them, though. Will the key be present, but empty? If it's
+		// missing how can we differentiate between messages that are intending
+		// to update that and those that aren't? TODO
+		if len(cacheEntry.station.Associated) > 0 {
+			if err := m.sr.ClearAssociatedStations(ctx, station.ID); err != nil {
+				return fmt.Errorf("clear associated stations: %v", err)
 			}
 		}
 

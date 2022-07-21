@@ -272,7 +272,7 @@ export default Vue.extend({
                 .getQuickSensors([stationId])
                 .then(async (quickSensors) => {
                     console.log("viz: quick-sensors", quickSensors);
-                    if (quickSensors.stations[stationId].length == 0) {
+                    if (quickSensors.stations[stationId].filter((r) => r.moduleId != null).length == 0) {
                         console.log("viz: no sensors TODO: FIX");
                         this.showNoSensors = true;
                         return Promise.delay(5000).then(() => {
@@ -434,7 +434,6 @@ export default Vue.extend({
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
-        transform: translateY(-4px);
         display: block;
 
         body.floodnet & {

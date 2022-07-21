@@ -313,6 +313,9 @@ func EncodeProcessStationRequest(encoder func(*http.Request) goahttp.Encoder) fu
 		if p.Completely != nil {
 			values.Add("completely", fmt.Sprintf("%v", *p.Completely))
 		}
+		if p.SkipManual != nil {
+			values.Add("skipManual", fmt.Sprintf("%v", *p.SkipManual))
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

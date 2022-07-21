@@ -7,6 +7,7 @@ import (
 var Owner = Type("StationOwner", func() {
 	Attribute("id", Int32)
 	Attribute("name", String)
+	Attribute("email", String)
 	Required("id", "name")
 })
 
@@ -160,6 +161,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("uploads", ArrayOf(StationUpload))
 		Attribute("photos", StationFullPhotos)
 		Attribute("readOnly", Boolean)
+		Attribute("status", String)
+		Attribute("hidden", Boolean)
 		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)

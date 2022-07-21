@@ -183,31 +183,31 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 
 	pr := repositories.NewProjectRepository(c.options.Database)
 
-    projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
-    if err != nil {
-        return nil, err
-    }
+	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
 
-    preciseLocation := false
-    for _, project := range projects {
-        if project.Privacy == data.Public {
-            preciseLocation = true
-        }
-    }
+	preciseLocation := false
+	for _, project := range projects {
+		if project.Privacy == data.Public {
+			preciseLocation = true
+		}
+	}
 
-    if !p.Anonymous() && !preciseLocation {
-        if p.UserID() == sf.Owner.ID {
-            preciseLocation = true
-        } else {
-            relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
-            if err != nil {
-                return nil, err
-            }
-            if row, ok := relationships[payload.ID]; ok {
-                preciseLocation = row.MemberRole >= 0
-            }
-        }
-    }
+	if !p.Anonymous() && !preciseLocation {
+		if p.UserID() == sf.Owner.ID {
+			preciseLocation = true
+		} else {
+			relationships, err := pr.QueryUserProjectRelationships(ctx, p.UserID())
+			if err != nil {
+				return nil, err
+			}
+			if row, ok := relationships[payload.ID]; ok {
+				preciseLocation = row.MemberRole >= 0
+			}
+		}
+	}
 
 	mmr := repositories.NewModuleMetaRepository(c.options.Database)
 	mm, err := mmr.FindAllModulesMeta(ctx)
@@ -581,8 +581,9 @@ func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (
 			Name:     es.Name,
 			DeviceID: hex.EncodeToString(es.DeviceID),
 			Owner: &station.StationOwner{
-				ID:   es.OwnerID,
-				Name: es.OwnerName,
+				ID:    es.OwnerID,
+				Name:  es.OwnerName,
+				Email: &es.OwnerEmail,
 			},
 			CreatedAt:          es.CreatedAt.Unix() * 1000,
 			UpdatedAt:          es.UpdatedAt.Unix() * 1000,
@@ -1086,6 +1087,8 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		PlaceNameNative:    sf.Station.PlaceNative,
 		Location:           location,
 		Data:               dataSummary,
+		Hidden:             sf.Station.Hidden,
+		Status:             sf.Station.Status,
 		Model: &station.StationFullModel{
 			Name:                      sf.Model.Name,
 			OnlyVisibleViaAssociation: sf.Model.OnlyVisibleViaAssociation,

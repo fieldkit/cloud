@@ -66,9 +66,9 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 	}
 
 	if message.SchemaID == nil {
-		log.Warnw("webhook", "message_id", message.ID, "schema_missing", true)
+		log.Warnw("wh:saved", "message_id", message.ID, "schema_missing", true)
 	} else {
-		log.Infow("webhook", "message_id", message.ID, "schema_id", message.SchemaID)
+		log.Infow("wh:saved", "message_id", message.ID, "schema_id", message.SchemaID)
 	}
 
 	if message.SchemaID != nil {
@@ -76,16 +76,11 @@ func (c *WebHookService) Webhook(ctx context.Context, payload *whService.Webhook
 			return err
 		}
 
-		// TODO If the process_interval of the schema is 0 then we can use that
-		// to indicate we should process this as they come in. For now, we'll be
-		// doing the intervals for everything.
-		if false {
-			if err := c.options.Publisher.Publish(ctx, &WebHookMessageReceived{
-				MessageID: message.ID,
-				SchemaID:  *message.SchemaID,
-			}); err != nil {
-				return err
-			}
+		if err := c.options.Publisher.Publish(ctx, &WebHookMessageReceived{
+			MessageID: message.ID,
+			SchemaID:  *message.SchemaID,
+		}); err != nil {
+			return err
 		}
 	}
 

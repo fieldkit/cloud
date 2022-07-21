@@ -29,7 +29,6 @@ func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) err
 
 	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err
-
 	}
 
 	return nil

@@ -1,7 +1,9 @@
 <template>
     <div class="spinner loader">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
 </template>
 
@@ -17,50 +19,37 @@ export default Vue.extend({
 @import "src/scss/_variables.scss";
 
 .spinner {
-    width: 40px;
-    height: 40px;
+    display: inline-block;
     position: relative;
+    width: 20px;
+    height: 20px;
 }
-
-.double-bounce1,
-.double-bounce2 {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: $color-dark;
-    opacity: 0.8;
+.spinner div {
+    box-sizing: border-box;
+    display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-
-    -webkit-animation: sk-bounce 2s infinite ease-in-out;
-    animation: sk-bounce 2s infinite ease-in-out;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
 }
-
-.double-bounce2 {
-    -webkit-animation-delay: -1s;
-    animation-delay: -1s;
+.spinner div:nth-child(1) {
+    animation-delay: -0.45s;
 }
-
-@-webkit-keyframes sk-bounce {
-    0%,
+.spinner div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.spinner div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
     100% {
-        -webkit-transform: scale(0);
-    }
-    50% {
-        -webkit-transform: scale(1);
-    }
-}
-
-@keyframes sk-bounce {
-    0%,
-    100% {
-        transform: scale(0);
-        -webkit-transform: scale(0);
-    }
-    50% {
-        transform: scale(1);
-        -webkit-transform: scale(1);
+        transform: rotate(360deg);
     }
 }
 </style>

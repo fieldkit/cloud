@@ -24,13 +24,14 @@ import {
 import FKApi, { Station, AssociatedStation, AssociatedStationsResponse } from "@/api/api";
 import i18n from "@/i18n";
 
-export * from "./common";
 import Config from "@/secrets";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation, stations } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
+
+export * from "./common";
 
 type SensorReadAtType = string;
 

@@ -84,6 +84,7 @@ type Station struct {
 	PlaceNative        *string    `db:"place_native"`
 	PhotoID            int32      `db:"photo_id"`
 	Hidden             *bool      `db:"hidden"`
+	Status             *string    `db:"status"`
 }
 
 func (s *Station) ParseHttpReply(raw string) (*pb.HttpReply, error) {
@@ -236,6 +237,7 @@ type EssentialStation struct {
 	DeviceID           []byte     `db:"device_id"`
 	OwnerID            int32      `db:"owner_id"`
 	OwnerName          string     `db:"owner_name"`
+	OwnerEmail         string     `db:"owner_email"`
 	CreatedAt          time.Time  `db:"created_at,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at,omitempty"`
 	RecordingStartedAt *time.Time `db:"recording_started_at"`

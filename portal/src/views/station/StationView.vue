@@ -18,9 +18,7 @@
             <section class="section-station">
                 <div class="container-box">
                     <div class="flex flex-al-center">
-                        <div class="station-photo-wrap">
-                            <StationPhoto :station="station" />
-                        </div>
+                        <StationPhoto :station="station" />
                         <div>
                             <div class="station-name">{{ station.name }}</div>
 
@@ -354,6 +352,8 @@ export default Vue.extend({
             width: 90px;
             height: 90px;
             object-fit: cover;
+            margin-right: 20px;
+            border-radius: 5px;
         }
 
         .photo-container {
@@ -611,24 +611,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
         }
     }
-
-    &-photo-wrap {
-        width: 90px;
-        height: 90px;
-        margin-right: 20px;
-        background-color: #e2e4e6;
-        position: relative;
-        border-radius: 5px;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        ::v-deep .spinner {
-            width: 20px;
-            height: 20px;
-        }
-    }
 }
 
 .small-light {
@@ -676,7 +658,6 @@ section {
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
-        transform: translateY(-4px);
 
         body.floodnet & {
             color: $color-dark;

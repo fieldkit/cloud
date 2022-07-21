@@ -30,6 +30,8 @@ type MessageSchemaAttribute struct {
 	Expression string `json:"expression"`
 	Location   bool   `json:"location"`
 	Associated bool   `json:"associated"`
+	Status     bool   `json:"status"`
+	Hidden     bool   `json:"hidden"`
 }
 
 type MessageSchemaStation struct {
