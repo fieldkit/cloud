@@ -33,7 +33,7 @@ type MoveBinaryDataHandler struct {
 	stations     *repositories.StationRepository
 	querySensors *repositories.SensorsRepository
 	byProvision  map[int64]*stationInfo
-	modules      map[string]int64
+	modules      map[int64]map[string]int64
 	skipping     map[int64]bool
 	errors       *importErrors
 }
@@ -45,6 +45,7 @@ func NewMoveBinaryDataHandler(resolve *Resolver, db *sqlxcache.DB, moveHandler M
 		metaFactory:  repositories.NewMetaFactory(db),
 		stations:     repositories.NewStationRepository(db),
 		querySensors: repositories.NewSensorsRepository(db),
+		modules:      make(map[int64]map[string]int64),
 		byProvision:  make(map[int64]*stationInfo),
 		skipping:     make(map[int64]bool),
 		errors: &importErrors{
@@ -75,15 +76,17 @@ func (h *MoveBinaryDataHandler) OnMeta(ctx context.Context, p *data.Provision, r
 		}
 	}
 
-	modules, err := h.stations.QueryStationModulesByMetaID(ctx, meta.ID)
-	if err != nil {
-		return err
-	}
+	if _, ok := h.modules[meta.ID]; !ok {
+		modules, err := h.stations.QueryStationModulesByMetaID(ctx, meta.ID)
+		if err != nil {
+			return err
+		}
 
-	h.modules = make(map[string]int64)
+		h.modules[meta.ID] = make(map[string]int64)
 
-	for _, module := range modules {
-		h.modules[hex.EncodeToString(module.HardwareID)] = module.ID
+		for _, module := range modules {
+			h.modules[meta.ID][hex.EncodeToString(module.HardwareID)] = module.ID
+		}
 	}
 
 	if _, err := h.metaFactory.Add(ctx, meta, true); err != nil {
@@ -143,7 +146,7 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 		}
 
 		hexModuleID := hex.EncodeToString(moduleHardwareID)
-		moduleID, hasModule := h.modules[hexModuleID]
+		moduleID, hasModule := h.modules[meta.ID][hexModuleID]
 		if !hasModule {
 			return fmt.Errorf("module missing: %v (%v)", hexModuleID, rv.Module.ID)
 		}

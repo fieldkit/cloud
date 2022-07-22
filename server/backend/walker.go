@@ -41,9 +41,9 @@ type RecordWalker struct {
 	started     time.Time
 	metaRecords int64
 	dataRecords int64
-	bytes       int64
 	wg          sync.WaitGroup
 	queue       chan []*data.DataRecord
+	maximumID   int64
 }
 
 func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
@@ -52,6 +52,7 @@ func NewRecordWalker(db *sqlxcache.DB) (rw *RecordWalker) {
 		provisions: make(map[int64]*data.Provision),
 		metas:      make(map[int64]*data.MetaRecord),
 		queue:      make(chan []*data.DataRecord, 10),
+		maximumID:  -1,
 	}
 }
 
@@ -173,27 +174,20 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 
 	log.Infow("query-statistics", "station_ids", params.StationIDs, "start", params.Start, "end", params.End)
 
+	provisionIDs, err := rw.queryProvisionIDs(ctx, params.StationIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	query, args, err := sqlx.In(`
-		WITH station_ids AS (
-			SELECT UNNEST(ARRAY[?]::integer[]) AS id
-		),
-		hidden_ranges AS (
-			SELECT tsrange(start_time, end_time) AS range, flags FROM fieldkit.record_range_meta WHERE station_id IN (SELECT id FROM station_ids) AND flags = 1
-		)
 		SELECT
 			MIN(r.time) AS start,
 			MAX(r.time) AS end,
 			COUNT(r.id) AS records
 		FROM fieldkit.data_record AS r
-		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-		LEFT JOIN hidden_ranges AS hr ON (r.time::timestamp <@ hr.range)
-		WHERE (
-			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (SELECT id FROM station_ids))
-			AND r.time >= ?
-			AND r.time < ?
-			AND hr.flags IS NULL
-		)
-		`, params.StationIDs, params.Start, params.End)
+		WHERE r.provision_id IN (?)
+	 	AND r.time > ?
+		`, provisionIDs, params.Start)
 	if err != nil {
 		return nil, err
 	}
@@ -208,37 +202,51 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 	return ws, nil
 }
 
+func (rw *RecordWalker) queryProvisionIDs(ctx context.Context, stationIDs []int32) ([]int64, error) {
+	query, args, err := sqlx.In(`
+		SELECT p.id FROM fieldkit.provision AS p WHERE p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (?))
+		`, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := make([]int64, 0)
+	err = rw.db.SelectContext(ctx, &ids, rw.db.Rebind(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return ids, nil
+}
+
 func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, offset int64, batchSize int64) ([]*data.DataRecord, error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("query-rows", "station_ids", params.StationIDs, "offset", offset, "batch_size", batchSize, "start", params.Start, "end", params.End)
 
-	query, args, err := sqlx.In(`
-		WITH station_ids AS (
-			SELECT UNNEST(ARRAY[?]::integer[]) AS id
-		),
-		hidden_ranges AS (
-			SELECT tsrange(start_time, end_time) AS range, flags FROM fieldkit.record_range_meta WHERE station_id IN (SELECT id FROM station_ids) AND flags = 1
-		)
-		SELECT
-			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
-			ST_AsBinary(r.location) AS location
-		FROM fieldkit.data_record AS r
-		JOIN fieldkit.provision AS p ON (r.provision_id = p.id)
-		LEFT JOIN hidden_ranges AS hr ON (r.time::timestamp <@ hr.range)
-		WHERE (
-			p.device_id IN (SELECT device_id FROM fieldkit.station WHERE id IN (SELECT id FROM station_ids))
-			AND r.time >= ?
-			AND r.time < ?
-			AND hr.flags IS NULL
-		)
-		ORDER BY r.time OFFSET ? LIMIT ?
-		`, params.StationIDs, params.Start, params.End, offset, batchSize)
+	rows := make([]*data.DataRecord, 0)
+
+	provisionIDs, err := rw.queryProvisionIDs(ctx, params.StationIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	rows := make([]*data.DataRecord, 0)
+	query, args, err := sqlx.In(`
+		SELECT
+			r.id, r.provision_id, r.time, r.number, r.meta_record_id, r.raw AS raw, r.pb,
+			ST_AsBinary(r.location) AS location
+		FROM fieldkit.data_record AS r
+		WHERE 
+			r.provision_id IN (?)
+			AND id > ?
+			AND r.time > ?
+		ORDER BY r.id
+		LIMIT ?
+		`, provisionIDs, rw.maximumID, params.Start, batchSize)
+	if err != nil {
+		return nil, err
+	}
+
 	err = rw.db.SelectContext(ctx, &rows, rw.db.Rebind(query), args...)
 	if err != nil {
 		return nil, err
@@ -247,6 +255,8 @@ func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, 
 	if len(rows) == 0 {
 		return nil, sql.ErrNoRows
 	}
+
+	rw.maximumID = rows[len(rows)-1].ID
 
 	return rows, nil
 }
