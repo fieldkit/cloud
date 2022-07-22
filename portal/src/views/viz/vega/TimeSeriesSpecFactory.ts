@@ -212,22 +212,22 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll = this.allSeries
+        const xDomainsAll: number[][] = this.allSeries
             .filter((series: SeriesData) => series.queried.data.length > 0)
             .map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll =
             xDomainsAll.length == 0
                 ? null
-                : [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+                : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
         // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
 
-        const makeDomainX = () => {
+        const makeDomainX = (): number[] | null => {
             // I can't think of a good reason to just always specify this.
             return timeRangeAll;
         };
 
-        const xDomain = makeDomainX();
+        const xDomain: number[] | null = makeDomainX();
 
         const data = [
             {
@@ -358,16 +358,23 @@ export class TimeSeriesSpecFactory {
         );
 
         const tinyXAxis = () => {
+            const formatMonth = (v: number): string => {
+                return new Date(v).toLocaleDateString();
+            };
+
             return [
                 {
                     orient: "bottom",
                     scale: "x",
                     domain: xDomain,
                     tickCount: 0,
-                    labelPadding: 0,
-                    tickSize: 0,
-                    tickDash: [2, 2],
-                    title: null,
+                    // values: xDomain,
+                    titleFontSize: 12,
+                    titlePadding: 4,
+                    titleFontWeight: "normal",
+                    labelPadding: 5,
+                    title: xDomain?.map((v) => formatMonth(v)).join(" - "),
+                    format: "%m/%d/%Y",
                 },
             ];
         };
