@@ -140,7 +140,7 @@ export default Vue.extend({
 .tiny-chart {
     margin-top: 10px;
     width: 100%;
-    height: 200px;
+    height: 150px;
     border: solid 1px #d8dce0;
     padding: 5px;
 }
