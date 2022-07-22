@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jackc/pgx/v4"
 
@@ -222,6 +223,8 @@ func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time,
 }
 
 func (v *AggregatingHandler) flushTs(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
 	batch := &pgx.Batch{}
 
 	// TODO location
@@ -232,6 +235,8 @@ func (v *AggregatingHandler) flushTs(ctx context.Context) error {
 				DO UPDATE SET value = EXCLUDED.value`
 		batch.Queue(sql, row...)
 	}
+
+	log.Infow("tsdb:flushing", "records", len(v.tsRecords))
 
 	v.tsRecords = make([][]interface{}, 0)
 
