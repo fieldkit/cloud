@@ -29,6 +29,7 @@ type Options struct {
 	TimeScaleURL string `split_words:"true"`
 
 	BinaryRecords        bool
+	StationID            int
 	JsonRecords          bool
 	SchemaID             int
 	Verbose              bool
@@ -135,8 +136,12 @@ func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, hand
 	log := logging.Logger(ctx).Sugar()
 
 	allStationIDs := []int32{}
-	if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
-		return err
+	if options.StationID > 0 {
+		allStationIDs = append(allStationIDs, int32(options.StationID))
+	} else {
+		if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
+			return err
+		}
 	}
 
 	for _, id := range allStationIDs {
@@ -408,6 +413,7 @@ func main() {
 	options := &Options{}
 
 	flag.BoolVar(&options.BinaryRecords, "binary", false, "process binary records")
+	flag.IntVar(&options.StationID, "station-id", -1, "station id to process, -1 (default) for all")
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
 	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
