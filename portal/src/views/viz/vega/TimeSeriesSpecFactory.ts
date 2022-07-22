@@ -414,14 +414,16 @@ export class TimeSeriesSpecFactory {
 
                     if (this.settings.tiny) {
                         return {
-                            title: null,
+                            title: series.vizInfo.axisLabel,
                             orient: makeOrientation(i),
                             scale: makeAxisScale(i),
                             domain: makeDomainY(i, series),
+                            titleFontSize: 10,
                             gridDash: [],
                             tickCount: 5,
                             domainOpacity: 0,
-                            titleOpacity: 0,
+                            titlePadding: 10,
+                            titleOpacity: 1,
                             gridOpacity: 0,
                         };
                     }

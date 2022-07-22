@@ -107,8 +107,11 @@ export default Vue.extend({
                 };
             }),
         };
+
         const queried = new QueriedData("key", TimeRange.eternity, sdr);
-        const name = sensor.strings["enUs"]["label"] || "Unknown";
+        const strings = sensor.strings["enUs"];
+        const name = strings["label"] || "Unknown";
+        const axisLabel = strings["axisLabel"] || strings["label"];
         const station = { name: this.station.name, location: null };
         const vizInfo = new VizInfo(
             sensor.key,
@@ -120,7 +123,7 @@ export default Vue.extend({
             sensor.viz || [],
             sensor.ranges,
             "", // ChartLabel
-            "" // AxisLabel
+            axisLabel
         );
 
         console.log("tiny-chart", { stationId: this.stationId, station: this.station, sensor, quickSensors, meta });
