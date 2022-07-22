@@ -60,7 +60,9 @@
             <div class="app-logo">
                 <span>{{ $t("layout.side.madeBy") }}</span>
                 <br />
-                <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+                <a href="https://www.fieldkit.org" target="_blank">
+                    <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+                </a>
             </div>
         </template>
     </div>
