@@ -79,7 +79,8 @@
             "stations": {
                 "title": "Stations",
                 "empty": "No stations added"
-            }
+            },
+            "madeBy": "Made by"
         },
         "header": {
             "login": "Log in",
