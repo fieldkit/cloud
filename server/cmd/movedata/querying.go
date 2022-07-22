@@ -192,3 +192,22 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 func (h *MoveBinaryDataHandler) OnDone(ctx context.Context) error {
 	return nil
 }
+
+type NoopDataHandler struct {
+}
+
+func NewNoopHandler() (h *NoopDataHandler) {
+	return &NoopDataHandler{}
+}
+
+func (h *NoopDataHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+	return nil
+}
+
+func (h *NoopDataHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	return nil
+}
+
+func (h *NoopDataHandler) OnDone(ctx context.Context) error {
+	return nil
+}
