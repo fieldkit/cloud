@@ -271,11 +271,10 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 		return fmt.Errorf("error loading provision: %v", err)
 	} else {
 		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
-			log := Logger(ctx).Sugar()
-			log.Infow("warning", "error", err)
+			return fmt.Errorf("(load-meta) error handling row: %v", err)
 		} else {
 			if err := handler.OnData(ctx, provision, nil, record, meta); err != nil {
-				return fmt.Errorf("error handling row: %v", err)
+				return fmt.Errorf("(on-data) error handling row: %v", err)
 			}
 		}
 	}
@@ -322,7 +321,7 @@ func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision,
 		// handler a chance to make sure things are still expecting
 		// this meta information.
 		if err := handler.OnMeta(ctx, provision, nil, rw.metas[id]); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("(on-meta) error: %v", err)
 		}
 		return rw.metas[id], nil
 	}
@@ -337,7 +336,7 @@ func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision,
 	}
 
 	if err := handler.OnMeta(ctx, provision, nil, records[0]); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(on-meta) error: %v", err)
 	}
 
 	rw.metas[id] = records[0]
