@@ -197,8 +197,12 @@ export default Vue.extend({
         padding: 0;
         display: flex;
         justify-content: center;
-        font-weight: bold;
-        transform: translate(-1px, -4px);
+        height: 100%;
+
+        &:after {
+            transform: translate(-1px, 3px);
+            font-weight: bold;
+        }
     }
 
     ::v-deep .options-btns {
