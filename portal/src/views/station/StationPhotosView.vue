@@ -1,6 +1,7 @@
 <template>
     <StandardLayout>
         <vue-confirm-dialog />
+        <SnackBar></SnackBar>
         <div class="container-wrap">
             <DoubleHeader
                 :backRoute="projectId ? 'viewStation' : 'viewStationFromMap'"
@@ -42,10 +43,12 @@ import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
 import { AddedPhoto, NoteMedia, PortalNoteMedia } from "@/views/notes/model";
 import { ActionTypes } from "@/store";
 import ListItemOptions, { ListItemOption } from "@/views/shared/ListItemOptions.vue";
+import SnackBar from "@/views/shared/SnackBar.vue";
 
 export default Vue.extend({
     name: "StationPhotosView",
     components: {
+        SnackBar,
         StandardLayout,
         DoubleHeader,
         AuthenticatedPhoto,
