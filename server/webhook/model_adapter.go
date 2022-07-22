@@ -98,7 +98,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	if updating == nil {
 		deviceName := string(pm.DeviceID)
 
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			deviceName = *pm.DeviceName
 		}
 
@@ -127,7 +127,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		station = added
 	} else {
 		station.ModelID = model.ID
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			station.Name = *pm.DeviceName
 		}
 	}
