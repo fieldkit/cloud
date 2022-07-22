@@ -838,10 +838,10 @@ func transformReading(s *data.ModuleSensor) *station.SensorReading {
 	}
 }
 
-func transformConfigurations(from *data.StationFull, transformAll bool, mm []*repositories.ModuleMeta) (to []*station.StationConfiguration, err error) {
+func transformConfigurations(from *data.StationFull, transformAll bool, moduleMeta *repositories.AllModuleMeta) (to []*station.StationConfiguration, err error) {
 	to = make([]*station.StationConfiguration, 0)
 	for _, v := range from.Configurations {
-		modules, err := transformModules(from, v.ID, mm)
+		modules, err := transformModules(from, v.ID, moduleMeta)
 		if err != nil {
 			return nil, err
 		}
@@ -874,7 +874,7 @@ func convertToTypedMap(obj interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
-func transformModules(from *data.StationFull, configurationID int64, mm []*repositories.ModuleMeta) (to []*station.StationModule, err error) {
+func transformModules(from *data.StationFull, configurationID int64, moduleMeta *repositories.AllModuleMeta) (to []*station.StationModule, err error) {
 	to = make([]*station.StationModule, 0)
 	for _, v := range from.Modules {
 		if v.ConfigurationID != configurationID {
@@ -900,7 +900,7 @@ func transformModules(from *data.StationFull, configurationID int64, mm []*repos
 
 			var serializedSensorMeta map[string]interface{}
 
-			sensorMeta := repositories.FindSensorByFullKey(mm, fullKey)
+			sensorMeta := moduleMeta.FindSensorByFullKey(fullKey)
 			if sensorMeta != nil {
 				converted, err := convertToTypedMap(sensorMeta.Sensor)
 				if err != nil {
@@ -1004,7 +1004,7 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta) (*station.StationFull, error) {
+func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta) (*station.StationFull, error) {
 	readOnly := true
 	if p != nil {
 		sp, err := p.ForStation(sf.Station)
@@ -1015,7 +1015,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		readOnly = sp.IsReadOnly()
 	}
 
-	configurations, err := transformConfigurations(sf, transformAllConfigurations, mm)
+	configurations, err := transformConfigurations(sf, transformAllConfigurations, moduleMeta)
 	if err != nil {
 		return nil, err
 	}
@@ -1123,11 +1123,11 @@ func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataS
 	}
 }
 
-func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, mm []*repositories.ModuleMeta, filtering bool) ([]*station.StationFull, error) {
+func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta, filtering bool) ([]*station.StationFull, error) {
 	stations := make([]*station.StationFull, 0)
 
 	for _, sf := range sfs {
-		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations, mm)
+		after, err := transformStationFull(signer, p, sf, preciseLocation, transformAllConfigurations, moduleMeta)
 		if err != nil {
 			return nil, err
 		}

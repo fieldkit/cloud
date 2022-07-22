@@ -51,6 +51,7 @@ type MetaFactory struct {
 	modulesRepository *ModuleMetaRepository
 	byMetaID          map[int64]*VersionMeta
 	ordered           []*VersionMeta
+	moduleMeta        *AllModuleMeta
 }
 
 func NewMetaFactory(db *sqlxcache.DB) *MetaFactory {
@@ -59,6 +60,7 @@ func NewMetaFactory(db *sqlxcache.DB) *MetaFactory {
 		modulesRepository: NewModuleMetaRepository(db),
 		byMetaID:          make(map[int64]*VersionMeta),
 		ordered:           make([]*VersionMeta, 0),
+		moduleMeta:        nil,
 	}
 }
 
@@ -69,6 +71,14 @@ func (mf *MetaFactory) InOrder() []*VersionMeta {
 func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord, fq bool) (*VersionMeta, error) {
 	if mf.byMetaID[databaseRecord.ID] != nil {
 		return mf.byMetaID[databaseRecord.ID], nil
+	}
+
+	if mf.moduleMeta == nil {
+		if allMeta, err := mf.modulesRepository.FindAllModulesMeta(ctx); err != nil {
+			return nil, err
+		} else {
+			mf.moduleMeta = allMeta
+		}
 	}
 
 	log := Logger(ctx).Sugar().With("meta_record_id", databaseRecord.ID)
@@ -105,7 +115,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
-			extraModule, extraSensor, err := mf.modulesRepository.FindSensorMeta(ctx, &hf, sensor.Name)
+			extraModule, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
@@ -128,7 +138,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			sensors = append(sensors, sensorMeta)
 		}
 
-		extraModule, err := mf.modulesRepository.FindModuleMeta(ctx, &hf)
+		extraModule, err := mf.moduleMeta.FindModuleMeta(&hf)
 		if err != nil {
 			return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 		}
