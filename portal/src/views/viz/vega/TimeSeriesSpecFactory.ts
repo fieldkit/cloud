@@ -366,14 +366,14 @@ export class TimeSeriesSpecFactory {
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain,
+                    domain: xDomain || [0, 1],
                     tickCount: 0,
                     // values: xDomain,
                     titleFontSize: 12,
                     titlePadding: 4,
                     titleFontWeight: "normal",
                     labelPadding: 5,
-                    title: xDomain?.map((v) => formatMonth(v)).join(" - "),
+                    title: xDomain?.map((v) => formatMonth(v)).join(" - ") || "",
                     format: "%m/%d/%Y",
                 },
             ];
