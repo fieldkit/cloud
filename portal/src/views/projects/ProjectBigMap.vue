@@ -10,6 +10,7 @@
                             class="summary-container"
                             :station="station"
                             :sensorDataQuerier="sensorDataQuerier"
+                            :exploreContext="exploreContext"
                             v-slot="{ sensorDataQuerier }"
                         >
                             <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
