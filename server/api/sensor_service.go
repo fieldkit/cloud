@@ -177,7 +177,7 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 
 	data := &MetaResult{
 		Sensors: sensors,
-		Modules: modules,
+		Modules: modules.All(),
 	}
 
 	return &sensor.MetaResult{

@@ -42,6 +42,10 @@ type AllModuleMeta struct {
 	all []*ModuleMeta
 }
 
+func (moduleMeta *AllModuleMeta) All() []*ModuleMeta {
+	return moduleMeta.all
+}
+
 func (moduleMeta *AllModuleMeta) FindSensorByFullKey(fullKey string) *SensorAndModuleMeta {
 	for _, module := range moduleMeta.all {
 		for _, sensor := range module.Sensors {
