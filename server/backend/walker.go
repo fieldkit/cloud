@@ -179,6 +179,10 @@ func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParamet
 		return nil, err
 	}
 
+	if len(provisionIDs) == 0 {
+		return &WalkStatistics{}, nil
+	}
+
 	query, args, err := sqlx.In(`
 		SELECT
 			MIN(r.time) AS start,
@@ -229,6 +233,10 @@ func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, 
 	provisionIDs, err := rw.queryProvisionIDs(ctx, params.StationIDs)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(provisionIDs) == 0 {
+		return nil, sql.ErrNoRows
 	}
 
 	query, args, err := sqlx.In(`
