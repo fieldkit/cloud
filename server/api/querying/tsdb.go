@@ -35,6 +35,7 @@ var (
 		&TimeScaleDBWindow{Specifier: "6h", Interval: time.Hour * 6},
 		&TimeScaleDBWindow{Specifier: "1h", Interval: time.Hour * 1},
 		&TimeScaleDBWindow{Specifier: "10m", Interval: time.Minute * 10},
+		&TimeScaleDBWindow{Specifier: "1m", Interval: time.Minute * 1},
 	}
 )
 
