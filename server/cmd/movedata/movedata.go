@@ -314,6 +314,7 @@ func refreshViews(ctx context.Context, options *Options) error {
 		"fieldkit.sensor_data_6h",
 		"fieldkit.sensor_data_1h",
 		"fieldkit.sensor_data_10m",
+		"fieldkit.sensor_data_1m",
 	}
 
 	pgPool, err := tsConfig.Acquire(ctx)
