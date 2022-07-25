@@ -113,10 +113,21 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			Kind:         module.Header.Kind,
 		}
 
+		extraModule, err := mf.moduleMeta.FindModuleMeta(&hf)
+		if err != nil {
+			return nil, err
+		}
+		if extraModule == nil {
+			return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
+		}
+
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
 			extraModule, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
+				return nil, err
+			}
+			if extraModule == nil || extraSensor == nil {
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
 
@@ -136,11 +147,6 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			}
 
 			sensors = append(sensors, sensorMeta)
-		}
-
-		extraModule, err := mf.moduleMeta.FindModuleMeta(&hf)
-		if err != nil {
-			return nil, errors.Structured(err, "meta_record_id", databaseRecord.ID)
 		}
 
 		moduleMeta := &DataMetaModule{
