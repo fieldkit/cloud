@@ -220,7 +220,19 @@ export class TimeSeriesSpecFactory {
                 ? null
                 : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
-        // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+        if (timeRangeAll) {
+            console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+        }
+
+        const getBarUnits = (timeRange: number[] | null) => {
+            if (timeRange) {
+                const duration = timeRange[1] - timeRange[0];
+                if (duration < 60000) {
+                    return ["year", "month", "date", "hours", "minutes", "seconds"];
+                }
+            }
+            return ["year", "month", "date", "hours", "minutes"];
+        };
 
         const makeDomainX = (): number[] | null => {
             // I can't think of a good reason to just always specify this.
@@ -282,7 +294,7 @@ export class TimeSeriesSpecFactory {
                                     {
                                         field: "time",
                                         type: "timeunit",
-                                        units: ["year", "month", "date", "hours"],
+                                        units: getBarUnits(timeRangeAll),
                                         as: ["barStartDate", "barEndDate"],
                                     },
                                     {
@@ -1051,7 +1063,8 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "brush_translate_delta",
                         },
-                        update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                        update:
+                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                     },
                     {
                         events: {
@@ -1082,7 +1095,8 @@ export class TimeSeriesSpecFactory {
                                 scale: "x",
                             },
                         ],
-                        update: '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        update:
+                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },
