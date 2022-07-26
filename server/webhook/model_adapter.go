@@ -269,11 +269,6 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		station.Station.Name = *pm.DeviceName
 	}
 
-	if station.LastReadingTime != nil {
-		station.Station.IngestionAt = station.LastReadingTime
-		station.Station.UpdatedAt = *station.LastReadingTime
-	}
-
 	if pm.ReceivedAt != nil {
 		for _, moduleSensor := range station.Sensors {
 			for _, pr := range pm.Data {
@@ -287,6 +282,11 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
 			station.LastReadingTime = pm.ReceivedAt
 		}
+	}
+
+	if station.LastReadingTime != nil {
+		station.Station.IngestionAt = station.LastReadingTime
+		station.Station.UpdatedAt = *station.LastReadingTime
 	}
 
 	if pm.Attributes != nil {
