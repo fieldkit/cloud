@@ -20,12 +20,14 @@ import (
 
 // Server lists the sensor service endpoint HTTP handlers.
 type Server struct {
-	Mounts   []*MountPoint
-	Meta     http.Handler
-	Data     http.Handler
-	Bookmark http.Handler
-	Resolve  http.Handler
-	CORS     http.Handler
+	Mounts      []*MountPoint
+	Meta        http.Handler
+	StationMeta http.Handler
+	SensorMeta  http.Handler
+	Data        http.Handler
+	Bookmark    http.Handler
+	Resolve     http.Handler
+	CORS        http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -62,19 +64,25 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Meta", "GET", "/sensors"},
+			{"StationMeta", "GET", "/meta/stations"},
+			{"SensorMeta", "GET", "/meta/sensors"},
 			{"Data", "GET", "/sensors/data"},
 			{"Bookmark", "POST", "/bookmarks/save"},
 			{"Resolve", "GET", "/bookmarks/resolve"},
 			{"CORS", "OPTIONS", "/sensors"},
+			{"CORS", "OPTIONS", "/meta/stations"},
+			{"CORS", "OPTIONS", "/meta/sensors"},
 			{"CORS", "OPTIONS", "/sensors/data"},
 			{"CORS", "OPTIONS", "/bookmarks/save"},
 			{"CORS", "OPTIONS", "/bookmarks/resolve"},
 		},
-		Meta:     NewMetaHandler(e.Meta, mux, decoder, encoder, errhandler, formatter),
-		Data:     NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
-		Bookmark: NewBookmarkHandler(e.Bookmark, mux, decoder, encoder, errhandler, formatter),
-		Resolve:  NewResolveHandler(e.Resolve, mux, decoder, encoder, errhandler, formatter),
-		CORS:     NewCORSHandler(),
+		Meta:        NewMetaHandler(e.Meta, mux, decoder, encoder, errhandler, formatter),
+		StationMeta: NewStationMetaHandler(e.StationMeta, mux, decoder, encoder, errhandler, formatter),
+		SensorMeta:  NewSensorMetaHandler(e.SensorMeta, mux, decoder, encoder, errhandler, formatter),
+		Data:        NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
+		Bookmark:    NewBookmarkHandler(e.Bookmark, mux, decoder, encoder, errhandler, formatter),
+		Resolve:     NewResolveHandler(e.Resolve, mux, decoder, encoder, errhandler, formatter),
+		CORS:        NewCORSHandler(),
 	}
 }
 
@@ -84,6 +92,8 @@ func (s *Server) Service() string { return "sensor" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Meta = m(s.Meta)
+	s.StationMeta = m(s.StationMeta)
+	s.SensorMeta = m(s.SensorMeta)
 	s.Data = m(s.Data)
 	s.Bookmark = m(s.Bookmark)
 	s.Resolve = m(s.Resolve)
@@ -93,6 +103,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the sensor endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountMetaHandler(mux, h.Meta)
+	MountStationMetaHandler(mux, h.StationMeta)
+	MountSensorMetaHandler(mux, h.SensorMeta)
 	MountDataHandler(mux, h.Data)
 	MountBookmarkHandler(mux, h.Bookmark)
 	MountResolveHandler(mux, h.Resolve)
@@ -128,6 +140,101 @@ func NewMetaHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "meta")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		var err error
+		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountStationMetaHandler configures the mux to serve the "sensor" service
+// "station meta" endpoint.
+func MountStationMetaHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/meta/stations", f)
+}
+
+// NewStationMetaHandler creates a HTTP handler which loads the HTTP request
+// and calls the "sensor" service "station meta" endpoint.
+func NewStationMetaHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeStationMetaRequest(mux, decoder)
+		encodeResponse = EncodeStationMetaResponse(encoder)
+		encodeError    = EncodeStationMetaError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "station meta")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountSensorMetaHandler configures the mux to serve the "sensor" service
+// "sensor meta" endpoint.
+func MountSensorMetaHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/meta/sensors", f)
+}
+
+// NewSensorMetaHandler creates a HTTP handler which loads the HTTP request and
+// calls the "sensor" service "sensor meta" endpoint.
+func NewSensorMetaHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeSensorMetaResponse(encoder)
+		encodeError    = EncodeSensorMetaError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "sensor meta")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
 		var err error
 		res, err := endpoint(ctx, nil)
@@ -307,6 +414,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/sensors", f)
+	mux.Handle("OPTIONS", "/meta/stations", f)
+	mux.Handle("OPTIONS", "/meta/sensors", f)
 	mux.Handle("OPTIONS", "/sensors/data", f)
 	mux.Handle("OPTIONS", "/bookmarks/save", f)
 	mux.Handle("OPTIONS", "/bookmarks/resolve", f)

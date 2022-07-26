@@ -15,19 +15,23 @@ import (
 
 // Client is the "sensor" service client.
 type Client struct {
-	MetaEndpoint     goa.Endpoint
-	DataEndpoint     goa.Endpoint
-	BookmarkEndpoint goa.Endpoint
-	ResolveEndpoint  goa.Endpoint
+	MetaEndpoint        goa.Endpoint
+	StationMetaEndpoint goa.Endpoint
+	SensorMetaEndpoint  goa.Endpoint
+	DataEndpoint        goa.Endpoint
+	BookmarkEndpoint    goa.Endpoint
+	ResolveEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "sensor" service client given the endpoints.
-func NewClient(meta, data, bookmark, resolve goa.Endpoint) *Client {
+func NewClient(meta, stationMeta, sensorMeta, data, bookmark, resolve goa.Endpoint) *Client {
 	return &Client{
-		MetaEndpoint:     meta,
-		DataEndpoint:     data,
-		BookmarkEndpoint: bookmark,
-		ResolveEndpoint:  resolve,
+		MetaEndpoint:        meta,
+		StationMetaEndpoint: stationMeta,
+		SensorMetaEndpoint:  sensorMeta,
+		DataEndpoint:        data,
+		BookmarkEndpoint:    bookmark,
+		ResolveEndpoint:     resolve,
 	}
 }
 
@@ -39,6 +43,26 @@ func (c *Client) Meta(ctx context.Context) (res *MetaResult, err error) {
 		return
 	}
 	return ires.(*MetaResult), nil
+}
+
+// StationMeta calls the "station meta" endpoint of the "sensor" service.
+func (c *Client) StationMeta(ctx context.Context, p *StationMetaPayload) (res *StationMetaResult, err error) {
+	var ires interface{}
+	ires, err = c.StationMetaEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationMetaResult), nil
+}
+
+// SensorMeta calls the "sensor meta" endpoint of the "sensor" service.
+func (c *Client) SensorMeta(ctx context.Context) (res *SensorMetaResult, err error) {
+	var ires interface{}
+	ires, err = c.SensorMetaEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(*SensorMetaResult), nil
 }
 
 // Data calls the "data" endpoint of the "sensor" service.

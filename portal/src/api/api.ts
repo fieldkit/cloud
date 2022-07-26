@@ -1099,7 +1099,7 @@ class FKApi {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
-            url: this.baseUrl + "/sensors",
+            url: this.baseUrl + "/meta/sensors",
         });
     }
 
@@ -1133,6 +1133,14 @@ class FKApi {
         });
     }
 
+    public stationMeta(params: URLSearchParams): Promise<any> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/meta/stations?" + params.toString(),
+        });
+    }
+
     public sensorData(params: URLSearchParams): Promise<any> {
         return this.invoke({
             auth: Auth.Optional,
@@ -1155,7 +1163,7 @@ class FKApi {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
-            url: this.baseUrl + "/sensors/data?" + qp.toString(),
+            url: this.baseUrl + "/meta/stations?" + qp.toString(),
         });
     }
 

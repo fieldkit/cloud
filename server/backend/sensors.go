@@ -54,6 +54,19 @@ type QueryParams struct {
 	Backend    string            `json:"backend"`
 }
 
+func ParseStationIDs(raw *string) []int32 {
+	stations := make([]int32, 0)
+	if raw != nil {
+		parts := strings.Split(*raw, ",")
+		for _, p := range parts {
+			if i, err := strconv.Atoi(p); err == nil {
+				stations = append(stations, int32(i))
+			}
+		}
+	}
+	return stations
+}
+
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 	start := time.Time{}
 	if raw.Start != nil {
@@ -70,15 +83,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		resolution = *raw.Resolution
 	}
 
-	stations := make([]int32, 0)
-	if raw.Stations != nil {
-		parts := strings.Split(*raw.Stations, ",")
-		for _, p := range parts {
-			if i, err := strconv.Atoi(p); err == nil {
-				stations = append(stations, int32(i))
-			}
-		}
-	}
+	stations := ParseStationIDs(raw.Stations)
 
 	if len(stations) == 0 {
 		return nil, errors.New("stations is required")

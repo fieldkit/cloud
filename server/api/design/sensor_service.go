@@ -20,6 +20,44 @@ var _ = Service("sensor", func() {
 		})
 	})
 
+	Method("station meta", func() {
+		Payload(func() {
+			Attribute("stations", String)
+		})
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("meta/stations")
+
+			Params(func() {
+				Param("stations")
+			})
+
+			Response(func() {
+				Body("object")
+			})
+		})
+	})
+
+	Method("sensor meta", func() {
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("meta/sensors")
+
+			Response(func() {
+				Body("object")
+			})
+		})
+	})
+
 	Method("data", func() {
 		Security(JWTAuth, func() {
 			// Optional
