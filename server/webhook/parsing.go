@@ -205,38 +205,40 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	var receivedAt *time.Time
 
-	receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
-	if err != nil {
-		if _, ok := err.(*EvaluationError); !ok {
-			return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
-		}
-	} else {
-		if receivedAtString, ok := receivedAtRaw.(string); ok {
-			parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
-			if err != nil {
-				parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
+	if stationSchema.ReceivedExpression != "" {
+		receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
+		if err != nil {
+			if _, ok := err.(*EvaluationError); !ok {
+				return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
+			}
+		} else {
+			if receivedAtString, ok := receivedAtRaw.(string); ok {
+				parsed, err := time.Parse("2006-01-02T15:04:05.999999999Z", receivedAtString)
 				if err != nil {
-					// NOTE: NOAA Tidal data was missing seconds.
-					parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+					parsed, err = time.Parse("2006-01-02 15:04:05.999999999+00:00", receivedAtString)
 					if err != nil {
-						return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+						// NOTE: NOAA Tidal data was missing seconds.
+						parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
+						if err != nil {
+							return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+						}
 					}
 				}
+
+				receivedAt = &parsed
+			} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
+				parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
+
+				receivedAt = &parsed
+			} else {
+				return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
 			}
-
-			receivedAt = &parsed
-		} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
-			parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
-
-			receivedAt = &parsed
-		} else {
-			return nil, fmt.Errorf("unexpected received-at value: %v", receivedAtRaw)
 		}
 	}
 
 	deviceIDString, ok := deviceIDRaw.(string)
 	if !ok {
-		return nil, fmt.Errorf("unexpected device-id value: %v", receivedAtRaw)
+		return nil, fmt.Errorf("unexpected device-id value: %v", deviceIDRaw)
 	}
 
 	if len(deviceIDString) == 0 {
