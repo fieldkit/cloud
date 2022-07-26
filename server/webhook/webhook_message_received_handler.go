@@ -95,6 +95,10 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 				}
 			}
 		}
+
+		if err := h.model.Close(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	return incoming, nil
