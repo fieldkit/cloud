@@ -12,6 +12,16 @@ func MetaSensorPath() string {
 	return "/sensors"
 }
 
+// StationMetaSensorPath returns the URL path to the sensor service station meta HTTP endpoint.
+func StationMetaSensorPath() string {
+	return "/meta/stations"
+}
+
+// SensorMetaSensorPath returns the URL path to the sensor service sensor meta HTTP endpoint.
+func SensorMetaSensorPath() string {
+	return "/meta/sensors"
+}
+
 // DataSensorPath returns the URL path to the sensor service data HTTP endpoint.
 func DataSensorPath() string {
 	return "/sensors/data"

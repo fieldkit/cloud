@@ -134,6 +134,249 @@ func DecodeMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 	}
 }
 
+// BuildStationMetaRequest instantiates a HTTP request object with method and
+// path set to call the "sensor" service "station meta" endpoint
+func (c *Client) BuildStationMetaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: StationMetaSensorPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "station meta", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeStationMetaRequest returns an encoder for requests sent to the sensor
+// station meta server.
+func EncodeStationMetaRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*sensor.StationMetaPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("sensor", "station meta", "*sensor.StationMetaPayload", v)
+		}
+		values := req.URL.Query()
+		if p.Stations != nil {
+			values.Add("stations", *p.Stations)
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeStationMetaResponse returns a decoder for responses returned by the
+// sensor station meta endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeStationMetaResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeStationMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body interface{}
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "station meta", err)
+			}
+			res := NewStationMetaResultOK(body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body StationMetaUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "station meta", err)
+			}
+			err = ValidateStationMetaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "station meta", err)
+			}
+			return nil, NewStationMetaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body StationMetaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "station meta", err)
+			}
+			err = ValidateStationMetaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "station meta", err)
+			}
+			return nil, NewStationMetaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body StationMetaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "station meta", err)
+			}
+			err = ValidateStationMetaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "station meta", err)
+			}
+			return nil, NewStationMetaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body StationMetaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "station meta", err)
+			}
+			err = ValidateStationMetaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "station meta", err)
+			}
+			return nil, NewStationMetaBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "station meta", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildSensorMetaRequest instantiates a HTTP request object with method and
+// path set to call the "sensor" service "sensor meta" endpoint
+func (c *Client) BuildSensorMetaRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: SensorMetaSensorPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "sensor meta", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeSensorMetaResponse returns a decoder for responses returned by the
+// sensor sensor meta endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeSensorMetaResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeSensorMetaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body interface{}
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "sensor meta", err)
+			}
+			res := NewSensorMetaResultOK(body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body SensorMetaUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "sensor meta", err)
+			}
+			err = ValidateSensorMetaUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "sensor meta", err)
+			}
+			return nil, NewSensorMetaUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body SensorMetaForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "sensor meta", err)
+			}
+			err = ValidateSensorMetaForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "sensor meta", err)
+			}
+			return nil, NewSensorMetaForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body SensorMetaNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "sensor meta", err)
+			}
+			err = ValidateSensorMetaNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "sensor meta", err)
+			}
+			return nil, NewSensorMetaNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body SensorMetaBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "sensor meta", err)
+			}
+			err = ValidateSensorMetaBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "sensor meta", err)
+			}
+			return nil, NewSensorMetaBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "sensor meta", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildDataRequest instantiates a HTTP request object with method and path set
 // to call the "sensor" service "data" endpoint
 func (c *Client) BuildDataRequest(ctx context.Context, v interface{}) (*http.Request, error) {

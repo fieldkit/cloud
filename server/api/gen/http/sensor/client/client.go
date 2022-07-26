@@ -20,6 +20,14 @@ type Client struct {
 	// Meta Doer is the HTTP client used to make requests to the meta endpoint.
 	MetaDoer goahttp.Doer
 
+	// StationMeta Doer is the HTTP client used to make requests to the station
+	// meta endpoint.
+	StationMetaDoer goahttp.Doer
+
+	// SensorMeta Doer is the HTTP client used to make requests to the sensor meta
+	// endpoint.
+	SensorMetaDoer goahttp.Doer
+
 	// Data Doer is the HTTP client used to make requests to the data endpoint.
 	DataDoer goahttp.Doer
 
@@ -55,6 +63,8 @@ func NewClient(
 ) *Client {
 	return &Client{
 		MetaDoer:            doer,
+		StationMetaDoer:     doer,
+		SensorMetaDoer:      doer,
 		DataDoer:            doer,
 		BookmarkDoer:        doer,
 		ResolveDoer:         doer,
@@ -81,6 +91,49 @@ func (c *Client) Meta() goa.Endpoint {
 		resp, err := c.MetaDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("sensor", "meta", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// StationMeta returns an endpoint that makes HTTP requests to the sensor
+// service station meta server.
+func (c *Client) StationMeta() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeStationMetaRequest(c.encoder)
+		decodeResponse = DecodeStationMetaResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildStationMetaRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.StationMetaDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "station meta", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// SensorMeta returns an endpoint that makes HTTP requests to the sensor
+// service sensor meta server.
+func (c *Client) SensorMeta() goa.Endpoint {
+	var (
+		decodeResponse = DecodeSensorMetaResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildSensorMetaRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.SensorMetaDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "sensor meta", err)
 		}
 		return decodeResponse(resp)
 	}

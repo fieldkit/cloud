@@ -106,7 +106,17 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	if qp.Tail > 0 {
 		return c.tail(ctx, qp)
 	} else if len(qp.Sensors) == 0 {
-		return c.stationsMeta(ctx, qp.Stations)
+		// TODO Deprecatd, remove in 0.2.53
+		// return nil, sensor.MakeBadRequest(fmt.Errorf("stations missing"))
+		if res, err := c.StationMeta(ctx, &sensor.StationMetaPayload{
+			Stations: payload.Stations,
+		}); err != nil {
+			return nil, err
+		} else {
+			return &sensor.DataResult{
+				Object: res.Object,
+			}, nil
+		}
 	}
 
 	be, err := c.chooseBackend(ctx, qp)
@@ -128,23 +138,6 @@ type StationsMeta struct {
 	Stations map[int32][]*repositories.StationSensor `json:"stations"`
 }
 
-func (c *SensorService) stationsMeta(ctx context.Context, stations []int32) (*sensor.DataResult, error) {
-	sr := repositories.NewStationRepository(c.db)
-
-	byStation, err := sr.QueryStationSensors(ctx, stations)
-	if err != nil {
-		return nil, err
-	}
-
-	data := &StationsMeta{
-		Stations: byStation,
-	}
-
-	return &sensor.DataResult{
-		Object: data,
-	}, nil
-}
-
 type SensorMeta struct {
 	ID  int64  `json:"id"`
 	Key string `json:"key"`
@@ -155,7 +148,26 @@ type MetaResult struct {
 	Modules interface{}   `json:"modules"`
 }
 
-func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
+func (c *SensorService) StationMeta(ctx context.Context, payload *sensor.StationMetaPayload) (*sensor.StationMetaResult, error) {
+	sr := repositories.NewStationRepository(c.db)
+
+	stationIDs := backend.ParseStationIDs(payload.Stations)
+
+	byStation, err := sr.QueryStationSensors(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &StationsMeta{
+		Stations: byStation,
+	}
+
+	return &sensor.StationMetaResult{
+		Object: data,
+	}, nil
+}
+
+func (c *SensorService) SensorMeta(ctx context.Context) (*sensor.SensorMetaResult, error) {
 	keysToId := []*data.Sensor{}
 	if err := c.db.SelectContext(ctx, &keysToId, `SELECT * FROM fieldkit.aggregated_sensor ORDER BY key`); err != nil {
 		return nil, err
@@ -180,9 +192,19 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) {
 		Modules: modules.All(),
 	}
 
-	return &sensor.MetaResult{
+	return &sensor.SensorMetaResult{
 		Object: data,
 	}, nil
+}
+
+func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) { // TODO Deprecated, remove in 0.2.53
+	if res, err := c.SensorMeta(ctx); err != nil {
+		return nil, err
+	} else {
+		return &sensor.MetaResult{
+			Object: res.Object,
+		}, nil
+	}
 }
 
 func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {

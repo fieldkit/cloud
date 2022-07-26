@@ -647,7 +647,7 @@ class MetaQuerier {
         const queryParams = new URLSearchParams();
         queryParams.append("stations", stationIds.join(","));
 
-        const stationSensors = await this.api.sensorData(queryParams);
+        const stationSensors = await this.api.stationMeta(queryParams);
         const associated = await this.api.getAssociatedStations(stationIds[0]);
 
         console.log("viz: meta", { stationSensors, associated });

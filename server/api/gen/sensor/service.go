@@ -19,6 +19,10 @@ import (
 type Service interface {
 	// Meta implements meta.
 	Meta(context.Context) (res *MetaResult, err error)
+	// StationMeta implements station meta.
+	StationMeta(context.Context, *StationMetaPayload) (res *StationMetaResult, err error)
+	// SensorMeta implements sensor meta.
+	SensorMeta(context.Context) (res *SensorMetaResult, err error)
 	// Data implements data.
 	Data(context.Context, *DataPayload) (res *DataResult, err error)
 	// Bookmark implements bookmark.
@@ -41,10 +45,27 @@ const ServiceName = "sensor"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"meta", "data", "bookmark", "resolve"}
+var MethodNames = [6]string{"meta", "station meta", "sensor meta", "data", "bookmark", "resolve"}
 
 // MetaResult is the result type of the sensor service meta method.
 type MetaResult struct {
+	Object interface{}
+}
+
+// StationMetaPayload is the payload type of the sensor service station meta
+// method.
+type StationMetaPayload struct {
+	Stations *string
+}
+
+// StationMetaResult is the result type of the sensor service station meta
+// method.
+type StationMetaResult struct {
+	Object interface{}
+}
+
+// SensorMetaResult is the result type of the sensor service sensor meta method.
+type SensorMetaResult struct {
 	Object interface{}
 }
 
