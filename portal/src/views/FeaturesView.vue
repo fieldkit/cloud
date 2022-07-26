@@ -1,6 +1,6 @@
 <template>
     <StandardLayout>
-        <div class="features-view" v-if="user">
+        <div class="features-view">
             <div>
                 TsDB
                 <button v-if="features.tsdb" @click="toggleBackend()">Disable</button>
@@ -31,9 +31,11 @@ export default {
         };
     },
     computed: {
+        /*
         user() {
             return this.$store.state.user.user;
         },
+        */
     },
     methods: {
         toggleBackend() {

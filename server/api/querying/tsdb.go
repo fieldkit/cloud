@@ -19,9 +19,9 @@ type TimeScaleDBWindow struct {
 	Interval  time.Duration
 }
 
-func (w *TimeScaleDBWindow) CalculateMaximumRows(start, end time.Time) int64 {
+func (w *TimeScaleDBWindow) CalculateMaximumRows(start, end time.Time) int {
 	duration := end.Sub(start)
-	return int64(duration / w.Interval)
+	return int(duration / w.Interval)
 }
 
 var (
@@ -30,11 +30,17 @@ var (
 )
 
 var (
+	Window24h        = &TimeScaleDBWindow{Specifier: "24h", Interval: time.Hour * 24}
+	Window6h         = &TimeScaleDBWindow{Specifier: "6h", Interval: time.Hour * 6}
+	Window1h         = &TimeScaleDBWindow{Specifier: "1h", Interval: time.Hour * 1}
+	Window10m        = &TimeScaleDBWindow{Specifier: "10m", Interval: time.Minute * 10}
+	Window1m         = &TimeScaleDBWindow{Specifier: "1m", Interval: time.Minute * 1}
 	TimeScaleWindows = []*TimeScaleDBWindow{
-		&TimeScaleDBWindow{Specifier: "24h", Interval: time.Hour * 24},
-		&TimeScaleDBWindow{Specifier: "6h", Interval: time.Hour * 6},
-		&TimeScaleDBWindow{Specifier: "1h", Interval: time.Hour * 1},
-		&TimeScaleDBWindow{Specifier: "10m", Interval: time.Minute * 10},
+		Window24h,
+		Window6h,
+		Window1h,
+		Window10m,
+		Window1m,
 	}
 )
 
@@ -55,7 +61,7 @@ type DataRow struct {
 	SensorID      int64     `json:"sensor_id"`
 	DataStart     time.Time `json:"start"`
 	DataEnd       time.Time `json:"end"`
-	BucketSamples int32     `json:"bucket_samples"`
+	BucketSamples int       `json:"bucket_samples"`
 	AverageValue  float64   `json:"average"`
 	MinimumValue  float64   `json:"minimum"`
 	MaximumValue  float64   `json:"maximum"`
@@ -136,24 +142,31 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, conn *pgx.Conn,
 	return dataRows, nil
 }
 
-func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (string, []interface{}, string, error) {
+type SelectedAggregate struct {
+	Specifier string
+}
+
+func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (*SelectedAggregate, error) {
 	log := Logger(ctx).Sugar()
+
+	ArbitrarySamplesThreshold := 2000
 
 	ranges, err := tsdb.queryRanges(ctx, conn, qp, ids)
 	if err != nil {
-		return "", nil, "", err
+		return nil, err
 	}
 
 	dataStart := MaxTime
 	dataEnd := MinTime
 
 	if len(ranges) == 0 {
-		log.Infow("tsdb:empty")
-		return "", nil, "", nil
+		return nil, nil
 	}
 
+	totalSamples := 0
+
 	for _, row := range ranges {
-		log.Infow("tsdb:range", "row", row, "verbose", true)
+		log.Infow("tsdb:range", "data_start", row.DataStart, "data_end", row.DataEnd, "bucket_samples", row.BucketSamples, "verbose", true)
 
 		if row.DataStart.Before(dataStart) {
 			dataStart = row.DataStart
@@ -161,48 +174,53 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn
 		if row.DataEnd.After(dataEnd) {
 			dataEnd = row.DataEnd
 		}
+		totalSamples += row.BucketSamples
 	}
 
+	// This could be greatly improved. The idea here is that there's no point in
+	// picking one if we can easily query all of it at maximum resolution.
+	if totalSamples < ArbitrarySamplesThreshold {
+		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples)
+
+		return &SelectedAggregate{
+			Specifier: Window1m.Specifier,
+		}, nil
+	}
+
+	// This logic is primarily for sensors that are consistently producing data.
 	duration := dataEnd.Sub(dataStart)
 	idealBucket := duration / 1000
 	nearestHour := idealBucket.Truncate(time.Hour)
 
 	log.Infow("tsdb:range", "start", dataStart, "end", dataEnd, "duration", duration, "ideal_bucket", idealBucket, "bucket_hour", nearestHour)
 
-	aggregateSpecifier := "24h"
+	aggregateSpecifier := Window24h.Specifier
 
 	for _, window := range TimeScaleWindows {
 		rows := window.CalculateMaximumRows(dataStart, dataEnd)
-		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "window", window.Specifier, "rows", rows)
+		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "window", window.Specifier, "rows", rows, "verbose", true)
 
-		if rows < 1000 {
+		if rows < ArbitrarySamplesThreshold {
 			aggregateSpecifier = window.Specifier
 		}
 	}
 
-	if nearestHour.Hours() > 0 {
-		sql := fmt.Sprintf(`
-			SELECT
-				time_bucket('%f hours', "bucket_time") AS bucket_time,
-				station_id,
-				module_id,
-				sensor_id,
-				SUM(bucket_samples) AS bucket_samples,
-				MIN(bucket_time) AS data_start,
-				MAX(bucket_time) AS data_end,
-				AVG(avg_value) AS avg_value,
-				MIN(min_value) AS min_value,
-				MAX(max_value) AS max_value,
-				LAST(last_value, bucket_time) AS last_value
-			FROM fieldkit.sensor_data_%s
-			WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3) AND bucket_time >= $4 AND bucket_time < $5
-			GROUP BY bucket_time, station_id, module_id, sensor_id
-			ORDER BY bucket_time
-		`, nearestHour.Hours(), aggregateSpecifier)
+	return &SelectedAggregate{
+		Specifier: aggregateSpecifier,
+	}, nil
+}
 
-		args := []interface{}{qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End}
+func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (string, []interface{}, *SelectedAggregate, error) {
+	log := Logger(ctx).Sugar()
 
-		return sql, args, aggregateSpecifier, nil
+	aggregate, err := tsdb.pickAggregate(ctx, conn, qp, ids)
+	if err != nil {
+		return "", nil, nil, fmt.Errorf("(pick-aggregate) %v", err)
+	}
+
+	if aggregate == nil {
+		log.Infow("tsdb:empty")
+		return "", nil, nil, nil
 	}
 
 	sql := fmt.Sprintf(`
@@ -210,11 +228,13 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn
 		FROM fieldkit.sensor_data_%s
 		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3) AND bucket_time >= $4 AND bucket_time < $5
 		ORDER BY bucket_time
-	`, aggregateSpecifier)
+	`, aggregate.Specifier)
 
 	args := []interface{}{qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End}
 
-	return sql, args, aggregateSpecifier, nil
+	log.Infow("tsdb:aggregate", "aggregate", aggregate.Specifier)
+
+	return sql, args, aggregate, nil
 }
 
 func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
@@ -252,7 +272,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	defer conn.Close(ctx)
 
 	// Determine the query we'll use to get the actual data we'll be returning.
-	dataQuerySql, dataQueryArgs, aggregateSpecifier, err := tsdb.getDataQuery(ctx, conn, qp, ids)
+	dataQuerySql, dataQueryArgs, aggregate, err := tsdb.getDataQuery(ctx, conn, qp, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +296,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return nil, err
 	}
 
-	log.Infow("tsdb:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors, "rows", len(dataRows), "aggregate", aggregateSpecifier)
+	log.Infow("tsdb:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors, "rows", len(dataRows), "aggregate", aggregate.Specifier)
 
 	backendRows := make([]*backend.DataRow, 0)
 	for _, row := range dataRows {
@@ -465,4 +485,29 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 	return &SensorTailData{
 		Data: allRows,
 	}, nil
+}
+
+func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
+	sql := fmt.Sprintf(`
+		SELECT
+			time_bucket('%f seconds', "bucket_time") AS bucket_time,
+			station_id,
+			module_id,
+			sensor_id,
+			SUM(bucket_samples) AS bucket_samples,
+			MIN(bucket_time) AS data_start,
+			MAX(bucket_time) AS data_end,
+			AVG(avg_value) AS avg_value,
+			MIN(min_value) AS min_value,
+			MAX(max_value) AS max_value,
+			LAST(last_value, bucket_time) AS last_value
+		FROM fieldkit.sensor_data_%s
+		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3) AND bucket_time >= $4 AND bucket_time < $5
+		GROUP BY bucket_time, station_id, module_id, sensor_id
+		ORDER BY bucket_time
+	`, duration.Seconds(), source.Specifier)
+
+	args := []interface{}{qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End}
+
+	return sql, args, nil
 }

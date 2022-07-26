@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"reflect"
 
-	// "github.com/bgentry/que-go"
 	"github.com/govau/que-go"
 
 	"github.com/fieldkit/cloud/server/common/logging"
+)
+
+var (
+	ids = logging.NewIdGenerator()
 )
 
 type QueMessagePublisher struct {

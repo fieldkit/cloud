@@ -517,6 +517,8 @@ func NewViewedStationProgress(res *StationProgress, view string) *stationviews.S
 // StationFull.
 func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	res := &StationFull{
+		Hidden:             vres.Hidden,
+		Status:             vres.Status,
 		Battery:            vres.Battery,
 		RecordingStartedAt: vres.RecordingStartedAt,
 		MemoryUsed:         vres.MemoryUsed,
@@ -585,6 +587,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		Name:               &res.Name,
 		DeviceID:           &res.DeviceID,
 		ReadOnly:           &res.ReadOnly,
+		Status:             res.Status,
+		Hidden:             res.Hidden,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,

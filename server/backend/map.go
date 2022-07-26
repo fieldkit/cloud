@@ -98,7 +98,7 @@ func webHookMessageReceived(ctx context.Context, j *que.Job, services *Backgroun
 		return err
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
+	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher, services.timeScaleConfig, false)
 	return handler.Handle(ctx, message)
 }
 

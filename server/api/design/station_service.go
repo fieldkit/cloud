@@ -197,6 +197,8 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("uploads")
 		Attribute("photos")
 		Attribute("readOnly")
+		Attribute("hidden")
+		Attribute("status")
 
 		Attribute("battery")
 		Attribute("recordingStartedAt")

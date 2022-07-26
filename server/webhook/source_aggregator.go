@@ -52,12 +52,15 @@ type SourceAggregator struct {
 	db       *sqlxcache.DB
 	handlers *handlers.InterestingnessHandler
 	verbose  bool
+	legacy   bool
 }
 
-func NewSourceAggregator(db *sqlxcache.DB) *SourceAggregator {
+func NewSourceAggregator(db *sqlxcache.DB, verbose, legacy bool) *SourceAggregator {
 	return &SourceAggregator{
 		db:       db,
 		handlers: handlers.NewInterestingnessHandler(db),
+		verbose:  verbose,
+		legacy:   legacy,
 	}
 }
 
@@ -128,8 +131,10 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 						}
 						aggregator := aggregators[saved.Station.ID]
 
-						if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
-							return fmt.Errorf("adding: %v", err)
+						if i.legacy {
+							if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
+								return fmt.Errorf("adding: %v", err)
+							}
 						}
 
 						for _, parsedSensor := range parsed.Data {
@@ -146,8 +151,10 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 									ModuleID:  saved.Module.ID,
 								}
 
-								if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
-									return fmt.Errorf("adding: %v", err)
+								if i.legacy {
+									if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
+										return fmt.Errorf("adding: %v", err)
+									}
 								}
 
 								ir := &data.IncomingReading{
@@ -170,12 +177,14 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 	}
 
 	stationIDs := make([]int32, 0)
-	for id, aggregator := range aggregators {
-		if err := aggregator.Close(ctx); err != nil {
-			return err
-		}
+	if i.legacy {
+		for id, aggregator := range aggregators {
+			if err := aggregator.Close(ctx); err != nil {
+				return err
+			}
 
-		stationIDs = append(stationIDs, id)
+			stationIDs = append(stationIDs, id)
+		}
 	}
 
 	if err := model.Close(ctx); err != nil {

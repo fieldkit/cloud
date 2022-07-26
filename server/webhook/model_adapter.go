@@ -98,7 +98,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	if updating == nil {
 		deviceName := string(pm.DeviceID)
 
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			deviceName = *pm.DeviceName
 		}
 
@@ -127,7 +127,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		station = added
 	} else {
 		station.ModelID = model.ID
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			station.Name = *pm.DeviceName
 		}
 	}
@@ -269,11 +269,6 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		station.Station.Name = *pm.DeviceName
 	}
 
-	if station.LastReadingTime != nil {
-		station.Station.IngestionAt = station.LastReadingTime
-		station.Station.UpdatedAt = *station.LastReadingTime
-	}
-
 	if pm.ReceivedAt != nil {
 		for _, moduleSensor := range station.Sensors {
 			for _, pr := range pm.Data {
@@ -287,6 +282,11 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
 			station.LastReadingTime = pm.ReceivedAt
 		}
+	}
+
+	if station.LastReadingTime != nil {
+		station.Station.IngestionAt = station.LastReadingTime
+		station.Station.UpdatedAt = *station.LastReadingTime
 	}
 
 	if pm.Attributes != nil {

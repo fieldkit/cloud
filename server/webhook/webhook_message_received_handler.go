@@ -23,13 +23,14 @@ type WebHookMessageReceivedHandler struct {
 	verbose  bool
 }
 
-func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *WebHookMessageReceivedHandler {
+func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig, verbose bool) *WebHookMessageReceivedHandler {
 	return &WebHookMessageReceivedHandler{
 		db:       db,
 		model:    NewModelAdapter(db),
 		tsConfig: tsConfig,
 		jqCache:  &JqCache{},
 		batch:    &MessageBatch{},
+		verbose:  verbose,
 	}
 }
 

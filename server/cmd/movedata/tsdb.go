@@ -11,14 +11,16 @@ import (
 )
 
 type MoveDataToTimeScaleDBHandler struct {
-	tsConfig *storage.TimeScaleDBConfig
-	records  [][]interface{}
+	tsConfig  *storage.TimeScaleDBConfig
+	batchSize int
+	records   [][]interface{}
 }
 
 func NewMoveDataToTimeScaleDBHandler(tsConfig *storage.TimeScaleDBConfig) *MoveDataToTimeScaleDBHandler {
 	return &MoveDataToTimeScaleDBHandler{
-		tsConfig: tsConfig,
-		records:  make([][]interface{}, 0),
+		tsConfig:  tsConfig,
+		batchSize: 1000,
+		records:   make([][]interface{}, 0),
 	}
 }
 
@@ -34,7 +36,7 @@ func (h *MoveDataToTimeScaleDBHandler) MoveReadings(ctx context.Context, reading
 		})
 	}
 
-	if len(h.records) >= 1000 {
+	if len(h.records) >= h.batchSize {
 		if err := h.flush(ctx); err != nil {
 			return err
 		}
@@ -55,6 +57,8 @@ func (h *MoveDataToTimeScaleDBHandler) flush(ctx context.Context) error {
 	}
 
 	batch := &pgx.Batch{}
+
+	log.Infow("tsdb:flushing", "records", len(h.records))
 
 	// TODO location
 	for _, row := range h.records {
@@ -90,8 +94,6 @@ func (h *MoveDataToTimeScaleDBHandler) flush(ctx context.Context) error {
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("(tsdb-commit) %v", err)
 	}
-
-	log.Infow("tsdb:flush", "records", len(h.records))
 
 	return nil
 }

@@ -30,11 +30,12 @@ class Chart {
     prepare(metaResponses, dataResponses) {
         const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
             const { vizSensor, sensor, station } = row;
-            const name = sensor.strings["en-us"]["label"] || "Unknown";
+            const strings = sensor.strings["en-us"];
+            const name = strings["label"] || "Unknown";
+            const axisLabel = strings["axisLabel"] || "";
             const data = dataResponses[index][0];
             const scale = [];
             const chartLabel = "";
-            const axisLabel = "";
             const vizInfo = new VizInfo(
                 sensor.key,
                 scale,

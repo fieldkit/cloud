@@ -17,6 +17,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Config from "@/secrets";
+import { promiseAfter } from "@/utilities";
 
 import Vue, { PropType } from "vue";
 
@@ -112,42 +113,59 @@ export class SensorDataQuerier {
         return window.localStorage["fk:backend"] || null;
     }
 
+    private _queue: Promise<[Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>]> | null = null;
+    private _queued: number[] = [];
+
     public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
-        const sensorMeta = this.api
-            .getAllSensorsMemoized()()
-            .then((meta) => new SensorMeta(meta));
+        // TODO Check if we already have the data.
 
-        if (this.stationIds.length == 0) {
-            return await Promise.all([Promise.resolve({ data: [] }), { station: [] }, sensorMeta]);
+        this._queued.push(stationId);
+
+        if (this._queue == null) {
+            this._queue = promiseAfter(50).then(() => {
+                const ids = this._queued;
+                this._queued = [];
+                this._queue = null;
+
+                console.log("sdq:querying", ids);
+
+                const params = new URLSearchParams();
+                params.append("stations", this.stationIds.join(","));
+                params.append("tail", "1");
+                const backend = this.getBackend();
+                if (backend) {
+                    params.append("backend", backend);
+                }
+                const data = this.api.tailSensorData(params);
+                const quickSensors = this.api.getQuickSensors(ids);
+
+                const sensorMeta = this.api
+                    .getAllSensorsMemoized()()
+                    .then((meta) => new SensorMeta(meta));
+
+                return [data, quickSensors, sensorMeta];
+            });
         }
 
-        if (this.data == null || this.quickSensors == null) {
-            this.quickSensors = this.api.getQuickSensors(this.stationIds);
+        return this._queue
+            .then(([data, quickSensors, sensorMeta]) => {
+                const dataQuery = data.then((response) => {
+                    return {
+                        data: response.data.filter((row) => row.stationId == stationId),
+                    };
+                });
 
-            const params = new URLSearchParams();
-            params.append("stations", this.stationIds.join(","));
-            params.append("tail", "1");
-            const backend = this.getBackend();
-            if (backend) {
-                params.append("backend", backend);
-            }
+                const quickSensorsQuery = quickSensors.then((response) => {
+                    return {
+                        station: response.stations[stationId],
+                    };
+                });
 
-            this.data = this.api.tailSensorData(params);
-        }
-
-        const dataQuery = this.data.then((response) => {
-            return {
-                data: response.data.filter((row) => row.stationId == stationId),
-            };
-        });
-
-        const quickSensorsQuery = this.quickSensors.then((response) => {
-            return {
-                station: response.stations[stationId],
-            };
-        });
-
-        return await Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
+                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
+            })
+            .then(([data, quickSensors, meta]) => {
+                return [data, quickSensors, meta];
+            });
     }
 }
 

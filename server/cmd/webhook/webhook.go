@@ -22,6 +22,7 @@ type Options struct {
 	MessageID   int
 	Resume      bool
 	Verbose     bool
+	NoLegacy    bool
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -36,7 +37,7 @@ func process(ctx context.Context, options *Options) error {
 
 	log.Infow("opened, preparing source")
 
-	aggregator := webhook.NewSourceAggregator(db)
+	aggregator := webhook.NewSourceAggregator(db, options.Verbose, !options.NoLegacy)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
@@ -70,7 +71,8 @@ func main() {
 	flag.IntVar(&options.SchemaID, "schema-id", 0, "schema id to process")
 	flag.IntVar(&options.MessageID, "message-id", 0, "message id to process")
 	flag.BoolVar(&options.Resume, "resume", false, "resume on message id")
-	flag.BoolVar(&options.Verbose, "verbose", false, "increased verbosity")
+	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
+	flag.BoolVar(&options.NoLegacy, "no-legacy", false, "disable legacy aggregate updates")
 
 	flag.Parse()
 

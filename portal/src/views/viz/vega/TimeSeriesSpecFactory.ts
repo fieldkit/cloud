@@ -197,35 +197,49 @@ export class TimeSeriesSpecFactory {
 
         // Are the sensors being charted the same? If they are then we should
         // use the same axis domain for both, and pick one that covers both.
+        const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
+        const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
         const uniqueSensorUnits = _.uniq(this.allSeries.map((series) => series.vizInfo.unitOfMeasure));
-        const sameSensors = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
+        const sameSensorUnits = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
         const makeDomainY = _.memoize((i: number, series) => {
-            if (sameSensors) {
+            if (sameSensorUnits) {
                 console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll = this.allSeries
+        const xDomainsAll: number[][] = this.allSeries
             .filter((series: SeriesData) => series.queried.data.length > 0)
             .map((series: SeriesData) => series.queried.timeRange);
         const timeRangeAll =
             xDomainsAll.length == 0
                 ? null
-                : [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+                : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
-        // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+        if (timeRangeAll) {
+            console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+        }
 
-        const makeDomainX = () => {
+        const getBarUnits = (timeRange: number[] | null) => {
+            if (timeRange) {
+                const duration = timeRange[1] - timeRange[0];
+                if (duration < 60000) {
+                    return ["year", "month", "date", "hours", "minutes", "seconds"];
+                }
+            }
+            return ["year", "month", "date", "hours", "minutes"];
+        };
+
+        const makeDomainX = (): number[] | null => {
             // I can't think of a good reason to just always specify this.
             return timeRangeAll;
         };
 
-        const xDomain = makeDomainX();
+        const xDomain: number[] | null = makeDomainX();
 
         const data = [
             {
@@ -280,7 +294,7 @@ export class TimeSeriesSpecFactory {
                                     {
                                         field: "time",
                                         type: "timeunit",
-                                        units: ["year", "month", "date", "hours"],
+                                        units: getBarUnits(timeRangeAll),
                                         as: ["barStartDate", "barEndDate"],
                                     },
                                     {
@@ -356,16 +370,23 @@ export class TimeSeriesSpecFactory {
         );
 
         const tinyXAxis = () => {
+            const formatMonth = (v: number): string => {
+                return new Date(v).toLocaleDateString();
+            };
+
             return [
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain,
+                    domain: xDomain || [0, 1],
                     tickCount: 0,
-                    labelPadding: 0,
-                    tickSize: 0,
-                    tickDash: [2, 2],
-                    title: null,
+                    // values: xDomain,
+                    titleFontSize: 12,
+                    titlePadding: 4,
+                    titleFontWeight: "normal",
+                    labelPadding: 5,
+                    title: xDomain?.map((v) => formatMonth(v)).join(" - ") || "",
+                    format: "%m/%d/%Y",
                 },
             ];
         };
@@ -412,14 +433,16 @@ export class TimeSeriesSpecFactory {
 
                     if (this.settings.tiny) {
                         return {
-                            title: null,
+                            title: series.vizInfo.axisLabel,
                             orient: makeOrientation(i),
                             scale: makeAxisScale(i),
                             domain: makeDomainY(i, series),
+                            titleFontSize: 10,
                             gridDash: [],
                             tickCount: 5,
                             domainOpacity: 0,
-                            titleOpacity: 0,
+                            titlePadding: 10,
+                            titleOpacity: 1,
                             gridOpacity: 0,
                         };
                     }

@@ -50,7 +50,10 @@ func (rr *MessageSchemaRepository) QuerySchemas(ctx context.Context, batch *Mess
 	for _, m := range batch.Messages {
 		if _, ok := batch.Schemas[*m.SchemaID]; !ok {
 			schemas := []*MessageSchemaRegistration{}
-			if err := rr.db.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema WHERE id = $1`, m.SchemaID); err != nil {
+			if err := rr.db.SelectContext(ctx, &schemas, `
+				SELECT id, owner_id, token, name, body, received_at, processed_at, process_interval, project_id
+				FROM fieldkit.ttn_schema WHERE id = $1
+			`, m.SchemaID); err != nil {
 				return nil, err
 			}
 
@@ -69,7 +72,10 @@ func (rr *MessageSchemaRepository) QuerySchemas(ctx context.Context, batch *Mess
 
 func (rr *MessageSchemaRepository) QueryAllSchemas(ctx context.Context) ([]*MessageSchemaRegistration, error) {
 	schemas := []*MessageSchemaRegistration{}
-	if err := rr.db.SelectContext(ctx, &schemas, `SELECT * FROM fieldkit.ttn_schema`); err != nil {
+	if err := rr.db.SelectContext(ctx, &schemas, `
+		SELECT id, owner_id, token, name, body, received_at, processed_at, process_interval, project_id
+		FROM fieldkit.ttn_schema
+		`); err != nil {
 		return nil, err
 	}
 	return schemas, nil

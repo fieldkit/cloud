@@ -326,7 +326,7 @@ export default Vue.extend({
         },
         getValidStations(): number[] {
             const validStations = Object.entries(this.workspace.stations)
-                .filter(([key, station]) => station.sensors.length > 0)
+                .filter(([key, station]) => !station.hidden && station.sensors.length > 0)
                 .map((d) => +d[0]);
 
             this.selectedIndex = validStations.indexOf(this.selectedId);
