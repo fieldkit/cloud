@@ -387,11 +387,12 @@ export default Vue.extend({
     position: fixed;
     bottom: 8px;
     left: 6px;
+    text-align: left;
 
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
-        font-size: 13px;
+        font-size: 10px;
         min-width: 50px;
     }
 
