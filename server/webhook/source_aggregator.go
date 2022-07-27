@@ -191,6 +191,10 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		return err
 	}
 
+	if err := i.handlers.Close(ctx); err != nil {
+		return err
+	}
+
 	if len(stationIDs) == 0 {
 		Logger(ctx).Sugar().Warnw("wh:zero-stations")
 	}
