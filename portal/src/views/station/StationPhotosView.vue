@@ -42,6 +42,7 @@ import AuthenticatedPhoto from "@/views/shared/AuthenticatedPhoto.vue";
 import { AddedPhoto, NoteMedia, PortalNoteMedia } from "@/views/notes/model";
 import { ActionTypes } from "@/store";
 import ListItemOptions, { ListItemOption } from "@/views/shared/ListItemOptions.vue";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "StationPhotosView",
@@ -92,7 +93,10 @@ export default Vue.extend({
                                     await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                                 })
                                 .finally(() => {
-                                    this.onFinishedPhotoAction();
+                                    this.onFinishedPhotoAction(this.$tc("successDeletePhoto"), SnackbarStyle.success);
+                                })
+                                .catch(() => {
+                                    this.onFinishedPhotoAction(this.$tc("somethingWentWrong"), SnackbarStyle.fail);
                                 });
                         }
                     },
@@ -106,12 +110,15 @@ export default Vue.extend({
                         await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                     })
                     .finally(() => {
-                        this.onFinishedPhotoAction();
+                        this.onFinishedPhotoAction(this.$tc("successSetAsStationPhoto"), SnackbarStyle.success);
+                    })
+                    .catch(() => {
+                        this.onFinishedPhotoAction(this.$tc("somethingWentWrong"), SnackbarStyle.fail);
                     });
             }
         },
-        onFinishedPhotoAction(): void {
-            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        onFinishedPhotoAction(message: string, type: SnackbarStyle): void {
+            this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, { message, type });
             this.loadingPhotoId = null;
         },
         upload(this: any, ev) {
@@ -121,10 +128,16 @@ export default Vue.extend({
             reader.onload = (ev) => {
                 if (ev?.target?.result) {
                     const photo = new AddedPhoto(image.type, image, ev.target.result);
-                    this.$services.api.uploadStationMedia(this.stationId, photo.key, photo.file).then(() => {
-                        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.stationId });
-                        return [];
-                    });
+                    this.$services.api
+                        .uploadStationMedia(this.stationId, photo.key, photo.file)
+                        .then(() => {
+                            this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.stationId });
+                            this.onFinishedPhotoAction(this.$tc("successAddedPhoto"), SnackbarStyle.success);
+                            return [];
+                        })
+                        .catch(() => {
+                            this.onFinishedPhotoAction(this.$tc("somethingWentWrong"), SnackbarStyle.fail);
+                        });
                 }
             };
 
@@ -197,8 +210,12 @@ export default Vue.extend({
         padding: 0;
         display: flex;
         justify-content: center;
-        font-weight: bold;
-        transform: translate(-1px, -4px);
+        height: 100%;
+
+        &:after {
+            transform: translate(-1px, 3px);
+            font-weight: bold;
+        }
     }
 
     ::v-deep .options-btns {
