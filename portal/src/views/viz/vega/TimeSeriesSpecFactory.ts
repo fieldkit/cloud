@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { DataRow } from "../api";
@@ -371,7 +372,7 @@ export class TimeSeriesSpecFactory {
 
         const tinyXAxis = () => {
             const formatMonth = (v: number): string => {
-                return new Date(v).toLocaleDateString();
+                return moment(new Date(v)).format("M/D/YYYY");
             };
 
             return [
