@@ -408,5 +408,9 @@
             "current": "Current"
         }
     },
-    "confirmDeletePhoto": "Are you sure you want to delete this photo?"
+    "confirmDeletePhoto": "Are you sure you want to delete this photo?",
+    "successDeletePhoto": "The photo was successfully removed.",
+    "successSetAsStationPhoto": "The photo was successfully set as a station image.",
+    "somethingWentWrong": "Something went wrong. Please try again later.",
+    "successAddedPhoto": "The photo was successfully saved"
 }

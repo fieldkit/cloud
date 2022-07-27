@@ -1,5 +1,5 @@
 <template>
-    <dialog :open="isOpen" class="snackbar show"></dialog>
+    <aside :class="{ show: isVisible, [style]: true }" class="snackbar">{{ message }}</aside>
 </template>
 
 <script lang="ts">
@@ -8,52 +8,49 @@ import Vue from "vue";
 export default Vue.extend({
     name: "SnackBar",
     data: () => {
-        return {
-            isOpen: false,
-        };
+        return {};
     },
-    methods: {
-        show() {
-            this.isOpen = true;
+    computed: {
+        isVisible() {
+            return this.$state.snackbar.visible;
+        },
+        message() {
+            return this.$state.snackbar.message;
+        },
+        style() {
+            return this.$state.snackbar.style;
         },
     },
 });
 </script>
 
 <style scoped lang="scss">
+@import "src/scss/variables";
 .snackbar {
-    visibility: hidden; /* Hidden by default. Visible on click */
-    min-width: 250px; /* Set a default minimum width */
-    margin-left: -125px; /* Divide value of min-width by 2 */
-    background-color: #333; /* Black background color */
-    color: #fff; /* White text color */
-    text-align: center; /* Centered text */
-    border-radius: 2px; /* Rounded borders */
-    padding: 16px; /* Padding */
-    position: fixed; /* Sit on top of the screen */
-    z-index: 1; /* Add a z-index if needed */
-    left: 50%; /* Center the snackbar */
-    bottom: 30px; /* 30px from the bottom */
-}
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: $color-dark;
+    text-align: center;
+    border-radius: 5px;
+    padding: 15px 20px;
+    position: fixed;
+    z-index: $z-index-top;
+    left: 50%;
+    bottom: 30px;
 
-/* Show the snackbar when clicking on a button (class added with JavaScript) */
-.snackbar.show {
-    visibility: visible; /* Show the snackbar */
-    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-  However, delay the fade out process for 2.5 seconds */
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-/* Animations to fade the snackbar in and out */
-@-webkit-keyframes fadein {
-    from {
-        bottom: 0;
-        opacity: 0;
+    &.show {
+        visibility: visible;
+        animation: fadein 0.5s, fadeout 0.5s 5s; // last value = persistence time
+        animation-iteration-count: 1;
     }
-    to {
-        bottom: 30px;
-        opacity: 1;
+
+    &.success {
+        background-color: #7cdb938a;
+    }
+    &.fail {
+        background-color: #f8d7da;
     }
 }
 
@@ -65,17 +62,6 @@ export default Vue.extend({
     to {
         bottom: 30px;
         opacity: 1;
-    }
-}
-
-@-webkit-keyframes fadeout {
-    from {
-        bottom: 30px;
-        opacity: 1;
-    }
-    to {
-        bottom: 0;
-        opacity: 0;
     }
 }
 

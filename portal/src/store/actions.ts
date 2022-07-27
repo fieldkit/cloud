@@ -46,3 +46,8 @@ export const NOTIFICATIONS_SEEN = "NOTIFICATIONS_SEEN";
 // Notes
 
 export const NEED_NOTES = "NEED_NOTES";
+
+// Snackbar
+
+export const SHOW_SNACKBAR = "SHOW_SNACKBAR";
+export const HIDE_SNACKBAR = "HIDE_SNACKBAR";
