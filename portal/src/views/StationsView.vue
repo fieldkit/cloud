@@ -73,6 +73,7 @@ import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
+import SnackBar from '@/views/shared/SnackBar.vue';
 
 export default Vue.extend({
     name: "StationsView",
