@@ -33,7 +33,7 @@ export default Vue.extend({
     background-color: #333;
     color: $color-dark;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 15px 20px;
     position: fixed;
     z-index: $z-index-top;
