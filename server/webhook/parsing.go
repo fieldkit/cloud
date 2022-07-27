@@ -227,7 +227,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 				receivedAt = &parsed
 			} else if receivedAtNumber, ok := receivedAtRaw.(float64); ok {
-				parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond))
+				parsed := time.Unix(0, int64(receivedAtNumber)*int64(time.Millisecond)).UTC()
 
 				receivedAt = &parsed
 			} else {
