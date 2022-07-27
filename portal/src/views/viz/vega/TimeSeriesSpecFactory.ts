@@ -830,7 +830,7 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: this.settings.tiny ? "tinyLine" : i === 0 ? "primaryLine" : "secondaryLine",
+                        style: i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
