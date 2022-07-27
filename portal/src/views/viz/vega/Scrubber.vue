@@ -80,10 +80,7 @@ export default {
             //     console.log(evt, value);
             // });
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
-                return this.$router.push({
-                    name: "exploreBookmark",
-                    query: { bookmark: value },
-                });
+              this.$emit("event-clicked", value);
             });
             vegaInfo.view.addEventListener("mouseup", () => {
                 console.log("viz: vega:scrubber-brush", scrubbed);

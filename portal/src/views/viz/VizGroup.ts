@@ -63,6 +63,9 @@ export const VizGroup = Vue.extend({
             }
             return this.group.vizes.length > 1;
         },
+        eventClicked(id: number): void {
+            this.$emit("event-clicked", id);
+        },
     },
     template: `
         <div v-bind:class="{ 'group-container': true, 'busy': false }">
@@ -86,7 +89,7 @@ export const VizGroup = Vue.extend({
                 </component>
             </div>
             <div v-if="group.scrubbers && !group.scrubbers.empty">
-                <Scrubber :scrubbers="group.scrubbers" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+                <Scrubber :scrubbers="group.scrubbers" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" @event-clicked="eventClicked"/>
             </div>
         </div>
 	`,
