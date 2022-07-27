@@ -2108,8 +2108,9 @@ func unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v *
 // *StationOwnerResponseBody.
 func unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v *StationOwnerResponseBody) *stationviews.StationOwnerView {
 	res := &stationviews.StationOwnerView{
-		ID:   v.ID,
-		Name: v.Name,
+		ID:    v.ID,
+		Name:  v.Name,
+		Email: v.Email,
 	}
 
 	return res
@@ -2395,6 +2396,8 @@ func unmarshalStationFullResponseBodyToStationviewsStationFullView(v *StationFul
 		Name:               v.Name,
 		DeviceID:           v.DeviceID,
 		ReadOnly:           v.ReadOnly,
+		Status:             v.Status,
+		Hidden:             v.Hidden,
 		Battery:            v.Battery,
 		RecordingStartedAt: v.RecordingStartedAt,
 		MemoryUsed:         v.MemoryUsed,

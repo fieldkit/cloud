@@ -1,7 +1,7 @@
 @Library('conservify') _
 
 timestamps {
-    node ("main") {
+    node ("jenkins-aws-ubuntu") {
         try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 			def branchName = params.DeployBranch ?: "main"
@@ -12,7 +12,9 @@ timestamps {
 
 					sh "cd migrations && make image"
 
-					sh "docker run --rm --env 'PGURL=${ws.database_url.value}' conservify/fk-cloud-migrate migrate"
+					sh "docker run --rm --env 'MIGRATE_DATABASE_URL=${ws.database_url.value}' --env 'MIGRATE_PATH=/migrations' -v `pwd`/migrations/primary:/migrations conservify/fk-cloud-migrate migrate"
+
+					sh "docker run --rm --env 'MIGRATE_DATABASE_URL=${ws.timescaledb_url.value}' --env 'MIGRATE_PATH=/migrations' -v `pwd`/migrations/tsdb:/migrations conservify/fk-cloud-migrate migrate"
 				}
 			}
         }

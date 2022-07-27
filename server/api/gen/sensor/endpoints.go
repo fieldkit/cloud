@@ -16,10 +16,12 @@ import (
 
 // Endpoints wraps the "sensor" service endpoints.
 type Endpoints struct {
-	Meta     goa.Endpoint
-	Data     goa.Endpoint
-	Bookmark goa.Endpoint
-	Resolve  goa.Endpoint
+	Meta        goa.Endpoint
+	StationMeta goa.Endpoint
+	SensorMeta  goa.Endpoint
+	Data        goa.Endpoint
+	Bookmark    goa.Endpoint
+	Resolve     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "sensor" service with endpoints.
@@ -27,16 +29,20 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Meta:     NewMetaEndpoint(s),
-		Data:     NewDataEndpoint(s, a.JWTAuth),
-		Bookmark: NewBookmarkEndpoint(s, a.JWTAuth),
-		Resolve:  NewResolveEndpoint(s, a.JWTAuth),
+		Meta:        NewMetaEndpoint(s),
+		StationMeta: NewStationMetaEndpoint(s),
+		SensorMeta:  NewSensorMetaEndpoint(s),
+		Data:        NewDataEndpoint(s, a.JWTAuth),
+		Bookmark:    NewBookmarkEndpoint(s, a.JWTAuth),
+		Resolve:     NewResolveEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "sensor" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Meta = m(e.Meta)
+	e.StationMeta = m(e.StationMeta)
+	e.SensorMeta = m(e.SensorMeta)
 	e.Data = m(e.Data)
 	e.Bookmark = m(e.Bookmark)
 	e.Resolve = m(e.Resolve)
@@ -47,6 +53,23 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 func NewMetaEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		return s.Meta(ctx)
+	}
+}
+
+// NewStationMetaEndpoint returns an endpoint function that calls the method
+// "station meta" of service "sensor".
+func NewStationMetaEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*StationMetaPayload)
+		return s.StationMeta(ctx, p)
+	}
+}
+
+// NewSensorMetaEndpoint returns an endpoint function that calls the method
+// "sensor meta" of service "sensor".
+func NewSensorMetaEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		return s.SensorMeta(ctx)
 	}
 }
 

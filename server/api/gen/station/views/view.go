@@ -72,6 +72,8 @@ type StationFullView struct {
 	Uploads            []*StationUploadView
 	Photos             *StationPhotosView
 	ReadOnly           *bool
+	Status             *string
+	Hidden             *bool
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32
@@ -97,8 +99,9 @@ type StationFullModelView struct {
 
 // StationOwnerView is a type that runs validations on a projected type.
 type StationOwnerView struct {
-	ID   *int32
-	Name *string
+	ID    *int32
+	Name  *string
+	Email *string
 }
 
 // StationInterestingnessView is a type that runs validations on a projected
@@ -326,6 +329,8 @@ var (
 			"uploads",
 			"photos",
 			"readOnly",
+			"hidden",
+			"status",
 			"battery",
 			"recordingStartedAt",
 			"memoryUsed",
@@ -405,6 +410,8 @@ var (
 			"uploads",
 			"photos",
 			"readOnly",
+			"hidden",
+			"status",
 			"battery",
 			"recordingStartedAt",
 			"memoryUsed",

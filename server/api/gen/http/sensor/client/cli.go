@@ -14,6 +14,21 @@ import (
 	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
 )
 
+// BuildStationMetaPayload builds the payload for the sensor station meta
+// endpoint from CLI flags.
+func BuildStationMetaPayload(sensorStationMetaStations string) (*sensor.StationMetaPayload, error) {
+	var stations *string
+	{
+		if sensorStationMetaStations != "" {
+			stations = &sensorStationMetaStations
+		}
+	}
+	v := &sensor.StationMetaPayload{}
+	v.Stations = stations
+
+	return v, nil
+}
+
 // BuildDataPayload builds the payload for the sensor data endpoint from CLI
 // flags.
 func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataStations string, sensorDataSensors string, sensorDataResolution string, sensorDataAggregate string, sensorDataComplete string, sensorDataTail string, sensorDataBackend string, sensorDataAuth string) (*sensor.DataPayload, error) {

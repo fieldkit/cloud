@@ -83,10 +83,12 @@ export default Vue.extend({
             // console.log(`viz: bookmark-resolving`, token);
 
             try {
-                if (!this.resolved[token]) {
+                if (!this.resolved[token] && token) {
                     const savedBookmark = await this.$services.api.resolveBookmark(token);
                     console.log(`viz: bookmark-resolved`, savedBookmark);
                     Vue.set(this.resolved, token, deserializeBookmark(savedBookmark.bookmark));
+                } else {
+                    console.log(`viz: bookmark-missing`);
                 }
             } catch (error) {
                 console.log("viz: bad-token", error);

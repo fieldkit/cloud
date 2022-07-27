@@ -1716,8 +1716,9 @@ func marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v *st
 // *stationviews.StationOwnerView.
 func marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v *stationviews.StationOwnerView) *StationOwnerResponseBody {
 	res := &StationOwnerResponseBody{
-		ID:   *v.ID,
-		Name: *v.Name,
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: v.Email,
 	}
 
 	return res
@@ -2019,6 +2020,8 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		Name:               *v.Name,
 		DeviceID:           *v.DeviceID,
 		ReadOnly:           *v.ReadOnly,
+		Status:             v.Status,
+		Hidden:             v.Hidden,
 		Battery:            v.Battery,
 		RecordingStartedAt: v.RecordingStartedAt,
 		MemoryUsed:         v.MemoryUsed,

@@ -1,8 +1,8 @@
 import _ from "lodash";
 
-export * from "./api";
-
 import { StationID, VizSensor, SensorSpec, VizConfig, SensorRange, DataRow, SensorDataResponse } from "./api";
+
+export * from "./api";
 
 export class Ids {
     private static c = 0;

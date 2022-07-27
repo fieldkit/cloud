@@ -50,6 +50,7 @@ var _ = Service("ingestion", func() {
 			Attribute("stationId", Int32)
 			Required("stationId")
 			Attribute("completely", Boolean)
+			Attribute("skipManual", Boolean)
 		})
 
 		HTTP(func() {
@@ -57,6 +58,7 @@ var _ = Service("ingestion", func() {
 
 			Params(func() {
 				Param("completely")
+				Param("skipManual")
 			})
 
 			httpAuthentication()

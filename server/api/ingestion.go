@@ -87,10 +87,15 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 	if payload.Completely != nil {
 		completely = *payload.Completely
 	}
+	skipManual := false
+	if payload.SkipManual != nil {
+		skipManual = *payload.SkipManual
+	}
 	if err := c.options.Publisher.Publish(ctx, &messages.RefreshStation{
 		StationID:   payload.StationID,
 		HowRecently: 0,
 		Completely:  completely,
+		SkipManual:  skipManual,
 		UserID:      p.UserID(),
 	}); err != nil {
 		log.Errorw("publishing", "err", err)

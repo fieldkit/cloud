@@ -3,41 +3,64 @@ package handlers
 import (
 	"context"
 	"fmt"
-	_ "strings"
+	"time"
 
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/jackc/pgx/v4"
 
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/storage"
 )
+
+type TimeScaleRecord struct {
+	Time      time.Time
+	StationID int32
+	ModuleID  int64
+	SensorID  int64
+	Location  []float64
+	Value     float64
+}
 
 type AggregatingHandler struct {
 	db                *sqlxcache.DB
 	metaFactory       *repositories.MetaFactory
 	stationRepository *repositories.StationRepository
+	tsConfig          *storage.TimeScaleDBConfig
 	provisionID       int64
 	metaID            int64
 	stations          map[int64]*Aggregator
 	seen              map[int32]*data.Station
+	stationIDs        map[int64]int32
 	stationConfig     *data.StationConfiguration
 	stationModules    map[uint32]*data.StationModule
 	aggregator        *Aggregator
+	sensors           map[string]*data.Sensor
 	tableSuffix       string
 	completely        bool
+	skipManual        bool
+	tsBatchSize       int
+	tsRecords         [][]interface{}
 }
 
-func NewAggregatingHandler(db *sqlxcache.DB, tableSuffix string, completely bool) *AggregatingHandler {
+func NewAggregatingHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string, completely, skipManual bool) *AggregatingHandler {
 	return &AggregatingHandler{
 		db:                db,
 		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
+		tsConfig:          tsConfig,
 		stations:          make(map[int64]*Aggregator),
 		seen:              make(map[int32]*data.Station),
+		stationIDs:        make(map[int64]int32),
 		stationConfig:     nil,
 		tableSuffix:       tableSuffix,
 		completely:        completely,
+		skipManual:        skipManual,
+		tsBatchSize:       1000,
+		tsRecords:         make([][]interface{}, 0),
 	}
 }
 
@@ -56,7 +79,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		aggregator := NewAggregator(v.db, v.tableSuffix, station.ID, 100, NewDefaultAggregatorConfig())
 
 		if _, ok := v.seen[station.ID]; !ok {
-			if v.completely {
+			if !v.skipManual && v.completely {
 				err = v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 					return aggregator.ClearNumberSamples(txCtx)
 				})
@@ -68,6 +91,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 		}
 
 		v.stations[p.ID] = aggregator
+		v.stationIDs[p.ID] = station.ID
 	}
 
 	if v.metaID != meta.ID {
@@ -123,8 +147,10 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 		return nil
 	}
 
-	if err := aggregator.NextTime(ctx, db.Time); err != nil {
-		return fmt.Errorf("error adding: %v", err)
+	if !v.skipManual {
+		if err := aggregator.NextTime(ctx, db.Time); err != nil {
+			return fmt.Errorf("error adding: %v", err)
+		}
 	}
 
 	for key, value := range filtered.Record.Readings {
@@ -137,8 +163,17 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 					SensorKey: key.SensorKey,
 					ModuleID:  sm.ID,
 				}
-				if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
-					return fmt.Errorf("error adding: %v", err)
+
+				if !v.skipManual {
+					if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
+						return fmt.Errorf("error adding: %v", err)
+					}
+				}
+
+				if v.tsConfig != nil {
+					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
+						return fmt.Errorf("error saving: %v", err)
+					}
 				}
 			}
 		}
@@ -147,23 +182,116 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingHandler) OnDone(ctx context.Context) error {
-	for _, aggregator := range v.stations {
-		if err := aggregator.Close(ctx); err != nil {
+func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time, location []float64, sensorKey *AggregateSensorKey, value float64) error {
+	stationID, ok := v.stationIDs[v.provisionID]
+	if !ok {
+		return fmt.Errorf("missing station id")
+	}
+
+	if v.sensors == nil {
+		sr := repositories.NewSensorsRepository(v.db)
+
+		sensors, err := sr.QueryAllSensors(ctx)
+		if err != nil {
+			return err
+		}
+
+		v.sensors = sensors
+	}
+
+	meta := v.sensors[sensorKey.SensorKey]
+	if meta == nil {
+		return fmt.Errorf("unknown sensor: '%s'", sensorKey.SensorKey)
+	}
+
+	// TODO location
+	v.tsRecords = append(v.tsRecords, []interface{}{
+		sampled,
+		stationID,
+		sensorKey.ModuleID,
+		meta.ID,
+		value,
+	})
+
+	if len(v.tsRecords) == v.tsBatchSize {
+		if err := v.flushTs(ctx); err != nil {
 			return err
 		}
 	}
 
-	if v.completely {
-		err := v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
-			for _, aggregator := range v.stations {
-				if err := aggregator.DeleteEmptyAggregates(txCtx); err != nil {
-					return err
-				}
+	return nil
+}
+
+func (v *AggregatingHandler) flushTs(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
+	batch := &pgx.Batch{}
+
+	// TODO location
+	for _, row := range v.tsRecords {
+		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
+				VALUES ($1, $2, $3, $4, $5)
+				ON CONFLICT (time, station_id, module_id, sensor_id)
+				DO UPDATE SET value = EXCLUDED.value`
+		batch.Queue(sql, row...)
+	}
+
+	log.Infow("tsdb:flushing", "records", len(v.tsRecords))
+
+	v.tsRecords = make([][]interface{}, 0)
+
+	pgPool, err := v.tsConfig.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+
+	tx, err := pgPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+
+	br := tx.SendBatch(ctx, batch)
+
+	if _, err := br.Exec(); err != nil {
+		return fmt.Errorf("(tsdb-exec) %v", err)
+	}
+
+	if err := br.Close(); err != nil {
+		return fmt.Errorf("(tsdb-close) %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("(tsdb-commit) %v", err)
+	}
+
+	return nil
+}
+
+func (v *AggregatingHandler) OnDone(ctx context.Context) error {
+	if !v.skipManual {
+		for _, aggregator := range v.stations {
+			if err := aggregator.Close(ctx); err != nil {
+				return err
 			}
-			return nil
-		})
-		if err != nil {
+		}
+
+		if v.completely {
+			err := v.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
+				for _, aggregator := range v.stations {
+					if err := aggregator.DeleteEmptyAggregates(txCtx); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(v.tsRecords) > 0 {
+		if err := v.flushTs(ctx); err != nil {
 			return err
 		}
 	}

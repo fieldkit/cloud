@@ -10,7 +10,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
     components: {
         LineChart,
     },
-    data() {
+    data(): {} {
         return {};
     },
     props: {

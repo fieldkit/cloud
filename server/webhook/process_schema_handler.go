@@ -21,7 +21,7 @@ func NewProcessSchemaHandler(db *sqlxcache.DB, metrics *logging.Metrics, publish
 }
 
 func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) error {
-	sourceAggregator := NewSourceAggregator(h.db)
+	sourceAggregator := NewSourceAggregator(h.db, false, true)
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 
@@ -29,7 +29,6 @@ func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) err
 
 	if err := sourceAggregator.ProcessSource(ctx, source, startTime); err != nil {
 		return err
-
 	}
 
 	return nil

@@ -84,6 +84,8 @@ type StationFull struct {
 	Uploads            []*StationUpload
 	Photos             *StationPhotos
 	ReadOnly           bool
+	Status             *string
+	Hidden             *bool
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32
@@ -233,8 +235,9 @@ type StationFullModel struct {
 }
 
 type StationOwner struct {
-	ID   int32
-	Name string
+	ID    int32
+	Name  string
+	Email *string
 }
 
 type StationInterestingness struct {
@@ -514,6 +517,8 @@ func NewViewedStationProgress(res *StationProgress, view string) *stationviews.S
 // StationFull.
 func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	res := &StationFull{
+		Hidden:             vres.Hidden,
+		Status:             vres.Status,
 		Battery:            vres.Battery,
 		RecordingStartedAt: vres.RecordingStartedAt,
 		MemoryUsed:         vres.MemoryUsed,
@@ -582,6 +587,8 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		Name:               &res.Name,
 		DeviceID:           &res.DeviceID,
 		ReadOnly:           &res.ReadOnly,
+		Status:             res.Status,
+		Hidden:             res.Hidden,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,
@@ -950,8 +957,9 @@ func transformStationviewsStationOwnerViewToStationOwner(v *stationviews.Station
 		return nil
 	}
 	res := &StationOwner{
-		ID:   *v.ID,
-		Name: *v.Name,
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: v.Email,
 	}
 
 	return res
@@ -1217,8 +1225,9 @@ func transformStationFullModelToStationviewsStationFullModelView(v *StationFullM
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
 	res := &stationviews.StationOwnerView{
-		ID:   &v.ID,
-		Name: &v.Name,
+		ID:    &v.ID,
+		Name:  &v.Name,
+		Email: v.Email,
 	}
 
 	return res

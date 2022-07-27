@@ -55,7 +55,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher)
+	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
 	assert.NoError(err)

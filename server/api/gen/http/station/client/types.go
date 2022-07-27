@@ -43,6 +43,8 @@ type AddResponseBody struct {
 	Uploads            []*StationUploadResponseBody          `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Photos             *StationPhotosResponseBody            `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                                 `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
 	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
@@ -73,6 +75,8 @@ type GetResponseBody struct {
 	Uploads            []*StationUploadResponseBody          `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Photos             *StationPhotosResponseBody            `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                                 `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
 	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
@@ -103,6 +107,8 @@ type UpdateResponseBody struct {
 	Uploads            []*StationUploadResponseBody          `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Photos             *StationPhotosResponseBody            `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                                 `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
 	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
@@ -1211,8 +1217,9 @@ type StationFullModelResponseBody struct {
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
-	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	ID    *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 }
 
 // StationInterestingnessResponseBody is used to define fields on response body
@@ -1354,6 +1361,8 @@ type StationFullResponseBody struct {
 	Uploads            []*StationUploadResponseBody          `form:"uploads,omitempty" json:"uploads,omitempty" xml:"uploads,omitempty"`
 	Photos             *StationPhotosResponseBody            `form:"photos,omitempty" json:"photos,omitempty" xml:"photos,omitempty"`
 	ReadOnly           *bool                                 `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
 	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
@@ -1461,6 +1470,8 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		Name:               body.Name,
 		DeviceID:           body.DeviceID,
 		ReadOnly:           body.ReadOnly,
+		Status:             body.Status,
+		Hidden:             body.Hidden,
 		Battery:            body.Battery,
 		RecordingStartedAt: body.RecordingStartedAt,
 		MemoryUsed:         body.MemoryUsed,
@@ -1573,6 +1584,8 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		Name:               body.Name,
 		DeviceID:           body.DeviceID,
 		ReadOnly:           body.ReadOnly,
+		Status:             body.Status,
+		Hidden:             body.Hidden,
 		Battery:            body.Battery,
 		RecordingStartedAt: body.RecordingStartedAt,
 		MemoryUsed:         body.MemoryUsed,
@@ -1790,6 +1803,8 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		Name:               body.Name,
 		DeviceID:           body.DeviceID,
 		ReadOnly:           body.ReadOnly,
+		Status:             body.Status,
+		Hidden:             body.Hidden,
 		Battery:            body.Battery,
 		RecordingStartedAt: body.RecordingStartedAt,
 		MemoryUsed:         body.MemoryUsed,

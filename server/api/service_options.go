@@ -18,6 +18,7 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/files"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 type ControllerOptions struct {
@@ -47,11 +48,11 @@ type ControllerOptions struct {
 	subscriptions *Subscriptions
 
 	influxConfig    *querying.InfluxDBConfig
-	timeScaleConfig *querying.TimeScaleDBConfig
+	timeScaleConfig *storage.TimeScaleDBConfig
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *querying.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {

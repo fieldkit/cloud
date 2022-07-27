@@ -16,8 +16,21 @@
 
 <script lang="ts">
 import _ from "lodash";
+import Config from "@/secrets";
+import { promiseAfter } from "@/utilities";
+
 import Vue, { PropType } from "vue";
-import { FKApi, TailSensorDataResponse, SensorsResponse, Module } from "@/api";
+
+import {
+    FKApi,
+    TailSensorDataResponse,
+    VizSensor,
+    StationInfoResponse,
+    ModuleSensorMeta,
+    SensorInfoResponse,
+    SensorsResponse,
+    Module,
+} from "@/api";
 
 export enum TrendType {
     Downward,
@@ -38,25 +51,121 @@ export class SensorReading {
     ) {}
 }
 
+export interface StationQuickSensors {
+    station: StationInfoResponse[];
+}
+
+export class SensorMeta {
+    constructor(private readonly meta: SensorsResponse) {}
+
+    public get sensors() {
+        return this.meta.sensors;
+    }
+
+    public get modules() {
+        return this.meta.modules;
+    }
+
+    public findSensorByKey(sensorKey: string): ModuleSensorMeta {
+        const sensors = _(this.meta.modules)
+            .map((m) => m.sensors)
+            .flatten()
+            .groupBy((s) => s.fullKey)
+            .value();
+
+        const byKey = sensors[sensorKey];
+        if (byKey.length == 0) {
+            throw new Error(`viz: Missing sensor meta: ${sensorKey}`);
+        }
+
+        return byKey[0];
+    }
+
+    public findSensor(vizSensor: VizSensor): ModuleSensorMeta {
+        const sensorId = vizSensor[1][1];
+
+        const sensorKeysById = _(this.meta.sensors)
+            .groupBy((r) => r.id)
+            .value();
+
+        if (!sensorKeysById[String(sensorId)]) {
+            console.log(`viz: sensors: ${JSON.stringify(_.keys(sensorKeysById))}`);
+            throw new Error(`viz: Missing sensor: ${sensorId}`);
+        }
+
+        const sensorKey = sensorKeysById[String(sensorId)][0].key;
+        return this.findSensorByKey(sensorKey);
+    }
+}
+
 export class SensorDataQuerier {
-    private everything: Promise<TailSensorDataResponse> | null = null;
+    private data: Promise<TailSensorDataResponse> | null = null;
+    private quickSensors: Promise<SensorInfoResponse> | null = null;
 
     constructor(private readonly api: FKApi, private readonly stationIds: number[]) {
         console.log("sdq:ctor", stationIds);
     }
 
-    public query(stationId: number): Promise<TailSensorDataResponse> {
-        if (this.everything == null) {
-            const params = new URLSearchParams();
-            params.append("stations", this.stationIds.join(","));
-            params.append("tail", "1");
-            this.everything = this.api.tailSensorData(params);
+    private getBackend(): string | null {
+        if (Config.backend) {
+            return Config.backend;
         }
-        return this.everything.then((response) => {
-            return {
-                data: response.data.filter((row) => row.stationId == stationId),
-            };
-        });
+        return window.localStorage["fk:backend"] || null;
+    }
+
+    private _queue: Promise<[Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>]> | null = null;
+    private _queued: number[] = [];
+
+    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
+        // TODO Check if we already have the data.
+
+        this._queued.push(stationId);
+
+        if (this._queue == null) {
+            this._queue = promiseAfter(50).then(() => {
+                const ids = this._queued;
+                this._queued = [];
+                this._queue = null;
+
+                console.log("sdq:querying", ids);
+
+                const params = new URLSearchParams();
+                params.append("stations", ids.join(","));
+                params.append("tail", "1");
+                const backend = this.getBackend();
+                if (backend) {
+                    params.append("backend", backend);
+                }
+                const data = this.api.tailSensorData(params);
+                const quickSensors = this.api.getQuickSensors(ids);
+
+                const sensorMeta = this.api
+                    .getAllSensorsMemoized()()
+                    .then((meta) => new SensorMeta(meta));
+
+                return [data, quickSensors, sensorMeta];
+            });
+        }
+
+        return this._queue
+            .then(([data, quickSensors, sensorMeta]) => {
+                const dataQuery = data.then((response) => {
+                    return {
+                        data: response.data.filter((row) => row.stationId == stationId),
+                    };
+                });
+
+                const quickSensorsQuery = quickSensors.then((response) => {
+                    return {
+                        station: response.stations[stationId],
+                    };
+                });
+
+                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
+            })
+            .then(([data, quickSensors, meta]) => {
+                return [data, quickSensors, meta];
+            });
     }
 }
 
@@ -78,13 +187,11 @@ export default Vue.extend({
         },
     },
     data(): {
-        allSensorsMemoized: () => Promise<SensorsResponse>;
         loading: boolean;
         sensors: SensorReading[];
         querier: SensorDataQuerier;
     } {
         return {
-            allSensorsMemoized: this.$services.api.getAllSensorsMemoized(),
             loading: true,
             sensors: [],
             querier: this.sensorDataQuerier || new SensorDataQuerier(this.$services.api, [this.id]),
@@ -103,14 +210,11 @@ export default Vue.extend({
     },
     methods: {
         refresh() {
-            const data = () => {
-                return this.querier.query(this.id);
-            };
-
             this.loading = true;
 
-            return Promise.all([data(), this.allSensorsMemoized()])
-                .then(([data, meta]) => {
+            return this.querier
+                .query(this.id)
+                .then(([data, quickSensors, meta]) => {
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {
@@ -119,6 +223,12 @@ export default Vue.extend({
                         )
                     );
 
+                    const sensorsByKey = _(meta.modules)
+                        .map((m) => m.sensors)
+                        .flatten()
+                        .keyBy((s) => s.fullKey)
+                        .value();
+
                     const idsToKey = _.mapValues(
                         _.keyBy(meta.sensors, (k) => k.id),
                         (v) => v.key
@@ -126,7 +236,7 @@ export default Vue.extend({
 
                     const idsToValue = _.mapValues(
                         _.keyBy(data.data, (r) => r.sensorId),
-                        (r) => r.value
+                        (r) => r
                     );
 
                     const keysToValue = _(idsToValue)
@@ -134,23 +244,19 @@ export default Vue.extend({
                         .fromPairs()
                         .value();
 
-                    const sensorsByKey = _(meta.modules)
-                        .map((m) => m.sensors)
-                        .flatten()
-                        .keyBy((s) => s.fullKey)
-                        .value();
-
                     const readings = _(keysToValue)
-                        .map((value, key) => {
+                        .map((reading, key) => {
                             const sensor = sensorsByKey[key];
                             if (!sensor) throw new Error("no sensor meta");
+
+                            const value = reading.value || reading[sensor.aggregationFunction];
+
                             const classes = [key.replaceAll(".", "-")];
                             if (sensor.unitOfMeasure == "°") {
                                 classes.push("degrees");
                             }
                             const sensorModule = sensorsToModule[key];
                             if (!sensorModule) throw new Error("no sensor module");
-                            // console.log(`sensor:`, sensor);
 
                             return new SensorReading(
                                 key,
@@ -171,7 +277,6 @@ export default Vue.extend({
                     );
                 })
                 .then((sensors) => {
-                    // console.log(`sensors`, sensors);
                     if (this.moduleKey) {
                         this.sensors = sensors.filter((sensor) => sensor.sensorModule.key === this.moduleKey);
                     } else {
@@ -179,6 +284,7 @@ export default Vue.extend({
                     }
                     this.loading = false;
                     this.$emit("layoutChange");
+
                     return this.sensors;
                 });
         },

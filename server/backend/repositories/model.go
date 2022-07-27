@@ -37,16 +37,18 @@ type VizConfig struct {
 	Thresholds *VizThresholds `json:"thresholds"`
 }
 
+// TODO Fix JSON keys
 type SensorMeta struct {
-	Key           string                       `json:"key"`
-	FullKey       string                       `json:"full_key"`
-	FirmwareKey   string                       `json:"firmware_key"`
-	UnitOfMeasure string                       `json:"unit_of_measure"`
-	Order         int                          `json:"order"`
-	Ranges        []SensorRanges               `json:"ranges"`
-	Internal      bool                         `json:"internal"`
-	VizConfigs    []VizConfig                  `json:"viz"`
-	Strings       map[string]map[string]string `json:"strings"`
+	Key                 string                       `json:"key"`
+	FullKey             string                       `json:"full_key"`
+	FirmwareKey         string                       `json:"firmware_key"`
+	UnitOfMeasure       string                       `json:"unit_of_measure"`
+	Order               int                          `json:"order"`
+	Ranges              []SensorRanges               `json:"ranges"`
+	Internal            bool                         `json:"internal"`
+	VizConfigs          []VizConfig                  `json:"viz"`
+	Strings             map[string]map[string]string `json:"strings"`
+	AggregationFunction string                       `json:"aggregationFunction"`
 }
 
 type ModuleMeta struct {
@@ -204,16 +206,19 @@ type PersistedModuleMeta struct {
 	Version      pq.Int32Array `db:"version" json:"version"`
 	Internal     bool          `db:"internal" json:"internal"`
 }
+
+// TODO Fix JSON keys
 type PersistedSensorMeta struct {
-	ID            int32          `db:"id" json:"id"`
-	ModuleID      int32          `db:"module_id" json:"module_id"`
-	SensorKey     string         `db:"sensor_key" json:"sensor_key"`
-	FirmwareKey   string         `db:"firmware_key" json:"firmware_key"`
-	FullKey       string         `db:"full_key" json:"full_key"`
-	UnitOfMeasure string         `db:"uom" json:"uom"`
-	Ordering      int            `db:"ordering" json:"ordering"`
-	Internal      bool           `db:"internal" json:"internal"`
-	Strings       types.JSONText `db:"strings" json:"strings"`
-	Viz           types.JSONText `db:"viz" json:"viz"`
-	Ranges        types.JSONText `db:"ranges" json:"ranges"`
+	ID                  int32          `db:"id" json:"id"`
+	ModuleID            int32          `db:"module_id" json:"module_id"`
+	SensorKey           string         `db:"sensor_key" json:"sensor_key"`
+	FirmwareKey         string         `db:"firmware_key" json:"firmware_key"`
+	FullKey             string         `db:"full_key" json:"full_key"`
+	UnitOfMeasure       string         `db:"uom" json:"uom"`
+	Ordering            int            `db:"ordering" json:"ordering"`
+	Internal            bool           `db:"internal" json:"internal"`
+	Strings             types.JSONText `db:"strings" json:"strings"`
+	Viz                 types.JSONText `db:"viz" json:"viz"`
+	Ranges              types.JSONText `db:"ranges" json:"ranges"`
+	AggregationFunction *string        `db:"aggregation_function" json:"aggregationFunction"`
 }

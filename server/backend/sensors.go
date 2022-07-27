@@ -54,6 +54,19 @@ type QueryParams struct {
 	Backend    string            `json:"backend"`
 }
 
+func ParseStationIDs(raw *string) []int32 {
+	stations := make([]int32, 0)
+	if raw != nil {
+		parts := strings.Split(*raw, ",")
+		for _, p := range parts {
+			if i, err := strconv.Atoi(p); err == nil {
+				stations = append(stations, int32(i))
+			}
+		}
+	}
+	return stations
+}
+
 func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 	start := time.Time{}
 	if raw.Start != nil {
@@ -70,15 +83,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		resolution = *raw.Resolution
 	}
 
-	stations := make([]int32, 0)
-	if raw.Stations != nil {
-		parts := strings.Split(*raw.Stations, ",")
-		for _, p := range parts {
-			if i, err := strconv.Atoi(p); err == nil {
-				stations = append(stations, int32(i))
-			}
-		}
-	}
+	stations := ParseStationIDs(raw.Stations)
 
 	if len(stations) == 0 {
 		return nil, errors.New("stations is required")
@@ -262,6 +267,7 @@ func (dq *DataQuerier) QueryMeta(ctx context.Context, qp *QueryParams) (qm *Quer
 }
 
 type QueriedModuleID struct {
+	StationID  int32  `db:"station_id"`
 	ModuleID   int64  `db:"module_id"`
 	HardwareID []byte `db:"hardware_id"`
 }
@@ -270,6 +276,48 @@ type SensorDatabaseIDs struct {
 	ModuleIDs       []int64
 	SensorIDs       []int64
 	KeyToHardwareID map[int64]string
+}
+
+func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*SensorDatabaseIDs, error) {
+	sensorIDs := make([]int64, 0)
+	moduleIDs := make([]int64, 0)
+
+	if len(stationIDs) == 0 {
+		return &SensorDatabaseIDs{
+			ModuleIDs:       moduleIDs,
+			SensorIDs:       sensorIDs,
+			KeyToHardwareID: make(map[int64]string),
+		}, nil
+	}
+
+	query, args, err := sqlx.In(`
+		SELECT s.id AS station_id, m.id AS module_id, m.hardware_id
+		FROM fieldkit.station AS s
+		RIGHT JOIN fieldkit.provision AS p ON (s.device_id = p.device_id)
+		RIGHT JOIN fieldkit.station_configuration AS c ON (c.provision_id = p.id)
+		RIGHT JOIN fieldkit.station_module AS m ON (c.id = m.configuration_id)
+		WHERE s.id IN (?)
+	`, stationIDs)
+	if err != nil {
+		return nil, fmt.Errorf("(station-ids) %v", err)
+	}
+
+	rows := []*QueriedModuleID{}
+	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
+		return nil, fmt.Errorf("(station-ids) %v", err)
+	}
+
+	keyToHardwareID := make(map[int64]string)
+
+	for _, row := range rows {
+		keyToHardwareID[row.ModuleID] = base64.StdEncoding.EncodeToString(row.HardwareID)
+	}
+
+	return &SensorDatabaseIDs{
+		ModuleIDs:       moduleIDs,
+		SensorIDs:       make([]int64, 0),
+		KeyToHardwareID: keyToHardwareID,
+	}, nil
 }
 
 func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*SensorDatabaseIDs, error) {
@@ -296,14 +344,21 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		}, nil
 	}
 
-	query, args, err := sqlx.In(`SELECT id AS module_id, hardware_id FROM fieldkit.station_module WHERE hardware_id IN (?)`, moduleHardwareIDs)
+	query, args, err := sqlx.In(`
+		SELECT s.id AS station_id, m.id AS module_id, m.hardware_id
+		FROM fieldkit.station_module AS m
+		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = m.configuration_id)
+		LEFT JOIN fieldkit.provision AS p ON (c.provision_id = p.id)
+		LEFT JOIN fieldkit.station AS s ON (p.device_id = s.device_id)
+		WHERE m.hardware_id IN (?)
+	`, moduleHardwareIDs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(get-ids) %v", err)
 	}
 
 	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("(get-ids) %v", err)
 	}
 
 	log := Logger(ctx).Sugar()
@@ -342,10 +397,13 @@ type DataRow struct {
 	TimeGroup *int32 `db:"time_group" json:"-"`
 
 	// TSDB
-	AverageValue *float64 `json:"avg,omitempty"`
-	MinimumValue *float64 `json:"min,omitempty"`
-	MaximumValue *float64 `json:"max,omitempty"`
-	LastValue    *float64 `json:"last,omitempty"`
+	BucketSamples *int32     `json:"-",omitempty`
+	DataStart     *time.Time `json:"-",omitempty`
+	DataEnd       *time.Time `json:"-",omitempty`
+	AverageValue  *float64   `json:"avg,omitempty"`
+	MinimumValue  *float64   `json:"min,omitempty"`
+	MaximumValue  *float64   `json:"max,omitempty"`
+	LastValue     *float64   `json:"-",omitempty`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {

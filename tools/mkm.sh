@@ -12,4 +12,4 @@ if [ -z $NAME ]; then
     exit 2
 fi
 
-migrate create -ext sql -dir migrations $1
+migrate create -ext sql -dir migrations/primary $1

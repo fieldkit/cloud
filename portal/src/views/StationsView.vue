@@ -2,14 +2,17 @@
     <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="layoutChanges++">
         <template v-if="viewType === 'list'">
             <div class="stations-list" v-if="stations && stations.length > 0">
-                <StationHoverSummary
-                    v-for="station in stations"
-                    v-bind:key="station.id"
-                    class="summary-container"
-                    @close="closeSummary"
-                    :station="station"
-                    :sensorDataQuerier="sensorDataQuerier"
-                />
+                <div v-for="station in stations" v-bind:key="station.id">
+                    <StationHoverSummary
+                        class="summary-container"
+                        @close="closeSummary"
+                        :station="station"
+                        :sensorDataQuerier="sensorDataQuerier"
+                        v-slot="{ sensorDataQuerier, station }"
+                    >
+                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
+                    </StationHoverSummary>
+                </div>
             </div>
         </template>
 
@@ -58,16 +61,18 @@
 </template>
 
 <script lang="ts">
+import { mapState, mapGetters } from "vuex";
+import * as ActionTypes from "@/store/actions";
+import { GlobalState } from "@/store/modules/global";
+import { DisplayStation, MappedStations } from "@/store";
+import { getFeaturesEnabled } from "@/utilities";
+
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
-
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
-import { GlobalState } from "@/store/modules/global";
-import { DisplayStation, MappedStations } from "@/store";
+import TinyChart from "@/views/viz/TinyChart.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -75,6 +80,7 @@ export default Vue.extend({
         StandardLayout,
         StationsMap,
         StationHoverSummary,
+        TinyChart,
     },
     props: {
         id: {
@@ -109,6 +115,9 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
+        tinyChartsEnabled(): boolean {
+            return getFeaturesEnabled().tinyCharts;
+        },
         activeStation(): DisplayStation {
             return this.$state.stations.stations[this.id];
         },

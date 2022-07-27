@@ -24,13 +24,14 @@ import {
 import FKApi, { Station, AssociatedStation, AssociatedStationsResponse } from "@/api/api";
 import i18n from "@/i18n";
 
-export * from "./common";
 import Config from "@/secrets";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation, stations } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
+
+export * from "./common";
 
 type SensorReadAtType = string;
 
@@ -60,7 +61,8 @@ export class StationMeta {
         public readonly id: number,
         public readonly name: string,
         public readonly location: [number, number],
-        public readonly sensors: SensorMeta[]
+        public readonly sensors: SensorMeta[],
+        public readonly hidden: boolean
     ) {
         if (!this.id) throw new Error("id is required");
         if (!this.name) throw new Error("name is required");
@@ -645,7 +647,7 @@ class MetaQuerier {
         const queryParams = new URLSearchParams();
         queryParams.append("stations", stationIds.join(","));
 
-        const stationSensors = await this.api.sensorData(queryParams);
+        const stationSensors = await this.api.stationMeta(queryParams);
         const associated = await this.api.getAssociatedStations(stationIds[0]);
 
         console.log("viz: meta", { stationSensors, associated });
@@ -755,12 +757,13 @@ export class Workspace implements VizInfoFactory {
 
         // TODO Map and assign.
         const test = _.map(meta.stationSensors.stations, (info, stationId) => {
+            const associated = meta.associated.stations.find((s) => s.station.id == Number(stationId));
             const stationName = info[0].stationName;
             const stationLocation = info[0].stationLocation;
             const sensors = info
                 .filter((row) => row.moduleId != null)
                 .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
-            const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors);
+            const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors, !associated || associated.hidden);
             this.stations[station.id] = station;
             return station;
         });

@@ -23,7 +23,8 @@ type Influx struct {
 func ToPoint(r *MovedReading) *write.Point {
 	tags := make(map[string]string)
 	tags["device_id"] = hex.EncodeToString(r.DeviceID)
-	tags["module_id"] = hex.EncodeToString(r.ModuleID)
+	tags["module_hardware_id"] = hex.EncodeToString(r.ModuleHardwareID)
+	tags["module_id"] = fmt.Sprintf("%v", r.ModuleID)
 	tags["station_id"] = fmt.Sprintf("%v", r.StationID)
 	tags["sensor_id"] = fmt.Sprintf("%v", r.SensorID)
 	tags["sensor_key"] = r.SensorKey

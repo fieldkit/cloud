@@ -1,5 +1,17 @@
 import _ from "lodash";
 
+interface FeatureFlags {
+    tsdb: boolean;
+    tinyCharts: boolean;
+}
+
+export function getFeaturesEnabled(): FeatureFlags {
+    return {
+        tsdb: window.localStorage["fk:backend"] === "tsdb",
+        tinyCharts: window.localStorage["fk:tiny-charts"] === "true",
+    };
+}
+
 export function serializePromiseChain(all, fn) {
     return all.reduce((accum, value, index) => {
         return accum.then((allValues) => {

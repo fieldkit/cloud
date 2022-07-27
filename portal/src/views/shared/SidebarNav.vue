@@ -56,11 +56,13 @@
             </router-link>
         </div>
 
-        <template v-if="isPartnerCustomisationEnabled() && !sidebar.narrow">
+        <template v-if="isPartnerCustomisationEnabled()">
             <div class="app-logo">
-                <span>Made by</span>
+                <span>{{ $t("layout.side.madeBy") }}</span>
                 <br />
-                <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+                <a href="https://www.fieldkit.org" target="_blank">
+                    <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+                </a>
             </div>
         </template>
     </div>
@@ -380,15 +382,17 @@ export default Vue.extend({
 }
 
 .app-logo {
-    font-size: 16px;
-    text-align: left;
-    margin: auto 0 15px 45px;
+    font-size: 11px;
     padding-top: 10px;
+    position: fixed;
+    bottom: 8px;
+    left: 6px;
+    text-align: left;
 
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
-        font-size: 12px;
+        font-size: 10px;
         min-width: 50px;
     }
 

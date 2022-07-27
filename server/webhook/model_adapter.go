@@ -98,7 +98,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	if updating == nil {
 		deviceName := string(pm.DeviceID)
 
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			deviceName = *pm.DeviceName
 		}
 
@@ -127,7 +127,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		station = added
 	} else {
 		station.ModelID = model.ID
-		if pm.DeviceName != nil {
+		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			station.Name = *pm.DeviceName
 		}
 	}
@@ -193,20 +193,20 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		if pm.ReceivedAt != nil {
-			for index, sensorSchema := range moduleSchema.Sensors {
-				// Transient sensors aren't saved.
-				if !sensorSchema.Transient {
-					// Add or create the sensor..
-					sensor := &data.ModuleSensor{
-						ConfigurationID: configuration.ID,
-						ModuleID:        module.ID,
-						Index:           uint32(index),
-						Name:            sensorSchema.Key,
-						ReadingValue:    nil,
-						ReadingTime:     nil,
-					}
+		for index, sensorSchema := range moduleSchema.Sensors {
+			// Transient sensors aren't saved.
+			if !sensorSchema.Transient {
+				// Add or create the sensor..
+				sensor := &data.ModuleSensor{
+					ConfigurationID: configuration.ID,
+					ModuleID:        module.ID,
+					Index:           uint32(index),
+					Name:            sensorSchema.Key,
+					ReadingValue:    nil,
+					ReadingTime:     nil,
+				}
 
+				if pm.ReceivedAt != nil {
 					for _, pr := range pm.Data {
 						if pr.Key == sensorSchema.Key {
 							sensor.ReadingValue = &pr.Value
@@ -214,17 +214,17 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 							break
 						}
 					}
-
-					if sensorSchema.UnitOfMeasure != nil {
-						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-					}
-
-					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-						return nil, err
-					}
-
-					sensors = append(sensors, sensor)
 				}
+
+				if sensorSchema.UnitOfMeasure != nil {
+					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+				}
+
+				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+					return nil, err
+				}
+
+				sensors = append(sensors, sensor)
 			}
 		}
 
@@ -269,14 +269,15 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 		station.Station.Name = *pm.DeviceName
 	}
 
-	if station.LastReadingTime != nil {
-		station.Station.IngestionAt = station.LastReadingTime
-		station.Station.UpdatedAt = *station.LastReadingTime
-	}
-
 	if pm.ReceivedAt != nil {
-		for _, moduleSensor := range station.Sensors {
-			for _, pr := range pm.Data {
+		hasNonTransients := false
+
+		for _, pr := range pm.Data {
+			if !pr.Transient {
+				hasNonTransients = true
+			}
+
+			for _, moduleSensor := range station.Sensors {
 				if pr.Key == moduleSensor.Name {
 					moduleSensor.ReadingValue = &pr.Value
 					moduleSensor.ReadingTime = pm.ReceivedAt
@@ -284,9 +285,17 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 				}
 			}
 		}
-		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
-			station.LastReadingTime = pm.ReceivedAt
+
+		if hasNonTransients {
+			if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
+				station.LastReadingTime = pm.ReceivedAt
+			}
 		}
+	}
+
+	if station.LastReadingTime != nil {
+		station.Station.IngestionAt = station.LastReadingTime
+		station.Station.UpdatedAt = *station.LastReadingTime
 	}
 
 	if pm.Attributes != nil {
@@ -309,6 +318,15 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 							}
 						}
 					}
+				}
+			} else if parsed.Hidden {
+				if boolValue, ok := parsed.JSONValue.(bool); ok {
+					station.Station.Hidden = &boolValue
+				}
+			} else if parsed.Status {
+				if stringValue, ok := parsed.JSONValue.(string); ok {
+					statusValue := strings.ToLower(stringValue)
+					station.Station.Status = &statusValue
 				}
 			} else {
 				if attribute := station.FindAttribute(name); attribute != nil {
@@ -354,6 +372,17 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 
 			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
 				return err
+			}
+		}
+
+		// This will at least cover changing associated stations for a station.
+		// We need to verify how partners intend to unassociate stations w/o
+		// replacing them, though. Will the key be present, but empty? If it's
+		// missing how can we differentiate between messages that are intending
+		// to update that and those that aren't? TODO
+		if len(cacheEntry.station.Associated) > 0 {
+			if err := m.sr.ClearAssociatedStations(ctx, station.ID); err != nil {
+				return fmt.Errorf("clear associated stations: %v", err)
 			}
 		}
 

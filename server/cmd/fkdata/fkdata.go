@@ -29,6 +29,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 const SecondsPerWeek = int64(60 * 60 * 24 * 7)
@@ -43,12 +44,24 @@ type Options struct {
 }
 
 type Config struct {
-	PostgresURL    string   `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	AwsProfile     string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	AwsId          string   `split_words:"true" default:""`
-	AwsSecret      string   `split_words:"true" default:""`
+	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
+	TimeScaleURL string `split_words:"true"`
+
+	AwsProfile string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	AwsId      string `split_words:"true" default:""`
+	AwsSecret  string `split_words:"true" default:""`
+
 	MediaBuckets   []string `split_words:"true" default:""`
 	StreamsBuckets []string `split_words:"true" default:""`
+}
+
+func (c *Config) timeScaleConfig() *storage.TimeScaleDBConfig {
+	if c.TimeScaleURL != "" {
+		return &storage.TimeScaleDBConfig{
+			Url: c.TimeScaleURL,
+		}
+	}
+	return nil
 }
 
 func fail(ctx context.Context, err error) {
@@ -112,6 +125,8 @@ func main() {
 
 	log := logging.Logger(ctx).Sugar()
 
+	tsConfig := config.timeScaleConfig()
+
 	var errors *multierror.Error
 
 	if options.Ingestion {
@@ -161,7 +176,7 @@ func main() {
 		qc := que.NewClient(pgxpool)
 		publisher := jobs.NewQueMessagePublisher(metrics, qc)
 
-		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher)
+		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, tsConfig)
 
 		process := func(ctx context.Context, id int32) error {
 			return isHandler.Handle(ctx, &messages.IngestStation{
@@ -206,7 +221,7 @@ func main() {
 			} else {
 				for _, id := range ids {
 					log.Infow("station", "station_id", id.ID)
-					if err := processStation(ctx, db, int32(id.ID), options.Recently); err != nil {
+					if err := processStation(ctx, db, tsConfig, int32(id.ID), options.Recently); err != nil {
 						errors = multierror.Append(errors, err)
 					}
 				}
@@ -218,7 +233,7 @@ func main() {
 						errors = multierror.Append(errors, err)
 					}
 				} else {
-					if err := processStation(ctx, db, int32(options.StationID), options.Recently); err != nil {
+					if err := processStation(ctx, db, tsConfig, int32(options.StationID), options.Recently); err != nil {
 						errors = multierror.Append(errors, err)
 					}
 				}
@@ -231,18 +246,18 @@ func main() {
 	}
 }
 
-func processStation(ctx context.Context, db *sqlxcache.DB, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db, "")
+func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, stationID int32, recently bool) error {
+	sr, err := backend.NewStationRefresher(db, tsConfig, "")
 	if err != nil {
 		return err
 	}
 
 	if recently {
-		if err := sr.Refresh(ctx, stationID, time.Hour*48, false); err != nil {
+		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
 			return fmt.Errorf("recently refresh failed: %v", err)
 		}
 	} else {
-		if err := sr.Refresh(ctx, stationID, 0, true); err != nil {
+		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
 			return fmt.Errorf("complete refresh failed: %v", err)
 		}
 	}

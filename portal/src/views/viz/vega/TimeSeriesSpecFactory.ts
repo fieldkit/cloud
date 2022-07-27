@@ -197,30 +197,49 @@ export class TimeSeriesSpecFactory {
 
         // Are the sensors being charted the same? If they are then we should
         // use the same axis domain for both, and pick one that covers both.
+        const uniqueSensorKeys = _.uniq(this.allSeries.map((series) => series.vizInfo.key));
+        const sameSensors = uniqueSensorKeys.length == 1 && this.allSeries.length > 1;
         const uniqueSensorUnits = _.uniq(this.allSeries.map((series) => series.vizInfo.unitOfMeasure));
-        const sameSensors = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
+        const sameSensorUnits = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
         const makeDomainY = _.memoize((i: number, series) => {
-            if (sameSensors) {
+            if (sameSensorUnits) {
                 console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        const timeRangeAll = [_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))];
+        const xDomainsAll: number[][] = this.allSeries
+            .filter((series: SeriesData) => series.queried.data.length > 0)
+            .map((series: SeriesData) => series.queried.timeRange);
+        const timeRangeAll =
+            xDomainsAll.length == 0
+                ? null
+                : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
-        // console.log("viz: time-domain", xDomainsAll, timeRangeAll);
+        if (timeRangeAll) {
+            console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+        }
 
-        const makeDomainX = () => {
+        const getBarUnits = (timeRange: number[] | null) => {
+            if (timeRange) {
+                const duration = timeRange[1] - timeRange[0];
+                if (duration < 60000) {
+                    return ["year", "month", "date", "hours", "minutes", "seconds"];
+                }
+            }
+            return ["year", "month", "date", "hours", "minutes"];
+        };
+
+        const makeDomainX = (): number[] | null => {
             // I can't think of a good reason to just always specify this.
             return timeRangeAll;
         };
 
-        const xDomain = makeDomainX();
+        const xDomain: number[] | null = makeDomainX();
 
         const data = [
             {
@@ -275,7 +294,7 @@ export class TimeSeriesSpecFactory {
                                     {
                                         field: "time",
                                         type: "timeunit",
-                                        units: ["year", "month", "date", "hours"],
+                                        units: getBarUnits(timeRangeAll),
                                         as: ["barStartDate", "barEndDate"],
                                     },
                                     {
@@ -307,24 +326,31 @@ export class TimeSeriesSpecFactory {
                     })
                 )
             )
-            .concat([
-                {
-                    name: "all_layouts",
-                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
-                    transform: [
-                        {
-                            type: "voronoi",
-                            x: "layout_x",
-                            y: "layout_y",
-                            size: [{ signal: "width" }, { signal: "height" }],
-                            as: "layout_path",
-                        },
-                    ],
-                },
-            ] as any[]);
+            .concat(
+                this.settings.tiny
+                    ? []
+                    : ([
+                          {
+                              name: "all_layouts",
+                              source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
+                              transform: [
+                                  {
+                                      type: "voronoi",
+                                      x: "layout_x",
+                                      y: "layout_y",
+                                      size: [{ signal: "width" }, { signal: "height" }],
+                                      as: "layout_path",
+                                  },
+                              ],
+                          },
+                      ] as any[])
+            );
 
         const legends = _.flatten(
             mapSeries((series, i) => {
+                if (this.settings.tiny) {
+                    return [];
+                }
                 if (sameSensors && i > 0) {
                     return [];
                 }
@@ -343,36 +369,83 @@ export class TimeSeriesSpecFactory {
             })
         );
 
-        const axes = [
-            {
-                orient: "bottom",
-                scale: "x",
-                domain: xDomain,
-                tickCount: 6,
-                labelPadding: -24,
-                tickSize: 30,
-                tickDash: [2, 2],
-                title: "Time",
-                format: {
-                    year: "%m/%d/%Y",
-                    quarter: "%m/%d/%Y",
-                    month: "%m/%d/%Y",
-                    week: "%m/%d/%Y",
-                    date: "%m/%d/%Y",
-                    hours: "%m/%d/%Y %H:%M",
-                    minutes: "%m/%d/%Y %H:%M",
-                    seconds: "%m/%d/%Y %H:%M",
-                    milliseconds: "%m/%d/%Y %H:%M",
+        const tinyXAxis = () => {
+            const formatMonth = (v: number): string => {
+                return new Date(v).toLocaleDateString();
+            };
+
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain || [0, 1],
+                    tickCount: 0,
+                    // values: xDomain,
+                    titleFontSize: 12,
+                    titlePadding: 4,
+                    titleFontWeight: "normal",
+                    labelPadding: 5,
+                    title: xDomain?.map((v) => formatMonth(v)).join(" - ") || "",
+                    format: "%m/%d/%Y",
                 },
-            },
-        ].concat(
-            _.flatten(
+            ];
+        };
+
+        const optionalXAxis = () => {
+            if (!xDomain) {
+                return [];
+            }
+
+            return [
+                {
+                    orient: "bottom",
+                    scale: "x",
+                    domain: xDomain,
+                    tickCount: 6,
+                    labelPadding: -24,
+                    tickSize: 30,
+                    tickDash: [2, 2],
+                    title: "Time",
+                    format: {
+                        year: "%m/%d/%Y",
+                        quarter: "%m/%d/%Y",
+                        month: "%m/%d/%Y",
+                        week: "%m/%d/%Y",
+                        date: "%m/%d/%Y",
+                        hours: "%m/%d/%Y %H:%M",
+                        minutes: "%m/%d/%Y %H:%M",
+                        seconds: "%m/%d/%Y %H:%M",
+                        milliseconds: "%m/%d/%Y %H:%M",
+                    },
+                },
+            ];
+        };
+
+        const axes = [
+            ...(this.settings.tiny ? tinyXAxis() : optionalXAxis()),
+            ..._.flatten(
                 mapSeries((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
                     const hoverCheck = ifHovering(i, 1, 0.2);
                     const hoverCheckGrid = ifHovering(i, 0.5, 0.2);
                     const makeOrientation = (i: number) => (i == 0 ? "left" : "right");
                     const makeAxisScale = (i: number) => (i == 0 ? "y" : "y2");
+
+                    if (this.settings.tiny) {
+                        return {
+                            title: series.vizInfo.axisLabel,
+                            orient: makeOrientation(i),
+                            scale: makeAxisScale(i),
+                            domain: makeDomainY(i, series),
+                            titleFontSize: 10,
+                            gridDash: [],
+                            tickCount: 5,
+                            domainOpacity: 0,
+                            titlePadding: 10,
+                            titleOpacity: 1,
+                            gridOpacity: 0,
+                        };
+                    }
 
                     return {
                         title: series.vizInfo.axisLabel,
@@ -394,8 +467,8 @@ export class TimeSeriesSpecFactory {
                         },
                     };
                 })
-            )
-        );
+            ),
+        ];
 
         const scales = _.flatten(
             mapSeries((series, i) => {
@@ -757,7 +830,7 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: i === 0 ? "primaryLine" : "secondaryLine",
+                        style: this.settings.tiny ? "tinyLine" : i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
@@ -785,15 +858,14 @@ export class TimeSeriesSpecFactory {
                 }
             }).reverse()
         );
-        
+
         // define mark stacking priority
-        const getMarkSortIndex = (d) =>  {
-            if(d['marks']) {
-                if (d['marks'][0].type === "line") return 1;
-                if (d['marks'][0].type === "rect") return 2;
+        const getMarkSortIndex = (d) => {
+            if (d["marks"]) {
+                if (d["marks"][0].type === "line") return 1;
+                if (d["marks"][0].type === "rect") return 2;
                 else return 0;
-            }
-            else return 0;
+            } else return 0;
         };
 
         // TODO Unique by thresholds and perhaps y value?
@@ -802,7 +874,7 @@ export class TimeSeriesSpecFactory {
                 const domain = makeSeriesDomain(series, i);
                 const scales = makeScales(i);
                 const thresholds = getSeriesThresholds(series);
-                if (thresholds) {
+                if (thresholds && timeRangeAll) {
                     return thresholds.levels
                         .filter((level) => level.label != null && !level.hidden)
                         .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
@@ -847,6 +919,10 @@ export class TimeSeriesSpecFactory {
         );
 
         const cellMarks = () => {
+            if (this.settings.tiny) {
+                return [];
+            }
+
             return [
                 {
                     name: "cell",
@@ -874,13 +950,20 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
+        /*
         console.log(seriesMarks.sort((a,b) => {
             return getMarkSortIndex(a) - getMarkSortIndex(b);
         }))
+        */
 
-        const marks = [...cellMarks(), ...brushMarks, ...ruleMarks, ...seriesMarks.sort((a,b) => {
-            return getMarkSortIndex(b) - getMarkSortIndex(a);
-        })];
+        const marks = [
+            ...cellMarks(),
+            ...brushMarks,
+            ...ruleMarks,
+            ...seriesMarks.sort((a, b) => {
+                return getMarkSortIndex(b) - getMarkSortIndex(a);
+            }),
+        ];
 
         const interactiveSignals = [
             {
@@ -1142,7 +1225,31 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const allSignals = this.settings.w == 0 ? interactiveSignals : staticSignals;
+        const tinySignals = [
+            {
+                name: "width",
+                init: "containerSize()[0]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[0]",
+                    },
+                ],
+            },
+            {
+                name: "height",
+                init: "containerSize()[1]",
+                on: [
+                    {
+                        events: "window:resize",
+                        update: "containerSize()[1]",
+                    },
+                ],
+            },
+            ...staticSignals,
+        ];
+
+        const allSignals = this.settings.tiny ? tinySignals : this.settings.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],

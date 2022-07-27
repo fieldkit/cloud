@@ -38,12 +38,16 @@ type ModuleMetaRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewModuleMetaRepository(db *sqlxcache.DB) *ModuleMetaRepository {
-	return &ModuleMetaRepository{db: db}
+type AllModuleMeta struct {
+	all []*ModuleMeta
 }
 
-func FindSensorByFullKey(all []*ModuleMeta, fullKey string) *SensorAndModuleMeta {
-	for _, module := range all {
+func (moduleMeta *AllModuleMeta) All() []*ModuleMeta {
+	return moduleMeta.all
+}
+
+func (moduleMeta *AllModuleMeta) FindSensorByFullKey(fullKey string) *SensorAndModuleMeta {
+	for _, module := range moduleMeta.all {
 		for _, sensor := range module.Sensors {
 			if sensor.FullKey == fullKey {
 				return &SensorAndModuleMeta{
@@ -57,45 +61,21 @@ func FindSensorByFullKey(all []*ModuleMeta, fullKey string) *SensorAndModuleMeta
 	return nil
 }
 
-func (r *ModuleMetaRepository) FindByFullKey(ctx context.Context, fullKey string) (mm *SensorAndModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	mm = FindSensorByFullKey(all, fullKey)
-	if mm != nil {
-		return mm, nil
-	}
-
-	return nil, fmt.Errorf("(module-meta) unknown sensor: %s", fullKey)
-}
-
-func (r *ModuleMetaRepository) FindModuleMeta(ctx context.Context, m *HeaderFields) (mm *ModuleMeta, err error) {
-	all, err := r.FindAllModulesMeta(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, module := range all {
+func (moduleMeta *AllModuleMeta) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
+	for _, module := range moduleMeta.all {
 		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
 			return module, nil
 		}
 	}
 
-	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
-	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
+	return nil, nil
 }
 
-func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
-	all, err := r.FindAllModulesMeta(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-
+func (moduleMeta *AllModuleMeta) FindSensorMeta(m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
 	// Very old firmware keys. We should sanitize these earlier in the process.
 	weNeedToCleanThisUp := strings.ReplaceAll(strings.ReplaceAll(sensor, " ", "_"), "-", "_")
 
-	for _, module := range all {
+	for _, module := range moduleMeta.all {
 		sameKind := module.Header.Kind == m.Kind
 		if !sameKind {
 			for _, k := range module.Header.AllKinds {
@@ -118,26 +98,67 @@ func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFiel
 		}
 	}
 
+	return nil, nil, nil
+}
+
+func NewModuleMetaRepository(db *sqlxcache.DB) *ModuleMetaRepository {
+	return &ModuleMetaRepository{db: db}
+}
+
+func (r *ModuleMetaRepository) FindByFullKey(ctx context.Context, fullKey string) (mm *SensorAndModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	mm = all.FindSensorByFullKey(fullKey)
+	if mm != nil {
+		return mm, nil
+	}
+
+	return nil, fmt.Errorf("(module-meta) unknown sensor: %s", fullKey)
+}
+
+func (r *ModuleMetaRepository) FindModuleMeta(ctx context.Context, m *HeaderFields) (mm *ModuleMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if mm, err := all.FindModuleMeta(m); err != nil {
+		return nil, err
+	} else if mm != nil {
+		return mm, nil
+	}
+
+	message := fmt.Sprintf("missing sensor meta (%v, %v)", m.Manufacturer, m.Kind)
+	return nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind)
+}
+
+func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFields, sensor string) (mm *ModuleMeta, sm *SensorMeta, err error) {
+	all, err := r.FindAllModulesMeta(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if mm, sm, err := all.FindSensorMeta(m, sensor); err != nil {
+		return nil, nil, err
+	} else if mm != nil && sm != nil {
+		return mm, sm, nil
+	}
+
 	message := fmt.Sprintf("missing sensor meta (manuf=%v, kind=%v, sensor=%v)", m.Manufacturer, m.Kind, sensor)
 	return nil, nil, errors.Structured(message, "manufacturer", m.Manufacturer, "kind", m.Kind, "sensor", sensor)
 }
 
-func toUint32Array(a []int32) []uint32 {
-	u := make([]uint32, len(a))
-	for i, _ := range a {
-		u[i] = uint32(a[i])
-	}
-	return u
-}
-
-func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*ModuleMeta, err error) {
+func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllModuleMeta, err error) {
 	modules := []*PersistedModuleMeta{}
-	if err := r.db.SelectContext(ctx, &modules, `SELECT * FROM fieldkit.module_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &modules, `SELECT id, key, manufacturer, kinds, version, internal FROM fieldkit.module_meta`); err != nil {
 		return nil, err
 	}
 
 	sensors := []*PersistedSensorMeta{}
-	if err := r.db.SelectContext(ctx, &sensors, `SELECT * FROM fieldkit.sensor_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aggregation_function FROM fieldkit.sensor_meta`); err != nil {
 		return nil, err
 	}
 
@@ -176,21 +197,35 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm []*Mo
 				return nil, err
 			}
 
+			function := "avg"
+			if psm.AggregationFunction != nil {
+				function = *psm.AggregationFunction
+			}
+
 			mm.Sensors = append(mm.Sensors, &SensorMeta{
-				Key:           psm.SensorKey,
-				FullKey:       psm.FullKey,
-				FirmwareKey:   psm.FirmwareKey,
-				UnitOfMeasure: psm.UnitOfMeasure,
-				Internal:      psm.Internal,
-				Order:         psm.Ordering,
-				Ranges:        ranges,
-				Strings:       strings,
-				VizConfigs:    viz,
+				Key:                 psm.SensorKey,
+				FullKey:             psm.FullKey,
+				FirmwareKey:         psm.FirmwareKey,
+				UnitOfMeasure:       psm.UnitOfMeasure,
+				Internal:            psm.Internal,
+				Order:               psm.Ordering,
+				Ranges:              ranges,
+				Strings:             strings,
+				VizConfigs:          viz,
+				AggregationFunction: function,
 			})
 		}
 
 		fromDb = append(fromDb, mm)
 	}
 
-	return fromDb, nil
+	return &AllModuleMeta{all: fromDb}, nil
+}
+
+func toUint32Array(a []int32) []uint32 {
+	u := make([]uint32, len(a))
+	for i, _ := range a {
+		u[i] = uint32(a[i])
+	}
+	return u
 }

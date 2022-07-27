@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/storage"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -12,17 +13,19 @@ import (
 
 type StationRefresher struct {
 	db          *sqlxcache.DB
+	tsConfig    *storage.TimeScaleDBConfig
 	tableSuffix string
 }
 
-func NewStationRefresher(db *sqlxcache.DB, tableSuffix string) (sr *StationRefresher, err error) {
+func NewStationRefresher(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, tableSuffix string) (sr *StationRefresher, err error) {
 	return &StationRefresher{
 		db:          db,
+		tsConfig:    tsConfig,
 		tableSuffix: tableSuffix,
 	}, nil
 }
 
-func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration, completely bool) error {
+func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRecently time.Duration, completely, skipManual bool) error {
 	start := time.Time{}
 	if !completely {
 		if howRecently == 0 {
@@ -38,7 +41,7 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 		StationIDs: []int32{stationID},
 	}
 
-	if err := sr.walk(ctx, walkParams, completely); err != nil {
+	if err := sr.walk(ctx, walkParams, completely, skipManual); err != nil {
 		return err
 	}
 
@@ -51,9 +54,9 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 	return nil
 }
 
-func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely bool) error {
+func (sr *StationRefresher) walk(ctx context.Context, walkParams *WalkParameters, completely, skipManual bool) error {
 	rw := NewRecordWalker(sr.db)
-	handler := handlers.NewAggregatingHandler(sr.db, sr.tableSuffix, completely)
+	handler := handlers.NewAggregatingHandler(sr.db, sr.tsConfig, sr.tableSuffix, completely, skipManual)
 	if err := rw.WalkStation(ctx, handler, WalkerProgressNoop, walkParams); err != nil {
 		return err
 	}
