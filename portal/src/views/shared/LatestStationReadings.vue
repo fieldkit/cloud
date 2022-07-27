@@ -17,7 +17,7 @@
 <script lang="ts">
 import _ from "lodash";
 import Config from "@/secrets";
-import { promiseAfter } from "@/utilities";
+import { getFeaturesEnabled, promiseAfter } from "@/utilities";
 
 import Vue, { PropType } from "vue";
 
@@ -107,10 +107,7 @@ export class SensorDataQuerier {
     }
 
     private getBackend(): string | null {
-        if (Config.backend) {
-            return Config.backend;
-        }
-        return window.localStorage["fk:backend"] || null;
+        return window.localStorage["fk:backend"] || "tsdb";
     }
 
     private _queue: Promise<[Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>]> | null = null;

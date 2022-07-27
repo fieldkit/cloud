@@ -13,7 +13,7 @@
                             :exploreContext="exploreContext"
                             v-slot="{ sensorDataQuerier }"
                         >
-                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
+                            <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
                         </StationHoverSummary>
                     </div>
                 </div>
@@ -58,12 +58,7 @@
                     v-bind:key="activeStation.id"
                     v-slot="{ sensorDataQuerier }"
                 >
-                    <TinyChart
-                        :station-id="activeStation.id"
-                        :station="activeStation"
-                        :querier="sensorDataQuerier"
-                        v-if="tinyChartsEnabled"
-                    />
+                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
                 </StationHoverSummary>
             </template>
         </div>
@@ -146,9 +141,6 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.id];
             },
         }),
-        tinyChartsEnabled(): boolean {
-            return getFeaturesEnabled().tinyCharts;
-        },
         project(): Project {
             return this.displayProject.project;
         },

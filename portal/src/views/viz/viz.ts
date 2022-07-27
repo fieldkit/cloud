@@ -40,10 +40,7 @@ function getString(d) {
 }
 
 function getBackend(): string | null {
-    if (Config.backend) {
-        return Config.backend;
-    }
-    return window.localStorage["fk:backend"] || null;
+    return window.localStorage["fk:backend"] || "tsdb";
 }
 
 export class SensorMeta {
