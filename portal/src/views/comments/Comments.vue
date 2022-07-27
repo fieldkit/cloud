@@ -2,7 +2,14 @@
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
         <header v-if="viewType === 'project'">Notes & Comments</header>
 
-        <SectionToggle class="comment-toggle" leftLabel="Comment" rightLabel="Log an Event" @toggle="onSectionToggle" :default="logMode === 'comment' ? 'left' : 'right'" v-if="viewType === 'data'">
+        <SectionToggle
+            class="comment-toggle"
+            leftLabel="Comment"
+            rightLabel="Log an Event"
+            @toggle="onSectionToggle"
+            :default="logMode === 'comment' ? 'left' : 'right'"
+            v-if="viewType === 'data'"
+        >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
                     <UserPhoto :user="user"></UserPhoto>
@@ -132,7 +139,7 @@
                     class="comment comment-first-level"
                     v-for="post in postsAndEvents"
                     v-bind:key="post.id"
-                    v-bind:id="'comment-id-' + post.id"
+                    v-bind:id="(post.body ? 'comment-id-' : 'event-id-') + post.id"
                     :ref="post.id"
                 >
                     <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
@@ -210,7 +217,7 @@
                         </transition>
 
                         <div class="actions">
-                            <button v-if="user" @click="addReply(post)">
+                            <button v-if="user && post.body" @click="addReply(post)">
                                 <i class="icon icon-reply"></i>
                                 {{ $t("comments.actions.reply") }}
                             </button>
@@ -315,6 +322,9 @@ export default Vue.extend({
     },
     watch: {
         parentData(): Promise<void> {
+            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) }).then(() => {
+                this.dataEvents = [...this.$getters.dataEvents, ...this.dataEvents];
+            });
             return this.getComments();
         },
         $route() {
