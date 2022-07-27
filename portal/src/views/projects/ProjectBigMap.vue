@@ -52,10 +52,19 @@
                     v-if="activeStation"
                     :station="activeStation"
                     :readings="false"
+                    :sensorDataQuerier="sensorDataQuerier"
                     :exploreContext="exploreContext"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"
-                />
+                    v-slot="{ sensorDataQuerier }"
+                >
+                    <TinyChart
+                        :station-id="activeStation.id"
+                        :station="activeStation"
+                        :querier="sensorDataQuerier"
+                        v-if="tinyChartsEnabled"
+                    />
+                </StationHoverSummary>
             </template>
         </div>
         <div class="view-type-container">
