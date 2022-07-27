@@ -167,7 +167,6 @@ export default Vue.extend({
     width: 100%;
     height: 150px;
     border: solid 1px #d8dce0;
-    padding: 5px;
 }
 
 .tiny-chart .fit-x {
