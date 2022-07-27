@@ -205,9 +205,6 @@ export default Vue.extend({
             this.layoutChanges++;
         },
     },
-    mounted() {
-        SnackBar.show('test');
-    },
 });
 </script>
 
