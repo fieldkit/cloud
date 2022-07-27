@@ -156,35 +156,43 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, conn *pgx.Con
 		return nil, err
 	}
 
-	dataStart := MaxTime
-	dataEnd := MinTime
-
 	if len(ranges) == 0 {
 		return nil, nil
 	}
 
-	totalSamples := 0
+	dataStart := MaxTime
+	dataEnd := MinTime
 
-	for _, row := range ranges {
-		log.Infow("tsdb:range", "data_start", row.DataStart, "data_end", row.DataEnd, "bucket_samples", row.BucketSamples, "verbose", true)
+	// If we're querying for all the station's data then we need to narrow
+	// things down to the real range of time the station has data for and use
+	// that to determine which aggregate.
+	if qp.Eternity {
+		totalSamples := 0
 
-		if row.DataStart.Before(dataStart) {
-			dataStart = row.DataStart
+		for _, row := range ranges {
+			log.Infow("tsdb:range", "data_start", row.DataStart, "data_end", row.DataEnd, "bucket_samples", row.BucketSamples, "verbose", true)
+
+			if row.DataStart.Before(dataStart) {
+				dataStart = row.DataStart
+			}
+			if row.DataEnd.After(dataEnd) {
+				dataEnd = row.DataEnd
+			}
+			totalSamples += row.BucketSamples
 		}
-		if row.DataEnd.After(dataEnd) {
-			dataEnd = row.DataEnd
+
+		// This could be greatly improved. The idea here is that there's no point in
+		// picking one if we can easily query all of it at maximum resolution.
+		if totalSamples < ArbitrarySamplesThreshold {
+			log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples)
+
+			return &SelectedAggregate{
+				Specifier: Window1m.Specifier,
+			}, nil
 		}
-		totalSamples += row.BucketSamples
-	}
-
-	// This could be greatly improved. The idea here is that there's no point in
-	// picking one if we can easily query all of it at maximum resolution.
-	if totalSamples < ArbitrarySamplesThreshold {
-		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples)
-
-		return &SelectedAggregate{
-			Specifier: Window1m.Specifier,
-		}, nil
+	} else {
+		dataStart = qp.Start
+		dataEnd = qp.End
 	}
 
 	// This logic is primarily for sensors that are consistently producing data.

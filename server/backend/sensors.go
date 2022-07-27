@@ -52,6 +52,7 @@ type QueryParams struct {
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
 	Backend    string            `json:"backend"`
+	Eternity   bool              `json:"eternity"`
 }
 
 func ParseStationIDs(raw *string) []int32 {
@@ -76,6 +77,13 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 	end := time.Now()
 	if raw.End != nil {
 		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
+	}
+
+	eternity := false
+	if raw.Start != nil && raw.End != nil {
+		if *raw.Start == -8640000000000000 && *raw.End == 8640000000000000 {
+			eternity = true
+		}
 	}
 
 	resolution := int32(0)
@@ -149,6 +157,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Tail:       tail,
 		Complete:   complete,
 		Backend:    backend,
+		Eternity:   eternity,
 	}
 
 	return

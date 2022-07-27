@@ -1,4 +1,5 @@
 import _ from "lodash";
+import moment from "moment";
 import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { DataRow } from "../api";
@@ -371,7 +372,7 @@ export class TimeSeriesSpecFactory {
 
         const tinyXAxis = () => {
             const formatMonth = (v: number): string => {
-                return new Date(v).toLocaleDateString();
+                return moment(new Date(v)).format("M/D/YYYY");
             };
 
             return [
@@ -830,7 +831,7 @@ export class TimeSeriesSpecFactory {
                     const hoverCheck = ifHovering(i, 1, 0.1);
                     const lineMark = {
                         type: "line",
-                        style: this.settings.tiny ? "tinyLine" : i === 0 ? "primaryLine" : "secondaryLine",
+                        style: i === 0 ? "primaryLine" : "secondaryLine",
                         from: { data: makeDataName(i) },
                         encode: {
                             enter: {
