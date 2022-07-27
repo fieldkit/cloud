@@ -21,6 +21,32 @@ func NewProcessSchemaHandler(db *sqlxcache.DB, metrics *logging.Metrics, publish
 }
 
 func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) error {
+	log := Logger(ctx).Sugar()
+
+	sr := NewMessageSchemaRepository(h.db)
+	schemas, err := sr.QuerySchemasPendingProcessing(ctx)
+	if err != nil {
+		return err
+	}
+
+	safe := false
+
+	for _, schema := range schemas {
+		if schema.ID == m.SchemaID {
+			safe = true
+			break
+		}
+	}
+
+	if !safe {
+		log.Infow("process-schema:skipping")
+		return nil
+	}
+
+	if err := sr.StartProcessingSchema(ctx, m.SchemaID); err != nil {
+		return err
+	}
+
 	sourceAggregator := NewSourceAggregator(h.db, false, true)
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
