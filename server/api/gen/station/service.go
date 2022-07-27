@@ -94,6 +94,7 @@ type StationFull struct {
 	FirmwareTime       *int64
 	Configurations     *StationConfigurations
 	UpdatedAt          int64
+	LastReadingAt      *int64
 	LocationName       *string
 	PlaceNameOther     *string
 	PlaceNameNative    *string
@@ -525,6 +526,7 @@ func newStationFull(vres *stationviews.StationFullView) *StationFull {
 		MemoryAvailable:    vres.MemoryAvailable,
 		FirmwareNumber:     vres.FirmwareNumber,
 		FirmwareTime:       vres.FirmwareTime,
+		LastReadingAt:      vres.LastReadingAt,
 		LocationName:       vres.LocationName,
 		PlaceNameOther:     vres.PlaceNameOther,
 		PlaceNameNative:    vres.PlaceNameNative,
@@ -596,6 +598,7 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		FirmwareNumber:     res.FirmwareNumber,
 		FirmwareTime:       res.FirmwareTime,
 		UpdatedAt:          &res.UpdatedAt,
+		LastReadingAt:      res.LastReadingAt,
 		LocationName:       res.LocationName,
 		PlaceNameOther:     res.PlaceNameOther,
 		PlaceNameNative:    res.PlaceNameNative,

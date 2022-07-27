@@ -331,6 +331,7 @@ export interface Station {
     readOnly: boolean;
     configurations: Configurations;
     updatedAt: number;
+    lastReadingAt: number | null;
     battery: number | null;
     location: StationLocation | null;
     locationName: string;

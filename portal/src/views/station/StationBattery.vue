@@ -1,8 +1,8 @@
 <template>
     <div class="station-battery-container">
-        <div class="station-seen" v-if="station.updatedAt">
+        <div class="station-seen" v-if="station.lastReadingAt">
             {{ $t("station.lastSeen") }}
-            <span class="small-light">{{ station.updatedAt | prettyDateTime }}</span>
+            <span class="small-light">{{ station.lastReadingAt | prettyDateTime }}</span>
         </div>
         <div class="station-battery" v-if="station.battery">
             <img class="battery" :alt="$t('station.batteryLevel')" :src="getBatteryIcon()" />
