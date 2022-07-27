@@ -130,7 +130,7 @@ export class SensorDataQuerier {
                 console.log("sdq:querying", ids);
 
                 const params = new URLSearchParams();
-                params.append("stations", this.stationIds.join(","));
+                params.append("stations", ids.join(","));
                 params.append("tail", "1");
                 const backend = this.getBackend();
                 if (backend) {

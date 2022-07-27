@@ -271,16 +271,24 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				log.Infow("evaluation-error", "error", err)
 			} else {
 				if value, ok := toFloat(maybeValue); ok {
-					reading := &ParsedReading{
-						Key:             sensor.Key,
-						ModuleKeyPrefix: moduleKeyPrefix,
-						FullSensorKey:   fullSensorKey,
-						Battery:         sensor.Battery,
-						Transient:       sensor.Transient,
-						Value:           value,
+					filtered := false
+					if sensor.Filter != nil && len(*sensor.Filter) == 2 {
+						if value < (*sensor.Filter)[0] || value > (*sensor.Filter)[1] {
+							filtered = true
+						}
 					}
+					if !filtered {
+						reading := &ParsedReading{
+							Key:             sensor.Key,
+							ModuleKeyPrefix: moduleKeyPrefix,
+							FullSensorKey:   fullSensorKey,
+							Battery:         sensor.Battery,
+							Transient:       sensor.Transient,
+							Value:           value,
+						}
 
-					sensors = append(sensors, reading)
+						sensors = append(sensors, reading)
+					}
 				} else {
 					return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
 				}

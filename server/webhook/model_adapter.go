@@ -270,8 +270,14 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 	}
 
 	if pm.ReceivedAt != nil {
-		for _, moduleSensor := range station.Sensors {
-			for _, pr := range pm.Data {
+		hasNonTransients := false
+
+		for _, pr := range pm.Data {
+			if !pr.Transient {
+				hasNonTransients = true
+			}
+
+			for _, moduleSensor := range station.Sensors {
 				if pr.Key == moduleSensor.Name {
 					moduleSensor.ReadingValue = &pr.Value
 					moduleSensor.ReadingTime = pm.ReceivedAt
@@ -279,8 +285,11 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 				}
 			}
 		}
-		if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
-			station.LastReadingTime = pm.ReceivedAt
+
+		if hasNonTransients {
+			if station.LastReadingTime == nil || station.LastReadingTime.Before(*pm.ReceivedAt) {
+				station.LastReadingTime = pm.ReceivedAt
+			}
 		}
 	}
 
