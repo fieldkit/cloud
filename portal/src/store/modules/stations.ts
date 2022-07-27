@@ -73,7 +73,7 @@ export class DisplayStation {
     public readonly name: string;
     public readonly configurations: Configurations;
     public readonly updatedAt: Date;
-    public readonly uploadedAt: Date | null = null;
+    public readonly lastReadingAt: Date | null = null;
     public readonly deployedAt: Date | null = null;
     public readonly totalReadings = 0;
     public readonly location: Location | null = null;
@@ -102,7 +102,7 @@ export class DisplayStation {
         this.deployedAt = station.recordingStartedAt;
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
-        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
+        this.lastReadingAt = station.lastReadingAt ? new Date(station.lastReadingAt) : null;
         this.attributes = station.attributes.attributes;
         this.readOnly = station.readOnly;
 
@@ -168,7 +168,8 @@ export class MapFeature {
         // Marker color scale
 
         if (thresholds) {
-            const markerScale = d3.scaleThreshold()
+            const markerScale = d3
+                .scaleThreshold()
                 .domain(thresholds.levels.map((d) => d.value))
                 .range(thresholds.levels.map((d) => d.color));
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/data"
 
+	"github.com/fieldkit/cloud/server/backend/handlers"
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/storage"
 )
@@ -17,6 +18,7 @@ import (
 type WebHookMessageReceivedHandler struct {
 	db       *sqlxcache.DB
 	model    *ModelAdapter
+	iness    *handlers.InterestingnessHandler
 	jqCache  *JqCache
 	batch    *MessageBatch
 	tsConfig *storage.TimeScaleDBConfig
@@ -27,6 +29,7 @@ func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics
 	return &WebHookMessageReceivedHandler{
 		db:       db,
 		model:    NewModelAdapter(db),
+		iness:    handlers.NewInterestingnessHandler(db),
 		tsConfig: tsConfig,
 		jqCache:  &JqCache{},
 		batch:    &MessageBatch{},
@@ -90,6 +93,10 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 							Value:     parsedSensor.Value,
 						}
 
+						if err := h.iness.ConsiderReading(ctx, ir); err != nil {
+							return nil, err
+						}
+
 						incoming = append(incoming, ir)
 					}
 				}
@@ -97,6 +104,10 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 		}
 
 		if err := h.model.Close(ctx); err != nil {
+			return nil, err
+		}
+
+		if err := h.iness.Close(ctx); err != nil {
 			return nil, err
 		}
 	}

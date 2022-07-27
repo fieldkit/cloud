@@ -1020,6 +1020,24 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		return nil, err
 	}
 
+	var lastReadingAt *int64
+
+	for _, configuration := range configurations {
+		for _, module := range configuration.Modules {
+			for _, sensor := range module.Sensors {
+				if sensor.Reading != nil && sensor.Reading.Time > 0 {
+					if lastReadingAt == nil {
+						lastReadingAt = &sensor.Reading.Time
+					} else {
+						if *lastReadingAt < sensor.Reading.Time {
+							lastReadingAt = &sensor.Reading.Time
+						}
+					}
+				}
+			}
+		}
+	}
+
 	dataSummary := transformDataSummary(sf.DataSummary)
 
 	location := transformLocation(sf, preciseLocation)
@@ -1080,6 +1098,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		FirmwareNumber:     sf.Station.FirmwareNumber,
 		FirmwareTime:       sf.Station.FirmwareTime,
 		UpdatedAt:          sf.Station.UpdatedAt.Unix() * 1000,
+		LastReadingAt:      lastReadingAt,
 		SyncedAt:           optionalTime(sf.Station.SyncedAt),
 		IngestionAt:        optionalTime(sf.Station.IngestionAt),
 		LocationName:       sf.Station.LocationName,

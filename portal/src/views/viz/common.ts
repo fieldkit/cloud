@@ -213,24 +213,6 @@ export class VizInfo {
     }
 
     public applyCustomFilter(rows: DataRow[]): DataRow[] {
-        if (this.firmwareKey == "wh.floodnet.depth") {
-            // HACK
-            return rows.map((row) => {
-                if (!row) throw new Error();
-                if (_.isNumber(row.value) && row.value >= 38) {
-                    // HACK
-                    return {
-                        time: row.time,
-                        stationId: null,
-                        sensorId: null,
-                        moduleId: null,
-                        location: null,
-                        value: null,
-                    };
-                }
-                return row;
-            });
-        }
         return rows;
     }
 }

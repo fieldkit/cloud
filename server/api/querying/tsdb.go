@@ -448,8 +448,6 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 		return nil, lastTimeRows.Err()
 	}
 
-	log.Infow("tsdb:query:last", "times", lastTimes)
-
 	byStation := make([][]*backend.DataRow, len(qp.Stations))
 	wg := new(sync.WaitGroup)
 

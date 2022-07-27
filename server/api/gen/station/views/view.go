@@ -82,6 +82,7 @@ type StationFullView struct {
 	FirmwareTime       *int64
 	Configurations     *StationConfigurationsView
 	UpdatedAt          *int64
+	LastReadingAt      *int64
 	LocationName       *string
 	PlaceNameOther     *string
 	PlaceNameNative    *string
@@ -339,6 +340,7 @@ var (
 			"firmwareTime",
 			"configurations",
 			"updatedAt",
+			"lastReadingAt",
 			"location",
 			"locationName",
 			"placeNameOther",
@@ -420,6 +422,7 @@ var (
 			"firmwareTime",
 			"configurations",
 			"updatedAt",
+			"lastReadingAt",
 			"location",
 			"locationName",
 			"placeNameOther",
