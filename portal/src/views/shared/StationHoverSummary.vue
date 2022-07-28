@@ -39,7 +39,7 @@
 import _ from "lodash";
 
 import Vue, { PropType } from "vue";
-import { mapState, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";

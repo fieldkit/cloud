@@ -70,6 +70,10 @@ type DataRow struct {
 	LastValue     float64   `json:"last"`
 }
 
+type SelectedAggregate struct {
+	Specifier string
+}
+
 func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
 		config: config,
@@ -142,10 +146,6 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.Que
 	}
 
 	return dataRows, nil
-}
-
-type SelectedAggregate struct {
-	Specifier string
 }
 
 func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (*SelectedAggregate, error) {

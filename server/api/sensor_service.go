@@ -22,6 +22,20 @@ import (
 	"github.com/fieldkit/cloud/server/api/querying"
 )
 
+type StationsMeta struct {
+	Stations map[int32][]*repositories.StationSensor `json:"stations"`
+}
+
+type SensorMeta struct {
+	ID  int64  `json:"id"`
+	Key string `json:"key"`
+}
+
+type MetaResult struct {
+	Sensors []*SensorMeta `json:"sensors"`
+	Modules interface{}   `json:"modules"`
+}
+
 func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQueryParams, error) {
 	return &backend.RawQueryParams{
 		Start:      payload.Start,
@@ -106,7 +120,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	if qp.Tail > 0 {
 		return c.tail(ctx, qp)
 	} else if len(qp.Sensors) == 0 {
-		// TODO Deprecatd, remove in 0.2.53
+		// TODO Deprecated, remove in 0.2.53
 		// return nil, sensor.MakeBadRequest(fmt.Errorf("stations missing"))
 		if res, err := c.StationMeta(ctx, &sensor.StationMetaPayload{
 			Stations: payload.Stations,
@@ -132,20 +146,6 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	return &sensor.DataResult{
 		Object: data,
 	}, nil
-}
-
-type StationsMeta struct {
-	Stations map[int32][]*repositories.StationSensor `json:"stations"`
-}
-
-type SensorMeta struct {
-	ID  int64  `json:"id"`
-	Key string `json:"key"`
-}
-
-type MetaResult struct {
-	Sensors []*SensorMeta `json:"sensors"`
-	Modules interface{}   `json:"modules"`
 }
 
 func (c *SensorService) StationMeta(ctx context.Context, payload *sensor.StationMetaPayload) (*sensor.StationMetaResult, error) {
