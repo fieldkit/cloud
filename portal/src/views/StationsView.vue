@@ -33,7 +33,11 @@
                 :station="activeStation"
                 v-bind:key="activeStation.id"
                 @layoutChange="layoutChange"
-            />
+                :sensorDataQuerier="sensorDataQuerier"
+                v-slot="{ sensorDataQuerier }"
+            >
+                <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+            </StationHoverSummary>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
