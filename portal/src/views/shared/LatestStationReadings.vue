@@ -126,14 +126,7 @@ export class SensorDataQuerier {
 
                 console.log("sdq:querying", ids);
 
-                const params = new URLSearchParams();
-                params.append("stations", ids.join(","));
-                params.append("tail", "1");
-                const backend = this.getBackend();
-                if (backend) {
-                    params.append("backend", backend);
-                }
-                const data = this.api.tailSensorData(params);
+                const data = this.api.tailSensorData(ids);
                 const quickSensors = this.api.getQuickSensors(ids);
 
                 const sensorMeta = this.api

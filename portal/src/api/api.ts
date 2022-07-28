@@ -1150,11 +1150,23 @@ class FKApi {
         });
     }
 
-    public tailSensorData(params: URLSearchParams): Promise<TailSensorDataResponse> {
+    public tailSensorData(stations: number[]): Promise<TailSensorDataResponse> {
+        const qp = new URLSearchParams();
+        qp.append("stations", stations.join(","));
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
-            url: this.baseUrl + "/sensors/data?" + params.toString(),
+            url: this.baseUrl + "/sensors/data/tail?" + qp.toString(),
+        });
+    }
+
+    public queryStationsRecently(stations: number[]): Promise<TailSensorDataResponse> {
+        const qp = new URLSearchParams();
+        qp.append("stations", stations.join(","));
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/sensors/data/recently?" + qp.toString(),
         });
     }
 

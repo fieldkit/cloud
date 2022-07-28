@@ -25,6 +25,10 @@ type Service interface {
 	SensorMeta(context.Context) (res *SensorMetaResult, err error)
 	// Data implements data.
 	Data(context.Context, *DataPayload) (res *DataResult, err error)
+	// Tail implements tail.
+	Tail(context.Context, *TailPayload) (res *TailResult, err error)
+	// Recently implements recently.
+	Recently(context.Context, *RecentlyPayload) (res *RecentlyResult, err error)
 	// Bookmark implements bookmark.
 	Bookmark(context.Context, *BookmarkPayload) (res *SavedBookmark, err error)
 	// Resolve implements resolve.
@@ -45,7 +49,7 @@ const ServiceName = "sensor"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"meta", "station meta", "sensor meta", "data", "bookmark", "resolve"}
+var MethodNames = [8]string{"meta", "station meta", "sensor meta", "data", "tail", "recently", "bookmark", "resolve"}
 
 // MetaResult is the result type of the sensor service meta method.
 type MetaResult struct {
@@ -85,6 +89,29 @@ type DataPayload struct {
 
 // DataResult is the result type of the sensor service data method.
 type DataResult struct {
+	Object interface{}
+}
+
+// TailPayload is the payload type of the sensor service tail method.
+type TailPayload struct {
+	Auth     *string
+	Stations *string
+	Backend  *string
+}
+
+// TailResult is the result type of the sensor service tail method.
+type TailResult struct {
+	Object interface{}
+}
+
+// RecentlyPayload is the payload type of the sensor service recently method.
+type RecentlyPayload struct {
+	Auth     *string
+	Stations *string
+}
+
+// RecentlyResult is the result type of the sensor service recently method.
+type RecentlyResult struct {
 	Object interface{}
 }
 

@@ -317,6 +317,150 @@ type DataBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// TailUnauthorizedResponseBody is the type of the "sensor" service "tail"
+// endpoint HTTP response body for the "unauthorized" error.
+type TailUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TailForbiddenResponseBody is the type of the "sensor" service "tail"
+// endpoint HTTP response body for the "forbidden" error.
+type TailForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TailNotFoundResponseBody is the type of the "sensor" service "tail" endpoint
+// HTTP response body for the "not-found" error.
+type TailNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// TailBadRequestResponseBody is the type of the "sensor" service "tail"
+// endpoint HTTP response body for the "bad-request" error.
+type TailBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RecentlyUnauthorizedResponseBody is the type of the "sensor" service
+// "recently" endpoint HTTP response body for the "unauthorized" error.
+type RecentlyUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RecentlyForbiddenResponseBody is the type of the "sensor" service "recently"
+// endpoint HTTP response body for the "forbidden" error.
+type RecentlyForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RecentlyNotFoundResponseBody is the type of the "sensor" service "recently"
+// endpoint HTTP response body for the "not-found" error.
+type RecentlyNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RecentlyBadRequestResponseBody is the type of the "sensor" service
+// "recently" endpoint HTTP response body for the "bad-request" error.
+type RecentlyBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // BookmarkUnauthorizedResponseBody is the type of the "sensor" service
 // "bookmark" endpoint HTTP response body for the "unauthorized" error.
 type BookmarkUnauthorizedResponseBody struct {
@@ -707,6 +851,118 @@ func NewDataBadRequestResponseBody(res *goa.ServiceError) *DataBadRequestRespons
 	return body
 }
 
+// NewTailUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "tail" endpoint of the "sensor" service.
+func NewTailUnauthorizedResponseBody(res *goa.ServiceError) *TailUnauthorizedResponseBody {
+	body := &TailUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTailForbiddenResponseBody builds the HTTP response body from the result
+// of the "tail" endpoint of the "sensor" service.
+func NewTailForbiddenResponseBody(res *goa.ServiceError) *TailForbiddenResponseBody {
+	body := &TailForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTailNotFoundResponseBody builds the HTTP response body from the result of
+// the "tail" endpoint of the "sensor" service.
+func NewTailNotFoundResponseBody(res *goa.ServiceError) *TailNotFoundResponseBody {
+	body := &TailNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewTailBadRequestResponseBody builds the HTTP response body from the result
+// of the "tail" endpoint of the "sensor" service.
+func NewTailBadRequestResponseBody(res *goa.ServiceError) *TailBadRequestResponseBody {
+	body := &TailBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRecentlyUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "recently" endpoint of the "sensor" service.
+func NewRecentlyUnauthorizedResponseBody(res *goa.ServiceError) *RecentlyUnauthorizedResponseBody {
+	body := &RecentlyUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRecentlyForbiddenResponseBody builds the HTTP response body from the
+// result of the "recently" endpoint of the "sensor" service.
+func NewRecentlyForbiddenResponseBody(res *goa.ServiceError) *RecentlyForbiddenResponseBody {
+	body := &RecentlyForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRecentlyNotFoundResponseBody builds the HTTP response body from the
+// result of the "recently" endpoint of the "sensor" service.
+func NewRecentlyNotFoundResponseBody(res *goa.ServiceError) *RecentlyNotFoundResponseBody {
+	body := &RecentlyNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRecentlyBadRequestResponseBody builds the HTTP response body from the
+// result of the "recently" endpoint of the "sensor" service.
+func NewRecentlyBadRequestResponseBody(res *goa.ServiceError) *RecentlyBadRequestResponseBody {
+	body := &RecentlyBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewBookmarkUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "bookmark" endpoint of the "sensor" service.
 func NewBookmarkUnauthorizedResponseBody(res *goa.ServiceError) *BookmarkUnauthorizedResponseBody {
@@ -839,6 +1095,25 @@ func NewDataPayload(start *int64, end *int64, stations *string, sensors *string,
 	v.Complete = complete
 	v.Tail = tail
 	v.Backend = backend
+	v.Auth = auth
+
+	return v
+}
+
+// NewTailPayload builds a sensor service tail endpoint payload.
+func NewTailPayload(stations *string, backend *string, auth *string) *sensor.TailPayload {
+	v := &sensor.TailPayload{}
+	v.Stations = stations
+	v.Backend = backend
+	v.Auth = auth
+
+	return v
+}
+
+// NewRecentlyPayload builds a sensor service recently endpoint payload.
+func NewRecentlyPayload(stations *string, auth *string) *sensor.RecentlyPayload {
+	v := &sensor.RecentlyPayload{}
+	v.Stations = stations
 	v.Auth = auth
 
 	return v

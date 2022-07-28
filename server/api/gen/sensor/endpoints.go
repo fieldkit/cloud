@@ -20,6 +20,8 @@ type Endpoints struct {
 	StationMeta goa.Endpoint
 	SensorMeta  goa.Endpoint
 	Data        goa.Endpoint
+	Tail        goa.Endpoint
+	Recently    goa.Endpoint
 	Bookmark    goa.Endpoint
 	Resolve     goa.Endpoint
 }
@@ -33,6 +35,8 @@ func NewEndpoints(s Service) *Endpoints {
 		StationMeta: NewStationMetaEndpoint(s),
 		SensorMeta:  NewSensorMetaEndpoint(s),
 		Data:        NewDataEndpoint(s, a.JWTAuth),
+		Tail:        NewTailEndpoint(s, a.JWTAuth),
+		Recently:    NewRecentlyEndpoint(s, a.JWTAuth),
 		Bookmark:    NewBookmarkEndpoint(s, a.JWTAuth),
 		Resolve:     NewResolveEndpoint(s, a.JWTAuth),
 	}
@@ -44,6 +48,8 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.StationMeta = m(e.StationMeta)
 	e.SensorMeta = m(e.SensorMeta)
 	e.Data = m(e.Data)
+	e.Tail = m(e.Tail)
+	e.Recently = m(e.Recently)
 	e.Bookmark = m(e.Bookmark)
 	e.Resolve = m(e.Resolve)
 }
@@ -93,6 +99,52 @@ func NewDataEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return s.Data(ctx, p)
+	}
+}
+
+// NewTailEndpoint returns an endpoint function that calls the method "tail" of
+// service "sensor".
+func NewTailEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*TailPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.Tail(ctx, p)
+	}
+}
+
+// NewRecentlyEndpoint returns an endpoint function that calls the method
+// "recently" of service "sensor".
+func NewRecentlyEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*RecentlyPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.Recently(ctx, p)
 	}
 }
 

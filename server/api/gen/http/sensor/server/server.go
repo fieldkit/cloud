@@ -25,6 +25,8 @@ type Server struct {
 	StationMeta http.Handler
 	SensorMeta  http.Handler
 	Data        http.Handler
+	Tail        http.Handler
+	Recently    http.Handler
 	Bookmark    http.Handler
 	Resolve     http.Handler
 	CORS        http.Handler
@@ -67,12 +69,16 @@ func New(
 			{"StationMeta", "GET", "/meta/stations"},
 			{"SensorMeta", "GET", "/meta/sensors"},
 			{"Data", "GET", "/sensors/data"},
+			{"Tail", "GET", "/sensors/data/tail"},
+			{"Recently", "GET", "/sensors/data/recently"},
 			{"Bookmark", "POST", "/bookmarks/save"},
 			{"Resolve", "GET", "/bookmarks/resolve"},
 			{"CORS", "OPTIONS", "/sensors"},
 			{"CORS", "OPTIONS", "/meta/stations"},
 			{"CORS", "OPTIONS", "/meta/sensors"},
 			{"CORS", "OPTIONS", "/sensors/data"},
+			{"CORS", "OPTIONS", "/sensors/data/tail"},
+			{"CORS", "OPTIONS", "/sensors/data/recently"},
 			{"CORS", "OPTIONS", "/bookmarks/save"},
 			{"CORS", "OPTIONS", "/bookmarks/resolve"},
 		},
@@ -80,6 +86,8 @@ func New(
 		StationMeta: NewStationMetaHandler(e.StationMeta, mux, decoder, encoder, errhandler, formatter),
 		SensorMeta:  NewSensorMetaHandler(e.SensorMeta, mux, decoder, encoder, errhandler, formatter),
 		Data:        NewDataHandler(e.Data, mux, decoder, encoder, errhandler, formatter),
+		Tail:        NewTailHandler(e.Tail, mux, decoder, encoder, errhandler, formatter),
+		Recently:    NewRecentlyHandler(e.Recently, mux, decoder, encoder, errhandler, formatter),
 		Bookmark:    NewBookmarkHandler(e.Bookmark, mux, decoder, encoder, errhandler, formatter),
 		Resolve:     NewResolveHandler(e.Resolve, mux, decoder, encoder, errhandler, formatter),
 		CORS:        NewCORSHandler(),
@@ -95,6 +103,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.StationMeta = m(s.StationMeta)
 	s.SensorMeta = m(s.SensorMeta)
 	s.Data = m(s.Data)
+	s.Tail = m(s.Tail)
+	s.Recently = m(s.Recently)
 	s.Bookmark = m(s.Bookmark)
 	s.Resolve = m(s.Resolve)
 	s.CORS = m(s.CORS)
@@ -106,6 +116,8 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountStationMetaHandler(mux, h.StationMeta)
 	MountSensorMetaHandler(mux, h.SensorMeta)
 	MountDataHandler(mux, h.Data)
+	MountTailHandler(mux, h.Tail)
+	MountRecentlyHandler(mux, h.Recently)
 	MountBookmarkHandler(mux, h.Bookmark)
 	MountResolveHandler(mux, h.Resolve)
 	MountCORSHandler(mux, h.CORS)
@@ -301,6 +313,108 @@ func NewDataHandler(
 	})
 }
 
+// MountTailHandler configures the mux to serve the "sensor" service "tail"
+// endpoint.
+func MountTailHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/sensors/data/tail", f)
+}
+
+// NewTailHandler creates a HTTP handler which loads the HTTP request and calls
+// the "sensor" service "tail" endpoint.
+func NewTailHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeTailRequest(mux, decoder)
+		encodeResponse = EncodeTailResponse(encoder)
+		encodeError    = EncodeTailError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "tail")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountRecentlyHandler configures the mux to serve the "sensor" service
+// "recently" endpoint.
+func MountRecentlyHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleSensorOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/sensors/data/recently", f)
+}
+
+// NewRecentlyHandler creates a HTTP handler which loads the HTTP request and
+// calls the "sensor" service "recently" endpoint.
+func NewRecentlyHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeRecentlyRequest(mux, decoder)
+		encodeResponse = EncodeRecentlyResponse(encoder)
+		encodeError    = EncodeRecentlyError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "recently")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "sensor")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountBookmarkHandler configures the mux to serve the "sensor" service
 // "bookmark" endpoint.
 func MountBookmarkHandler(mux goahttp.Muxer, h http.Handler) {
@@ -417,6 +531,8 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/meta/stations", f)
 	mux.Handle("OPTIONS", "/meta/sensors", f)
 	mux.Handle("OPTIONS", "/sensors/data", f)
+	mux.Handle("OPTIONS", "/sensors/data/tail", f)
+	mux.Handle("OPTIONS", "/sensors/data/recently", f)
 	mux.Handle("OPTIONS", "/bookmarks/save", f)
 	mux.Handle("OPTIONS", "/bookmarks/resolve", f)
 }

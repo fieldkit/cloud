@@ -51,9 +51,10 @@ type LastTimeRow struct {
 }
 
 type TimeScaleDBBackend struct {
-	config *storage.TimeScaleDBConfig
-	db     *sqlxcache.DB
-	pool   *pgxpool.Pool
+	config    *storage.TimeScaleDBConfig
+	db        *sqlxcache.DB
+	pool      *pgxpool.Pool
+	debugging bool
 }
 
 type DataRow struct {
@@ -76,15 +77,16 @@ type SelectedAggregate struct {
 
 func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
-		config: config,
-		db:     db,
+		config:    config,
+		db:        db,
+		debugging: false,
 	}, nil
 }
 
-func (tsdb *TimeScaleDBBackend) queryIDsForStation(ctx context.Context, stationID int32) (*backend.SensorDatabaseIDs, error) {
+func (tsdb *TimeScaleDBBackend) queryIDsForStations(ctx context.Context, stationIDs []int32) (*backend.SensorDatabaseIDs, error) {
 	dq := backend.NewDataQuerier(tsdb.db)
 
-	ids, err := dq.GetStationIDs(ctx, []int32{stationID})
+	ids, err := dq.GetStationIDs(ctx, stationIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +359,7 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 
 	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime)
 
-	ids, err := tsdb.queryIDsForStation(ctx, last.StationID)
+	ids, err := tsdb.queryIDsForStations(ctx, []int32{last.StationID})
 	if err != nil {
 		return nil, err
 	}
@@ -418,23 +420,15 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 	return rows, nil
 }
 
-func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
-	log := Logger(ctx).Sugar()
-
-	if err := tsdb.initialize(ctx); err != nil {
-		return nil, err
-	}
-
-	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
-
-	lastTimesSql := `
+func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs []int32) (map[int32]*LastTimeRow, error) {
+	sql := `
 		SELECT station_id, MAX(data_end) AS last_time
 		FROM fieldkit.sensor_data_365d
 		WHERE station_id = ANY($1)
 		GROUP BY station_id
 		ORDER BY last_time
 	`
-	lastTimeRows, err := tsdb.pool.Query(ctx, lastTimesSql, qp.Stations)
+	lastTimeRows, err := tsdb.pool.Query(ctx, sql, stationIDs)
 	if err != nil {
 		return nil, fmt.Errorf("(last-times) %v", err)
 	}
@@ -459,10 +453,121 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 		return nil, lastTimeRows.Err()
 	}
 
-	byStation := make([][]*backend.DataRow, len(qp.Stations))
+	return lastTimes, nil
+}
+
+func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
+	since := time.Now()
+
+	if tsdb.debugging {
+		since = since.Add(time.Hour * 24 * 3 * -1)
+	}
+
+	sql := fmt.Sprintf(`
+	SELECT
+		MAX(bucket_time) AS bucket_time,
+		station_id, module_id, sensor_id,
+		SUM(bucket_samples) AS bucket_samples,
+		MIN(data_start) AS data_start,
+		MAX(data_end) AS data_end,
+		AVG(avg_value) AS avg_value,
+		MIN(min_value) AS min_value,
+		MAX(max_value) AS max_value,
+		LAST(last_value, bucket_time) AS last_value
+	FROM fieldkit.sensor_data_24h
+	WHERE station_id = ANY($1) AND bucket_time > ($2::TIMESTAMP + interval '-%f seconds')
+	GROUP BY station_id, module_id, sensor_id
+	`, duration.Seconds())
+
+	pgRows, err := tsdb.pool.Query(ctx, sql, stationIDs, since)
+	if err != nil {
+		return nil, fmt.Errorf("(daily-agg) %v", err)
+	}
+
+	defer pgRows.Close()
+
+	rows := make([]*backend.DataRow, 0)
+
+	for pgRows.Next() {
+		dr := &backend.DataRow{}
+
+		var moduleID int64
+
+		if err := pgRows.Scan(&dr.Time, &dr.StationID, &moduleID, &dr.SensorID, &dr.BucketSamples, &dr.DataStart, &dr.DataEnd,
+			&dr.MinimumValue, &dr.AverageValue, &dr.MaximumValue, &dr.LastValue); err != nil {
+			return nil, err
+		}
+
+		hardwareID := ids.KeyToHardwareID[moduleID]
+
+		dr.ModuleID = &hardwareID
+
+		rows = append(rows, dr)
+	}
+
+	if pgRows.Err() != nil {
+		return nil, pgRows.Err()
+	}
+
+	return rows, nil
+}
+
+func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
+	if err := tsdb.initialize(ctx); err != nil {
+		return nil, err
+	}
+
+	ids, err := tsdb.queryIDsForStations(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	byWindow := make(map[time.Duration][]*backend.DataRow)
 	wg := new(sync.WaitGroup)
 
-	for index, stationID := range qp.Stations {
+	for _, duration := range windows {
+		wg.Add(1)
+
+		key := duration / time.Hour
+
+		byWindow[key] = make([]*backend.DataRow, 0)
+
+		go func(duration time.Duration) {
+			daily, err := tsdb.queryDailyAggregate(ctx, stationIDs, duration, ids)
+			if err != nil {
+				log := Logger(ctx).Sugar()
+				log.Errorw("tsdb:error", "error", err)
+			} else {
+				byWindow[key] = daily
+			}
+
+			wg.Done()
+		}(duration)
+	}
+
+	wg.Wait()
+
+	return byWindow, nil
+}
+
+func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error) {
+	log := Logger(ctx).Sugar()
+
+	if err := tsdb.initialize(ctx); err != nil {
+		return nil, err
+	}
+
+	log.Infow("tsdb:query:prepare", "stations", stationIDs)
+
+	lastTimes, err := tsdb.queryLastTimes(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	byStation := make([][]*backend.DataRow, len(stationIDs))
+	wg := new(sync.WaitGroup)
+
+	for index, stationID := range stationIDs {
 		if last, ok := lastTimes[stationID]; ok {
 			wg.Add(1)
 
@@ -475,6 +580,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 				} else {
 					byStation[index] = tailed
 				}
+
 				wg.Done()
 			}(index, stationID)
 		} else {
@@ -504,8 +610,8 @@ func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Co
 			module_id,
 			sensor_id,
 			SUM(bucket_samples) AS bucket_samples,
-			MIN(bucket_time) AS data_start,
-			MAX(bucket_time) AS data_end,
+			MIN(data_start) AS data_start,
+			MAX(data_end) AS data_end,
 			AVG(avg_value) AS avg_value,
 			MIN(min_value) AS min_value,
 			MAX(max_value) AS max_value,

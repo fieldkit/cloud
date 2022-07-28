@@ -19,17 +19,21 @@ type Client struct {
 	StationMetaEndpoint goa.Endpoint
 	SensorMetaEndpoint  goa.Endpoint
 	DataEndpoint        goa.Endpoint
+	TailEndpoint        goa.Endpoint
+	RecentlyEndpoint    goa.Endpoint
 	BookmarkEndpoint    goa.Endpoint
 	ResolveEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "sensor" service client given the endpoints.
-func NewClient(meta, stationMeta, sensorMeta, data, bookmark, resolve goa.Endpoint) *Client {
+func NewClient(meta, stationMeta, sensorMeta, data, tail, recently, bookmark, resolve goa.Endpoint) *Client {
 	return &Client{
 		MetaEndpoint:        meta,
 		StationMetaEndpoint: stationMeta,
 		SensorMetaEndpoint:  sensorMeta,
 		DataEndpoint:        data,
+		TailEndpoint:        tail,
+		RecentlyEndpoint:    recently,
 		BookmarkEndpoint:    bookmark,
 		ResolveEndpoint:     resolve,
 	}
@@ -73,6 +77,26 @@ func (c *Client) Data(ctx context.Context, p *DataPayload) (res *DataResult, err
 		return
 	}
 	return ires.(*DataResult), nil
+}
+
+// Tail calls the "tail" endpoint of the "sensor" service.
+func (c *Client) Tail(ctx context.Context, p *TailPayload) (res *TailResult, err error) {
+	var ires interface{}
+	ires, err = c.TailEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*TailResult), nil
+}
+
+// Recently calls the "recently" endpoint of the "sensor" service.
+func (c *Client) Recently(ctx context.Context, p *RecentlyPayload) (res *RecentlyResult, err error) {
+	var ires interface{}
+	ires, err = c.RecentlyEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*RecentlyResult), nil
 }
 
 // Bookmark calls the "bookmark" endpoint of the "sensor" service.
