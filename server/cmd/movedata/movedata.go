@@ -13,13 +13,20 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/storage"
 	"github.com/fieldkit/cloud/server/webhook"
 )
@@ -28,10 +35,17 @@ type Options struct {
 	PostgresURL  string `split_words:"true"`
 	TimeScaleURL string `split_words:"true"`
 
+	AWSProfile     string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
+	StreamsBuckets []string `split_words:"true" default:""`
+	AwsId          string   `split_words:"true" default:""`
+	AwsSecret      string   `split_words:"true" default:""`
+
 	BinaryRecords        bool
 	StationID            int
 	JsonRecords          bool
 	SchemaID             int
+	Ingestions           bool
+	ID                   int
 	Verbose              bool
 	FailOnMissingSensors bool
 	RefreshViews         bool
@@ -295,6 +309,99 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolv
 			return err
 		}
 	}
+
+	return nil
+}
+
+func processStationIngestions(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler, stationID int32) error {
+	ir, err := repositories.NewIngestionRepository(db)
+	if err != nil {
+		return err
+	}
+
+	ingestions, err := ir.QueryByStationID(ctx, stationID)
+	if err != nil {
+		return err
+	}
+
+	for _, ingestion := range ingestions {
+		if err := processIngestion(ctx, options, db, resolver, handler, ingestion.ID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (config *Options) getAwsSessionOptions() session.Options {
+	if config.AwsId == "" || config.AwsSecret == "" {
+		return session.Options{
+			Profile: config.AWSProfile,
+			Config: aws.Config{
+				Region:                        aws.String("us-east-1"),
+				CredentialsChainVerboseErrors: aws.Bool(true),
+			},
+		}
+	}
+
+	return session.Options{
+		Profile: config.AWSProfile,
+		Config: aws.Config{
+			Region:                        aws.String("us-east-1"),
+			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
+			CredentialsChainVerboseErrors: aws.Bool(true),
+		},
+	}
+}
+
+func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
+	publisher := jobs.NewDevNullMessagePublisher()
+	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
+
+	awsSessionOptions := options.getAwsSessionOptions()
+
+	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
+	if err != nil {
+		return err
+	}
+
+	reading := make([]files.FileArchive, 0)
+	writing := make([]files.FileArchive, 0)
+
+	fs := files.NewLocalFilesArchive()
+	reading = append(reading, fs)
+	writing = append(writing, fs)
+
+	for _, bucketName := range options.StreamsBuckets {
+		s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
+		if err != nil {
+			return err
+		}
+		reading = append(reading, s3)
+	}
+
+	archive := files.NewPrioritizedFilesArchive(reading, writing)
+
+	ingestionReceived := backend.NewIngestionReceivedHandler(db, archive, metrics, publisher, options.timeScaleConfig())
+
+	ir, err := repositories.NewIngestionRepository(db)
+	if err != nil {
+		return err
+	}
+
+	if id, err := ir.Enqueue(ctx, ingestionID); err != nil {
+		return err
+	} else {
+		if err := ingestionReceived.Handle(ctx, &messages.IngestionReceived{
+			QueuedID: id,
+			UserID:   2,
+			Verbose:  true,
+			Refresh:  true,
+		}); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -400,6 +507,19 @@ func process(ctx context.Context, options *Options) error {
 		}
 	}
 
+	if options.Ingestions {
+		if options.ID > 0 {
+			if err := processIngestion(ctx, options, db, resolver, destination, int64(options.ID)); err != nil {
+				return err
+			}
+		}
+		if options.StationID > 0 {
+			if err := processStationIngestions(ctx, options, db, resolver, destination, int32(options.StationID)); err != nil {
+				return err
+			}
+		}
+	}
+
 	if options.RefreshViews {
 		if err := refreshViews(ctx, options); err != nil {
 			return err
@@ -418,6 +538,8 @@ func main() {
 	flag.BoolVar(&options.JsonRecords, "json", false, "process json records")
 	flag.IntVar(&options.SchemaID, "schema-id", -1, "schema id to process, -1 (default) for all")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
+	flag.BoolVar(&options.Ingestions, "ingestions", false, "process ingestions")
+	flag.IntVar(&options.ID, "id", -1, "id to process")
 	flag.BoolVar(&options.RefreshViews, "refresh-views", false, "refresh views")
 
 	flag.Parse()

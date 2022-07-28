@@ -60,6 +60,18 @@ timestamps {
                         }
 			        }
 
+			        stage ('move-ingestions') {
+                        def matcher = include =~ /ingestions-(\d+)/
+
+                        if (matcher) {
+                            sh "rm -f move-ingestions.log"
+
+                            def stationId = matcher[0][1]
+
+                            sh "FIELDKIT_TIME_SCALE_URL='${ws.timescaledb_url.value}' FIELDKIT_POSTGRES_URL='${ws.database_url.value}' ./movedata --ingestions --station-id ${stationId} >> move-ingestions.log"
+                        }
+			        }
+
 					notifySuccess()
 				}
 			}
