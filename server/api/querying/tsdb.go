@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -52,6 +53,7 @@ type LastTimeRow struct {
 type TimeScaleDBBackend struct {
 	config *storage.TimeScaleDBConfig
 	db     *sqlxcache.DB
+	pool   *pgxpool.Pool
 }
 
 type DataRow struct {
@@ -118,12 +120,12 @@ func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) (
 	return dataRows, nil
 }
 
-func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) ([]*DataRow, error) {
+func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) ([]*DataRow, error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("tsdb:query-ranges", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "modules", ids.ModuleIDs, "sensors", ids.SensorIDs)
 
-	pgRows, err := conn.Query(ctx, `
+	pgRows, err := tsdb.pool.Query(ctx, `
 		SELECT bucket_time, station_id, module_id, sensor_id, bucket_samples, data_start, data_end, avg_value, min_value, max_value, last_value FROM fieldkit.sensor_data_365d
 		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3)
 		AND (bucket_time, bucket_time + interval '1 year') OVERLAPS ($4, $5)
@@ -146,12 +148,12 @@ type SelectedAggregate struct {
 	Specifier string
 }
 
-func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (*SelectedAggregate, error) {
+func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (*SelectedAggregate, error) {
 	log := Logger(ctx).Sugar()
 
 	ArbitrarySamplesThreshold := 2000
 
-	ranges, err := tsdb.queryRanges(ctx, conn, qp, ids)
+	ranges, err := tsdb.queryRanges(ctx, qp, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -218,10 +220,10 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, conn *pgx.Con
 	}, nil
 }
 
-func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (string, []interface{}, *SelectedAggregate, error) {
+func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) (string, []interface{}, *SelectedAggregate, error) {
 	log := Logger(ctx).Sugar()
 
-	aggregate, err := tsdb.pickAggregate(ctx, conn, qp, ids)
+	aggregate, err := tsdb.pickAggregate(ctx, qp, ids)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("(pick-aggregate) %v", err)
 	}
@@ -262,8 +264,25 @@ func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.Que
 	return queriedData, nil
 }
 
+func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
+	if tsdb.pool == nil {
+		opened, err := pgxpool.Connect(ctx, tsdb.config.Url)
+		if err != nil {
+			return fmt.Errorf("(tsdb) error connecting: %v", err)
+		}
+
+		tsdb.pool = opened
+	}
+
+	return nil
+}
+
 func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	log := Logger(ctx).Sugar()
+
+	if err := tsdb.initialize(ctx); err != nil {
+		return nil, err
+	}
 
 	ids, err := tsdb.queryIDs(ctx, qp)
 	if err != nil {
@@ -272,15 +291,8 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 
 	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
 
-	conn, err := pgx.Connect(ctx, tsdb.config.Url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer conn.Close(ctx)
-
 	// Determine the query we'll use to get the actual data we'll be returning.
-	dataQuerySql, dataQueryArgs, aggregate, err := tsdb.getDataQuery(ctx, conn, qp, ids)
+	dataQuerySql, dataQueryArgs, aggregate, err := tsdb.getDataQuery(ctx, qp, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +304,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	}
 
 	// Query for the data, transform into backend.* types and return.
-	pgRows, err := conn.Query(ctx, dataQuerySql, dataQueryArgs...)
+	pgRows, err := tsdb.pool.Query(ctx, dataQuerySql, dataQueryArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -350,13 +362,6 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 		return nil, err
 	}
 
-	conn, err := pgx.Connect(ctx, tsdb.config.Url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer conn.Close(ctx)
-
 	maximum := 200
 	duration := time.Hour * 48
 	interval := duration.Seconds() / float64(maximum)
@@ -380,7 +385,7 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 		ORDER BY bucket_time
 	`, interval, duration.Seconds())
 
-	pgRows, err := conn.Query(ctx, dataSql, []int32{last.StationID}, last.LastTime)
+	pgRows, err := tsdb.pool.Query(ctx, dataSql, []int32{last.StationID}, last.LastTime)
 	if err != nil {
 		return nil, fmt.Errorf("(tail-station) %v", err)
 	}
@@ -416,15 +421,11 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
-
-	// TODO Use pgxpool
-	conn, err := pgx.Connect(ctx, tsdb.config.Url)
-	if err != nil {
+	if err := tsdb.initialize(ctx); err != nil {
 		return nil, err
 	}
 
-	defer conn.Close(ctx)
+	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
 
 	lastTimesSql := `
 		SELECT station_id, MAX(data_end) AS last_time
@@ -433,7 +434,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 		GROUP BY station_id
 		ORDER BY last_time
 	`
-	lastTimeRows, err := conn.Query(ctx, lastTimesSql, qp.Stations)
+	lastTimeRows, err := tsdb.pool.Query(ctx, lastTimesSql, qp.Stations)
 	if err != nil {
 		return nil, fmt.Errorf("(last-times) %v", err)
 	}
