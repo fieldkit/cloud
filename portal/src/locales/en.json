@@ -413,5 +413,6 @@
     "successDeletePhoto": "The photo was successfully removed.",
     "successSetAsStationPhoto": "The photo was successfully set as a station image.",
     "somethingWentWrong": "Something went wrong. Please try again later.",
-    "successAddedPhoto": "The photo was successfully saved"
+    "successAddedPhoto": "The photo was successfully saved",
+    "noData": "No Data"
 }

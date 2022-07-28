@@ -17,7 +17,8 @@
             class="latest-primary"
             :style="{ color: latestPrimaryColor }"
         >
-            {{ latestPrimaryLevel }}
+            <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+            <template v-else>{{ $t("noData") }}</template>
             <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
         </div>
 
@@ -107,7 +108,7 @@ export default Vue.extend({
             if (this.stationFeature && this.stationFeature.properties) {
                 const primaryValue = this.stationFeature.properties.value;
                 const level = this.stationFeature.properties.thresholds?.levels.find(
-                    (level) => level.start < primaryValue && level.value > primaryValue
+                    (level) => level.start <= primaryValue && level.value > primaryValue
                 );
                 return level?.plainLabel["enUS"] || level?.mapKeyLabel["enUS"];
             }
