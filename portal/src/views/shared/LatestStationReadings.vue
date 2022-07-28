@@ -23,13 +23,14 @@ import Vue, { PropType } from "vue";
 
 import {
     FKApi,
-    TailSensorDataResponse,
     VizSensor,
     StationInfoResponse,
     ModuleSensorMeta,
     SensorInfoResponse,
     SensorsResponse,
     Module,
+    TailSensorDataResponse,
+    QueryRecentlyResponse,
 } from "@/api";
 
 export enum TrendType {
@@ -110,10 +111,12 @@ export class SensorDataQuerier {
         return window.localStorage["fk:backend"] || "tsdb";
     }
 
-    private _queue: Promise<[Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>]> | null = null;
+    private _queue: Promise<
+        [Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>, Promise<QueryRecentlyResponse>]
+    > | null = null;
     private _queued: number[] = [];
 
-    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
+    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta, QueryRecentlyResponse]> {
         // TODO Check if we already have the data.
 
         this._queued.push(stationId);
@@ -133,12 +136,14 @@ export class SensorDataQuerier {
                     .getAllSensorsMemoized()()
                     .then((meta) => new SensorMeta(meta));
 
-                return [data, quickSensors, sensorMeta];
+                const recently = this.api.queryStationsRecently(ids);
+
+                return [data, quickSensors, sensorMeta, recently];
             });
         }
 
         return this._queue
-            .then(([data, quickSensors, sensorMeta]) => {
+            .then(([data, quickSensors, sensorMeta, recently]) => {
                 const dataQuery = data.then((response) => {
                     return {
                         data: response.data.filter((row) => row.stationId == stationId),
@@ -151,10 +156,16 @@ export class SensorDataQuerier {
                     };
                 });
 
-                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
+                const stationRecently = recently.then((response) => {
+                    return _.mapValues(response, (window, hours) => {
+                        return window.filter((row) => row.stationId == stationId);
+                    });
+                });
+
+                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta, stationRecently]);
             })
-            .then(([data, quickSensors, meta]) => {
-                return [data, quickSensors, meta];
+            .then(([data, quickSensors, meta, recently]) => {
+                return [data, quickSensors, meta, recently];
             });
     }
 }

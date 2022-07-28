@@ -380,6 +380,8 @@ export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
 }
 
+export type QueryRecentlyResponse = { [index: number]: TailSensorDataRow[] };
+
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
 // headers for authentication.
@@ -1160,7 +1162,7 @@ class FKApi {
         });
     }
 
-    public queryStationsRecently(stations: number[]): Promise<TailSensorDataResponse> {
+    public queryStationsRecently(stations: number[]): Promise<QueryRecentlyResponse> {
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
