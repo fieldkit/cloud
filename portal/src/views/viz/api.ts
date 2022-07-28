@@ -34,7 +34,7 @@ export interface VizConfig {
     thresholds: VizThresholds;
 }
 
-type SensorStrings = { [index: string]: Record<string, string> };
+export type SensorStrings = { [index: string]: Record<string, string> };
 
 export interface ModuleSensorMeta {
     key: string;
