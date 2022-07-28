@@ -74,7 +74,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		start = time.Unix(0, *raw.Start*int64(time.Millisecond)).UTC()
 	}
 
-	end := time.Now()
+	end := time.Now().UTC()
 	if raw.End != nil {
 		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
 	}

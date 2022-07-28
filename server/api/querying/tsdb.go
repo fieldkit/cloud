@@ -449,6 +449,8 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, qp *backend.Query
 			return nil, err
 		}
 
+		row.LastTime = row.LastTime.UTC()
+
 		lastTimes[row.StationID] = row
 	}
 
