@@ -268,7 +268,16 @@ func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.Que
 
 func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
 	if tsdb.pool == nil {
-		opened, err := pgxpool.Connect(ctx, tsdb.config.Url)
+		log := Logger(ctx).Sugar()
+
+		config, err := pgxpool.ParseConfig(tsdb.config.Url)
+		if err != nil {
+			return fmt.Errorf("(tsdb) configuration error: %v", err)
+		}
+
+		log.Infow("tsdb:config", "pg_max_conns", config.MaxConns)
+
+		opened, err := pgxpool.ConnectConfig(ctx, config)
 		if err != nil {
 			return fmt.Errorf("(tsdb) error connecting: %v", err)
 		}
