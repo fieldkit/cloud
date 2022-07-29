@@ -104,3 +104,8 @@ func (r *UserProjectRelationship) LookupRole() *Role {
 	}
 	return PublicRole
 }
+
+func (r *UserProjectRelationship) CanModify() bool {
+	role := r.LookupRole()
+	return role == AdministratorRole
+}
