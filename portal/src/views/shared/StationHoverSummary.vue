@@ -110,7 +110,7 @@ export default Vue.extend({
                 const level = this.stationFeature.properties.thresholds?.levels.find(
                     (level) => level.start <= primaryValue && level.value > primaryValue
                 );
-                return level?.plainLabel["enUS"] || level?.mapKeyLabel["enUS"];
+                return level.plainLabel?.enUS || level.mapKeyLabel?.enUS;
             }
             return null;
         },
