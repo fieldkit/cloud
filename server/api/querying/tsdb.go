@@ -267,9 +267,9 @@ func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.Que
 }
 
 func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
-	if tsdb.pool == nil {
-		log := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
+	if tsdb.pool == nil {
 		config, err := pgxpool.ParseConfig(tsdb.config.Url)
 		if err != nil {
 			return fmt.Errorf("(tsdb) configuration error: %v", err)
@@ -284,6 +284,10 @@ func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
 
 		tsdb.pool = opened
 	}
+
+	stats := tsdb.pool.Stat()
+
+	log.Infow("tsdb:stats", "total", stats.TotalConns(), "max", stats.MaxConns(), "idle", stats.IdleConns())
 
 	return nil
 }

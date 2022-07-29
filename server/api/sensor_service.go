@@ -56,6 +56,7 @@ type SensorService struct {
 	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 	db              *sqlxcache.DB
+	tsdb            querying.DataBackend
 }
 
 func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
@@ -69,12 +70,19 @@ func NewSensorService(ctx context.Context, options *ControllerOptions, influxCon
 
 func (c *SensorService) chooseBackend(ctx context.Context, backend *string) (querying.DataBackend, error) {
 	if backend == nil || *backend == "tsdb" {
-		if c.timeScaleConfig == nil {
-			log := Logger(ctx).Sugar()
-			log.Errorw("tsdb:no-configuration")
-		} else {
-			return querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db)
+		if c.tsdb == nil {
+			if c.timeScaleConfig == nil {
+				log := Logger(ctx).Sugar()
+				log.Errorw("tsdb:no-configuration")
+			} else {
+				if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db); err != nil {
+					return nil, err
+				} else {
+					c.tsdb = tsdb
+				}
+			}
 		}
+		return c.tsdb, nil
 	}
 	return querying.NewPostgresBackend(c.db), nil
 }
