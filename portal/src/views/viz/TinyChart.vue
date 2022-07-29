@@ -6,7 +6,8 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
+import { SensorDataQuerier } from "../shared/sensor_data_querier";
 import { ModuleSensor, DisplayStation, TailSensorDataRow } from "@/store";
 
 import {
@@ -23,7 +24,6 @@ import {
 } from "./vega/SpecFactory";
 
 import LineChart from "./vega/LineChart.vue";
-import { SensorDataQuerier } from "../shared/LatestStationReadings.vue";
 
 export default Vue.extend({
     name: "TinyChart",

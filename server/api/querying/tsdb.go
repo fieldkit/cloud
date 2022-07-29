@@ -79,7 +79,7 @@ func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) 
 	return &TimeScaleDBBackend{
 		config:    config,
 		db:        db,
-		debugging: false,
+		debugging: true,
 	}, nil
 }
 

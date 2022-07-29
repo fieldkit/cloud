@@ -69,12 +69,11 @@ import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
-import { getFeaturesEnabled } from "@/utilities";
+import { SensorDataQuerier } from "./shared/sensor_data_querier";
 
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
-import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
