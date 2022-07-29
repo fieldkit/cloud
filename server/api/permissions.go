@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -217,14 +216,11 @@ func (p *defaultPermissions) ForProject(project *data.Project) (permissions Proj
 
 	var projectUser *data.ProjectUser = nil
 	if !p.Anonymous() {
-		projectUser = &data.ProjectUser{}
-		if err := p.options.Database.GetContext(p.context, projectUser, `
-			SELECT user_id, project_id, role FROM fieldkit.project_user WHERE user_id = $1 AND project_id = $2
-			`, p.UserID(), project.ID); err != nil {
-			if err != sql.ErrNoRows {
-				return nil, err
-			}
-			projectUser = nil
+		pr := repositories.NewProjectRepository(p.options.Database)
+		if found, err := pr.QueryProjectUser(p.context, p.UserID(), project.ID); err != nil {
+			return nil, err
+		} else if found != nil {
+			projectUser = found
 		}
 	}
 
@@ -242,11 +238,10 @@ func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermis
 		return nil, err
 	}
 
-	project := &data.Project{}
-	if err := p.options.Database.GetContext(p.context, project, `
-		SELECT * FROM fieldkit.project WHERE id = $1
-		`, id); err != nil {
-		return nil, p.notFound(fmt.Sprintf("project not found: %v", err))
+	pr := repositories.NewProjectRepository(p.options.Database)
+	project, err := pr.QueryByID(p.context, id)
+	if err != nil {
+		return nil, err
 	}
 
 	return p.ForProject(project)
