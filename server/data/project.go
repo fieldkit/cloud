@@ -1,8 +1,9 @@
 package data
 
 import (
-	"github.com/jmoiron/sqlx/types"
 	"time"
+
+	"github.com/jmoiron/sqlx/types"
 )
 
 type Project struct {
@@ -36,6 +37,11 @@ type ProjectUserAndUser struct {
 type ProjectUserAndProject struct {
 	ProjectUser
 	Project
+}
+
+type ProjectStation struct {
+	ProjectID int32 `db:"project_id"`
+	StationID int32 `db:"station_id"`
 }
 
 func (u *ProjectUser) LookupRole() *Role {
