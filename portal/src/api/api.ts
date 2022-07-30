@@ -371,9 +371,10 @@ export interface TailSensorDataRow {
     stationId: number;
     sensorId: number;
     moduleId: string;
-    avg: number;
-    min: number;
-    max: number;
+    avg: number | undefined;
+    min: number | undefined;
+    max: number | undefined;
+    last: number | undefined;
 }
 
 export interface TailSensorDataResponse {

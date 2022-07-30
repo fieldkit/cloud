@@ -13,21 +13,16 @@
         </StationSummaryContent>
 
         <div
-            v-if="isPartnerCustomisationEnabled() && station.latestPrimary !== null"
+            v-if="isPartnerCustomisationEnabled() && visibleReadingValue !== null"
             class="latest-primary"
             :style="{ color: latestPrimaryColor }"
         >
             <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
             <template v-else>{{ $t("noData") }}</template>
-            <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
+            <i :style="{ 'background-color': latestPrimaryColor }">{{ visibleReadingValue | prettyNum }}</i>
         </div>
 
-        <slot :station="station" :sensorDataQuerier="sensorDataQuerier">
-            <div class="readings-container" v-if="readings">
-                <div class="title">Latest Readings</div>
-                <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
-            </div>
-        </slot>
+        <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 
@@ -43,12 +38,18 @@ import { mapGetters } from "vuex";
 
 import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
-import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import * as utils from "@/utilities";
+import { SensorDataQuerier, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+
+import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
+
+export enum VisibleReadings {
+    Current,
+    Last24h,
+}
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -57,26 +58,17 @@ export default Vue.extend({
         StationSummaryContent,
         StationBattery,
     },
-    data: () => {
-        return {
-            viewingSummary: true,
-        };
-    },
     props: {
         station: {
             type: Object,
             required: true,
-        },
-        readings: {
-            type: Boolean,
-            default: true,
         },
         explore: {
             type: Boolean,
             default: true,
         },
         exploreContext: {
-            type: Object,
+            type: Object as PropType<ExploreContext>,
             default: () => {
                 return new ExploreContext();
             },
@@ -85,6 +77,10 @@ export default Vue.extend({
             type: Object as PropType<SensorDataQuerier>,
             required: false,
         },
+        visibleReadings: {
+            type: Number as PropType<VisibleReadings>,
+            default: VisibleReadings.Current,
+        },
     },
     filters: {
         integer: (value) => {
@@ -92,36 +88,67 @@ export default Vue.extend({
             return Math.round(value);
         },
     },
+    data(): {
+        viewingSummary: boolean;
+        readings: QueryRecentlyResponse | null;
+    } {
+        return {
+            viewingSummary: true,
+            readings: null,
+        };
+    },
+    async mounted() {
+        if (this.sensorDataQuerier) {
+            this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
+        }
+    },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
-        allProjectFeatures() {
-            return _.flatten(
+        visibleReadingValue(): number | null {
+            if (this.readings && 24 in this.readings && this.readings[24].length > 0) {
+                console.log(this.visibleReadings, this.readings);
+                let value: number | undefined;
+                if (this.visibleReadings == VisibleReadings.Current) {
+                    value = this.readings[24][0].last;
+                } else {
+                    value = this.readings[24][0].max;
+                }
+                return value === undefined ? null : value;
+            }
+
+            return null;
+        },
+        thresholds() {
+            // TODO Use another means to determine thresholds.
+            const allFeatures = _.flatten(
                 Object.values(this.projectsById)
                     .filter((p) => p != null)
                     .map((p) => p.mapped.features)
             );
-        },
-        stationFeature(): any {
-            return this.allProjectFeatures.find((feature) => feature.properties?.id === this.station.id);
-        },
-        latestPrimaryLevel(): any {
-            if (this.stationFeature && this.stationFeature.properties) {
-                const primaryValue = this.stationFeature.properties.value;
-                const level = this.stationFeature.properties.thresholds?.levels.find(
-                    (level) => level.start <= primaryValue && level.value > primaryValue
-                );
-                if (level) {
-                    return level.plainLabel?.enUS || level.mapKeyLabel?.enUS;
-                }
-                return null;
+            const feature = allFeatures.find((feature) => feature.properties?.id === this.station.id);
+            if (feature && feature.properties) {
+                return feature.properties.thresholds || null;
             }
             return null;
         },
-        latestPrimaryColor(): string {
-            if (this.stationFeature && this.stationFeature.properties) {
-                return this.stationFeature.properties.color;
+        visibleLevel() {
+            const value = this.visibleReadingValue;
+            if (value !== null) {
+                const thresholds = this.thresholds;
+                if (thresholds) {
+                    const level = thresholds.levels.find((level) => level.start <= value && level.value > value);
+                    return level ?? null;
+                }
             }
-            return "#00CCFF";
+            return null;
+        },
+        latestPrimaryLevel(): any {
+            const level = this.visibleLevel;
+            return level?.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
+        },
+        latestPrimaryColor(): string {
+            const level = this.visibleLevel;
+            return level?.color || "#00CCFF";
         },
     },
     methods: {
@@ -136,7 +163,7 @@ export default Vue.extend({
             });
         },
         getBatteryIcon() {
-            return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
+            return this.$loadAsset(getBatteryIcon(this.station.battery));
         },
         wantCloseSummary() {
             this.$emit("close");

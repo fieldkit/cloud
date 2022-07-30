@@ -7,13 +7,12 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import { SensorDataQuerier } from "../shared/sensor_data_querier";
 import { ModuleSensor, DisplayStation, TailSensorDataRow } from "@/store";
+import { SensorDataQuerier, StandardObserver } from "../shared/sensor_data_querier";
 
 import {
     ChartSettings,
     SeriesData,
-    DataRow,
     DataSetSeries,
     QueriedData,
     VizInfo,
@@ -54,32 +53,14 @@ export default Vue.extend({
         };
     },
     async mounted() {
-        if (!("IntersectionObserver" in window)) {
-            console.log("tiny-chart:warning", "no-intersection-observer");
-        }
-
-        const observer = new IntersectionObserver((entries) => {
-            // Use `intersectionRatio` because of Edge 15's lack of support for
-            // `isIntersecting`.  See: // https://github.com/w3c/IntersectionObserver/issues/211
-            if (entries[0].intersectionRatio <= 0) return;
-
-            // Cleanup
-            observer.unobserve(this.$el);
-
+        new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
-
             void this.load();
         });
-
-        // We observe the root `$el` of the mounted loading component to detect
-        // when it becomes visible.
-        observer.observe(this.$el);
     },
-    computed: {},
-    watch: {},
     methods: {
         async load(): Promise<void> {
-            const [stationData, quickSensors, meta] = await this.querier.query(this.stationId);
+            const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
 
             function getFirstQuickSensor(quickSensors): VizSensor {
                 const sensorModuleId = quickSensors.station[0].moduleId;

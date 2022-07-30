@@ -64,7 +64,7 @@ export default Vue.extend({
         return {
             loading: true,
             sensors: [],
-            querier: this.sensorDataQuerier || new SensorDataQuerier(this.$services.api, [this.id]),
+            querier: this.sensorDataQuerier || new SensorDataQuerier(this.$services.api),
         };
     },
     watch: {

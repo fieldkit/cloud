@@ -107,7 +107,7 @@ export default Vue.extend({
             showNoStationsMessage: true,
             viewType: "map",
             layoutChanges: 0,
-            sensorDataQuerier: new SensorDataQuerier(this.$services.api, []),
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     computed: {
@@ -146,10 +146,7 @@ export default Vue.extend({
     watch: {
         stations() {
             // console.log("stations-view:stations", this.stations);
-            this.sensorDataQuerier = new SensorDataQuerier(
-                this.$services.api,
-                this.stations.map((s: DisplayStation) => s.id)
-            );
+            this.sensorDataQuerier = new SensorDataQuerier(this.$services.api);
         },
         id(): Promise<any> {
             if (this.id) {

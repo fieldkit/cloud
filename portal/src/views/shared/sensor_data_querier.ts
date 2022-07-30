@@ -10,6 +10,9 @@ import {
 } from "@/api";
 
 import { promiseAfter } from "@/utilities";
+import _ from "lodash";
+
+export { QueryRecentlyResponse };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];
@@ -58,51 +61,52 @@ export class SensorMeta {
     }
 }
 
-export class SensorDataQuerier {
-    private data: Promise<TailSensorDataResponse> | null = null;
-    private quickSensors: Promise<SensorInfoResponse> | null = null;
+class Batcher<T> {
+    private queued: number[] = [];
+    private queue: Promise<T> | null = null;
 
-    constructor(private readonly api: FKApi, private readonly stationIds: number[]) {
-        console.log("sdq:ctor", stationIds);
-    }
+    constructor(private readonly handler) {}
 
-    private getBackend(): string | null {
-        return window.localStorage["fk:backend"] || "tsdb";
-    }
+    public async query(id: number): Promise<T> {
+        this.queued.push(id);
 
-    private _queue: Promise<
-        [Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>, Promise<QueryRecentlyResponse>]
-    > | null = null;
-    private _queued: number[] = [];
-
-    public async query(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta, QueryRecentlyResponse]> {
-        // TODO Check if we already have the data.
-
-        this._queued.push(stationId);
-
-        if (this._queue == null) {
-            this._queue = promiseAfter(50).then(() => {
-                const ids = this._queued;
-                this._queued = [];
-                this._queue = null;
-
-                console.log("sdq:querying", ids);
-
-                const data = this.api.tailSensorData(ids);
-                const quickSensors = this.api.getQuickSensors(ids);
-
-                const sensorMeta = this.api
-                    .getAllSensorsMemoized()()
-                    .then((meta) => new SensorMeta(meta));
-
-                const recently = this.api.queryStationsRecently(ids);
-
-                return [data, quickSensors, sensorMeta, recently];
+        if (this.queue == null) {
+            this.queue = promiseAfter(50).then(() => {
+                const ids = this.queued;
+                this.queued = [];
+                this.queue = null;
+                return this.handler(ids);
             });
         }
 
-        return this._queue
-            .then(([data, quickSensors, sensorMeta, recently]) => {
+        return this.queue;
+    }
+}
+
+export class SensorDataQuerier {
+    constructor(private readonly api: FKApi) {}
+
+    private tinyChartData = new Batcher<[TailSensorDataResponse, SensorInfoResponse, SensorMeta]>((ids: number[]) => {
+        console.log("tcd:querying", ids);
+        const data = this.api.tailSensorData(ids);
+        const quickSensors = this.api.getQuickSensors(ids);
+
+        const sensorMeta = this.api
+            .getAllSensorsMemoized()()
+            .then((meta) => new SensorMeta(meta));
+
+        return [data, quickSensors, sensorMeta];
+    });
+
+    private recently = new Batcher<QueryRecentlyResponse>((ids: number[]) => {
+        console.log("qrd:querying", ids);
+        return this.api.queryStationsRecently(ids);
+    });
+
+    public async queryTinyChartData(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
+        return this.tinyChartData
+            .query(stationId)
+            .then(([data, quickSensors, sensorMeta]) => {
                 const dataQuery = data.then((response) => {
                     return {
                         data: response.data.filter((row) => row.stationId == stationId),
@@ -115,16 +119,41 @@ export class SensorDataQuerier {
                     };
                 });
 
-                const stationRecently = recently.then((response) => {
-                    return _.mapValues(response, (window, hours) => {
-                        return window.filter((row) => row.stationId == stationId);
-                    });
-                });
-
-                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta, stationRecently]);
+                return Promise.all([dataQuery, quickSensorsQuery, sensorMeta]);
             })
-            .then(([data, quickSensors, meta, recently]) => {
-                return [data, quickSensors, meta, recently];
+            .then(([data, quickSensors, meta]) => {
+                return [data, quickSensors, meta];
             });
+    }
+
+    public async queryRecently(stationId: number): Promise<QueryRecentlyResponse> {
+        return this.recently.query(stationId).then((response) => {
+            return _.mapValues(response, (rows, hours) => {
+                return rows.filter((row) => row.stationId == stationId);
+            });
+        });
+    }
+}
+
+export class StandardObserver {
+    observe(el, handler) {
+        if (!("IntersectionObserver" in window)) {
+            console.log("tiny-chart:warning", "no-intersection-observer");
+        } else {
+            const observer = new IntersectionObserver((entries) => {
+                // Use `intersectionRatio` because of Edge 15's lack of support for
+                // `isIntersecting`.  See: // https://github.com/w3c/IntersectionObserver/issues/211
+                if (entries[0].intersectionRatio <= 0) return;
+
+                // Cleanup
+                observer.unobserve(el);
+
+                handler();
+            });
+
+            // We observe the root `$el` of the mounted loading component to detect
+            // when it becomes visible.
+            observer.observe(el);
+        }
     }
 }
