@@ -69,11 +69,13 @@ export class SensorMeta {
     }
 }
 
+type HandlerType<PromisedData> = (ids: number[]) => PromisedData;
+
 class Batcher<T> {
     private queued: number[] = [];
     private queue: Promise<T> | null = null;
 
-    constructor(private readonly handler) {}
+    constructor(private readonly handler: HandlerType<T>) {}
 
     public async query(id: number): Promise<T> {
         this.queued.push(id);
@@ -94,15 +96,17 @@ class Batcher<T> {
 export class SensorDataQuerier {
     constructor(private readonly api: FKApi) {}
 
-    private tinyChartData = new Batcher<[TailSensorDataResponse, SensorInfoResponse, SensorMeta]>((ids: number[]) => {
-        console.log("tcd:querying", ids);
-        const data = this.api.tailSensorData(ids);
-        const quickSensors = this.api.getQuickSensors(ids);
-        const sensorMeta = this.querySensorMeta();
-        return [data, quickSensors, sensorMeta];
-    });
+    private tinyChartData = new Batcher<[Promise<TailSensorDataResponse>, Promise<SensorInfoResponse>, Promise<SensorMeta>]>(
+        (ids: number[]) => {
+            console.log("tcd:querying", ids);
+            const data = this.api.tailSensorData(ids);
+            const quickSensors = this.api.getQuickSensors(ids);
+            const sensorMeta = this.querySensorMeta();
+            return [data, quickSensors, sensorMeta];
+        }
+    );
 
-    private recently = new Batcher<QueryRecentlyResponse>((ids: number[]) => {
+    private recently = new Batcher<Promise<QueryRecentlyResponse>>((ids: number[]) => {
         console.log("qrd:querying", ids);
         return this.api.queryStationsRecently(ids);
     });
@@ -137,11 +141,14 @@ export class SensorDataQuerier {
     }
 
     public async queryRecently(stationId: number): Promise<QueryRecentlyResponse> {
-        return this.recently.query(stationId).then((response) => {
-            return _.mapValues(response, (rows, hours) => {
-                return rows.filter((row) => row.stationId == stationId);
+        return this.recently
+            .query(stationId)
+            .then((response) => response)
+            .then((response) => {
+                return _.mapValues(response, (rows, hours) => {
+                    return rows.filter((row) => row.stationId == stationId);
+                });
             });
-        });
     }
 }
 
