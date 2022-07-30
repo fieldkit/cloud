@@ -12,7 +12,7 @@ import {
 import { promiseAfter } from "@/utilities";
 import _ from "lodash";
 
-export { QueryRecentlyResponse };
+export { ModuleSensorMeta, QueryRecentlyResponse };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];
@@ -42,6 +42,14 @@ export class SensorMeta {
         }
 
         return byKey[0];
+    }
+
+    public findSensorById(id: number): ModuleSensorMeta {
+        const row = this.meta.sensors.find((row) => row.id == id);
+        if (!row) {
+            throw new Error(`viz: Missing sensor meta: ${id}`);
+        }
+        return this.findSensorByKey(row.key);
     }
 
     public findSensor(vizSensor: VizSensor): ModuleSensorMeta {
@@ -90,11 +98,7 @@ export class SensorDataQuerier {
         console.log("tcd:querying", ids);
         const data = this.api.tailSensorData(ids);
         const quickSensors = this.api.getQuickSensors(ids);
-
-        const sensorMeta = this.api
-            .getAllSensorsMemoized()()
-            .then((meta) => new SensorMeta(meta));
-
+        const sensorMeta = this.querySensorMeta();
         return [data, quickSensors, sensorMeta];
     });
 
@@ -102,6 +106,12 @@ export class SensorDataQuerier {
         console.log("qrd:querying", ids);
         return this.api.queryStationsRecently(ids);
     });
+
+    public async querySensorMeta(): Promise<SensorMeta> {
+        return this.api
+            .getAllSensorsMemoized()()
+            .then((meta) => new SensorMeta(meta));
+    }
 
     public async queryTinyChartData(stationId: number): Promise<[TailSensorDataResponse, StationQuickSensors, SensorMeta]> {
         return this.tinyChartData

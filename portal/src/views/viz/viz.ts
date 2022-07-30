@@ -24,8 +24,6 @@ import {
 import FKApi, { Station, AssociatedStation, AssociatedStationsResponse } from "@/api/api";
 import i18n from "@/i18n";
 
-import Config from "@/secrets";
-
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation, stations } from "@/store";

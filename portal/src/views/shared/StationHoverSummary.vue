@@ -40,7 +40,7 @@ import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import { SensorDataQuerier, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
@@ -90,28 +90,44 @@ export default Vue.extend({
     },
     data(): {
         viewingSummary: boolean;
+        sensorMeta: SensorMeta | null;
         readings: QueryRecentlyResponse | null;
     } {
         return {
             viewingSummary: true,
+            sensorMeta: null,
             readings: null,
         };
     },
     async mounted() {
         if (this.sensorDataQuerier) {
             this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
+            this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
         }
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
+        visibleSensor(): ModuleSensorMeta | null {
+            if (this.sensorMeta && this.readings && 24 in this.readings && this.readings[24].length > 0) {
+                const sensorId = this.readings[24][0].sensorId;
+                return this.sensorMeta.findSensorById(sensorId);
+            }
+            return null;
+        },
         visibleReadingValue(): number | null {
-            if (this.readings && 24 in this.readings && this.readings[24].length > 0) {
-                console.log(this.visibleReadings, this.readings);
+            const sensor = this.visibleSensor;
+            if (sensor && this.readings && 24 in this.readings && this.readings[24].length > 0) {
+                // console.log(this.visibleReadings, this.readings);
                 let value: number | undefined;
                 if (this.visibleReadings == VisibleReadings.Current) {
                     value = this.readings[24][0].last;
                 } else {
-                    value = this.readings[24][0].max;
+                    if (sensor.aggregationFunction == "max") {
+                        // TODO Pull into helper
+                        value = this.readings[24][0].max;
+                    } else {
+                        value = this.readings[24][0].avg;
+                    }
                 }
                 return value === undefined ? null : value;
             }
@@ -119,15 +135,11 @@ export default Vue.extend({
             return null;
         },
         thresholds() {
-            // TODO Use another means to determine thresholds.
-            const allFeatures = _.flatten(
-                Object.values(this.projectsById)
-                    .filter((p) => p != null)
-                    .map((p) => p.mapped.features)
-            );
-            const feature = allFeatures.find((feature) => feature.properties?.id === this.station.id);
-            if (feature && feature.properties) {
-                return feature.properties.thresholds || null;
+            const sensor = this.visibleSensor;
+            if (sensor && sensor.viz && sensor.viz.length > 0) {
+                if (sensor.viz[0].thresholds) {
+                    return sensor.viz[0].thresholds;
+                }
             }
             return null;
         },
