@@ -20,10 +20,7 @@ type AggregateInfo struct {
 }
 
 type QueriedData struct {
-	Summaries map[string]*backend.AggregateSummary `json:"summaries"`
-	Aggregate AggregateInfo                        `json:"aggregate"`
-	Data      []*backend.DataRow                   `json:"data"`
-	Outer     []*backend.DataRow                   `json:"outer"`
+	Data []*backend.DataRow `json:"data"`
 }
 
 type DataBackend interface {

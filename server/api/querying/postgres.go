@@ -82,16 +82,7 @@ func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	}
 
 	data := &QueriedData{
-		Summaries: summaries,
-		Aggregate: AggregateInfo{
-			Name:     aqp.AggregateName,
-			Interval: aqp.Interval,
-			Complete: aqp.Complete,
-			Start:    aqp.Start,
-			End:      aqp.End,
-		},
-		Data:  rows,
-		Outer: outerRows,
+		Data: rows,
 	}
 
 	return data, nil

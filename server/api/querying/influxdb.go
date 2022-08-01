@@ -203,16 +203,7 @@ func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	log.Infow("influx:queried", "rows", len(dataRows))
 
 	queriedData := &QueriedData{
-		Summaries: make(map[string]*backend.AggregateSummary),
-		Aggregate: AggregateInfo{
-			Name:     "",
-			Interval: 0,
-			Complete: qp.Complete,
-			Start:    qp.Start,
-			End:      qp.End,
-		},
-		Data:  dataRows,
-		Outer: make([]*backend.DataRow, 0),
+		Data: dataRows,
 	}
 
 	return queriedData, nil

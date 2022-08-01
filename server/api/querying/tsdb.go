@@ -249,16 +249,7 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 
 func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	queriedData := &QueriedData{
-		Summaries: make(map[string]*backend.AggregateSummary),
-		Aggregate: AggregateInfo{
-			Name:     "",
-			Interval: 0,
-			Complete: qp.Complete,
-			Start:    qp.Start,
-			End:      qp.End,
-		},
-		Data:  make([]*backend.DataRow, 0),
-		Outer: make([]*backend.DataRow, 0),
+		Data: make([]*backend.DataRow, 0),
 	}
 
 	return queriedData, nil
@@ -350,16 +341,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	}
 
 	queriedData := &QueriedData{
-		Summaries: make(map[string]*backend.AggregateSummary),
-		Aggregate: AggregateInfo{
-			Name:     "",
-			Interval: 0,
-			Complete: qp.Complete,
-			Start:    qp.Start,
-			End:      qp.End,
-		},
-		Data:  backendRows,
-		Outer: make([]*backend.DataRow, 0),
+		Data: backendRows,
 	}
 
 	return queriedData, nil
