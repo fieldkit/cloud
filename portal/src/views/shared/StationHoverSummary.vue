@@ -12,14 +12,14 @@
             </template>
         </StationSummaryContent>
 
-        <div
-            v-if="isPartnerCustomisationEnabled() && station.latestPrimary !== null"
-            class="latest-primary"
-            :style="{ color: latestPrimaryColor }"
-        >
+        <div v-if="isPartnerCustomisationEnabled()" class="latest-primary" :style="{ color: latestPrimaryColor }">
             <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-            <template v-else>{{ $t("noData") }}</template>
-            <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
+            <span v-else class="no-data">{{ $t("noData") }}</span>
+
+            <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                <template v-if="station.status === StationStatus.down">-</template>
+                <template v-else>{{ station.latestPrimary | prettyNum }}</template>
+            </i>
         </div>
 
         <slot :station="station" :sensorDataQuerier="sensorDataQuerier">
@@ -49,6 +49,7 @@ import StationSummaryContent from "./StationSummaryContent.vue";
 import * as utils from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
+import { StationStatus } from "@/api";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -60,6 +61,7 @@ export default Vue.extend({
     data: () => {
         return {
             viewingSummary: true,
+            StationStatus: StationStatus,
         };
     },
     props: {
@@ -104,7 +106,7 @@ export default Vue.extend({
         stationFeature(): any {
             return this.allProjectFeatures.find((feature) => feature.properties?.id === this.station.id);
         },
-        latestPrimaryLevel(): any {
+        latestPrimaryLevel(): string {
             if (this.stationFeature && this.stationFeature.properties) {
                 const primaryValue = this.stationFeature.properties.value;
                 const level = this.stationFeature.properties.thresholds?.levels.find(
@@ -277,6 +279,11 @@ export default Vue.extend({
         margin-left: 5px;
         min-width: 1.2em;
         text-align: center;
+    }
+
+    .no-data {
+        color: #cccccc;
+        font-family: $font-family-bold;
     }
 }
 </style>
