@@ -11,6 +11,7 @@
                             :station="station"
                             :sensorDataQuerier="sensorDataQuerier"
                             :exploreContext="exploreContext"
+                            :visibleReadings="visibleReadings"
                             v-slot="{ sensorDataQuerier }"
                         >
                             <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
@@ -51,9 +52,9 @@
                 <StationHoverSummary
                     v-if="activeStation"
                     :station="activeStation"
-                    :readings="false"
                     :sensorDataQuerier="sensorDataQuerier"
                     :exploreContext="exploreContext"
+                    :visibleReadings="visibleReadings"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"
                     v-slot="{ sensorDataQuerier }"
@@ -83,21 +84,19 @@
 
 <script lang="ts">
 import * as utils from "../../utilities";
-import { getFeaturesEnabled } from "@/utilities";
 
+import { mapState, mapGetters } from "vuex";
 import { ActionTypes, GlobalState, ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
+import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 
 import Vue from "vue";
-import { mapState, mapGetters } from "vuex";
-
 import StandardLayout from "../StandardLayout.vue";
 import StationsMap from "../shared/StationsMap.vue";
-import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
-import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
+import StationHoverSummary, { VisibleReadings } from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
-import { ExploreContext } from "@/views/viz/common";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
+import { ExploreContext } from "@/views/viz/common";
 
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 
@@ -141,6 +140,9 @@ export default Vue.extend({
                 return this.$getters.projectsById[this.id];
             },
         }),
+        visibleReadings(): VisibleReadings {
+            return this.recentMapMode ? VisibleReadings.Last24h : VisibleReadings.Current;
+        },
         project(): Project {
             return this.displayProject.project;
         },

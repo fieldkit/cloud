@@ -218,8 +218,13 @@ func (idb *InfluxDBBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	return queriedData, nil
 }
 
-func (idb *InfluxDBBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+func (idb *InfluxDBBackend) QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error) {
 	return &SensorTailData{
 		Data: make([]*backend.DataRow, 0),
 	}, nil
+}
+
+func (idb *InfluxDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
+	empty := make(map[time.Duration][]*backend.DataRow)
+	return empty, nil
 }

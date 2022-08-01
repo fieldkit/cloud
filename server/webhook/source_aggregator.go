@@ -39,7 +39,8 @@ func MaxValue(values []float64) float64 {
 }
 
 func (c *sourceAggregatorConfig) Apply(key handlers.AggregateSensorKey, values []float64) (float64, error) {
-	if strings.HasSuffix(key.SensorKey, ".depth") { // HACK HACK
+	// HACK This can be left until we deprecate this entire file.
+	if strings.HasSuffix(key.SensorKey, ".depth") {
 		if len(values) == 0 {
 			return 0, fmt.Errorf("aggregating empty slice")
 		}

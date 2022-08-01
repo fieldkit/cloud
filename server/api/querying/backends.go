@@ -28,5 +28,6 @@ type QueriedData struct {
 
 type DataBackend interface {
 	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
-	QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
+	QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error)
+	QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error)
 }

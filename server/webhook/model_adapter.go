@@ -148,7 +148,6 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	}
 
 	// Add or create the provision.
-	// TODO Consider eventually using an expression to drive the re-up of this?
 	defaultGenerationID := pm.DeviceID
 	provision, err := m.pr.QueryOrCreateProvision(ctx, pm.DeviceID, defaultGenerationID)
 	if err != nil {

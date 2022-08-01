@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"time"
 
 	_ "github.com/lib/pq"
 
@@ -96,7 +97,7 @@ func (pgb *PostgresBackend) QueryData(ctx context.Context, qp *backend.QueryPara
 	return data, nil
 }
 
-func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error) {
+func (pgb *PostgresBackend) QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error) {
 	query, args, err := sqlx.In(fmt.Sprintf(`
 		SELECT
 		id,
@@ -114,7 +115,7 @@ func (pgb *PostgresBackend) QueryTail(ctx context.Context, qp *backend.QueryPara
 		) AS q
 		WHERE
 		q.r <= ?
-		`, "fieldkit.aggregated_1m"), qp.Stations, qp.Tail)
+		`, "fieldkit.aggregated_1m"), stationIDs, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -152,4 +153,9 @@ func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	}
 
 	return nil
+}
+
+func (pgb *PostgresBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
+	empty := make(map[time.Duration][]*backend.DataRow)
+	return empty, nil
 }

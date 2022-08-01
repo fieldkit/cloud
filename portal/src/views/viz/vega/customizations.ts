@@ -22,7 +22,7 @@ export function getString(d: VizStrings | null): string | null {
 }
 
 export function getAxisLabel(level: VizThresholdLevel): string | null {
-    return (level.keyLabel) ? getString(level.keyLabel) : getString(level.label);
+    return level.keyLabel ? getString(level.keyLabel) : getString(level.label);
 }
 
 export function getSeriesThresholds(series: SeriesData): VizThresholds | null {
@@ -30,10 +30,11 @@ export function getSeriesThresholds(series: SeriesData): VizThresholds | null {
         const vizConfig = series.vizInfo.viz[0];
         const thresholds = vizConfig.thresholds;
         if (thresholds) {
-            thresholds.levels = thresholds.levels.filter((d: VizThresholdLevel) => !d.hidden);
-
-            if (thresholds && thresholds.levels && thresholds.levels.length > 0) {
-                return thresholds;
+            const visible = thresholds.levels.filter((d: VizThresholdLevel) => !d.hidden);
+            if (thresholds && thresholds.levels && visible.length > 0) {
+                return _.merge({}, thresholds, {
+                    levels: visible,
+                });
             }
         }
     }

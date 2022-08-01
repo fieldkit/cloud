@@ -27,6 +27,16 @@ func DataSensorPath() string {
 	return "/sensors/data"
 }
 
+// TailSensorPath returns the URL path to the sensor service tail HTTP endpoint.
+func TailSensorPath() string {
+	return "/sensors/data/tail"
+}
+
+// RecentlySensorPath returns the URL path to the sensor service recently HTTP endpoint.
+func RecentlySensorPath() string {
+	return "/sensors/data/recently"
+}
+
 // BookmarkSensorPath returns the URL path to the sensor service bookmark HTTP endpoint.
 func BookmarkSensorPath() string {
 	return "/bookmarks/save"
