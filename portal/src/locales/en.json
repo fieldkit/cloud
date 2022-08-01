@@ -213,7 +213,8 @@
             "deletePhoto": "Delete Photo",
             "setAsStationImage": "Set as Station Image",
             "linkToPhotos": "View all photos"
-        }
+        },
+        "inactive": "Inactive"
     },
     "user": {
         "profile": {
