@@ -18,8 +18,12 @@
             :style="{ color: latestPrimaryColor }"
         >
             <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-            <template v-else>{{ $t("noData") }}</template>
-            <i :style="{ 'background-color': latestPrimaryColor }">{{ visibleReadingValue | prettyNum }}</i>
+            <span v-else class="no-data">{{ $t("noData") }}</span>
+
+            <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                <template v-if="station.status === StationStatus.down">-</template>
+                <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+            </i>
         </div>
 
         <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
@@ -45,6 +49,7 @@ import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
+import { StationStatus } from "@/api";
 
 export enum VisibleReadings {
     Current,
@@ -92,11 +97,13 @@ export default Vue.extend({
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
         readings: QueryRecentlyResponse | null;
+        StationStatus: any;
     } {
         return {
             viewingSummary: true,
             sensorMeta: null,
             readings: null,
+            StationStatus: StationStatus,
         };
     },
     async mounted() {
@@ -319,6 +326,11 @@ export default Vue.extend({
         margin-left: 5px;
         min-width: 1.2em;
         text-align: center;
+    }
+
+    .no-data {
+        color: #cccccc;
+        font-family: $font-family-bold;
     }
 }
 </style>
