@@ -18,12 +18,12 @@
             :style="{ color: latestPrimaryColor }"
         >
             <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-          <span v-else class="no-data">{{ $t("noData") }}</span>
+            <span v-else class="no-data">{{ $t("noData") }}</span>
 
-          <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-            <template v-if="station.status === StationStatus.down">-</template>
-            <template v-else>{{ visibleReadingValue | prettyNum }}</template>
-          </i>
+            <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                <template v-if="station.status === StationStatus.down">-</template>
+                <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+            </i>
         </div>
 
         <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
@@ -97,12 +97,13 @@ export default Vue.extend({
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
         readings: QueryRecentlyResponse | null;
-      StationStatus: StationStatus,
+        StationStatus: any;
     } {
         return {
             viewingSummary: true,
             sensorMeta: null,
             readings: null,
+            StationStatus: StationStatus,
         };
     },
     async mounted() {
