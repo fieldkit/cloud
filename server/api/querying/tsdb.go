@@ -51,10 +51,9 @@ type LastTimeRow struct {
 }
 
 type TimeScaleDBBackend struct {
-	config    *storage.TimeScaleDBConfig
-	db        *sqlxcache.DB
-	pool      *pgxpool.Pool
-	debugging bool
+	config *storage.TimeScaleDBConfig
+	db     *sqlxcache.DB
+	pool   *pgxpool.Pool
 }
 
 type DataRow struct {
@@ -77,9 +76,8 @@ type SelectedAggregate struct {
 
 func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
-		config:    config,
-		db:        db,
-		debugging: true,
+		config: config,
+		db:     db,
 	}, nil
 }
 
@@ -471,10 +469,6 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 
 func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
 	since := time.Now()
-
-	if tsdb.debugging {
-		since = since.Add(time.Hour * 24 * 3 * -1)
-	}
 
 	sql := fmt.Sprintf(`
 	SELECT
