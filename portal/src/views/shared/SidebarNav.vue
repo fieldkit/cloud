@@ -140,11 +140,6 @@ export default Vue.extend({
                 this.narrow = true;
                 this.toggleSidebar();
             }
-            if (from.name === "viewProjectBigMap") {
-                this.narrow = false;
-                this.closeMenuOnMobile();
-                this.toggleSidebar();
-            }
         },
     },
     computed: {
