@@ -321,6 +321,11 @@ export interface ProjectAttribute {
     priority: number;
 }
 
+export enum StationStatus {
+    up = "up",
+    down = "down",
+}
+
 export interface Station {
     id: number;
     name: string;
@@ -342,6 +347,7 @@ export interface Station {
     attributes: {
         attributes: ProjectAttribute[];
     };
+    status: StationStatus;
 }
 
 export interface ProjectsResponse {

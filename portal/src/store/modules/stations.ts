@@ -20,6 +20,7 @@ import {
     Photos,
     VizThresholds,
     ProjectAttribute,
+    StationStatus,
 } from "@/api";
 
 import { VizConfig } from "@/views/viz/viz";
@@ -89,6 +90,7 @@ export class DisplayStation {
     public readonly primarySensor: ModuleSensor | null;
     public readonly attributes: ProjectAttribute[];
     public readonly readOnly: boolean;
+    public readonly status: StationStatus;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -105,6 +107,7 @@ export class DisplayStation {
         this.lastReadingAt = station.lastReadingAt ? new Date(station.lastReadingAt) : null;
         this.attributes = station.attributes.attributes;
         this.readOnly = station.readOnly;
+        this.status = station.status;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);

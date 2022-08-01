@@ -118,6 +118,9 @@ export default Vue.extend({
             }
         },
     },
+    mounted() {
+        console.log("Radoi station", this.station);
+    },
 });
 </script>
 
