@@ -141,7 +141,7 @@ export default Vue.extend({
             },
         }),
         visibleReadings(): VisibleReadings {
-            return this.recentMapMode ? VisibleReadings.Last24h : VisibleReadings.Current;
+            return this.recentMapMode ? VisibleReadings.Last72h : VisibleReadings.Current;
         },
         project(): Project {
             return this.displayProject.project;

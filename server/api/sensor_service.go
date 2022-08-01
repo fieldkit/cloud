@@ -179,6 +179,7 @@ func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPa
 	durations := []time.Duration{
 		time.Hour * 24,
 		time.Hour * 48,
+		time.Hour * 72,
 	}
 
 	data, err := be.QueryRecentlyAggregated(ctx, stationIDs, durations)
