@@ -12,17 +12,16 @@
             </template>
         </StationSummaryContent>
 
-        <div
-            v-if="isPartnerCustomisationEnabled() && visibleReadingValue !== null"
-            class="latest-primary"
-            :style="{ color: latestPrimaryColor }"
-        >
+        <div v-if="isPartnerCustomisationEnabled()" class="latest-primary" :style="{ color: latestPrimaryColor }">
             <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
             <span v-else class="no-data">{{ $t("noData") }}</span>
 
             <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-                <template v-if="station.status === StationStatus.down">-</template>
+                <template v-if="station.status === StationStatus.down">&#x25CF;</template>
                 <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+            </i>
+            <i v-else :style="{ 'background-color': latestPrimaryColor }">
+                &#x25CF;
             </i>
         </div>
 
@@ -162,10 +161,16 @@ export default Vue.extend({
             return null;
         },
         latestPrimaryLevel(): any {
+            if (this.visibleReadingValue === null) {
+                return null;
+            }
             const level = this.visibleLevel;
             return level?.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
         },
         latestPrimaryColor(): string {
+            if (this.visibleReadingValue === null) {
+                return "#cccccc";
+            }
             const level = this.visibleLevel;
             return level?.color || "#00CCFF";
         },
