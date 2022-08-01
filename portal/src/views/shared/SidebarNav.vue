@@ -136,9 +136,8 @@ export default Vue.extend({
     },
     watch: {
         $route(to, from) {
-            if (to.name === "viewProjectBigMap") {
-                this.narrow = true;
-                this.toggleSidebar();
+            if (to.name === "viewProjectBigMap" || to.name === "root") {
+                this.sidebar.narrow = true;
             }
         },
     },
