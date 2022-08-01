@@ -155,7 +155,13 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null; color: string } | null = null;
+    public readonly properties: {
+        icon: string;
+        id: number;
+        value: number | "-" | null;
+        thresholds: object | null;
+        color: string;
+    } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -167,7 +173,7 @@ export class MapFeature {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
 
-        let color;
+        let color = "#00CCFF";
         // Marker color scale
 
         if (thresholds) {
@@ -177,17 +183,13 @@ export class MapFeature {
                 .range(thresholds.levels.map((d) => d.color));
 
             color = markerScale(station.latestPrimary);
-        } else {
-            // default color
-            color = "#00CCFF";
         }
-
         this.properties = {
             id: station.id,
-            value: station.latestPrimary,
+            value: station.status === "down" ? "-" : station.latestPrimary,
             icon: "marker",
             thresholds: thresholds,
-            color,
+            color: station.status === "down" ? "#CCCCCC" : color,
         };
     }
 
