@@ -1047,7 +1047,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 	}
 
 	var photos *station.StationPhotos
-	if sf.HasImages {
+	 if sf.Station.PhotoID != 0 {
 		photos = &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		}
