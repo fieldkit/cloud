@@ -57,7 +57,7 @@ function getDeploymentDate(station: DisplayStation): string | null {
 
 export function getPartnerCustomization(): PartnerCustomization | null {
     // dataviz.floodnet.nyc, floodnet.fieldkit.org
-    if (window.location.hostname.indexOf("floodnet.") < 0) {
+    if (window.location.hostname.indexOf("floodnet.") >= 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
