@@ -82,6 +82,7 @@ export interface DataRow {
 
 export interface SensorDataResponse {
     data: DataRow[];
+    bucketSize: number;
 }
 
 export interface StationInfoResponse {

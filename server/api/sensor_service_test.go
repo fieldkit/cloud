@@ -92,6 +92,7 @@ func TestGetSensorsData(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
+		"bucketSize": "<<PRESENCE>>",
 		"data": "<<PRESENCE>>"
 	}`)
 }

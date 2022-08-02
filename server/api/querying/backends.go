@@ -20,7 +20,8 @@ type AggregateInfo struct {
 }
 
 type QueriedData struct {
-	Data []*backend.DataRow `json:"data"`
+	Data       []*backend.DataRow `json:"data"`
+	BucketSize int                `json:"bucketSize"`
 }
 
 type DataBackend interface {

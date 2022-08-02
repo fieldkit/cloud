@@ -25,6 +25,10 @@ func (w *TimeScaleDBWindow) CalculateMaximumRows(start, end time.Time) int {
 	return int(duration / w.Interval)
 }
 
+func (w *TimeScaleDBWindow) BucketSize() int {
+	return int(w.Interval.Seconds())
+}
+
 var (
 	MaxTime = time.Unix(1<<63-62135596801, 999999999)
 	MinTime = time.Time{}
@@ -71,7 +75,8 @@ type DataRow struct {
 }
 
 type SelectedAggregate struct {
-	Specifier string
+	Specifier  string
+	BucketSize int
 }
 
 func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB) (*TimeScaleDBBackend, error) {
@@ -189,7 +194,8 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 			log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples)
 
 			return &SelectedAggregate{
-				Specifier: Window1m.Specifier,
+				Specifier:  Window1m.Specifier,
+				BucketSize: Window1m.BucketSize(),
 			}, nil
 		}
 	} else {
@@ -204,19 +210,20 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 
 	log.Infow("tsdb:range", "start", dataStart, "end", dataEnd, "duration", duration, "ideal_bucket", idealBucket, "bucket_hour", nearestHour)
 
-	aggregateSpecifier := Window24h.Specifier
+	selected := Window24h
 
 	for _, window := range TimeScaleWindows {
 		rows := window.CalculateMaximumRows(dataStart, dataEnd)
 		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "window", window.Specifier, "rows", rows, "verbose", true)
 
 		if rows < ArbitrarySamplesThreshold {
-			aggregateSpecifier = window.Specifier
+			selected = window
 		}
 	}
 
 	return &SelectedAggregate{
-		Specifier: aggregateSpecifier,
+		Specifier:  selected.Specifier,
+		BucketSize: selected.BucketSize(),
 	}, nil
 }
 
@@ -341,7 +348,8 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	}
 
 	queriedData := &QueriedData{
-		Data: backendRows,
+		Data:       backendRows,
+		BucketSize: aggregate.BucketSize,
 	}
 
 	return queriedData, nil

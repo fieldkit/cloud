@@ -50,81 +50,6 @@ export class TimeSeriesSpecFactory {
         };
 
         const filteredData = mapSeries((series, i) => {
-            /*
-            function calculateTimeDeltas(rows: DataRow[]) {
-                const initial: { prev: DataRow | null; deltas: number[] } = {
-                    prev: null,
-                    deltas: [] as number[],
-                };
-                return _.reduce(
-                    rows,
-                    (state, datum) => {
-                        if (state.prev != null) {
-                            state.deltas.push(datum.time - state.prev.time);
-                        }
-                        return _.extend(state, { prev: datum });
-                    },
-                    initial
-                ).deltas;
-            }
-
-            function calculateGaps(rows: DataRow[]) {
-                const initial: { prev: DataRow | null; gaps: number[] } = {
-                    prev: null,
-                    gaps: [0] as number[],
-                };
-                return _.reduce(
-                    rows,
-                    (state, datum) => {
-                        if (_.isNumber(datum.value)) {
-                            if (state.gaps[state.gaps.length - 1] > 0) {
-                                state.gaps.push(0);
-                            }
-                        } else {
-                            state.gaps[state.gaps.length - 1]++;
-                        }
-                        return state;
-                    },
-                    initial
-                ).gaps;
-            }
-
-            function rebin(rows: DataRow[], interval: number): DataRow[] {
-                const aggregateFunction = series.vizInfo.aggregationFunction;
-                const grouped = _(rows)
-                    .groupBy((datum) => {
-                        return Math.floor(datum.time / interval) * interval;
-                    })
-                    .mapValues((bin, time) => {
-                        const valid = bin.filter((datum) => _.isNumber(datum.value));
-                        if (valid.length == 1) {
-                            return valid[0];
-                        }
-                        if (valid.length > 1) {
-                            return {
-                                time: Number(time),
-                                stationId: valid[0].stationId,
-                                moduleId: valid[0].moduleId,
-                                sensorId: valid[0].sensorId,
-                                location: valid[0].location,
-                                value: aggregateFunction(valid.map((v) => v.value)) || null,
-                            };
-                        }
-                        return {
-                            time: Number(time),
-                            stationId: null,
-                            moduleId: null,
-                            sensorId: null,
-                            location: null,
-                            value: null,
-                        };
-                    })
-                    .value();
-
-                return _.values(grouped);
-            }
-            */
-
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
             const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
@@ -225,14 +150,16 @@ export class TimeSeriesSpecFactory {
             console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
         }
 
-        const getBarUnits = (timeRange: number[] | null) => {
-            if (timeRange) {
-                const duration = timeRange[1] - timeRange[0];
-                if (duration < 60000) {
-                    return ["year", "month", "date", "hours", "minutes", "seconds"];
-                }
+        const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
+            const bucketSize = this.allSeries[i].queried.bucketSize;
+            let step = 5;
+            if (bucketSize > 300) {
+                step = bucketSize / 60;
             }
-            return ["year", "month", "date", "hours", "minutes"];
+            return {
+                units: ["year", "month", "date", "hours", "minutes"],
+                step: step,
+            };
         };
 
         const makeDomainX = (): number[] | null => {
@@ -292,12 +219,14 @@ export class TimeSeriesSpecFactory {
                                 name: makeBarDataName(i),
                                 source: makeValidDataName(i),
                                 transform: [
-                                    {
-                                        field: "time",
-                                        type: "timeunit",
-                                        units: getBarUnits(timeRangeAll),
-                                        as: ["barStartDate", "barEndDate"],
-                                    },
+                                    _.extend(
+                                        {
+                                            field: "time",
+                                            type: "timeunit",
+                                            as: ["barStartDate", "barEndDate"],
+                                        },
+                                        getBarConfiguration(i, timeRangeAll)
+                                    ),
                                     {
                                         type: "formula",
                                         expr: "time(datum.barStartDate)",
