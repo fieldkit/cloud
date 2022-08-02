@@ -1062,7 +1062,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Time:            iness.ReadingTime.Unix() * 1000,
 		})
 	}
-
+    
 	attributes := make([]*station.StationProjectAttribute, 0)
 	for _, attribute := range sf.Attributes {
 		attributes = append(attributes, &station.StationProjectAttribute{
