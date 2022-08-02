@@ -270,7 +270,7 @@ func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.Defa
 	}
 
 	updating.UpdatedAt = time.Now()
-	updating.PhotoID = payload.PhotoID
+	updating.PhotoID = &payload.PhotoID
 
 	if err := sr.UpdatePhoto(ctx, updating); err != nil {
 		return err
