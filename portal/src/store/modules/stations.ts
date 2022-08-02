@@ -2,25 +2,24 @@ import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
-import { Location, BoundingRectangle, LngLat } from "../map-types";
+import { BoundingRectangle, LngLat, Location } from "../map-types";
 
 import {
-    FKApi,
-    Services,
-    OnNoReject,
-    Station,
-    StationModule,
-    ModuleSensor,
-    StationRegion,
-    Project,
-    ProjectUser,
-    ProjectFollowers,
     Activity,
     Configurations,
+    ModuleSensor,
+    OnNoReject,
     Photos,
-    VizThresholds,
+    Project,
     ProjectAttribute,
+    ProjectFollowers,
+    ProjectUser,
+    Services,
+    Station,
+    StationModule,
+    StationRegion,
     StationStatus,
+    VizThresholds,
 } from "@/api";
 
 import { VizConfig } from "@/views/viz/viz";
@@ -129,6 +128,11 @@ export class DisplayStation {
             this.latestPrimary = null;
         }
 
+        // TODO: remove after wiring the map values to the new sensorDataQuerier code
+        if (station.status === StationStatus.down) {
+            this.latestPrimary = null;
+        }
+
         if (station.location) {
             if (station.location.precise) {
                 this.location = new Location(station.location.precise[1], station.location.precise[0]);
@@ -186,10 +190,10 @@ export class MapFeature {
         }
         this.properties = {
             id: station.id,
-            value: station.status === "down" ? "-" : station.latestPrimary,
+            value: station.status === StationStatus.down ? null : station.latestPrimary,
             icon: "marker",
             thresholds: thresholds,
-            color: station.status === "down" ? "#CCCCCC" : color,
+            color: color,
         };
     }
 

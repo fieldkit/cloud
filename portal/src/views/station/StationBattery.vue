@@ -66,7 +66,6 @@ export default Vue.extend({
 }
 
 .inactive {
-    color: #fe4d4c;
     font-family: $font-family-bold;
     margin-right: 5px;
     font-size: 14px;
