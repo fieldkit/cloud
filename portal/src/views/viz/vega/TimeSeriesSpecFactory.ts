@@ -152,10 +152,7 @@ export class TimeSeriesSpecFactory {
 
         const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
             const bucketSize = this.allSeries[i].queried.bucketSize;
-            let step = 5;
-            if (bucketSize > 300) {
-                step = bucketSize / 60;
-            }
+            const step = bucketSize > 300 ? bucketSize / 60 : 5;
             return {
                 units: ["year", "month", "date", "hours", "minutes"],
                 step: step,
@@ -229,12 +226,16 @@ export class TimeSeriesSpecFactory {
                                     ),
                                     {
                                         type: "formula",
-                                        expr: "time(datum.barStartDate)",
+                                        expr: timeRangeAll
+                                            ? `time(clamp(datum.barStartDate , ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                            : `time(datum.barStartDate)`,
                                         as: "barStart",
                                     },
                                     {
                                         type: "formula",
-                                        expr: "time(datum.barEndDate)",
+                                        expr: timeRangeAll
+                                            ? `time(clamp(datum.barEndDate, ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                            : `time(datum.barEndDate)`,
                                         as: "barEnd",
                                     },
                                     {
