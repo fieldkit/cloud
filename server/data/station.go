@@ -82,7 +82,7 @@ type Station struct {
 	FirmwareTime       *int64     `db:"firmware_time"`
 	PlaceOther         *string    `db:"place_other"`
 	PlaceNative        *string    `db:"place_native"`
-	PhotoID            int32      `db:"photo_id"`
+	PhotoID            *int32     `db:"photo_id"`
 	Hidden             *bool      `db:"hidden"`
 	Status             *string    `db:"status"`
 }
