@@ -68,7 +68,7 @@ func (rr *MessagesRepository) processQuery(ctx context.Context, batch *MessageBa
 	return nil
 }
 
-func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, batch *MessageBatch, messageID int64) error {
+func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, batch *MessageBatch, messageID int64, verbose bool) error {
 	log := Logger(ctx).Sugar()
 
 	if batch.Messages != nil {
@@ -86,7 +86,9 @@ func (rr *MessagesRepository) QueryMessageForProcessing(ctx context.Context, bat
 
 	elapsed := time.Since(started)
 
-	log.Infow("queried", "elapsed", elapsed, "records", len(messages))
+	if verbose {
+		log.Infow("queried", "elapsed", elapsed, "records", len(messages))
+	}
 
 	return rr.processQuery(ctx, batch, messages)
 }

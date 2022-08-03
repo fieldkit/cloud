@@ -10,3 +10,12 @@ services:
       - POSTGRES_PASSWORD=password
     volumes:
       - ./active-schema:/docker-entrypoint-initdb.d/:ro
+
+  tsdb:
+    image: timescale/timescaledb:latest-pg13
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./.tsdb:/var/lib/postgresql/data

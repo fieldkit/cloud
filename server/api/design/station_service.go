@@ -175,6 +175,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Required("configurations")
 
 		Attribute("updatedAt", Int64)
+		Attribute("lastReadingAt", Int64)
 		Attribute("locationName", String)
 		Attribute("placeNameOther", String)
 		Attribute("placeNameNative", String)
@@ -209,6 +210,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("configurations")
 
 		Attribute("updatedAt")
+		Attribute("lastReadingAt")
 		Attribute("location")
 		Attribute("locationName")
 		Attribute("placeNameOther")

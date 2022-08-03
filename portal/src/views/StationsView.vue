@@ -10,7 +10,7 @@
                         :sensorDataQuerier="sensorDataQuerier"
                         v-slot="{ sensorDataQuerier, station }"
                     >
-                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" v-if="tinyChartsEnabled" />
+                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
                     </StationHoverSummary>
                 </div>
             </div>
@@ -33,7 +33,11 @@
                 :station="activeStation"
                 v-bind:key="activeStation.id"
                 @layoutChange="layoutChange"
-            />
+                :sensorDataQuerier="sensorDataQuerier"
+                v-slot="{ sensorDataQuerier }"
+            >
+                <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+            </StationHoverSummary>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
@@ -65,14 +69,14 @@ import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
-import { getFeaturesEnabled } from "@/utilities";
+import { SensorDataQuerier } from "./shared/sensor_data_querier";
 
 import Vue, { PropType } from "vue";
 import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
-import { SensorDataQuerier } from "./shared/LatestStationReadings.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
+import SnackBar from "@/views/shared/SnackBar.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -103,7 +107,7 @@ export default Vue.extend({
             showNoStationsMessage: true,
             viewType: "map",
             layoutChanges: 0,
-            sensorDataQuerier: new SensorDataQuerier(this.$services.api, []),
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     computed: {
@@ -115,9 +119,6 @@ export default Vue.extend({
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
             anyStations: (s: GlobalState) => Object.values(s.stations.user.stations).length > 0,
         }),
-        tinyChartsEnabled(): boolean {
-            return getFeaturesEnabled().tinyCharts;
-        },
         activeStation(): DisplayStation {
             return this.$state.stations.stations[this.id];
         },
@@ -145,10 +146,7 @@ export default Vue.extend({
     watch: {
         stations() {
             // console.log("stations-view:stations", this.stations);
-            this.sensorDataQuerier = new SensorDataQuerier(
-                this.$services.api,
-                this.stations.map((s: DisplayStation) => s.id)
-            );
+            this.sensorDataQuerier = new SensorDataQuerier(this.$services.api);
         },
         id(): Promise<any> {
             if (this.id) {

@@ -46,7 +46,7 @@ func (a *InMemoryArchive) Archive(ctx context.Context, contentType string, meta 
 
 func (a *InMemoryArchive) OpenByURL(ctx context.Context, url string) (of *files.OpenedFile, err error) {
 	if file, ok := a.files[url]; ok {
-		info, err := a.Info(ctx, url) // TODO Problem?
+		info, err := a.Info(ctx, url)
 		if err != nil {
 			return nil, err
 		}

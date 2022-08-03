@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -26,7 +25,7 @@ type StationPermissions interface {
 	Station() *data.Station
 	CanView() error
 	CanModify() error
-	IsReadOnly() bool
+	IsReadOnly() (bool, error)
 }
 
 type Permissions interface {
@@ -217,14 +216,11 @@ func (p *defaultPermissions) ForProject(project *data.Project) (permissions Proj
 
 	var projectUser *data.ProjectUser = nil
 	if !p.Anonymous() {
-		projectUser = &data.ProjectUser{}
-		if err := p.options.Database.GetContext(p.context, projectUser, `
-			SELECT p.* FROM fieldkit.project_user AS p WHERE p.user_id = $1 AND p.project_id = $2
-			`, p.UserID(), project.ID); err != nil {
-			if err != sql.ErrNoRows {
-				return nil, err
-			}
-			projectUser = nil
+		pr := repositories.NewProjectRepository(p.options.Database)
+		if found, err := pr.QueryProjectUser(p.context, p.UserID(), project.ID); err != nil {
+			return nil, err
+		} else if found != nil {
+			projectUser = found
 		}
 	}
 
@@ -242,27 +238,27 @@ func (p *defaultPermissions) ForProjectByID(id int32) (permissions ProjectPermis
 		return nil, err
 	}
 
-	project := &data.Project{}
-	if err := p.options.Database.GetContext(p.context, project, "SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1", id); err != nil {
-		return nil, p.notFound(fmt.Sprintf("project not found: %v", err))
+	pr := repositories.NewProjectRepository(p.options.Database)
+	project, err := pr.QueryByID(p.context, id)
+	if err != nil {
+		return nil, err
 	}
 
 	return p.ForProject(project)
 }
 
 func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissions, err error) {
+	sr := repositories.NewStationRepository(p.options.Database)
+	pr := repositories.NewProjectRepository(p.options.Database)
+
 	if err := p.unwrap(); err != nil {
 		return nil, err
 	}
 
-	sr := repositories.NewStationRepository(p.options.Database)
-
 	station, err := sr.QueryStationByID(p.context, int32(id))
 	if err != nil {
-		return nil, p.notFound(fmt.Sprintf("station not found"))
+		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
-
-	pr := repositories.NewProjectRepository(p.options.Database)
 
 	stationProjects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
@@ -279,18 +275,17 @@ func (p *defaultPermissions) ForStationByID(id int) (permissions StationPermissi
 }
 
 func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions StationPermissions, err error) {
+	sr := repositories.NewStationRepository(p.options.Database)
+	pr := repositories.NewProjectRepository(p.options.Database)
+
 	if err := p.unwrap(); err != nil {
 		return nil, err
 	}
 
-	sr := repositories.NewStationRepository(p.options.Database)
-
 	station, err := sr.QueryStationByDeviceID(p.context, id)
 	if err != nil {
-		return nil, p.notFound(fmt.Sprintf("station not found"))
+		return nil, p.notFound(fmt.Sprintf("station not found: %v", err))
 	}
-
-	pr := repositories.NewProjectRepository(p.options.Database)
 
 	stationProjects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
@@ -307,13 +302,13 @@ func (p *defaultPermissions) ForStationByDeviceID(id []byte) (permissions Statio
 }
 
 func (p *defaultPermissions) ForStation(station *data.Station) (permissions StationPermissions, err error) {
+	pr := repositories.NewProjectRepository(p.options.Database)
+
 	if err := p.unwrap(); err != nil {
 		return nil, err
 	}
 
-	pr := repositories.NewProjectRepository(p.options.Database)
-
-	stationProjets, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
+	stationProjects, err := pr.QueryProjectsByStationIDForPermissions(p.context, station.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +316,7 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 	permissions = &stationPermissions{
 		defaultPermissions: *p,
 		station:            station,
-		stationProjects:    stationProjets,
+		stationProjects:    stationProjects,
 	}
 
 	return
@@ -352,12 +347,12 @@ func (p *stationPermissions) CanView() error {
 	// We don't know until we check the projects the station is a part
 	// of, one of them has to be public.
 	for _, project := range p.stationProjects {
-		subPermissions, err := NewPermissions(p.context, p.options).ForProjectByID(project.ID)
+		projectPermissions, err := NewPermissions(p.context, p.options).ForProjectByID(project.ID)
 		if err != nil {
 			return err
 		}
 
-		if err := subPermissions.CanView(); err == nil {
+		if err := projectPermissions.CanView(); err == nil {
 			return nil
 		}
 	}
@@ -396,11 +391,30 @@ func (p *stationPermissions) CanModify() error {
 	return p.forbidden("forbidden")
 }
 
-func (p *stationPermissions) IsReadOnly() bool {
+func (p *stationPermissions) IsReadOnly() (bool, error) {
 	if p.anonymous {
-		return true
+		return true, nil
 	}
-	return p.station.OwnerID != p.UserID()
+
+	if p.station.OwnerID == p.UserID() {
+		return false, nil
+	}
+
+	pr := repositories.NewProjectRepository(p.options.Database)
+	relationships, err := pr.QueryUserProjectRelationships(p.context, p.UserID())
+	if err != nil {
+		return true, err
+	}
+
+	for _, stationProject := range p.stationProjects {
+		if rel, ok := relationships[stationProject.ID]; ok {
+			if rel.CanModify() {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
 }
 
 type projectPermissions struct {

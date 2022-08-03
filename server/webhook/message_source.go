@@ -32,7 +32,6 @@ func NewDatabaseMessageSource(db *sqlxcache.DB, schemaID int32, messageID int64,
 func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) error {
 	log := Logger(ctx).Sugar()
 
-	schemas := NewMessageSchemaRepository(s.db)
 	messages := NewMessagesRepository(s.db)
 
 	if s.messageID == 0 && s.schemaID == 0 {
@@ -40,15 +39,11 @@ func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBat
 	}
 
 	if s.messageID > 0 && !s.resume {
-		return messages.QueryMessageForProcessing(ctx, batch, s.messageID)
+		return messages.QueryMessageForProcessing(ctx, batch, s.messageID, true)
 	}
 
 	if !s.started {
 		log.Infow("initializing", "schema_id", s.schemaID, "message_id", s.messageID, "resume", s.resume)
-
-		if err := schemas.StartProcessingSchema(ctx, s.schemaID); err != nil {
-			return err
-		}
 
 		if s.messageID > 0 && s.resume {
 			if err := messages.ResumeOnMessage(ctx, batch, s.messageID); err != nil {

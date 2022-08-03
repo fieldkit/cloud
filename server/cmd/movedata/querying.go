@@ -163,7 +163,6 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 			}
 		}
 
-		// TODO Should/can we reuse maps for this?
 		tags := make(map[string]string)
 		tags["provision_id"] = fmt.Sprintf("%v", p.ID)
 

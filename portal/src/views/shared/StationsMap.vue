@@ -223,7 +223,6 @@ export default Vue.extend({
             // Generate custom map markers
             const valueMarker = Vue.extend(ValueMarker);
             const sorted = _.cloneDeep(this.mapped.features).sort((a, b) => a.properties.value - b.properties.value);
-
             for (const feature of sorted) {
                 const instance = new valueMarker({
                     propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },

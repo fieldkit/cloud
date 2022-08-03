@@ -539,6 +539,285 @@ func DecodeDataResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 	}
 }
 
+// BuildTailRequest instantiates a HTTP request object with method and path set
+// to call the "sensor" service "tail" endpoint
+func (c *Client) BuildTailRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: TailSensorPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "tail", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeTailRequest returns an encoder for requests sent to the sensor tail
+// server.
+func EncodeTailRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*sensor.TailPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("sensor", "tail", "*sensor.TailPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		if p.Stations != nil {
+			values.Add("stations", *p.Stations)
+		}
+		if p.Backend != nil {
+			values.Add("backend", *p.Backend)
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeTailResponse returns a decoder for responses returned by the sensor
+// tail endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+// DecodeTailResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeTailResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body interface{}
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "tail", err)
+			}
+			res := NewTailResultOK(body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body TailUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "tail", err)
+			}
+			err = ValidateTailUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "tail", err)
+			}
+			return nil, NewTailUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body TailForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "tail", err)
+			}
+			err = ValidateTailForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "tail", err)
+			}
+			return nil, NewTailForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body TailNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "tail", err)
+			}
+			err = ValidateTailNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "tail", err)
+			}
+			return nil, NewTailNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body TailBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "tail", err)
+			}
+			err = ValidateTailBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "tail", err)
+			}
+			return nil, NewTailBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "tail", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildRecentlyRequest instantiates a HTTP request object with method and path
+// set to call the "sensor" service "recently" endpoint
+func (c *Client) BuildRecentlyRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RecentlySensorPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("sensor", "recently", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeRecentlyRequest returns an encoder for requests sent to the sensor
+// recently server.
+func EncodeRecentlyRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*sensor.RecentlyPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("sensor", "recently", "*sensor.RecentlyPayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		if p.Stations != nil {
+			values.Add("stations", *p.Stations)
+		}
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeRecentlyResponse returns a decoder for responses returned by the
+// sensor recently endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeRecentlyResponse may return the following errors:
+//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
+//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//	- error: internal error
+func DecodeRecentlyResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body interface{}
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "recently", err)
+			}
+			res := NewRecentlyResultOK(body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body RecentlyUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "recently", err)
+			}
+			err = ValidateRecentlyUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "recently", err)
+			}
+			return nil, NewRecentlyUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body RecentlyForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "recently", err)
+			}
+			err = ValidateRecentlyForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "recently", err)
+			}
+			return nil, NewRecentlyForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body RecentlyNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "recently", err)
+			}
+			err = ValidateRecentlyNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "recently", err)
+			}
+			return nil, NewRecentlyNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body RecentlyBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("sensor", "recently", err)
+			}
+			err = ValidateRecentlyBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("sensor", "recently", err)
+			}
+			return nil, NewRecentlyBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("sensor", "recently", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildBookmarkRequest instantiates a HTTP request object with method and path
 // set to call the "sensor" service "bookmark" endpoint
 func (c *Client) BuildBookmarkRequest(ctx context.Context, v interface{}) (*http.Request, error) {

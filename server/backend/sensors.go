@@ -52,6 +52,7 @@ type QueryParams struct {
 	Tail       int32             `json:"tail"`
 	Complete   bool              `json:"complete"`
 	Backend    string            `json:"backend"`
+	Eternity   bool              `json:"eternity"`
 }
 
 func ParseStationIDs(raw *string) []int32 {
@@ -73,9 +74,16 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		start = time.Unix(0, *raw.Start*int64(time.Millisecond)).UTC()
 	}
 
-	end := time.Now()
+	end := time.Now().UTC()
 	if raw.End != nil {
 		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
+	}
+
+	eternity := false
+	if raw.Start != nil && raw.End != nil {
+		if *raw.Start == -8640000000000000 && *raw.End == 8640000000000000 {
+			eternity = true
+		}
 	}
 
 	resolution := int32(0)
@@ -149,6 +157,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		Tail:       tail,
 		Complete:   complete,
 		Backend:    backend,
+		Eternity:   eternity,
 	}
 
 	return
@@ -403,7 +412,7 @@ type DataRow struct {
 	AverageValue  *float64   `json:"avg,omitempty"`
 	MinimumValue  *float64   `json:"min,omitempty"`
 	MaximumValue  *float64   `json:"max,omitempty"`
-	LastValue     *float64   `json:"-",omitempty`
+	LastValue     *float64   `json:"last,omitempty"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {

@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <router-view />
+        <SnackBar></SnackBar>
     </div>
 </template>
 
@@ -9,8 +10,12 @@ import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
+import SnackBar from "@/views/shared/SnackBar.vue";
 
 export default Vue.extend({
+    components: {
+        SnackBar,
+    },
     async beforeMount(): Promise<void> {
         try {
             this.applyCustomClasses();

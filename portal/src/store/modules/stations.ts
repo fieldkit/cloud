@@ -2,24 +2,24 @@ import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
-import { Location, BoundingRectangle, LngLat } from "../map-types";
+import { BoundingRectangle, LngLat, Location } from "../map-types";
 
 import {
-    FKApi,
-    Services,
-    OnNoReject,
-    Station,
-    StationModule,
-    ModuleSensor,
-    StationRegion,
-    Project,
-    ProjectUser,
-    ProjectFollowers,
     Activity,
     Configurations,
+    ModuleSensor,
+    OnNoReject,
     Photos,
-    VizThresholds,
+    Project,
     ProjectAttribute,
+    ProjectFollowers,
+    ProjectUser,
+    Services,
+    Station,
+    StationModule,
+    StationRegion,
+    StationStatus,
+    VizThresholds,
 } from "@/api";
 
 import { VizConfig } from "@/views/viz/viz";
@@ -73,7 +73,7 @@ export class DisplayStation {
     public readonly name: string;
     public readonly configurations: Configurations;
     public readonly updatedAt: Date;
-    public readonly uploadedAt: Date | null = null;
+    public readonly lastReadingAt: Date | null = null;
     public readonly deployedAt: Date | null = null;
     public readonly totalReadings = 0;
     public readonly location: Location | null = null;
@@ -89,6 +89,7 @@ export class DisplayStation {
     public readonly primarySensor: ModuleSensor | null;
     public readonly attributes: ProjectAttribute[];
     public readonly readOnly: boolean;
+    public readonly status: StationStatus;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -102,9 +103,10 @@ export class DisplayStation {
         this.deployedAt = station.recordingStartedAt;
         if (!station.updatedAt) throw new Error(`station missing updatedAt`);
         this.updatedAt = new Date(station.updatedAt);
-        this.uploadedAt = _.first(station.uploads.filter((u) => u.type == "data").map((u) => new Date(u.time))) || null;
+        this.lastReadingAt = station.lastReadingAt ? new Date(station.lastReadingAt) : null;
         this.attributes = station.attributes.attributes;
         this.readOnly = station.readOnly;
+        this.status = station.status;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
@@ -123,6 +125,11 @@ export class DisplayStation {
         if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
             this.latestPrimary = prioritizedSensors[0].reading;
         } else {
+            this.latestPrimary = null;
+        }
+
+        // TODO: remove after wiring the map values to the new sensorDataQuerier code
+        if (station.status === StationStatus.down) {
             this.latestPrimary = null;
         }
 
@@ -152,7 +159,13 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null; color: string } | null = null;
+    public readonly properties: {
+        icon: string;
+        id: number;
+        value: number | "-" | null;
+        thresholds: object | null;
+        color: string;
+    } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -164,26 +177,23 @@ export class MapFeature {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
 
-        let color;
+        let color = "#00CCFF";
         // Marker color scale
 
         if (thresholds) {
-            const markerScale = d3.scaleThreshold()
+            const markerScale = d3
+                .scaleThreshold()
                 .domain(thresholds.levels.map((d) => d.value))
                 .range(thresholds.levels.map((d) => d.color));
 
             color = markerScale(station.latestPrimary);
-        } else {
-            // default color
-            color = "#00CCFF";
         }
-
         this.properties = {
             id: station.id,
-            value: station.latestPrimary,
+            value: station.status === StationStatus.down ? null : station.latestPrimary,
             icon: "marker",
             thresholds: thresholds,
-            color,
+            color: color,
         };
     }
 

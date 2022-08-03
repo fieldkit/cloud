@@ -31,6 +31,13 @@ type Client struct {
 	// Data Doer is the HTTP client used to make requests to the data endpoint.
 	DataDoer goahttp.Doer
 
+	// Tail Doer is the HTTP client used to make requests to the tail endpoint.
+	TailDoer goahttp.Doer
+
+	// Recently Doer is the HTTP client used to make requests to the recently
+	// endpoint.
+	RecentlyDoer goahttp.Doer
+
 	// Bookmark Doer is the HTTP client used to make requests to the bookmark
 	// endpoint.
 	BookmarkDoer goahttp.Doer
@@ -66,6 +73,8 @@ func NewClient(
 		StationMetaDoer:     doer,
 		SensorMetaDoer:      doer,
 		DataDoer:            doer,
+		TailDoer:            doer,
+		RecentlyDoer:        doer,
 		BookmarkDoer:        doer,
 		ResolveDoer:         doer,
 		CORSDoer:            doer,
@@ -158,6 +167,54 @@ func (c *Client) Data() goa.Endpoint {
 		resp, err := c.DataDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("sensor", "data", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Tail returns an endpoint that makes HTTP requests to the sensor service tail
+// server.
+func (c *Client) Tail() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeTailRequest(c.encoder)
+		decodeResponse = DecodeTailResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildTailRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.TailDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "tail", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Recently returns an endpoint that makes HTTP requests to the sensor service
+// recently server.
+func (c *Client) Recently() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRecentlyRequest(c.encoder)
+		decodeResponse = DecodeRecentlyResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRecentlyRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RecentlyDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("sensor", "recently", err)
 		}
 		return decodeResponse(resp)
 	}

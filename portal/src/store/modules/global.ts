@@ -6,6 +6,7 @@ import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
 import { NotesState } from "@/store";
+import { SnackbarState } from "@/store/modules/snackbar";
 
 export interface RouteState {
     name: string | null;
@@ -28,6 +29,7 @@ export interface GlobalState {
     readonly layout: LayoutState;
     readonly notifications: NotificationsState;
     readonly notes: NotesState;
+    readonly snackbar: SnackbarState;
 }
 
 export interface GlobalGetters {

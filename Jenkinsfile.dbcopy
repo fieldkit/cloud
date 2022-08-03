@@ -9,13 +9,21 @@ timestamps {
     node ("jenkins-aws-ubuntu") {
 		try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
+			def name = params.DbName  ?: "db"
+			def url = name == "tsdb" ? ws.timescaledb_url.value : ws.database_url.value
+			def exclusions = params.Exclusions ?: ""
 
 			def now = new Date()
 			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
 
 			stage ('dbcopy') {
 				sh "rm -rf *.bz2"
-				sh "docker run --log-driver none --rm postgres pg_dump -T 'fieldkit.aggregated_old_*' '${ws.database_url.value}' | bzip2 > db-${stamp}.sql.bz2"
+
+				if (exclusions != "") {
+					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
+				} else {
+					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
+				}
 			}
 
 			stage ('archive') {

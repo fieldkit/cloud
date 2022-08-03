@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 
@@ -21,6 +22,20 @@ import (
 
 	"github.com/fieldkit/cloud/server/api/querying"
 )
+
+type StationsMeta struct {
+	Stations map[int32][]*repositories.StationSensor `json:"stations"`
+}
+
+type SensorMeta struct {
+	ID  int64  `json:"id"`
+	Key string `json:"key"`
+}
+
+type MetaResult struct {
+	Sensors []*SensorMeta `json:"sensors"`
+	Modules interface{}   `json:"modules"`
+}
 
 func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQueryParams, error) {
 	return &backend.RawQueryParams{
@@ -41,6 +56,7 @@ type SensorService struct {
 	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 	db              *sqlxcache.DB
+	tsdb            querying.DataBackend
 }
 
 func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
@@ -52,33 +68,27 @@ func NewSensorService(ctx context.Context, options *ControllerOptions, influxCon
 	}
 }
 
-func (c *SensorService) chooseBackend(ctx context.Context, qp *backend.QueryParams) (querying.DataBackend, error) {
-	if qp.Backend == "tsdb" {
-		if c.timeScaleConfig == nil {
-			log := Logger(ctx).Sugar()
-			log.Errorw("fatal: Missing TsDB configuration")
-		} else {
-			return querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db)
+func (c *SensorService) chooseBackend(ctx context.Context, backend *string) (querying.DataBackend, error) {
+	if backend == nil || *backend == "tsdb" {
+		if c.tsdb == nil {
+			if c.timeScaleConfig == nil {
+				log := Logger(ctx).Sugar()
+				log.Errorw("tsdb:no-configuration")
+			} else {
+				if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db); err != nil {
+					return nil, err
+				} else {
+					c.tsdb = tsdb
+				}
+			}
 		}
-	}
-	if qp.Backend == "influxdb" {
-		if c.influxConfig == nil {
-			log := Logger(ctx).Sugar()
-			log.Errorw("fatal: Missing InfluxDB configuration")
-		} else {
-			return querying.NewInfluxDBBackend(c.influxConfig)
-		}
+		return c.tsdb, nil
 	}
 	return querying.NewPostgresBackend(c.db), nil
 }
 
-func (c *SensorService) tail(ctx context.Context, qp *backend.QueryParams) (*sensor.DataResult, error) {
-	be, err := c.chooseBackend(ctx, qp)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := be.QueryTail(ctx, qp)
+func (c *SensorService) tail(ctx context.Context, be querying.DataBackend, stationIDs []int32) (*sensor.DataResult, error) {
+	data, err := be.QueryTail(ctx, stationIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -99,15 +109,20 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.MakeBadRequest(err)
 	}
 
+	be, err := c.chooseBackend(ctx, payload.Backend)
+	if err != nil {
+		return nil, sensor.MakeBadRequest(err)
+	}
+
 	log := Logger(ctx).Sugar()
 
 	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensors", qp.Sensors, "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
 
 	if qp.Tail > 0 {
-		return c.tail(ctx, qp)
+		return c.tail(ctx, be, qp.Stations)
 	} else if len(qp.Sensors) == 0 {
-		// TODO Deprecatd, remove in 0.2.53
-		// return nil, sensor.MakeBadRequest(fmt.Errorf("stations missing"))
+		// TODO Deprecated, remove in 0.2.53
+		// return nil, sensor.MakeBadRequest(fmt.Errorf("stations:empty"))
 		if res, err := c.StationMeta(ctx, &sensor.StationMetaPayload{
 			Stations: payload.Stations,
 		}); err != nil {
@@ -117,11 +132,6 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 				Object: res.Object,
 			}, nil
 		}
-	}
-
-	be, err := c.chooseBackend(ctx, qp)
-	if err != nil {
-		return nil, err
 	}
 
 	data, err := be.QueryData(ctx, qp)
@@ -134,18 +144,52 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 	}, nil
 }
 
-type StationsMeta struct {
-	Stations map[int32][]*repositories.StationSensor `json:"stations"`
+func (c *SensorService) Tail(ctx context.Context, payload *sensor.TailPayload) (*sensor.TailResult, error) {
+	stationIDs := backend.ParseStationIDs(payload.Stations)
+	if len(stationIDs) == 0 {
+		return nil, sensor.MakeBadRequest(fmt.Errorf("stations:empty"))
+	}
+
+	be, err := c.chooseBackend(ctx, payload.Backend)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := be.QueryTail(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sensor.TailResult{
+		Object: data,
+	}, nil
 }
 
-type SensorMeta struct {
-	ID  int64  `json:"id"`
-	Key string `json:"key"`
-}
+func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPayload) (*sensor.RecentlyResult, error) {
+	stationIDs := backend.ParseStationIDs(payload.Stations)
+	if len(stationIDs) == 0 {
+		return nil, sensor.MakeBadRequest(fmt.Errorf("stations:empty"))
+	}
 
-type MetaResult struct {
-	Sensors []*SensorMeta `json:"sensors"`
-	Modules interface{}   `json:"modules"`
+	be, err := c.chooseBackend(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	durations := []time.Duration{
+		time.Hour * 24,
+		time.Hour * 48,
+		time.Hour * 72,
+	}
+
+	data, err := be.QueryRecentlyAggregated(ctx, stationIDs, durations)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sensor.RecentlyResult{
+		Object: data,
+	}, nil
 }
 
 func (c *SensorService) StationMeta(ctx context.Context, payload *sensor.StationMetaPayload) (*sensor.StationMetaResult, error) {

@@ -16,6 +16,7 @@ export interface VizThresholdLevel {
     label: { [index: string]: string };
     keyLabel: { [index: string]: string };
     mapKeyLabel: { [index: string]: string };
+    plainLabel: { [index: string]: string };
     value: number;
     color: string;
     hidden: boolean;
@@ -33,7 +34,7 @@ export interface VizConfig {
     thresholds: VizThresholds;
 }
 
-type SensorStrings = { [index: string]: Record<string, string> };
+export type SensorStrings = { [index: string]: Record<string, string> };
 
 export interface ModuleSensorMeta {
     key: string;
@@ -81,6 +82,7 @@ export interface DataRow {
 
 export interface SensorDataResponse {
     data: DataRow[];
+    bucketSize: number;
 }
 
 export interface StationInfoResponse {

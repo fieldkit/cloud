@@ -2029,6 +2029,7 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		FirmwareNumber:     v.FirmwareNumber,
 		FirmwareTime:       v.FirmwareTime,
 		UpdatedAt:          *v.UpdatedAt,
+		LastReadingAt:      v.LastReadingAt,
 		LocationName:       v.LocationName,
 		PlaceNameOther:     v.PlaceNameOther,
 		PlaceNameNative:    v.PlaceNameNative,

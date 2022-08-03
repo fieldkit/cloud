@@ -53,6 +53,7 @@ type AddResponseBody struct {
 	FirmwareTime       *int64                                `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody    `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	UpdatedAt          *int64                                `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	LastReadingAt      *int64                                `form:"lastReadingAt,omitempty" json:"lastReadingAt,omitempty" xml:"lastReadingAt,omitempty"`
 	LocationName       *string                               `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                               `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                               `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
@@ -85,6 +86,7 @@ type GetResponseBody struct {
 	FirmwareTime       *int64                                `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody    `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	UpdatedAt          *int64                                `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	LastReadingAt      *int64                                `form:"lastReadingAt,omitempty" json:"lastReadingAt,omitempty" xml:"lastReadingAt,omitempty"`
 	LocationName       *string                               `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                               `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                               `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
@@ -117,6 +119,7 @@ type UpdateResponseBody struct {
 	FirmwareTime       *int64                                `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody    `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	UpdatedAt          *int64                                `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	LastReadingAt      *int64                                `form:"lastReadingAt,omitempty" json:"lastReadingAt,omitempty" xml:"lastReadingAt,omitempty"`
 	LocationName       *string                               `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                               `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                               `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
@@ -1371,6 +1374,7 @@ type StationFullResponseBody struct {
 	FirmwareTime       *int64                                `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
 	Configurations     *StationConfigurationsResponseBody    `form:"configurations,omitempty" json:"configurations,omitempty" xml:"configurations,omitempty"`
 	UpdatedAt          *int64                                `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	LastReadingAt      *int64                                `form:"lastReadingAt,omitempty" json:"lastReadingAt,omitempty" xml:"lastReadingAt,omitempty"`
 	LocationName       *string                               `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	PlaceNameOther     *string                               `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
 	PlaceNameNative    *string                               `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
@@ -1479,6 +1483,7 @@ func NewAddStationFullOK(body *AddResponseBody) *stationviews.StationFullView {
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
 		UpdatedAt:          body.UpdatedAt,
+		LastReadingAt:      body.LastReadingAt,
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
@@ -1593,6 +1598,7 @@ func NewGetStationFullOK(body *GetResponseBody) *stationviews.StationFullView {
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
 		UpdatedAt:          body.UpdatedAt,
+		LastReadingAt:      body.LastReadingAt,
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
@@ -1812,6 +1818,7 @@ func NewUpdateStationFullOK(body *UpdateResponseBody) *stationviews.StationFullV
 		FirmwareNumber:     body.FirmwareNumber,
 		FirmwareTime:       body.FirmwareTime,
 		UpdatedAt:          body.UpdatedAt,
+		LastReadingAt:      body.LastReadingAt,
 		LocationName:       body.LocationName,
 		PlaceNameOther:     body.PlaceNameOther,
 		PlaceNameNative:    body.PlaceNameNative,
