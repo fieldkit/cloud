@@ -13,19 +13,20 @@
         </StationSummaryContent>
 
         <template v-if="isPartnerCustomisationEnabled()">
-            <div v-if="station.status === StationStatus.up" class="latest-primary" :style="{ color: latestPrimaryColor }">
-                <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                <span v-else class="no-data">{{ $t("noData") }}</span>
-
+            <div class="latest-primary" :style="{ color: latestPrimaryColor }">
+                <template v-if="station.status === StationStatus.up">
+                    <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+                    <span v-else class="no-data">{{ $t("noData") }}</span>
+                </template>
+                <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
                 <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-                    <template v-if="station.status === StationStatus.down">&#x25CF;</template>
+                    <template v-if="station.status === StationStatus.down">-</template>
                     <template v-else>{{ visibleReadingValue | prettyNum }}</template>
                 </i>
                 <i v-else :style="{ 'background-color': latestPrimaryColor }">
-                    &#x25CF;
+                    –
                 </i>
             </div>
-            <div v-if="station.status === StationStatus.down" class="latest-primary">{{ $t("station.inactive") }}</div>
         </template>
 
         <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
