@@ -35,7 +35,7 @@
                             </div>
                             <div class="legend-item" v-if="hasStationsWithoutData">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
-                                <span>No Data</span>
+                                <span>{{ $t("map.legend.noData") }}</span>
                             </div>
                         </div>
                     </div>
