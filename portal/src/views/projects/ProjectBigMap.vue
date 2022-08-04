@@ -64,20 +64,20 @@
             </template>
         </div>
         <div class="view-type-container">
-            <label class="toggle-btn">
+            <!--            <label class="toggle-btn">
                 <input type="checkbox" v-model="recentMapMode" />
                 <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
                 <i></i>
                 <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
-            </label>
-            <div class="view-type">
+            </label>-->
+            <!--            <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
                     {{ $t("map.toggle.map") }}
                 </div>
                 <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
                     {{ $t("map.toggle.list") }}
                 </div>
-            </div>
+            </div>-->
         </div>
     </StandardLayout>
 </template>
@@ -538,9 +538,14 @@ export default Vue.extend({
 ::v-deep .mapboxgl-ctrl {
     margin: 35px 0 0 30px;
 
+    @include bp-down($sm) {
+        margin: 60px 0 0 10px;
+    }
+
     .mapboxgl-ctrl-geocoder {
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
         border: solid 1px #f4f5f7;
+        border-radius: 0;
     }
 }
 </style>

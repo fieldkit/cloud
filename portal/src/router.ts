@@ -54,7 +54,6 @@ function makeDefaultRouteForProject(projectId: number) {
             };
         },
         meta: {
-            bodyClass: "disable-scrolling",
             secured: true,
         },
     };
@@ -256,7 +255,6 @@ const routes = [
             };
         },
         meta: {
-            bodyClass: "disable-scrolling",
             secured: true,
         },
     },

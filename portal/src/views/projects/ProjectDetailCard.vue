@@ -71,16 +71,9 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         width: 100%;
-        position: fixed;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        bottom: 0px;
-        text-align: center;
-        padding-bottom: 10px;
-        top: auto;
-        right: auto;
-        align-items: center;
-        justify-content: center;
+        padding: 10px;
+        top: 53px;
+        height: 50px; // temp
     }
 
     body.floodnet & {
@@ -130,7 +123,8 @@ export default Vue.extend({
     }
 
     @include bp-down($sm) {
-        display: none;
+        width: 30px;
+        height: 30px;
     }
 }
 </style>
