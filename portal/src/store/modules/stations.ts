@@ -34,6 +34,7 @@ export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
+export const STATION_CLEAR = "STATION_CLEAR";
 export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 export const PROJECT_DELETED = "PROJECT_DELETED";
@@ -420,6 +421,12 @@ const actions = (services: Services) => {
 
             commit(MutationTypes.LOADING, { stations: false });
         },
+        [ActionTypes.CLEAR_STATION]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            id: number
+        ) => {
+            commit(STATION_CLEAR, id);
+        },
         [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.followProject(payload.projectId);
             commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
@@ -562,6 +569,9 @@ const mutations = {
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
         Vue.set(state.stations, payload.id, new DisplayStation(payload));
+    },
+    [STATION_CLEAR]: (state: StationsState, id: number) => {
+        Vue.set(state.stations, id, null);
     },
     [PROJECT_LOADED]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);
