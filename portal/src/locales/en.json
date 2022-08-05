@@ -408,6 +408,9 @@
             "map": "Map",
             "recent": "Recent",
             "current": "Current"
+        },
+        "legend": {
+            "noData": "No Data or Inactive"
         }
     },
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
