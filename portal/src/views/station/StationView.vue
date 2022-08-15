@@ -1,6 +1,6 @@
 <template>
-    <StandardLayout v-if="station">
-        <div class="container-wrap">
+    <StandardLayout>
+        <div class="container-wrap" v-if="station">
             <DoubleHeader
                 backRoute="viewProject"
                 :title="station.name"

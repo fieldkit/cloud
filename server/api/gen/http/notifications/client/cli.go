@@ -23,7 +23,7 @@ func BuildSeenPayload(notificationsSeenBody string, notificationsSeenAuth string
 	{
 		err = json.Unmarshal([]byte(notificationsSeenBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ids\": [\n         8112165336342481737,\n         1218142301322671049,\n         30351320873187435,\n         7515598796411769176\n      ]\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ids\": [\n         215620773325637799,\n         2642081405108272245\n      ]\n   }'")
 		}
 		if body.Ids == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("ids", "body"))

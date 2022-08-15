@@ -15,11 +15,15 @@ import (
 )
 
 type RecordRepository struct {
-	db *sqlxcache.DB
+	db        *sqlxcache.DB
+	metaCache map[int64]*data.MetaRecord
 }
 
-func NewRecordRepository(db *sqlxcache.DB) (rr *RecordRepository, err error) {
-	return &RecordRepository{db: db}, nil
+func NewRecordRepository(db *sqlxcache.DB) *RecordRepository {
+	return &RecordRepository{
+		db:        db,
+		metaCache: make(map[int64]*data.MetaRecord),
+	}
 }
 
 type RecordsPage struct {
@@ -150,6 +154,10 @@ func (r *RecordRepository) findLocation(dataRecord *pb.DataRecord) (l *data.Loca
 }
 
 func (r *RecordRepository) findMeta(ctx context.Context, provisionId, number int64) (*data.MetaRecord, error) {
+	if record, ok := r.metaCache[number]; ok {
+		return record, nil
+	}
+
 	records := []*data.MetaRecord{}
 	if err := r.db.SelectContext(ctx, &records, `
 		SELECT r.* FROM fieldkit.meta_record AS r WHERE r.provision_id = $1 AND r.number = $2
@@ -160,6 +168,8 @@ func (r *RecordRepository) findMeta(ctx context.Context, provisionId, number int
 	if len(records) != 1 {
 		return nil, nil
 	}
+
+	r.metaCache[number] = records[0]
 
 	return records[0], nil
 }

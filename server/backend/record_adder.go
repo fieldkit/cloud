@@ -26,7 +26,9 @@ type RecordAdder struct {
 	metrics             *logging.Metrics
 	stationRepository   *repositories.StationRepository
 	provisionRepository *repositories.ProvisionRepository
+	recordRepository    *repositories.RecordRepository
 	statistics          *newRecordStatistics
+	provisionsCache     map[int64]*data.Provision
 }
 
 type ParsedRecord struct {
@@ -44,7 +46,9 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		handler:             handler,
 		stationRepository:   repositories.NewStationRepository(db),
 		provisionRepository: repositories.NewProvisionRepository(db),
+		recordRepository:    repositories.NewRecordRepository(db),
 		statistics:          &newRecordStatistics{},
+		provisionsCache:     make(map[int64]*data.Provision),
 	}
 }
 
@@ -79,7 +83,16 @@ func (ra *RecordAdder) tryFindStation(ctx context.Context, i *data.Ingestion) (*
 }
 
 func (ra *RecordAdder) findProvision(ctx context.Context, i *data.Ingestion) (*data.Provision, error) {
-	return ra.provisionRepository.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID)
+	if provision, ok := ra.provisionsCache[i.ID]; ok {
+		return provision, nil
+	}
+
+	if provision, err := ra.provisionRepository.QueryOrCreateProvision(ctx, i.DeviceID, i.GenerationID); err != nil {
+		return nil, err
+	} else {
+		ra.provisionsCache[i.ID] = provision
+		return provision, nil
+	}
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *ParsedRecord) (warning error, fatal error) {
@@ -91,13 +104,8 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		return nil, err
 	}
 
-	recordRepository, err := repositories.NewRecordRepository(ra.db)
-	if err != nil {
-		return nil, err
-	}
-
 	if pr.SignedRecord != nil {
-		metaRecord, err := recordRepository.AddSignedMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord, pr.Bytes)
+		metaRecord, err := ra.recordRepository.AddSignedMetaRecord(ctx, provision, i, pr.SignedRecord, pr.DataRecord, pr.Bytes)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +115,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 		}
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Metadata != nil {
-			metaRecord, err := recordRepository.AddMetaRecord(ctx, provision, i, int64(pr.DataRecord.Metadata.Record), pr.DataRecord, pr.Bytes)
+			metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, provision, i, int64(pr.DataRecord.Metadata.Record), pr.DataRecord, pr.Bytes)
 			if err != nil {
 				return nil, err
 			}
@@ -116,7 +124,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 				return nil, err
 			}
 		} else {
-			dataRecord, metaRecord, err := recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord, pr.Bytes)
+			dataRecord, metaRecord, err := ra.recordRepository.AddDataRecord(ctx, provision, i, pr.DataRecord, pr.Bytes)
 			if err != nil {
 				if err == repositories.ErrMalformedRecord {
 					verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)

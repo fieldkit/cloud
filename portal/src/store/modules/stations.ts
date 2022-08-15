@@ -2,24 +2,24 @@ import _ from "lodash";
 import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
-import { Location, BoundingRectangle, LngLat } from "../map-types";
+import { BoundingRectangle, LngLat, Location } from "../map-types";
 
 import {
-    FKApi,
-    Services,
-    OnNoReject,
-    Station,
-    StationModule,
-    ModuleSensor,
-    StationRegion,
-    Project,
-    ProjectUser,
-    ProjectFollowers,
     Activity,
     Configurations,
+    ModuleSensor,
+    OnNoReject,
     Photos,
-    VizThresholds,
+    Project,
     ProjectAttribute,
+    ProjectFollowers,
+    ProjectUser,
+    Services,
+    Station,
+    StationModule,
+    StationRegion,
+    StationStatus,
+    VizThresholds,
 } from "@/api";
 
 import { VizConfig } from "@/views/viz/viz";
@@ -34,6 +34,7 @@ export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
 export const PROJECT_STATIONS = "PROJECT_STATIONS";
 export const PROJECT_ACTIVITY = "PROJECT_ACTIVITY";
 export const STATION_UPDATE = "STATION_UPDATE";
+export const STATION_CLEAR = "STATION_CLEAR";
 export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 export const PROJECT_DELETED = "PROJECT_DELETED";
@@ -89,6 +90,7 @@ export class DisplayStation {
     public readonly primarySensor: ModuleSensor | null;
     public readonly attributes: ProjectAttribute[];
     public readonly readOnly: boolean;
+    public readonly status: StationStatus;
 
     constructor(station: Station) {
         this.id = station.id;
@@ -105,6 +107,7 @@ export class DisplayStation {
         this.lastReadingAt = station.lastReadingAt ? new Date(station.lastReadingAt) : null;
         this.attributes = station.attributes.attributes;
         this.readOnly = station.readOnly;
+        this.status = station.status;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
@@ -123,6 +126,11 @@ export class DisplayStation {
         if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
             this.latestPrimary = prioritizedSensors[0].reading;
         } else {
+            this.latestPrimary = null;
+        }
+
+        // TODO: remove after wiring the map values to the new sensorDataQuerier code
+        if (station.status === StationStatus.down) {
             this.latestPrimary = null;
         }
 
@@ -152,7 +160,13 @@ export class ProjectModule {
 export class MapFeature {
     public readonly type = "Feature";
     public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
-    public readonly properties: { icon: string; id: number; value: number | null; thresholds: object | null; color: string } | null = null;
+    public readonly properties: {
+        icon: string;
+        id: number;
+        value: number | "-" | null;
+        thresholds: object | null;
+        color: string;
+    } | null = null;
 
     constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
@@ -164,7 +178,7 @@ export class MapFeature {
             thresholds = station.primarySensor.meta.viz[0].thresholds;
         }
 
-        let color;
+        let color = "#00CCFF";
         // Marker color scale
 
         if (thresholds) {
@@ -174,17 +188,13 @@ export class MapFeature {
                 .range(thresholds.levels.map((d) => d.color));
 
             color = markerScale(station.latestPrimary);
-        } else {
-            // default color
-            color = "#00CCFF";
         }
-
         this.properties = {
             id: station.id,
-            value: station.latestPrimary,
+            value: station.status === StationStatus.down ? null : station.latestPrimary,
             icon: "marker",
             thresholds: thresholds,
-            color,
+            color: color,
         };
     }
 
@@ -411,6 +421,12 @@ const actions = (services: Services) => {
 
             commit(MutationTypes.LOADING, { stations: false });
         },
+        [ActionTypes.CLEAR_STATION]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            id: number
+        ) => {
+            commit(STATION_CLEAR, id);
+        },
         [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.followProject(payload.projectId);
             commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
@@ -553,6 +569,9 @@ const mutations = {
     },
     [STATION_UPDATE]: (state: StationsState, payload: Station) => {
         Vue.set(state.stations, payload.id, new DisplayStation(payload));
+    },
+    [STATION_CLEAR]: (state: StationsState, id: number) => {
+        Vue.set(state.stations, id, null);
     },
     [PROJECT_LOADED]: (state: StationsState, project: Project) => {
         Vue.set(state.projects, project.id, project);

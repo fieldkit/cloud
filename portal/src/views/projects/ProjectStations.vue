@@ -80,7 +80,6 @@
                 <StationHoverSummary
                     v-if="activeStation"
                     :station="activeStation"
-                    :readings="false"
                     :exploreContext="exploreContext"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"

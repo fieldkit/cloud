@@ -133,6 +133,57 @@ func BuildDataPayload(sensorDataStart string, sensorDataEnd string, sensorDataSt
 	return v, nil
 }
 
+// BuildTailPayload builds the payload for the sensor tail endpoint from CLI
+// flags.
+func BuildTailPayload(sensorTailStations string, sensorTailBackend string, sensorTailAuth string) (*sensor.TailPayload, error) {
+	var stations *string
+	{
+		if sensorTailStations != "" {
+			stations = &sensorTailStations
+		}
+	}
+	var backend *string
+	{
+		if sensorTailBackend != "" {
+			backend = &sensorTailBackend
+		}
+	}
+	var auth *string
+	{
+		if sensorTailAuth != "" {
+			auth = &sensorTailAuth
+		}
+	}
+	v := &sensor.TailPayload{}
+	v.Stations = stations
+	v.Backend = backend
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildRecentlyPayload builds the payload for the sensor recently endpoint
+// from CLI flags.
+func BuildRecentlyPayload(sensorRecentlyStations string, sensorRecentlyAuth string) (*sensor.RecentlyPayload, error) {
+	var stations *string
+	{
+		if sensorRecentlyStations != "" {
+			stations = &sensorRecentlyStations
+		}
+	}
+	var auth *string
+	{
+		if sensorRecentlyAuth != "" {
+			auth = &sensorRecentlyAuth
+		}
+	}
+	v := &sensor.RecentlyPayload{}
+	v.Stations = stations
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildBookmarkPayload builds the payload for the sensor bookmark endpoint
 // from CLI flags.
 func BuildBookmarkPayload(sensorBookmarkBookmark string, sensorBookmarkAuth string) (*sensor.BookmarkPayload, error) {

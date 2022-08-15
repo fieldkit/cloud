@@ -40,7 +40,7 @@ func NewWebHookMessageReceivedHandler(db *sqlxcache.DB, metrics *logging.Metrics
 func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMessageReceived) error {
 	mr := NewMessagesRepository(h.db)
 
-	if err := mr.QueryMessageForProcessing(ctx, h.batch, m.MessageID); err != nil {
+	if err := mr.QueryMessageForProcessing(ctx, h.batch, m.MessageID, false); err != nil {
 		return err
 	}
 

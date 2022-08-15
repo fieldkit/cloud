@@ -20,13 +20,12 @@ type AggregateInfo struct {
 }
 
 type QueriedData struct {
-	Summaries map[string]*backend.AggregateSummary `json:"summaries"`
-	Aggregate AggregateInfo                        `json:"aggregate"`
-	Data      []*backend.DataRow                   `json:"data"`
-	Outer     []*backend.DataRow                   `json:"outer"`
+	Data       []*backend.DataRow `json:"data"`
+	BucketSize int                `json:"bucketSize"`
 }
 
 type DataBackend interface {
 	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
-	QueryTail(ctx context.Context, qp *backend.QueryParams) (*SensorTailData, error)
+	QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error)
+	QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error)
 }

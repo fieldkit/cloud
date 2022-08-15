@@ -84,11 +84,26 @@ func (pr *ProjectRepository) AddStationToDefaultProjectMaybe(ctx context.Context
 func (pr *ProjectRepository) QueryByID(ctx context.Context, projectID int32) (*data.Project, error) {
 	getting := &data.Project{}
 	if err := pr.db.GetContext(ctx, getting, `
-		SELECT p.* FROM fieldkit.project AS p WHERE p.id = $1
+		SELECT id, name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations, community_ranking FROM fieldkit.project WHERE id = $1
 		`, projectID); err != nil {
 		return nil, err
 	}
 	return getting, nil
+}
+
+func (pr *ProjectRepository) QueryProjectUser(ctx context.Context, userID, projectID int32) (*data.ProjectUser, error) {
+	projectUsers := []*data.ProjectUser{}
+	if err := pr.db.SelectContext(ctx, &projectUsers, `
+		SELECT user_id, project_id, role FROM fieldkit.project_user WHERE user_id = $1 AND project_id = $2
+		`, userID, projectID); err != nil {
+		return nil, err
+	}
+
+	if len(projectUsers) == 0 {
+		return nil, nil
+	}
+
+	return projectUsers[0], nil
 }
 
 func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, userID int32) (map[int32]*data.UserProjectRelationship, error) {
@@ -96,7 +111,7 @@ func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, 
 	if err := pr.db.SelectContext(ctx, &all, `
 		SELECT
 			p.id AS project_id,
-			COUNT(f.*) > 0 AS following,
+			COUNT(f.follower_id) > 0 AS following,
 			COALESCE(MAX(m.role), -1) AS member_role
 		FROM fieldkit.project AS p
 		LEFT JOIN fieldkit.project_follower AS f ON (p.id = f.project_id AND f.follower_id = $1)

@@ -39,6 +39,7 @@ export default Vue.extend({
     z-index: $z-index-top;
     left: 50%;
     bottom: 30px;
+    box-shadow: 0 0px 5px 0 rgb(0 0 0 / 15%);
 
     &.show {
         visibility: visible;
@@ -47,7 +48,7 @@ export default Vue.extend({
     }
 
     &.success {
-        background-color: #7cdb938a;
+        background-color: #97e2a9;
     }
     &.fail {
         background-color: #f8d7da;

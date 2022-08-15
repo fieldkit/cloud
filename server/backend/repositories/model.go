@@ -19,6 +19,7 @@ type VizThreshold struct {
 	Label       map[string]string `json:"label"`
 	KeyLabel    map[string]string `json:"keyLabel"`
 	MapKeyLabel map[string]string `json:"mapKeyLabel"`
+	PlainLabel  map[string]string `json:"plainLabel"`
 	Value       float64           `json:"value"`
 	Color       string            `json:"color"`
 	Hidden      bool              `json:"hidden"`

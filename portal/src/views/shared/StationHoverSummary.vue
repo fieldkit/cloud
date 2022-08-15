@@ -12,21 +12,24 @@
             </template>
         </StationSummaryContent>
 
-        <div
-            v-if="isPartnerCustomisationEnabled() && station.latestPrimary !== null"
-            class="latest-primary"
-            :style="{ color: latestPrimaryColor }"
-        >
-            {{ latestPrimaryLevel }}
-            <i :style="{ 'background-color': latestPrimaryColor }">{{ station.latestPrimary | prettyNum }}</i>
-        </div>
-
-        <slot :station="station" :sensorDataQuerier="sensorDataQuerier">
-            <div class="readings-container" v-if="readings">
-                <div class="title">Latest Readings</div>
-                <LatestStationReadings :id="station.id" @layoutChange="layoutChange" :sensorDataQuerier="sensorDataQuerier" />
+        <template v-if="isPartnerCustomisationEnabled()">
+            <div class="latest-primary" :style="{ color: latestPrimaryColor }">
+                <template v-if="station.status === StationStatus.up">
+                    <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+                    <span v-else class="no-data">{{ $t("noData") }}</span>
+                </template>
+                <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
+                <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                    <template v-if="station.status === StationStatus.down">-</template>
+                    <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+                </i>
+                <i v-else :style="{ 'background-color': latestPrimaryColor }">
+                    –
+                </i>
             </div>
-        </slot>
+        </template>
+
+        <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
 
         <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 
@@ -38,16 +41,23 @@
 import _ from "lodash";
 
 import Vue, { PropType } from "vue";
-import { mapState, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
-import { SensorDataQuerier } from "@/views/shared/LatestStationReadings.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import * as utils from "@/utilities";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+
+import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
+import { StationStatus } from "@/api";
+
+export enum VisibleReadings {
+    Current,
+    Last72h,
+}
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -56,26 +66,17 @@ export default Vue.extend({
         StationSummaryContent,
         StationBattery,
     },
-    data: () => {
-        return {
-            viewingSummary: true,
-        };
-    },
     props: {
         station: {
             type: Object,
             required: true,
-        },
-        readings: {
-            type: Boolean,
-            default: true,
         },
         explore: {
             type: Boolean,
             default: true,
         },
         exploreContext: {
-            type: Object,
+            type: Object as PropType<ExploreContext>,
             default: () => {
                 return new ExploreContext();
             },
@@ -84,6 +85,10 @@ export default Vue.extend({
             type: Object as PropType<SensorDataQuerier>,
             required: false,
         },
+        visibleReadings: {
+            type: Number as PropType<VisibleReadings>,
+            default: VisibleReadings.Current,
+        },
     },
     filters: {
         integer: (value) => {
@@ -91,33 +96,87 @@ export default Vue.extend({
             return Math.round(value);
         },
     },
+    data(): {
+        viewingSummary: boolean;
+        sensorMeta: SensorMeta | null;
+        readings: QueryRecentlyResponse | null;
+        StationStatus: any;
+    } {
+        return {
+            viewingSummary: true,
+            sensorMeta: null,
+            readings: null,
+            StationStatus: StationStatus,
+        };
+    },
+    async mounted() {
+        if (this.sensorDataQuerier) {
+            this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
+            this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+        }
+    },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
-        allProjectFeatures() {
-            return _.flatten(
-                Object.values(this.projectsById)
-                    .filter((p) => p != null)
-                    .map((p) => p.mapped.features)
-            );
-        },
-        stationFeature(): any {
-            return this.allProjectFeatures.find((feature) => feature.properties?.id === this.station.id);
-        },
-        latestPrimaryLevel(): any {
-            if (this.stationFeature && this.stationFeature.properties) {
-                const primaryValue = this.stationFeature.properties.value;
-                const level = this.stationFeature.properties.thresholds?.levels.find(
-                    (level) => level.start < primaryValue && level.value > primaryValue
-                );
-                return level?.label["enUS"];
+        visibleSensor(): ModuleSensorMeta | null {
+            if (this.sensorMeta && this.readings && 72 in this.readings && this.readings[72].length > 0) {
+                const sensorId = this.readings[72][0].sensorId;
+                return this.sensorMeta.findSensorById(sensorId);
             }
             return null;
         },
-        latestPrimaryColor(): string {
-            if (this.stationFeature && this.stationFeature.properties) {
-                return this.stationFeature.properties.color;
+        visibleReadingValue(): number | null {
+            const sensor = this.visibleSensor;
+            if (sensor && this.readings && 72 in this.readings && this.readings[72].length > 0) {
+                // console.log(this.visibleReadings, this.readings);
+                let value: number | undefined;
+                if (this.visibleReadings == VisibleReadings.Current) {
+                    value = this.readings[72][0].last;
+                } else {
+                    if (sensor.aggregationFunction == "max") {
+                        // TODO Pull into helper
+                        value = this.readings[72][0].max;
+                    } else {
+                        value = this.readings[72][0].avg;
+                    }
+                }
+                return value === undefined ? null : value;
             }
-            return "#00CCFF";
+
+            return null;
+        },
+        thresholds() {
+            const sensor = this.visibleSensor;
+            if (sensor && sensor.viz && sensor.viz.length > 0) {
+                if (sensor.viz[0].thresholds) {
+                    return sensor.viz[0].thresholds;
+                }
+            }
+            return null;
+        },
+        visibleLevel() {
+            const value = this.visibleReadingValue;
+            if (value !== null) {
+                const thresholds = this.thresholds;
+                if (thresholds) {
+                    const level = thresholds.levels.find((level) => level.start <= value && level.value > value);
+                    return level ?? null;
+                }
+            }
+            return null;
+        },
+        latestPrimaryLevel(): any {
+            if (this.visibleReadingValue === null) {
+                return null;
+            }
+            const level = this.visibleLevel;
+            return level?.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
+        },
+        latestPrimaryColor(): string {
+            if (this.visibleReadingValue === null) {
+                return "#cccccc";
+            }
+            const level = this.visibleLevel;
+            return level?.color || "#00CCFF";
         },
     },
     methods: {
@@ -132,7 +191,7 @@ export default Vue.extend({
             });
         },
         getBatteryIcon() {
-            return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
+            return this.$loadAsset(getBatteryIcon(this.station.battery));
         },
         wantCloseSummary() {
             this.$emit("close");
@@ -275,6 +334,12 @@ export default Vue.extend({
         color: #fff;
         margin-left: 5px;
         min-width: 1.2em;
+        text-align: center;
+    }
+
+    .no-data {
+        color: #cccccc;
+        font-family: $font-family-bold;
     }
 }
 </style>

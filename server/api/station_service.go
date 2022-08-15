@@ -270,7 +270,7 @@ func (c *StationService) DefaultPhoto(ctx context.Context, payload *station.Defa
 	}
 
 	updating.UpdatedAt = time.Now()
-	updating.PhotoID = payload.PhotoID
+	updating.PhotoID = &payload.PhotoID
 
 	if err := sr.UpdatePhoto(ctx, updating); err != nil {
 		return err
@@ -347,11 +347,8 @@ func (c *StationService) ListMine(ctx context.Context, payload *station.ListMine
 
 func (c *StationService) ListProject(ctx context.Context, payload *station.ListProjectPayload) (response *station.StationsFull, err error) {
 	pr := repositories.NewProjectRepository(c.options.Database)
-
-	project, err := pr.QueryByID(ctx, payload.ID)
-	if err != nil {
-		return nil, err
-	}
+	sr := repositories.NewStationRepository(c.options.Database)
+	mmr := repositories.NewModuleMetaRepository(c.options.Database)
 
 	p, err := NewPermissions(ctx, c.options).ForProjectByID(payload.ID)
 	if err != nil {
@@ -362,8 +359,12 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		return nil, err
 	}
 
-	preciseLocation := project.Privacy == data.Public
+	project, err := pr.QueryByID(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
 
+	preciseLocation := project.Privacy == data.Public
 	if !p.Anonymous() && !preciseLocation {
 		// NOTE This may already be in Permissions.
 		// NOTE Compare with GET
@@ -376,14 +377,11 @@ func (c *StationService) ListProject(ctx context.Context, payload *station.ListP
 		}
 	}
 
-	sr := repositories.NewStationRepository(c.options.Database)
-
 	sfs, err := sr.QueryStationFullByProjectID(ctx, payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	mmr := repositories.NewModuleMetaRepository(c.options.Database)
 	mm, err := mmr.FindAllModulesMeta(ctx)
 	if err != nil {
 		return nil, err
@@ -420,10 +418,7 @@ type associatedStationSorter struct {
 
 func (a associatedStationSorter) Len() int { return len(a.stations) }
 func (a associatedStationSorter) Less(i, j int) bool {
-	if a.stations[i].Station.ID == a.queriedStationID {
-		return true
-	}
-	return false // a[i].Order < a[j].Order
+	return a.stations[i].Station.ID == a.queriedStationID
 }
 func (a associatedStationSorter) Swap(i, j int) {
 	a.stations[i], a.stations[j] = a.stations[j], a.stations[i]
@@ -1012,7 +1007,10 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			return nil, err
 		}
 
-		readOnly = sp.IsReadOnly()
+		readOnly, err = sp.IsReadOnly()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	configurations, err := transformConfigurations(sf, transformAllConfigurations, moduleMeta)
@@ -1049,7 +1047,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 	}
 
 	var photos *station.StationPhotos
-	if sf.HasImages {
+    if sf.Station.PhotoID != nil {
 		photos = &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		}

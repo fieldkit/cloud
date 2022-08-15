@@ -11,7 +11,6 @@ BEGIN
 WITH scores AS (
 	SELECT q.project_id, SUM(q.score) AS score FROM
 	(
-	/* TODO Make recursive */
 	SELECT project_id, COUNT(project_id) AS score FROM fieldkit.discussion_post WHERE project_id IS NOT NULL GROUP BY project_id
 	UNION
 	SELECT project_id, COUNT(project_id) AS score FROM fieldkit.project_station GROUP BY project_id

@@ -952,3 +952,14 @@ func unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(v *NoteMediaRespons
 
 	return res
 }
+
+// unmarshalFieldNoteStationResponseBodyToNotesviewsFieldNoteStationView builds
+// a value of type *notesviews.FieldNoteStationView from a value of type
+// *FieldNoteStationResponseBody.
+func unmarshalFieldNoteStationResponseBodyToNotesviewsFieldNoteStationView(v *FieldNoteStationResponseBody) *notesviews.FieldNoteStationView {
+	res := &notesviews.FieldNoteStationView{
+		ReadOnly: v.ReadOnly,
+	}
+
+	return res
+}

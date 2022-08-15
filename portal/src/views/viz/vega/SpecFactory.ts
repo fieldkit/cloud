@@ -1,17 +1,12 @@
 import _ from "lodash";
-
+import type { VizSensor, DataRow, SensorDataResponse, ModuleSensorMeta, SensorsResponse } from "../common";
 import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
 import {
     SeriesData,
     DataSetSeries,
     TimeRange,
     VizInfo,
-    QueriedData,
-    DataRow,
-    SensorDataResponse,
-    VizSensor,
-    SensorsResponse,
-    ModuleSensorMeta,
+    QueriedData
 } from "../common";
 
 export {

@@ -39,7 +39,7 @@ func (s *DatabaseMessageSource) NextBatch(ctx context.Context, batch *MessageBat
 	}
 
 	if s.messageID > 0 && !s.resume {
-		return messages.QueryMessageForProcessing(ctx, batch, s.messageID)
+		return messages.QueryMessageForProcessing(ctx, batch, s.messageID, true)
 	}
 
 	if !s.started {

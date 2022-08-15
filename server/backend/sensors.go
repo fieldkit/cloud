@@ -74,7 +74,7 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		start = time.Unix(0, *raw.Start*int64(time.Millisecond)).UTC()
 	}
 
-	end := time.Now()
+	end := time.Now().UTC()
 	if raw.End != nil {
 		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
 	}
@@ -412,7 +412,7 @@ type DataRow struct {
 	AverageValue  *float64   `json:"avg,omitempty"`
 	MinimumValue  *float64   `json:"min,omitempty"`
 	MaximumValue  *float64   `json:"max,omitempty"`
-	LastValue     *float64   `json:"-",omitempty`
+	LastValue     *float64   `json:"last,omitempty"`
 }
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {

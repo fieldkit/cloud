@@ -104,6 +104,68 @@ var _ = Service("sensor", func() {
 		})
 	})
 
+	Method("tail", func() {
+		Security(JWTAuth, func() {
+			// Optional
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("stations", String)
+			Attribute("backend", String)
+		})
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("sensors/data/tail")
+
+			Params(func() {
+				Param("stations")
+				Param("backend")
+			})
+
+			Response(func() {
+				Body("object")
+			})
+
+			httpAuthentication()
+		})
+	})
+
+	Method("recently", func() {
+		Security(JWTAuth, func() {
+			// Optional
+		})
+
+		Payload(func() {
+			Token("auth")
+			Attribute("stations", String)
+		})
+
+		Result(func() {
+			Attribute("object", Any)
+			Required("object")
+		})
+
+		HTTP(func() {
+			GET("sensors/data/recently")
+
+			Params(func() {
+				Param("stations")
+			})
+
+			Response(func() {
+				Body("object")
+			})
+
+			httpAuthentication()
+		})
+	})
+
 	Method("bookmark", func() {
 		Security(JWTAuth, func() {
 			// Optional

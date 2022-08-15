@@ -102,7 +102,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             templates: {
                 extraProjectDescription: `
                     <div class="detail-description">
-                        To report a flood in your neighborhood, please use the 
+                        Report a flood: 
                         <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
                             Community Flood Watch Project Survey
                         </a>

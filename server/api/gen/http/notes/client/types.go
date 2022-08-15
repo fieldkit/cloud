@@ -22,15 +22,17 @@ type UpdateRequestBody struct {
 // UpdateResponseBody is the type of the "notes" service "update" endpoint HTTP
 // response body.
 type UpdateResponseBody struct {
-	Notes []*FieldNoteResponseBody `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
-	Media []*NoteMediaResponseBody `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
+	Notes   []*FieldNoteResponseBody      `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Media   []*NoteMediaResponseBody      `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
+	Station *FieldNoteStationResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
 }
 
 // GetResponseBody is the type of the "notes" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	Notes []*FieldNoteResponseBody `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
-	Media []*NoteMediaResponseBody `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
+	Notes   []*FieldNoteResponseBody      `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
+	Media   []*NoteMediaResponseBody      `form:"media,omitempty" json:"media,omitempty" xml:"media,omitempty"`
+	Station *FieldNoteStationResponseBody `form:"station,omitempty" json:"station,omitempty" xml:"station,omitempty"`
 }
 
 // UploadMediaResponseBody is the type of the "notes" service "upload media"
@@ -450,6 +452,11 @@ type NoteMediaResponseBody struct {
 	ContentType *string `form:"contentType,omitempty" json:"contentType,omitempty" xml:"contentType,omitempty"`
 }
 
+// FieldNoteStationResponseBody is used to define fields on response body types.
+type FieldNoteStationResponseBody struct {
+	ReadOnly *bool `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+}
+
 // NewUpdateRequestBody builds the HTTP request body from the payload of the
 // "update" endpoint of the "notes" service.
 func NewUpdateRequestBody(p *notes.UpdatePayload) *UpdateRequestBody {
@@ -472,6 +479,7 @@ func NewUpdateFieldNotesOK(body *UpdateResponseBody) *notesviews.FieldNotesView 
 	for i, val := range body.Media {
 		v.Media[i] = unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(val)
 	}
+	v.Station = unmarshalFieldNoteStationResponseBodyToNotesviewsFieldNoteStationView(body.Station)
 
 	return v
 }
@@ -545,6 +553,7 @@ func NewGetFieldNotesOK(body *GetResponseBody) *notesviews.FieldNotesView {
 	for i, val := range body.Media {
 		v.Media[i] = unmarshalNoteMediaResponseBodyToNotesviewsNoteMediaView(val)
 	}
+	v.Station = unmarshalFieldNoteStationResponseBodyToNotesviewsFieldNoteStationView(body.Station)
 
 	return v
 }
@@ -1365,6 +1374,15 @@ func ValidateNoteMediaResponseBody(body *NoteMediaResponseBody) (err error) {
 	}
 	if body.ContentType == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("contentType", "body"))
+	}
+	return
+}
+
+// ValidateFieldNoteStationResponseBody runs the validations defined on
+// FieldNoteStationResponseBody
+func ValidateFieldNoteStationResponseBody(body *FieldNoteStationResponseBody) (err error) {
+	if body.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "body"))
 	}
 	return
 }

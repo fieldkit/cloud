@@ -321,6 +321,11 @@ export interface ProjectAttribute {
     priority: number;
 }
 
+export enum StationStatus {
+    up = "up",
+    down = "down",
+}
+
 export interface Station {
     id: number;
     name: string;
@@ -342,6 +347,7 @@ export interface Station {
     attributes: {
         attributes: ProjectAttribute[];
     };
+    status: StationStatus;
 }
 
 export interface ProjectsResponse {
@@ -371,14 +377,17 @@ export interface TailSensorDataRow {
     stationId: number;
     sensorId: number;
     moduleId: string;
-    avg: number;
-    min: number;
-    max: number;
+    avg: number | undefined;
+    min: number | undefined;
+    max: number | undefined;
+    last: number | undefined;
 }
 
 export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
 }
+
+export type QueryRecentlyResponse = { [index: number]: TailSensorDataRow[] };
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
@@ -1150,11 +1159,23 @@ class FKApi {
         });
     }
 
-    public tailSensorData(params: URLSearchParams): Promise<TailSensorDataResponse> {
+    public tailSensorData(stations: number[]): Promise<TailSensorDataResponse> {
+        const qp = new URLSearchParams();
+        qp.append("stations", stations.join(","));
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
-            url: this.baseUrl + "/sensors/data?" + params.toString(),
+            url: this.baseUrl + "/sensors/data/tail?" + qp.toString(),
+        });
+    }
+
+    public queryStationsRecently(stations: number[]): Promise<QueryRecentlyResponse> {
+        const qp = new URLSearchParams();
+        qp.append("stations", stations.join(","));
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/sensors/data/recently?" + qp.toString(),
         });
     }
 

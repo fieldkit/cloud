@@ -1,0 +1,84 @@
+import groovy.json.JsonSlurper
+
+@Library('conservify') _
+
+properties([
+	buildDiscarder(logRotator(numToKeepStr: '1')),
+	disableConcurrentBuilds(),
+])
+
+def execute(url, query) {
+    writeFile(file: "query.sql", text: query)
+
+	return sh(returnStdout: true, script: "docker run --log-driver none --rm -i postgres psql '${url}' -tq < query.sql").split("\n")
+}
+
+timestamps {
+    node ("jenkins-aws-ubuntu") {
+        try {
+            def workEnv = "prod"
+			def branchName = params.DeployBranch ?: "develop"
+			def include = params.Move ?: ""
+            def job = "cloud/" + "develop"
+			def now = new Date()
+			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
+			
+			cleanWs()
+
+            def ws = conservifyTerraformWorkspace(env: workEnv)
+
+			stage ('processing') {
+				withCredentials([usernamePassword(credentialsId: 'jenkins-artifact-download', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASSWORD')]) {
+					copyArtifacts(projectName: job, flatten: true, excludes: "**/*.tar")
+			        
+			        stage ('move-json') {
+                        if ("json" in include) {
+                            sh "FIELDKIT_TIME_SCALE_URL='${ws.timescaledb_url.value}' FIELDKIT_POSTGRES_URL='${ws.database_url.value}' ./movedata --json --schema-id 7"
+                        }
+			        }
+
+			        stage ('move-binary') {
+                        if ("binary-all" in include) {
+                            sh "rm -f move-binary.log"
+
+                            def stations = execute(ws.database_url.value, "SELECT id FROM fieldkit.station ORDER BY id DESC")
+
+                            for (def stationId : stations) {
+                                print(stationId)
+                                sh "FIELDKIT_TIME_SCALE_URL='${ws.timescaledb_url.value}' FIELDKIT_POSTGRES_URL='${ws.database_url.value}' ./movedata --binary --station-id ${stationId} >> move-binary.log"
+                            }
+                        }
+
+                        def matcher = include =~ /binary-(\d+)/
+
+                        if (matcher) {
+                            sh "rm -f move-binary.log"
+
+                            def stationId = matcher[0][1]
+
+                            sh "FIELDKIT_TIME_SCALE_URL='${ws.timescaledb_url.value}' FIELDKIT_POSTGRES_URL='${ws.database_url.value}' ./movedata --binary --station-id ${stationId} >> move-binary.log"
+                        }
+			        }
+
+			        stage ('move-ingestions') {
+                        def matcher = include =~ /ingestions-(\d+)/
+
+                        if (matcher) {
+                            sh "rm -f move-ingestions.log"
+
+                            def stationId = matcher[0][1]
+
+                            sh "FIELDKIT_TIME_SCALE_URL='${ws.timescaledb_url.value}' FIELDKIT_POSTGRES_URL='${ws.database_url.value}' ./movedata --ingestions --station-id ${stationId} >> move-ingestions.log"
+                        }
+			        }
+
+					notifySuccess()
+				}
+			}
+        }
+        catch (Exception e) {
+            notifyFailure(e)
+            throw e
+        }
+    }
+}

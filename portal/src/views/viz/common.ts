@@ -259,6 +259,10 @@ export class QueriedData {
         return this.sdr.data;
     }
 
+    get bucketSize(): number {
+        return this.sdr.bucketSize;
+    }
+
     private getAverageTimeBetweenSample(): number | null {
         if (this.sdr.data.length <= 1) {
             return null;
@@ -294,6 +298,7 @@ export class QueriedData {
     public sorted(): QueriedData {
         const sorted = {
             data: _.sortBy(this.sdr.data, (d) => d.time),
+            bucketSize: this.sdr.bucketSize,
         };
         return new QueriedData(this.key, this.timeRangeQueried, sorted);
     }
@@ -301,6 +306,7 @@ export class QueriedData {
     public removeMalformed(): QueriedData {
         const filtered = {
             data: this.sdr.data.filter((d) => d.sensorId),
+            bucketSize: this.sdr.bucketSize,
         };
         // console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
@@ -309,6 +315,7 @@ export class QueriedData {
     public removeDuplicates(): QueriedData {
         const filtered = {
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
+            bucketSize: this.sdr.bucketSize,
         };
         // console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);

@@ -83,7 +83,7 @@ func TestGetSensorsData(t *testing.T) {
 
 	moduleId := base64.StdEncoding.EncodeToString(reply.Modules[0].Id)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/sensors/data?sensors=%s&stations=%d", fmt.Sprintf("%v,%v", url.QueryEscape(moduleId), 1), 1), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/sensors/data?sensors=%s&stations=%d&backend=tests", fmt.Sprintf("%v,%v", url.QueryEscape(moduleId), 1), 1), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
@@ -92,10 +92,8 @@ func TestGetSensorsData(t *testing.T) {
 	ja := jsonassert.New(t)
 	ja.Assertf(rr.Body.String(), `
 	{
-		"summaries": "<<PRESENCE>>",
-		"aggregate": "<<PRESENCE>>",
-		"data": "<<PRESENCE>>",
-		"outer": "<<PRESENCE>>"
+		"bucketSize": "<<PRESENCE>>",
+		"data": "<<PRESENCE>>"
 	}`)
 }
 
@@ -110,7 +108,7 @@ func TestGetStationSensors(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/sensors/data?stations=%d", 1), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/meta/stations?stations=%d", 1), nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr := tests.ExecuteRequest(req, api)
 
