@@ -67,6 +67,17 @@ var FieldNoteUpdate = ResultType("application/vnd.app.notes.update", func() {
 	})
 })
 
+var FieldNoteStation = ResultType("application/vnd.app.notes.station", func() {
+	TypeName("FieldNoteStation")
+	Attributes(func() {
+		Attribute("readOnly", Boolean)
+		Required("readOnly")
+	})
+	View("default", func() {
+		Attribute("readOnly")
+	})
+})
+
 var StationFieldNotes = ResultType("application/vnd.app.notes", func() {
 	TypeName("FieldNotes")
 	Attributes(func() {
@@ -74,10 +85,13 @@ var StationFieldNotes = ResultType("application/vnd.app.notes", func() {
 		Required("notes")
 		Attribute("media", ArrayOf(NoteMedia))
 		Required("media")
+		Attribute("station", FieldNoteStation)
+		Required("station")
 	})
 	View("default", func() {
 		Attribute("notes")
 		Attribute("media")
+		Attribute("station")
 	})
 })
 

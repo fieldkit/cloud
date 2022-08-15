@@ -726,3 +726,14 @@ func marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(v *notesviews.NoteMed
 
 	return res
 }
+
+// marshalNotesviewsFieldNoteStationViewToFieldNoteStationResponseBody builds a
+// value of type *FieldNoteStationResponseBody from a value of type
+// *notesviews.FieldNoteStationView.
+func marshalNotesviewsFieldNoteStationViewToFieldNoteStationResponseBody(v *notesviews.FieldNoteStationView) *FieldNoteStationResponseBody {
+	res := &FieldNoteStationResponseBody{
+		ReadOnly: *v.ReadOnly,
+	}
+
+	return res
+}
