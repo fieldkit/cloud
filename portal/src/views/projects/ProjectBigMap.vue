@@ -540,6 +540,7 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         margin: 60px 0 0 10px;
+        width: 40px;
     }
 
     .mapboxgl-ctrl-geocoder {
