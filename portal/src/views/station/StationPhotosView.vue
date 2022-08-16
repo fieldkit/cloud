@@ -97,6 +97,7 @@ export default Vue.extend({
                                 .deleteMedia(photo.id)
                                 .then(async () => {
                                     await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+                                    await this.$store.dispatch(ActionTypes.CLEAR_STATION, this.$route.params.stationId);
                                 })
                                 .finally(() => {
                                     this.onFinishedPhotoAction(this.$tc("successDeletePhoto"), SnackbarStyle.success);

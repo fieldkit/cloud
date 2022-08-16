@@ -22,15 +22,17 @@ type UpdateRequestBody struct {
 // UpdateResponseBody is the type of the "notes" service "update" endpoint HTTP
 // response body.
 type UpdateResponseBody struct {
-	Notes []*FieldNoteResponseBody `form:"notes" json:"notes" xml:"notes"`
-	Media []*NoteMediaResponseBody `form:"media" json:"media" xml:"media"`
+	Notes   []*FieldNoteResponseBody      `form:"notes" json:"notes" xml:"notes"`
+	Media   []*NoteMediaResponseBody      `form:"media" json:"media" xml:"media"`
+	Station *FieldNoteStationResponseBody `form:"station" json:"station" xml:"station"`
 }
 
 // GetResponseBody is the type of the "notes" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	Notes []*FieldNoteResponseBody `form:"notes" json:"notes" xml:"notes"`
-	Media []*NoteMediaResponseBody `form:"media" json:"media" xml:"media"`
+	Notes   []*FieldNoteResponseBody      `form:"notes" json:"notes" xml:"notes"`
+	Media   []*NoteMediaResponseBody      `form:"media" json:"media" xml:"media"`
+	Station *FieldNoteStationResponseBody `form:"station" json:"station" xml:"station"`
 }
 
 // UploadMediaResponseBody is the type of the "notes" service "upload media"
@@ -428,6 +430,11 @@ type NoteMediaResponseBody struct {
 	ContentType string `form:"contentType" json:"contentType" xml:"contentType"`
 }
 
+// FieldNoteStationResponseBody is used to define fields on response body types.
+type FieldNoteStationResponseBody struct {
+	ReadOnly bool `form:"readOnly" json:"readOnly" xml:"readOnly"`
+}
+
 // FieldNoteUpdateRequestBody is used to define fields on request body types.
 type FieldNoteUpdateRequestBody struct {
 	Notes    []*ExistingFieldNoteRequestBody `form:"notes,omitempty" json:"notes,omitempty" xml:"notes,omitempty"`
@@ -465,6 +472,9 @@ func NewUpdateResponseBody(res *notesviews.FieldNotesView) *UpdateResponseBody {
 			body.Media[i] = marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(val)
 		}
 	}
+	if res.Station != nil {
+		body.Station = marshalNotesviewsFieldNoteStationViewToFieldNoteStationResponseBody(res.Station)
+	}
 	return body
 }
 
@@ -483,6 +493,9 @@ func NewGetResponseBody(res *notesviews.FieldNotesView) *GetResponseBody {
 		for i, val := range res.Media {
 			body.Media[i] = marshalNotesviewsNoteMediaViewToNoteMediaResponseBody(val)
 		}
+	}
+	if res.Station != nil {
+		body.Station = marshalNotesviewsFieldNoteStationViewToFieldNoteStationResponseBody(res.Station)
 	}
 	return body
 }

@@ -55,8 +55,9 @@ type UpdatePayload struct {
 
 // FieldNotes is the result type of the notes service update method.
 type FieldNotes struct {
-	Notes []*FieldNote
-	Media []*NoteMedia
+	Notes   []*FieldNote
+	Media   []*NoteMedia
+	Station *FieldNoteStation
 }
 
 // GetPayload is the payload type of the notes service get method.
@@ -139,6 +140,10 @@ type FieldNoteAuthor struct {
 	MediaURL string
 }
 
+type FieldNoteStation struct {
+	ReadOnly bool
+}
+
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return &goa.ServiceError{
@@ -216,6 +221,9 @@ func newFieldNotes(vres *notesviews.FieldNotesView) *FieldNotes {
 			res.Media[i] = transformNotesviewsNoteMediaViewToNoteMedia(val)
 		}
 	}
+	if vres.Station != nil {
+		res.Station = newFieldNoteStation(vres.Station)
+	}
 	return res
 }
 
@@ -234,6 +242,9 @@ func newFieldNotesView(res *FieldNotes) *notesviews.FieldNotesView {
 		for i, val := range res.Media {
 			vres.Media[i] = transformNoteMediaToNotesviewsNoteMediaView(val)
 		}
+	}
+	if res.Station != nil {
+		vres.Station = newFieldNoteStationView(res.Station)
 	}
 	return vres
 }
@@ -260,6 +271,25 @@ func newNoteMediaView(res *NoteMedia) *notesviews.NoteMediaView {
 		ID:  &res.ID,
 		URL: &res.URL,
 		Key: &res.Key,
+	}
+	return vres
+}
+
+// newFieldNoteStation converts projected type FieldNoteStation to service type
+// FieldNoteStation.
+func newFieldNoteStation(vres *notesviews.FieldNoteStationView) *FieldNoteStation {
+	res := &FieldNoteStation{}
+	if vres.ReadOnly != nil {
+		res.ReadOnly = *vres.ReadOnly
+	}
+	return res
+}
+
+// newFieldNoteStationView projects result type FieldNoteStation to projected
+// type FieldNoteStationView using the "default" view.
+func newFieldNoteStationView(res *FieldNoteStation) *notesviews.FieldNoteStationView {
+	vres := &notesviews.FieldNoteStationView{
+		ReadOnly: &res.ReadOnly,
 	}
 	return vres
 }

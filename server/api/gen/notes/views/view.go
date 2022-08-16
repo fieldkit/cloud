@@ -29,8 +29,9 @@ type NoteMedia struct {
 
 // FieldNotesView is a type that runs validations on a projected type.
 type FieldNotesView struct {
-	Notes []*FieldNoteView
-	Media []*NoteMediaView
+	Notes   []*FieldNoteView
+	Media   []*NoteMediaView
+	Station *FieldNoteStationView
 }
 
 // FieldNoteView is a type that runs validations on a projected type.
@@ -60,6 +61,11 @@ type NoteMediaView struct {
 	ContentType *string
 }
 
+// FieldNoteStationView is a type that runs validations on a projected type.
+type FieldNoteStationView struct {
+	ReadOnly *bool
+}
+
 var (
 	// FieldNotesMap is a map of attribute names in result type FieldNotes indexed
 	// by view name.
@@ -67,6 +73,7 @@ var (
 		"default": []string{
 			"notes",
 			"media",
+			"station",
 		},
 	}
 	// NoteMediaMap is a map of attribute names in result type NoteMedia indexed by
@@ -76,6 +83,13 @@ var (
 			"id",
 			"url",
 			"key",
+		},
+	}
+	// FieldNoteStationMap is a map of attribute names in result type
+	// FieldNoteStation indexed by view name.
+	FieldNoteStationMap = map[string][]string{
+		"default": []string{
+			"readOnly",
 		},
 	}
 )
@@ -125,6 +139,11 @@ func ValidateFieldNotesView(result *FieldNotesView) (err error) {
 			if err2 := ValidateNoteMediaView(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
+		}
+	}
+	if result.Station != nil {
+		if err2 := ValidateFieldNoteStationView(result.Station); err2 != nil {
+			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
@@ -191,6 +210,15 @@ func ValidateNoteMediaView(result *NoteMediaView) (err error) {
 	}
 	if result.Key == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("key", "result"))
+	}
+	return
+}
+
+// ValidateFieldNoteStationView runs the validations defined on
+// FieldNoteStationView using the "default" view.
+func ValidateFieldNoteStationView(result *FieldNoteStationView) (err error) {
+	if result.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "result"))
 	}
 	return
 }

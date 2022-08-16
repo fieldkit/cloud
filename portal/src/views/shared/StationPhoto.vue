@@ -3,13 +3,19 @@
         <Spinner class="spinner" />
     </div>
     <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo" alt="Station Image" />
-    <img v-else src="@/assets/station-image-placeholder.png" class="station-photo photo" alt="Default Station Image" />
+    <img
+        v-else
+        :src="$loadAsset(interpolatePartner('station-image-placeholder-') + '.png')"
+        class="station-photo photo"
+        alt="Default Station Image"
+    />
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DisplayStation } from "@/store";
 import Spinner from "./Spinner.vue";
+import { interpolatePartner } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StationPhoto",
@@ -53,6 +59,9 @@ export default Vue.extend({
             } else {
                 this.loading = false;
             }
+        },
+        interpolatePartner(baseString: string): string {
+            return interpolatePartner(baseString);
         },
     },
 });
