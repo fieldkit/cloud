@@ -25,11 +25,11 @@
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            Share
+                            <span class="button-submit-text">Share</span>
                         </div>
                         <div v-if="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
-                            Export
+                            <span class="button-submit-text">Export</span>
                         </div>
                     </template>
                 </DoubleHeader>
@@ -358,7 +358,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 
-#vg-tooltip-element {
+::v-deep #vg-tooltip-element {
     background-color: #f4f5f7;
     border-radius: 1px;
     box-shadow: none;
@@ -390,16 +390,16 @@ export default Vue.extend({
         font-size: 13px;
     }
 }
-#vg-tooltip-element .key {
+::v-deep #vg-tooltip-element .key {
     display: none;
 }
-#vg-tooltip-element table tr:first-of-type td.value {
+::v-deep #vg-tooltip-element table tr:first-of-type td.value {
     text-align: center;
     font-family: "Avenir", sans-serif;
     font-size: 16px;
     color: #2c3e50;
 }
-#vg-tooltip-element table tr:nth-of-type(2) td.value {
+::v-deep #vg-tooltip-element table tr:nth-of-type(2) td.value {
     text-align: center;
     font-family: "Avenir", sans-serif;
     font-size: 13px;
@@ -411,6 +411,18 @@ export default Vue.extend({
     background-color: #fcfcfc;
     padding: 40px;
     flex-grow: 1;
+
+    @include bp-down($lg) {
+        padding: 30px 45px 60px;
+    }
+
+    @include bp-down($sm) {
+        padding: 30px 20px 30px;
+    }
+
+    @include bp-down($xs) {
+        padding: 20px 10px 10px;
+    }
 }
 .explore-header {
     margin-bottom: 1em;
@@ -442,24 +454,24 @@ export default Vue.extend({
     }
 }
 
-.workspace-container {
+::v-deep .workspace-container {
     display: flex;
     flex-direction: column;
     border-radius: 1px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 1px #f4f5f7;
 }
-.tree-container {
+::v-deep .tree-container {
     flex: 0;
 }
-.loading-scrubber {
+::v-deep .loading-scrubber {
     padding: 20px;
 }
-.groups-container {
+::v-deep .groups-container {
     background-color: white;
 }
 
-.icons-container {
+::v-deep .icons-container {
     margin-top: 30px;
     display: flex;
     justify-content: center;
@@ -469,26 +481,26 @@ export default Vue.extend({
     padding-right: 20px;
 }
 
-.icons-container.linked {
+::v-deep .icons-container.linked {
     background-color: #efefef;
     height: 1px;
 }
 
-.icons-container.unlinked {
+::v-deep .icons-container.unlinked {
     border-top: 1px solid #efefef;
     border-bottom: 1px solid #efefef;
     background-color: #fcfcfc;
     height: 8px;
 }
 
-.icons-container div:first-child {
+::v-deep .icons-container div:first-child {
     margin-right: auto;
     visibility: hidden;
 }
-.icons-container div:last-child {
+::v-deep .icons-container div:last-child {
     margin-left: auto;
 }
-.icons-container .icon {
+::v-deep .icons-container .icon {
     background-color: #fcfcfc;
     box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
     border: 1px solid var(--color-border);
@@ -502,7 +514,7 @@ export default Vue.extend({
     }
 }
 
-.icons-container .remove-icon {
+::v-deep .icons-container .remove-icon {
     background-position: center;
     background-image: url(../../assets/Icon_Close_Circle.png);
     background-size: 20px;
@@ -511,7 +523,7 @@ export default Vue.extend({
     height: 20px;
 }
 
-.vega-embed {
+::v-deep .vega-embed {
     width: 100%;
 
     summary {
@@ -520,10 +532,10 @@ export default Vue.extend({
         margin-right: 0.5em;
     }
 }
-.graph .vega-embed {
+::v-deep .graph .vega-embed {
     height: 340px;
 }
-.scrubber .vega-embed {
+::v-deep .scrubber .vega-embed {
     height: 40px;
 
     summary {
@@ -531,7 +543,7 @@ export default Vue.extend({
     }
 }
 
-.workspace-container {
+::v-deep .workspace-container {
     position: relative;
 
     .busy-panel {
@@ -555,17 +567,17 @@ export default Vue.extend({
     }
 }
 
-.controls-container {
+::v-deep .controls-container {
     margin-left: 40px;
     margin-right: 40px;
     margin-bottom: 10px;
 }
 
-.controls-container .row {
+::v-deep .controls-container .row {
     display: flex;
 }
 
-.controls-container .row-1 {
+::v-deep .controls-container .row-1 {
     padding: 10px;
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
@@ -573,18 +585,18 @@ export default Vue.extend({
     min-height: 60px;
 }
 
-.controls-container .row-2 {
+::v-deep .controls-container .row-2 {
     margin-top: 5px;
     padding: 10px;
 }
 
-.controls-container .left {
+::v-deep .controls-container .left {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-.controls-container .left .row {
+::v-deep .controls-container .left .row {
     align-items: center;
     display: flex;
 
@@ -599,18 +611,18 @@ export default Vue.extend({
     }
 }
 
-.controls-container .tree-pair {
+::v-deep .controls-container .tree-pair {
     display: flex;
     align-items: center;
     width: 100%;
     flex: 0 0 500px;
 }
 
-.controls-container .tree-pair > div {
+::v-deep .controls-container .tree-pair > div {
     flex: 0 1 auto;
 }
 
-.tree-key {
+::v-deep .tree-key {
     flex-basis: 0;
     margin-right: 15px;
     line-height: 35px;
@@ -621,7 +633,7 @@ export default Vue.extend({
     }
 }
 
-.controls-container .right {
+::v-deep .controls-container .right {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -631,25 +643,25 @@ export default Vue.extend({
     }
 }
 
-.controls-container .right {
+::v-deep .controls-container .right {
     font-size: 12px;
 }
 
-.controls-container .right.half {
+::v-deep .controls-container .right.half {
     align-items: flex-start;
     flex: 0 0 110px;
 }
 
-.controls-container .view-by {
+::v-deep .controls-container .view-by {
     margin: 0px 10px 0 10px;
 }
 
-.controls-container .fast-time {
+::v-deep .controls-container .fast-time {
     margin: 0px 10px 0 10px;
     cursor: pointer;
 }
 
-.controls-container .date-picker {
+::v-deep .controls-container .date-picker {
     margin-left: 20px;
 
     span {
@@ -663,19 +675,19 @@ export default Vue.extend({
     }
 }
 
-.controls-container .date-picker input {
+::v-deep .controls-container .date-picker input {
     padding: 5px;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
 }
 
-.controls-container .fast-time.selected {
+::v-deep .controls-container .fast-time.selected {
     text-decoration: underline;
     font-weight: bold;
 }
 
-.controls-container .left .button {
+::v-deep .controls-container .left .button {
     margin-right: 20px;
     font-size: 12px;
     padding: 5px 10px;
@@ -685,7 +697,7 @@ export default Vue.extend({
     cursor: pointer;
 }
 
-.debug-panel {
+::v-deep .debug-panel {
     font-size: 8px;
 }
 
@@ -698,7 +710,7 @@ export default Vue.extend({
     border-radius: 4px;
 }
 
-.svg-container {
+::v-deep .svg-container {
     display: inline-block;
     position: relative;
     width: 100%;
@@ -706,20 +718,20 @@ export default Vue.extend({
     overflow: hidden;
 }
 
-.svg-content-responsive {
+::v-deep .svg-content-responsive {
     display: inline-block;
     position: absolute;
     top: 10px;
     left: 0;
 }
 
-.viz.map .viz-map {
+::v-deep .viz.map .viz-map {
     height: 400px;
     margin-bottom: 20px;
 }
 
-.share-floating,
-.exports-floating {
+::v-deep .share-floating,
+::v-deep .exports-floating {
     position: absolute;
     right: 0;
     top: 70px;
@@ -740,19 +752,23 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
+    @include bp-down($sm) {
+        display: none;
+    }
+
     div {
         padding-left: 1em;
     }
 }
 
-.brush_brush_bg path {
+::v-deep .brush_brush_bg path {
     body.floodnet & {
         fill: var(--color-primary);
         fill-opacity: 1;
     }
 }
 
-.layer_1_marks path {
+::v-deep .layer_1_marks path {
     fill: var(--color-primary);
 
     body.floodnet & {
@@ -763,6 +779,12 @@ export default Vue.extend({
 .one {
     display: flex;
     flex-direction: row;
+
+    @include bp-down($sm) {
+        color: #979797;
+        font-size: 14px;
+        letter-spacing: 0.06px;
+    }
 }
 
 .button-submit {
@@ -770,9 +792,40 @@ export default Vue.extend({
 
     &:nth-child(n + 1) {
         margin-left: 20px;
+
+        @include bp-down($sm) {
+            margin-left: 5px;
+        }
+    }
+
+    @include bp-down($lg) {
+        padding: 0 14px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    @include bp-down($sm) {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+
+        .icon {
+            margin: 0;
+            font-size: 18px;
+
+            &-export {
+                transform: translateX(1px);
+            }
+        }
+    }
+
+    &-text {
+        @include bp-down($sm) {
+            display: none;
+        }
     }
 }
-.station-summary {
+::v-deep .station-summary {
     background-color: #fff;
     border-bottom: 1px solid var(--color-border);
     padding: 20px;
@@ -810,5 +863,12 @@ export default Vue.extend({
     margin-right: 13px;
     justify-content: center;
 }
+
+::v-deep .double-header .actions {
+    @include bp-down($sm) {
+        position: absolute;
+        right: 0;
+        margin: 0 !important;
+    }
+}
 </style>
-"
