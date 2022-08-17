@@ -1,6 +1,18 @@
 import { DisplayStation } from "@/store";
 import moment from "moment";
 
+import Vue, { Component } from "vue";
+
+const FloodNetProjectLinks = Vue.extend({
+    name: "FloodNetProjectLinks",
+    template: `
+    <div class="example" v-if="false">
+        Here's an example, this can also be in a separate file and imported.
+        The v-if is there to hide this example, probably would be left off in a real use case.
+    </div>
+    `,
+});
+
 export interface PartnerCustomization {
     title: string; // TODO i18n
     class: string;
@@ -32,7 +44,12 @@ export interface PartnerCustomization {
     };
     routeAfterLogin: string;
     sidebarNarrow: boolean;
-    templates: { [key: string]: string };
+    components: {
+        project: Component | null;
+    };
+    templates: {
+        [key: string]: string;
+    };
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -99,6 +116,9 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             routeAfterLogin: "root",
             sidebarNarrow: true,
+            components: {
+                project: FloodNetProjectLinks,
+            },
             templates: {
                 extraProjectDescription: `
                     <div class="detail-description">
@@ -156,6 +176,9 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         },
         routeAfterLogin: "projects",
         sidebarNarrow: false,
+        components: {
+            project: null,
+        },
         templates: {},
     };
 }

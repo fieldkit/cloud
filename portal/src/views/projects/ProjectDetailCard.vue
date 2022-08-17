@@ -25,6 +25,8 @@
                 v-if="partnerCustomization.templates.extraProjectDescription"
                 v-html="partnerCustomization.templates.extraProjectDescription"
             ></div>
+
+            <component v-if="partnerCustomization.components.project" v-bind:is="partnerCustomization.components.project"></component>
         </div>
     </div>
 </template>
