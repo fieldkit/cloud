@@ -417,13 +417,22 @@ export default Vue.extend({
 
 .view-type {
     width: 115px;
-    height: 39px;
+    height: 38px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
     border: solid 1px #f4f5f7;
     background-color: #ffffff;
     cursor: pointer;
     margin-left: 30px;
     @include flex(center, center);
+
+    @include bp-down($sm) {
+        width: 98px;
+        margin-left: 5px;
+    }
+
+    @media screen and (max-width: 350px) {
+        width: 88px;
+    }
 
     &-container {
         z-index: $z-index-top;
@@ -432,7 +441,7 @@ export default Vue.extend({
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($sm) {
-            @include position(absolute, 67px 10px null null);
+            @include position(absolute, 115px 10px null null);
         }
     }
 
@@ -440,6 +449,10 @@ export default Vue.extend({
         flex-basis: 50%;
         height: 100%;
         @include flex(center, center);
+
+        @include bp-down($sm) {
+            font-size: 14px;
+        }
 
         &.active {
             font-family: $font-family-bold;
@@ -457,13 +470,26 @@ export default Vue.extend({
 }
 
 .toggle-btn {
-    display: inline-block;
     cursor: pointer;
     z-index: $z-index-top;
     position: relative;
     font-size: 14px;
     -webkit-tap-highlight-color: transparent;
     font-family: $font-family-medium !important;
+    height: 38px;
+    display: flex;
+    align-items: center;
+
+    @include bp-down($sm) {
+        background-color: #fff;
+        padding: 0 10px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+        border: solid 1px #f4f5f7;
+    }
+
+    @media screen and (max-width: 350px) {
+        padding: 0 8px;
+    }
 
     * {
         font-family: $font-family-medium !important;
@@ -535,12 +561,42 @@ export default Vue.extend({
     transform: translate3d(13px, 2px, 0);
 }
 
-::v-deep .mapboxgl-ctrl {
-    margin: 35px 0 0 30px;
+::v-deep .mapboxgl-ctrl-geocoder {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+    border: solid 1px #f4f5f7;
+    border-radius: 0;
+    height: 40px;
+    margin: 30px 0 0 30px;
 
-    .mapboxgl-ctrl-geocoder {
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-        border: solid 1px #f4f5f7;
+    @include bp-down($sm) {
+        margin: 61px 0 0 10px;
+        width: 40px;
     }
+
+    &.mapboxgl-ctrl-geocoder--collapsed {
+        min-width: 40px;
+    }
+
+    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
+        @include bp-down($xs) {
+            min-width: calc(100vw - 20px) !important;
+        }
+    }
+
+    input {
+        outline: none;
+        height: 37px;
+        padding-left: 38px;
+        font-size: 16px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-search {
+    top: 9px;
+    left: 8px;
+}
+
+::v-deep .mapboxgl-ctrl-bottom-left {
+    margin-left: 30px;
 }
 </style>
