@@ -5,8 +5,7 @@
         </div>
         <div class="detail-container">
             <div class="flex flex-al-center">
-                <h1 class="detail-title">{{ project.name }} assadasdsadadasadasds asdasd adsda sad</h1>
-
+                <h1 class="detail-title">{{ project.name }}</h1>
                 <div class="detail-links" :class="{ 'mobile-visible': showLinksOnMobile }">
                     <router-link
                         v-if="!isPartnerCustomisationEnabled"
@@ -80,7 +79,6 @@ export default Vue.extend({
     background-color: #ffffff;
     text-align: left;
     padding: 27px 30px;
-    z-index: 10;
 
     body.floodnet & {
         background-color: #f6f9f8;
@@ -97,6 +95,7 @@ export default Vue.extend({
         align-items: center;
         border-left-width: 0;
         border-right-width: 0;
+        z-index: 10;
 
         &:after {
             content: "";
