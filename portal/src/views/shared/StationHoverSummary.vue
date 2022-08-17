@@ -16,6 +16,7 @@
             <div class="latest-primary" :style="{ color: latestPrimaryColor }">
                 <template v-if="station.status === StationStatus.up">
                     <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+                    <span v-else-if="hasData">{{ $t("noRecentData") }}</span>
                     <span v-else class="no-data">{{ $t("noData") }}</span>
                 </template>
                 <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
@@ -47,7 +48,7 @@ import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, RecentlyAggregatedWindows } from "@/views/shared/sensor_data_querier";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
@@ -99,20 +100,24 @@ export default Vue.extend({
     data(): {
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
-        readings: QueryRecentlyResponse | null;
+        readings: RecentlyAggregatedWindows | null;
+        hasData: boolean;
         StationStatus: any;
     } {
         return {
             viewingSummary: true,
             sensorMeta: null,
             readings: null,
+            hasData: false,
             StationStatus: StationStatus,
         };
     },
     async mounted() {
         if (this.sensorDataQuerier) {
-            this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
+            const recently = await this.sensorDataQuerier.queryRecently(this.station.id);
             this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+            this.readings = recently.windows;
+            this.hasData = recently.stations[this.station.id].last != null;
         }
     },
     computed: {

@@ -509,7 +509,7 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 	return rows, nil
 }
 
-func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
+func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (*RecentlyAggregated, error) {
 	if err := tsdb.initialize(ctx); err != nil {
 		return nil, err
 	}
@@ -517,6 +517,24 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 	ids, err := tsdb.queryIDsForStations(ctx, stationIDs)
 	if err != nil {
 		return nil, err
+	}
+
+	lastTimes, err := tsdb.queryLastTimes(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	stations := make(map[int32]*StationLastTime)
+
+	for _, id := range stationIDs {
+		if last, ok := lastTimes[id]; ok {
+			wireTime := data.NumericWireTime(last.LastTime)
+			stations[id] = &StationLastTime{
+				Last: &wireTime,
+			}
+		} else {
+			stations[id] = &StationLastTime{}
+		}
 	}
 
 	byWindow := make(map[time.Duration][]*backend.DataRow)
@@ -544,7 +562,10 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 
 	wg.Wait()
 
-	return byWindow, nil
+	return &RecentlyAggregated{
+		Windows:  byWindow,
+		Stations: stations,
+	}, nil
 }
 
 func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error) {

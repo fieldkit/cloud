@@ -418,5 +418,6 @@
     "successSetAsStationPhoto": "The photo was successfully set as a station image.",
     "somethingWentWrong": "Something went wrong. Please try again later.",
     "successAddedPhoto": "The photo was successfully saved",
-    "noData": "No Data"
+    "noData": "No Data",
+    "noRecentData": "No Recent Data"
 }
