@@ -344,10 +344,6 @@ export default Vue.extend({
         margin-right: 10px;
         font-size: 1.5em;
     }
-
-    @include bp-down($sm) {
-        display: none;
-    }
 }
 
 ::v-deep .station-hover-summary {

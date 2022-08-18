@@ -393,7 +393,10 @@
             "floodnet": "Check out this data on FloodNet!"
         }
     },
-    "linkToFloodnet": "Project Info, Methodology & Data Sources",
+    "linkToFloodnet": {
+        "desktop": "Project Info, Methodology & Data Sources",
+        "mobile": "Project Info"
+    },
     "attributes": {
         "title": "Attributes",
         "noValueYet": "Nothing added yet"
@@ -419,5 +422,9 @@
     "somethingWentWrong": "Something went wrong. Please try again later.",
     "successAddedPhoto": "The photo was successfully saved",
     "noData": "No Data",
-    "noRecentData": "No Recent Data"
+    "noRecentData": "No Recent Data",
+    "floodnet": {
+        "reportFlood": "Report a Flood",
+        "survey": "Community Flood Watch Project Survey"
+    }
 }
