@@ -4,29 +4,11 @@
             <ProjectPhoto :project="project" :image-size="150" />
         </div>
         <div class="detail-container">
-            <div class="flex flex-al-center">
-                <h1 class="detail-title">{{ project.name }}</h1>
-                <div class="detail-links" :class="{ 'mobile-visible': showLinksOnMobile }">
-                    <router-link
-                        v-if="!isPartnerCustomisationEnabled"
-                        :to="{ name: 'viewProject', params: { id: project.id } }"
-                        class="link"
-                    >
-                        Project Dashboard >
-                    </router-link>
-                    <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
-                        {{ $t(link.text) }} >
-                    </a>
-                </div>
-            </div>
-            <div class="detail-description">{{ project.description }}</div>
-
-            <div
-                v-if="partnerCustomization.templates.extraProjectDescription"
-                v-html="partnerCustomization.templates.extraProjectDescription"
-            ></div>
-
-            <component v-if="partnerCustomization.components.project" v-bind:is="partnerCustomization.components.project"></component>
+            <component
+                v-bind:is="partnerCustomization.components.project"
+                :project="project"
+                :showLinksOnMobile="showLinksOnMobile"
+            ></component>
         </div>
     </div>
 </template>
@@ -50,9 +32,11 @@ export default Vue.extend({
     },
     data(): {
         showLinksOnMobile: boolean;
+        isMobileView: boolean;
     } {
         return {
             showLinksOnMobile: false,
+            isMobileView: window.screen.availWidth < 768,
         };
     },
     computed: {
@@ -81,6 +65,7 @@ export default Vue.extend({
     background-color: #ffffff;
     text-align: left;
     padding: 27px 30px;
+    z-index: $z-index-top;
 
     body.floodnet & {
         background-color: #f6f9f8;
@@ -115,11 +100,12 @@ export default Vue.extend({
         }
     }
 
-    .link {
+    ::v-deep .link {
         color: $color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
+        display: block;
 
         @include bp-down($sm) {
             font-family: $font-family-medium;
@@ -138,7 +124,7 @@ export default Vue.extend({
     overflow: hidden;
 }
 
-.detail-title {
+::v-deep .detail-title {
     font-family: $font-family-bold;
     font-size: 18px;
     margin-top: 0;
@@ -163,12 +149,18 @@ export default Vue.extend({
     overflow: hidden;
     margin-right: 10px;
 
+    .link {
+        display: inline-block;
+        font-size: 14px;
+        text-decoration: underline;
+    }
+
     @include bp-down($sm) {
         display: none;
     }
 }
 
-.detail-links {
+::v-deep .detail-links {
     @include bp-down($sm) {
         position: fixed;
         top: 104px;
