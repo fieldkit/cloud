@@ -69,8 +69,6 @@ func NewSensorService(ctx context.Context, options *ControllerOptions, influxCon
 }
 
 func (c *SensorService) chooseBackend(ctx context.Context, backend *string) (querying.DataBackend, error) {
-	return querying.NewPostgresBackend(c.db), nil
-
 	if backend == nil || *backend == "tsdb" {
 		if c.tsdb == nil {
 			if c.timeScaleConfig == nil {
