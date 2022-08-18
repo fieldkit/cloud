@@ -200,7 +200,12 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 		}
 	} else {
 		dataStart = qp.Start
-		dataEnd = qp.End
+
+		if qp.EndOfTime {
+			dataEnd = time.Now().UTC()
+		} else {
+			dataEnd = qp.End
+		}
 	}
 
 	// This logic is primarily for sensors that are consistently producing data.
