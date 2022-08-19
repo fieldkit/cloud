@@ -49,14 +49,15 @@
                         :mapBounds="mapBounds"
                     />
                 </div>
+
                 <StationHoverSummary
                     v-if="activeStation"
                     :station="activeStation"
                     :sensorDataQuerier="sensorDataQuerier"
                     :exploreContext="exploreContext"
                     :visibleReadings="visibleReadings"
+                    :hasCupertinoPane="true"
                     @close="onCloseSummary"
-                    v-bind:key="activeStation.id"
                     v-slot="{ sensorDataQuerier }"
                 >
                     <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
@@ -116,6 +117,7 @@ export default Vue.extend({
         viewType: string;
         recentMapMode: boolean;
         legendCollapsed: boolean;
+        isMobileView: boolean;
     } {
         return {
             layoutChanges: 0,
@@ -123,6 +125,7 @@ export default Vue.extend({
             viewType: "map",
             recentMapMode: false,
             legendCollapsed: false,
+            isMobileView: window.screen.availWidth <= 768,
         };
     },
     props: {
@@ -350,6 +353,42 @@ export default Vue.extend({
     width: 359px;
     top: calc(50% - 100px);
     left: calc(50% - 180px);
+
+    @include bp-down($xs) {
+        width: 100%;
+        left: 0;
+        border-radius: 10px;
+        padding: 25px 10px 12px 10px;
+
+        &.is-pane {
+            top: 0;
+        }
+
+        .close-button {
+            display: none;
+        }
+
+        .navigate-button {
+            width: 14px;
+            height: 14px;
+            right: -3px;
+            top: -17px;
+        }
+
+        .image-container {
+            flex-basis: 62px;
+            margin-right: 10px;
+        }
+
+        .station-name {
+            font-size: 14px;
+        }
+
+        .explore-button {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+    }
 }
 
 ::v-deep .stations-list {
@@ -457,7 +496,7 @@ export default Vue.extend({
 
     &-map {
         flex-basis: 50%;
-        border-right: solid 1px #d8dce0;
+        border-right: solid 1px $color-border;
     }
 
     .icon {

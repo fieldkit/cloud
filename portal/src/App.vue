@@ -202,4 +202,15 @@ li {
 .vc-nav-header * {
     color: #fff !important;
 }
+
+.cupertino-pane-wrapper {
+    .draggable {
+        z-index: 10 !important;
+    }
+    .move {
+        height: 3px;
+        margin-top: 2px;
+    }
+}
+
 </style>
