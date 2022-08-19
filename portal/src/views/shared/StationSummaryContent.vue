@@ -1,5 +1,5 @@
 <template>
-    <div class="row general-row" v-if="station">
+    <div class="row general-row js-generalRow" ref="summaryGeneralRow" v-if="station">
         <div class="image-container">
             <StationPhoto :station="station" />
         </div>
@@ -48,13 +48,19 @@
                 </div>
             </template>
 
-            <div v-if="!isCustomisationEnabled()" class="station-modules">
+            <div v-if="!isMobileView && !isCustomisationEnabled()" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
                     <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
                 </div>
             </div>
 
             <slot name="extra-detail"></slot>
+        </div>
+
+        <div v-if="isMobileView && !isCustomisationEnabled()" class="station-modules">
+            <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
+                <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+            </div>
         </div>
     </div>
 </template>
@@ -72,7 +78,9 @@ export default Vue.extend({
         ...CommonComponents,
     },
     data: () => {
-        return {};
+        return {
+            isMobileView: window.screen.availWidth < 500,
+        };
     },
     props: {
         station: {
@@ -128,6 +136,7 @@ export default Vue.extend({
     flex: 0 0 93px;
     text-align: center;
     margin-right: 11px;
+    display: flex;
 }
 
 .image-container img {
@@ -155,17 +164,28 @@ export default Vue.extend({
         width: 24px;
         height: 24px;
     }
+
+    @include bp-down($xs) {
+        margin-right: 3px;
+
+        img {
+            width: 18px;
+            height: 18px;
+        }
+    }
 }
 
 .general-row {
     display: flex;
     flex-direction: row;
-    position: relative;
+    flex-wrap: wrap;
     flex: 1;
+    position: relative;
 }
 
 .station-details {
     text-align: left;
+    flex: 1 0;
 }
 
 .location-container {
@@ -197,6 +217,12 @@ export default Vue.extend({
 .station-modules {
     @include flex();
     margin-left: -2px;
+    flex: 0 0 100%;
+
+    @include bp-down($xs) {
+        margin-top: 10px;
+        margin-left: 0;
+    }
 }
 
 .coordinates-row {
