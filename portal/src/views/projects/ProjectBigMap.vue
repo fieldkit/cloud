@@ -391,7 +391,7 @@ export default Vue.extend({
     }
 }
 
-::v-deep .stations-list {
+.stations-list {
     @include flex();
     flex-wrap: wrap;
     padding: 160px 70px;
@@ -415,7 +415,11 @@ export default Vue.extend({
         width: calc(100% - 20px);
     }
 
-    .summary-container {
+    ::v-deep .station-hover-summary {
+        position: unset;
+    }
+
+    ::v-deep .summary-container {
         z-index: 0;
         position: unset;
         margin: 20px;
