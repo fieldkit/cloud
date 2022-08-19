@@ -147,7 +147,9 @@ export default Vue.extend({
         }
     },
     destroyed() {
-        this.cupertinoPane.destroy({ animate: false });
+        if (this.cupertinoPane) {
+            this.cupertinoPane.destroy({ animate: false });
+        }
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
