@@ -388,7 +388,7 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 			MAX(value) AS max_value,
 			LAST(value, time) AS last_value
 		FROM fieldkit.sensor_data
-		WHERE station_id = ANY($1) AND time >= ($2::TIMESTAMP + interval '-%f seconds')
+		WHERE station_id = ANY($1) AND time >= ($2::TIMESTAMP + interval '-%f seconds') AND time <= $2
 		GROUP BY bucket_time, station_id, module_id, sensor_id
 		ORDER BY bucket_time
 	`, interval, duration.Seconds())
