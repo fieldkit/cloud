@@ -178,8 +178,8 @@ export default Vue.extend({
         }
 
         .link {
-            color: #1a8ad1;
-            border: 1px solid #1a8ad1;
+            color: $color-dark;
+            border: 1px solid $color-dark;
             border-radius: 25px;
             padding: 6px 12px;
             display: inline-block;
