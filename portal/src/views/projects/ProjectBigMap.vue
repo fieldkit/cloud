@@ -223,9 +223,6 @@ export default Vue.extend({
         }
         return Promise.resolve();
     },
-    mounted() {
-        console.log("dada");
-    },
     methods: {
         switchView(type: string): void {
             this.viewType = type;
