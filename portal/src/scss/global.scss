@@ -141,7 +141,8 @@
     image-rendering: -webkit-optimize-contrast;
 }
 
-.link {
+.link,
+::v-deep .link {
     text-decoration: underline;
     font-family: var(--font-family-bold);
 }

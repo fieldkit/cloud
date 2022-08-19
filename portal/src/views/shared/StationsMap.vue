@@ -8,7 +8,7 @@
             zoom: 10,
         }"
         :nav-control="{
-            show: true,
+            show: !isMobileView,
             position: 'bottom-left',
         }"
         @map-init="onMapInitialized"
@@ -48,12 +48,14 @@ export default Vue.extend({
         ready: boolean;
         sensorMeta: Map<string, any>;
         hasGeocoder: boolean;
+        isMobileView: boolean;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
             hasGeocoder: false,
+            isMobileView: window.screen.availWidth <= 768,
         };
     },
     props: {
@@ -254,4 +256,5 @@ export default Vue.extend({
     height: 10px;
     width: 10px;
 }
+
 </style>

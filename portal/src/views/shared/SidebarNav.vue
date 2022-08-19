@@ -383,6 +383,10 @@ export default Vue.extend({
     left: 6px;
     text-align: left;
 
+    @include bp-down($xs) {
+        display: none;
+    }
+
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;

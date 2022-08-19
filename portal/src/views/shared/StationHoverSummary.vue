@@ -1,39 +1,47 @@
 <template>
-    <div class="station-hover-summary" v-if="viewingSummary && station">
-        <StationSummaryContent :station="station">
-            <template #top-right-actions>
-                <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
-                <img
-                    :alt="$tc('station.navigateToStation')"
-                    class="navigate-button"
-                    :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
-                    @click="openStationPageTab"
-                />
-            </template>
-        </StationSummaryContent>
-
-        <template v-if="isPartnerCustomisationEnabled()">
-            <div class="latest-primary" :style="{ color: latestPrimaryColor }">
-                <template v-if="station.status === StationStatus.up">
-                    <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                    <span v-else class="no-data">{{ $t("noData") }}</span>
+    <div class="js-cupertinoPane">
+        <div
+            class="station-hover-summary js-paneContent"
+            ref="paneContent"
+            :class="{ 'is-pane': hasCupertinoPane }"
+            v-if="viewingSummary && station"
+        >
+            <StationSummaryContent ref="summaryContent" :station="station">
+                <template #top-right-actions>
+                    <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
+                    <img
+                        :alt="$tc('station.navigateToStation')"
+                        class="navigate-button"
+                        :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
+                        @click="openStationPageTab"
+                    />
                 </template>
-                <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
-                <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-                    <template v-if="station.status === StationStatus.down">-</template>
-                    <template v-else>{{ visibleReadingValue | prettyNum }}</template>
-                </i>
-                <i v-else :style="{ 'background-color': latestPrimaryColor }">
-                    –
-                </i>
-            </div>
-        </template>
+            </StationSummaryContent>
 
-        <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
+            <template v-if="isPartnerCustomisationEnabled()">
+                <div class="latest-primary" :style="{ color: latestPrimaryColor }">
+                    <template v-if="station.status === StationStatus.up">
+                        <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+                        <span v-else-if="hasData">{{ $t("noRecentData") }}</span>
+                        <span v-else class="no-data">{{ $t("noData") }}</span>
+                    </template>
+                    <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
+                    <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                        <template v-if="station.status === StationStatus.down">-</template>
+                        <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+                    </i>
+                    <i v-else :style="{ 'background-color': latestPrimaryColor }">
+                        –
+                    </i>
+                </div>
+            </template>
 
-        <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
+            <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
 
-        <StationBattery :station="station" />
+            <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
+
+            <StationBattery :station="station" />
+        </div>
     </div>
 </template>
 
@@ -47,12 +55,14 @@ import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, RecentlyAggregatedWindows } from "@/views/shared/sensor_data_querier";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
+import { CupertinoPane } from "cupertino-pane";
+import { CupertinoEvents } from "cupertino-pane/dist/types/models";
 
 export enum VisibleReadings {
     Current,
@@ -89,6 +99,10 @@ export default Vue.extend({
             type: Number as PropType<VisibleReadings>,
             default: VisibleReadings.Current,
         },
+        hasCupertinoPane: {
+            type: Boolean,
+            default: false,
+        },
     },
     filters: {
         integer: (value) => {
@@ -96,23 +110,45 @@ export default Vue.extend({
             return Math.round(value);
         },
     },
+    watch: {
+        station(this: any) {
+            this.updatePaneHeights();
+        },
+    },
     data(): {
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
-        readings: QueryRecentlyResponse | null;
+        readings: RecentlyAggregatedWindows | null;
+        hasData: boolean;
         StationStatus: any;
+        isMobileView: boolean;
+        cupertinoPane: CupertinoPane | null;
     } {
         return {
             viewingSummary: true,
             sensorMeta: null,
             readings: null,
+            hasData: false,
             StationStatus: StationStatus,
+            isMobileView: window.screen.availWidth < 500,
+            cupertinoPane: null,
         };
     },
     async mounted() {
+        if (this.hasCupertinoPane && this.isMobileView) {
+            this.initCupertinoPane();
+        }
+
         if (this.sensorDataQuerier) {
-            this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
+            const recently = await this.sensorDataQuerier.queryRecently(this.station.id);
             this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+            this.readings = recently.windows;
+            this.hasData = recently.stations[this.station.id].last != null;
+        }
+    },
+    destroyed() {
+        if (this.cupertinoPane) {
+            this.cupertinoPane.destroy({ animate: false });
         }
     },
     computed: {
@@ -209,6 +245,34 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        async initCupertinoPane(): void {
+            const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
+            const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
+            this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
+                parentElement: "body",
+                breaks: {
+                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
+                    // add padding top of container and margin of general row
+                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                },
+                bottomClose: true,
+                buttonDestroy: false,
+            });
+
+            this.cupertinoPane.present({ animate: true }).then();
+        },
+        updatePaneHeights(): void {
+            this.$nextTick(() => {
+                const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
+                const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
+                this.cupertinoPane.setBreakpoints({
+                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
+                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                });
+            });
+        },
     },
 });
 </script>
@@ -219,7 +283,7 @@ export default Vue.extend({
 .station-hover-summary {
     position: absolute;
     background-color: #ffffff;
-    border: 1px solid rgb(215, 220, 225);
+    border: solid 1px #d8dce0;
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -236,9 +300,11 @@ export default Vue.extend({
         padding: 0;
         margin-right: 14px;
         overflow: hidden;
+        max-height: 62px;
 
         img {
             padding: 0;
+            object-fit: cover;
         }
     }
 
@@ -324,6 +390,10 @@ export default Vue.extend({
     font-size: 12px;
     font-family: $font-family-bold;
     @include flex(center, flex-end);
+
+    @include bp-down($xs) {
+        margin-top: 10px;
+    }
 
     i {
         font-style: normal;

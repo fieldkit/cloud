@@ -7,12 +7,13 @@ import {
     SensorsResponse,
     TailSensorDataResponse,
     QueryRecentlyResponse,
+    RecentlyAggregatedWindows,
 } from "@/api";
 
 import { promiseAfter } from "@/utilities";
 import _ from "lodash";
 
-export { ModuleSensorMeta, QueryRecentlyResponse };
+export { ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];
@@ -145,9 +146,14 @@ export class SensorDataQuerier {
             .query(stationId)
             .then((response) => response)
             .then((response) => {
-                return _.mapValues(response, (rows, hours) => {
+                const filteredWindows = _.mapValues(response.windows, (rows, hours) => {
                     return rows.filter((row) => row.stationId == stationId);
                 });
+
+                return {
+                    windows: filteredWindows,
+                    stations: response.stations,
+                };
             });
     }
 }

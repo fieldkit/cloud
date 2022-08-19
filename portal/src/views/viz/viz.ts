@@ -402,7 +402,7 @@ export class Graph extends Viz {
             const days = fastTime as number;
             const start = new Date(sensorRange.end);
             start.setDate(start.getDate() - days);
-            return new TimeRange(start.getTime(), Time.Max);
+            return new TimeRange(start.getTime(), sensorRange.end);
         }
     }
 

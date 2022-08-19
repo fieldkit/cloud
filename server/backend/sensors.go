@@ -43,16 +43,18 @@ type ModuleAndSensor struct {
 }
 
 type QueryParams struct {
-	Start      time.Time         `json:"start"`
-	End        time.Time         `json:"end"`
-	Stations   []int32           `json:"stations"`
-	Sensors    []ModuleAndSensor `json:"sensors"`
-	Resolution int32             `json:"resolution"`
-	Aggregate  string            `json:"aggregate"`
-	Tail       int32             `json:"tail"`
-	Complete   bool              `json:"complete"`
-	Backend    string            `json:"backend"`
-	Eternity   bool              `json:"eternity"`
+	Start           time.Time         `json:"start"`
+	End             time.Time         `json:"end"`
+	Stations        []int32           `json:"stations"`
+	Sensors         []ModuleAndSensor `json:"sensors"`
+	Resolution      int32             `json:"resolution"`
+	Aggregate       string            `json:"aggregate"`
+	Tail            int32             `json:"tail"`
+	Complete        bool              `json:"complete"`
+	Backend         string            `json:"backend"`
+	Eternity        bool              `json:"eternity"`
+	BeginningOfTime bool              `json:"beginning_of_time"`
+	EndOfTime       bool              `json:"end_of_time"`
 }
 
 func ParseStationIDs(raw *string) []int32 {
@@ -79,12 +81,14 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 		end = time.Unix(0, *raw.End*int64(time.Millisecond)).UTC()
 	}
 
+	beginningOfTime := false
+	endOfTime := false
 	eternity := false
 	if raw.Start != nil && raw.End != nil {
-		if *raw.Start == -8640000000000000 && *raw.End == 8640000000000000 {
-			eternity = true
-		}
+		beginningOfTime = *raw.Start == -8640000000000000
+		endOfTime = *raw.End == 8640000000000000
 	}
+	eternity = beginningOfTime && endOfTime
 
 	resolution := int32(0)
 	if raw.Resolution != nil {
@@ -148,16 +152,18 @@ func (raw *RawQueryParams) BuildQueryParams() (qp *QueryParams, err error) {
 	}
 
 	qp = &QueryParams{
-		Start:      start,
-		End:        end,
-		Resolution: resolution,
-		Stations:   stations,
-		Sensors:    sensors,
-		Aggregate:  aggregate,
-		Tail:       tail,
-		Complete:   complete,
-		Backend:    backend,
-		Eternity:   eternity,
+		Start:           start,
+		End:             end,
+		Resolution:      resolution,
+		Stations:        stations,
+		Sensors:         sensors,
+		Aggregate:       aggregate,
+		Tail:            tail,
+		Complete:        complete,
+		Backend:         backend,
+		Eternity:        eternity,
+		BeginningOfTime: beginningOfTime,
+		EndOfTime:       endOfTime,
 	}
 
 	return

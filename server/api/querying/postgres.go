@@ -146,7 +146,9 @@ func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	return nil
 }
 
-func (pgb *PostgresBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
-	empty := make(map[time.Duration][]*backend.DataRow)
-	return empty, nil
+func (pgb *PostgresBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (*RecentlyAggregated, error) {
+	return &RecentlyAggregated{
+		Windows:  make(map[time.Duration][]*backend.DataRow),
+		Stations: make(map[int32]*StationLastTime),
+	}, nil
 }

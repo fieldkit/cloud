@@ -387,7 +387,12 @@ export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
 }
 
-export type QueryRecentlyResponse = { [index: number]: TailSensorDataRow[] };
+export type RecentlyAggregatedWindows = { [index: number]: TailSensorDataRow[] };
+
+export interface QueryRecentlyResponse {
+    windows: RecentlyAggregatedWindows;
+    stations: { [index: number]: { last: number | null } };
+}
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
