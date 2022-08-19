@@ -97,7 +97,11 @@ Vue.filter("prettyNum", (value: number) => {
     if (!isNaN(value)) {
         if (value % 1 === 0) {
             return value;
-        } else return d3format(".2s")(value);
+        } else {
+            // This was using .2s, until we noticed for things like "0.510" we
+            // were displaying 510m, which is very confusing.
+            return d3format(".2f")(value);
+        }
     } else return value;
 });
 
