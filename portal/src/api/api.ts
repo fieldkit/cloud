@@ -389,9 +389,11 @@ export interface TailSensorDataResponse {
 
 export type RecentlyAggregatedWindows = { [index: number]: TailSensorDataRow[] };
 
+export type RecentlyAggregatedLast = { last: number | null };
+
 export interface QueryRecentlyResponse {
     windows: RecentlyAggregatedWindows;
-    stations: { [index: number]: { last: number | null } };
+    stations: { [index: number]: RecentlyAggregatedLast };
 }
 
 // Intentionally keeping this synchronous since it'll get used in
@@ -1175,6 +1177,12 @@ class FKApi {
     }
 
     public queryStationsRecently(stations: number[]): Promise<QueryRecentlyResponse> {
+        if (stations.length == 0) {
+            return Promise.resolve({
+                windows: {},
+                stations: {},
+            });
+        }
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({

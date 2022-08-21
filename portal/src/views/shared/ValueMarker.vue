@@ -9,7 +9,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import * as d3 from "d3";
 
 export default Vue.extend({
     name: "ValueMarker",

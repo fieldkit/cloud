@@ -55,7 +55,8 @@ import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, RecentlyAggregatedWindows } from "@/views/shared/sensor_data_querier";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta } from "@/views/shared/sensor_data_querier";
+import { VisibleReadings, DecoratedReading } from "@/store";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
@@ -63,11 +64,6 @@ import { interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
 import { CupertinoEvents } from "cupertino-pane/dist/types/models";
-
-export enum VisibleReadings {
-    Current,
-    Last72h,
-}
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -118,8 +114,6 @@ export default Vue.extend({
     data(): {
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
-        readings: RecentlyAggregatedWindows | null;
-        hasData: boolean;
         StationStatus: any;
         isMobileView: boolean;
         cupertinoPane: CupertinoPane | null;
@@ -127,8 +121,6 @@ export default Vue.extend({
         return {
             viewingSummary: true,
             sensorMeta: null,
-            readings: null,
-            hasData: false,
             StationStatus: StationStatus,
             isMobileView: window.screen.availWidth < 500,
             cupertinoPane: null,
@@ -138,79 +130,55 @@ export default Vue.extend({
         if (this.hasCupertinoPane && this.isMobileView) {
             this.initCupertinoPane();
         }
-
-        if (this.sensorDataQuerier) {
-            const recently = await this.sensorDataQuerier.queryRecently(this.station.id);
-            this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
-            this.readings = recently.windows;
-            this.hasData = recently.stations[this.station.id].last != null;
-        }
+        this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
     },
     destroyed() {
-        this.cupertinoPane.destroy({ animate: false });
+        if (this.cupertinoPane) {
+            this.cupertinoPane.destroy({ animate: false });
+        }
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
         visibleSensor(): ModuleSensorMeta | null {
-            if (this.sensorMeta && this.readings && 72 in this.readings && this.readings[72].length > 0) {
-                const sensorId = this.readings[72][0].sensorId;
-                return this.sensorMeta.findSensorById(sensorId);
+            const primarySensor = this.station.primarySensor;
+            if (this.sensorMeta && primarySensor) {
+                return this.sensorMeta.findSensorByKey(primarySensor.fullKey);
+            }
+            return null;
+        },
+        hasData(): boolean {
+            return this.station.hasData;
+        },
+        decoratedReading(): DecoratedReading | null {
+            const readings = this.station.getDecoratedReadings(this.visibleReadings);
+            if (readings && readings.length > 0) {
+                return readings[0];
             }
             return null;
         },
         visibleReadingValue(): number | null {
-            const sensor = this.visibleSensor;
-            if (sensor && this.readings && 72 in this.readings && this.readings[72].length > 0) {
-                // console.log(this.visibleReadings, this.readings);
-                let value: number | undefined;
-                if (this.visibleReadings == VisibleReadings.Current) {
-                    value = this.readings[72][0].last;
-                } else {
-                    if (sensor.aggregationFunction == "max") {
-                        // TODO Pull into helper
-                        value = this.readings[72][0].max;
-                    } else {
-                        value = this.readings[72][0].avg;
-                    }
-                }
-                return value === undefined ? null : value;
-            }
-
-            return null;
-        },
-        thresholds() {
-            const sensor = this.visibleSensor;
-            if (sensor && sensor.viz && sensor.viz.length > 0) {
-                if (sensor.viz[0].thresholds) {
-                    return sensor.viz[0].thresholds;
-                }
-            }
-            return null;
-        },
-        visibleLevel() {
-            const value = this.visibleReadingValue;
-            if (value !== null) {
-                const thresholds = this.thresholds;
-                if (thresholds) {
-                    const level = thresholds.levels.find((level) => level.start <= value && level.value > value);
-                    return level ?? null;
-                }
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading) {
+                return reading.value;
             }
             return null;
         },
         latestPrimaryLevel(): any {
-            if (this.visibleReadingValue === null) {
-                return null;
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading) {
+                return reading?.thresholdLabel;
             }
-            const level = this.visibleLevel;
-            return level?.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
+            return null;
         },
         latestPrimaryColor(): string {
-            if (this.visibleReadingValue === null) {
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading === null) {
                 return "#cccccc";
             }
-            const level = this.visibleLevel;
-            return level?.color || "#00CCFF";
+            if (reading) {
+                return reading?.color;
+            }
+            return "#00CCFF";
         },
     },
     methods: {

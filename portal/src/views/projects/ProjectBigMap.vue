@@ -46,6 +46,7 @@
                         :mapped="mappedProject"
                         :layoutChanges="layoutChanges"
                         :showStations="project.showStations"
+                        :visibleReadings="visibleReadings"
                         :mapBounds="mapBounds"
                     />
                 </div>
@@ -84,16 +85,26 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import * as utils from "../../utilities";
 
 import { mapState, mapGetters } from "vuex";
-import { ActionTypes, GlobalState, ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
+import {
+    ActionTypes,
+    GlobalState,
+    ProjectModule,
+    DisplayStation,
+    Project,
+    MappedStations,
+    BoundingRectangle,
+    VisibleReadings,
+} from "@/store";
 import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import StationsMap from "../shared/StationsMap.vue";
-import StationHoverSummary, { VisibleReadings } from "@/views/shared/StationHoverSummary.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
@@ -150,13 +161,16 @@ export default Vue.extend({
             return this.displayProject.project;
         },
         sensorDataQuerier(): SensorDataQuerier {
-            return new SensorDataQuerier(
-                this.$services.api,
-                this.projectStations.map((s: DisplayStation) => s.id)
-            );
+            return new SensorDataQuerier(this.$services.api);
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);
+            const stations = this.$getters.projectsById[this.id].stations;
+            const sortFactors = _.fromPairs(stations.map((station) => [station.id, station.getSortOrder(this.visibleReadings)]));
+            return _.orderBy(
+                this.$getters.projectsById[this.id].stations.slice(),
+                [(station) => sortFactors[station.id][0], (station) => sortFactors[station.id][1], (station) => sortFactors[station.id][2]],
+                ["asc", "desc", "asc"]
+            );
         },
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.id].mapped;
@@ -186,7 +200,7 @@ export default Vue.extend({
             return new ExploreContext(this.project.id, true);
         },
         stationsWithData(): DisplayStation[] {
-            return this.displayProject.stations.filter((station) => station.latestPrimary != null);
+            return this.displayProject.stations.filter((station) => station.hasData);
         },
         hasStationsWithoutData(): boolean {
             return this.stationsWithData.length < this.projectStations.length;
@@ -232,7 +246,7 @@ export default Vue.extend({
             return this.$loadAsset(utils.getModuleImg(module));
         },
         showSummary(station: DisplayStation): void {
-            console.log("showSummay", station);
+            console.log("map: show-summay", station);
             this.activeStationId = station.id;
         },
         onCloseSummary(): void {
