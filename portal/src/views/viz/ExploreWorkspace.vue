@@ -790,6 +790,7 @@ export default Vue.extend({
     .summary-content {
         .image-container {
             flex-basis: 86px;
+            height: 86px;
         }
     }
 

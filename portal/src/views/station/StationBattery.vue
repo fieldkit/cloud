@@ -67,6 +67,7 @@ export default Vue.extend({
 
 .station-battery-container {
     display: flex;
+    align-items: center;
 }
 
 .battery {
@@ -75,5 +76,4 @@ export default Vue.extend({
     padding-right: 3px;
     margin-left: 10px;
 }
-
 </style>

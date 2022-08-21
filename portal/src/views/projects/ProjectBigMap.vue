@@ -64,7 +64,7 @@
                 </StationHoverSummary>
             </template>
         </div>
-        <div class="view-type-container">
+        <div class="view-type-container" :class="{ 'list-toggled': viewType === 'list' }">
             <label class="toggle-btn">
                 <input type="checkbox" v-model="recentMapMode" />
                 <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
@@ -377,6 +377,7 @@ export default Vue.extend({
 
         .image-container {
             flex-basis: 62px;
+            height: 62px;
             margin-right: 10px;
         }
 
@@ -476,11 +477,21 @@ export default Vue.extend({
     &-container {
         z-index: $z-index-top;
         margin: 0;
+        box-sizing: border-box;
         @include flex(center, center);
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($sm) {
             @include position(absolute, 115px 10px null null);
+        }
+
+        &.list-toggled {
+            @include bp-down($sm) {
+                left: 0;
+                width: 100%;
+                justify-content: space-between;
+                padding: 0 10px;
+            }
         }
     }
 
@@ -520,10 +531,12 @@ export default Vue.extend({
     align-items: center;
 
     @include bp-down($sm) {
-        background-color: #fff;
-        padding: 0 10px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-        border: solid 1px #f4f5f7;
+        .view-type-container:not(.list-toggled) & {
+            background-color: #fff;
+            padding: 0 10px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+            border: solid 1px #f4f5f7;
+        }
     }
 
     @media screen and (max-width: 350px) {
@@ -633,6 +646,14 @@ export default Vue.extend({
 ::v-deep .mapboxgl-ctrl-geocoder--icon-search {
     top: 9px;
     left: 8px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 4px;
+
+    @include bp-down($sm) {
+        margin-top: 3px;
+    }
 }
 
 ::v-deep .mapboxgl-ctrl-bottom-left {
