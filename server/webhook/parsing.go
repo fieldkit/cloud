@@ -220,7 +220,15 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 						// NOTE: NOAA Tidal data was missing seconds.
 						parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
 						if err != nil {
-							return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+							// NOTE: 2022-08-17 16:56:11.835000-04:00
+							parsed, err = time.Parse("2006-01-02 15:04:05.000000-04:00", receivedAtString)
+							if err != nil {
+								// NOTE: 2022-08-17 16:56:11-04:00
+								parsed, err = time.Parse("2006-01-02 15:04:05-04:00", receivedAtString)
+								if err != nil {
+									return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+								}
+							}
 						}
 					}
 				}
