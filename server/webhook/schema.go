@@ -7,13 +7,14 @@ import (
 )
 
 type MessageSchemaSensor struct {
-	Key           string     `json:"key"`
-	Name          string     `json:"name"`
-	Expression    string     `json:"expression"`
-	Battery       bool       `json:"battery"`
-	Transient     bool       `json:"transient"`
-	UnitOfMeasure *string    `json:"units"`
-	Filter        *[]float64 `json:"filter"`
+	Key                 string     `json:"key"`
+	Name                string     `json:"name"`
+	ConditionExpression string     `json:"condition"`
+	Expression          string     `json:"expression"`
+	Battery             bool       `json:"battery"`
+	Transient           bool       `json:"transient"`
+	UnitOfMeasure       *string    `json:"units"`
+	Filter              *[]float64 `json:"filter"`
 }
 
 type MessageSchemaModule struct {

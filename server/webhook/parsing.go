@@ -167,18 +167,33 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 	return "", &EvaluationError{NoReturn: true, Query: query}
 }
 
+func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, expression string, allowEmpty bool, source interface{}) (bool, error) {
+	if value, err := m.evaluate(ctx, cache, source, expression); err != nil {
+		if _, ok := err.(*EvaluationError); ok {
+			// No luck, skipping and maybe another stationSchema will cover this message.
+			return false, nil
+		}
+		return false, fmt.Errorf("evaluating condition-expression: %v", err)
+	} else if value == nil {
+		return false, nil
+	} else if stringValue, ok := value.(string); ok {
+		if !allowEmpty && len(stringValue) == 0 {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
 	log := Logger(ctx).Sugar()
 
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
 	if stationSchema.ConditionExpression != "" {
-		if _, err := m.evaluate(ctx, cache, source, stationSchema.ConditionExpression); err != nil {
-			if _, ok := err.(*EvaluationError); ok {
-				// No luck, skipping and maybe another stationSchema will cover this message.
-				return nil, nil
-			}
-			return nil, fmt.Errorf("evaluating condition-expression: %v", err)
+		if pass, err := m.evaluateCondition(ctx, cache, stationSchema.ConditionExpression, true, source); err != nil {
+			return nil, err
+		} else if !pass {
+			return nil, nil
 		}
 	}
 
@@ -269,6 +284,14 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if expectedKey != sensor.Key {
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
+			}
+
+			if sensor.ConditionExpression != "" {
+				if pass, err := m.evaluateCondition(ctx, cache, sensor.ConditionExpression, false, source); err != nil {
+					return nil, err
+				} else if !pass {
+					continue
+				}
 			}
 
 			moduleKeyPrefix := module.KeyPrefix()
