@@ -261,19 +261,6 @@ export default Vue.extend({
         font-size: 16px;
     }
 
-    ::v-deep .image-container {
-        border-radius: 5px;
-        padding: 0;
-        margin-right: 14px;
-        overflow: hidden;
-        max-height: 62px;
-
-        img {
-            padding: 0;
-            object-fit: cover;
-        }
-    }
-
     * {
         font-family: $font-family-light;
     }

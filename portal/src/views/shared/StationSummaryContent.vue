@@ -133,10 +133,19 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .image-container {
-    flex: 0 0 93px;
+    flex: 0 0 95px;
+    height: 90px;
     text-align: center;
-    margin-right: 11px;
     display: flex;
+    border-radius: 5px;
+    padding: 0;
+    margin-right: 14px;
+    overflow: hidden;
+
+    img {
+        padding: 0;
+        object-fit: cover;
+    }
 }
 
 .image-container img {
