@@ -38,6 +38,7 @@ type MessageSchemaAttribute struct {
 type MessageSchemaStation struct {
 	Key                  string                    `json:"key"`
 	Model                string                    `json:"model"`
+	Flatten              bool                      `json:"flatten"`
 	ConditionExpression  string                    `json:"condition"`
 	IdentifierExpression string                    `json:"identifier"`
 	NameExpression       string                    `json:"name"`

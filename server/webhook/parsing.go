@@ -367,6 +367,9 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	for _, sourceObject := range unrolled {
 		for _, stationSchema := range schema.Stations {
+			if stationSchema.Flatten {
+				sourceObject = flattenObjects(sourceObject)
+			}
 			if p, err := m.tryParse(ctx, cache, schemaRegistration, stationSchema, sourceObject); err != nil {
 				return nil, err
 			} else if p != nil {
@@ -377,4 +380,21 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 	}
 
 	return parsed, nil
+}
+
+func flattenObjects(source interface{}) interface{} {
+	if sourceMap, ok := source.(map[string]interface{}); ok {
+		flattened := make(map[string]interface{})
+		for key, value := range sourceMap {
+			if childMap, ok := value.(map[string]interface{}); ok {
+				for childKey, childValue := range childMap {
+					flattened[childKey] = childValue
+				}
+			} else {
+				flattened[key] = value
+			}
+		}
+		return flattened
+	}
+	return source
 }
