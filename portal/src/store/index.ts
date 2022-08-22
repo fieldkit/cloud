@@ -1,4 +1,5 @@
 import _ from "lodash";
+import Config from "@/secrets";
 import Vuex from "vuex";
 import createLogger from "./logger";
 import { clock } from "./modules/clock";
@@ -65,7 +66,7 @@ function customizeLogger() {
 
 export default function(services: Services) {
     return new Vuex.Store({
-        plugins: [customizeLogger()],
+        plugins: Config.vuexLogging ? [customizeLogger()] : [],
         modules: {
             clock: clock(services),
             exporting: exporting(services),
