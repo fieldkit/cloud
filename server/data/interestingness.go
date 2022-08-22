@@ -14,6 +14,7 @@ type InterestingnessFunction interface {
 type IncomingReading struct {
 	StationID int32
 	ModuleID  int64
+	SensorID  int64
 	SensorKey string
 	Time      time.Time
 	Value     float64
