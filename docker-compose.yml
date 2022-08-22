@@ -9,6 +9,7 @@ services:
       - POSTGRES_USER=fieldkit
       - POSTGRES_PASSWORD=password
     volumes:
+      - ./.db:/var/lib/postgresql/data
       - ./active-schema:/docker-entrypoint-initdb.d/:ro
 
   tsdb:

@@ -4,7 +4,7 @@
             {{ $t("station.lastSeen") }}
             <span class="small-light">{{ station.lastReadingAt | prettyDateTime }}</span>
         </div>
-        <span v-if="station.status === StationStatus.down" class="small-light inactive">({{ $t("station.inactive") }})</span>
+        <span v-if="station.status === StationStatus.down" class="small-light">({{ $t("station.inactive") }})</span>
         <div class="station-battery" v-if="station.battery">
             <img class="battery" :alt="$t('station.batteryLevel')" :src="getBatteryIcon()" />
             <span class="small-light">{{ station.battery | integer }}%</span>
@@ -46,12 +46,23 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "src/scss/variables";
+@import "src/scss/mixins";
 
 .station-seen {
     font-size: 14px;
     font-family: $font-family-bold;
     align-self: flex-start;
     margin-right: 5px;
+
+    @include bp-down($xs) {
+        font-size: 10px;
+    }
+}
+
+.small-light {
+    @include bp-down($xs) {
+        font-size: 10px;
+    }
 }
 
 .station-battery-container {
@@ -65,7 +76,4 @@ export default Vue.extend({
     margin-left: 10px;
 }
 
-.inactive {
-    font-size: 14px;
-}
 </style>

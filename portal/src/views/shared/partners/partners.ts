@@ -1,5 +1,97 @@
-import { DisplayStation } from "@/store";
+import { DisplayStation, Project } from "@/store";
 import moment from "moment";
+
+import Vue, { Component, PropType } from "vue";
+
+const FieldKitProjectDescription = Vue.extend({
+    name: "FieldKitProjectDescription",
+    props: {
+        showLinksOnMobile: {
+            type: Boolean,
+            required: true,
+        },
+        project: {
+            type: Object as PropType<Project>,
+            required: true,
+        },
+    },
+    data(): {
+        isMobileView: boolean;
+    } {
+        return {
+            isMobileView: window.screen.availWidth < 768,
+        };
+    },
+    template: `
+        <div>
+            <div class="flex flex-al-center">
+                <h1 class="detail-title">{{ project.name }}</h1>
+                <div class="detail-links" :class="{ 'mobile-visible': showLinksOnMobile }">
+                  <router-link :to="{ name: 'viewProject', params: { id: project.id } }" class="link">
+                      {{$t('project.dashboard')}} >
+                  </router-link>
+                </div>
+            </div>
+            <div class="detail-description">{{ project.description }}</div>
+        </div>
+    `,
+});
+
+const FloodNetProjectDescription = Vue.extend({
+    name: "FloodNetProjectDescription",
+    props: {
+        showLinksOnMobile: {
+            type: Boolean,
+            required: true,
+        },
+        project: {
+            type: Object as PropType<Project>,
+            required: true,
+        },
+    },
+    data(): {
+        isMobileView: boolean;
+        links: {
+            text: string;
+            mobileText: string;
+            url: string;
+        }[];
+    } {
+        return {
+            isMobileView: window.screen.availWidth < 768,
+            links: [
+                {
+                    text: "linkToFloodnet.desktop",
+                    mobileText: "linkToFloodnet.mobile",
+                    url: "https://www.floodnet.nyc/methodology",
+                },
+            ],
+        };
+    },
+    template: `
+        <div>
+            <div class="flex flex-al-center">
+                <h1 class="detail-title">{{ project.name }}</h1>
+                <div class="detail-links" :class="{ 'mobile-visible': showLinksOnMobile }">
+                    <a v-for="link in links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
+                        <template v-if="isMobileView">{{ $t(link.mobileText) }} ></template>
+                        <template v-else>{{ $t(link.text) }} ></template>
+                    </a>
+                    <a v-if="isMobileView" href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
+                        {{ $t('floodnet.reportFlood') }} >
+                    </a>
+                </div>
+            </div>
+            <div class="detail-description">{{ project.description }}</div>
+            <div class="detail-description">
+                {{ $t('floodnet.reportFlood') }}:
+                <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
+                    {{ $t('floodnet.survey') }}
+                </a>
+            </div>
+        </div>
+    `,
+});
 
 export interface PartnerCustomization {
     title: string; // TODO i18n
@@ -21,10 +113,6 @@ export interface PartnerCustomization {
     email: {
         subject: string;
     };
-    links: {
-        text: string;
-        url: string;
-    }[];
     stationLocationName: (station: DisplayStation) => string;
     getStationDeploymentDate: (station: DisplayStation) => string | Date | null;
     viz: {
@@ -32,7 +120,9 @@ export interface PartnerCustomization {
     };
     routeAfterLogin: string;
     sidebarNarrow: boolean;
-    templates: { [key: string]: string };
+    components: {
+        project: Component | null;
+    };
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -80,12 +170,6 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             email: {
                 subject: "sharePanel.emailSubject.floodnet",
             },
-            links: [
-                {
-                    text: "linkToFloodnet",
-                    url: "https://www.floodnet.nyc/methodology",
-                },
-            ],
             stationLocationName: (station: DisplayStation) => {
                 return getNeighborhood(station) || station.locationName;
             },
@@ -99,15 +183,8 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             routeAfterLogin: "root",
             sidebarNarrow: true,
-            templates: {
-                extraProjectDescription: `
-                    <div class="detail-description">
-                        Report a flood: 
-                        <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
-                            Community Flood Watch Project Survey
-                        </a>
-                    </div>
-                `,
+            components: {
+                project: FloodNetProjectDescription,
             },
         };
     }
@@ -142,7 +219,6 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         email: {
             subject: "sharePanel.emailSubject.fieldkit",
         },
-        links: [],
         stationLocationName: (station: DisplayStation) => {
             return station.locationName;
         },
@@ -156,7 +232,9 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         },
         routeAfterLogin: "projects",
         sidebarNarrow: false,
-        templates: {},
+        components: {
+            project: FieldKitProjectDescription,
+        },
     };
 }
 

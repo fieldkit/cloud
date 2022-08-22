@@ -200,7 +200,12 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 		}
 	} else {
 		dataStart = qp.Start
-		dataEnd = qp.End
+
+		if qp.EndOfTime {
+			dataEnd = time.Now().UTC()
+		} else {
+			dataEnd = qp.End
+		}
 	}
 
 	// This logic is primarily for sensors that are consistently producing data.
@@ -383,7 +388,7 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 			MAX(value) AS max_value,
 			LAST(value, time) AS last_value
 		FROM fieldkit.sensor_data
-		WHERE station_id = ANY($1) AND time >= ($2::TIMESTAMP + interval '-%f seconds')
+		WHERE station_id = ANY($1) AND time >= ($2::TIMESTAMP + interval '-%f seconds') AND time <= $2
 		GROUP BY bucket_time, station_id, module_id, sensor_id
 		ORDER BY bucket_time
 	`, interval, duration.Seconds())
@@ -509,7 +514,7 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 	return rows, nil
 }
 
-func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (map[time.Duration][]*backend.DataRow, error) {
+func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, stationIDs []int32, windows []time.Duration) (*RecentlyAggregated, error) {
 	if err := tsdb.initialize(ctx); err != nil {
 		return nil, err
 	}
@@ -517,6 +522,24 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 	ids, err := tsdb.queryIDsForStations(ctx, stationIDs)
 	if err != nil {
 		return nil, err
+	}
+
+	lastTimes, err := tsdb.queryLastTimes(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	stations := make(map[int32]*StationLastTime)
+
+	for _, id := range stationIDs {
+		if last, ok := lastTimes[id]; ok {
+			wireTime := data.NumericWireTime(last.LastTime)
+			stations[id] = &StationLastTime{
+				Last: &wireTime,
+			}
+		} else {
+			stations[id] = &StationLastTime{}
+		}
 	}
 
 	byWindow := make(map[time.Duration][]*backend.DataRow)
@@ -544,7 +567,10 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 
 	wg.Wait()
 
-	return byWindow, nil
+	return &RecentlyAggregated{
+		Windows:  byWindow,
+		Stations: stations,
+	}, nil
 }
 
 func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error) {

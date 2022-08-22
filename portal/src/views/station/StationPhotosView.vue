@@ -8,7 +8,7 @@
                 :backTitle="$tc('layout.backStationDashboard')"
                 :backRouteParams="{ projectId, stationId }"
             >
-                <template v-slot:default v-if="isUserStation">
+                <template v-slot:default v-if="!readOnly">
                     <button class="button-social">
                         <label for="imageInput">
                             <i class="icon icon-photo"></i>
@@ -21,7 +21,7 @@
 
             <div class="flex flex-wrap flex-space-between" v-if="media">
                 <div class="photo-wrap" v-for="photo in photos" v-bind:key="photo.key">
-                    <button class="photo-options" v-if="isUserStation">
+                    <button class="photo-options" v-if="!readOnly">
                         <ListItemOptions :options="photoOptions" @listItemOptionClick="onPhotoOptionClick($event, photo)"></ListItemOptions>
                     </button>
                     <AuthenticatedPhoto :url="photo.url" :loading="photo.id === loadingPhotoId" />
@@ -65,11 +65,8 @@ export default Vue.extend({
         media(): PortalNoteMedia[] {
             return this.$state.notes.media;
         },
-        isUserStation(): boolean {
-            if (this.$state.stations.user.stations[this.stationId]) {
-                return true;
-            }
-            return false;
+        readOnly(): boolean {
+            return this.$state.notes.readOnly;
         },
     },
     data: (): {

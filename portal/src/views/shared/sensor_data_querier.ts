@@ -7,66 +7,17 @@ import {
     SensorsResponse,
     TailSensorDataResponse,
     QueryRecentlyResponse,
+    RecentlyAggregatedWindows,
 } from "@/api";
 
+import { SensorMeta } from "@/store";
 import { promiseAfter } from "@/utilities";
 import _ from "lodash";
 
-export { ModuleSensorMeta, QueryRecentlyResponse };
+export { ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];
-}
-
-export class SensorMeta {
-    constructor(private readonly meta: SensorsResponse) {}
-
-    public get sensors() {
-        return this.meta.sensors;
-    }
-
-    public get modules() {
-        return this.meta.modules;
-    }
-
-    public findSensorByKey(sensorKey: string): ModuleSensorMeta {
-        const sensors = _(this.meta.modules)
-            .map((m) => m.sensors)
-            .flatten()
-            .groupBy((s) => s.fullKey)
-            .value();
-
-        const byKey = sensors[sensorKey];
-        if (byKey.length == 0) {
-            throw new Error(`viz: Missing sensor meta: ${sensorKey}`);
-        }
-
-        return byKey[0];
-    }
-
-    public findSensorById(id: number): ModuleSensorMeta {
-        const row = this.meta.sensors.find((row) => row.id == id);
-        if (!row) {
-            throw new Error(`viz: Missing sensor meta: ${id}`);
-        }
-        return this.findSensorByKey(row.key);
-    }
-
-    public findSensor(vizSensor: VizSensor): ModuleSensorMeta {
-        const sensorId = vizSensor[1][1];
-
-        const sensorKeysById = _(this.meta.sensors)
-            .groupBy((r) => r.id)
-            .value();
-
-        if (!sensorKeysById[String(sensorId)]) {
-            console.log(`viz: sensors: ${JSON.stringify(_.keys(sensorKeysById))}`);
-            throw new Error(`viz: Missing sensor: ${sensorId}`);
-        }
-
-        const sensorKey = sensorKeysById[String(sensorId)][0].key;
-        return this.findSensorByKey(sensorKey);
-    }
 }
 
 type HandlerType<PromisedData> = (ids: number[]) => PromisedData;
@@ -106,11 +57,6 @@ export class SensorDataQuerier {
         }
     );
 
-    private recently = new Batcher<Promise<QueryRecentlyResponse>>((ids: number[]) => {
-        console.log("qrd:querying", ids);
-        return this.api.queryStationsRecently(ids);
-    });
-
     public async querySensorMeta(): Promise<SensorMeta> {
         return this.api
             .getAllSensorsMemoized()()
@@ -137,17 +83,6 @@ export class SensorDataQuerier {
             })
             .then(([data, quickSensors, meta]) => {
                 return [data, quickSensors, meta];
-            });
-    }
-
-    public async queryRecently(stationId: number): Promise<QueryRecentlyResponse> {
-        return this.recently
-            .query(stationId)
-            .then((response) => response)
-            .then((response) => {
-                return _.mapValues(response, (rows, hours) => {
-                    return rows.filter((row) => row.stationId == stationId);
-                });
             });
     }
 }
