@@ -60,7 +60,7 @@ func process(ctx context.Context, options *Options) error {
 
 	if options.File != "" {
 		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID), options.Verbose)
-	} else {
+	} else if options.SchemaID > 0 {
 		if options.MessageID == 0 {
 			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0, true)
 		} else {
@@ -102,7 +102,7 @@ func main() {
 
 	flag.Parse()
 
-	if options.MessageID == 0 && options.SchemaID == 0 {
+	if options.MessageID == 0 && options.SchemaID == 0 && !options.RefreshViews {
 		flag.PrintDefaults()
 		return
 	}
