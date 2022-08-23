@@ -16,6 +16,13 @@
                     <template v-slot:title>
                         <div class="one">
                             Data View
+
+                            <span class="info">
+                                <span class="info-icon">?</span>
+                                <span class="info-content">
+                                    For a better data analysis experience, view this data on your computer.
+                                </span>
+                            </span>
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
                                 <div>Add Chart</div>
@@ -358,7 +365,7 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 
-::v-deep #vg-tooltip-element {
+#vg-tooltip-element {
     background-color: #f4f5f7;
     border-radius: 1px;
     box-shadow: none;
@@ -390,16 +397,16 @@ export default Vue.extend({
         font-size: 13px;
     }
 }
-::v-deep #vg-tooltip-element .key {
+#vg-tooltip-element .key {
     display: none;
 }
-::v-deep #vg-tooltip-element table tr:first-of-type td.value {
+#vg-tooltip-element table tr:first-of-type td.value {
     text-align: center;
     font-family: "Avenir", sans-serif;
     font-size: 16px;
     color: #2c3e50;
 }
-::v-deep #vg-tooltip-element table tr:nth-of-type(2) td.value {
+#vg-tooltip-element table tr:nth-of-type(2) td.value {
     text-align: center;
     font-family: "Avenir", sans-serif;
     font-size: 13px;
@@ -420,7 +427,7 @@ export default Vue.extend({
         padding: 30px 20px 30px;
     }
 
-    @include bp-down($xs) {
+    @include bp-down($sm) {
         padding: 20px 10px 10px;
     }
 }
@@ -454,24 +461,29 @@ export default Vue.extend({
     }
 }
 
-::v-deep .workspace-container {
+.workspace-container {
     display: flex;
     flex-direction: column;
     border-radius: 1px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 1px #f4f5f7;
+
+    @include bp-down($sm) {
+        border: 0;
+        box-shadow: unset;
+    }
 }
-::v-deep .tree-container {
+.tree-container {
     flex: 0;
 }
-::v-deep .loading-scrubber {
+.loading-scrubber {
     padding: 20px;
 }
-::v-deep .groups-container {
+.groups-container {
     background-color: white;
 }
 
-::v-deep .icons-container {
+.icons-container {
     margin-top: 30px;
     display: flex;
     justify-content: center;
@@ -481,26 +493,26 @@ export default Vue.extend({
     padding-right: 20px;
 }
 
-::v-deep .icons-container.linked {
+.icons-container.linked {
     background-color: #efefef;
     height: 1px;
 }
 
-::v-deep .icons-container.unlinked {
+.icons-container.unlinked {
     border-top: 1px solid #efefef;
     border-bottom: 1px solid #efefef;
     background-color: #fcfcfc;
     height: 8px;
 }
 
-::v-deep .icons-container div:first-child {
+.icons-container div:first-child {
     margin-right: auto;
     visibility: hidden;
 }
-::v-deep .icons-container div:last-child {
+.icons-container div:last-child {
     margin-left: auto;
 }
-::v-deep .icons-container .icon {
+.icons-container .icon {
     background-color: #fcfcfc;
     box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.11);
     border: 1px solid var(--color-border);
@@ -514,7 +526,7 @@ export default Vue.extend({
     }
 }
 
-::v-deep .icons-container .remove-icon {
+.icons-container .remove-icon {
     background-position: center;
     background-image: url(../../assets/Icon_Close_Circle.png);
     background-size: 20px;
@@ -523,7 +535,7 @@ export default Vue.extend({
     height: 20px;
 }
 
-::v-deep .vega-embed {
+.vega-embed {
     width: 100%;
 
     summary {
@@ -532,10 +544,10 @@ export default Vue.extend({
         margin-right: 0.5em;
     }
 }
-::v-deep .graph .vega-embed {
+.graph .vega-embed {
     height: 340px;
 }
-::v-deep .scrubber .vega-embed {
+.scrubber .vega-embed {
     height: 40px;
 
     summary {
@@ -543,7 +555,7 @@ export default Vue.extend({
     }
 }
 
-::v-deep .workspace-container {
+.workspace-container {
     position: relative;
 
     .busy-panel {
@@ -567,43 +579,59 @@ export default Vue.extend({
     }
 }
 
-::v-deep .controls-container {
+.controls-container {
     margin-left: 40px;
     margin-right: 40px;
     margin-bottom: 10px;
+
+    @include bp-down($sm) {
+        margin: 0 0 28px;
+    }
 }
 
-::v-deep .controls-container .row {
+.controls-container .row {
     display: flex;
 }
 
-::v-deep .controls-container .row-1 {
+.controls-container .row-1 {
     padding: 10px;
     border-bottom: 1px solid #efefef;
     margin-bottom: 5px;
     align-items: center;
     min-height: 60px;
+
+    @include bp-down($sm) {
+        display: none;
+    }
 }
 
-::v-deep .controls-container .row-2 {
+.controls-container .row-2 {
     margin-top: 5px;
     padding: 10px;
 }
 
-::v-deep .controls-container .left {
+.controls-container .left {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-::v-deep .controls-container .left .row {
+.controls-container .left .row {
     align-items: center;
     display: flex;
+
+    &:not(:first-of-type) {
+        margin-top: 10px;
+    }
 
     .actions {
         margin-left: 1em;
         display: flex;
         align-items: center;
+
+        @include bp-down($sm) {
+            display: none;
+        }
 
         .button {
             margin-bottom: 0;
@@ -611,57 +639,74 @@ export default Vue.extend({
     }
 }
 
-::v-deep .controls-container .tree-pair {
+.controls-container .tree-pair {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     width: 100%;
     flex: 0 0 500px;
+
+    @include bp-down($sm) {
+        flex: 1 1 auto;
+    }
 }
 
-::v-deep .controls-container .tree-pair > div {
+.controls-container .tree-pair > div {
     flex: 0 1 auto;
+
+    &:first-of-type {
+        margin-bottom: 12px;
+    }
 }
 
-::v-deep .tree-key {
+.tree-key {
     flex-basis: 0;
     margin-right: 15px;
     line-height: 35px;
     font-size: 40px;
+
+    @include bp-down($sm) {
+        margin-right: 7px;
+    }
 
     body.floodnet & {
         margin-top: -10px;
     }
 }
 
-::v-deep .controls-container .right {
+.controls-container .right {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    @include bp-down($sm) {
+        display: none;
+    }
 
     &.time {
         margin-left: auto;
     }
 }
 
-::v-deep .controls-container .right {
+.controls-container .right {
     font-size: 12px;
 }
 
-::v-deep .controls-container .right.half {
+.controls-container .right.half {
     align-items: flex-start;
     flex: 0 0 110px;
 }
 
-::v-deep .controls-container .view-by {
+.controls-container .view-by {
     margin: 0px 10px 0 10px;
 }
 
-::v-deep .controls-container .fast-time {
+.controls-container .fast-time {
     margin: 0px 10px 0 10px;
     cursor: pointer;
 }
 
-::v-deep .controls-container .date-picker {
+.controls-container .date-picker {
     margin-left: 20px;
 
     span {
@@ -675,19 +720,19 @@ export default Vue.extend({
     }
 }
 
-::v-deep .controls-container .date-picker input {
+.controls-container .date-picker input {
     padding: 5px;
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
 }
 
-::v-deep .controls-container .fast-time.selected {
+.controls-container .fast-time.selected {
     text-decoration: underline;
     font-weight: bold;
 }
 
-::v-deep .controls-container .left .button {
+.controls-container .left .button {
     margin-right: 20px;
     font-size: 12px;
     padding: 5px 10px;
@@ -697,7 +742,7 @@ export default Vue.extend({
     cursor: pointer;
 }
 
-::v-deep .debug-panel {
+.debug-panel {
     font-size: 8px;
 }
 
@@ -710,7 +755,7 @@ export default Vue.extend({
     border-radius: 4px;
 }
 
-::v-deep .svg-container {
+.svg-container {
     display: inline-block;
     position: relative;
     width: 100%;
@@ -718,20 +763,20 @@ export default Vue.extend({
     overflow: hidden;
 }
 
-::v-deep .svg-content-responsive {
+.svg-content-responsive {
     display: inline-block;
     position: absolute;
     top: 10px;
     left: 0;
 }
 
-::v-deep .viz.map .viz-map {
+.viz.map .viz-map {
     height: 400px;
     margin-bottom: 20px;
 }
 
-::v-deep .share-floating,
-::v-deep .exports-floating {
+.share-floating,
+.exports-floating {
     position: absolute;
     right: 0;
     top: 70px;
@@ -761,14 +806,14 @@ export default Vue.extend({
     }
 }
 
-::v-deep .brush_brush_bg path {
+.brush_brush_bg path {
     body.floodnet & {
         fill: var(--color-primary);
         fill-opacity: 1;
     }
 }
 
-::v-deep .layer_1_marks path {
+.layer_1_marks path {
     fill: var(--color-primary);
 
     body.floodnet & {
@@ -825,12 +870,13 @@ export default Vue.extend({
         }
     }
 }
-::v-deep .station-summary {
+.station-summary {
     background-color: #fff;
     border-bottom: 1px solid var(--color-border);
     padding: 20px;
     display: flex;
     justify-content: space-between;
+    background: transparent;
 
     @include bp-down($sm) {
         flex-direction: column;
@@ -842,7 +888,8 @@ export default Vue.extend({
 
     .summary-content {
         .image-container {
-            flex-basis: 86px;
+            flex-basis: 90px;
+            height: 90px;
         }
     }
 
@@ -862,13 +909,79 @@ export default Vue.extend({
     display: flex;
     margin-right: 13px;
     justify-content: center;
+
+    @include bp-down($sm) {
+        margin-left: auto;
+        margin-right: 0;
+    }
 }
 
-::v-deep .double-header .actions {
+.info-icon {
+    display: block;
+    background-color: #6a6d71;
+    color: #fff;
+    text-align: center;
+    text-indent: -1px;
+    line-height: 14px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    opacity: 0.3;
+    font-size: 10px;
+    font-family: $font-family-medium;
+
+    @include bp-up($sm) {
+        display: none;
+    }
+}
+
+.info-content {
+    visibility: hidden;
+    opacity: 0;
+    padding: 14px;
+    font-size: 10px;
+    color: #6a6d71;
+    position: absolute;
+    top: calc(100% + 10px);
+    border-radius: 2px;
+    border: solid 1px #cccdcf;
+    background-color: #fff;
+    width: 200px;
+    z-index: $z-index-top;
+}
+
+.info {
+    position: relative;
+    margin-left: 5px;
+
+    &:hover {
+        .info-content {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
+</style>
+
+<style scoped lang="scss">
+@import "src/scss/mixins";
+
+::v-deep .double-header {
     @include bp-down($sm) {
-        position: absolute;
-        right: 0;
-        margin: 0 !important;
+        .actions {
+            position: absolute;
+            right: 0;
+            margin: 0 !important;
+        }
+        .one {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back {
+            margin-bottom: 25px;
+        }
     }
 }
 </style>
