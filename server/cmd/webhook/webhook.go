@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -19,6 +20,8 @@ import (
 type Options struct {
 	PostgresURL  string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 	TimeScaleURL string `split_words:"true"`
+
+	RefreshViews bool
 
 	File      string
 	SchemaID  int
@@ -73,6 +76,15 @@ func process(ctx context.Context, options *Options) error {
 		}
 	}
 
+	if options.RefreshViews {
+		if tsConfig == nil {
+			return fmt.Errorf("TsDB configuration missing")
+		}
+		if err := tsConfig.RefreshViews(ctx); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -86,6 +98,7 @@ func main() {
 	flag.BoolVar(&options.Resume, "resume", false, "resume on message id")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
 	flag.BoolVar(&options.NoLegacy, "no-legacy", false, "disable legacy aggregate updates")
+	flag.BoolVar(&options.RefreshViews, "refresh-views", false, "refresh views")
 
 	flag.Parse()
 

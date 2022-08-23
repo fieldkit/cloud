@@ -406,39 +406,13 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, r
 }
 
 func refreshViews(ctx context.Context, options *Options) error {
-	log := logging.Logger(ctx).Sugar()
-
 	tsConfig := options.timeScaleConfig()
 
 	if tsConfig == nil {
 		return fmt.Errorf("refresh-views missing tsdb configuration")
 	}
 
-	views := []string{
-		"fieldkit.sensor_data_365d",
-		"fieldkit.sensor_data_7d",
-		"fieldkit.sensor_data_24h",
-		"fieldkit.sensor_data_6h",
-		"fieldkit.sensor_data_1h",
-		"fieldkit.sensor_data_10m",
-		"fieldkit.sensor_data_1m",
-	}
-
-	pgPool, err := tsConfig.Acquire(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, view := range views {
-		log.Infow("refreshing", "view_name", view)
-
-		_, err := pgPool.Exec(ctx, fmt.Sprintf(`CALL refresh_continuous_aggregate('%s', NULL, NULL)`, view))
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return tsConfig.RefreshViews(ctx)
 }
 
 func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
