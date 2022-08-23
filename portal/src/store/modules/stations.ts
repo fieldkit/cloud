@@ -146,7 +146,7 @@ export class StationReadings {
     }
 
     public get hasData(): boolean {
-        return this.last.last != null;
+        return this.last?.last != null;
     }
 
     public hasReading(visible: VisibleReadings): boolean {
