@@ -22,19 +22,20 @@
 /* eslint-disable vue/no-unused-components */
 
 import _ from "lodash";
-import Vue from "vue";
-import Mapbox from "mapbox-gl-vue";
 import Config from "@/secrets";
-import { MappedStations, LngLat, BoundingRectangle } from "@/store";
-import ValueMarker from "./ValueMarker.vue";
+import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading } from "@/store";
 
-import * as d3 from "d3";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
+import Vue, { PropType } from "vue";
+import ValueMarker from "./ValueMarker.vue";
+import Mapbox from "mapbox-gl-vue";
+
 export interface ProtectedData {
     map: any;
+    markers: { [index: number]: any };
 }
 
 export default Vue.extend({
@@ -46,7 +47,7 @@ export default Vue.extend({
     data(): {
         mapbox: { token: string; style: string };
         ready: boolean;
-        sensorMeta: Map<string, any>;
+        sensorMeta: Map<string, any> | null;
         hasGeocoder: boolean;
         isMobileView: boolean;
     } {
@@ -75,6 +76,10 @@ export default Vue.extend({
         layoutChanges: {
             type: Number,
             default: 0,
+        },
+        visibleReadings: {
+            type: Number as PropType<VisibleReadings>,
+            default: VisibleReadings.Current,
         },
     },
     computed: {
@@ -105,6 +110,10 @@ export default Vue.extend({
             this.updateMap();
         },
         showStations(): void {
+            this.updateMap();
+        },
+        visibleReadings(): void {
+            console.log("map: visible-readings");
             this.updateMap();
         },
     },
@@ -169,51 +178,56 @@ export default Vue.extend({
             }
 
             if (!map.getLayer("station-markers") && this.showStations) {
-                console.log("map: updating", this.mapped);
+                const stationsSource = map.getSource("stations");
+                if (!stationsSource) {
+                    console.log("map: updating", this.mapped);
 
-                map.addSource("stations", {
-                    type: "geojson",
-                    data: {
-                        type: "FeatureCollection",
-                        features: this.mapped.features,
-                    },
-                });
-
-                map.addLayer({
-                    id: "regions",
-                    type: "fill",
-                    source: "stations",
-                    paint: {
-                        "fill-color": "#aaaaaa",
-                        "fill-opacity": 0.2,
-                    },
-                    filter: ["==", "$type", "Polygon"],
-                });
-
-                if (!this.mapped.isSingleType) {
-                    map.addLayer({
-                        id: "station-markers",
-                        type: "symbol",
-                        source: "stations",
-                        filter: ["==", "$type", "Point"],
-                        layout: {
-                            "icon-image": "dot",
-                            "text-field": "{title}",
-                            "icon-ignore-placement": true,
-                            "icon-allow-overlap": true,
-                            "text-allow-overlap": true,
-                            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                            "text-offset": [0, 0.75],
-                            "text-variable-anchor": ["top", "right", "bottom", "left"],
+                    map.addSource("stations", {
+                        type: "geojson",
+                        data: {
+                            type: "FeatureCollection",
+                            features: this.mapped.features,
                         },
                     });
-                }
 
-                map.on("click", "station-markers", (e) => {
-                    const id = e.features[0].properties.id;
-                    console.log("map: click", id);
-                    this.$emit("show-summary", { id: id });
-                });
+                    map.addLayer({
+                        id: "regions",
+                        type: "fill",
+                        source: "stations",
+                        paint: {
+                            "fill-color": "#aaaaaa",
+                            "fill-opacity": 0.2,
+                        },
+                        filter: ["==", "$type", "Polygon"],
+                    });
+
+                    if (!this.mapped.isSingleType) {
+                        map.addLayer({
+                            id: "station-markers",
+                            type: "symbol",
+                            source: "stations",
+                            filter: ["==", "$type", "Point"],
+                            layout: {
+                                "icon-image": "dot",
+                                "text-field": "{title}",
+                                "icon-ignore-placement": true,
+                                "icon-allow-overlap": true,
+                                "text-allow-overlap": true,
+                                "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+                                "text-offset": [0, 0.75],
+                                "text-variable-anchor": ["top", "right", "bottom", "left"],
+                            },
+                        });
+                    }
+
+                    map.on("click", "station-markers", (e) => {
+                        const id = e.features[0].properties.id;
+                        console.log("map: click", id);
+                        this.$emit("show-summary", { id: id });
+                    });
+                } else {
+                    console.log("map: keeping", this.mapped);
+                }
             } else {
                 console.log("map: keeping", this.mapped);
             }
@@ -222,20 +236,49 @@ export default Vue.extend({
                 map.fitBounds(this.bounds, { duration: 0 });
             }
 
-            // Generate custom map markers
-            const valueMarker = Vue.extend(ValueMarker);
-            const sorted = _.cloneDeep(this.mapped.features).sort((a, b) => a.properties.value - b.properties.value);
+            // Regenerate custom map markers
+            if (this.protectedData.markers) {
+                for (const entry of this.protectedData.markers) {
+                    const { marker } = entry;
+                    marker.remove();
+                }
+                this.protectedData.markers = {};
+            }
+
+            const ValueMarkerCtor = Vue.extend(ValueMarker);
+            const markers = [];
+            const sortFactors = _.fromPairs(
+                this.mapped.features.map((feature) => [feature.properties?.id, feature.station.getSortOrder(this.visibleReadings)])
+            );
+            const sorted = _.reverse(
+                _.orderBy(
+                    _.cloneDeep(this.mapped.features),
+                    [
+                        (feature) => sortFactors[feature.properties.id][0],
+                        (feature) => sortFactors[feature.properties.id][1],
+                        (feature) => sortFactors[feature.properties.id][2],
+                    ],
+                    ["asc", "desc", "asc"]
+                )
+            );
             for (const feature of sorted) {
-                const instance = new valueMarker({
-                    propsData: { color: feature.properties.color, value: feature.properties.value, id: feature.properties.id },
+                const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
+                const instance = new ValueMarkerCtor({
+                    propsData: {
+                        color: readings && readings.length > 0 ? readings[0].color : "#ccc",
+                        value: readings && readings.length > 0 ? readings[0].value : null,
+                        id: feature.properties.id,
+                    },
                 });
                 instance.$mount();
                 instance.$on("marker-click", (evt) => {
                     this.$emit("show-summary", { id: evt.id });
                 });
 
-                new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
+                const marker = new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
+                markers.push({ marker: marker, instance: instance });
             }
+            this.protectedData.markers = markers;
         },
     },
 });
@@ -256,5 +299,4 @@ export default Vue.extend({
     height: 10px;
     width: 10px;
 }
-
 </style>

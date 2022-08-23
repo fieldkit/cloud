@@ -316,6 +316,8 @@ export const ViewingControls = Vue.extend({
         },
         raiseManualTime(fromPicker, pickerType): void {
             if (fromPicker) {
+                const pickedDateOnly = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate());
+
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
@@ -325,16 +327,18 @@ export const ViewingControls = Vue.extend({
                     return;
                 }
 
+                console.log("viz: picker", fromPicker, pickedDateOnly);
+
                 let pickerStart: Date = new Date();
                 let pickerEnd: Date = new Date();
 
                 if (pickerType === "start") {
-                    pickerStart = fromPicker;
+                    pickerStart = pickedDateOnly;
                     pickerEnd = this.manualRangeValue.end;
                 }
                 if (pickerType === "end") {
                     pickerStart = this.manualRangeValue.start;
-                    pickerEnd = fromPicker;
+                    pickerEnd = pickedDateOnly;
                 }
 
                 const rangeViz = this.viz.visibleTimeRange;

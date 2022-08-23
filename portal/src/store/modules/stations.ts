@@ -19,10 +19,15 @@ import {
     StationModule,
     StationRegion,
     StationStatus,
+    SensorsResponse,
+    ModuleSensorMeta,
     VizThresholds,
+    QueryRecentlyResponse,
+    RecentlyAggregatedWindows,
+    RecentlyAggregatedLast,
 } from "@/api";
 
-import { VizConfig } from "@/views/viz/viz";
+import { VizSensor, VizConfig } from "@/views/viz/viz";
 
 import * as d3 from "d3";
 
@@ -38,6 +43,58 @@ export const STATION_CLEAR = "STATION_CLEAR";
 export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 export const PROJECT_DELETED = "PROJECT_DELETED";
+export const SENSOR_META = "SENSOR_META";
+
+export class SensorMeta {
+    constructor(private readonly meta: SensorsResponse) {}
+
+    public get sensors() {
+        return this.meta.sensors;
+    }
+
+    public get modules() {
+        return this.meta.modules;
+    }
+
+    public findSensorByKey(sensorKey: string): ModuleSensorMeta {
+        const sensors = _(this.meta.modules)
+            .map((m) => m.sensors)
+            .flatten()
+            .groupBy((s) => s.fullKey)
+            .value();
+
+        const byKey = sensors[sensorKey];
+        if (byKey.length == 0) {
+            throw new Error(`viz: Missing sensor meta: ${sensorKey}`);
+        }
+
+        return byKey[0];
+    }
+
+    public findSensorById(id: number): ModuleSensorMeta {
+        const row = this.meta.sensors.find((row) => row.id == id);
+        if (!row) {
+            throw new Error(`viz: Missing sensor meta: ${id}`);
+        }
+        return this.findSensorByKey(row.key);
+    }
+
+    public findSensor(vizSensor: VizSensor): ModuleSensorMeta {
+        const sensorId = vizSensor[1][1];
+
+        const sensorKeysById = _(this.meta.sensors)
+            .groupBy((r) => r.id)
+            .value();
+
+        if (!sensorKeysById[String(sensorId)]) {
+            console.log(`viz: sensors: ${JSON.stringify(_.keys(sensorKeysById))}`);
+            throw new Error(`viz: Missing sensor: ${sensorId}`);
+        }
+
+        const sensorKey = sensorKeysById[String(sensorId)][0].key;
+        return this.findSensorByKey(sensorKey);
+    }
+}
 
 export class DisplaySensor {
     name: string;
@@ -69,6 +126,98 @@ export class DisplayModule {
     }
 }
 
+export enum VisibleReadings {
+    Current,
+    Last72h,
+}
+
+export class DecoratedReading {
+    constructor(public readonly value: number, public readonly color: string, public readonly thresholdLabel: string | null) {}
+}
+
+export class StationReadings {
+    constructor(
+        private readonly stationId: number,
+        private readonly meta: SensorMeta,
+        private readonly recently: RecentlyAggregatedWindows,
+        private readonly last: RecentlyAggregatedLast
+    ) {
+        // console.log("station-readings:ctor", stationId, recently, last);
+    }
+
+    public get hasData(): boolean {
+        return this.last?.last != null;
+    }
+
+    public hasReading(visible: VisibleReadings): boolean {
+        return this.getReading(visible) != null;
+    }
+
+    public getReading(visible: VisibleReadings): number | null {
+        const readings = this.getDecoratedReadings(visible);
+        if (readings && readings.length > 0) {
+            return readings[0].value;
+        }
+        return null;
+    }
+
+    private createDecoratedReading(sensorId: number, value: number): DecoratedReading[] {
+        const sensor = this.meta.findSensorById(sensorId);
+
+        if (sensor && sensor.viz && sensor.viz.length > 0) {
+            if (sensor.viz[0].thresholds) {
+                const thresholds = sensor.viz[0].thresholds;
+                if (thresholds) {
+                    const level = thresholds.levels.find((level) => level.start <= value && level.value > value);
+                    if (level) {
+                        const color = level.color;
+                        const label = level.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
+                        return [new DecoratedReading(value, color, label)];
+                    }
+                }
+            }
+        }
+
+        return [new DecoratedReading(value, "#00ccff", null)];
+    }
+
+    public getDecoratedReadings(visible: VisibleReadings): DecoratedReading[] | null {
+        switch (visible) {
+            case VisibleReadings.Current: {
+                const all = _.sortBy(_.flatten(_.values(this.recently)), (row) => row.time);
+                if (all.length > 0) {
+                    const last = all[all.length - 1];
+                    const sensorId = last.sensorId;
+                    const value = last.last;
+                    if (value === undefined) {
+                        return null;
+                    }
+                    // console.log("station-readings:curr", value);
+                    return this.createDecoratedReading(sensorId, value);
+                }
+                break;
+            }
+            case VisibleReadings.Last72h: {
+                // TODO Order sensors and pick first.
+                if (this.recently[72] && this.recently[72].length > 0) {
+                    const sensorId = this.recently[72][0].sensorId;
+                    const value = this.recently[72][0].max; // TODO Use aggregate function.
+                    if (value === undefined) {
+                        return null;
+                    }
+                    // console.log("station-readings:72h", value);
+                    return this.createDecoratedReading(sensorId, value);
+                }
+                break;
+            }
+        }
+        // console.log("station-readings:null", this.recently);
+        return null;
+    }
+}
+
+type StationSortTuiple = [number, number, string];
+
 export class DisplayStation {
     public readonly id: number;
     public readonly name: string;
@@ -85,14 +234,75 @@ export class DisplayStation {
     public readonly placeNameNative: string | null;
     public readonly battery: number | null;
     public readonly regions: StationRegion[] | null;
-    public readonly latestPrimary: number | null;
     public readonly firmwareNumber: number | null;
     public readonly primarySensor: ModuleSensor | null;
     public readonly attributes: ProjectAttribute[];
     public readonly readOnly: boolean;
     public readonly status: StationStatus;
 
-    constructor(station: Station) {
+    public get latestPrimary(): number | null {
+        if (!this.readings) {
+            console.log("stations: No readings");
+            return null;
+        }
+
+        // TODO Remove after wiring the map values to the new sensorDataQuerier code
+        if (this.station.status === StationStatus.down) {
+            return null;
+        }
+
+        return this.getVisibleReading(VisibleReadings.Current);
+    }
+
+    public getVisibleReading(which: VisibleReadings): number | null {
+        if (this.readings) {
+            return this.readings.getReading(which);
+        }
+        return null;
+    }
+
+    public getDecoratedReadings(visible: VisibleReadings): DecoratedReading[] | null {
+        if (this.readings) {
+            return this.readings.getDecoratedReadings(visible);
+        }
+        return null;
+    }
+
+    public getSortOrder(which: VisibleReadings): StationSortTuiple {
+        if (this.inactive) {
+            return [3, 0, this.name];
+        }
+        if (!this.hasData) {
+            return [2, 0, this.name];
+        }
+        if (this.readings) {
+            const value = this.readings.getReading(which);
+            if (value !== null) {
+                return [0, value, this.name];
+            }
+        }
+        return [1, 0, this.name];
+    }
+
+    private get inactive(): boolean {
+        return this.status == StationStatus.down;
+    }
+
+    public get hasData(): boolean {
+        if (this.readings) {
+            return this.readings.hasData;
+        }
+        return false;
+    }
+
+    public get hasRecentData(): boolean {
+        if (this.readings) {
+            return this.readings.hasReading(VisibleReadings.Last72h);
+        }
+        return false;
+    }
+
+    constructor(private readonly station: Station, public readings: StationReadings | null = null) {
         this.id = station.id;
         this.name = station.name;
         this.configurations = station.configurations;
@@ -108,6 +318,7 @@ export class DisplayStation {
         this.attributes = station.attributes.attributes;
         this.readOnly = station.readOnly;
         this.status = station.status;
+        this.readings = readings;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
@@ -121,18 +332,6 @@ export class DisplayStation {
             _(station.configurations.all)
                 .map((c) => c.modules.filter((m) => !m.internal).map((m) => new DisplayModule(m)))
                 .head() || [];
-
-        const prioritizedSensors = _.flatten(this.modules.map((m) => m.sensors));
-        if (prioritizedSensors.length > 0 && prioritizedSensors[0].reading !== null) {
-            this.latestPrimary = prioritizedSensors[0].reading;
-        } else {
-            this.latestPrimary = null;
-        }
-
-        // TODO: remove after wiring the map values to the new sensorDataQuerier code
-        if (station.status === StationStatus.down) {
-            this.latestPrimary = null;
-        }
 
         if (station.location) {
             if (station.location.precise) {
@@ -168,7 +367,7 @@ export class MapFeature {
         color: string;
     } | null = null;
 
-    constructor(station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
+    constructor(private readonly station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
             type: type,
             coordinates: coordinates,
@@ -274,6 +473,7 @@ export class MappedStations {
 }
 
 export class StationsState {
+    sensorMeta: SensorMeta | null = null;
     stations: { [index: number]: DisplayStation } = {};
     hasNoStations: boolean;
     projects: { [index: number]: Project } = {};
@@ -294,6 +494,7 @@ export class StationsState {
         projects: {},
     };
     mapped: MappedStations | null = null;
+    readings: { [index: number]: StationReadings } = {};
 }
 
 export class DisplayProject {
@@ -403,9 +604,15 @@ const actions = (services: Services) => {
                 services.api.getStationsByProject(payload.id),
             ]);
 
+            const meta = await services.api.getAllSensorsMemoized()(); // TODO  Why?
+            const sensorMeta = new SensorMeta(meta);
+            commit(SENSOR_META, sensorMeta);
+
+            const recently = await services.api.queryStationsRecently(stations.stations.map((s: { id: number }) => s.id));
+
             commit(PROJECT_LOADED, project);
             commit(PROJECT_USERS, { projectId: payload.id, users: users.users });
-            commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations });
+            commit(PROJECT_STATIONS, { projectId: payload.id, stations: stations.stations, recently: recently });
 
             commit(MutationTypes.LOADING, { projects: false });
         },
@@ -559,8 +766,22 @@ const mutations = {
     [PROJECT_FOLLOWS]: (state: StationsState, payload: { projectId: number; followers: ProjectFollowers }) => {
         Vue.set(state.projectFollowers, payload.projectId, payload.followers);
     },
-    [PROJECT_STATIONS]: (state: StationsState, payload: { projectId: number; stations: Station[] }) => {
-        const projectStations = payload.stations.map((s) => new DisplayStation(s));
+    [PROJECT_STATIONS]: (
+        state: StationsState,
+        payload: { projectId: number; stations: Station[]; recently: QueryRecentlyResponse | null }
+    ) => {
+        const sensorMeta = state.sensorMeta;
+        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
+        const projectStations = payload.stations.map((station) => {
+            if (payload.recently) {
+                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
+                    return rows.filter((row) => row.stationId == station.id);
+                });
+                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
+                return new DisplayStation(station, readings);
+            }
+            return new DisplayStation(station);
+        });
         state.stations = { ...state.stations, ..._.keyBy(projectStations, (s) => s.id) };
         Vue.set(state.projectStations, payload.projectId, projectStations);
     },
@@ -593,6 +814,9 @@ const mutations = {
         delete state.projects[payload.projectId];
         delete state.user.projects[payload.projectId];
         delete state.community.projects[payload.projectId];
+    },
+    [SENSOR_META]: (state: StationsState, payload: SensorMeta) => {
+        state.sensorMeta = payload;
     },
 };
 
