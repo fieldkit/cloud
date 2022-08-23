@@ -1012,6 +1012,7 @@ export default Vue.extend({
 ::v-deep .date-pickers {
     position: absolute;
     bottom: 70px;
+    width: 100%;
 
     @include bp-up($sm) {
         display: none;
