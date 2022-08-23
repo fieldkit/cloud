@@ -162,14 +162,15 @@ export default Vue.extend({
 
 ::v-deep .detail-links {
     @include bp-down($sm) {
-        position: fixed;
-        top: 104px;
+        position: absolute;
+        top: 51px;
         left: 0;
         background-color: #fff;
         width: 100%;
-        padding: 10px 10px 5px 10px;
+        padding: 12px 10px 7px 10px;
         opacity: 0;
         visibility: hidden;
+        box-sizing: border-box;
         box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
 
         &.mobile-visible {

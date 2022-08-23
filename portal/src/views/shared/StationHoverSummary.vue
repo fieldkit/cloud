@@ -22,7 +22,7 @@
                 <div class="latest-primary" :style="{ color: latestPrimaryColor }">
                     <template v-if="station.status === StationStatus.up">
                         <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                        <span v-else-if="hasData">{{ $t("noRecentData") }}</span>
+                        <span v-else-if="hasData" class="no-data">{{ $t("noRecentData") }}</span>
                         <span v-else class="no-data">{{ $t("noData") }}</span>
                     </template>
                     <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
@@ -63,7 +63,6 @@ import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
-import { CupertinoEvents } from "cupertino-pane/dist/types/models";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -259,19 +258,6 @@ export default Vue.extend({
 
     ::v-deep .station-name {
         font-size: 16px;
-    }
-
-    ::v-deep .image-container {
-        border-radius: 5px;
-        padding: 0;
-        margin-right: 14px;
-        overflow: hidden;
-        max-height: 62px;
-
-        img {
-            padding: 0;
-            object-fit: cover;
-        }
     }
 
     * {

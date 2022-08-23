@@ -620,6 +620,10 @@ export default Vue.extend({
     align-items: center;
     display: flex;
 
+    @include bp-down($sm) {
+        align-items: flex-start;
+    }
+
     &:not(:first-of-type) {
         margin-top: 10px;
     }
@@ -642,12 +646,12 @@ export default Vue.extend({
 .controls-container .tree-pair {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     width: 100%;
     flex: 0 0 500px;
 
     @include bp-down($sm) {
         flex: 1 1 auto;
+        flex-wrap: wrap;
     }
 }
 
@@ -655,7 +659,9 @@ export default Vue.extend({
     flex: 0 1 auto;
 
     &:first-of-type {
-        margin-bottom: 12px;
+        @include bp-down($sm) {
+            margin-bottom: 12px;
+        }
     }
 }
 
@@ -786,6 +792,12 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+
+    @include bp-down($sm) {
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
 }
 
 .loading-options {
@@ -876,13 +888,19 @@ export default Vue.extend({
     padding: 20px;
     display: flex;
     justify-content: space-between;
-    background: transparent;
 
     @include bp-down($sm) {
         flex-direction: column;
+        background: transparent;
+        padding: 0 0 10px;
 
         .pagination {
             margin-top: 0.5em;
+        }
+
+        .navigate-button {
+            width: 16px;
+            height: 16px;
         }
     }
 
@@ -890,6 +908,7 @@ export default Vue.extend({
         .image-container {
             flex-basis: 90px;
             height: 90px;
+            margin-right: 10px;
         }
     }
 
@@ -983,5 +1002,31 @@ export default Vue.extend({
             margin-bottom: 25px;
         }
     }
+}
+
+::v-deep .scrubber {
+    @include bp-down($sm) {
+        padding-bottom: 120px;
+    }
+}
+::v-deep .date-pickers {
+    position: absolute;
+    bottom: 70px;
+
+    @include bp-up($sm) {
+        display: none;
+    }
+
+    .date-input {
+        height: 35px;
+        padding: 0 7px;
+        border: 1px solid $color-border;
+        border-radius: 3px;
+        flex: 0 0 calc(50% - 5px);
+    }
+}
+
+::v-deep .groups-container {
+    position: relative;
 }
 </style>
