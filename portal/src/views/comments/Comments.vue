@@ -485,10 +485,6 @@ header {
         padding: 15px 10px;
     }
 
-    @media screen and (max-width: 320px) {
-        flex-wrap: wrap;
-    }
-
     .container.data-view & {
         &:not(.reply) {
             background-color: rgba(#f4f5f7, 0.55);
