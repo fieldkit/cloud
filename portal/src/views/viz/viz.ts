@@ -146,7 +146,13 @@ export interface VizInfoFactory {
 
 type ResolveData = (qd: QueriedData) => void;
 
-class VizQuery {
+interface CanQuery {
+    readonly params: DataQueryParams;
+    howBusy(d: number): any;
+    resolve(qd: QueriedData);
+}
+
+class VizQuery implements CanQuery {
     constructor(public readonly params: DataQueryParams, public readonly vizes: Viz[], private readonly r: ResolveData) {}
 
     public howBusy(d: number): any {
@@ -162,7 +168,7 @@ class VizQuery {
     }
 }
 
-class BufferedResolveQuery {
+class BufferedResolveQuery implements CanQuery {
     private qd: QueriedData | null;
 
     constructor(private readonly children: VizQuery[]) {}
@@ -615,7 +621,7 @@ export class Group {
 class DataQuerier {
     private data: { [index: string]: QueriedData } = {};
 
-    public queryData(vq: VizQuery): Promise<QueriedData> {
+    public queryData(vq: CanQuery): Promise<QueriedData> {
         if (!vq.params) throw new Error("no params");
 
         const params = vq.params;
