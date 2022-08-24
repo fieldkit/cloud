@@ -96,13 +96,12 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { Station, ActionTypes, DisplayStation } from "@/store";
+import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse, AssociatedStation } from "./api";
-import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-import * as utils from "@/utilities";
+import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 
@@ -301,7 +300,11 @@ export default Vue.extend({
                             const end = new Date(quickSensor[0].sensorReadAt);
                             const start = new Date(end);
 
-                            start.setDate(end.getDate() - 14); // TODO Use getFastTime
+                            if (isMobile()) {
+                                start.setDate(end.getDate() - 1); // TODO Use getFastTime
+                            } else {
+                                start.setDate(end.getDate() - 14); // TODO Use getFastTime
+                            }
 
                             return new Bookmark(
                                 this.bookmark.v,
@@ -350,7 +353,7 @@ export default Vue.extend({
             window.open(routeData.href, "_blank");
         },
         getBatteryIcon() {
-            return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
+            return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
         },
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);

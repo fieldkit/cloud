@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import _ from "lodash";
+import { isMobile } from "@/utilities";
 import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
 
@@ -24,7 +25,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => (window.screen.availWidth < 1040 ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
+            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
         },
     },
     data(): {

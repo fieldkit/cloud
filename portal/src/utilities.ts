@@ -5,6 +5,10 @@ interface FeatureFlags {
     tinyCharts: boolean;
 }
 
+export function isMobile(): boolean {
+    return window.screen.availWidth < 1040;
+}
+
 export function getFeaturesEnabled(): FeatureFlags {
     return {
         tsdb: window.localStorage["fk:backend"] === "tsdb",

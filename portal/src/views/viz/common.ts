@@ -194,6 +194,13 @@ export class VizInfo {
         public readonly axisLabel: string
     ) {}
 
+    public get minimumGap(): number | null {
+        if (this.viz.length == 0) {
+            return null;
+        }
+        return this.viz[0].minimumGap || null;
+    }
+
     public get constrainedRanges(): SensorRange[] {
         return this.ranges.filter((r) => r.constrained === true);
     }

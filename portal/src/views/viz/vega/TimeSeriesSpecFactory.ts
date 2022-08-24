@@ -55,48 +55,29 @@ export class TimeSeriesSpecFactory {
             const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
             const original = series.queried.data;
 
-            function sanitize(original: DataRow[]): DataRow[] {
-                // This was the first approach we tried to prevent
-                // the infilled missing values from creating
-                // distracting graphs of too many valid data
-                // islands.
-                /*
-                const valid = original.filter((datum) => _.isNumber(datum.value));
-                const deltas = calculateTimeDeltas(valid);
+            // If a sensor has a custom filter, that information will be in the vizInfo object.
+            const afterCustomFilter = series.vizInfo.applyCustomFilter(original);
 
-                // console.log("viz: gaps", calculateGaps(original));
-                // console.log("viz: deltas", _.mean(deltas) / 60000);
+            // Decorate the rows with information about the series and the vizInfo details necessary for rendering/tooltips.
+            const afterProperties = afterCustomFilter.map((datum) => _.extend(datum, properties));
 
-                // Very simple heuristic for enabling re-bin. We
-                // basically rebin to the average interval if more
-                // of the data is invalid than valid. I think we can
-                // do better.
-                if (original.length - valid.length > valid.length) {
-                    const meanBetweenValid = _.mean(deltas);
-                    const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
-                    console.log("viz: rebin", interval);
-                    return rebin(original, interval);
-                } else {
-                    console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+            // Add gap information so we can determine where missing data lies.
+            const afterGapsAdded = afterProperties.reduce((previous: DataRow[], item) => {
+                if (previous.length == 0) {
+                    return [_.extend(item, { gap: 0 })];
                 }
-                */
+                const gap = (item.time - previous[previous.length - 1].time) / 1000;
+                return [...previous, _.extend(item, { gap: gap })];
+            }, []);
 
-                // This is the another approach we're trying,
-                // basically remove missing data if the queried
-                // resolution is finer than the expected sensor
-                // data's resolution.
-                if (series.queried.shouldIgnoreMissing) {
-                    return original.filter((datum) => _.isNumber(datum.value));
-                }
+            const maybeMinimumGap = series.vizInfo.minimumGap;
 
-                return original;
-            }
+            console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap);
 
-            function applyCustomFilter(rows: DataRow[]): DataRow[] {
-                return series.vizInfo.applyCustomFilter(rows);
-            }
+            const afterMostMinimumGapAdded =
+                maybeMinimumGap !== null ? afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: 600 })) : afterGapsAdded;
 
-            return sanitize(applyCustomFilter(original)).map((datum) => _.extend(datum, properties));
+            return afterMostMinimumGapAdded;
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -692,7 +673,7 @@ export class TimeSeriesSpecFactory {
                     },
                 };
 
-                const firstLineMark = {
+                const dashedLineMark = {
                     type: "line",
                     from: {
                         data: makeValidDataName(i),
@@ -740,7 +721,7 @@ export class TimeSeriesSpecFactory {
 
                             return {
                                 type: "line",
-                                from: { data: makeDataName(i) },
+                                from: { data: makeValidDataName(i) },
                                 encode: {
                                     enter: {
                                         interpolate: { value: "cardinal" },
@@ -749,7 +730,7 @@ export class TimeSeriesSpecFactory {
                                         x: { scale: scales.x, field: "time" },
                                         y: { scale: scales.y, field: alias },
                                         strokeWidth: { value: strokeWidth },
-                                        defined: { signal: `isValid(datum.${alias})` },
+                                        defined: { signal: `datum.${alias} <= datum.minimumGap` },
                                     },
                                     update: {
                                         strokeOpacity: {
@@ -764,7 +745,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                            marks: _.concat([dashedLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
                         },
                     ];
                 } else {
@@ -781,7 +762,7 @@ export class TimeSeriesSpecFactory {
                                 x: { scale: scales.x, field: "time" },
                                 y: { scale: scales.y, field: "value" },
                                 strokeWidth: { value: 2 },
-                                defined: { signal: "isValid(datum.value)" },
+                                defined: { signal: `datum.gap <= datum.minimumGap` },
                             },
                             update: {
                                 strokeOpacity: {
@@ -793,7 +774,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: [firstLineMark, lineMark, symbolMark],
+                            marks: [dashedLineMark, lineMark, symbolMark],
                         },
                     ];
                 }
