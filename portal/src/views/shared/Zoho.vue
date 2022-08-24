@@ -9,11 +9,11 @@ export default Vue.extend({
     name: "Zoho",
     mounted() {
         if (process.env.NODE_ENV !== "production") {
-            console.log("zoho:disabled");
+            // console.log("zoho: disabled");
             return;
         }
         if (getPartnerCustomization() != null) {
-            console.log("zoho:disabled");
+            // console.log("zoho: disabled");
             return;
         }
 
