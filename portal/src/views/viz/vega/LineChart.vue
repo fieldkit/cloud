@@ -119,6 +119,8 @@ export default Vue.extend({
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
+                graph: vegaInfo.view.scenegraph(),
+                runtime: vegaInfo.view._runtime,
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
         },
