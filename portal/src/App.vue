@@ -223,6 +223,7 @@ li {
 .cupertino-pane-wrapper {
     .draggable {
         z-index: 10 !important;
+        width: calc(100% - 60px);
     }
     .move {
         height: 3px;
