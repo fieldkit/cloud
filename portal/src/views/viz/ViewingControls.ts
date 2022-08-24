@@ -85,6 +85,9 @@ export const SensorSelectionRow = Vue.extend({
             }
             return this.viz.busy;
         },
+        searchable(): boolean {
+            return !(window.screen.availWidth <= 768);
+        },
     },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
@@ -106,7 +109,7 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
-            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="true" :disable-branch-nodes="true" />
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="searchable" :disable-branch-nodes="true" />
             <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="3" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,
