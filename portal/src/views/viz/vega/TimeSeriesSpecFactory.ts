@@ -75,7 +75,7 @@ export class TimeSeriesSpecFactory {
             // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
             const afterMostMinimumGapAdded = () => {
-                if (maybeMinimumGap === null) {
+                if (!maybeMinimumGap || !series.queried.bucketSize) {
                     return afterGapsAdded;
                 }
 
