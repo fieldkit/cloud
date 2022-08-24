@@ -332,11 +332,21 @@ export class TimeSeriesSpecFactory {
                     orient: "bottom",
                     scale: "x",
                     domain: xDomain,
-                    tickCount: 6,
-                    labelPadding: -24,
+                    tickCount: this.settings.mobile ? 3 : 6,
+                    labelPadding: this.settings.mobile ? -20 : -24,
                     tickSize: 30,
                     tickDash: [2, 2],
                     title: "Time",
+                    values: this.settings.mobile ? xDomain : undefined,
+                    encode: {
+                        labels: {
+                            update: {
+                                align: {
+                                    signal: this.settings.mobile ? "item === item.mark.items[0] ? 'left' : 'right'" : "'center'",
+                                },
+                            },
+                        },
+                    },
                     format: {
                         year: "%m/%d/%Y",
                         quarter: "%m/%d/%Y",

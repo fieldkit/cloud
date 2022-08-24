@@ -24,7 +24,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => ChartSettings.Auto,
+            default: () => (window.screen.availWidth < 1040 ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
         },
     },
     data(): {
@@ -119,6 +119,8 @@ export default Vue.extend({
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
+                graph: vegaInfo.view.scenegraph(),
+                runtime: vegaInfo.view._runtime,
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
         },
