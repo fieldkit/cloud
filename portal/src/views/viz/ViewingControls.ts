@@ -316,35 +316,44 @@ export const ViewingControls = Vue.extend({
         },
         raiseManualTime(fromPicker, pickerType): void {
             if (fromPicker) {
-                const pickedDateOnly = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate());
-
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
-
                 if (!this.manualRangeValue) {
                     return;
                 }
 
-                console.log("viz: picker", fromPicker, pickedDateOnly);
+                const pickedDateOnly = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate());
+                const rangeViz = this.viz.visibleTimeRange;
 
                 let pickerStart: Date = new Date();
                 let pickerEnd: Date = new Date();
 
                 if (pickerType === "start") {
+                    if (fromPicker.getTime() === rangeViz.start) {
+                        console.log("viz: swallow(same-start)");
+                        return;
+                    }
+
                     pickerStart = pickedDateOnly;
                     pickerEnd = this.manualRangeValue.end;
                 }
+
                 if (pickerType === "end") {
+                    if (fromPicker.getTime() == rangeViz.end) {
+                        console.log("viz: swallow(same-end)");
+                        return;
+                    }
+
                     pickerStart = this.manualRangeValue.start;
                     pickerEnd = pickedDateOnly;
                 }
 
-                const rangeViz = this.viz.visibleTimeRange;
                 const rangePicker = new TimeRange(pickerStart.getTime(), pickerEnd.getTime());
+
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                    console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
+                    console.log("viz: raising viz-time-zoomed", "viz", rangeViz.describe(), "picked", rangePicker.describe());
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("viz: swallowing viz-time-zoomed");
