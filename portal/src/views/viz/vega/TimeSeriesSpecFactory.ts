@@ -72,7 +72,7 @@ export class TimeSeriesSpecFactory {
 
             const maybeMinimumGap = series.vizInfo.minimumGap;
 
-            console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
+            // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
             const afterMostMinimumGapAdded = () => {
                 if (maybeMinimumGap === null) {
@@ -122,7 +122,7 @@ export class TimeSeriesSpecFactory {
 
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {
-                console.log("viz: identical-y", dataRangeAll);
+                // console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
             return makeSeriesDomain(series, i);
@@ -137,7 +137,7 @@ export class TimeSeriesSpecFactory {
                 : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
         if (timeRangeAll) {
-            console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+            // console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
         }
 
         const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {

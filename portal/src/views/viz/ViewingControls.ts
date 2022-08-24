@@ -11,7 +11,7 @@ import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
 
 interface VueDatepickerStyles {
-    // this type might be extended with other customisations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
+    // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
     highlight: {
         start: {
             style: {
@@ -264,7 +264,7 @@ export const ViewingControls = Vue.extend({
                 return color + _opacity.toString(16).toUpperCase();
             };
 
-            // for calendar range selection
+            // For calendar range selection
             return {
                 highlight: {
                     start: {

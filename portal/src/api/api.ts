@@ -1508,7 +1508,7 @@ class FKApi {
             this.socket = new WebSocket(wsBase + "/notifications");
 
             this.socket.addEventListener("open", () => {
-                console.log("ws:connected");
+                console.log("ws: connected");
                 if (!this.socket) throw new Error("disconnected");
                 const token = this.token.getHeader();
                 this.socket.send(JSON.stringify({ token: token }));
@@ -1517,16 +1517,16 @@ class FKApi {
             this.socket.addEventListener("message", (event) => {
                 const message = JSON.parse(event.data);
                 if (message.error) {
-                    console.log("ws:error", message.error);
+                    console.log("ws: error", message.error);
                 } else {
-                    console.log("ws:message", message);
+                    console.log("ws: message", message);
                     void callback(message);
                     this.wsBackoff.reset();
                 }
             });
 
             this.socket.addEventListener("close", async () => {
-                console.log("ws:closed");
+                // console.log("ws: closed");
                 void status(false);
                 this.socket = null;
 
@@ -1549,7 +1549,7 @@ class FKApi {
             });
 
             this.wsBackoff.on("ready", async (number: number, delay: number) => {
-                console.log("ws:ready", number, delay);
+                // console.log("ws: ready", number, delay);
 
                 await this.establish(callback, status);
             });

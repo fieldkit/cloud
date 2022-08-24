@@ -70,8 +70,8 @@ export default {
             //     console.log(evt, value);
             // });
             vegaInfo.view.addEventListener("mouseup", () => {
-                console.log("viz: vega:scrubber-brush", scrubbed);
                 if (scrubbed.length == 2) {
+                    console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
@@ -80,11 +80,11 @@ export default {
         },
         async brush(times: number[]): Promise<void> {
             if (!this.vega || !this.series[0].queried) {
-                console.log("viz: vega:scrubber:brush-ignore");
+                console.log("viz: vega:scrubber:brushing-ignore");
                 return;
             }
             const x = times.map((v) => this.vega.view.scale("x")(v));
-            console.log("viz: vega:scrubber:brush", times, x);
+            console.log("viz: vega:scrubber:brushing", times, x);
             try {
                 await this.vega.view
                     .signal("brush_x", x)
