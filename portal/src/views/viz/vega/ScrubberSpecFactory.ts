@@ -123,7 +123,6 @@ export class ScrubberSpecFactory {
                 },
             ],
             signals: [
-                /*
                 {
                     name: "width",
                     init: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
@@ -420,7 +419,6 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
-                */
             ],
             marks: [
                 {
