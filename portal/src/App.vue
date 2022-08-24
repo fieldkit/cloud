@@ -214,6 +214,12 @@ li {
     color: #fff !important;
 }
 
+.vc-popover-caret {
+    @include bp-down($sm) {
+        display: none !important;
+    }
+}
+
 .cupertino-pane-wrapper {
     .draggable {
         z-index: 10 !important;
