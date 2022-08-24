@@ -482,7 +482,6 @@ header {
     position: relative;
 
     @include bp-down($xs) {
-        margin: 0 -10px;
         padding: 15px 10px;
     }
 
@@ -530,10 +529,6 @@ header {
                 width: 42px;
                 height: 42px;
             }
-        }
-
-        .new-comment-wrap {
-            flex: 0 0 calc(100% - 65px);
         }
     }
 
@@ -725,5 +720,9 @@ header {
 
 .no-comments {
     margin-left: 20px;
+
+    @include bp-down($xs) {
+        margin-left: 10px;
+    }
 }
 </style>
