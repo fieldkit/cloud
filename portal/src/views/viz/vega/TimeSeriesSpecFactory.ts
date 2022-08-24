@@ -72,12 +72,21 @@ export class TimeSeriesSpecFactory {
 
             const maybeMinimumGap = series.vizInfo.minimumGap;
 
-            console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap);
+            console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
-            const afterMostMinimumGapAdded =
-                maybeMinimumGap !== null ? afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: 600 })) : afterGapsAdded;
+            const afterMostMinimumGapAdded = () => {
+                if (maybeMinimumGap === null) {
+                    return afterGapsAdded;
+                }
 
-            return afterMostMinimumGapAdded;
+                if (series.queried.bucketSize > maybeMinimumGap) {
+                    return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
+                }
+
+                return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
+            };
+
+            return afterMostMinimumGapAdded();
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -730,7 +739,7 @@ export class TimeSeriesSpecFactory {
                                         x: { scale: scales.x, field: "time" },
                                         y: { scale: scales.y, field: alias },
                                         strokeWidth: { value: strokeWidth },
-                                        defined: { signal: `datum.${alias} <= datum.minimumGap` },
+                                        defined: { signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap` },
                                     },
                                     update: {
                                         strokeOpacity: {
@@ -762,7 +771,7 @@ export class TimeSeriesSpecFactory {
                                 x: { scale: scales.x, field: "time" },
                                 y: { scale: scales.y, field: "value" },
                                 strokeWidth: { value: 2 },
-                                defined: { signal: `datum.gap <= datum.minimumGap` },
+                                defined: { signal: `!datum.minimumGap || datum.gap <= datum.minimumGap` },
                             },
                             update: {
                                 strokeOpacity: {
