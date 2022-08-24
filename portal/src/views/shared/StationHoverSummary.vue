@@ -126,6 +126,9 @@ export default Vue.extend({
         }
         this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
     },
+    destroyed() {
+        this.destroyCupertinoPane();
+    },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
         visibleSensor(): ModuleSensorMeta | null {
@@ -215,6 +218,11 @@ export default Vue.extend({
                 buttonDestroy: false,
             });
             this.cupertinoPane.present({ animate: true });
+        },
+        destroyCupertinoPane(): void {
+            if (this.cupertinoPane) {
+                this.cupertinoPane.destroy();
+            }
         },
     },
 });
