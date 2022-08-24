@@ -1,5 +1,5 @@
 <template>
-    <div class="row general-row js-generalRow" ref="summaryGeneralRow" v-if="station">
+    <div class="row general-row" ref="summaryGeneralRow" v-if="station">
         <div class="image-container">
             <StationPhoto :station="station" />
         </div>
