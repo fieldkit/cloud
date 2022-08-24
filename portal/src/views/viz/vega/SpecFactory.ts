@@ -33,7 +33,8 @@ export class ChartSettings {
         public readonly w: number = 0,
         public readonly h: number = 0,
         public readonly auto = false,
-        public readonly tiny = false
+        public readonly tiny = false,
+        public readonly mobile = false
     ) {}
 
     public apply(spec: unknown): unknown {
@@ -64,7 +65,8 @@ export class ChartSettings {
         return _.extend(spec, containerSize);
     }
 
-    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false, false);
-    public static Auto = new ChartSettings(TimeRange.eternity, 0, 0, true, false);
-    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, true, true);
+    public static DefaultDesktop = new ChartSettings(TimeRange.eternity, 0, 0, true, false, false);
+    public static DefaultMobile = new ChartSettings(TimeRange.eternity, 0, 0, true, false, true);
+    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false, false, false);
+    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, true, true, false);
 }

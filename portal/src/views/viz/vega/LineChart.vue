@@ -24,7 +24,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => ChartSettings.Auto,
+            default: () => (window.screen.availWidth < 1040 ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
         },
     },
     data(): {
