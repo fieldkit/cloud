@@ -162,6 +162,36 @@ class VizQuery {
     }
 }
 
+class BufferedResolveQuery {
+    private qd: QueriedData | null;
+
+    constructor(private readonly children: VizQuery[]) {}
+
+    public get params(): DataQueryParams {
+        return this.children[0].params;
+    }
+
+    public get vizes(): Viz[] {
+        return _.flatten(this.children.map((p) => p.vizes));
+    }
+
+    public howBusy(d: number): any {
+        return this.vizes.map((v) => v.howBusy(d));
+    }
+
+    public resolve(qd: QueriedData) {
+        // console.log("viz: resolve(buffered)");
+        this.qd = qd;
+    }
+
+    public close() {
+        if (!this.qd) throw new Error("viz: Close before resolve");
+        for (const child of this.children) {
+            child.resolve(this.qd);
+        }
+    }
+}
+
 class InfoQuery {
     constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
 
@@ -583,7 +613,6 @@ export class Group {
 }
 
 class DataQuerier {
-    // private info: { [index: string]: SensorInfoResponse } = {};
     private data: { [index: string]: QueriedData } = {};
 
     public queryData(vq: VizQuery): Promise<QueriedData> {
@@ -593,14 +622,10 @@ class DataQuerier {
         const queryParams = params.queryParams(getBackend());
         const key = queryParams.toString();
 
-        // console.log(`viz: query-data`, key);
-
         if (this.data[key]) {
-            // vq.howBusy(1);
-
             return promiseAfter(1).then(() => {
+                // console.log("viz: resolve(cached)", key);
                 vq.resolve(this.data[key]);
-                // vq.howBusy(-1);
                 return this.data[key];
             });
         }
@@ -614,11 +639,12 @@ class DataQuerier {
                     .sensorData(queryParams)
                     .then((sdr: SensorDataResponse) => {
                         const queried = new QueriedData(key, params.when, sdr);
-                        const filtered = queried./*removeMalformed().*/ removeDuplicates();
+                        const filtered = queried.removeDuplicates();
                         this.data[key] = filtered;
                         return filtered;
                     })
                     .then((data) => {
+                        // console.log("viz: resolve(data)", key);
                         vq.resolve(data);
                         return data;
                     })
@@ -680,8 +706,7 @@ export class Workspace implements VizInfoFactory {
         if (!firstVizSensor) {
             throw new Error();
         }
-        // console.log("viz: first-viz-sensor", firstVizSensor);
-        return /*this.findStationOverride(firstVizSensor) ||*/ firstVizSensor[0];
+        return firstVizSensor[0];
     }
 
     public get empty(): boolean {
@@ -720,19 +745,11 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
 
-    private vizStationIds(): number[] {
-        return _.uniq(_.flatten(_.flatten(this.groups.map((g) => g.vizes.map((v) => (v as Graph).allStationIds)))));
-    }
-
     private get allVizes(): Viz[] {
         return _(this.groups)
             .map((g) => g.vizes)
             .flatten()
             .value();
-    }
-
-    private findStationOverride(sensor: VizSensor): number | null {
-        return null;
     }
 
     public getStation(id: number): DisplayStation | null {
@@ -751,7 +768,7 @@ export class Workspace implements VizInfoFactory {
         const meta = await this.metaQuerier.query(this.stationIds);
 
         // TODO Map and assign.
-        const test = _.map(meta.stationSensors.stations, (info, stationId) => {
+        const ignored = _.map(meta.stationSensors.stations, (info, stationId) => {
             const associated = meta.associated.stations.find((s) => s.station.id == Number(stationId));
             const stationName = info[0].stationName;
             const stationLocation = info[0].stationLocation;
@@ -790,15 +807,19 @@ export class Workspace implements VizInfoFactory {
         const allQueries = [...scrubberQueries, ...graphingQueries];
         const uniqueQueries = _(allQueries)
             .groupBy((q) => q.params.queryParams(getBackend()).toString())
-            .map((p) => new VizQuery(p[0].params, _.flatten(p.map((p) => p.vizes)), (qd: QueriedData) => p.map((p) => p.resolve(qd))))
+            .map((p) => new BufferedResolveQuery(p))
             .value();
 
         console.log("viz: workspace: querying", uniqueQueries.length, "data");
 
         const pendingData = uniqueQueries.map((vq) => this.dataQuerier.queryData(vq) as Promise<unknown>);
-        return Promise.all([...pendingData]).then(() => {
-            // Update options here if doing so lazily.
-            // console.log("viz: workspace: query done ");
+        return Promise.all([...pendingData]).then((what) => {
+            console.log("viz: workspace: query done", "version", this.version, what, uniqueQueries);
+
+            for (const buffered of uniqueQueries) {
+                buffered.close();
+            }
+
             this.version++;
         });
     }
