@@ -1,6 +1,8 @@
 <template>
     <div class="pagination" :class="{ textual: textual }">
-        <div class="button" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">◀</div>
+        <div class="button prev" v-on:click="onPrevious" v-bind:class="{ enabled: canPagePrevious }">
+            <span class="arrow"></span>
+        </div>
         <div class="pages" v-if="!textual">
             <div
                 v-for="page in pages"
@@ -13,14 +15,15 @@
             </div>
         </div>
         <div v-if="textual">{{ page + 1 }} of {{ totalPages }}</div>
-        <div class="button" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">▶</div>
+        <div class="button next" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">
+            <span class="arrow"></span>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import { findParentNodeClosestToPos } from "@tiptap/core";
 import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "PaginationControls",
@@ -95,14 +98,43 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import "src/scss/variables";
+@import "src/scss/mixins";
+
 .pagination .button {
-    font-size: 22px;
     color: #d8d8d8;
-    justify-content: center;
-    align-items: center;
+    border: 0;
+    margin-top: -2px;
 
     .textual & {
         font-size: 12px;
+    }
+
+    .arrow {
+        border-style: solid;
+        display: flex;
+    }
+
+    &.next {
+        .arrow {
+            border-width: 8px 0 8px 15px;
+            border-color: transparent transparent transparent $color-dark;
+
+            @include bp-down($sm) {
+                border-width: 6px 0 6px 12px;
+            }
+        }
+    }
+
+    &.prev {
+        .arrow {
+            border-width: 8px 15px 8px 0;
+            border-color: transparent $color-dark transparent transparent;
+
+            @include bp-down($sm) {
+                border-width: 6px 12px 6px 0;
+            }
+        }
     }
 }
 .button:first-child {
@@ -126,14 +158,9 @@ export default Vue.extend({
     align-items: center;
 }
 .pagination .textual .button {
-    padding: 0;
-    border: 0;
+    padding: 3px;
     margin-bottom: 0;
     user-select: none;
-    font-size: 12px;
-    color: #d8d8d8;
-    justify-content: center;
-    align-items: center;
 }
 .pagination .button.enabled {
     color: #2c3e50;
