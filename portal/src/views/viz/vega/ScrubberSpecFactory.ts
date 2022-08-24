@@ -147,7 +147,7 @@ export class ScrubberSpecFactory {
                     name: "brush",
                     update: 'vlSelectionResolve("brush_store", "union")',
                 },
-                // TODO block all other events when scrubber handle clicked
+                // TODO Block all other events when scrubber handle clicked
                 {
                     name: "scrub_handle_left",
                     value: {},
@@ -203,7 +203,7 @@ export class ScrubberSpecFactory {
                             update: "[brush_x[0], x(unit)]",
                         },
                         {
-                            //Update right extent of brush on mouse down
+                            // Update right extent of brush on mouse down
                             events: {
                                 source: "window",
                                 type: "mousemove",
@@ -226,7 +226,7 @@ export class ScrubberSpecFactory {
                             update: "[brush_x[0], clamp(x(unit), 0, width)]",
                         },
                         {
-                            //Update left extent of brush on mouse down
+                            // Update left extent of brush on mouse down
                             events: {
                                 source: "window",
                                 type: "mousemove",
@@ -334,7 +334,7 @@ export class ScrubberSpecFactory {
                     value: {},
                     on: [
                         {
-                            // start brush area translation
+                            // Start brush area translation
                             events: [
                                 {
                                     source: "scope",
@@ -351,7 +351,7 @@ export class ScrubberSpecFactory {
                     value: {},
                     on: [
                         {
-                            // translate brush area after mousdown
+                            // Translate brush area after mousdown
                             events: [
                                 {
                                     source: "window",
@@ -739,7 +739,6 @@ export class ScrubberSpecFactory {
                     scale: "x",
                     orient: "bottom",
                     grid: false,
-                    //title: "Time",
                     formatType: "time",
                     labelPadding: -14,
                     tickCount: 8,
