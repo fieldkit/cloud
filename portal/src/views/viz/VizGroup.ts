@@ -88,19 +88,6 @@ export const VizGroup = Vue.extend({
             <div v-if="group.scrubbers && !group.scrubbers.empty">
                 <Scrubber :scrubbers="group.scrubbers" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
             </div>
-
-            <div class="flex flex-space-between date-pickers">
-              <v-date-picker>
-                <template v-slot="{ inputValue, inputEvents }">
-                    <input type="text" class="date-input" :value="inputValue" v-on="inputEvents" :placeholder="'Start Date'" />
-                </template>
-              </v-date-picker>
-              <v-date-picker>
-                <template v-slot="{ inputValue, inputEvents }">
-                  <input type="text" class="date-input" :value="inputValue" v-on="inputEvents" :placeholder="'End Date'" />
-                </template>
-              </v-date-picker>
-            </div>
         </div>
 	`,
 });

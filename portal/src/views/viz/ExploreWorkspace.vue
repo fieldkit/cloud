@@ -601,7 +601,9 @@ export default Vue.extend({
     min-height: 60px;
 
     @include bp-down($sm) {
-        display: none;
+        min-height: unset;
+        padding: 0;
+        border: 0;
     }
 }
 
@@ -685,10 +687,6 @@ export default Vue.extend({
     justify-content: flex-end;
     align-items: center;
 
-    @include bp-down($sm) {
-        display: none;
-    }
-
     &.time {
         margin-left: auto;
     }
@@ -701,6 +699,10 @@ export default Vue.extend({
 .controls-container .right.half {
     align-items: flex-start;
     flex: 0 0 110px;
+
+    @include bp-down($sm) {
+        display: none;
+    }
 }
 
 .controls-container .view-by {
@@ -712,13 +714,40 @@ export default Vue.extend({
     cursor: pointer;
 }
 
+.controls-container .fast-time-container {
+    display: flex;
+
+    @include bp-down($sm) {
+        display: none;
+    }
+}
+
 .controls-container .date-picker {
     margin-left: 20px;
+
+    @include bp-down($sm) {
+        position: absolute;
+        bottom: 70px;
+        width: 100%;
+        margin: 0;
+
+        span {
+            width: 50%;
+        }
+
+        input {
+            width: 100%;
+        }
+    }
 
     span {
         &:nth-of-type(1) {
             margin-right: 5px;
         }
+    }
+
+    input {
+        height: 18px;
     }
 
     .vc-day-layer {
@@ -1007,22 +1036,6 @@ export default Vue.extend({
 ::v-deep .scrubber {
     @include bp-down($sm) {
         padding-bottom: 120px;
-    }
-}
-::v-deep .date-pickers {
-    position: absolute;
-    bottom: 70px;
-
-    @include bp-up($sm) {
-        display: none;
-    }
-
-    .date-input {
-        height: 35px;
-        padding: 0 7px;
-        border: 1px solid $color-border;
-        border-radius: 3px;
-        flex: 0 0 calc(50% - 5px);
     }
 }
 
