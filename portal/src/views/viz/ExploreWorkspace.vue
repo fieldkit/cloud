@@ -16,6 +16,13 @@
                     <template v-slot:title>
                         <div class="one">
                             Data View
+
+                            <span class="info">
+                                <span class="info-icon">?</span>
+                                <span class="info-content">
+                                    For a better data analysis experience, view this data on your computer.
+                                </span>
+                            </span>
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
                                 <div>Add Chart</div>
@@ -25,11 +32,11 @@
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            Share
+                            <span class="button-submit-text">Share</span>
                         </div>
                         <div v-if="user" class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
-                            Export
+                            <span class="button-submit-text">Export</span>
                         </div>
                     </template>
                 </DoubleHeader>
@@ -89,13 +96,12 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { Station, ActionTypes, DisplayStation } from "@/store";
+import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse, AssociatedStation } from "./api";
-import { ForbiddenError } from "@/api";
 import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-import * as utils from "@/utilities";
+import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 
@@ -294,7 +300,11 @@ export default Vue.extend({
                             const end = new Date(quickSensor[0].sensorReadAt);
                             const start = new Date(end);
 
-                            start.setDate(end.getDate() - 14); // TODO Use getFastTime
+                            if (isMobile()) {
+                                start.setDate(end.getDate() - 1); // TODO Use getFastTime
+                            } else {
+                                start.setDate(end.getDate() - 14); // TODO Use getFastTime
+                            }
 
                             return new Bookmark(
                                 this.bookmark.v,
@@ -343,7 +353,7 @@ export default Vue.extend({
             window.open(routeData.href, "_blank");
         },
         getBatteryIcon() {
-            return this.$loadAsset(utils.getBatteryIcon(this.selectedStation.battery));
+            return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
         },
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);
@@ -411,6 +421,18 @@ export default Vue.extend({
     background-color: #fcfcfc;
     padding: 40px;
     flex-grow: 1;
+
+    @include bp-down($lg) {
+        padding: 30px 45px 60px;
+    }
+
+    @include bp-down($sm) {
+        padding: 30px 20px 30px;
+    }
+
+    @include bp-down($sm) {
+        padding: 20px 10px 10px;
+    }
 }
 .explore-header {
     margin-bottom: 1em;
@@ -448,6 +470,11 @@ export default Vue.extend({
     border-radius: 1px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 1px #f4f5f7;
+
+    @include bp-down($sm) {
+        border: 0;
+        box-shadow: unset;
+    }
 }
 .tree-container {
     flex: 0;
@@ -559,6 +586,10 @@ export default Vue.extend({
     margin-left: 40px;
     margin-right: 40px;
     margin-bottom: 10px;
+
+    @include bp-down($sm) {
+        margin: 0 0 28px;
+    }
 }
 
 .controls-container .row {
@@ -571,6 +602,12 @@ export default Vue.extend({
     margin-bottom: 5px;
     align-items: center;
     min-height: 60px;
+
+    @include bp-down($sm) {
+        min-height: unset;
+        padding: 0;
+        border: 0;
+    }
 }
 
 .controls-container .row-2 {
@@ -588,10 +625,22 @@ export default Vue.extend({
     align-items: center;
     display: flex;
 
+    @include bp-down($sm) {
+        align-items: flex-start;
+    }
+
+    &:not(:first-of-type) {
+        margin-top: 10px;
+    }
+
     .actions {
         margin-left: 1em;
         display: flex;
         align-items: center;
+
+        @include bp-down($sm) {
+            display: none;
+        }
 
         .button {
             margin-bottom: 0;
@@ -604,10 +653,21 @@ export default Vue.extend({
     align-items: center;
     width: 100%;
     flex: 0 0 500px;
+
+    @include bp-down($sm) {
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+    }
 }
 
 .controls-container .tree-pair > div {
     flex: 0 1 auto;
+
+    &:first-of-type {
+        @include bp-down($sm) {
+            margin-bottom: 12px;
+        }
+    }
 }
 
 .tree-key {
@@ -615,6 +675,10 @@ export default Vue.extend({
     margin-right: 15px;
     line-height: 35px;
     font-size: 40px;
+
+    @include bp-down($sm) {
+        margin-right: 7px;
+    }
 
     body.floodnet & {
         margin-top: -10px;
@@ -638,6 +702,10 @@ export default Vue.extend({
 .controls-container .right.half {
     align-items: flex-start;
     flex: 0 0 110px;
+
+    @include bp-down($sm) {
+        display: none;
+    }
 }
 
 .controls-container .view-by {
@@ -649,13 +717,40 @@ export default Vue.extend({
     cursor: pointer;
 }
 
+.controls-container .fast-time-container {
+    display: flex;
+
+    @include bp-down($sm) {
+        display: none;
+    }
+}
+
 .controls-container .date-picker {
     margin-left: 20px;
+
+    @include bp-down($sm) {
+        position: absolute;
+        bottom: 70px;
+        width: 100%;
+        margin: 0;
+
+        span {
+            width: 50%;
+        }
+
+        input {
+            width: 100%;
+        }
+    }
 
     span {
         &:nth-of-type(1) {
             margin-right: 5px;
         }
+    }
+
+    input {
+        height: 18px;
     }
 
     .vc-day-layer {
@@ -729,6 +824,12 @@ export default Vue.extend({
     z-index: 10;
     overflow-y: scroll;
     width: 30em;
+
+    @include bp-down($sm) {
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
 }
 
 .loading-options {
@@ -739,6 +840,10 @@ export default Vue.extend({
 .button.compare {
     display: flex;
     align-items: center;
+
+    @include bp-down($sm) {
+        display: none;
+    }
 
     div {
         padding-left: 1em;
@@ -763,6 +868,12 @@ export default Vue.extend({
 .one {
     display: flex;
     flex-direction: row;
+
+    @include bp-down($sm) {
+        color: #979797;
+        font-size: 14px;
+        letter-spacing: 0.06px;
+    }
 }
 
 .button-submit {
@@ -770,6 +881,37 @@ export default Vue.extend({
 
     &:nth-child(n + 1) {
         margin-left: 20px;
+
+        @include bp-down($sm) {
+            margin-left: 5px;
+        }
+    }
+
+    @include bp-down($lg) {
+        padding: 0 14px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    @include bp-down($sm) {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+
+        .icon {
+            margin: 0;
+            font-size: 18px;
+
+            &-export {
+                transform: translateX(1px);
+            }
+        }
+    }
+
+    &-text {
+        @include bp-down($sm) {
+            display: none;
+        }
     }
 }
 .station-summary {
@@ -781,16 +923,24 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         flex-direction: column;
+        background: transparent;
+        padding: 0 0 10px;
 
         .pagination {
             margin-top: 0.5em;
+        }
+
+        .navigate-button {
+            width: 16px;
+            height: 16px;
         }
     }
 
     .summary-content {
         .image-container {
-            flex-basis: 86px;
-            height: 86px;
+            flex-basis: 90px;
+            height: 90px;
+            margin-right: 10px;
         }
     }
 
@@ -810,6 +960,89 @@ export default Vue.extend({
     display: flex;
     margin-right: 13px;
     justify-content: center;
+
+    @include bp-down($sm) {
+        margin-left: auto;
+        margin-right: 0;
+    }
+}
+
+.info-icon {
+    display: block;
+    background-color: #6a6d71;
+    color: #fff;
+    text-align: center;
+    text-indent: -1px;
+    line-height: 14px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    opacity: 0.3;
+    font-size: 10px;
+    font-family: $font-family-medium;
+
+    @include bp-up($sm) {
+        display: none;
+    }
+}
+
+.info-content {
+    visibility: hidden;
+    opacity: 0;
+    padding: 14px;
+    font-size: 10px;
+    color: #6a6d71;
+    position: absolute;
+    top: calc(100% + 10px);
+    border-radius: 2px;
+    border: solid 1px #cccdcf;
+    background-color: #fff;
+    width: 200px;
+    z-index: $z-index-top;
+}
+
+.info {
+    position: relative;
+    margin-left: 5px;
+
+    &:hover {
+        .info-content {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
 }
 </style>
-"
+
+<style scoped lang="scss">
+@import "src/scss/mixins";
+
+::v-deep .double-header {
+    @include bp-down($sm) {
+        .actions {
+            position: absolute;
+            right: 0;
+            margin: 0 !important;
+        }
+        .one {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back {
+            margin-bottom: 25px;
+        }
+    }
+}
+
+::v-deep .scrubber {
+    @include bp-down($sm) {
+        padding-bottom: 120px;
+    }
+}
+
+::v-deep .groups-container {
+    position: relative;
+}
+</style>

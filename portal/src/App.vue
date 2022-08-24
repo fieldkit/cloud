@@ -189,6 +189,17 @@ li {
 
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
+
+    @include bp-down($sm) {
+        border-radius: 2px;
+    }
+}
+
+.vue-treeselect__control-arrow {
+    @include bp-down($sm) {
+        width: 11px;
+        height: 11px;
+    }
 }
 
 .vc-nav-item {
@@ -203,14 +214,20 @@ li {
     color: #fff !important;
 }
 
+.vc-popover-caret {
+    @include bp-down($sm) {
+        display: none !important;
+    }
+}
+
 .cupertino-pane-wrapper {
     .draggable {
         z-index: 10 !important;
+        width: calc(100% - 60px);
     }
     .move {
         height: 3px;
         margin-top: 2px;
     }
 }
-
 </style>

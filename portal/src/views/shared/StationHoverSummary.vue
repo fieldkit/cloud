@@ -1,11 +1,6 @@
 <template>
     <div class="js-cupertinoPane">
-        <div
-            class="station-hover-summary js-paneContent"
-            ref="paneContent"
-            :class="{ 'is-pane': hasCupertinoPane }"
-            v-if="viewingSummary && station"
-        >
+        <div class="station-hover-summary" ref="paneContent" :class="{ 'is-pane': hasCupertinoPane }" v-if="viewingSummary && station">
             <StationSummaryContent ref="summaryContent" :station="station">
                 <template #top-right-actions>
                     <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
@@ -107,7 +102,7 @@ export default Vue.extend({
     },
     watch: {
         station(this: any) {
-            this.updatePaneHeights();
+            this.cupertinoPane.present({ animate: true });
         },
     },
     data(): {
@@ -132,9 +127,7 @@ export default Vue.extend({
         this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
     },
     destroyed() {
-        if (this.cupertinoPane) {
-            this.cupertinoPane.destroy({ animate: false });
-        }
+        this.destroyCupertinoPane();
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
@@ -210,33 +203,26 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
-        async initCupertinoPane(): void {
-            const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
-            const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
+        async initCupertinoPane(): Promise<void> {
+            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
+            const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
             this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
                 parentElement: "body",
                 breaks: {
                     top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
                     // add padding top of container and margin of general row
                     middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                    bottom: { enabled: true, height: 0 },
                 },
                 bottomClose: true,
                 buttonDestroy: false,
             });
-
-            this.cupertinoPane.present({ animate: true }).then();
+            this.cupertinoPane.present({ animate: true });
         },
-        updatePaneHeights(): void {
-            this.$nextTick(() => {
-                const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
-                const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
-                this.cupertinoPane.setBreakpoints({
-                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
-                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                });
-            });
+        destroyCupertinoPane(): void {
+            if (this.cupertinoPane) {
+                this.cupertinoPane.destroy();
+            }
         },
     },
 });

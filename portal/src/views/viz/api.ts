@@ -32,6 +32,7 @@ export interface VizConfig {
     name: string;
     disabled: boolean;
     thresholds: VizThresholds;
+    minimumGap: number | undefined;
 }
 
 export type SensorStrings = { [index: string]: Record<string, string> };
