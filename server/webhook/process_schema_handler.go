@@ -47,7 +47,7 @@ func (h *ProcessSchemaHandler) Handle(ctx context.Context, m *ProcessSchema) err
 		return err
 	}
 
-	sourceAggregator := NewSourceAggregator(h.db, false, true)
+	sourceAggregator := NewSourceAggregator(h.db, nil, false, true)
 
 	startTime := time.Now().Add(time.Hour * -WebHookRecentWindowHours)
 

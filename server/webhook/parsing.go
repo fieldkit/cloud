@@ -167,18 +167,33 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 	return "", &EvaluationError{NoReturn: true, Query: query}
 }
 
+func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, expression string, allowEmpty bool, source interface{}) (bool, error) {
+	if value, err := m.evaluate(ctx, cache, source, expression); err != nil {
+		if _, ok := err.(*EvaluationError); ok {
+			// No luck, skipping and maybe another stationSchema will cover this message.
+			return false, nil
+		}
+		return false, fmt.Errorf("evaluating condition-expression: %v", err)
+	} else if value == nil {
+		return false, nil
+	} else if stringValue, ok := value.(string); ok {
+		if !allowEmpty && len(stringValue) == 0 {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
 	log := Logger(ctx).Sugar()
 
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
 	if stationSchema.ConditionExpression != "" {
-		if _, err := m.evaluate(ctx, cache, source, stationSchema.ConditionExpression); err != nil {
-			if _, ok := err.(*EvaluationError); ok {
-				// No luck, skipping and maybe another stationSchema will cover this message.
-				return nil, nil
-			}
-			return nil, fmt.Errorf("evaluating condition-expression: %v", err)
+		if pass, err := m.evaluateCondition(ctx, cache, stationSchema.ConditionExpression, true, source); err != nil {
+			return nil, err
+		} else if !pass {
+			return nil, nil
 		}
 	}
 
@@ -220,7 +235,15 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 						// NOTE: NOAA Tidal data was missing seconds.
 						parsed, err = time.Parse("2006-01-02 15:04+00:00", receivedAtString)
 						if err != nil {
-							return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+							// NOTE: 2022-08-17 16:56:11.835000-04:00
+							parsed, err = time.Parse("2006-01-02 15:04:05.000000Z07:00", receivedAtString)
+							if err != nil {
+								// NOTE: 2022-08-17 16:56:11-04:00
+								parsed, err = time.Parse("2006-01-02 15:04:05Z07:00", receivedAtString)
+								if err != nil {
+									return nil, fmt.Errorf("malformed received-at value: %v", receivedAtRaw)
+								}
+							}
 						}
 					}
 				}
@@ -261,6 +284,14 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if expectedKey != sensor.Key {
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
+			}
+
+			if sensor.ConditionExpression != "" {
+				if pass, err := m.evaluateCondition(ctx, cache, sensor.ConditionExpression, false, source); err != nil {
+					return nil, err
+				} else if !pass {
+					continue
+				}
 			}
 
 			moduleKeyPrefix := module.KeyPrefix()
@@ -367,6 +398,9 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	for _, sourceObject := range unrolled {
 		for _, stationSchema := range schema.Stations {
+			if stationSchema.Flatten {
+				sourceObject = flattenObjects(sourceObject)
+			}
 			if p, err := m.tryParse(ctx, cache, schemaRegistration, stationSchema, sourceObject); err != nil {
 				return nil, err
 			} else if p != nil {
@@ -377,4 +411,21 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 	}
 
 	return parsed, nil
+}
+
+func flattenObjects(source interface{}) interface{} {
+	if sourceMap, ok := source.(map[string]interface{}); ok {
+		flattened := make(map[string]interface{})
+		for key, value := range sourceMap {
+			if childMap, ok := value.(map[string]interface{}); ok {
+				for childKey, childValue := range childMap {
+					flattened[childKey] = childValue
+				}
+			} else {
+				flattened[key] = value
+			}
+		}
+		return flattened
+	}
+	return source
 }

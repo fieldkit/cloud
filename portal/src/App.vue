@@ -189,6 +189,17 @@ li {
 
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
+
+    @include bp-down($sm) {
+        border-radius: 2px;
+    }
+}
+
+.vue-treeselect__control-arrow {
+    @include bp-down($sm) {
+        width: 11px;
+        height: 11px;
+    }
 }
 
 .vc-nav-item {
@@ -212,5 +223,4 @@ li {
         margin-top: 2px;
     }
 }
-
 </style>

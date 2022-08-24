@@ -1,11 +1,6 @@
 <template>
     <div class="js-cupertinoPane">
-        <div
-            class="station-hover-summary js-paneContent"
-            ref="paneContent"
-            :class="{ 'is-pane': hasCupertinoPane }"
-            v-if="viewingSummary && station"
-        >
+        <div class="station-hover-summary" ref="paneContent" :class="{ 'is-pane': hasCupertinoPane }" v-if="viewingSummary && station">
             <StationSummaryContent ref="summaryContent" :station="station">
                 <template #top-right-actions>
                     <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
@@ -22,7 +17,7 @@
                 <div class="latest-primary" :style="{ color: latestPrimaryColor }">
                     <template v-if="station.status === StationStatus.up">
                         <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                        <span v-else-if="hasData">{{ $t("noRecentData") }}</span>
+                        <span v-else-if="hasData" class="no-data">{{ $t("noRecentData") }}</span>
                         <span v-else class="no-data">{{ $t("noData") }}</span>
                     </template>
                     <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
@@ -63,7 +58,6 @@ import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
-import { CupertinoEvents } from "cupertino-pane/dist/types/models";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -108,7 +102,7 @@ export default Vue.extend({
     },
     watch: {
         station(this: any) {
-            this.updatePaneHeights();
+            this.cupertinoPane.present({ animate: true });
         },
     },
     data(): {
@@ -131,11 +125,6 @@ export default Vue.extend({
             this.initCupertinoPane();
         }
         this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
-    },
-    destroyed() {
-        if (this.cupertinoPane) {
-            this.cupertinoPane.destroy({ animate: false });
-        }
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
@@ -211,33 +200,21 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
-        async initCupertinoPane(): void {
-            const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
-            const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
+        async initCupertinoPane(): Promise<void> {
+            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
+            const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
             this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
                 parentElement: "body",
                 breaks: {
                     top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
                     // add padding top of container and margin of general row
                     middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                    bottom: { enabled: true, height: 0 },
                 },
                 bottomClose: true,
                 buttonDestroy: false,
             });
-
-            this.cupertinoPane.present({ animate: true }).then();
-        },
-        updatePaneHeights(): void {
-            this.$nextTick(() => {
-                const paneContentEl = document.querySelector(".js-paneContent") as HTMLElement;
-                const generalRowEl = document.querySelector(".js-generalRow") as HTMLElement;
-                this.cupertinoPane.setBreakpoints({
-                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
-                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                    bottom: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                });
-            });
+            this.cupertinoPane.present({ animate: true });
         },
     },
 });
