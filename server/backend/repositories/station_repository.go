@@ -1430,7 +1430,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			SELECT    
 				station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 				encode(station_module.hardware_id, 'base64') AS module_id,
-				module_sensor.name AS module_key,
+				station_module.name AS module_key,
 				station_module.name || '.' || module_sensor.name AS full_sensor_key,
 				module_sensor.reading_time AS sensor_read_at                                                                                                                      
 			FROM fieldkit.station AS station
