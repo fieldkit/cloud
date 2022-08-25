@@ -8,8 +8,13 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
+type StationTailInfo struct {
+	BucketSize int `json:"bucketSize"`
+}
+
 type SensorTailData struct {
-	Data []*backend.DataRow `json:"data"`
+	Data     []*backend.DataRow         `json:"data"`
+	Stations map[int32]*StationTailInfo `json:"stations"`
 }
 
 type AggregateInfo struct {

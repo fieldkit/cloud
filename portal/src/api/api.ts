@@ -385,6 +385,7 @@ export interface TailSensorDataRow {
 
 export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
+    stations: { [index: number]: { bucketSize: number } };
 }
 
 export type RecentlyAggregatedWindows = { [index: number]: TailSensorDataRow[] };

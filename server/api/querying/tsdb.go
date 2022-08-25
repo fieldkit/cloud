@@ -360,7 +360,13 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	return queriedData, nil
 }
 
-func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeRow) ([]*backend.DataRow, error) {
+type TailedStation struct {
+	StationID  int32
+	Rows       []*backend.DataRow
+	BucketSize int
+}
+
+func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeRow) (*TailedStation, error) {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime)
@@ -423,7 +429,11 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 		return nil, pgRows.Err()
 	}
 
-	return rows, nil
+	return &TailedStation{
+		StationID:  last.StationID,
+		Rows:       rows,
+		BucketSize: int(duration.Seconds()),
+	}, nil
 }
 
 func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs []int32) (map[int32]*LastTimeRow, error) {
@@ -587,7 +597,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 		return nil, err
 	}
 
-	byStation := make([][]*backend.DataRow, len(stationIDs))
+	byStation := make([]*TailedStation, len(stationIDs))
 	wg := new(sync.WaitGroup)
 
 	for index, stationID := range stationIDs {
@@ -614,14 +624,19 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	wg.Wait()
 
 	allRows := make([]*backend.DataRow, 0)
+	stations := make(map[int32]*StationTailInfo)
 	for _, tailed := range byStation {
-		allRows = append(allRows, tailed...)
+		allRows = append(allRows, tailed.Rows...)
+		stations[tailed.StationID] = &StationTailInfo{
+			BucketSize: tailed.BucketSize,
+		}
 	}
 
 	log.Infow("tsdb:query:tailed")
 
 	return &SensorTailData{
-		Data: allRows,
+		Data:     allRows,
+		Stations: stations,
 	}, nil
 }
 
