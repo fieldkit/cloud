@@ -166,6 +166,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return nil, err
 	}
 
+	if err := m.sr.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
+		return nil, err
+	}
+
 	if len(pm.Schema.Modules) != 1 {
 		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
 	}

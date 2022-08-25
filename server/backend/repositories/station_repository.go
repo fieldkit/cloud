@@ -393,12 +393,20 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 
 	log.Infow("configuration", "station_id", station.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
+	if err := r.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) UpsertVisibleConfiguration(ctx context.Context, stationID int32, configurationID int64) error {
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
         SELECT $1 AS station_id, $2 AS configuration_id
 		ON CONFLICT ON CONSTRAINT visible_configuration_pkey
 		DO UPDATE SET configuration_id = EXCLUDED.configuration_id
-		`, station.ID, configuration.ID); err != nil {
+		`, stationID, configurationID); err != nil {
 		return err
 	}
 
