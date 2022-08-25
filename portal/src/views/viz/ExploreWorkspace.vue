@@ -993,7 +993,7 @@ export default Vue.extend({
     font-size: 10px;
     color: #6a6d71;
     position: absolute;
-    top: calc(100% + 10px);
+    top: 100%;
     border-radius: 2px;
     border: solid 1px #cccdcf;
     background-color: #fff;
@@ -1003,7 +1003,8 @@ export default Vue.extend({
 
 .info {
     position: relative;
-    margin-left: 5px;
+    padding: 5px;
+    margin-top: -3px;
 
     &:hover {
         .info-content {
