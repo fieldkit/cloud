@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 
@@ -26,14 +27,19 @@ func NewMoveDataToTimeScaleDBHandler(tsConfig *storage.TimeScaleDBConfig) *MoveD
 
 func (h *MoveDataToTimeScaleDBHandler) MoveReadings(ctx context.Context, readings []*MovedReading) error {
 	for _, reading := range readings {
-		// TODO location
-		h.records = append(h.records, []interface{}{
-			reading.Time,
-			reading.StationID,
-			reading.ModuleID,
-			reading.SensorID,
-			reading.Value,
-		})
+		if reading.Time.After(time.Now()) {
+			log := logging.Logger(ctx).Sugar()
+			log.Warnw("ignored-future-sample", "future_time", reading.Time)
+		} else {
+			// TODO location
+			h.records = append(h.records, []interface{}{
+				reading.Time,
+				reading.StationID,
+				reading.ModuleID,
+				reading.SensorID,
+				reading.Value,
+			})
+		}
 	}
 
 	if len(h.records) >= h.batchSize {
