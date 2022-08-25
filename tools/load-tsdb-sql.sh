@@ -19,7 +19,9 @@ psql -h 127.0.0.1 -p 5433 -U postgres postgres -c "DROP DATABASE fk;" || true
 psql -h 127.0.0.1 -p 5433 -U postgres postgres -c "CREATE DATABASE fk;"
 
 if [ "${sql_file: -4}" == ".bz2" ]; then
-	bunzip2 $sql_file | psql -h 127.0.0.1 -p 5433 -U postgres fk
+	bunzip2 -c $sql_file | psql -h 127.0.0.1 -p 5433 -U postgres fk
+elif [ "${sql_file: -3}" == ".xv" ]; then
+	xv -c $sql_file | psql -h 127.0.0.1 -p 5433 -U postgres fk
 else
 	psql -h 127.0.0.1 -p 5433 -U postgres fk < $sql_file
 fi

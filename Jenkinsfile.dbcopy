@@ -17,17 +17,17 @@ timestamps {
 			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
 
 			stage ('dbcopy') {
-				sh "rm -rf *.bz2"
+				sh "rm -rf *.bz2 *.xz"
 
 				if (exclusions != "") {
-					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
+					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
 				} else {
-					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
+					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
 				}
 			}
 
 			stage ('archive') {
-				archiveArtifacts(artifacts: "*.bz2")
+				archiveArtifacts(artifacts: "*.xz")
 			}
 
 			notifySuccess()
