@@ -302,11 +302,5 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		Logger(ctx).Sugar().Warnw("wh:zero-stations")
 	}
 
-	sr := repositories.NewStationRepository(i.db)
-	err := sr.RefreshStationSensors(ctx, stationIDs)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
