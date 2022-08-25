@@ -120,6 +120,8 @@ export class TimeSeriesSpecFactory {
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
+        const timeLabel = "Time (" + Intl.DateTimeFormat().resolvedOptions().timeZone + ")";
+
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {
                 // console.log("viz: identical-y", dataRangeAll);
@@ -326,7 +328,7 @@ export class TimeSeriesSpecFactory {
                     labelPadding: this.settings.mobile ? -20 : -24,
                     tickSize: 30,
                     tickDash: [2, 2],
-                    title: "Time",
+                    title: timeLabel,
                     values: this.settings.mobile ? xDomain : undefined,
                     encode: {
                         labels: {
