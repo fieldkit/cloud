@@ -98,6 +98,28 @@ func (m *Metrics) FileUpload() *Timing {
 	}
 }
 
+func (m *Metrics) TailQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:         m.SC,
+		timer:      timer,
+		timingKey:  "api.data.tail.query.time",
+		counterKey: "api.data.tail.query",
+	}
+}
+
+func (m *Metrics) DataQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:         m.SC,
+		timer:      timer,
+		timingKey:  "api.data.query.time",
+		counterKey: "api.data.query",
+	}
+}
+
 func (m *Metrics) HandleMessage() *Timing {
 	timer := m.SC.NewTiming()
 
