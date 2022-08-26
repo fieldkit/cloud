@@ -237,7 +237,7 @@ export default Vue.extend({
         },
         async onChange(bookmark: Bookmark): Promise<void> {
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
-                console.log("viz: bookmark-no-change", bookmark);
+                // console.log("viz: bookmark-no-change", bookmark);
                 return Promise.resolve(this.workspace);
             }
             console.log("viz: bookmark-change", bookmark);

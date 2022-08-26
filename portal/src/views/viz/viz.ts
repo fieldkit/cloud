@@ -26,7 +26,7 @@ import i18n from "@/i18n";
 
 import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
-import { DisplayStation, stations } from "@/store";
+import { DisplayStation } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
 
 export * from "./common";
@@ -199,30 +199,6 @@ class BufferedResolveQuery implements CanQuery {
     }
 }
 
-class InfoQuery {
-    constructor(public readonly params: Stations, public readonly vizes: Viz[]) {}
-
-    public howBusy(d: number): any {
-        return this.vizes.map((v) => v.howBusy(d));
-    }
-}
-
-export class Scrubber {
-    constructor(public readonly index: number, public readonly data: QueriedData, public readonly viz: Viz) {}
-}
-
-export class Scrubbers {
-    public readonly timeRange: TimeRange;
-
-    public get empty(): boolean {
-        return this.rows.length == 0;
-    }
-
-    constructor(public readonly id: string, public readonly visible: TimeRange, public readonly rows: Scrubber[]) {
-        this.timeRange = TimeRange.mergeArrays(rows.map((s) => s.data.timeRange));
-    }
-}
-
 export class Bookmark {
     static Version = 1;
 
@@ -327,6 +303,7 @@ export class NewParams implements HasSensorParams {
 
 export class Graph extends Viz {
     public visible: TimeRange = TimeRange.eternity;
+    public dragged: TimeRange | null = null;
     public queried: TimeRange = TimeRange.eternity;
     public chartType: ChartType = ChartType.TimeSeries;
     public fastTime: FastTime = FastTime.All;
@@ -358,8 +335,16 @@ export class Graph extends Viz {
         return this.loadedDataSets.map((ds) => {
             if (!ds.graphing) throw new Error(`viz: No data`);
             const vizInfo = vizInfoFactory.vizInfo(this, ds);
-            return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
+            return new SeriesData(ds.graphing.key, this.visible, ds, ds.graphing, vizInfo);
         });
+    }
+
+    public get allStationIds(): StationID[] {
+        return this.dataSets.map((ds) => ds.stationId);
+    }
+
+    private get draggable(): boolean {
+        return false;
     }
 
     public get timeRangeOfAll(): TimeRange | null {
@@ -370,7 +355,11 @@ export class Graph extends Viz {
         return null;
     }
 
+    // Only called from Group, otherwise would be private.
     public get visibleTimeRange(): TimeRange {
+        if (this.dragged) {
+            return this.dragged;
+        }
         const range = this.timeRangeOfAll;
         const visible = this.visible;
         if (range && visible.isExtreme()) {
@@ -381,13 +370,16 @@ export class Graph extends Viz {
         return this.visible;
     }
 
-    public get allStationIds(): StationID[] {
-        return this.dataSets.map((ds) => ds.stationId);
+    private get timeRangeToQuery(): TimeRange {
+        if (this.draggable) {
+            return this.visible.rewindStart(7);
+        }
+        return this.visible;
     }
 
     public graphingQueries(): VizQuery[] {
         return this.dataSets.map((ds) => {
-            const params = new DataQueryParams(this.visible, [ds.vizSensor]);
+            const params = new DataQueryParams(this.timeRangeToQuery, [ds.vizSensor]);
             return new VizQuery(params, [this], (qd) => {
                 ds.graphing = qd;
                 return;
@@ -413,7 +405,11 @@ export class Graph extends Viz {
         return c;
     }
 
-    public timeZoomed(zoom: TimeZoom): TimeRange {
+    public timeZoomed(zoom: TimeZoom): void {
+        if (this.dragged !== null) {
+            this.dragged = null;
+        }
+
         if (zoom.range !== null) {
             this.visible = zoom.range;
             this.fastTime = FastTime.Custom;
@@ -421,8 +417,14 @@ export class Graph extends Viz {
             this.visible = this.getFastRange(zoom.fast);
             this.fastTime = zoom.fast;
         }
+    }
 
-        return this.visible;
+    public timeDragged(zoom: TimeZoom): void {
+        if (zoom.range !== null) {
+            this.dragged = zoom.range;
+        } else {
+            this.dragged = null;
+        }
     }
 
     public geoZoomed(zoom: GeoZoom): GeoZoom {
@@ -504,17 +506,8 @@ export class Graph extends Viz {
 
 export class Group {
     public readonly id = Ids.make();
-    private visible_: TimeRange = TimeRange.eternity;
 
-    constructor(public vizes: Viz[] = []) {
-        // This returns eternity when merging empty array.
-        this.visible_ = TimeRange.mergeRanges(
-            vizes
-                .map((v) => v as Graph)
-                .filter((v) => v)
-                .map((v) => v.visible)
-        );
-    }
+    constructor(public vizes: Viz[] = []) {}
 
     public log(...args: any[]) {
         console.log(...["viz:", this.id, this.constructor.name, ...args]);
@@ -573,9 +566,15 @@ export class Group {
     public timeZoomed(zoom: TimeZoom) {
         this.vizes.forEach((viz) => {
             if (viz instanceof Graph) {
-                // Yeah this is kind of weird... the idea though is
-                // that they'll all return the same thing.
-                this.visible_ = viz.timeZoomed(zoom);
+                viz.timeZoomed(zoom);
+            }
+        });
+    }
+
+    public timeDragged(zoom: TimeZoom) {
+        this.vizes.forEach((viz) => {
+            if (viz instanceof Graph) {
+                viz.timeDragged(zoom);
             }
         });
     }
@@ -588,26 +587,19 @@ export class Group {
         });
     }
 
-    public get scrubbers(): Scrubbers {
-        const children = this.vizes
+    public get numberedChildren(): { graph: Graph; index: number }[] {
+        return this.vizes
             .map((viz) => viz as Graph)
             .map((graph, index) => {
                 return {
                     graph,
                     index,
                 };
-            })
-            .filter((r) => r.graph.dataSets[0].all != null); // TODO Ignoring others
+            });
+    }
 
-        const childScrubbers = children.map((r) => {
-            const all = r.graph.dataSets[0].all; // TODO Ignoring others
-            if (!all) throw new Error(`no viz data on Graph`);
-            return new Scrubber(r.index, all, r.graph);
-        });
-
-        const mergedVisible = TimeRange.mergeArrays(children.map((v) => v.graph.visibleTimeRange.toArray()));
-        // console.log("viz: scrubbers", this.visible_.toArray(), mergedVisible);
-        return new Scrubbers(this.id, mergedVisible, childScrubbers);
+    public get visible(): TimeRange {
+        return TimeRange.mergeArrays(this.numberedChildren.map((v) => v.graph.visibleTimeRange.toArray()));
     }
 
     public bookmark(): GroupBookmark {
@@ -917,6 +909,11 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
 
+    public graphTimeDragged(viz: Viz, zoom: TimeZoom): Workspace {
+        this.findGroup(viz).timeDragged(zoom);
+        return this;
+    }
+
     public graphGeoZoomed(viz: Viz, zoom: GeoZoom): Workspace {
         this.findGroup(viz).geoZoomed(zoom);
         return this;
@@ -925,6 +922,24 @@ export class Workspace implements VizInfoFactory {
     public groupZoomed(group: Group, zoom: TimeZoom): Workspace {
         group.timeZoomed(zoom);
         return this;
+    }
+
+    public allGroupSeries(group: Group): SeriesData[] {
+        const groupGraphs = group.numberedChildren.filter((r) => r.graph.dataSets[0].all !== null);
+
+        // console.log("viz:", "allGroupSeries", groupGraphs);
+
+        return _.flatten(
+            groupGraphs.map((row) => {
+                return row.graph.loadedDataSets.map(
+                    (ds): SeriesData => {
+                        const vizInfo = this.vizInfo(row.graph, ds);
+                        if (ds.all == null) throw new Error("viz: Expected loaded data set");
+                        return new SeriesData(row.graph.id, TimeRange.eternity, ds, ds.all, vizInfo);
+                    }
+                );
+            })
+        );
     }
 
     private findGroup(viz: Viz): Group {
@@ -939,7 +954,6 @@ export class Workspace implements VizInfoFactory {
         const group = new Group();
         group.add(graph);
         this.groups.unshift(group);
-        // this.refreshStationIds();
         return this;
     }
 

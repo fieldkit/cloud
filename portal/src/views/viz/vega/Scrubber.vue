@@ -22,7 +22,7 @@ export default {
             required: true,
         },
         visible: {
-            type: Array,
+            type: Object as PropType<TimeRange>,
             required: true,
         },
     },
@@ -34,7 +34,7 @@ export default {
     },
     watch: {
         async series(): Promise<void> {
-            await this.refresh();
+            // await this.refresh();
         },
         async visible() {
             this.pickRange(this.visible);
@@ -42,6 +42,8 @@ export default {
     },
     methods: {
         async refresh(): Promise<void> {
+            console.log("scrubber: refresh");
+
             const factory = new ScrubberSpecFactory(
                 this.series,
                 new ChartSettings(TimeRange.mergeArrays([this.visible]), undefined, { w: 0, h: 0 }, false, false, isMobile())
@@ -64,15 +66,6 @@ export default {
                     scrubbed = this.series[0].data.timeRange;
                 }
             });
-            // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
-            //     console.log("SCRUB HANDLE RIGHT", value)
-            // });
-            // vegaInfo.view.addSignalListener("scrub_handle_right", (_, value) => {
-            //     console.log("SCRUB HANDLE RIGHT", value)
-            // });
-            // vegaInfo.view.addEventListener("mousedown", (evt, value) => {
-            //     console.log(evt, value);
-            // });
             vegaInfo.view.addEventListener("mouseup", () => {
                 if (scrubbed.length == 2) {
                     console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
@@ -82,13 +75,13 @@ export default {
 
             this.pickRange(this.visible);
         },
-        async brush(times: number[]): Promise<void> {
+        async brush(times: TimeRange): Promise<void> {
             if (!this.vega || !this.series[0].queried) {
                 console.log("viz: vega:scrubber:brushing-ignore");
                 return;
             }
-            const x = times.map((v) => this.vega.view.scale("x")(v));
-            console.log("viz: vega:scrubber:brushing", times, x);
+            const x = times.toArray().map((v) => this.vega.view.scale("x")(v));
+            // console.log("viz: vega:scrubber:brushing", times, x);
             try {
                 await this.vega.view
                     .signal("brush_x", x)
@@ -107,7 +100,7 @@ export default {
                 console.log("viz: error", error);
             }
         },
-        async pickRange(timeRange: number[]): Promise<void> {
+        async pickRange(timeRange: TimeRange): Promise<void> {
             const first = this.series[0];
             if (first.ds) {
                 await this.brush(timeRange);

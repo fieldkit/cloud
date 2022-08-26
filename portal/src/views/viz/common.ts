@@ -70,6 +70,16 @@ export class TimeRange {
     public static mergeRanges(ranges: TimeRange[]): TimeRange {
         return TimeRange.mergeArrays(ranges.map((r) => r.array));
     }
+
+    public rewind(delta: number): TimeRange {
+        return new TimeRange(this.start - delta, this.end - delta);
+    }
+
+    public rewindStart(days: number): TimeRange {
+        const rewound = new Date(this.start);
+        rewound.setDate(rewound.getDate() - days);
+        return new TimeRange(rewound.getTime(), this.end);
+    }
 }
 
 export class Sensor {
@@ -360,6 +370,7 @@ export class DataSetSeries {
 export class SeriesData {
     constructor(
         public readonly key: string,
+        public readonly visible: TimeRange,
         public readonly ds: DataSetSeries,
         public readonly queried: QueriedData,
         public readonly vizInfo: VizInfo

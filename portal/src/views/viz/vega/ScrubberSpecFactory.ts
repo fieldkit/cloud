@@ -325,12 +325,14 @@ export class ScrubberSpecFactory {
                             },
                             update: "[clamp(x(unit), 0, width), brush_x[1]]",
                         },
+                        /*
                         {
                             events: {
                                 signal: "brush_scale_trigger",
                             },
                             update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
                         },
+                        */
                         {
                             events: [
                                 {
@@ -347,12 +349,14 @@ export class ScrubberSpecFactory {
                             update:
                                 "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                         },
+                        /*
                         {
                             events: {
                                 signal: "brush_zoom_delta",
                             },
                             update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
                         },
+                        */
                     ],
                 },
                 {
@@ -366,6 +370,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                /*
                 {
                     name: "brush_scale_trigger",
                     value: {},
@@ -381,6 +386,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                */
                 {
                     name: "brush_tuple",
                     on: [
@@ -450,6 +456,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                /*
                 {
                     name: "brush_zoom_anchor",
                     on: [
@@ -483,6 +490,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                */
                 {
                     name: "brush_modify",
                     on: [
