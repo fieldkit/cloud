@@ -62,31 +62,38 @@ export class TimeSeriesSpecFactory {
             const afterProperties = afterCustomFilter.map((datum) => _.extend(datum, properties));
 
             // Add gap information so we can determine where missing data lies.
-            const afterGapsAdded = afterProperties.reduce((previous: DataRow[], item) => {
-                if (previous.length == 0) {
-                    return [_.extend(item, { gap: 0 })];
+            const addGaps = (rows) => {
+                for (let i = 0; i < rows.length; ++i) {
+                    if (i == rows.length - 1) {
+                        rows[i].gap = 0;
+                    } else {
+                        rows[i].gap = (rows[i + 1].time - rows[i].time) / 1000;
+                    }
                 }
-                const gap = (item.time - previous[previous.length - 1].time) / 1000;
-                return [...previous, _.extend(item, { gap: gap })];
-            }, []);
+                return rows;
+            };
 
-            const maybeMinimumGap = series.vizInfo.minimumGap;
+            const afterGapsAdded = addGaps(afterProperties);
 
             // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
-            const afterMostMinimumGapAdded = () => {
+            const maybeMinimumGap = series.vizInfo.minimumGap;
+
+            const addMinimumGap = (rows) => {
                 if (!maybeMinimumGap || !series.queried.bucketSize) {
-                    return afterGapsAdded;
+                    return rows;
                 }
 
                 if (series.queried.bucketSize > maybeMinimumGap) {
-                    return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
+                    return rows.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
                 }
 
-                return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
+                return rows.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
             };
 
-            return afterMostMinimumGapAdded();
+            const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded);
+
+            return afterMostMinimumGapAdded;
         });
 
         // This returns the domain for a single series. Primarily responsible
