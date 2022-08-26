@@ -143,7 +143,11 @@ func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 
-		t.Send("http.req.time")
+		if IsWebSocket(r) {
+			t.Send("ws.req.time")
+		} else {
+			t.Send("http.req.time")
+		}
 	})
 }
 
@@ -153,4 +157,8 @@ func (m *Metrics) RecordsViewed(records int) {
 
 func (m *Metrics) ReadingsViewed(readings int) {
 	m.SC.Count("api.data.readings.viewed", readings)
+}
+
+func IsWebSocket(r *http.Request) bool {
+	return r.Header.Get("Upgrade") == "websocket"
 }
