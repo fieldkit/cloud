@@ -191,8 +191,6 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 		totalSamples := 0
 
 		for _, row := range ranges {
-			log.Infow("tsdb:range", "data_start", row.DataStart, "data_end", row.DataEnd, "bucket_samples", row.BucketSamples, "verbose", true)
-
 			if row.DataStart.Before(dataStart) {
 				dataStart = row.DataStart
 			}
