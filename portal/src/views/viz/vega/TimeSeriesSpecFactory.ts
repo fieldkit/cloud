@@ -879,7 +879,8 @@ export class TimeSeriesSpecFactory {
                             tooltip: {
                                 signal: `{
                                 title: datum.vizInfo.label,
-                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
+                                unitOfMeasure: datum.vizInfo.unitOfMeasure,
+                                value: datum.value,
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
                                 name: datum.name
                             }`,

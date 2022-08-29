@@ -16,6 +16,17 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
+function roundForDisplay(value: number): number {
+    for (let i = 1; i < 6; ++i) {
+        const factor = Math.pow(10, i);
+        const rounded = Math.round(value * factor) / factor;
+        if (rounded !== 0) {
+            return rounded;
+        }
+    }
+    return value;
+}
+
 export default Vue.extend({
     name: "LineChart",
     props: {
@@ -59,11 +70,13 @@ export default Vue.extend({
                 tooltip: {
                     offsetX: -50,
                     offsetY: 50,
-                    formatTooltip: (value, sanitize) => {
-                        return `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(value.name))};">■</span>
-                                        ${sanitize(value.title)}</h3>
-                                        <p class="value">${sanitize(value.Value)}</p>
-                                        <p class="time">${sanitize(value.time)}</p>`;
+                    formatTooltip: (tooltip, sanitize) => {
+                        const roundedValue = roundForDisplay(tooltip.value);
+                        const withUoM = [roundedValue, tooltip.unitOfMeasure || " "].join(" ");
+                        return `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(tooltip.name))};">■</span>
+                                        ${sanitize(tooltip.title)}</h3>
+                                        <p class="value">${sanitize(withUoM)}</p>
+                                        <p class="time">${sanitize(tooltip.time)}</p>`;
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
