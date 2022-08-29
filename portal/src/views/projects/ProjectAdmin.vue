@@ -191,7 +191,6 @@ export default Vue.extend({
 .project-admin {
     display: flex;
     flex-direction: column;
-    padding-bottom: 100px;
 }
 .header {
     display: flex;
