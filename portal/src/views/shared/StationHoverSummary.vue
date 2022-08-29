@@ -102,7 +102,9 @@ export default Vue.extend({
     },
     watch: {
         station(this: any) {
-            this.cupertinoPane.present({ animate: true });
+            if (this.cupertinoPane) {
+                this.cupertinoPane.present({ animate: true });
+            }
         },
     },
     data(): {
