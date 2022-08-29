@@ -53,6 +53,13 @@ export default Vue.extend({
             series: [],
         };
     },
+    watch: {
+        stationId(): void {
+            console.log("tiny-chart:", "station-id");
+            // TODO Should we also be checking if we're in view?
+            void this.load();
+        },
+    },
     async mounted() {
         new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
@@ -61,6 +68,7 @@ export default Vue.extend({
     },
     methods: {
         async load(): Promise<void> {
+            // TODO Show busy when loading?
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
 
             function getFirstQuickSensor(quickSensors): VizSensor {

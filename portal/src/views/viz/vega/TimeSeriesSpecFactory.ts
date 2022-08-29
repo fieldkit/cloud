@@ -347,11 +347,11 @@ export class TimeSeriesSpecFactory {
                         },
                     },
                     format: {
-                        year: "%m/%d/%Y",
-                        quarter: "%m/%d/%Y",
-                        month: "%m/%d/%Y",
-                        week: "%m/%d/%Y",
-                        date: "%m/%d/%Y",
+                        year: "%m/%d/%Y %H:%M",
+                        quarter: "%m/%d/%Y %H:%M",
+                        month: "%m/%d/%Y %H:%M",
+                        week: "%m/%d/%Y %H:%M",
+                        date: "%m/%d/%Y %H:%M",
                         hours: "%m/%d/%Y %H:%M",
                         minutes: "%m/%d/%Y %H:%M",
                         seconds: "%m/%d/%Y %H:%M",
@@ -879,7 +879,8 @@ export class TimeSeriesSpecFactory {
                             tooltip: {
                                 signal: `{
                                 title: datum.vizInfo.label,
-                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
+                                unitOfMeasure: datum.vizInfo.unitOfMeasure,
+                                value: datum.value,
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
                                 name: datum.name
                             }`,

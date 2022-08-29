@@ -83,7 +83,7 @@ export default Vue.extend({
             this.loading = true;
 
             return this.querier
-                .query(this.id)
+                .queryTinyChartData(this.id)
                 .then(([data, quickSensors, meta]) => {
                     const sensorsToModule = _.fromPairs(
                         _.flatten(

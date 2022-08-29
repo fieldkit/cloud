@@ -23,7 +23,7 @@ func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 			log := Logger(newCtx).Named(name).Sugar()
 			sanitizedUrl := sanitize(r.URL)
 
-			log.Infow("req:begin", "req", r.Method+" "+sanitizedUrl.String(), "from", from(r))
+			log.Infow("req:begin", "req", r.Method+" "+sanitizedUrl.String(), "from", from(r), "ws", IsWebSocket(r))
 
 			cw := CaptureResponse(w)
 			h.ServeHTTP(AllowWriteHeaderPrevention(cw), withCtx)
