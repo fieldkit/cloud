@@ -70,6 +70,7 @@ export class SensorDataQuerier {
                 const dataQuery = data.then((response) => {
                     return {
                         data: response.data.filter((row) => row.stationId == stationId),
+                        stations: { [stationId]: response.stations[stationId] },
                     };
                 });
 

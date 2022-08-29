@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -69,35 +70,40 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 		rowLog.Infow("wh:skipping", "reason", err)
 	} else {
 		for _, parsed := range allParsed {
-			if h.verbose {
-				rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
-			}
+			if parsed.ReceivedAt.After(time.Now()) {
+				rowLog.Warnw("wh:ignored-future-sample", "future_time", parsed.ReceivedAt)
+			} else {
+				if h.verbose {
+					rowLog.Infow("wh:parsed", "received_at", parsed.ReceivedAt, "device_name", parsed.DeviceName, "data", parsed.Data)
+				}
 
-			if saved, err := h.model.Save(ctx, parsed); err != nil {
-				return nil, err
-			} else if parsed.ReceivedAt != nil {
-				for _, parsedSensor := range parsed.Data {
-					key := parsedSensor.Key
-					if key == "" {
-						return nil, fmt.Errorf("parsed-sensor has no sensor key")
-					}
+				if saved, err := h.model.Save(ctx, parsed); err != nil {
+					return nil, err
+				} else if parsed.ReceivedAt != nil {
 
-					if !parsedSensor.Transient {
-						sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
-
-						ir := &data.IncomingReading{
-							Time:      *parsed.ReceivedAt,
-							StationID: saved.Station.ID,
-							ModuleID:  saved.Module.ID,
-							SensorKey: sensorKey,
-							Value:     parsedSensor.Value,
+					for _, parsedSensor := range parsed.Data {
+						key := parsedSensor.Key
+						if key == "" {
+							return nil, fmt.Errorf("parsed-sensor has no sensor key")
 						}
 
-						if err := h.iness.ConsiderReading(ctx, ir); err != nil {
-							return nil, err
-						}
+						if !parsedSensor.Transient {
+							sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
 
-						incoming = append(incoming, ir)
+							ir := &data.IncomingReading{
+								Time:      *parsed.ReceivedAt,
+								StationID: saved.Station.ID,
+								ModuleID:  saved.Module.ID,
+								SensorKey: sensorKey,
+								Value:     parsedSensor.Value,
+							}
+
+							if err := h.iness.ConsiderReading(ctx, ir); err != nil {
+								return nil, err
+							}
+
+							incoming = append(incoming, ir)
+						}
 					}
 				}
 			}

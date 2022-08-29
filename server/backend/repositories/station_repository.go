@@ -393,12 +393,20 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 
 	log.Infow("configuration", "station_id", station.ID, "configuration_id", configuration.ID, "provision_id", p.ID)
 
+	if err := r.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *StationRepository) UpsertVisibleConfiguration(ctx context.Context, stationID int32, configurationID int64) error {
 	if _, err := r.db.ExecContext(ctx, `
 		INSERT INTO fieldkit.visible_configuration (station_id, configuration_id)
         SELECT $1 AS station_id, $2 AS configuration_id
 		ON CONFLICT ON CONSTRAINT visible_configuration_pkey
 		DO UPDATE SET configuration_id = EXCLUDED.configuration_id
-		`, station.ID, configuration.ID); err != nil {
+		`, stationID, configurationID); err != nil {
 		return err
 	}
 
@@ -1280,7 +1288,6 @@ func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error 
 		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.aggregated_10s WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_sensor_updated WHERE station_id IN ($1);`,
 		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
@@ -1379,47 +1386,6 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 	return nil, nil
 }
 
-type UpdatedSensorRow struct {
-	StationID int32      `db:"station_id"`
-	SensorID  *int64     `db:"sensor_id"`
-	ModuleID  *string    `db:"module_id"`
-	Time      *time.Time `db:"time"`
-}
-
-func (sr *StationRepository) RefreshStationSensors(ctx context.Context, stations []int32) error {
-	if len(stations) == 0 {
-		return nil
-	}
-
-	query, args, err := sqlx.In(`
-		SELECT station_id, sensor_id, module_id, max(time) AS "time" FROM fieldkit.aggregated_10s
-		WHERE station_id IN (?)
-		GROUP BY station_id, sensor_id, module_id
-		`, stations)
-	if err != nil {
-		return err
-	}
-
-	rows := []*UpdatedSensorRow{}
-	if err := sr.db.SelectContext(ctx, &rows, sr.db.Rebind(query), args...); err != nil {
-		return err
-	}
-
-	for _, row := range rows {
-		if _, err := sr.db.NamedExecContext(ctx, `
-			INSERT INTO fieldkit.aggregated_sensor_updated
-				(station_id, sensor_id, module_id, time) VALUES
-				(:station_id, :sensor_id, :module_id, :time)
-			ON CONFLICT (station_id, sensor_id, module_id)
-			DO UPDATE SET time = EXCLUDED.time
-			`, row); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 type StationSensorRow struct {
 	StationID       int32          `db:"station_id" json:"stationId"`
 	StationName     string         `db:"station_name" json:"stationName"`
@@ -1451,19 +1417,30 @@ func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(`
-		SELECT    
-			station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
-			encode(station_module.hardware_id, 'base64') AS module_id,
-			station_module.name AS module_key,
-			sensor_id AS sensor_id,
-			sensor.key AS sensor_key,
-			updated.time AS sensor_read_at                                                                                                                      
-		FROM fieldkit.station AS station
-		LEFT JOIN fieldkit.aggregated_sensor_updated AS updated ON (updated.station_id = station.id)
-		LEFT JOIN fieldkit.aggregated_sensor AS sensor ON (updated.sensor_id = sensor.id)
-		LEFT JOIN fieldkit.station_module AS station_module ON (updated.module_id = station_module.id)
-		WHERE station.id IN (?)
-		ORDER BY sensor_read_at DESC
+		SELECT
+			q.station_id,
+			q.station_name,
+			q.station_location,
+			q.module_id,
+			q.module_key,
+			agg_sensor.id AS sensor_id,
+			q.full_sensor_key AS sensor_key,
+			q.sensor_read_at
+		FROM (
+			SELECT    
+				station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
+				encode(station_module.hardware_id, 'base64') AS module_id,
+				station_module.name AS module_key,
+				station_module.name || '.' || module_sensor.name AS full_sensor_key,
+				module_sensor.reading_time AS sensor_read_at                                                                                                                      
+			FROM fieldkit.station AS station
+			LEFT JOIN fieldkit.visible_configuration AS vc ON (vc.station_id = station.id)
+			LEFT JOIN fieldkit.station_module AS station_module ON (vc.configuration_id = station_module.configuration_id)
+			LEFT JOIN fieldkit.module_sensor AS module_sensor ON (module_sensor.module_id = station_module.id)
+			WHERE station.id IN (?)
+			ORDER BY sensor_read_at DESC
+		) AS q
+		LEFT JOIN fieldkit.aggregated_sensor AS agg_sensor ON (agg_sensor.key = full_sensor_key)
 		`, stations)
 	if err != nil {
 		return nil, err

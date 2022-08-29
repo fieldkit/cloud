@@ -62,31 +62,38 @@ export class TimeSeriesSpecFactory {
             const afterProperties = afterCustomFilter.map((datum) => _.extend(datum, properties));
 
             // Add gap information so we can determine where missing data lies.
-            const afterGapsAdded = afterProperties.reduce((previous: DataRow[], item) => {
-                if (previous.length == 0) {
-                    return [_.extend(item, { gap: 0 })];
+            const addGaps = (rows) => {
+                for (let i = 0; i < rows.length; ++i) {
+                    if (i == rows.length - 1) {
+                        rows[i].gap = 0;
+                    } else {
+                        rows[i].gap = (rows[i + 1].time - rows[i].time) / 1000;
+                    }
                 }
-                const gap = (item.time - previous[previous.length - 1].time) / 1000;
-                return [...previous, _.extend(item, { gap: gap })];
-            }, []);
+                return rows;
+            };
 
-            const maybeMinimumGap = series.vizInfo.minimumGap;
+            const afterGapsAdded = addGaps(afterProperties);
 
             // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
-            const afterMostMinimumGapAdded = () => {
+            const maybeMinimumGap = series.vizInfo.minimumGap;
+
+            const addMinimumGap = (rows) => {
                 if (!maybeMinimumGap || !series.queried.bucketSize) {
-                    return afterGapsAdded;
+                    return rows;
                 }
 
                 if (series.queried.bucketSize > maybeMinimumGap) {
-                    return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
+                    return rows.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
                 }
 
-                return afterGapsAdded.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
+                return rows.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
             };
 
-            return afterMostMinimumGapAdded();
+            const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded);
+
+            return afterMostMinimumGapAdded;
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -119,6 +126,8 @@ export class TimeSeriesSpecFactory {
         const sameSensorUnits = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
+
+        const timeLabel = "Time (" + Intl.DateTimeFormat().resolvedOptions().timeZone + ")";
 
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {
@@ -326,7 +335,7 @@ export class TimeSeriesSpecFactory {
                     labelPadding: this.settings.mobile ? -20 : -24,
                     tickSize: 30,
                     tickDash: [2, 2],
-                    title: "Time",
+                    title: timeLabel,
                     values: this.settings.mobile ? xDomain : undefined,
                     encode: {
                         labels: {
@@ -338,11 +347,11 @@ export class TimeSeriesSpecFactory {
                         },
                     },
                     format: {
-                        year: "%m/%d/%Y",
-                        quarter: "%m/%d/%Y",
-                        month: "%m/%d/%Y",
-                        week: "%m/%d/%Y",
-                        date: "%m/%d/%Y",
+                        year: "%m/%d/%Y %H:%M",
+                        quarter: "%m/%d/%Y %H:%M",
+                        month: "%m/%d/%Y %H:%M",
+                        week: "%m/%d/%Y %H:%M",
+                        date: "%m/%d/%Y %H:%M",
                         hours: "%m/%d/%Y %H:%M",
                         minutes: "%m/%d/%Y %H:%M",
                         seconds: "%m/%d/%Y %H:%M",
@@ -870,7 +879,8 @@ export class TimeSeriesSpecFactory {
                             tooltip: {
                                 signal: `{
                                 title: datum.vizInfo.label,
-                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
+                                unitOfMeasure: datum.vizInfo.unitOfMeasure,
+                                value: datum.value,
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
                                 name: datum.name
                             }`,

@@ -66,12 +66,12 @@
             </template>
         </div>
         <div class="view-type-container" :class="{ 'list-toggled': viewType === 'list' }">
-            <label class="toggle-btn">
+<!--            <label class="toggle-btn">
                 <input type="checkbox" v-model="recentMapMode" />
                 <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
                 <i></i>
                 <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
-            </label>
+            </label>-->
             <div class="view-type">
                 <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
                     {{ $t("map.toggle.map") }}

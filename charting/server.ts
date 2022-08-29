@@ -6,9 +6,11 @@ import axios from "axios";
 
 const app = express();
 
+import { keysToCamel } from "./json-tools";
+
 import { TimeRange, QueriedData, VizInfo, SeriesData, VizSensor, DataSetSeries } from "./common";
 
-import { ModuleSensorMeta } from "./api";
+import { SensorInfoResponse, ModuleSensorMeta } from "./api";
 
 import { ChartSettings } from "./vega/SpecFactory";
 import { TimeSeriesSpecFactory } from "./vega/TimeSeriesSpecFactory";
@@ -30,7 +32,9 @@ class Chart {
     prepare(metaResponses, dataResponses) {
         const allSeries = metaResponses.map((row: ResponseRow, index: number) => {
             const { vizSensor, sensor, station } = row;
-            const strings = sensor.strings["en-us"];
+
+            console.log("chart", vizSensor, sensor, station);
+            const strings = sensor.strings["enUs"];
             const name = strings["label"] || "Unknown";
             const axisLabel = strings["axisLabel"] || "";
             const data = dataResponses[index][0];
@@ -133,6 +137,34 @@ app.get("/charting/rendered", async (req, res, next) => {
 
         const charts: Chart[] = [];
 
+        const vizStationIds: number[] = _.flattenDeep(
+            bookmark.g.map((g1) => {
+                return g1.map((g2) => {
+                    return g2.map((viz) => {
+                        return viz[0].map((vizSensor, index) => {
+                            return vizSensor[0];
+                        });
+                    });
+                });
+            })
+        );
+
+        // Query for all station information mentioned in the Bookmark, we need
+        // to do this before building other queries so that we can resolve
+        // modules to the station that owns them.
+        const stationIds = [...vizStationIds, ...bookmark.s];
+        const queryParams = new URLSearchParams();
+        queryParams.append("stations", stationIds.join(","));
+        const metaResponse = await axios({ url: `${baseUrl}/meta/stations?` + queryParams.toString() });
+        const meta: SensorInfoResponse = keysToCamel(metaResponse.data) as SensorInfoResponse;
+
+        // Build the map from modules to stations.
+        const modulesToStations = _(Object.values(meta.stations))
+            .flatten()
+            .map((metaRow) => [metaRow.moduleId, metaRow.stationId])
+            .fromPairs()
+            .value();
+
         const allQueries: KeyedHandler[] = _.flattenDeep(
             bookmark.g.map((g1) => {
                 return g1.map((g2) => {
@@ -152,8 +184,12 @@ app.get("/charting/rendered", async (req, res, next) => {
                         return viz[0].map((vizSensor, index) => {
                             const when = viz[1];
 
-                            const stationId = vizSensor[0];
+                            // This may not be the station id we should be
+                            // querying against, and is instead the one that the
+                            // user found the sensor via/through.
+                            const moduleId = vizSensor[1][0];
                             const sensorId = vizSensor[1][1];
+                            const stationId = modulesToStations[moduleId] || vizSensor[0];
 
                             const dataParams = new URLSearchParams();
                             dataParams.append("start", when[0].toString());
@@ -182,7 +218,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                                         const sensors = _(data.modules)
                                             .map((m) => m.sensors)
                                             .flatten()
-                                            .groupBy((s) => s.full_key)
+                                            .groupBy((s) => s.fullKey)
                                             .value();
 
                                         const byKey = sensors[sensorKey];
@@ -193,7 +229,7 @@ app.get("/charting/rendered", async (req, res, next) => {
                                         const sensor = byKey[0];
 
                                         console.log(
-                                            `charting: handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unit_of_measure}'`
+                                            `charting: handle-meta(${key}) sensor-id=${sensorId} sensor-key=${sensorKey} uom='${sensor.unitOfMeasure}'`
                                         );
 
                                         const station = {
@@ -235,7 +271,7 @@ app.get("/charting/rendered", async (req, res, next) => {
             uniqueQueries.map((axiosQuery) =>
                 axios({ url: axiosQuery.url }).then((response) => {
                     const handlers = handlersByKey[axiosQuery.key].map((q) => q.handle);
-                    const params = handlers.map((h) => h(axiosQuery.key, response.data));
+                    const params = handlers.map((h) => h(axiosQuery.key, keysToCamel(response.data)));
 
                     return {
                         key: axiosQuery.key,

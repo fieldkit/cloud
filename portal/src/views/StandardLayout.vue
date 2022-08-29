@@ -19,6 +19,16 @@
                 <HeaderBar />
 
                 <slot></slot>
+
+                <template v-if="isPartnerCustomisationEnabled()">
+                    <div class="app-logo">
+                        <span>{{ $t("layout.side.madeBy") }}</span>
+                        <br />
+                        <a href="https://www.fieldkit.org" target="_blank">
+                            <i role="img" class="icon icon-logo-fieldkit" :aria-label="$tc('layout.logo.fieldkit')"></i>
+                        </a>
+                    </div>
+                </template>
             </div>
         </div>
         <Zoho />
@@ -32,7 +42,7 @@ import SidebarNav from "./shared/SidebarNav.vue";
 import Zoho from "./shared/Zoho.vue";
 import { mapState, mapGetters } from "vuex";
 import { GlobalState, DisplayStation } from "@/store";
-import {getPartnerCustomizationWithDefault} from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "StandardLayout",
@@ -100,12 +110,17 @@ export default Vue.extend({
         onSidebarToggle(): void {
             this.$emit("sidebar-toggle");
         },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
+        },
     },
 });
 </script>
 
 <style scoped lang="scss">
-@import "../scss/variables";
+@import "src/scss/variables";
+@import "src/scss/mixins";
+
 .container-ignored {
     height: 100%;
 }
@@ -129,5 +144,36 @@ export default Vue.extend({
 }
 .scrolling-disabled {
     overflow-y: hidden;
+}
+
+.app-logo {
+    font-size: 11px;
+    padding-top: 10px;
+    position: fixed;
+    bottom: 8px;
+    left: 6px;
+    text-align: left;
+    z-index: $z-index-app-logo;
+    display: none;
+
+    @include bp-down($sm) {
+        position: initial;
+        padding: 30px;
+    }
+
+    @include bp-down($xs) {
+        padding: 10px;
+    }
+
+    span {
+        font-family: var(--font-family-bold);
+        margin-bottom: 5px;
+        font-size: 10px;
+        min-width: 50px;
+    }
+
+    i:before {
+        color: var(--color-dark);
+    }
 }
 </style>
