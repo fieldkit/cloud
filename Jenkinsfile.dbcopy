@@ -10,7 +10,8 @@ timestamps {
 		try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 			def name = params.DbName  ?: "db"
-			def url = name == "tsdb" ? ws.timescaledb_url.value : ws.database_url.value
+			def isTsDB = name == "tsdb"
+			def url = isTsDB ? ws.timescaledb_url.value : ws.database_url.value
 			def exclusions = params.Exclusions ?: ""
 
 			def now = new Date()
@@ -19,10 +20,20 @@ timestamps {
 			stage ('dbcopy') {
 				sh "rm -rf *.bz2 *.xz"
 
+				if (isTsDB) {
+					writeFile(file: "stop_workers.sql", text: "SELECT _timescaledb_internal.stop_background_workers();")
+					sh "docker run --rm -i postgres psql '${url}' < stop_workers.sql"
+				}
+
 				if (exclusions != "") {
 					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
 				} else {
 					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
+				}
+
+				if (isTsDB) {
+					writeFile(file: "start_workers.sql", text: "SELECT _timescaledb_internal.start_background_workers();")
+					sh "docker run --rm -i postgres psql '${url}' < start_workers.sql"
 				}
 			}
 
