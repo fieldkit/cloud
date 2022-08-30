@@ -80,7 +80,7 @@ export default Vue.extend({
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
-                scaleFactor: window.screen.availWidth <= 768 ? 2 : 1,
+                scaleFactor: isMobile() ? 2 : 1,
             });
 
             this.vega = vegaInfo;
