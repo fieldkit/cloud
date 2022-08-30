@@ -327,7 +327,6 @@ export const ViewingControls = Vue.extend({
                     return;
                 }
 
-                const pickedDateOnly = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate());
                 const rangeViz = this.viz.visibleTimeRange;
 
                 let pickerStart: Date = new Date();
@@ -339,7 +338,7 @@ export const ViewingControls = Vue.extend({
                         return;
                     }
 
-                    pickerStart = pickedDateOnly;
+                    pickerStart = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate(), 0, 0, 0, 0);
                     pickerEnd = this.manualRangeValue.end;
                 }
 
@@ -350,7 +349,7 @@ export const ViewingControls = Vue.extend({
                     }
 
                     pickerStart = this.manualRangeValue.start;
-                    pickerEnd = pickedDateOnly;
+                    pickerEnd = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate(), 23, 59, 59, 999);
                 }
 
                 const rangePicker = new TimeRange(pickerStart.getTime(), pickerEnd.getTime());
