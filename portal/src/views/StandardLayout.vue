@@ -154,6 +154,7 @@ export default Vue.extend({
     left: 6px;
     text-align: left;
     z-index: $z-index-app-logo;
+    display: none;
 
     @include bp-down($sm) {
         position: initial;
