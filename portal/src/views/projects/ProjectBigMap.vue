@@ -21,7 +21,7 @@
             </template>
 
             <template v-if="viewType === 'map'">
-                <!-- fixme: currently restricted to floodnet project -->
+                <!-- TODO This should be handled via partner customization. -->
                 <div class="map-legend" v-if="id === 174 && levels.length > 0" :class="{ collapsed: legendCollapsed }">
                     <a class="legend-toggle" @click="legendCollapsed = !legendCollapsed">
                         <i class="icon icon-chevron-right"></i>
@@ -33,7 +33,7 @@
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
                                 <span>{{ item.mapKeyLabel ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
                             </div>
-                            <div class="legend-item" v-if="hasStationsWithoutData">
+                            <div class="legend-item">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
                                 <span>{{ $t("map.legend.noData") }}</span>
                             </div>
