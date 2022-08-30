@@ -137,7 +137,6 @@ export default Vue.extend({
     background: #fcfcfc;
     position: relative;
     width: 100%;
-    min-height: 100vh;
 
     body.floodnet & {
         background: #{lighten($color-floodnet-border, 5%)};
