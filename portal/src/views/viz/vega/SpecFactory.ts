@@ -27,11 +27,16 @@ export {
 
 export type MapFunction<T> = (series: SeriesData, i: number) => T;
 
+interface WidthAndHeight {
+    w: number;
+    h: number
+};
+
 export class ChartSettings {
     constructor(
         public readonly timeRange = TimeRange.eternity,
-        public readonly w: number = 0,
-        public readonly h: number = 0,
+        public readonly estimated: WidthAndHeight | undefined = undefined,
+        public readonly size: WidthAndHeight  = { w: 0, h:0},
         public readonly auto = false,
         public readonly tiny = false,
         public readonly mobile = false
@@ -49,10 +54,10 @@ export class ChartSettings {
             return _.extend(spec, autoSize);
         }
 
-        if (this.w > 0 && this.h > 0) {
+        if (this.size.w > 0 && this.size.h > 0) {
             const fixedSize = {
-                width: this.w,
-                height: this.h,
+                width: this.size.w,
+                height: this.size.h,
                 autosize: "pad",
             };
             return _.extend(spec, fixedSize);
@@ -65,8 +70,15 @@ export class ChartSettings {
         return _.extend(spec, containerSize);
     }
 
-    public static DefaultDesktop = new ChartSettings(TimeRange.eternity, 0, 0, true, false, false);
-    public static DefaultMobile = new ChartSettings(TimeRange.eternity, 0, 0, true, false, true);
-    public static Container = new ChartSettings(TimeRange.eternity, 0, 0, false, false, false);
-    public static Tiny = new ChartSettings(TimeRange.eternity, 0, 0, true, true, false);
+    public static makeDefaultDesktop(): ChartSettings {
+        const estimated = {
+            w: window.innerWidth,
+            h: window.innerHeight,
+        };
+        return new ChartSettings(TimeRange.eternity, estimated , { w: 0, h: 0 }, true, false, false);
+    }
+
+    public static DefaultMobile = new ChartSettings(TimeRange.eternity, undefined, { w: 0, h: 0 }, true, false, true);
+    public static Container = new ChartSettings(TimeRange.eternity, undefined, { w: 0, h: 0 }, false, false, false);
+    public static Tiny = new ChartSettings(TimeRange.eternity, undefined, { w: 0, h: 0 }, true, true, false);
 }

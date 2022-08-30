@@ -36,7 +36,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
+            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.makeDefaultDesktop()),
         },
     },
     data(): {

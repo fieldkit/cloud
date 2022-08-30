@@ -129,9 +129,11 @@ app.get("/charting/rendered", async (req, res, next) => {
         }
 
         const bookmark = JSON.parse(queryArgument(req.query.bookmark));
-        const w = Number(req.query.w || 800 * 2);
-        const h = Number(req.query.h || 418 * 2);
-        const settings = new ChartSettings(TimeRange.eternity, w, h);
+        const size = {
+            w: Number(req.query.w || 800 * 2),
+            h: Number(req.query.h || 418 * 2),
+        };
+        const settings = new ChartSettings(TimeRange.eternity, size, size);
 
         console.log(`charting: bookmark`, JSON.stringify(bookmark));
 
