@@ -49,24 +49,24 @@
                         :visibleReadings="visibleReadings"
                         :mapBounds="mapBounds"
                     />
-                </div>
 
-                <StationHoverSummary
-                    v-if="activeStation"
-                    :station="activeStation"
-                    :sensorDataQuerier="sensorDataQuerier"
-                    :exploreContext="exploreContext"
-                    :visibleReadings="visibleReadings"
-                    :hasCupertinoPane="true"
-                    @close="onCloseSummary"
-                    v-slot="{ sensorDataQuerier }"
-                >
-                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
-                </StationHoverSummary>
+                    <StationHoverSummary
+                        v-if="activeStation"
+                        :station="activeStation"
+                        :sensorDataQuerier="sensorDataQuerier"
+                        :exploreContext="exploreContext"
+                        :visibleReadings="visibleReadings"
+                        :hasCupertinoPane="true"
+                        @close="onCloseSummary"
+                        v-slot="{ sensorDataQuerier }"
+                    >
+                        <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                    </StationHoverSummary>
+                </div>
             </template>
         </div>
         <div class="view-type-container" :class="{ 'list-toggled': viewType === 'list' }">
-<!--            <label class="toggle-btn">
+            <!--            <label class="toggle-btn">
                 <input type="checkbox" v-model="recentMapMode" />
                 <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
                 <i></i>
@@ -239,6 +239,7 @@ export default Vue.extend({
     },
     methods: {
         switchView(type: string): void {
+            this.activeStationId = null;
             this.viewType = type;
             this.layoutChanges++;
         },
@@ -503,7 +504,7 @@ export default Vue.extend({
             @include bp-down($sm) {
                 left: 0;
                 width: 100%;
-                justify-content: space-between;
+                justify-content: flex-end;
                 padding: 0 10px;
             }
         }
