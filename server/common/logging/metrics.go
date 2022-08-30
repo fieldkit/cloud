@@ -76,25 +76,29 @@ func (m *Metrics) MessagePublished() {
 }
 
 type Timing struct {
-	sc         *statsd.Client
-	timer      statsd.Timing
-	timingKey  string
-	counterKey string
+	sc          *statsd.Client
+	timer       statsd.Timing
+	timingKeys  []string
+	counterKeys []string
 }
 
 func (t *Timing) Send() {
-	t.timer.Send(t.timingKey)
-	t.sc.Increment(t.counterKey)
+	for _, key := range t.timingKeys {
+		t.timer.Send(key)
+	}
+	for _, key := range t.counterKeys {
+		t.sc.Increment(key)
+	}
 }
 
 func (m *Metrics) FileUpload() *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "files.uploading.time",
-		counterKey: "files.uploaded",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"files.uploading.time"},
+		counterKeys: []string{"files.uploaded"},
 	}
 }
 
@@ -102,21 +106,21 @@ func (m *Metrics) TailQuery() *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "api.data.tail.query.time",
-		counterKey: "api.data.tail.query",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.tail.query.time"},
+		counterKeys: []string{"api.data.tail.query"},
 	}
 }
 
-func (m *Metrics) DataQuery() *Timing {
+func (m *Metrics) DataQuery(aggregate string) *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "api.data.query.time",
-		counterKey: "api.data.query",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.query.time", fmt.Sprintf("api.data.query.%s.time", aggregate)},
+		counterKeys: []string{"api.data.query", fmt.Sprintf("api.data.query.%s", aggregate)},
 	}
 }
 
@@ -124,10 +128,10 @@ func (m *Metrics) HandleMessage() *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "messages.handling.time",
-		counterKey: "messages.processed",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"messages.handling.time"},
+		counterKeys: []string{"messages.processed"},
 	}
 }
 

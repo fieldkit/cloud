@@ -70,7 +70,7 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 		rowLog.Infow("wh:skipping", "reason", err)
 	} else {
 		for _, parsed := range allParsed {
-			if parsed.ReceivedAt.After(time.Now()) {
+			if parsed.ReceivedAt != nil && parsed.ReceivedAt.After(time.Now()) {
 				rowLog.Warnw("wh:ignored-future-sample", "future_time", parsed.ReceivedAt)
 			} else {
 				if h.verbose {

@@ -334,7 +334,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return tsdb.createEmpty(ctx, qp)
 	}
 
-	queryMetrics := tsdb.metrics.DataQuery()
+	queryMetrics := tsdb.metrics.DataQuery(aggregate.Specifier)
 
 	// Query for the data, transform into backend.* types and return.
 	pgRows, err := tsdb.pool.Query(ctx, dataQuerySql, dataQueryArgs...)

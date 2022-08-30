@@ -29,14 +29,13 @@ func (tsc *TimeScaleDBConfig) Acquire(ctx context.Context) (*pgxpool.Pool, error
 func (tsc *TimeScaleDBConfig) RefreshViews(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 
-	views := []string{
-		"fieldkit.sensor_data_365d",
-		"fieldkit.sensor_data_7d",
-		"fieldkit.sensor_data_24h",
-		"fieldkit.sensor_data_6h",
-		"fieldkit.sensor_data_1h",
-		"fieldkit.sensor_data_10m",
-		"fieldkit.sensor_data_1m",
+	queries := []string{
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_10m', NULL, NOW() - INTERVAL '20 minutes');",
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1h', NULL, NOW() - INTERVAL '3 hours');",
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_6h', NULL, NOW() - INTERVAL '21 hours');",
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_24h', NULL, NOW() - INTERVAL '72 hours');",
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_7d', NULL, NOW() - INTERVAL '21 days');",
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_365d', NULL, NOW() - INTERVAL '730 days');",
 	}
 
 	pgPool, err := tsc.Acquire(ctx)
@@ -44,10 +43,10 @@ func (tsc *TimeScaleDBConfig) RefreshViews(ctx context.Context) error {
 		return err
 	}
 
-	for _, view := range views {
-		log.Infow("refreshing", "view_name", view)
+	for _, sql := range queries {
+		log.Infow("refreshing", "sql", sql)
 
-		_, err := pgPool.Exec(ctx, fmt.Sprintf(`CALL refresh_continuous_aggregate('%s', NULL, NULL)`, view))
+		_, err := pgPool.Exec(ctx, sql)
 		if err != nil {
 			return err
 		}

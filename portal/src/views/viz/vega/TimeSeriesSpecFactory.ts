@@ -1234,6 +1234,15 @@ export class TimeSeriesSpecFactory {
                     gridDash: [],
                 },
                 style: chartStyles,
+                legend: {
+                    layout: {
+                        top: {
+                            anchor: "left",
+                            direction: this.settings.mobile ? "vertical" : "horizontal",
+                            margin: 0,
+                        },
+                    },
+                },
             },
             signals: signals,
             data: data,

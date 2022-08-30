@@ -153,12 +153,12 @@ export default Vue.extend({
     bottom: 8px;
     left: 6px;
     text-align: left;
-    z-index: $z-index-app-logo;
     display: none;
 
     @include bp-down($sm) {
         position: initial;
         padding: 30px;
+        display: block;
     }
 
     @include bp-down($xs) {
