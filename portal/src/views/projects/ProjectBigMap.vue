@@ -73,10 +73,18 @@
                 <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
             </label>-->
             <div class="view-type">
-                <router-link :to="{ name: 'viewProjectBigMap' }" class="view-type-map" v-bind:class="{ active: viewType === 'map' }">
+                <router-link
+                    :to="{ name: 'viewProjectBigMap', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'map' }"
+                >
                     {{ $t("map.toggle.map") }}
                 </router-link>
-                <router-link :to="{ name: 'viewProjectBigMapList' }" class="view-type-map" v-bind:class="{ active: viewType === 'list' }">
+                <router-link
+                    :to="{ name: 'viewProjectBigMapList', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'list' }"
+                >
                     {{ $t("map.toggle.list") }}
                 </router-link>
             </div>
