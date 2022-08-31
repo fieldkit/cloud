@@ -1,13 +1,11 @@
+import type { QueryRecentlyResponse, RecentlyAggregatedWindows, ModuleSensorMeta } from "@/api"
 import {
     FKApi,
     VizSensor,
     StationInfoResponse,
-    ModuleSensorMeta,
     SensorInfoResponse,
     SensorsResponse,
     TailSensorDataResponse,
-    QueryRecentlyResponse,
-    RecentlyAggregatedWindows,
 } from "@/api";
 
 import { SensorMeta } from "@/store";

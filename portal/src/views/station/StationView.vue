@@ -118,7 +118,7 @@
 
             <section v-if="showMap">
                 <div class="container-map">
-                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" />
+                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" :visibleReadings="visibleReadings" />
                 </div>
             </section>
 
@@ -151,6 +151,7 @@ import {
     MappedStations,
     ProjectAttribute,
     ProjectModule,
+    VisibleReadings,
 } from "@/store";
 import * as utils from "@/utilities";
 import { NoteMedia, PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
@@ -193,6 +194,9 @@ export default Vue.extend({
         },
     },
     computed: {
+        visibleReadings(): VisibleReadings {
+            return VisibleReadings.Current;
+        },
         projectId(): string {
             return this.$route.params.projectId;
         },
