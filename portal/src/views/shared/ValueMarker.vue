@@ -1,6 +1,6 @@
 <template>
     <div class="marker-container" @click="onClick">
-        <span class="value-label">{{ value === null || value === undefined ? "&ndash;" : value | prettyNum }}</span>
+        <span class="value-label">{{ value === null || value === undefined ? "&ndash;" : value | prettyReadingNarrowSpace }}</span>
         <svg viewBox="0 0 36 36">
             <circle class="marker-circle" cx="18" cy="18" r="16" :fill="value !== null ? color : '#ccc'" />
         </svg>

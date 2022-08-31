@@ -93,6 +93,25 @@ Vue.filter("prettyPercentage", (value: number | null) => {
     return value.toFixed(1) + "%";
 });
 
+Vue.filter("prettyReadingNarrowSpace", (value: number) => {
+    if (!isNaN(value)) {
+        if (value % 1 === 0) {
+            return value;
+        } else {
+            if (value >= 10) {
+                return d3format(".0f")(value);
+            } else if (value >= 1) {
+                return d3format(".1f")(value);
+            } else {
+                // This was using .2s, until we noticed for things like "0.510" we
+                // were displaying 510m, which is very confusing.
+                return d3format(".2f")(value);
+            }
+        }
+    }
+    return value;
+});
+
 Vue.filter("prettyNum", (value: number) => {
     if (!isNaN(value)) {
         if (value % 1 === 0) {
@@ -102,7 +121,8 @@ Vue.filter("prettyNum", (value: number) => {
             // were displaying 510m, which is very confusing.
             return d3format(".2f")(value);
         }
-    } else return value;
+    }
+    return value;
 });
 
 export interface ReadingLike {
