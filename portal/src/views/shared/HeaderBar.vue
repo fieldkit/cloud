@@ -7,8 +7,8 @@
             class="header-account"
             :class="isAuthenticated ? 'loggedin' : ''"
             v-on:click="onAccountClick()"
-            v-on:mouseenter="onAccountHover($event)"
-            v-on:mouseleave="onAccountHover($event)"
+            v-on:mouseenter="onAccountHover()"
+            v-on:mouseleave="onAccountHoverOut()"
         >
             <div v-if="user" class="header-avatar">
                 <i class="badge" v-if="numberOfUnseenNotifications > 0">
@@ -28,7 +28,7 @@
                 {{ $t("layout.header.login") }}
             </router-link>
 
-            <div v-if="user" class="notifications-container" v-bind:class="{ active: isAccountHovered && !hiding }">
+            <div v-if="user" class="notifications-container" v-bind:class="{ active: isAccountHovered }">
                 <header class="notifications-header">
                     <span class="notifications-header-text">{{ $t("layout.header.notifications") }}</span>
                     <div class="flex">
@@ -73,6 +73,7 @@ import NotificationsList from "@/views/notifications/NotificationsList.vue";
 import { GlobalState } from "@/store/modules/global";
 import Logo from "@/views/shared/Logo.vue";
 import { Notification } from "@/store/modules/notifications";
+import { isMobile } from "@/utilities";
 
 export default Vue.extend({
     name: "HeaderBar",
@@ -81,10 +82,9 @@ export default Vue.extend({
         NotificationsList,
         Logo,
     },
-    data(): { isAccountHovered: boolean; hiding: boolean } {
+    data(): { isAccountHovered: boolean } {
         return {
             isAccountHovered: false,
-            hiding: false,
         };
     },
     computed: {
@@ -107,25 +107,21 @@ export default Vue.extend({
                 // Action handles where we go after.
             });
         },
-        onAccountHover(event: Event): void {
+        onAccountHover(): void {
             // console.log("hover", this.hiding, this.isAccountHovered);
-
-            if (this.hiding && this.isAccountHovered) {
-                this.isAccountHovered = false;
-                this.hiding = false;
-                return;
+            if (!isMobile()) {
+                this.isAccountHovered = !this.isAccountHovered;
             }
-
-            if (window.screen.availWidth < 768 && event.type == "mouseenter") {
-                return;
-            }
-            this.isAccountHovered = !this.isAccountHovered;
+        },
+        onAccountHoverOut(): void {
+            this.isAccountHovered = false;
         },
         onAccountClick(): void {
-            this.hiding = true;
+            if (isMobile()) {
+                this.isAccountHovered = !this.isAccountHovered;
+            }
         },
         async markAllSeen(): Promise<void> {
-            this.hiding = true;
             await this.$store.dispatch(new MarkNotificationsSeen([]));
         },
         viewAll() {
