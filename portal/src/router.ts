@@ -256,6 +256,23 @@ const routes = [
         },
         meta: {
             secured: true,
+            viewType: "map",
+        },
+    },
+    {
+        path: "/dashboard/projects/:id/map/list",
+        name: "viewProjectBigMapList",
+        component: ProjectBigMap,
+        props: (route) => {
+            return {
+                id: Number(route.params.id),
+                forcePublic: false,
+                bigMap: true,
+            };
+        },
+        meta: {
+            secured: true,
+            viewType: "list",
         },
     },
     {
