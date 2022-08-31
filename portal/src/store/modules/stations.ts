@@ -31,6 +31,7 @@ import { VizSensor, VizConfig } from "@/views/viz/viz";
 
 import * as d3 from "d3";
 
+export const NEED_SENSOR_META = "NEED_SENSOR_META";
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
 export const HAVE_COMMUNITY_PROJECTS = "HAVE_COMMUNITY_PROJECTS";
@@ -562,9 +563,13 @@ const actions = (services: Services) => {
         [ActionTypes.AUTHENTICATED]: async ({ dispatch }: { dispatch: any }) => {
             await dispatch(ActionTypes.NEED_COMMON);
         },
-        [ActionTypes.NEED_COMMON]: async ({ dispatch }: { dispatch: any }) => {
-            await dispatch(ActionTypes.NEED_PROJECTS);
-            await dispatch(ActionTypes.NEED_STATIONS);
+        [ActionTypes.NEED_COMMON]: async ({ dispatch, commit }: { dispatch: any; commit: any }) => {
+            await Promise.all([dispatch(ActionTypes.NEED_PROJECTS), dispatch(ActionTypes.NEED_STATIONS), dispatch(NEED_SENSOR_META)]);
+        },
+        [NEED_SENSOR_META]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+            const meta = await services.api.getAllSensorsMemoized()(); // TODO  Why?
+            const sensorMeta = new SensorMeta(meta);
+            commit(SENSOR_META, sensorMeta);
         },
         [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
             commit(MutationTypes.LOADING, { projects: true });
@@ -604,10 +609,6 @@ const actions = (services: Services) => {
                 services.api.getStationsByProject(payload.id),
             ]);
 
-            const meta = await services.api.getAllSensorsMemoized()(); // TODO  Why?
-            const sensorMeta = new SensorMeta(meta);
-            commit(SENSOR_META, sensorMeta);
-
             const recently = await services.api.queryStationsRecently(stations.stations.map((s: { id: number }) => s.id));
 
             commit(PROJECT_LOADED, project);
@@ -622,9 +623,12 @@ const actions = (services: Services) => {
         ) => {
             commit(MutationTypes.LOADING, { stations: true });
 
-            const [station] = await Promise.all([services.api.getStation(payload.id)]);
+            const [station, recently] = await Promise.all([
+                services.api.getStation(payload.id),
+                services.api.queryStationsRecently([payload.id]),
+            ]);
 
-            commit(STATION_UPDATE, station);
+            commit(STATION_UPDATE, { station, recently });
 
             commit(MutationTypes.LOADING, { stations: false });
         },
@@ -788,8 +792,22 @@ const mutations = {
     [PROJECT_ACTIVITY]: (state: StationsState, payload: { projectId: number; activities: Activity[] }) => {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
-    [STATION_UPDATE]: (state: StationsState, payload: Station) => {
-        Vue.set(state.stations, payload.id, new DisplayStation(payload));
+    [STATION_UPDATE]: (state: StationsState, payload: { station: Station; recently: QueryRecentlyResponse }) => {
+        const sensorMeta = state.sensorMeta;
+        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
+        const station = payload.station;
+        const makeDisplayStation = () => {
+            if (payload.recently) {
+                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
+                    return rows.filter((row) => row.stationId == station.id);
+                });
+                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
+                return new DisplayStation(station, readings);
+            }
+            return new DisplayStation(station);
+        };
+
+        Vue.set(state.stations, payload.station.id, makeDisplayStation());
     },
     [STATION_CLEAR]: (state: StationsState, id: number) => {
         Vue.set(state.stations, id, null);

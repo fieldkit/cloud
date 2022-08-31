@@ -36,7 +36,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.DefaultDesktop), // TODO Condition to utility function
+            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.makeDefaultDesktop()),
         },
     },
     data(): {
@@ -80,6 +80,7 @@ export default Vue.extend({
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
+                scaleFactor: isMobile() ? 2 : 1,
             });
 
             this.vega = vegaInfo;

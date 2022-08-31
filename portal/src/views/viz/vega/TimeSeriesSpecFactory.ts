@@ -300,23 +300,27 @@ export class TimeSeriesSpecFactory {
         );
 
         const tinyXAxis = () => {
-            const formatMonth = (v: number): string => {
-                return moment(new Date(v)).format("M/D/YYYY");
-            };
-
             return [
                 {
                     orient: "bottom",
                     scale: "x",
                     domain: xDomain || [0, 1],
-                    tickCount: 0,
-                    // values: xDomain,
+                    tickCount: undefined,
+                    values: xDomain,
                     titleFontSize: 12,
                     titlePadding: 4,
                     titleFontWeight: "normal",
-                    labelPadding: 5,
-                    title: xDomain?.map((v) => formatMonth(v)).join(" - ") || "",
-                    format: "%m/%d/%Y",
+                    labelPadding: 0,
+                    format: "%m/%d/%Y %H:%M",
+                    encode: {
+                        labels: {
+                            update: {
+                                align: {
+                                    signal: "item === item.mark.items[0] ? 'left' : 'right'",
+                                },
+                            },
+                        },
+                    },
                 },
             ];
         };
@@ -326,36 +330,42 @@ export class TimeSeriesSpecFactory {
                 return [];
             }
 
+            if (this.settings.mobile) {
+                return tinyXAxis();
+            }
+
+            const getTimeTicks = () => {
+                if (this.settings.estimated && xDomain) {
+                    const number = Math.ceil(this.settings.estimated.w / 250);
+                    const range = xDomain[1] - xDomain[0];
+                    const step = range / number;
+                    return _.range(0, number + 1).map((n) => xDomain[0] + n * step);
+                }
+                return xDomain;
+            };
+            const values = getTimeTicks();
+
             return [
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain,
-                    tickCount: this.settings.mobile ? 3 : 6,
-                    labelPadding: this.settings.mobile ? -20 : -24,
+                    domain: xDomain || [0, 1],
+                    tickCount: undefined,
+                    labelPadding: -24,
                     tickSize: 30,
                     tickDash: [2, 2],
                     title: timeLabel,
-                    values: this.settings.mobile ? xDomain : undefined,
+                    values: values,
+                    format: "%m/%d/%Y %H:%M",
                     encode: {
                         labels: {
                             update: {
                                 align: {
-                                    signal: this.settings.mobile ? "item === item.mark.items[0] ? 'left' : 'right'" : "'center'",
+                                    signal:
+                                        "item === item.mark.items[0] ? 'left' : item === item.mark.items[item.mark.items.length - 1] ? 'right' : 'center'",
                                 },
                             },
                         },
-                    },
-                    format: {
-                        year: "%m/%d/%Y %H:%M",
-                        quarter: "%m/%d/%Y %H:%M",
-                        month: "%m/%d/%Y %H:%M",
-                        week: "%m/%d/%Y %H:%M",
-                        date: "%m/%d/%Y %H:%M",
-                        hours: "%m/%d/%Y %H:%M",
-                        minutes: "%m/%d/%Y %H:%M",
-                        seconds: "%m/%d/%Y %H:%M",
-                        milliseconds: "%m/%d/%Y %H:%M",
                     },
                 },
             ];
@@ -454,6 +464,8 @@ export class TimeSeriesSpecFactory {
                     };
                 } else {
                     return {
+                        domain: [""],
+                        range: [i == 0 ? "#003F5C" : "#6ef0da"], // primaryLine, secondaryLine
                         name: strokeName,
                         type: "ordinal",
                     };
@@ -1190,7 +1202,7 @@ export class TimeSeriesSpecFactory {
             ...staticSignals,
         ];
 
-        const allSignals = this.settings.tiny ? tinySignals : this.settings.w == 0 ? interactiveSignals : staticSignals;
+        const allSignals = this.settings.tiny ? tinySignals : this.settings.size.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],

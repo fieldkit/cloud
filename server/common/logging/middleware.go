@@ -34,7 +34,7 @@ func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 				"time", fmt.Sprintf("%vns", elapsed.Nanoseconds()),
 				"time_human", elapsed.String(),
 				"req", r.Method+" "+sanitizedUrl.String(),
-				"from", from(r))
+				"from", from(r), "ws", IsWebSocket(r))
 		})
 	}
 }

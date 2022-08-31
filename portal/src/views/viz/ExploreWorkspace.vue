@@ -34,7 +34,7 @@
                             <i class="icon icon-share"></i>
                             <span class="button-submit-text">Share</span>
                         </div>
-                        <div v-if="user" class="button-submit" @click="openExports">
+                        <div class="button-submit" @click="openExports" v-if="false">
                             <i class="icon icon-export"></i>
                             <span class="button-submit-text">Export</span>
                         </div>

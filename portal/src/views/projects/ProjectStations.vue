@@ -79,6 +79,7 @@
                 />
                 <StationHoverSummary
                     v-if="activeStation"
+                    :sensorDataQuerier="sensorDataQuerier"
                     :station="activeStation"
                     :exploreContext="exploreContext"
                     @close="onCloseSummary"
@@ -106,6 +107,8 @@ import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { StationPickerActionType } from "@/views/shared/StationPicker.vue";
 import StationOrSensor from "@/views/shared/partners/StationOrSensor.vue";
 import { interpolatePartner } from "@/views/shared/partners";
+
+import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 
 export default Vue.extend({
     name: "ProjectStations",
@@ -177,6 +180,9 @@ export default Vue.extend({
             const start = this.page * this.pageSize;
             const end = start + this.pageSize;
             return this.projectStations.slice(start, end);
+        },
+        sensorDataQuerier(): SensorDataQuerier {
+            return new SensorDataQuerier(this.$services.api);
         },
         totalPages(): number {
             if (this.projectStations) {

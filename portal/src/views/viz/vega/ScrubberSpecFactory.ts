@@ -14,6 +14,81 @@ export class ScrubberSpecFactory {
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
+        const interactiveMarks = () => {
+            if (this.settings.mobile) {
+                return [];
+            }
+            return [
+                {
+                    type: "rect",
+                    interactive: false,
+                    encode: {
+                        enter: {
+                            y: { value: 0 },
+                            height: { value: 50 },
+                            width: { value: 2 },
+                            fill: "transparent",
+                        },
+                        update: {
+                            x: { signal: "brush_x[0]" },
+                            fill: { value: "white" },
+                        },
+                    },
+                },
+                {
+                    type: "rect",
+                    interactive: false,
+                    encode: {
+                        enter: {
+                            y: { value: 0 },
+                            height: { value: 50 },
+                            width: { value: 2 },
+                            fill: { value: "white" },
+                        },
+                        update: {
+                            x: { signal: "brush_x[1]" },
+                        },
+                    },
+                },
+                {
+                    type: "symbol",
+                    interactive: true,
+                    clip: true,
+                    name: "right_scrub",
+                    encode: {
+                        enter: {
+                            yc: { value: 25 },
+                            fill: "transparent",
+                            size: { value: 100 },
+                        },
+                        update: {
+                            xc: { signal: "brush_x[1] + 1" },
+                            fill: { value: "#b6b6b6" },
+                            stroke: { value: "#999" },
+                        },
+                    },
+                },
+                {
+                    type: "symbol",
+                    interactive: true,
+                    clip: true,
+                    name: "left_scrub",
+                    encode: {
+                        enter: {
+                            yc: { value: 25 },
+                            fill: "transparent",
+                            size: { value: 100 },
+                        },
+                        update: {
+                            xc: { signal: "brush_x[0] + 1" },
+                            fill: { value: "#b6b6b6" },
+                            stroke: { value: "#999" },
+                        },
+                    },
+                },
+            ];
+        };
+
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",
             description: "FK Scrubber Spec",
@@ -621,73 +696,7 @@ export class ScrubberSpecFactory {
                         },
                     },
                 },
-                {
-                    type: "rect",
-                    interactive: false,
-                    encode: {
-                        enter: {
-                            y: { value: 0 },
-                            height: { value: 50 },
-                            width: { value: 2 },
-                            fill: "transparent",
-                        },
-                        update: {
-                            x: { signal: "brush_x[0]" },
-                            fill: { value: "white" },
-                        },
-                    },
-                },
-                {
-                    type: "rect",
-                    interactive: false,
-                    encode: {
-                        enter: {
-                            y: { value: 0 },
-                            height: { value: 50 },
-                            width: { value: 2 },
-                            fill: { value: "white" },
-                        },
-                        update: {
-                            x: { signal: "brush_x[1]" },
-                        },
-                    },
-                },
-                {
-                    type: "symbol",
-                    interactive: true,
-                    clip: true,
-                    name: "right_scrub",
-                    encode: {
-                        enter: {
-                            yc: { value: 25 },
-                            fill: "transparent",
-                            size: { value: 100 },
-                        },
-                        update: {
-                            xc: { signal: "brush_x[1] + 1" },
-                            fill: { value: "#b6b6b6" },
-                            stroke: { value: "#999" },
-                        },
-                    },
-                },
-                {
-                    type: "symbol",
-                    interactive: true,
-                    clip: true,
-                    name: "left_scrub",
-                    encode: {
-                        enter: {
-                            yc: { value: 25 },
-                            fill: "transparent",
-                            size: { value: 100 },
-                        },
-                        update: {
-                            xc: { signal: "brush_x[0] + 1" },
-                            fill: { value: "#b6b6b6" },
-                            stroke: { value: "#999" },
-                        },
-                    },
-                },
+                ...interactiveMarks(),
             ],
             scales: [
                 {

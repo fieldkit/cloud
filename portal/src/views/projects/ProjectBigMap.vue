@@ -73,12 +73,20 @@
                 <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
             </label>-->
             <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
+                <router-link
+                    :to="{ name: 'viewProjectBigMap', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'map' }"
+                >
                     {{ $t("map.toggle.map") }}
-                </div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
+                </router-link>
+                <router-link
+                    :to="{ name: 'viewProjectBigMapList', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'list' }"
+                >
                     {{ $t("map.toggle.list") }}
-                </div>
+                </router-link>
             </div>
         </div>
     </StandardLayout>
@@ -125,7 +133,6 @@ export default Vue.extend({
     data(): {
         layoutChanges: number;
         activeStationId: number | null;
-        viewType: string;
         recentMapMode: boolean;
         legendCollapsed: boolean;
         isMobileView: boolean;
@@ -133,7 +140,6 @@ export default Vue.extend({
         return {
             layoutChanges: 0,
             activeStationId: null,
-            viewType: "map",
             recentMapMode: false,
             legendCollapsed: false,
             isMobileView: window.screen.availWidth <= 768,
@@ -222,6 +228,12 @@ export default Vue.extend({
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
         },
+        viewType(): string {
+            if (this.$route.meta?.viewType) {
+                return this.$route.meta.viewType;
+            }
+            return "map";
+        },
     },
     watch: {
         id(): Promise<any> {
@@ -238,9 +250,8 @@ export default Vue.extend({
         return Promise.resolve();
     },
     methods: {
-        switchView(type: string): void {
+        switchView(): void {
             this.activeStationId = null;
-            this.viewType = type;
             this.layoutChanges++;
         },
         getModuleImg(module: ProjectModule): string {
@@ -510,9 +521,10 @@ export default Vue.extend({
         }
     }
 
-    > div {
+    > a {
         flex-basis: 50%;
         height: 100%;
+        font-family: $font-family-light;
         @include flex(center, center);
 
         @include bp-down($sm) {

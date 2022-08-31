@@ -1,5 +1,6 @@
 static.env
 api.js
 common.js
+json-tools.js
 server.js
 vega/*.js

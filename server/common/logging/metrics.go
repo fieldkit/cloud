@@ -172,7 +172,11 @@ func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 		if IsWebSocket(r) {
 			t.Send("ws.req.time")
 		} else {
-			t.Send("http.req.time")
+			if IsIngestion(r) {
+				t.Send("http.ingestion.time")
+			} else {
+				t.Send("http.req.time")
+			}
 		}
 	})
 }
@@ -187,4 +191,8 @@ func (m *Metrics) ReadingsViewed(readings int) {
 
 func IsWebSocket(r *http.Request) bool {
 	return r.Header.Get("Upgrade") == "websocket"
+}
+
+func IsIngestion(r *http.Request) bool {
+	return r.URL.Path == "/ingestion"
 }

@@ -9,6 +9,7 @@ import _ from "lodash";
 import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
 
+import { isMobile } from "@/utilities";
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
@@ -41,7 +42,10 @@ export default {
     },
     methods: {
         async refresh(): Promise<void> {
-            const factory = new ScrubberSpecFactory(this.series, new ChartSettings(TimeRange.mergeArrays([this.visible])));
+            const factory = new ScrubberSpecFactory(
+                this.series,
+                new ChartSettings(TimeRange.mergeArrays([this.visible]), undefined, { w: 0, h: 0 }, false, false, isMobile())
+            );
 
             const spec = factory.create();
 
