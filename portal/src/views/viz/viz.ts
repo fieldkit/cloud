@@ -984,7 +984,12 @@ export class Workspace implements VizInfoFactory {
         });
 
         const regular = unassociated.map((station) => {
-            const hasMoreSpecificOption = nearby.find((option) => option.stationId === station.id) !== null;
+            const allNearby =
+                _(nearby)
+                    .map((n) => n.children || [])
+                    .flatten()
+                    .value() || [];
+            const hasMoreSpecificOption = allNearby.find((option) => option.stationId === station.id) !== undefined;
             return new StationTreeOption(
                 hasMoreSpecificOption ? `other-${station.id}` : `${station.id}`,
                 station.id,

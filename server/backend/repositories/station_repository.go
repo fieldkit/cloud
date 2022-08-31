@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/iancoleman/strcase"
 
 	"github.com/jmoiron/sqlx"
 
@@ -245,7 +246,20 @@ func (r *StationRepository) UpsertConfiguration(ctx context.Context, configurati
 	return nil, fmt.Errorf("invalid StationConfiguration")
 }
 
+func migrateModuleName(name string) string {
+	if strings.HasPrefix(name, "modules.") {
+		return strings.Replace(name, "modules.", "fk.", 1)
+	}
+	if !strings.Contains(name, ".") {
+		return "fk." + name
+	}
+	return name
+}
+
 func (r *StationRepository) UpsertStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+	originalName := module.Name
+	module.Name = migrateModuleName(originalName)
+
 	if err := r.db.NamedGetContext(ctx, module, `
 		INSERT INTO fieldkit.station_module
 			(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
@@ -262,10 +276,26 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 		`, module); err != nil {
 		return nil, err
 	}
+
+	if originalName != module.Name {
+		Logger(ctx).Sugar().Infow("module:renamed", "original_name", originalName, "name", module.Name, "module_id", module.ID, "verbose", true)
+	}
+
 	return module, nil
 }
 
+func migrateSensorName(name string) string {
+	name = strings.ReplaceAll(name, "-", "_")
+	if strings.Contains(name, "_") {
+		return strcase.ToLowerCamel(name)
+	}
+	return name
+}
+
 func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data.ModuleSensor) (*data.ModuleSensor, error) {
+	originalName := sensor.Name
+	sensor.Name = migrateSensorName(sensor.Name)
+
 	if err := r.db.NamedGetContext(ctx, sensor, `
 		INSERT INTO fieldkit.module_sensor AS s
 			(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
@@ -279,6 +309,11 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 		`, sensor); err != nil {
 		return nil, err
 	}
+
+	if originalName != sensor.Name {
+		Logger(ctx).Sugar().Infow("sensor:renamed", "original_name", originalName, "name", sensor.Name, "sensor_id", sensor.ID, "verbose", true)
+	}
+
 	return sensor, nil
 }
 
