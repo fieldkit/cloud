@@ -28,7 +28,11 @@ timestamps {
 				def excluding = exclusions.split(",").collect { it.replaceAll("\\s", "") }.collect { "-T '${it}'" }
 				def extraArgs = excluding.join(" ")
 
-				sh "docker run --log-driver none --rm postgres pg_dump ${extraArgs} '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
+				def file = "${name}-${stamp}.sql"
+				sh "docker run --log-driver none --rm postgres pg_dump --schema-only '${url}' > ${file}"
+				sh "docker run --log-driver none --rm postgres pg_dump --data-only ${extraArgs} '${url}' >> ${file}"
+				sh "ls -alh ${file}"
+				sh "xz -T2 ${file}"
 
 				if (isTsDB) {
 					writeFile(file: "start_workers.sql", text: "SELECT _timescaledb_internal.start_background_workers();")
