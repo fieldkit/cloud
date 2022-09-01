@@ -102,6 +102,56 @@ func (m *Metrics) FileUpload() *Timing {
 	}
 }
 
+func (m *Metrics) TailMultiQuery(batch int) *Timing {
+	m.SC.Count("api.data.tail.multi.query.batch", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.tail.multi.query.time"},
+		counterKeys: []string{"api.data.tail.multi.query"},
+	}
+}
+
+func (m *Metrics) RecentlyMultiQuery(batch int) *Timing {
+	m.SC.Count("api.data.recently.multi.query.time", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.recently.multi.query.time"},
+		counterKeys: []string{"api.data.recently.multi.query"},
+	}
+}
+
+func (m *Metrics) LastTimesQuery(batch int) *Timing {
+	m.SC.Count("api.data.lasttimes.multi.query.time", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.lasttimes.query.time"},
+		counterKeys: []string{"api.data.lasttimes.query"},
+	}
+}
+
+func (m *Metrics) DailyQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.daily.query.time"},
+		counterKeys: []string{"api.data.daily.query"},
+	}
+}
+
 func (m *Metrics) TailQuery() *Timing {
 	timer := m.SC.NewTiming()
 

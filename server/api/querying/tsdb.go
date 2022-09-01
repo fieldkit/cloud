@@ -336,13 +336,13 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 
 	queryMetrics := tsdb.metrics.DataQuery(aggregate.Specifier)
 
+	defer queryMetrics.Send()
+
 	// Query for the data, transform into backend.* types and return.
 	pgRows, err := tsdb.pool.Query(ctx, dataQuerySql, dataQueryArgs...)
 	if err != nil {
 		return nil, err
 	}
-
-	queryMetrics.Send()
 
 	defer pgRows.Close()
 
@@ -426,12 +426,12 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 
 	queryMetrics := tsdb.metrics.TailQuery()
 
+	defer queryMetrics.Send()
+
 	pgRows, err := tsdb.pool.Query(ctx, dataSql, []int32{last.StationID}, last.LastTime)
 	if err != nil {
 		return nil, fmt.Errorf("(tail-station) %v", err)
 	}
-
-	queryMetrics.Send()
 
 	defer pgRows.Close()
 
@@ -468,6 +468,10 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 }
 
 func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs []int32) (map[int32]*LastTimeRow, error) {
+	queryMetrics := tsdb.metrics.LastTimesQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
+
 	sql := `
 		SELECT station_id, MAX(data_end) AS last_time
 		FROM fieldkit.sensor_data_24h
@@ -504,6 +508,10 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 }
 
 func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
+	queryMetrics := tsdb.metrics.DailyQuery()
+
+	defer queryMetrics.Send()
+
 	since := time.Now()
 
 	sql := fmt.Sprintf(`
@@ -561,6 +569,10 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 	if err := tsdb.initialize(ctx); err != nil {
 		return nil, err
 	}
+
+	queryMetrics := tsdb.metrics.RecentlyMultiQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
 
 	ids, err := tsdb.queryIDsForStations(ctx, stationIDs)
 	if err != nil {
@@ -624,6 +636,10 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}
 
 	log.Infow("tsdb:query:prepare", "stations", stationIDs)
+
+	queryMetrics := tsdb.metrics.TailMultiQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
 
 	lastTimes, err := tsdb.queryLastTimes(ctx, stationIDs)
 	if err != nil {
