@@ -390,8 +390,6 @@ type TailedStation struct {
 func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeRow) (*TailedStation, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime)
-
 	ids, err := tsdb.queryIDsForStations(ctx, []int32{last.StationID})
 	if err != nil {
 		return nil, err
@@ -400,6 +398,8 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 	maximum := 200
 	duration := time.Hour * 48
 	interval := duration.Seconds() / float64(maximum)
+
+	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime, "interval", interval, "duration", duration)
 
 	dataSql := fmt.Sprintf(`
 		SELECT
@@ -442,6 +442,8 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 			&row.DataStart, &row.DataEnd, &row.AverageValue, &row.MinimumValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
+
+		row.CoerceNaNs()
 
 		if hardwareID, ok := ids.KeyToHardwareID[moduleID]; ok {
 			row.ModuleID = &hardwareID
@@ -526,20 +528,22 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 	rows := make([]*backend.DataRow, 0)
 
 	for pgRows.Next() {
-		dr := &backend.DataRow{}
+		row := &backend.DataRow{}
 
 		var moduleID int64
 
-		if err := pgRows.Scan(&dr.Time, &dr.StationID, &moduleID, &dr.SensorID, &dr.BucketSamples, &dr.DataStart, &dr.DataEnd,
-			&dr.MinimumValue, &dr.AverageValue, &dr.MaximumValue, &dr.LastValue); err != nil {
+		if err := pgRows.Scan(&row.Time, &row.StationID, &moduleID, &row.SensorID, &row.BucketSamples, &row.DataStart, &row.DataEnd,
+			&row.MinimumValue, &row.AverageValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
 
-		hardwareID := ids.KeyToHardwareID[moduleID]
+		row.CoerceNaNs()
 
-		dr.ModuleID = &hardwareID
+		if hardwareID, ok := ids.KeyToHardwareID[moduleID]; ok {
+			row.ModuleID = &hardwareID
+		}
 
-		rows = append(rows, dr)
+		rows = append(rows, row)
 	}
 
 	if pgRows.Err() != nil {
