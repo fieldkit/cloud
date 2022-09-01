@@ -25,11 +25,10 @@ timestamps {
 					sh "docker run --rm -i postgres psql '${url}' < stop_workers.sql"
 				}
 
-				if (exclusions != "") {
-					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
-				} else {
-					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
-				}
+				def excluding = exclusions.split(",").collect { "-T '${it}'" }
+				def extraArgs = excluding.join(" ")
+
+				sh "docker run --log-driver none --rm postgres pg_dump ${extraArgs} '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
 
 				if (isTsDB) {
 					writeFile(file: "start_workers.sql", text: "SELECT _timescaledb_internal.start_background_workers();")
