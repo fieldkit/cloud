@@ -594,7 +594,10 @@ const actions = (services: Services) => {
                     });
                 }),
             ]);
-            commit(HAVE_USER_STATIONS, stations.stations);
+
+            const recently = await services.api.queryStationsRecently(stations.stations.map((s: { id: number }) => s.id));
+
+            commit(HAVE_USER_STATIONS, { stations: stations.stations, recently: recently });
             commit(MutationTypes.LOADING, { stations: false });
         },
         [ActionTypes.NEED_PROJECT]: async (
@@ -753,16 +756,28 @@ const mutations = {
         );
         Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
-    [HAVE_USER_STATIONS]: (state: StationsState, payload: Station[]) => {
-        const stations = payload.map((station) => new DisplayStation(station));
+    [HAVE_USER_STATIONS]: (state: StationsState, payload: { stations: Station[]; recently: QueryRecentlyResponse | null }) => {
+        const sensorMeta = state.sensorMeta;
+        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
+        const userStations = payload.stations.map((station) => {
+            if (payload.recently) {
+                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
+                    return rows.filter((row) => row.stationId == station.id);
+                });
+                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
+                return new DisplayStation(station, readings);
+            }
+            return new DisplayStation(station);
+        });
+
         Vue.set(
             state.user,
             "stations",
-            _.keyBy(stations, (s) => s.id)
+            _.keyBy(userStations, (s) => s.id)
         );
-        Vue.set(state, "stations", { ...state.stations, ..._.keyBy(stations, (s) => s.id) });
-        Vue.set(state, "hasNoStations", stations.length == 0);
-        Vue.set(state, "mapped", MappedStations.make(stations));
+        Vue.set(state, "stations", { ...state.stations, ..._.keyBy(userStations, (s) => s.id) });
+        Vue.set(state, "hasNoStations", userStations.length == 0);
+        Vue.set(state, "mapped", MappedStations.make(userStations));
     },
     [PROJECT_USERS]: (state: StationsState, payload: { projectId: number; users: ProjectUser[] }) => {
         Vue.set(state.projectUsers, payload.projectId, payload.users);
