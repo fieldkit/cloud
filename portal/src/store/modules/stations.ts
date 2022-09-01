@@ -739,6 +739,20 @@ const actions = (services: Services) => {
     };
 };
 
+function makeDisplayStations(sensorMeta: SensorMeta | null, stations: Station[], recently: QueryRecentlyResponse | null): DisplayStation[] {
+    if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
+    return stations.map((station) => {
+        if (recently) {
+            const windows = _.mapValues(recently.windows, (rows, hours) => {
+                return rows.filter((row) => row.stationId == station.id);
+            });
+            const readings = new StationReadings(station.id, sensorMeta, windows, recently.stations[station.id]);
+            return new DisplayStation(station, readings);
+        }
+        return new DisplayStation(station);
+    });
+}
+
 const mutations = {
     [HAVE_COMMUNITY_PROJECTS]: (state: StationsState, projects: Project[]) => {
         Vue.set(
@@ -757,18 +771,7 @@ const mutations = {
         Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
     },
     [HAVE_USER_STATIONS]: (state: StationsState, payload: { stations: Station[]; recently: QueryRecentlyResponse | null }) => {
-        const sensorMeta = state.sensorMeta;
-        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
-        const userStations = payload.stations.map((station) => {
-            if (payload.recently) {
-                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
-                    return rows.filter((row) => row.stationId == station.id);
-                });
-                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
-                return new DisplayStation(station, readings);
-            }
-            return new DisplayStation(station);
-        });
+        const userStations = makeDisplayStations(state.sensorMeta, payload.stations, payload.recently);
 
         Vue.set(
             state.user,
@@ -789,18 +792,8 @@ const mutations = {
         state: StationsState,
         payload: { projectId: number; stations: Station[]; recently: QueryRecentlyResponse | null }
     ) => {
-        const sensorMeta = state.sensorMeta;
-        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
-        const projectStations = payload.stations.map((station) => {
-            if (payload.recently) {
-                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
-                    return rows.filter((row) => row.stationId == station.id);
-                });
-                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
-                return new DisplayStation(station, readings);
-            }
-            return new DisplayStation(station);
-        });
+        const projectStations = makeDisplayStations(state.sensorMeta, payload.stations, payload.recently);
+
         state.stations = { ...state.stations, ..._.keyBy(projectStations, (s) => s.id) };
         Vue.set(state.projectStations, payload.projectId, projectStations);
     },
@@ -808,21 +801,8 @@ const mutations = {
         Vue.set(state.projectActivities, payload.projectId, payload.activities);
     },
     [STATION_UPDATE]: (state: StationsState, payload: { station: Station; recently: QueryRecentlyResponse }) => {
-        const sensorMeta = state.sensorMeta;
-        if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
-        const station = payload.station;
-        const makeDisplayStation = () => {
-            if (payload.recently) {
-                const windows = _.mapValues(payload.recently.windows, (rows, hours) => {
-                    return rows.filter((row) => row.stationId == station.id);
-                });
-                const readings = new StationReadings(station.id, sensorMeta, windows, payload.recently.stations[station.id]);
-                return new DisplayStation(station, readings);
-            }
-            return new DisplayStation(station);
-        };
-
-        Vue.set(state.stations, payload.station.id, makeDisplayStation());
+        const updated = makeDisplayStations(state.sensorMeta, [payload.station], payload.recently);
+        Vue.set(state.stations, payload.station.id, updated[0]);
     },
     [STATION_CLEAR]: (state: StationsState, id: number) => {
         Vue.set(state.stations, id, null);
