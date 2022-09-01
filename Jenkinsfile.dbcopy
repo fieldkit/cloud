@@ -25,7 +25,7 @@ timestamps {
 					sh "docker run --rm -i postgres psql '${url}' < stop_workers.sql"
 				}
 
-				def excluding = exclusions.split(",").collect { "-T '${it}'" }
+				def excluding = exclusions.split(",").collect { it.replaceAll("\\s", "") }.collect { "-T '${it}'" }
 				def extraArgs = excluding.join(" ")
 
 				sh "docker run --log-driver none --rm postgres pg_dump ${extraArgs} '${url}' | xz -T2 > ${name}-${stamp}.sql.xz"
