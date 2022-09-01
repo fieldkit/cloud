@@ -115,14 +115,14 @@ func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) (
 	dataRows := make([]*DataRow, 0)
 
 	for pgRows.Next() {
-		dr := &DataRow{}
+		row := &DataRow{}
 
-		if err := pgRows.Scan(&dr.Time, &dr.StationID, &dr.ModuleID, &dr.SensorID, &dr.BucketSamples, &dr.DataStart, &dr.DataEnd,
-			&dr.MinimumValue, &dr.AverageValue, &dr.MaximumValue, &dr.LastValue); err != nil {
+		if err := pgRows.Scan(&row.Time, &row.StationID, &row.ModuleID, &row.SensorID, &row.BucketSamples, &row.DataStart, &row.DataEnd,
+			&row.MinimumValue, &row.AverageValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
 
-		dataRows = append(dataRows, dr)
+		dataRows = append(dataRows, row)
 	}
 
 	if pgRows.Err() != nil {
@@ -357,7 +357,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	for _, row := range dataRows {
 		moduleID := ids.KeyToHardwareID[row.ModuleID]
 
-		backendRows = append(backendRows, &backend.DataRow{
+		dataRow := &backend.DataRow{
 			Time:         data.NumericWireTime(row.Time),
 			StationID:    &row.StationID,
 			ModuleID:     &moduleID,
@@ -368,7 +368,11 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 			MaximumValue: &row.MaximumValue,
 			LastValue:    &row.LastValue,
 			Location:     nil,
-		})
+		}
+
+		dataRow.CoerceNaNs()
+
+		backendRows = append(backendRows, dataRow)
 	}
 
 	tsdb.metrics.RecordsViewed(len(backendRows))
