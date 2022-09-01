@@ -532,19 +532,37 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
-	if len(projects) == 0 {
-		return &station.AssociatedStations{
-			Stations: make([]*station.AssociatedStation, 0),
-		}, nil
-	}
-
 	if len(projects) > 1 {
 		log.Warnw("associated:ambiguous-projects", "station_id", payload.ID, "projects", len(projects))
 	}
 
-	return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
-		ProjectID: projects[0].ID,
+	for _, project := range projects {
+		projectPermissions, err := NewPermissions(ctx, c.options).ForProject(project)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := projectPermissions.CanView(); err == nil {
+			return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
+				ProjectID: projects[0].ID,
+			})
+		}
+	}
+
+	get, err := c.Get(ctx, &station.GetPayload{
+		ID: payload.ID,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &station.AssociatedStations{
+		Stations: []*station.AssociatedStation{
+			&station.AssociatedStation{
+				Station: get,
+			},
+		},
+	}, nil
 }
 
 func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {
@@ -1047,7 +1065,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 	}
 
 	var photos *station.StationPhotos
-    if sf.Station.PhotoID != nil {
+	if sf.Station.PhotoID != nil {
 		photos = &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		}
