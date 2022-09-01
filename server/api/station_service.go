@@ -660,7 +660,8 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	allMedia := []*data.FieldNoteMedia{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
-        SELECT * FROM fieldkit.notes_media WHERE id IN (SELECT photo_id FROM fieldkit.station WHERE id = $1) ORDER BY created_at DESC
+        SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE id IN (SELECT photo_id FROM fieldkit.station WHERE id = $1) ORDER BY created_at DESC
         `, payload.StationID); err != nil {
 		return nil, err
 	}

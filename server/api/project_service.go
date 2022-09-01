@@ -386,10 +386,10 @@ func (c *ProjectService) EditUser(ctx context.Context, payload *project.EditUser
 		return err
 	}
 
-    if _, err := c.options.Database.ExecContext(ctx, `
+	if _, err := c.options.Database.ExecContext(ctx, `
         UPDATE fieldkit.project_user SET role = $1 WHERE project_id = $2 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $3)`, payload.Edit.Role, payload.ProjectID, payload.Edit.Email); err != nil {
-        return err
-    }
+		return err
+	}
 
 	return nil
 }
