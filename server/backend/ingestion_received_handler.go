@@ -111,13 +111,26 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 					}
 				}
 
-				if err := h.publisher.Publish(ctx, &messages.RefreshStation{
+				if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
+					ModifiedAt:  now,
+					PublishedAt: now,
 					StationID:   *info.StationID,
-					HowRecently: howFarBack,
-					Completely:  false,
 					UserID:      i.UserID,
+					Start:       info.DataStart,
+					End:         info.DataEnd,
 				}); err != nil {
 					return err
+				}
+
+				if false {
+					if err := h.publisher.Publish(ctx, &messages.RefreshStation{
+						StationID:   *info.StationID,
+						HowRecently: howFarBack,
+						Completely:  false,
+						UserID:      i.UserID,
+					}); err != nil {
+						return err
+					}
 				}
 			}
 		}

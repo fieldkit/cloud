@@ -788,7 +788,6 @@ func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminD
 			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
 			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
 			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
-
 			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
 			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
 			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,

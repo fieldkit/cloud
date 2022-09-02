@@ -71,7 +71,8 @@ export interface HasSensorParams {
 
 export class StationTreeOption {
     constructor(
-        public readonly id: string | number,
+        public readonly id: string,
+        public readonly stationId: number | null,
         public readonly label: string,
         public readonly isDisabled: boolean,
         public readonly isDefaultExpanded: boolean = false,
@@ -758,7 +759,8 @@ export class Workspace implements VizInfoFactory {
             .value();
     }
 
-    public getStation(id: number): DisplayStation | null {
+    public getStation(id: number | null): DisplayStation | null {
+        if (id === null) throw new Error();
         if (this.stationsFull) {
             const found = this.stationsFull.filter((d) => d.id === id);
             if (found.length > 0) {
@@ -965,10 +967,10 @@ export class Workspace implements VizInfoFactory {
         // console.log("viz: nearby", nearby);
 
         const options = nearby.map((station: Station) => {
-            return new StationTreeOption(station.id, station.name, false);
+            return new StationTreeOption(`${station.id}`, station.id, station.name, false);
         });
 
-        return [new StationTreeOption(`nearby`, "Nearby", false, true, options)];
+        return [new StationTreeOption(`nearby`, null, "Nearby", false, true, options)];
     }
 
     public get stationOptions(): StationTreeOption[] {
@@ -976,25 +978,32 @@ export class Workspace implements VizInfoFactory {
 
         // This is for removing stations that already have an option because of
         // they're associated. Not a fan of this approach.
-        const selected = this.selectedAssociated;
         const hiddenById = _.fromPairs(this.associated.map((assoc) => [assoc.station.id, assoc.hidden]));
         const unassociated = Object.values(this.stations).filter((station) => {
-            if (hiddenById[station.id]) {
-                return false;
-            }
-            return !selected.location || !selected.location.find((l) => l.stationID == station.id);
+            return !hiddenById[station.id];
         });
 
         const regular = unassociated.map((station) => {
-            return new StationTreeOption(station.id, station.name, station.sensors.length == 0);
+            const allNearby =
+                _(nearby)
+                    .map((n) => n.children || [])
+                    .flatten()
+                    .value() || [];
+            const hasMoreSpecificOption = allNearby.find((option) => option.stationId === station.id) !== undefined;
+            return new StationTreeOption(
+                hasMoreSpecificOption ? `other-${station.id}` : `${station.id}`,
+                station.id,
+                station.name,
+                station.sensors.length == 0
+            );
         });
 
         const partnerCustomization = getPartnerCustomizationWithDefault();
 
         const grouped = _(regular)
-            .filter((option) => _.isNumber(option.id))
+            .filter((option) => _.isNumber(option.stationId))
             .map((stationOption) => {
-                const station = this.getStation(Number(stationOption.id));
+                const station = this.getStation(stationOption.stationId);
                 if (station) {
                     return [
                         {
@@ -1022,6 +1031,7 @@ export class Workspace implements VizInfoFactory {
             .map((group, name) => {
                 return new StationTreeOption(
                     `group-${name}`,
+                    null,
                     name,
                     false,
                     false,
@@ -1031,9 +1041,8 @@ export class Workspace implements VizInfoFactory {
             .value();
 
         const allOptions = [...groupOptions, ...ungrouped];
-        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, "All", false, false, allOptions)] : [];
+        const all = allOptions.length > 0 ? [new StationTreeOption(`all`, null, "All", false, false, allOptions)] : [];
 
-        /*
         console.log("viz: stations", {
             stations: this.stations,
             associated: this.associated,
@@ -1043,7 +1052,6 @@ export class Workspace implements VizInfoFactory {
             ungrouped,
             all,
         });
-        */
 
         return [...nearby, ...all];
     }

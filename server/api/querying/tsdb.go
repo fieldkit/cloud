@@ -115,14 +115,14 @@ func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) (
 	dataRows := make([]*DataRow, 0)
 
 	for pgRows.Next() {
-		dr := &DataRow{}
+		row := &DataRow{}
 
-		if err := pgRows.Scan(&dr.Time, &dr.StationID, &dr.ModuleID, &dr.SensorID, &dr.BucketSamples, &dr.DataStart, &dr.DataEnd,
-			&dr.MinimumValue, &dr.AverageValue, &dr.MaximumValue, &dr.LastValue); err != nil {
+		if err := pgRows.Scan(&row.Time, &row.StationID, &row.ModuleID, &row.SensorID, &row.BucketSamples, &row.DataStart, &row.DataEnd,
+			&row.MinimumValue, &row.AverageValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
 
-		dataRows = append(dataRows, dr)
+		dataRows = append(dataRows, row)
 	}
 
 	if pgRows.Err() != nil {
@@ -336,13 +336,13 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 
 	queryMetrics := tsdb.metrics.DataQuery(aggregate.Specifier)
 
+	defer queryMetrics.Send()
+
 	// Query for the data, transform into backend.* types and return.
 	pgRows, err := tsdb.pool.Query(ctx, dataQuerySql, dataQueryArgs...)
 	if err != nil {
 		return nil, err
 	}
-
-	queryMetrics.Send()
 
 	defer pgRows.Close()
 
@@ -357,7 +357,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	for _, row := range dataRows {
 		moduleID := ids.KeyToHardwareID[row.ModuleID]
 
-		backendRows = append(backendRows, &backend.DataRow{
+		dataRow := &backend.DataRow{
 			Time:         data.NumericWireTime(row.Time),
 			StationID:    &row.StationID,
 			ModuleID:     &moduleID,
@@ -368,7 +368,11 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 			MaximumValue: &row.MaximumValue,
 			LastValue:    &row.LastValue,
 			Location:     nil,
-		})
+		}
+
+		dataRow.CoerceNaNs()
+
+		backendRows = append(backendRows, dataRow)
 	}
 
 	tsdb.metrics.RecordsViewed(len(backendRows))
@@ -390,8 +394,6 @@ type TailedStation struct {
 func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeRow) (*TailedStation, error) {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime)
-
 	ids, err := tsdb.queryIDsForStations(ctx, []int32{last.StationID})
 	if err != nil {
 		return nil, err
@@ -400,6 +402,8 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 	maximum := 200
 	duration := time.Hour * 48
 	interval := duration.Seconds() / float64(maximum)
+
+	log.Infow("tsdb:query:tail", "station_id", last.StationID, "last", last.LastTime, "interval", interval, "duration", duration)
 
 	dataSql := fmt.Sprintf(`
 		SELECT
@@ -422,12 +426,12 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 
 	queryMetrics := tsdb.metrics.TailQuery()
 
+	defer queryMetrics.Send()
+
 	pgRows, err := tsdb.pool.Query(ctx, dataSql, []int32{last.StationID}, last.LastTime)
 	if err != nil {
 		return nil, fmt.Errorf("(tail-station) %v", err)
 	}
-
-	queryMetrics.Send()
 
 	defer pgRows.Close()
 
@@ -442,6 +446,8 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 			&row.DataStart, &row.DataEnd, &row.AverageValue, &row.MinimumValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
+
+		row.CoerceNaNs()
 
 		if hardwareID, ok := ids.KeyToHardwareID[moduleID]; ok {
 			row.ModuleID = &hardwareID
@@ -462,6 +468,10 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 }
 
 func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs []int32) (map[int32]*LastTimeRow, error) {
+	queryMetrics := tsdb.metrics.LastTimesQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
+
 	sql := `
 		SELECT station_id, MAX(data_end) AS last_time
 		FROM fieldkit.sensor_data_24h
@@ -498,6 +508,10 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 }
 
 func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
+	queryMetrics := tsdb.metrics.DailyQuery()
+
+	defer queryMetrics.Send()
+
 	since := time.Now()
 
 	sql := fmt.Sprintf(`
@@ -526,20 +540,22 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 	rows := make([]*backend.DataRow, 0)
 
 	for pgRows.Next() {
-		dr := &backend.DataRow{}
+		row := &backend.DataRow{}
 
 		var moduleID int64
 
-		if err := pgRows.Scan(&dr.Time, &dr.StationID, &moduleID, &dr.SensorID, &dr.BucketSamples, &dr.DataStart, &dr.DataEnd,
-			&dr.MinimumValue, &dr.AverageValue, &dr.MaximumValue, &dr.LastValue); err != nil {
+		if err := pgRows.Scan(&row.Time, &row.StationID, &moduleID, &row.SensorID, &row.BucketSamples, &row.DataStart, &row.DataEnd,
+			&row.MinimumValue, &row.AverageValue, &row.MaximumValue, &row.LastValue); err != nil {
 			return nil, err
 		}
 
-		hardwareID := ids.KeyToHardwareID[moduleID]
+		row.CoerceNaNs()
 
-		dr.ModuleID = &hardwareID
+		if hardwareID, ok := ids.KeyToHardwareID[moduleID]; ok {
+			row.ModuleID = &hardwareID
+		}
 
-		rows = append(rows, dr)
+		rows = append(rows, row)
 	}
 
 	if pgRows.Err() != nil {
@@ -553,6 +569,10 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 	if err := tsdb.initialize(ctx); err != nil {
 		return nil, err
 	}
+
+	queryMetrics := tsdb.metrics.RecentlyMultiQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
 
 	ids, err := tsdb.queryIDsForStations(ctx, stationIDs)
 	if err != nil {
@@ -616,6 +636,10 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}
 
 	log.Infow("tsdb:query:prepare", "stations", stationIDs)
+
+	queryMetrics := tsdb.metrics.TailMultiQuery(len(stationIDs))
+
+	defer queryMetrics.Send()
 
 	lastTimes, err := tsdb.queryLastTimes(ctx, stationIDs)
 	if err != nil {

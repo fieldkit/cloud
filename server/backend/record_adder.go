@@ -151,15 +151,16 @@ func (ra *RecordAdder) Handle(ctx context.Context, i *data.Ingestion, pr *Parsed
 }
 
 type WriteInfo struct {
-	IngestionID  int64
-	TotalRecords int64
-	DataRecords  int64
-	MetaRecords  int64
-	MetaErrors   int64
-	DataErrors   int64
-	StationID    *int32
-	DataStart    time.Time
-	DataEnd      time.Time
+	IngestionID   int64
+	TotalRecords  int64
+	DataRecords   int64
+	MetaRecords   int64
+	MetaErrors    int64
+	DataErrors    int64
+	FutureIgnores int64
+	StationID     *int32
+	DataStart     time.Time
+	DataEnd       time.Time
 }
 
 func (ra *RecordAdder) fixDataRecord(ctx context.Context, record *pb.DataRecord) (bool, error) {
@@ -301,6 +302,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 		"data_errors", dataErrors,
 		"data_fixed", dataFixed,
 		"record_run", records,
+		"future_ignores", ra.statistics.futureIgnores,
 		"start_human", prettyTime(ra.statistics.start),
 		"end_human", prettyTime(ra.statistics.end))
 
@@ -323,15 +325,16 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, i *data.Ingestion) (inf
 	}
 
 	info = &WriteInfo{
-		IngestionID:  i.ID,
-		TotalRecords: int64(totalRecords),
-		MetaRecords:  int64(metaProcessed),
-		DataRecords:  int64(dataProcessed),
-		MetaErrors:   int64(metaErrors),
-		DataErrors:   int64(dataErrors),
-		StationID:    stationID,
-		DataStart:    ra.statistics.start,
-		DataEnd:      ra.statistics.end,
+		IngestionID:   i.ID,
+		TotalRecords:  int64(totalRecords),
+		MetaRecords:   int64(metaProcessed),
+		DataRecords:   int64(dataProcessed),
+		MetaErrors:    int64(metaErrors),
+		DataErrors:    int64(dataErrors),
+		FutureIgnores: int64(ra.statistics.futureIgnores),
+		StationID:     stationID,
+		DataStart:     ra.statistics.start,
+		DataEnd:       ra.statistics.end,
 	}
 
 	withInfo.Infow("done")
@@ -347,15 +350,20 @@ func prettyTime(t time.Time) string {
 }
 
 type newRecordStatistics struct {
-	start time.Time
-	end   time.Time
+	start         time.Time
+	end           time.Time
+	futureIgnores int
 }
 
 func (s *newRecordStatistics) addTime(t time.Time) {
-	if s.start.IsZero() || t.Before(s.start) {
-		s.start = t
-	}
-	if s.end.IsZero() || t.After(s.end) {
-		s.end = t
+	if t.Before(time.Now()) {
+		if s.start.IsZero() || t.Before(s.start) {
+			s.start = t
+		}
+		if s.end.IsZero() || t.After(s.end) {
+			s.end = t
+		}
+	} else {
+		s.futureIgnores++
 	}
 }

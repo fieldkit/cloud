@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"encoding/base64"
@@ -9,9 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"image"
-	"image/jpeg"
-	"io"
 	"math"
 	"sort"
 	"strings"
@@ -532,19 +528,37 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 		return nil, err
 	}
 
-	if len(projects) == 0 {
-		return &station.AssociatedStations{
-			Stations: make([]*station.AssociatedStation, 0),
-		}, nil
-	}
-
 	if len(projects) > 1 {
 		log.Warnw("associated:ambiguous-projects", "station_id", payload.ID, "projects", len(projects))
 	}
 
-	return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
-		ProjectID: projects[0].ID,
+	for _, project := range projects {
+		projectPermissions, err := NewPermissions(ctx, c.options).ForProject(project)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := projectPermissions.CanView(); err == nil {
+			return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
+				ProjectID: projects[0].ID,
+			})
+		}
+	}
+
+	get, err := c.Get(ctx, &station.GetPayload{
+		ID: payload.ID,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &station.AssociatedStations{
+		Stations: []*station.AssociatedStation{
+			&station.AssociatedStation{
+				Station: get,
+			},
+		},
+	}, nil
 }
 
 func (c *StationService) queriedToPage(queried *repositories.QueriedEssential) (*station.PageOfStations, error) {
@@ -627,13 +641,16 @@ func (c *StationService) Delete(ctx context.Context, payload *station.DeletePayl
 	return sr.Delete(ctx, payload.StationID)
 }
 
-func findImage(media []*data.FieldNoteMedia) *data.FieldNoteMedia {
+func findStaticImageOrGif(media []*data.FieldNoteMedia) *data.FieldNoteMedia {
+	if len(media) == 0 {
+		return nil
+	}
 	for _, m := range media {
 		if m.ContentType != "image/gif" {
 			return m
 		}
 	}
-	return nil
+	return media[0]
 }
 
 func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.DownloadPhotoPayload) (*station.DownloadedPhoto, error) {
@@ -642,7 +659,8 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	allMedia := []*data.FieldNoteMedia{}
 	if err := c.options.Database.SelectContext(ctx, &allMedia, `
-        SELECT * FROM fieldkit.notes_media WHERE id IN (SELECT photo_id FROM fieldkit.station WHERE id = $1) ORDER BY created_at DESC
+        SELECT id, user_id, content_type, created_at, url, key, station_id
+		FROM fieldkit.notes_media WHERE id IN (SELECT photo_id FROM fieldkit.station WHERE id = $1) ORDER BY created_at DESC
         `, payload.StationID); err != nil {
 		return nil, err
 	}
@@ -651,101 +669,43 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		return defaultPhoto(payload.StationID)
 	}
 
-	haveGif := false
-	media := findImage(allMedia)
-	if media == nil {
-		// Must be a gif, pick the first one.
-		media = allMedia[0]
-		haveGif = true
-	}
+	media := findStaticImageOrGif(allMedia)
 
-	etag := quickHash(media.URL)
+	photoCache := NewPhotoCache(c.options.MediaFiles)
+
+	var resize *PhotoResizeSettings
 	if payload.Size != nil {
-		etag += fmt.Sprintf(":%d", *payload.Size)
-	}
-
-	if payload.IfNoneMatch != nil {
-		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
-			return &station.DownloadedPhoto{
-				ContentType: "image/jpeg",
-				Etag:        etag,
-				Body:        []byte{},
-			}, nil
+		resize = &PhotoResizeSettings{
+			Size: *payload.Size,
 		}
 	}
 
-	mr := repositories.NewMediaRepository(c.options.MediaFiles)
-	lm, err := mr.LoadByURL(ctx, media.URL)
+	photo, err := photoCache.Load(ctx, &ExternalMedia{
+		URL:         media.URL,
+		ContentType: media.ContentType,
+	},
+		resize,
+		&PhotoCropSettings{
+			X: x,
+			Y: y,
+		},
+		payload.IfNoneMatch,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	if haveGif {
-		buffer := make([]byte, lm.Size)
-		_, err := io.ReadFull(lm.Reader, buffer)
-		if err != nil {
-			return nil, err
-		}
-		return &station.DownloadedPhoto{
-			Length:      lm.Size,
-			ContentType: media.ContentType,
-			Etag:        etag,
-			Body:        buffer,
-		}, nil
-	}
-
-	original, _, err := image.Decode(lm.Reader)
-	if err != nil {
-		log := Logger(ctx).Sugar()
-		log.Warnw("image-error", "error", err, "station_id", payload.StationID, "content_type", media.ContentType)
-		// return defaultPhoto(payload.StationID)
-		return nil, station.MakeNotFound(fmt.Errorf("not-found"))
-	}
-
-	data := []byte{}
-
-	if payload.Size != nil {
-		if media.ContentType == "image/jpeg" || media.ContentType == "image/png" {
-			resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
-			if err != nil {
-				return nil, err
-			}
-			return &station.DownloadedPhoto{
-				Length:      resized.Size,
-				ContentType: resized.ContentType,
-				Etag:        etag,
-				Body:        resized.Data,
-			}, nil
-		}
-	} else {
-		cropped, err := smartCrop(original, x, y)
-		if err != nil {
-			return nil, err
-		}
-
-		options := jpeg.Options{
-			Quality: 80,
-		}
-
-		buf := new(bytes.Buffer)
-		if err := jpeg.Encode(buf, cropped, &options); err != nil {
-			return nil, err
-		}
-
-		data = buf.Bytes()
-	}
-
-	if len(data) == 0 {
+	if len(photo.Bytes) == 0 && !photo.EtagMatch {
 		log := Logger(ctx).Sugar()
 		log.Warnw("empty-image", "station_id", payload.StationID)
 		return defaultPhoto(payload.StationID)
 	}
 
 	return &station.DownloadedPhoto{
-		Length:      int64(len(data)),
-		ContentType: "image/jpeg",
-		Etag:        etag,
-		Body:        data,
+		Length:      int64(photo.Size),
+		ContentType: photo.ContentType,
+		Etag:        photo.Etag,
+		Body:        photo.Bytes,
 	}, nil
 }
 
@@ -1047,7 +1007,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 	}
 
 	var photos *station.StationPhotos
-    if sf.Station.PhotoID != nil {
+	if sf.Station.PhotoID != nil {
 		photos = &station.StationPhotos{
 			Small: fmt.Sprintf("/stations/%d/photo", sf.Station.ID),
 		}
