@@ -80,7 +80,7 @@ export default Vue.extend({
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
-                scaleFactor: isMobile() ? 2 : 1,
+                scaleFactor: 2,
             });
 
             this.vega = vegaInfo;
