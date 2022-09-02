@@ -92,7 +92,7 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 		}, nil
 	}
 
-	if resize != nil && media.ContentType == MimeTypeJpeg || media.ContentType == MimeTypePng {
+	if resize != nil && (media.ContentType == MimeTypeJpeg || media.ContentType == MimeTypePng) {
 		resized, err := resizeLoadedMedia(ctx, lm, uint(resize.Size), 0)
 		if err != nil {
 			return nil, err
