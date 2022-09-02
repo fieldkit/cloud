@@ -421,6 +421,28 @@ type DataRow struct {
 	LastValue     *float64   `json:"last,omitempty"`
 }
 
+func (row *DataRow) CoerceNaNs() {
+	if row.AverageValue != nil && math.IsNaN(*row.AverageValue) {
+		row.AverageValue = nil
+	}
+
+	if row.MinimumValue != nil && math.IsNaN(*row.MinimumValue) {
+		row.MinimumValue = nil
+	}
+
+	if row.MaximumValue != nil && math.IsNaN(*row.MaximumValue) {
+		row.MaximumValue = nil
+	}
+
+	if row.LastValue != nil && math.IsNaN(*row.LastValue) {
+		row.LastValue = nil
+	}
+
+	if row.Value != nil && math.IsNaN(*row.Value) {
+		row.Value = nil
+	}
+}
+
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
 	if err := queried.StructScan(row); err != nil {
 		return fmt.Errorf("error scanning row: %v", err)

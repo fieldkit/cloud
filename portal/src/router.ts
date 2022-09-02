@@ -55,6 +55,7 @@ function makeDefaultRouteForProject(projectId: number) {
         },
         meta: {
             secured: true,
+            viewType: "map",
         },
     };
 }

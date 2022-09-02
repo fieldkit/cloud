@@ -23,7 +23,7 @@
                     <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
                     <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
                         <template v-if="station.status === StationStatus.down">-</template>
-                        <template v-else>{{ visibleReadingValue | prettyNum }}</template>
+                        <template v-else>{{ visibleReadingValue | prettyReadingNarrowSpace }}</template>
                     </i>
                     <i v-else :style="{ 'background-color': latestPrimaryColor }">
                         –

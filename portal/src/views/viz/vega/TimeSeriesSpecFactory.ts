@@ -464,6 +464,8 @@ export class TimeSeriesSpecFactory {
                     };
                 } else {
                     return {
+                        domain: [""],
+                        range: [i == 0 ? "#003F5C" : "#6ef0da"], // primaryLine, secondaryLine
                         name: strokeName,
                         type: "ordinal",
                     };

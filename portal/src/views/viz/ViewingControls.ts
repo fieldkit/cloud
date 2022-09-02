@@ -65,12 +65,12 @@ export const SensorSelectionRow = Vue.extend({
         },
     },
     computed: {
-        selectedStation(): number | null {
+        selectedStation(): string | null {
             if (this.disabled) {
                 return null;
             }
             const originalStationId = this.ds.vizSensor[0]; // TODO VizSensor
-            return originalStationId;
+            return `${originalStationId}`;
         },
         selectedSensor(): string | null {
             if (this.disabled) {
@@ -92,7 +92,8 @@ export const SensorSelectionRow = Vue.extend({
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
-                const newSeries = this.workspace.makeSeries(Number(node.id), null);
+                if (!node.stationId) throw new Error();
+                const newSeries = this.workspace.makeSeries(Number(node.stationId), null);
                 console.log("raising viz-change-series", newSeries);
                 this.$emit("viz-change-series", newSeries);
             });
