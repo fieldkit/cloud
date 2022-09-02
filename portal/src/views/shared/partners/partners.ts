@@ -1,3 +1,4 @@
+import Config from "@/secrets";
 import { DisplayStation, Project } from "@/store";
 import moment from "moment";
 
@@ -147,7 +148,8 @@ function getDeploymentDate(station: DisplayStation): string | null {
 
 export function getPartnerCustomization(): PartnerCustomization | null {
     // dataviz.floodnet.nyc, floodnet.fieldkit.org
-    if (window.location.hostname.indexOf("floodnet.") >= 0) {
+    const hostname = Config.partners.hostOverride || window.location.hostname;
+    if (hostname.indexOf("floodnet.") >= 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",

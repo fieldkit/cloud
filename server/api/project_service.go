@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/jmoiron/sqlx/types"
@@ -386,10 +385,10 @@ func (c *ProjectService) EditUser(ctx context.Context, payload *project.EditUser
 		return err
 	}
 
-    if _, err := c.options.Database.ExecContext(ctx, `
+	if _, err := c.options.Database.ExecContext(ctx, `
         UPDATE fieldkit.project_user SET role = $1 WHERE project_id = $2 AND user_id IN (SELECT u.id FROM fieldkit.user AS u WHERE u.email = $3)`, payload.Edit.Role, payload.ProjectID, payload.Edit.Email); err != nil {
-        return err
-    }
+		return err
+	}
 
 	return nil
 }
@@ -867,9 +866,6 @@ func (s *ProjectService) UploadPhoto(ctx context.Context, payload *project.Uploa
 }
 
 func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.DownloadPhotoPayload) (*project.DownloadedPhoto, error) {
-	log := Logger(ctx).Sugar()
-
-	// TODO Maybe make a separate type with fewer columns?
 	resource := &data.Project{}
 	if err := s.options.Database.GetContext(ctx, resource, `
 		SELECT id, privacy, media_url, media_content_type FROM fieldkit.project WHERE id = $1
@@ -892,52 +888,36 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
-	etag := quickHash(*resource.MediaURL)
-	if payload.Size != nil {
-		etag += fmt.Sprintf(":%d", *payload.Size)
-	}
+	photoCache := NewPhotoCache(s.options.MediaFiles)
 
-	if payload.IfNoneMatch != nil {
-		if *payload.IfNoneMatch == fmt.Sprintf(`"%s"`, etag) {
-			return &project.DownloadedPhoto{
-				Etag: etag,
-				Body: []byte{},
-			}, nil
+	var resize *PhotoResizeSettings
+	if payload.Size != nil {
+		resize = &PhotoResizeSettings{
+			Size: *payload.Size,
 		}
 	}
 
-	mr := repositories.NewMediaRepository(s.options.MediaFiles)
-	lm, err := mr.LoadByURL(ctx, *resource.MediaURL)
-	if err != nil {
-		log.Error("load-by-url:error", "error", err)
-		return nil, project.MakeNotFound(errors.New("not found"))
-	}
-
-	if payload.Size != nil {
-		if *resource.MediaContentType == "image/jpeg" || *resource.MediaContentType == "image/png" {
-			resized, err := resizeLoadedMedia(ctx, lm, uint(*payload.Size), 0)
-			if err != nil {
-				return nil, err
-			}
-			return &project.DownloadedPhoto{
-				Length:      resized.Size,
-				ContentType: resized.ContentType,
-				Etag:        etag,
-				Body:        resized.Data,
-			}, nil
-		}
-	}
-
-	data, err := ioutil.ReadAll(lm.Reader)
+	photo, err := photoCache.Load(ctx, &ExternalMedia{
+		URL:         *resource.MediaURL,
+		ContentType: *resource.MediaContentType,
+	},
+		resize,
+		nil,
+		payload.IfNoneMatch,
+	)
 	if err != nil {
 		return nil, err
 	}
 
+	if len(photo.Bytes) == 0 && !photo.EtagMatch {
+		return nil, project.MakeNotFound(errors.New("not found"))
+	}
+
 	return &project.DownloadedPhoto{
-		Length:      int64(lm.Size),
-		ContentType: *resource.MediaContentType,
-		Etag:        etag,
-		Body:        data,
+		Length:      int64(photo.Size),
+		ContentType: photo.ContentType,
+		Etag:        photo.Etag,
+		Body:        photo.Bytes,
 	}, nil
 }
 
