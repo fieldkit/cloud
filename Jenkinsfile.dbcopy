@@ -31,13 +31,14 @@ timestamps {
 				def file = "${name}-${stamp}.sql"
 				sh "docker run --log-driver none --rm postgres pg_dump --schema-only '${url}' > ${file}"
 				sh "docker run --log-driver none --rm postgres pg_dump --data-only --disable-triggers ${extraArgs} '${url}' >> ${file}"
-				sh "ls -alh ${file}"
-				sh "xz -T2 ${file}"
 
 				if (isTsDB) {
 					writeFile(file: "start_workers.sql", text: "SELECT _timescaledb_internal.start_background_workers();")
 					sh "docker run --rm -i postgres psql '${url}' < start_workers.sql"
 				}
+
+				sh "ls -alh ${file}"
+				sh "xz -T2 ${file}"
 			}
 
 			stage ('archive') {
