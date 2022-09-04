@@ -154,9 +154,17 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 		return fmt.Errorf("uninitialized")
 	}
 
+	// CHeck to see if this is already in the pile, if so we log a warning and move on.
 	needlePath := pile.getNeedlePath(key)
 	if _, err := os.Stat(needlePath); !os.IsNotExist(err) {
-		return fmt.Errorf("key exists")
+		pile.log.Warnw("adding:collision", "key", key, "path", needlePath)
+		return nil
+	}
+
+	// If the pile was deleted, recreate the directory. May want to do this
+	// conditionally? Though MkdirAll has to check, anyway.
+	if err := os.MkdirAll(pile.path, 0755); err != nil {
+		return err
 	}
 
 	writing, err := os.OpenFile(needlePath, os.O_RDWR|os.O_CREATE, 0666)
