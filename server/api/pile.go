@@ -66,6 +66,8 @@ func (pile *Pile) Open(ctx context.Context) error {
 		return fmt.Errorf("already opened")
 	}
 
+	pile.log.Infow("opening")
+
 	if err := os.MkdirAll(pile.path, 0755); err != nil {
 		return err
 	}
@@ -73,6 +75,8 @@ func (pile *Pile) Open(ctx context.Context) error {
 	pathMeta := path.Join(pile.path, "pile.json")
 
 	if _, err := os.Stat(pathMeta); os.IsNotExist(err) {
+		pile.log.Infow("created")
+
 		pile.meta = &PileMeta{}
 
 		return pile.flush(ctx)
@@ -88,10 +92,14 @@ func (pile *Pile) Open(ctx context.Context) error {
 		pile.meta = meta
 	}
 
+	pile.log.Infow("opened")
+
 	return nil
 }
 
 func (pile *Pile) flush(ctx context.Context) error {
+	pile.log.Infow("saving")
+
 	pathMeta := path.Join(pile.path, "pile.json")
 
 	if file, err := os.OpenFile(pathMeta, os.O_RDWR|os.O_CREATE, 0666); err != nil {
