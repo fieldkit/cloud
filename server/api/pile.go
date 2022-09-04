@@ -183,11 +183,6 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 		Size:  copied,
 	}
 
-	/// Were we being deleted while we were waiting?
-	if pile.meta == nil {
-		return fmt.Errorf("canceled, pile deleted")
-	}
-
 	// Check for a duplicate just in case there was a race.
 	l := len(pile.meta.Tail)
 	if l > 0 && pile.meta.Tail[l-1].Key == key {
