@@ -118,11 +118,11 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",
 									"sensors": [
-										{ "key": "random0", "fullKey": "random-module-1.random0", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random1", "fullKey": "random-module-1.random1", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random2", "fullKey": "random-module-1.random2", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random3", "fullKey": "random-module-1.random3", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random4", "fullKey": "random-module-1.random4", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
+										{ "key": "random0", "fullKey": "fk.random-module-1.random0", "name": "random0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random1", "fullKey": "fk.random-module-1.random1", "name": "random1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random2", "fullKey": "fk.random-module-1.random2", "name": "random2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random3", "fullKey": "fk.random-module-1.random3", "name": "random3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random4", "fullKey": "fk.random-module-1.random4", "name": "random4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
 									]
 								},
 								{
@@ -135,16 +135,16 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 									"name": "<<PRESENCE>>",
 									"position": "<<PRESENCE>>",
 									"sensors": [
-										{ "key": "random0", "fullKey": "random-module-2.random0", "name": "random_0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random1", "fullKey": "random-module-2.random1", "name": "random_1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random2", "fullKey": "random-module-2.random2", "name": "random_2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random3", "fullKey": "random-module-2.random3", "name": "random_3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random4", "fullKey": "random-module-2.random4", "name": "random_4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random5", "fullKey": "random-module-2.random5", "name": "random_5", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random6", "fullKey": "random-module-2.random6", "name": "random_6", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random7", "fullKey": "random-module-2.random7", "name": "random_7", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random8", "fullKey": "random-module-2.random8", "name": "random_8", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
-										{ "key": "random9", "fullKey": "random-module-2.random9", "name": "random_9", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
+										{ "key": "random0", "fullKey": "fk.random-module-2.random0", "name": "random0", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random1", "fullKey": "fk.random-module-2.random1", "name": "random1", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random2", "fullKey": "fk.random-module-2.random2", "name": "random2", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random3", "fullKey": "fk.random-module-2.random3", "name": "random3", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random4", "fullKey": "fk.random-module-2.random4", "name": "random4", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random5", "fullKey": "fk.random-module-2.random5", "name": "random5", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random6", "fullKey": "fk.random-module-2.random6", "name": "random6", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random7", "fullKey": "fk.random-module-2.random7", "name": "random7", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random8", "fullKey": "fk.random-module-2.random8", "name": "random8", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" },
+										{ "key": "random9", "fullKey": "fk.random-module-2.random9", "name": "random9", "ranges": null, "unitOfMeasure": "C", "reading": "<<PRESENCE>>" }
 									]
 								}
 							]

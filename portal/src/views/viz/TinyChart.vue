@@ -9,6 +9,7 @@ import _ from "lodash";
 import Vue from "vue";
 import { ModuleSensor, DisplayStation, TailSensorDataRow } from "@/store";
 import { SensorDataQuerier, StandardObserver } from "../shared/sensor_data_querier";
+import { DataRow } from "@/views/viz/api";
 
 import {
     ChartSettings,
@@ -52,6 +53,13 @@ export default Vue.extend({
             series: [],
         };
     },
+    watch: {
+        stationId(): void {
+            console.log("tiny-chart:", "station-id");
+            // TODO Should we also be checking if we're in view?
+            void this.load();
+        },
+    },
     async mounted() {
         new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
@@ -60,6 +68,7 @@ export default Vue.extend({
     },
     methods: {
         async load(): Promise<void> {
+            // TODO Show busy when loading?
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
 
             function getFirstQuickSensor(quickSensors): VizSensor {
@@ -75,7 +84,7 @@ export default Vue.extend({
             // to fill that in, by choosing the first one and then making up a fake vizSensor.
             function getSensorMetaAndData(
                 station: DisplayStation
-            ): { vizSensor: VizSensor; sensor: ModuleSensorMeta; data: TailSensorDataRow[] } | null {
+            ): { vizSensor: VizSensor; sensor: ModuleSensorMeta; sdr: SensorDataResponse } | null {
                 if (quickSensors.station.filter((r) => r.moduleId != null).length == 0) {
                     const moduleSensor: ModuleSensor[] = _.flattenDeep(
                         station.configurations.all.map((c) => c.modules.map((m) => m.sensors))
@@ -85,14 +94,34 @@ export default Vue.extend({
                     }
 
                     const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
-                    return { vizSensor: [station.id, ["", 0]], sensor, data: [] };
+                    return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSize: 0 } };
                 }
 
                 const vizSensor = getFirstQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
 
-                return { vizSensor, sensor, data };
+                const sdr: SensorDataResponse = {
+                    data: data.map(
+                        (row: TailSensorDataRow): DataRow => {
+                            return {
+                                time: row.time,
+                                stationId: row.stationId,
+                                moduleId: row.moduleId,
+                                sensorId: row.sensorId,
+                                value: row.max !== undefined ? row.max : null, // TODO
+                                avg: row.avg,
+                                min: row.min,
+                                max: row.max,
+                                last: row.last,
+                                location: null,
+                            };
+                        }
+                    ),
+                    bucketSize: stationData.stations[station.id].bucketSize,
+                };
+
+                return { vizSensor, sensor, sdr };
             }
 
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
@@ -101,20 +130,7 @@ export default Vue.extend({
                 return;
             }
 
-            const { vizSensor, sensor, data } = maybeSensorMetaAndData;
-
-            const sdr: SensorDataResponse = {
-                data: data.map((row: TailSensorDataRow) => {
-                    return {
-                        time: row.time,
-                        stationId: row.stationId,
-                        moduleId: row.moduleId,
-                        sensorId: row.sensorId,
-                        value: row.max,
-                        location: null,
-                    };
-                }),
-            };
+            const { vizSensor, sensor, sdr } = maybeSensorMetaAndData;
 
             const queried = new QueriedData("key", TimeRange.eternity, sdr);
             const strings = sensor.strings["enUs"];

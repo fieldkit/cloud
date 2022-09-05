@@ -33,7 +33,7 @@ export const VegaScrubber = Vue.extend({
                     });
                 })
             );
-            console.log("viz: scrubber:all", all, this.scrubbers);
+            // console.log("viz: scrubber:all", all, this.scrubbers);
             return all;
         },
         visible(): number[] {

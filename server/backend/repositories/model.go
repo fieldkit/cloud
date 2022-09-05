@@ -34,7 +34,7 @@ type VizThresholds struct {
 type VizConfig struct {
 	Name       string         `json:"name"`
 	Disabled   bool           `json:"disabled"`
-	YZero      bool           `json:"y_zero"`
+	MinimumGap int32          `json:"minimumGap"`
 	Thresholds *VizThresholds `json:"thresholds"`
 }
 

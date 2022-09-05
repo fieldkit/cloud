@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import _ from "lodash";
+import { isMobile } from "@/utilities";
 import Vue, { PropType } from "vue";
 import { default as vegaEmbed } from "vega-embed";
 
@@ -14,6 +15,17 @@ import { TimeZoom, SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
+
+function roundForDisplay(value: number): number {
+    for (let i = 1; i < 6; ++i) {
+        const factor = Math.pow(10, i);
+        const rounded = Math.round(value * factor) / factor;
+        if (rounded !== 0) {
+            return rounded;
+        }
+    }
+    return value;
+}
 
 export default Vue.extend({
     name: "LineChart",
@@ -24,7 +36,7 @@ export default Vue.extend({
         },
         settings: {
             type: Object as PropType<ChartSettings>,
-            default: () => ChartSettings.Auto,
+            default: () => (isMobile() ? ChartSettings.DefaultMobile : ChartSettings.makeDefaultDesktop()),
         },
     },
     data(): {
@@ -58,14 +70,17 @@ export default Vue.extend({
                 tooltip: {
                     offsetX: -50,
                     offsetY: 50,
-                    formatTooltip: (value, sanitize) => {
-                        return `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(value.name))};">■</span>
-                                        ${sanitize(value.title)}</h3>
-                                        <p class="value">${sanitize(value.Value)}</p>
-                                        <p class="time">${sanitize(value.time)}</p>`;
+                    formatTooltip: (tooltip, sanitize) => {
+                        const roundedValue = roundForDisplay(tooltip.value);
+                        const withUoM = [roundedValue, tooltip.unitOfMeasure || " "].join(" ");
+                        return `<h3><span class="tooltip-color" style="color: ${sanitize(this.getTooltipColor(tooltip.name))};">■</span>
+                                        ${sanitize(tooltip.title)}</h3>
+                                        <p class="value">${sanitize(withUoM)}</p>
+                                        <p class="time">${sanitize(tooltip.time)}</p>`;
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
+                scaleFactor: 2,
             });
 
             this.vega = vegaInfo;
@@ -119,6 +134,8 @@ export default Vue.extend({
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
+                graph: vegaInfo.view.scenegraph(),
+                runtime: vegaInfo.view._runtime,
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
         },
@@ -142,7 +159,9 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style lang="scss">
+@import "src/scss/mixins";
+
 .viz {
     width: 100%;
 }
@@ -154,14 +173,45 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     margin-right: 3.2em !important;
+
+    @include bp-down($sm) {
+        bottom: -195px;
+        top: unset !important;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 1 !important;
+        width: 80px;
+
+        span {
+            font-size: 14px;
+            font-family: $font-family-bold;
+        }
+    }
 }
 .vega-embed summary svg {
     width: 16px !important;
     height: 16px !important;
     display: inline-block;
+
+    @include bp-down($sm) {
+        width: 20px !important;
+        height: 20px !important;
+    }
 }
 .vega-embed .vega-actions {
     right: 3em !important;
+
+    @include bp-down($sm) {
+        bottom: -225px;
+        top: unset !important;
+        right: 50% !important;
+    }
+}
+
+.vega-embed.has-actions {
+    @include bp-down($sm) {
+        padding-right: 0 !important;
+    }
 }
 .save-label {
     font-size: 10px;

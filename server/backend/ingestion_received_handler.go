@@ -111,11 +111,13 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 					}
 				}
 
-				if err := h.publisher.Publish(ctx, &messages.RefreshStation{
+				if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
+					ModifiedAt:  now,
+					PublishedAt: now,
 					StationID:   *info.StationID,
-					HowRecently: howFarBack,
-					Completely:  false,
 					UserID:      i.UserID,
+					Start:       info.DataStart,
+					End:         info.DataEnd,
 				}); err != nil {
 					return err
 				}
@@ -161,7 +163,6 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
 	}
 
-	// NOTE: We may want to adjust this to be something more... accurate than NOW().
 	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
 		return fmt.Errorf("error updating station: %v", err)
 	}

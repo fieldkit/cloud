@@ -385,9 +385,17 @@ export interface TailSensorDataRow {
 
 export interface TailSensorDataResponse {
     data: TailSensorDataRow[];
+    stations: { [index: number]: { bucketSize: number } };
 }
 
-export type QueryRecentlyResponse = { [index: number]: TailSensorDataRow[] };
+export type RecentlyAggregatedWindows = { [index: number]: TailSensorDataRow[] };
+
+export type RecentlyAggregatedLast = { last: number | null };
+
+export interface QueryRecentlyResponse {
+    windows: RecentlyAggregatedWindows;
+    stations: { [index: number]: RecentlyAggregatedLast };
+}
 
 // Intentionally keeping this synchronous since it'll get used in
 // VueJS stuff quite often to make URLs that don't require custom
@@ -1170,6 +1178,12 @@ class FKApi {
     }
 
     public queryStationsRecently(stations: number[]): Promise<QueryRecentlyResponse> {
+        if (stations.length == 0) {
+            return Promise.resolve({
+                windows: {},
+                stations: {},
+            });
+        }
         const qp = new URLSearchParams();
         qp.append("stations", stations.join(","));
         return this.invoke({
@@ -1528,7 +1542,7 @@ class FKApi {
             this.socket = new WebSocket(wsBase + "/notifications");
 
             this.socket.addEventListener("open", () => {
-                console.log("ws:connected");
+                console.log("ws: connected");
                 if (!this.socket) throw new Error("disconnected");
                 const token = this.token.getHeader();
                 this.socket.send(JSON.stringify({ token: token }));
@@ -1537,16 +1551,16 @@ class FKApi {
             this.socket.addEventListener("message", (event) => {
                 const message = JSON.parse(event.data);
                 if (message.error) {
-                    console.log("ws:error", message.error);
+                    console.log("ws: error", message.error);
                 } else {
-                    console.log("ws:message", message);
+                    console.log("ws: message", message);
                     void callback(message);
                     this.wsBackoff.reset();
                 }
             });
 
             this.socket.addEventListener("close", async () => {
-                console.log("ws:closed");
+                // console.log("ws: closed");
                 void status(false);
                 this.socket = null;
 
@@ -1569,7 +1583,7 @@ class FKApi {
             });
 
             this.wsBackoff.on("ready", async (number: number, delay: number) => {
-                console.log("ws:ready", number, delay);
+                // console.log("ws: ready", number, delay);
 
                 await this.establish(callback, status);
             });

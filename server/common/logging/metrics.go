@@ -76,25 +76,101 @@ func (m *Metrics) MessagePublished() {
 }
 
 type Timing struct {
-	sc         *statsd.Client
-	timer      statsd.Timing
-	timingKey  string
-	counterKey string
+	sc          *statsd.Client
+	timer       statsd.Timing
+	timingKeys  []string
+	counterKeys []string
 }
 
 func (t *Timing) Send() {
-	t.timer.Send(t.timingKey)
-	t.sc.Increment(t.counterKey)
+	for _, key := range t.timingKeys {
+		t.timer.Send(key)
+	}
+	for _, key := range t.counterKeys {
+		t.sc.Increment(key)
+	}
 }
 
 func (m *Metrics) FileUpload() *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "files.uploading.time",
-		counterKey: "files.uploaded",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"files.uploading.time"},
+		counterKeys: []string{"files.uploaded"},
+	}
+}
+
+func (m *Metrics) TailMultiQuery(batch int) *Timing {
+	m.SC.Count("api.data.tail.multi.query.batch", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.tail.multi.query.time"},
+		counterKeys: []string{"api.data.tail.multi.query"},
+	}
+}
+
+func (m *Metrics) RecentlyMultiQuery(batch int) *Timing {
+	m.SC.Count("api.data.recently.multi.query.time", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.recently.multi.query.time"},
+		counterKeys: []string{"api.data.recently.multi.query"},
+	}
+}
+
+func (m *Metrics) LastTimesQuery(batch int) *Timing {
+	m.SC.Count("api.data.lasttimes.multi.query.time", batch)
+
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.lasttimes.query.time"},
+		counterKeys: []string{"api.data.lasttimes.query"},
+	}
+}
+
+func (m *Metrics) DailyQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.daily.query.time"},
+		counterKeys: []string{"api.data.daily.query"},
+	}
+}
+
+func (m *Metrics) TailQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.tail.query.time"},
+		counterKeys: []string{"api.data.tail.query"},
+	}
+}
+
+func (m *Metrics) DataQuery(aggregate string) *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.query.time", fmt.Sprintf("api.data.query.%s.time", aggregate)},
+		counterKeys: []string{"api.data.query", fmt.Sprintf("api.data.query.%s", aggregate)},
 	}
 }
 
@@ -102,11 +178,23 @@ func (m *Metrics) HandleMessage() *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
-		sc:         m.SC,
-		timer:      timer,
-		timingKey:  "messages.handling.time",
-		counterKey: "messages.processed",
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"messages.handling.time"},
+		counterKeys: []string{"messages.processed"},
 	}
+}
+
+func (m *Metrics) PileHit(pile string) {
+	m.SC.Increment(fmt.Sprintf("api.pile.%s.hit", pile))
+}
+
+func (m *Metrics) PileMiss(pile string) {
+	m.SC.Increment(fmt.Sprintf("api.pile.%s.miss", pile))
+}
+
+func (m *Metrics) PileBytes(pile string, bytes int64) {
+	m.SC.Gauge(fmt.Sprintf("api.pile.%s.bytes", pile), bytes)
 }
 
 func (m *Metrics) UserValidated() {
@@ -143,7 +231,15 @@ func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 
-		t.Send("http.req.time")
+		if IsWebSocket(r) {
+			t.Send("ws.req.time")
+		} else {
+			if IsIngestion(r) {
+				t.Send("http.ingestion.time")
+			} else {
+				t.Send("http.req.time")
+			}
+		}
 	})
 }
 
@@ -153,4 +249,12 @@ func (m *Metrics) RecordsViewed(records int) {
 
 func (m *Metrics) ReadingsViewed(readings int) {
 	m.SC.Count("api.data.readings.viewed", readings)
+}
+
+func IsWebSocket(r *http.Request) bool {
+	return r.Header.Get("Upgrade") == "websocket"
+}
+
+func IsIngestion(r *http.Request) bool {
+	return r.URL.Path == "/ingestion"
 }

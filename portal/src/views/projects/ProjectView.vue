@@ -5,7 +5,7 @@
                 <DoubleHeader
                     :title="isAdministrator ? displayProject.name : null"
                     :subtitle="isAdministrator ? $t('project.dashboard') : null"
-                    :backTitle="getBackTitle()"
+                    :backTitle="$tc(partnerCustomization.nav.project.back.label)"
                     backRoute="projects"
                     v-if="displayProject && !bigMap"
                 >
@@ -47,7 +47,7 @@ import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { AuthenticationRequiredError, ForbiddenError } from "@/api";
-import { isCustomisationEnabled } from "@/views/shared/partners";
+import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ProjectView",
@@ -98,6 +98,9 @@ export default Vue.extend({
                 return false;
             },
         }),
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
+        },
     },
     watch: {
         id() {
@@ -135,20 +138,6 @@ export default Vue.extend({
         },
         closeActivity(this: any) {
             return this.$router.push({ name: "viewProject", params: { id: this.id } });
-        },
-        isPartnerCustomisationEnabled(): boolean {
-            return isCustomisationEnabled();
-        },
-        getBackTitle(): string {
-            if (isCustomisationEnabled()) {
-                return null;
-            }
-
-            if (this.isAdministrator) {
-                return this.$t("layout.backProjects");
-            }
-
-            return this.$t("layout.backProjectDashboard");
         },
     },
 });

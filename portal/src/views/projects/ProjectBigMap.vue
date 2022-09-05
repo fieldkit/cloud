@@ -21,21 +21,21 @@
             </template>
 
             <template v-if="viewType === 'map'">
-                <!-- fixme: currently restricted to floodnet project -->
+                <!-- TODO This should be handled via partner customization. -->
                 <div class="map-legend" v-if="id === 174 && levels.length > 0" :class="{ collapsed: legendCollapsed }">
                     <a class="legend-toggle" @click="legendCollapsed = !legendCollapsed">
                         <i class="icon icon-chevron-right"></i>
                     </a>
                     <div class="legend-content">
                         <div class="legend-content-wrap">
-                            <h4>Current {{ keyTitle }}</h4>
+                            <h4>{{ keyTitle }}</h4>
                             <div class="legend-item" v-for="(item, idx) in levels" :key="idx">
                                 <span class="legend-dot" :style="{ color: item.color }">&#x25CF;</span>
                                 <span>{{ item.mapKeyLabel ? item.mapKeyLabel["enUS"] : item.label["enUS"] }}</span>
                             </div>
-                            <div class="legend-item" v-if="hasStationsWithoutData">
+                            <div class="legend-item">
                                 <span class="legend-dot" style="color: #ccc">&#x25CF;</span>
-                                <span>No Data</span>
+                                <span>{{ $t("map.legend.noData") }}</span>
                             </div>
                         </div>
                     </div>
@@ -46,53 +46,73 @@
                         :mapped="mappedProject"
                         :layoutChanges="layoutChanges"
                         :showStations="project.showStations"
+                        :visibleReadings="visibleReadings"
                         :mapBounds="mapBounds"
                     />
+
+                    <StationHoverSummary
+                        v-if="activeStation"
+                        :station="activeStation"
+                        :sensorDataQuerier="sensorDataQuerier"
+                        :exploreContext="exploreContext"
+                        :visibleReadings="visibleReadings"
+                        :hasCupertinoPane="true"
+                        @close="onCloseSummary"
+                        v-slot="{ sensorDataQuerier }"
+                    >
+                        <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                    </StationHoverSummary>
                 </div>
-                <StationHoverSummary
-                    v-if="activeStation"
-                    :station="activeStation"
-                    :sensorDataQuerier="sensorDataQuerier"
-                    :exploreContext="exploreContext"
-                    :visibleReadings="visibleReadings"
-                    @close="onCloseSummary"
-                    v-bind:key="activeStation.id"
-                    v-slot="{ sensorDataQuerier }"
-                >
-                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
-                </StationHoverSummary>
             </template>
         </div>
-        <div class="view-type-container">
-            <label class="toggle-btn">
+        <div class="view-type-container" :class="{ 'list-toggled': viewType === 'list' }">
+            <!--            <label class="toggle-btn">
                 <input type="checkbox" v-model="recentMapMode" />
                 <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
                 <i></i>
                 <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
-            </label>
+            </label>-->
             <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
+                <router-link
+                    :to="{ name: 'viewProjectBigMap', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'map' }"
+                >
                     {{ $t("map.toggle.map") }}
-                </div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
+                </router-link>
+                <router-link
+                    :to="{ name: 'viewProjectBigMapList', params: { id: id } }"
+                    class="view-type-map"
+                    v-bind:class="{ active: viewType === 'list' }"
+                >
                     {{ $t("map.toggle.list") }}
-                </div>
+                </router-link>
             </div>
         </div>
     </StandardLayout>
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import * as utils from "../../utilities";
 
 import { mapState, mapGetters } from "vuex";
-import { ActionTypes, GlobalState, ProjectModule, DisplayStation, Project, MappedStations, BoundingRectangle } from "@/store";
+import {
+    ActionTypes,
+    GlobalState,
+    ProjectModule,
+    DisplayStation,
+    Project,
+    MappedStations,
+    BoundingRectangle,
+    VisibleReadings,
+} from "@/store";
 import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import StationsMap from "../shared/StationsMap.vue";
-import StationHoverSummary, { VisibleReadings } from "@/views/shared/StationHoverSummary.vue";
+import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
@@ -113,16 +133,16 @@ export default Vue.extend({
     data(): {
         layoutChanges: number;
         activeStationId: number | null;
-        viewType: string;
         recentMapMode: boolean;
         legendCollapsed: boolean;
+        isMobileView: boolean;
     } {
         return {
             layoutChanges: 0,
             activeStationId: null,
-            viewType: "map",
             recentMapMode: false,
             legendCollapsed: false,
+            isMobileView: window.screen.availWidth <= 768,
         };
     },
     props: {
@@ -147,13 +167,16 @@ export default Vue.extend({
             return this.displayProject.project;
         },
         sensorDataQuerier(): SensorDataQuerier {
-            return new SensorDataQuerier(
-                this.$services.api,
-                this.projectStations.map((s: DisplayStation) => s.id)
-            );
+            return new SensorDataQuerier(this.$services.api);
         },
         projectStations(): DisplayStation[] {
-            return this.$getters.projectsById[this.id].stations.slice().sort((a, b) => b.latestPrimary - a.latestPrimary);
+            const stations = this.$getters.projectsById[this.id].stations;
+            const sortFactors = _.fromPairs(stations.map((station) => [station.id, station.getSortOrder(this.visibleReadings)]));
+            return _.orderBy(
+                this.$getters.projectsById[this.id].stations.slice(),
+                [(station) => sortFactors[station.id][0], (station) => sortFactors[station.id][1], (station) => sortFactors[station.id][2]],
+                ["asc", "desc", "asc"]
+            );
         },
         mappedProject(): MappedStations | null {
             return this.$getters.projectsById[this.id].mapped;
@@ -183,7 +206,7 @@ export default Vue.extend({
             return new ExploreContext(this.project.id, true);
         },
         stationsWithData(): DisplayStation[] {
-            return this.displayProject.stations.filter((station) => station.latestPrimary != null);
+            return this.displayProject.stations.filter((station) => station.hasData);
         },
         hasStationsWithoutData(): boolean {
             return this.stationsWithData.length < this.projectStations.length;
@@ -205,6 +228,12 @@ export default Vue.extend({
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
         },
+        viewType(): string {
+            if (this.$route.meta?.viewType) {
+                return this.$route.meta.viewType;
+            }
+            return "map";
+        },
     },
     watch: {
         id(): Promise<any> {
@@ -221,15 +250,15 @@ export default Vue.extend({
         return Promise.resolve();
     },
     methods: {
-        switchView(type: string): void {
-            this.viewType = type;
+        switchView(): void {
+            this.activeStationId = null;
             this.layoutChanges++;
         },
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
         showSummary(station: DisplayStation): void {
-            console.log("showSummay", station);
+            console.log("map: show-summay", station);
             this.activeStationId = station.id;
         },
         onCloseSummary(): void {
@@ -344,19 +373,52 @@ export default Vue.extend({
         margin-right: 10px;
         font-size: 1.5em;
     }
-
-    @include bp-down($sm) {
-        display: none;
-    }
 }
 
 ::v-deep .station-hover-summary {
     width: 359px;
     top: calc(50% - 100px);
     left: calc(50% - 180px);
+
+    @include bp-down($xs) {
+        width: 100%;
+        left: 0;
+        border-radius: 10px;
+        padding: 25px 10px 12px 10px;
+
+        &.is-pane {
+            top: 0;
+        }
+
+        .close-button {
+            display: none;
+        }
+
+        .navigate-button {
+            width: 14px;
+            height: 14px;
+            right: -3px;
+            top: -17px;
+        }
+
+        .image-container {
+            flex-basis: 62px;
+            height: 62px;
+            margin-right: 10px;
+        }
+
+        .station-name {
+            font-size: 14px;
+        }
+
+        .explore-button {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+    }
 }
 
-::v-deep .stations-list {
+.stations-list {
     @include flex();
     flex-wrap: wrap;
     padding: 160px 70px;
@@ -380,7 +442,11 @@ export default Vue.extend({
         width: calc(100% - 20px);
     }
 
-    .summary-container {
+    ::v-deep .station-hover-summary {
+        position: unset;
+    }
+
+    ::v-deep .summary-container {
         z-index: 0;
         position: unset;
         margin: 20px;
@@ -417,7 +483,7 @@ export default Vue.extend({
 
 .view-type {
     width: 115px;
-    height: 39px;
+    height: 38px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
     border: solid 1px #f4f5f7;
     background-color: #ffffff;
@@ -425,21 +491,45 @@ export default Vue.extend({
     margin-left: 30px;
     @include flex(center, center);
 
+    @include bp-down($sm) {
+        width: 98px;
+        margin-left: 5px;
+    }
+
+    @media screen and (max-width: 350px) {
+        width: 88px;
+    }
+
     &-container {
         z-index: $z-index-top;
         margin: 0;
+        box-sizing: border-box;
         @include flex(center, center);
         @include position(absolute, 90px 25px null null);
 
         @include bp-down($sm) {
-            @include position(absolute, 67px 10px null null);
+            @include position(absolute, 115px 10px null null);
+        }
+
+        &.list-toggled {
+            @include bp-down($sm) {
+                left: 0;
+                width: 100%;
+                justify-content: flex-end;
+                padding: 0 10px;
+            }
         }
     }
 
-    > div {
+    > a {
         flex-basis: 50%;
         height: 100%;
+        font-family: $font-family-light;
         @include flex(center, center);
+
+        @include bp-down($sm) {
+            font-size: 14px;
+        }
 
         &.active {
             font-family: $font-family-bold;
@@ -448,7 +538,7 @@ export default Vue.extend({
 
     &-map {
         flex-basis: 50%;
-        border-right: solid 1px #d8dce0;
+        border-right: solid 1px $color-border;
     }
 
     .icon {
@@ -457,13 +547,28 @@ export default Vue.extend({
 }
 
 .toggle-btn {
-    display: inline-block;
     cursor: pointer;
     z-index: $z-index-top;
     position: relative;
     font-size: 14px;
     -webkit-tap-highlight-color: transparent;
     font-family: $font-family-medium !important;
+    height: 38px;
+    display: flex;
+    align-items: center;
+
+    @include bp-down($sm) {
+        .view-type-container:not(.list-toggled) & {
+            background-color: #fff;
+            padding: 0 10px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+            border: solid 1px #f4f5f7;
+        }
+    }
+
+    @media screen and (max-width: 350px) {
+        padding: 0 8px;
+    }
 
     * {
         font-family: $font-family-medium !important;
@@ -535,12 +640,50 @@ export default Vue.extend({
     transform: translate3d(13px, 2px, 0);
 }
 
-::v-deep .mapboxgl-ctrl {
-    margin: 35px 0 0 30px;
+::v-deep .mapboxgl-ctrl-geocoder {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+    border: solid 1px #f4f5f7;
+    border-radius: 0;
+    height: 40px;
+    margin: 30px 0 0 30px;
 
-    .mapboxgl-ctrl-geocoder {
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-        border: solid 1px #f4f5f7;
+    @include bp-down($sm) {
+        margin: 61px 0 0 10px;
+        width: 40px;
     }
+
+    &.mapboxgl-ctrl-geocoder--collapsed {
+        min-width: 40px;
+    }
+
+    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
+        @include bp-down($xs) {
+            min-width: calc(100vw - 20px) !important;
+        }
+    }
+
+    input {
+        outline: none;
+        height: 37px;
+        padding-left: 38px;
+        font-size: 16px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-search {
+    top: 9px;
+    left: 8px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 4px;
+
+    @include bp-down($sm) {
+        margin-top: 3px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-bottom-left {
+    margin-left: 30px;
 }
 </style>

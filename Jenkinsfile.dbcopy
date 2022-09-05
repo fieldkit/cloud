@@ -10,24 +10,39 @@ timestamps {
 		try {
 			def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 			def name = params.DbName  ?: "db"
-			def url = name == "tsdb" ? ws.timescaledb_url.value : ws.database_url.value
+			def isTsDB = name == "tsdb"
+			def url = isTsDB ? ws.timescaledb_url.value : ws.database_url.value
 			def exclusions = params.Exclusions ?: ""
 
 			def now = new Date()
 			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
 
 			stage ('dbcopy') {
-				sh "rm -rf *.bz2"
+				sh "rm -rf *.bz2 *.xz"
 
-				if (exclusions != "") {
-					sh "docker run --log-driver none --rm postgres pg_dump -T '${exclusions}' '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
-				} else {
-					sh "docker run --log-driver none --rm postgres pg_dump '${url}' | bzip2 > ${name}-${stamp}.sql.bz2"
+				if (isTsDB) {
+					writeFile(file: "stop_workers.sql", text: "SELECT _timescaledb_internal.stop_background_workers();")
+					sh "docker run --rm -i postgres psql '${url}' < stop_workers.sql"
 				}
+
+				def excluding = exclusions.split(",").collect { it.replaceAll("\\s", "") }.collect { "-T '${it}'" }
+				def extraArgs = excluding.join(" ")
+
+				def file = "${name}-${stamp}.sql"
+				sh "docker run --log-driver none --rm postgres pg_dump --schema-only '${url}' > ${file}"
+				sh "docker run --log-driver none --rm postgres pg_dump --data-only --disable-triggers ${extraArgs} '${url}' >> ${file}"
+
+				if (isTsDB) {
+					writeFile(file: "start_workers.sql", text: "SELECT _timescaledb_internal.start_background_workers();")
+					sh "docker run --rm -i postgres psql '${url}' < start_workers.sql"
+				}
+
+				sh "ls -alh ${file}"
+				sh "xz -T2 ${file}"
 			}
 
 			stage ('archive') {
-				archiveArtifacts(artifacts: "*.bz2")
+				archiveArtifacts(artifacts: "*.xz")
 			}
 
 			notifySuccess()

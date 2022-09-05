@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_PATCH = 0
+VERSION_PATCH = 11
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -128,7 +128,12 @@ schema-production:
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
 	@echo "CREATE DATABASE keycloak;" >> schema-production/0.sql
 	@echo "UPDATE que_jobs SET run_at = run_at + INTERVAL '10 year' WHERE run_at <= NOW();" >> schema-production/2.sql
-	@for f in `find schema-production -name "*.bz2"`; do              \
+	@for f in `find schema-production -name "*.xz"`; do                   \
+		echo $$f                                                     ;\
+		xz -d < $$f > schema-production/1.sql                        ;\
+		rm $$f                                                       ;\
+	done
+	@for f in `find schema-production -name "*.bz2"`; do                  \
 		echo $$f                                                     ;\
 		bunzip2 < $$f > schema-production/1.sql                      ;\
 		rm $$f                                                       ;\
@@ -144,8 +149,10 @@ active-schema:
 	ln -sf schema active-schema
 
 restart-postgres: active-schema
+	sudo whoami
 	docker-compose stop postgres
 	docker-compose rm -f postgres
+	sudo rm -rf .db
 	docker-compose up -d postgres
 
 veryclean:

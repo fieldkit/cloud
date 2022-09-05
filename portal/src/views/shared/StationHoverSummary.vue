@@ -1,38 +1,42 @@
 <template>
-    <div class="station-hover-summary" v-if="viewingSummary && station">
-        <StationSummaryContent :station="station">
-            <template #top-right-actions>
-                <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
-                <img
-                    :alt="$tc('station.navigateToStation')"
-                    class="navigate-button"
-                    :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
-                    @click="openStationPageTab"
-                />
+    <div class="js-cupertinoPane">
+        <div class="station-hover-summary" ref="paneContent" :class="{ 'is-pane': hasCupertinoPane }" v-if="viewingSummary && station">
+            <StationSummaryContent ref="summaryContent" :station="station">
+                <template #top-right-actions>
+                    <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
+                    <img
+                        :alt="$tc('station.navigateToStation')"
+                        class="navigate-button"
+                        :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
+                        @click="openStationPageTab"
+                    />
+                </template>
+            </StationSummaryContent>
+
+            <template v-if="isPartnerCustomisationEnabled()">
+                <div class="latest-primary" :style="{ color: latestPrimaryColor }">
+                    <template v-if="station.status === StationStatus.up">
+                        <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
+                        <span v-else-if="hasData" class="no-data">{{ $t("noRecentData") }}</span>
+                        <span v-else class="no-data">{{ $t("noData") }}</span>
+                    </template>
+                    <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
+                    <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
+                        <template v-if="station.status === StationStatus.down">-</template>
+                        <template v-else>{{ visibleReadingValue | prettyReadingNarrowSpace }}</template>
+                    </i>
+                    <i v-else :style="{ 'background-color': latestPrimaryColor }">
+                        –
+                    </i>
+                </div>
             </template>
-        </StationSummaryContent>
 
-        <template v-if="isPartnerCustomisationEnabled()">
-            <div v-if="station.status === StationStatus.up" class="latest-primary" :style="{ color: latestPrimaryColor }">
-                <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                <span v-else class="no-data">{{ $t("noData") }}</span>
+            <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
 
-                <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-                    <template v-if="station.status === StationStatus.down">&#x25CF;</template>
-                    <template v-else>{{ visibleReadingValue | prettyNum }}</template>
-                </i>
-                <i v-else :style="{ 'background-color': latestPrimaryColor }">
-                    &#x25CF;
-                </i>
-            </div>
-            <div v-if="station.status === StationStatus.down" class="latest-primary">{{ $t("station.inactive") }}</div>
-        </template>
+            <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
 
-        <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
-
-        <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
-
-        <StationBattery :station="station" />
+            <StationBattery :station="station" />
+        </div>
     </div>
 </template>
 
@@ -46,17 +50,14 @@ import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 import StationSummaryContent from "./StationSummaryContent.vue";
 
-import { ModuleSensorMeta, SensorDataQuerier, SensorMeta, QueryRecentlyResponse } from "@/views/shared/sensor_data_querier";
+import { ModuleSensorMeta, SensorDataQuerier, SensorMeta } from "@/views/shared/sensor_data_querier";
+import { VisibleReadings, DecoratedReading } from "@/store";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
-
-export enum VisibleReadings {
-    Current,
-    Last72h,
-}
+import { CupertinoPane } from "cupertino-pane";
 
 export default Vue.extend({
     name: "StationHoverSummary",
@@ -88,6 +89,10 @@ export default Vue.extend({
             type: Number as PropType<VisibleReadings>,
             default: VisibleReadings.Current,
         },
+        hasCupertinoPane: {
+            type: Boolean,
+            default: false,
+        },
     },
     filters: {
         integer: (value) => {
@@ -95,87 +100,79 @@ export default Vue.extend({
             return Math.round(value);
         },
     },
+    watch: {
+        station(this: any) {
+            if (this.cupertinoPane) {
+                this.cupertinoPane.present({ animate: true });
+            }
+        },
+    },
     data(): {
         viewingSummary: boolean;
         sensorMeta: SensorMeta | null;
-        readings: QueryRecentlyResponse | null;
         StationStatus: any;
+        isMobileView: boolean;
+        cupertinoPane: CupertinoPane | null;
     } {
         return {
             viewingSummary: true,
             sensorMeta: null,
-            readings: null,
             StationStatus: StationStatus,
+            isMobileView: window.screen.availWidth < 500,
+            cupertinoPane: null,
         };
     },
     async mounted() {
-        if (this.sensorDataQuerier) {
-            this.readings = await this.sensorDataQuerier.queryRecently(this.station.id);
-            this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+        if (this.hasCupertinoPane && this.isMobileView) {
+            this.initCupertinoPane();
         }
+        this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+    },
+    destroyed() {
+        this.destroyCupertinoPane();
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
         visibleSensor(): ModuleSensorMeta | null {
-            if (this.sensorMeta && this.readings && 72 in this.readings && this.readings[72].length > 0) {
-                const sensorId = this.readings[72][0].sensorId;
-                return this.sensorMeta.findSensorById(sensorId);
+            const primarySensor = this.station.primarySensor;
+            if (this.sensorMeta && primarySensor) {
+                return this.sensorMeta.findSensorByKey(primarySensor.fullKey);
+            }
+            return null;
+        },
+        hasData(): boolean {
+            return this.station.hasData;
+        },
+        decoratedReading(): DecoratedReading | null {
+            const readings = this.station.getDecoratedReadings(this.visibleReadings);
+            if (readings && readings.length > 0) {
+                return readings[0];
             }
             return null;
         },
         visibleReadingValue(): number | null {
-            const sensor = this.visibleSensor;
-            if (sensor && this.readings && 72 in this.readings && this.readings[72].length > 0) {
-                // console.log(this.visibleReadings, this.readings);
-                let value: number | undefined;
-                if (this.visibleReadings == VisibleReadings.Current) {
-                    value = this.readings[72][0].last;
-                } else {
-                    if (sensor.aggregationFunction == "max") {
-                        // TODO Pull into helper
-                        value = this.readings[72][0].max;
-                    } else {
-                        value = this.readings[72][0].avg;
-                    }
-                }
-                return value === undefined ? null : value;
-            }
-
-            return null;
-        },
-        thresholds() {
-            const sensor = this.visibleSensor;
-            if (sensor && sensor.viz && sensor.viz.length > 0) {
-                if (sensor.viz[0].thresholds) {
-                    return sensor.viz[0].thresholds;
-                }
-            }
-            return null;
-        },
-        visibleLevel() {
-            const value = this.visibleReadingValue;
-            if (value !== null) {
-                const thresholds = this.thresholds;
-                if (thresholds) {
-                    const level = thresholds.levels.find((level) => level.start <= value && level.value > value);
-                    return level ?? null;
-                }
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading) {
+                return reading.value;
             }
             return null;
         },
         latestPrimaryLevel(): any {
-            if (this.visibleReadingValue === null) {
-                return null;
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading) {
+                return reading?.thresholdLabel;
             }
-            const level = this.visibleLevel;
-            return level?.plainLabel?.enUS || level?.mapKeyLabel?.enUS;
+            return null;
         },
         latestPrimaryColor(): string {
-            if (this.visibleReadingValue === null) {
+            const reading: DecoratedReading | null = this.decoratedReading;
+            if (reading === null) {
                 return "#cccccc";
             }
-            const level = this.visibleLevel;
-            return level?.color || "#00CCFF";
+            if (reading) {
+                return reading?.color;
+            }
+            return "#00CCFF";
         },
     },
     methods: {
@@ -208,6 +205,27 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        async initCupertinoPane(): Promise<void> {
+            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
+            const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
+            this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
+                parentElement: "body",
+                breaks: {
+                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
+                    // add padding top of container and margin of general row
+                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
+                    bottom: { enabled: true, height: 0 },
+                },
+                bottomClose: true,
+                buttonDestroy: false,
+            });
+            this.cupertinoPane.present({ animate: true });
+        },
+        destroyCupertinoPane(): void {
+            if (this.cupertinoPane) {
+                this.cupertinoPane.destroy();
+            }
+        },
     },
 });
 </script>
@@ -218,7 +236,7 @@ export default Vue.extend({
 .station-hover-summary {
     position: absolute;
     background-color: #ffffff;
-    border: 1px solid rgb(215, 220, 225);
+    border: solid 1px #d8dce0;
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -228,17 +246,6 @@ export default Vue.extend({
 
     ::v-deep .station-name {
         font-size: 16px;
-    }
-
-    ::v-deep .image-container {
-        border-radius: 5px;
-        padding: 0;
-        margin-right: 14px;
-        overflow: hidden;
-
-        img {
-            padding: 0;
-        }
     }
 
     * {
@@ -323,6 +330,10 @@ export default Vue.extend({
     font-size: 12px;
     font-family: $font-family-bold;
     @include flex(center, flex-end);
+
+    @include bp-down($xs) {
+        margin-top: 10px;
+    }
 
     i {
         font-style: normal;

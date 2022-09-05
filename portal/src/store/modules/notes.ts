@@ -7,6 +7,7 @@ import * as MutationTypes from "@/store/mutations";
 export class NotesState {
     media: PortalNoteMedia[];
     notes: PortalStationNotes[];
+    readOnly: boolean;
 }
 
 const getters = {
@@ -36,10 +37,12 @@ const mutations = {
         payload: {
             media: PortalNoteMedia[];
             notes: PortalStationNotes[];
+            station: { readOnly: boolean };
         }
     ) => {
         Vue.set(state, "notes", payload.notes);
         Vue.set(state, "media", payload.media);
+        Vue.set(state, "readOnly", payload.station.readOnly);
     },
 };
 

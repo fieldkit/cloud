@@ -18,6 +18,12 @@ psql -h 127.0.0.1 -p 5433 -U postgres postgres -c "SELECT pg_terminate_backend(p
 psql -h 127.0.0.1 -p 5433 -U postgres postgres -c "DROP DATABASE fk;" || true
 psql -h 127.0.0.1 -p 5433 -U postgres postgres -c "CREATE DATABASE fk;"
 
-psql -h 127.0.0.1 -p 5433 -U postgres fk < $sql_file
+if [ "${sql_file: -4}" == ".bz2" ]; then
+	bunzip2 -c $sql_file | psql -h 127.0.0.1 -p 5433 -U postgres fk
+elif [ "${sql_file: -3}" == ".xz" ]; then
+	xz -dc $sql_file | psql -h 127.0.0.1 -p 5433 -U postgres fk
+elif [ "${sql_file: -4}" == ".sql" ]; then
+	psql -h 127.0.0.1 -p 5433 -U postgres fk < $sql_file
+fi
 
 make migrate-up-tsdb

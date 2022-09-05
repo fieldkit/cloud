@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -12,17 +13,30 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/storage"
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
-	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
-	File        string
-	SchemaID    int
-	MessageID   int
-	Resume      bool
-	Verbose     bool
-	NoLegacy    bool
+	PostgresURL  string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
+	TimeScaleURL string `split_words:"true"`
+
+	RefreshViews bool
+
+	File      string
+	SchemaID  int
+	MessageID int
+	Resume    bool
+	Verbose   bool
+	NoLegacy  bool
+}
+
+func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
+	if options.TimeScaleURL == "" {
+		return nil
+	}
+
+	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -37,14 +51,16 @@ func process(ctx context.Context, options *Options) error {
 
 	log.Infow("opened, preparing source")
 
-	aggregator := webhook.NewSourceAggregator(db, options.Verbose, !options.NoLegacy)
+	tsConfig := options.timeScaleConfig()
+
+	aggregator := webhook.NewSourceAggregator(db, tsConfig, options.Verbose, !options.NoLegacy)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
 
 	if options.File != "" {
 		source = webhook.NewCsvMessageSource(options.File, int32(options.SchemaID), options.Verbose)
-	} else {
+	} else if options.SchemaID > 0 {
 		if options.MessageID == 0 {
 			source = webhook.NewDatabaseMessageSource(db, int32(options.SchemaID), 0, true)
 		} else {
@@ -56,6 +72,15 @@ func process(ctx context.Context, options *Options) error {
 		log.Infow("processing")
 
 		if err := aggregator.ProcessSource(ctx, source, startTime); err != nil {
+			return err
+		}
+	}
+
+	if options.RefreshViews {
+		if tsConfig == nil {
+			return fmt.Errorf("TsDB configuration missing")
+		}
+		if err := tsConfig.RefreshViews(ctx); err != nil {
 			return err
 		}
 	}
@@ -73,10 +98,11 @@ func main() {
 	flag.BoolVar(&options.Resume, "resume", false, "resume on message id")
 	flag.BoolVar(&options.Verbose, "verbose", false, "increase verbosity")
 	flag.BoolVar(&options.NoLegacy, "no-legacy", false, "disable legacy aggregate updates")
+	flag.BoolVar(&options.RefreshViews, "refresh-views", false, "refresh views")
 
 	flag.Parse()
 
-	if options.MessageID == 0 && options.SchemaID == 0 {
+	if options.MessageID == 0 && options.SchemaID == 0 && !options.RefreshViews {
 		flag.PrintDefaults()
 		return
 	}

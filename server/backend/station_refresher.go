@@ -8,7 +8,6 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 
 	"github.com/fieldkit/cloud/server/backend/handlers"
-	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type StationRefresher struct {
@@ -42,12 +41,6 @@ func (sr *StationRefresher) Refresh(ctx context.Context, stationID int32, howRec
 	}
 
 	if err := sr.walk(ctx, walkParams, completely, skipManual); err != nil {
-		return err
-	}
-
-	stationRepository := repositories.NewStationRepository(sr.db)
-	err := stationRepository.RefreshStationSensors(ctx, []int32{stationID})
-	if err != nil {
 		return err
 	}
 

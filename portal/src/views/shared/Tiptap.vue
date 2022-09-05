@@ -292,6 +292,10 @@ export default Vue.extend({
 }
 
 .ProseMirror {
+    @supports (-webkit-touch-callout: none) { // iOS only - prevent zoom in behaviour
+        font-size: 16px;
+    }
+
     > * + * {
         margin-top: 0.75em;
     }

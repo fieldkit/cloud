@@ -118,6 +118,11 @@ type NoteMediaWithNoteID struct {
 }
 
 func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*notes.FieldNotes, error) {
+	p, err := NewPermissions(ctx, s.options).ForStationByID(int(payload.StationID))
+	if err != nil {
+		return nil, err
+	}
+
 	allAuthors := []*data.User{}
 	if err := s.options.Database.SelectContext(ctx, &allAuthors, `
 		SELECT * FROM fieldkit.user WHERE id IN (
@@ -190,9 +195,19 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		})
 	}
 
+	readOnly, err := p.IsReadOnly()
+	if err != nil {
+		return nil, err
+	}
+
+	webStation := &notes.FieldNoteStation{
+		ReadOnly: readOnly,
+	}
+
 	return &notes.FieldNotes{
-		Notes: webNotes,
-		Media: stationMedia,
+		Notes:   webNotes,
+		Station: webStation,
+		Media:   stationMedia,
 	}, nil
 }
 
@@ -292,25 +307,25 @@ func (s *NotesService) UploadMedia(ctx context.Context, payload *notes.UploadMed
 }
 
 func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMediaPayload) error {
-    sr := repositories.NewStationRepository(s.options.Database)
+	sr := repositories.NewStationRepository(s.options.Database)
 
-    station, err := sr.QueryStationByPhotoID(ctx, payload.MediaID)
+	station, err := sr.QueryStationByPhotoID(ctx, payload.MediaID)
 
 	p, err := NewPermissions(ctx, s.options).ForStation(station)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    if err := p.CanModify(); err != nil {
-        return err
-    }
+	if err := p.CanModify(); err != nil {
+		return err
+	}
 
-    if _, err := s.options.Database.ExecContext(ctx, `
+	if _, err := s.options.Database.ExecContext(ctx, `
         UPDATE fieldkit.station SET photo_id = NULL
                 WHERE photo_id = $1
         `, payload.MediaID); err != nil {
-        return err
-    }
+		return err
+	}
 
 	if _, err := s.options.Database.ExecContext(ctx, `
 		DELETE FROM fieldkit.notes_media WHERE id = $1

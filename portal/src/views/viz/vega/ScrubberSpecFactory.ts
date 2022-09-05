@@ -14,21 +14,93 @@ export class ScrubberSpecFactory {
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
+        const interactiveMarks = () => {
+            if (this.settings.mobile) {
+                return [];
+            }
+            return [
+                {
+                    type: "rect",
+                    interactive: false,
+                    encode: {
+                        enter: {
+                            y: { value: 0 },
+                            height: { value: 50 },
+                            width: { value: 2 },
+                            fill: "transparent",
+                        },
+                        update: {
+                            x: { signal: "brush_x[0]" },
+                            fill: { value: "white" },
+                        },
+                    },
+                },
+                {
+                    type: "rect",
+                    interactive: false,
+                    encode: {
+                        enter: {
+                            y: { value: 0 },
+                            height: { value: 50 },
+                            width: { value: 2 },
+                            fill: { value: "white" },
+                        },
+                        update: {
+                            x: { signal: "brush_x[1]" },
+                        },
+                    },
+                },
+                {
+                    type: "symbol",
+                    interactive: true,
+                    clip: true,
+                    name: "right_scrub",
+                    encode: {
+                        enter: {
+                            yc: { value: 25 },
+                            fill: "transparent",
+                            size: { value: 100 },
+                        },
+                        update: {
+                            xc: { signal: "brush_x[1] + 1" },
+                            fill: { value: "#b6b6b6" },
+                            stroke: { value: "#999" },
+                        },
+                    },
+                },
+                {
+                    type: "symbol",
+                    interactive: true,
+                    clip: true,
+                    name: "left_scrub",
+                    encode: {
+                        enter: {
+                            yc: { value: 25 },
+                            fill: "transparent",
+                            size: { value: 100 },
+                        },
+                        update: {
+                            xc: { signal: "brush_x[0] + 1" },
+                            fill: { value: "#b6b6b6" },
+                            stroke: { value: "#999" },
+                        },
+                    },
+                },
+            ];
+        };
+
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",
             description: "FK Scrubber Spec",
-            autosize:
-            {
+            autosize: {
                 type: "fit-x",
             },
             background: "white",
             padding: 5,
             height: 50,
             style: "cell",
-            config:
-            {
-                axis:
-                {
+            config: {
+                axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
                     labelColor: "#2c3e50",
@@ -39,25 +111,22 @@ export class ScrubberSpecFactory {
                     titlePadding: 10,
                     tickSize: 10,
                     tickOpacity: 0,
-                    domain: false
+                    domain: false,
                 },
-                axisX:
-                {
+                axisX: {
                     title: null,
-                    tickSize: 20
+                    tickSize: 20,
                 },
-                style:
-                {
-                    cell:
-                    {
+                style: {
+                    cell: {
                         fill: "#f4f5f7",
-                        stroke: "transparent"
-                    }
-                }
+                        stroke: "transparent",
+                    },
+                },
             },
             data: [
                 {
-                    name: "brush_store"
+                    name: "brush_store",
                 },
                 {
                     name: "table",
@@ -66,83 +135,62 @@ export class ScrubberSpecFactory {
                 {
                     name: "data_0",
                     source: "table",
-                    transform:
-                    [
+                    transform: [
                         {
                             type: "formula",
-                            expr: "toDate(datum[\"time\"])",
-                            as: "time"
-                        }
-                    ]
+                            expr: 'toDate(datum["time"])',
+                            as: "time",
+                        },
+                    ],
                 },
                 {
                     name: "data_1",
                     source: "data_0",
-                    transform:
-                    [
+                    transform: [
                         {
                             type: "impute",
                             field: "value",
-                            groupby:
-                            [],
+                            groupby: [],
                             key: "time",
                             method: "value",
-                            value: 0
+                            value: 0,
                         },
                         {
                             type: "stack",
-                            groupby:
-                            [
-                                "time"
-                            ],
+                            groupby: ["time"],
                             field: "value",
-                            sort:
-                            {
-                                field:
-                                [],
-                                order:
-                                []
+                            sort: {
+                                field: [],
+                                order: [],
                             },
-                            as:
-                            [
-                                "value_start",
-                                "value_end"
-                            ],
-                            offset: "zero"
-                        }
-                    ]
+                            as: ["value_start", "value_end"],
+                            offset: "zero",
+                        },
+                    ],
                 },
                 {
                     name: "data_2",
                     source: "data_0",
-                    transform:
-                    [
+                    transform: [
                         {
                             type: "filter",
-                            expr: "!length(data(\"brush_store\")) || vlSelectionTest(\"brush_store\", datum)"
+                            expr: '!length(data("brush_store")) || vlSelectionTest("brush_store", datum)',
                         },
                         {
                             type: "impute",
                             field: "value",
-                            groupby:
-                            [],
+                            groupby: [],
                             key: "time",
                             method: "value",
-                            value: 0
+                            value: 0,
                         },
                         {
                             type: "stack",
-                            groupby:
-                            [
-                                "time"
-                            ],
+                            groupby: ["time"],
                             field: "value",
-                            sort:
-                            {
-                                field:
-                                [],
-                                order:
-                                []
+                            sort: {
+                                field: [],
+                                order: [],
                             },
                             as:
                             [
@@ -158,18 +206,16 @@ export class ScrubberSpecFactory {
                     values: this.dataEvents,
                 },
             ],
-            signals:
-            [
+            signals: [
                 {
                     name: "width",
                     init: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
-                    on:
-                    [
+                    on: [
                         {
                             update: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
-                            events: "window:resize"
-                        }
-                    ]
+                            events: "window:resize",
+                        },
+                    ],
                 },
                 {
                     name: "event_click",
@@ -213,820 +259,552 @@ export class ScrubberSpecFactory {
                 },
                 {
                     name: "unit",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            "events": "mousemove",
-                            "update": "isTuple(group()) ? group() : unit"
-                        }
-                    ]
+                            events: "mousemove",
+                            update: "isTuple(group()) ? group() : unit",
+                        },
+                    ],
                 },
                 {
                     name: "brush",
-                    update: "vlSelectionResolve(\"brush_store\", \"union\")"
+                    update: 'vlSelectionResolve("brush_store", "union")',
                 },
-                // TODO block all other events when scrubber handle clicked
+                // TODO Block all other events when scrubber handle clicked
                 {
                     name: "scrub_handle_left",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            events:
-                            {
+                            events: {
                                 type: "mouseup",
                                 marktype: "symbol",
-                                markname: "left_scrub"
+                                markname: "left_scrub",
                             },
-                            update: "scrub_handle_left + 1"
-                        }
-                    ]
+                            update: "scrub_handle_left + 1",
+                        },
+                    ],
                 },
                 {
                     name: "scrub_handle_right",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            events:
-                            {
+                            events: {
                                 type: "mouseup",
                                 marktype: "symbol",
-                                markname: "right_scrub"
+                                markname: "right_scrub",
                             },
-                            update: "scrub_handle_right + 1"
-                        }
-                    ]
+                            update: "scrub_handle_right + 1",
+                        },
+                    ],
                 },
                 {
                     name: "brush_x",
-                    value:
-                    [],
-                    on:
-                    [
+                    value: [],
+                    on: [
                         {
                             // Update brush xy on area mousedown
                             events:
                             {
                                 source: "scope",
                                 type: "mousedown",
-                                filter:
-                                [
-                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\" && event.item.mark.name !== \"left_scrub\")"
-                                ]
+                                filter: [
+                                    '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub" && event.item.mark.name !== "left_scrub")',
+                                ],
                             },
-                            update: "[x(unit), x(unit)]"
+                            update: "[x(unit), x(unit)]",
                         },
                         {
                             // Update brush xy on area mouseup
-                            events:
-                            {
-
+                            events: {
                                 source: "scope",
                                 type: "mouseup",
-                                filter:
-                                [
-                                    "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\" && event.item.mark.name !== \"left_scrub\")"
-                                ]
+                                filter: [
+                                    '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub" && event.item.mark.name !== "left_scrub")',
+                                ],
                             },
-                            update: "[brush_x[0], x(unit)]"
+                            update: "[brush_x[0], x(unit)]",
                         },
                         {
-                            //Update right extent of brush on mouse down
-                            events:
-                            {
+                            // Update right extent of brush on mouse down
+                            events: {
                                 source: "window",
                                 type: "mousemove",
                                 consume: true,
-                                between:
-                                [
+                                between: [
                                     {
                                         source: "scope",
                                         type: "mousedown",
-                                        filter:
-                                        [
-                                            "!event.item || (event.item.mark.name !== \"brush_brush\")"
-                                        ],
-                                        markname: "right_scrub"
-
+                                        filter: ['!event.item || (event.item.mark.name !== "brush_brush")'],
+                                        markname: "right_scrub",
                                     },
                                     {
                                         source: "scope",
                                         type: "mouseup",
-                                        filter:
-                                        [
-                                            "!event.item || (event.item.mark.name !== \"brush_brush\")"
-                                        ],
-                                        markname: "right_scrub"
-
-                                    }
-                                ]
+                                        filter: ['!event.item || (event.item.mark.name !== "brush_brush")'],
+                                        markname: "right_scrub",
+                                    },
+                                ],
                             },
-                            update: "[brush_x[0], clamp(x(unit), 0, width)]"
+                            update: "[brush_x[0], clamp(x(unit), 0, width)]",
                         },
                         {
-                            //Update left extent of brush on mouse down
-                            events:
-                            {
+                            // Update left extent of brush on mouse down
+                            events: {
                                 source: "window",
                                 type: "mousemove",
                                 consume: true,
-                                between:
-                                [
+                                between: [
                                     {
                                         source: "scope",
                                         type: "mousedown",
-                                        filter:
-                                        [
-                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
+                                        filter: [
+                                            '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',
                                         ],
                                     },
                                     {
                                         source: "scope",
                                         type: "mouseup",
-                                        filter:
-                                        [
-                                            "!event.item || (event.item.mark.name !== \"brush_brush\" && event.item.mark.name !== \"right_scrub\")"
+                                        filter: [
+                                            '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',
                                         ],
-                                    }
-                                ]
+                                    },
+                                ],
                             },
-                            update: "[clamp(x(unit), 0, width), brush_x[1]]"
+                            update: "[clamp(x(unit), 0, width), brush_x[1]]",
                         },
                         {
-                            events:
-                            {
-                                signal: "brush_scale_trigger"
+                            events: {
+                                signal: "brush_scale_trigger",
                             },
-                            update: "[scale(\"x\", brush_time[0]), scale(\"x\", brush_time[1])]"
+                            update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
                         },
                         {
-                            events:
-                            [
+                            events: [
                                 {
                                     source: "view",
-                                    type: "dblclick"
-                                }
+                                    type: "dblclick",
+                                },
                             ],
-                            update: "[0, 0]"
+                            update: "[0, 0]",
                         },
                         {
-                            events:
-                            {
-                                signal: "brush_translate_delta"
+                            events: {
+                                signal: "brush_translate_delta",
                             },
-                            update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)"
+                            update:
+                                "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                         },
                         {
-                            events:
-                            {
-                                signal: "brush_zoom_delta"
+                            events: {
+                                signal: "brush_zoom_delta",
                             },
-                            update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)"
-                        }
-                    ]
+                            update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
+                        },
+                    ],
                 },
                 {
                     name: "brush_time",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            {
-                                signal: "brush_x"
+                            events: {
+                                signal: "brush_x",
                             },
-                            update: "brush_x[0] === brush_x[1] ? null : invert(\"x\", brush_x)"
-                        }
-                    ]
+                            update: 'brush_x[0] === brush_x[1] ? null : invert("x", brush_x)',
+                        },
+                    ],
                 },
                 {
                     name: "brush_scale_trigger",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            events:
-                            [
+                            events: [
                                 {
-                                    scale: "x"
-                                }
+                                    scale: "x",
+                                },
                             ],
-                            update: "(!isArray(brush_time) || (+invert(\"x\", brush_x)[0] === +brush_time[0] && +invert(\"x\", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}"
-                        }
-                    ]
+                            update:
+                                '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
+                        },
+                    ],
                 },
                 {
                     name: "brush_tuple",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            [
+                            events: [
                                 {
-                                    signal: "brush_time"
-                                }
+                                    signal: "brush_time",
+                                },
                             ],
-                            update: "brush_time ? {unit: \"layer_0\", fields: brush_tuple_fields, values: [brush_time]} : null"
-                        }
-                    ]
+                            update: 'brush_time ? {unit: "layer_0", fields: brush_tuple_fields, values: [brush_time]} : null',
+                        },
+                    ],
                 },
                 {
                     name: "brush_tuple_fields",
-                    value:
-                    [
+                    value: [
                         {
                             field: "time",
                             channel: "x",
-                            type: "R"
-                        }
-                    ]
+                            type: "R",
+                        },
+                    ],
                 },
                 {
                     name: "brush_translate_anchor",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            // start brush area translation
-                            events:
-                            [
+                            // Start brush area translation
+                            events: [
                                 {
                                     source: "scope",
                                     type: "mousedown",
                                     markname: "brush_brush",
-                                }
+                                },
                             ],
-                            update: "{x: x(unit), y: y(unit), extent_x: slice(brush_x)}"
-                        }
-                    ]
+                            update: "{x: x(unit), y: y(unit), extent_x: slice(brush_x)}",
+                        },
+                    ],
                 },
                 {
                     name: "brush_translate_delta",
-                    value:
-                    {},
-                    on:
-                    [
+                    value: {},
+                    on: [
                         {
-                            // translate brush area after mousdown
-                            events:
-                            [
+                            // Translate brush area after mousdown
+                            events: [
                                 {
                                     source: "window",
                                     type: "mousemove",
                                     consume: true,
-                                    between:
-                                    [
+                                    between: [
                                         {
                                             source: "scope",
                                             type: "mousedown",
                                             markname: "brush_brush",
-                                            filter: "event.item.name !== \"right_scrub\""
+                                            filter: 'event.item.name !== "right_scrub"',
                                         },
                                         {
                                             source: "window",
-                                            type: "mouseup"
-                                        }
-                                    ]
-                                }
+                                            type: "mouseup",
+                                        },
+                                    ],
+                                },
                             ],
-                            update: "{x: brush_translate_anchor.x - x(unit), y: brush_translate_anchor.y - y(unit)}"
-                        }
-                    ]
+                            update: "{x: brush_translate_anchor.x - x(unit), y: brush_translate_anchor.y - y(unit)}",
+                        },
+                    ],
                 },
                 {
                     name: "brush_zoom_anchor",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            [
+                            events: [
                                 {
                                     source: "scope",
                                     type: "wheel",
                                     consume: true,
-                                    markname: "brush_brush"
-                                }
+                                    markname: "brush_brush",
+                                },
                             ],
-                            update: "{x: x(unit), y: y(unit)}"
-                        }
-                    ]
+                            update: "{x: x(unit), y: y(unit)}",
+                        },
+                    ],
                 },
                 {
                     name: "brush_zoom_delta",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            [
+                            events: [
                                 {
                                     source: "scope",
                                     type: "wheel",
                                     consume: true,
-                                    markname: "brush_brush"
-                                }
+                                    markname: "brush_brush",
+                                },
                             ],
                             force: true,
-                            update: "pow(1.001, event.deltaY * pow(16, event.deltaMode))"
-                        }
-                    ]
+                            update: "pow(1.001, event.deltaY * pow(16, event.deltaMode))",
+                        },
+                    ],
                 },
                 {
                     name: "brush_modify",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            {
-                                signal: "brush_tuple"
+                            events: {
+                                signal: "brush_tuple",
                             },
-                            update: "modify(\"brush_store\", brush_tuple, true)"
-                        }
-                    ]
-                }
+                            update: 'modify("brush_store", brush_tuple, true)',
+                        },
+                    ],
+                },
             ],
-            marks:
-            [
+            marks: [
                 {
                     name: "brush_brush_bg",
                     type: "rect",
                     clip: true,
-                    encode:
-                    {
-                        enter:
-                        {
-                            fill:
-                            {
-                                value: "#333"
+                    encode: {
+                        enter: {
+                            fill: {
+                                value: "#333",
                             },
-                            fillOpacity:
-                            {
-                                value: 0.125
-                            }
+                            fillOpacity: {
+                                value: 0.125,
+                            },
                         },
-                        update:
-                        {
-                            x:
-                            [
+                        update: {
+                            x: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    signal: "brush_x[0]"
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    signal: "brush_x[0]",
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            y:
-                            [
+                            y: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    value: 0
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    value: 0,
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            x2:
-                            [
+                            x2: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    signal: "brush_x[1]"
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    signal: "brush_x[1]",
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            y2:
-                            [
+                            y2: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    field:
-                                    {
-                                        group: "height"
-                                    }
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    field: {
+                                        group: "height",
+                                    },
                                 },
                                 {
-                                    value: 0
-                                }
-                            ]
-                        }
-                    }
+                                    value: 0,
+                                },
+                            ],
+                        },
+                    },
                 },
                 {
                     name: "layer_0_marks",
                     type: "area",
-                    style:
-                    [
-                        "area"
-                    ],
-                    sort:
-                    {
-                        field: "datum[\"time\"]"
+                    style: ["area"],
+                    sort: {
+                        field: 'datum["time"]',
                     },
                     interactive: true,
-                    from:
-                    {
-                        data: "data_1"
+                    from: {
+                        data: "data_1",
                     },
-                    encode:
-                    {
-                        update:
-                        {
-                            orient:
-                            {
-                                value: "vertical"
+                    encode: {
+                        update: {
+                            orient: {
+                                value: "vertical",
                             },
-                            fill:
-                            {
-                                value: "#DCDEDF"
+                            fill: {
+                                value: "#DCDEDF",
                             },
-                            description:
-                            {
-                                signal: "\"Time: \" + (timeFormat(datum[\"time\"], '%b %d, %Y')) + \"; value: \" + (format(datum[\"value\"], \"\"))"
+                            description: {
+                                signal:
+                                    '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
                             },
-                            x:
-                            {
+                            x: {
                                 scale: "x",
-                                field: "time"
+                                field: "time",
                             },
-                            y:
-                            {
+                            y: {
                                 scale: "y",
-                                field: "value_end"
+                                field: "value_end",
                             },
-                            y2:
-                            {
+                            y2: {
                                 scale: "y",
-                                field: "value_start"
+                                field: "value_start",
                             },
-                            defined:
-                            {
-                                signal: "isValid(datum[\"time\"]) && isFinite(+datum[\"time\"]) && isValid(datum[\"value\"]) && isFinite(+datum[\"value\"])"
-                            }
-                        }
-                    }
+                            defined: {
+                                signal:
+                                    'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                            },
+                        },
+                    },
                 },
                 {
                     name: "layer_1_marks",
                     type: "area",
-                    style:
-                    [
-                        "area"
-                    ],
-                    sort:
-                    {
-                        "field": "datum[\"time\"]"
+                    style: ["area"],
+                    sort: {
+                        field: 'datum["time"]',
                     },
                     interactive: false,
-                    from:
-                    {
-                        data: "data_2"
+                    from: {
+                        data: "data_2",
                     },
-                    encode:
-                    {
-                        update:
-                        {
-                            orient:
-                            {
-                                value: "vertical"
+                    encode: {
+                        update: {
+                            orient: {
+                                value: "vertical",
                             },
-                            fill:
-                            {
-                                value: "#52b5e4"
+                            fill: {
+                                value: "#52b5e4",
                             },
-                            description:
-                            {
-                                signal: "\"Time: \" + (timeFormat(datum[\"time\"], '%b %d, %Y')) + \"; value: \" + (format(datum[\"value\"], \"\"))"
+                            description: {
+                                signal:
+                                    '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
                             },
-                            x:
-                            {
+                            x: {
                                 scale: "x",
-                                field: "time"
+                                field: "time",
                             },
-                            y:
-                            {
+                            y: {
                                 scale: "y",
-                                field: "value_end"
+                                field: "value_end",
                             },
-                            y2:
-                            {
+                            y2: {
                                 scale: "y",
-                                field: "value_start"
+                                field: "value_start",
                             },
-                            defined:
-                            {
-                                signal: "isValid(datum[\"time\"]) && isFinite(+datum[\"time\"]) && isValid(datum[\"value\"]) && isFinite(+datum[\"value\"])"
-                            }
-                        }
-                    }
+                            defined: {
+                                signal:
+                                    'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                            },
+                        },
+                    },
                 },
                 {
                     name: "brush_brush",
                     type: "rect",
                     clip: true,
-                    encode:
-                    {
-                        enter:
-                        {
-                            fill:
-                            {
-                                value: "transparent"
-                            }
+                    encode: {
+                        enter: {
+                            fill: {
+                                value: "transparent",
+                            },
                         },
-                        update:
-                        {
-                            x:
-                            [
+                        update: {
+                            x: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    signal: "brush_x[0]"
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    signal: "brush_x[0]",
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            y:
-                            [
+                            y: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    value: 0
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    value: 0,
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            x2:
-                            [
+                            x2: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    signal: "brush_x[1]"
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    signal: "brush_x[1]",
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            y2:
-                            [
+                            y2: [
                                 {
-                                    test: "data(\"brush_store\").length && data(\"brush_store\")[0].unit === \"layer_0\"",
-                                    field:
-                                    {
-                                        group: "height"
-                                    }
+                                    test: 'data("brush_store").length && data("brush_store")[0].unit === "layer_0"',
+                                    field: {
+                                        group: "height",
+                                    },
                                 },
                                 {
-                                    value: 0
-                                }
+                                    value: 0,
+                                },
                             ],
-                            stroke:
-                            [
+                            stroke: [
                                 {
                                     test: "brush_x[0] !== brush_x[1]",
-                                    value: "white"
+                                    value: "white",
                                 },
                                 {
-                                    value: null
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    type: "rect",
-                    interactive: false,
-                    encode: {
-                      enter: {
-                        y: {value: 0},
-                        height: {value: 50},
-                        width: {value: 2},
-                        fill: "transparent"
-                      },
-                      update: {
-                        x: {signal: "brush_x[0]"},
-                        fill: {value: "white"}
-                      }
-                    }
-                },
-                {
-                    type: "rect",
-                    interactive: false,
-                    encode: {
-                      enter: {
-                        y: {value: 0},
-                        height: {value: 50},
-                        width: {value: 2},
-                        fill: {value: "white"}
-                      },
-                      update: {
-                        x: {signal: "brush_x[1]"}
-                      }
-                    }
-                },
-                {
-                    type: "rect",
-                    interactive: false,
-                    name: "de_highlight",
-                    encode: {
-                      enter: {
-                        fill: {value: "#999"},
-                        opacity: {value: 0.5},
-                        y: {value: 0},
-                        height: {value: 50},
-                        width: {value: 100},
-                      },
-                      update: {
-                        x: {signal: "event_hover[0]"}
-                      }
-                    }
-                },
-                {
-                    type: "rect",
-                    interactive: false,
-                    name: "de_highlight_start",
-                    from:
-                    {
-                        data: "data_events"
+                                    value: null,
+                                },
+                            ],
+                        },
                     },
-                    encode: {
-                      enter: {
-                        fill: {value: "#999"},
-                        opacity: {value: 0.5},
-                        y: {value: 0},
-                        height: {value: 50},
-                        width: {value: 2},
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "start"}
-                      }
-                    }
                 },
-                {
-                    type: "rect",
-                    interactive: false,
-                    name: "de_highlight_end",
-                    from:
-                    {
-                        data: "data_events"
-                    },
-                    encode: {
-                      enter: {
-                        fill: {value: "#999"},
-                        opacity: {value: 0.5},
-                        y: {value: 0},
-                        height: {value: 50},
-                        width: {value: 2},
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "end"}
-                      }
-                    }
-                },
-                {
-                    type: "symbol",
-                    interactive: true,
-                    name: "de_circle",
-                    from:
-                    {
-                        data: "data_events"
-                    },
-                    encode: {
-                      enter: {
-                        yc: {value: 50},
-                        fill: {value: "white"},
-                        stroke: {value: "#999"},
-                        size: {value: 700},
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "start"}
-                      }
-                    }
-                },
-                {
-                    type: "path",
-                    interactive: false,
-                    name: "de_flag",
-                    from:
-                    {
-                        data: "data_events"
-                    },
-                    encode: {
-                      enter: {
-                        yc: {value: 50},
-                        fill: {value: "#52b5e4"},
-                        size: {value: 100},
-                        path: {value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z"}
-                      },
-                      update: {
-                        "x": {"scale": "x", "field": "start"}
-                      }
-                    }
-                },
-                {
-                    type: "symbol",
-                    interactive: true,
-                    clip: true,
-                    name: "right_scrub",
-                    encode: {
-                      enter: {
-                        yc: {value: 25},
-                        fill: "transparent",
-                        size: {value: 100}
-                      },
-                      update: {
-                        xc: {signal: "brush_x[1] + 1"},
-                        fill: {value: "#b6b6b6"},
-                        stroke: {value: "#999"}
-                      }
-                    }
-                },
-                {
-                    type: "symbol",
-                    interactive: true,
-                    clip: true,
-                    name: "left_scrub",
-                    encode: {
-                      enter: {
-                        yc: {value: 25},
-                        fill: "transparent",
-                        size: {value: 100}
-                      },
-                      update: {
-                        xc: {signal: "brush_x[0] + 1"},
-                        fill: {value: "#b6b6b6"},
-                        stroke: {value: "#999"}
-                      }
-                    }
-                },
+                ...interactiveMarks(),
             ],
-            scales:
-            [
+            scales: [
                 {
                     name: "x",
                     type: "time",
                     domain: timeRangeAll,
-                    range:
-                    [
+                    range: [
                         0,
                         {
-                            signal: "width"
-                        }
-                    ]
+                            signal: "width",
+                        },
+                    ],
                 },
                 {
                     name: "y",
                     type: "linear",
-                    domain:
-                    {
-                        fields:
-                        [
+                    domain: {
+                        fields: [
                             {
-                                "data": "data_1",
-                                "field": "value_start"
+                                data: "data_1",
+                                field: "value_start",
                             },
                             {
-                                "data": "data_1",
-                                "field": "value_end"
+                                data: "data_1",
+                                field: "value_end",
                             },
                             {
-                                "data": "data_2",
-                                "field": "value_start"
+                                data: "data_2",
+                                field: "value_start",
                             },
                             {
-                                "data": "data_2",
-                                "field": "value_end"
-                            }
-                        ]
+                                data: "data_2",
+                                field: "value_end",
+                            },
+                        ],
                     },
-                    range:
-                    [
+                    range: [
                         {
-                            signal: "height"
+                            signal: "height",
                         },
-                        0
+                        0,
                     ],
                     nice: true,
-                    zero: true
-                }
+                    zero: true,
+                },
             ],
-            axes:
-            [
+            axes: [
                 {
                     scale: "x",
                     orient: "bottom",
                     grid: false,
-                    //title: "Time",
                     formatType: "time",
                     labelPadding: -14,
                     tickCount: 8,
                     titlePadding: 5,
                     labelFlush: true,
                     labelOverlap: true,
-                    zindex: 0
+                    zindex: 0,
                 },
                 {
                     scale: "y",
@@ -1036,12 +814,11 @@ export class ScrubberSpecFactory {
                     labelOpacity: 0,
                     titleOpacity: 0,
                     labelOverlap: true,
-                    tickCount:
-                    {
-                        signal: "ceil(height/40)"
+                    tickCount: {
+                        signal: "ceil(height/40)",
                     },
-                    zindex: 0
-                }
+                    zindex: 0,
+                },
             ],
         };
     }

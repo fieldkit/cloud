@@ -1,24 +1,14 @@
 <template>
-    <div class="project-detail-card">
+    <div class="project-detail-card" :class="{ 'mobile-expanded': showLinksOnMobile }" @click="showLinksOnMobile = !showLinksOnMobile">
         <div class="photo-container">
             <ProjectPhoto :project="project" :image-size="150" />
         </div>
         <div class="detail-container">
-            <div class="flex flex-al-center">
-                <h1 class="detail-title">{{ project.name }}</h1>
-                <router-link v-if="!isPartnerCustomisationEnabled" :to="{ name: 'viewProject', params: { id: project.id } }" class="link">
-                    Project Dashboard >
-                </router-link>
-                <a v-for="link in partnerCustomization.links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
-                    {{ $t(link.text) }} >
-                </a>
-            </div>
-            <div class="detail-description">{{ project.description }}</div>
-
-            <div
-                v-if="partnerCustomization.templates.extraProjectDescription"
-                v-html="partnerCustomization.templates.extraProjectDescription"
-            ></div>
+            <component
+                v-bind:is="partnerCustomization.components.project"
+                :project="project"
+                :showLinksOnMobile="showLinksOnMobile"
+            ></component>
         </div>
     </div>
 </template>
@@ -40,6 +30,15 @@ export default Vue.extend({
             required: true,
         },
     },
+    data(): {
+        showLinksOnMobile: boolean;
+        isMobileView: boolean;
+    } {
+        return {
+            showLinksOnMobile: false,
+            isMobileView: window.screen.availWidth < 768,
+        };
+    },
     computed: {
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -58,8 +57,6 @@ export default Vue.extend({
 .project-detail-card {
     display: flex;
     border: 1px solid var(--color-border);
-    border-radius: 3px;
-    z-index: $z-index-top;
     width: 100%;
     position: absolute;
     top: 66px;
@@ -68,46 +65,80 @@ export default Vue.extend({
     background-color: #ffffff;
     text-align: left;
     padding: 27px 30px;
-
-    @include bp-down($sm) {
-        width: 100%;
-        position: fixed;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        bottom: 0px;
-        text-align: center;
-        padding-bottom: 10px;
-        top: auto;
-        right: auto;
-        align-items: center;
-        justify-content: center;
-    }
+    z-index: $z-index-top;
 
     body.floodnet & {
         background-color: #f6f9f8;
+
+        @include bp-down($sm) {
+            background-color: #ffffff;
+        }
     }
 
-    .link {
+    @include bp-down($sm) {
+        width: 100%;
+        padding: 10px;
+        top: 52px;
+        align-items: center;
+        border-left-width: 0;
+        border-right-width: 0;
+        z-index: 10;
+
+        &:after {
+            content: "";
+            width: 0;
+            height: 0;
+            border-width: 8px 8px 0 8px;
+            border-color: #d8d8d8 transparent transparent transparent;
+            border-style: solid;
+            margin-left: auto;
+        }
+
+        &.mobile-expanded:after {
+            border-width: 0 8px 8px 8px;
+            border-color: transparent transparent #d8d8d8 transparent;
+        }
+    }
+
+    ::v-deep .link {
         color: $color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
+        display: block;
+
+        @include bp-down($sm) {
+            font-family: $font-family-medium;
+            font-size: 14px;
+        }
 
         body.floodnet & {
-            color: $color-dark;
+            @include bp-up($sm) {
+                color: $color-dark;
+            }
         }
     }
 }
-.detail-title {
-    font-family: var(--font-family-bold);
+
+.detail-container {
+    overflow: hidden;
+}
+
+::v-deep .detail-title {
+    font-family: $font-family-bold;
     font-size: 18px;
     margin-top: 0;
     margin-bottom: 2px;
     margin-right: 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    @include bp-down($sm) {
+        margin-bottom: 0;
+    }
 }
-.detail-container {
-    width: 75%;
-}
+
 ::v-deep .detail-description {
     font-family: var(--font-family-light);
     font-size: 14px;
@@ -115,13 +146,51 @@ export default Vue.extend({
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    max-height: 35px;
     overflow: hidden;
     margin-right: 10px;
+
+    .link {
+        display: inline-block;
+        font-size: 14px;
+        text-decoration: underline;
+    }
+
+    @include bp-down($sm) {
+        display: none;
+    }
+}
+
+::v-deep .detail-links {
+    @include bp-down($sm) {
+        position: absolute;
+        top: 51px;
+        left: 0;
+        background-color: #fff;
+        width: 100%;
+        padding: 12px 10px 7px 10px;
+        opacity: 0;
+        visibility: hidden;
+        box-sizing: border-box;
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+
+        &.mobile-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .link {
+            color: $color-dark;
+            border: 1px solid $color-dark;
+            border-radius: 25px;
+            padding: 6px 12px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+    }
 }
 
 .photo-container {
-    width: 38px;
+    flex: 0 0 38px;
     height: 38px;
     margin: 0 12px 0 0;
 
@@ -130,7 +199,8 @@ export default Vue.extend({
     }
 
     @include bp-down($sm) {
-        display: none;
+        flex-basis: 30px;
+        height: 30px;
     }
 }
 </style>

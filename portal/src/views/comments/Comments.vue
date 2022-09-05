@@ -933,6 +933,10 @@ header {
 
 .no-comments {
     margin-left: 20px;
+
+    @include bp-down($xs) {
+      margin-left: 10px;
+    }
 }
 .event-sensor-selector {
     display: flex;

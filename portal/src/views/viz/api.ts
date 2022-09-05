@@ -32,6 +32,7 @@ export interface VizConfig {
     name: string;
     disabled: boolean;
     thresholds: VizThresholds;
+    minimumGap: number | undefined;
 }
 
 export type SensorStrings = { [index: string]: Record<string, string> };
@@ -73,11 +74,15 @@ export interface Summary {
 
 export interface DataRow {
     time: number;
-    stationId: number | null;
-    sensorId: number | null;
-    moduleId: string | null;
+    stationId: number;
+    sensorId: number;
+    moduleId: string;
     location: [number, number] | null;
-    value: number | null;
+    value: number | null; // TODO Remove
+    avg: number | undefined;
+    min: number | undefined;
+    max: number | undefined;
+    last: number | undefined;
 }
 
 export interface SensorDataResponse {

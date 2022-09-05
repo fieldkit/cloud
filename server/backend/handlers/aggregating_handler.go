@@ -164,15 +164,19 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 					ModuleID:  sm.ID,
 				}
 
-				if !v.skipManual {
-					if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
-						return fmt.Errorf("error adding: %v", err)
+				if db.Time.After(time.Now()) {
+					log.Warnw("ignored-future-sample", "data_record_id", db.ID, "future_time", db.Time)
+				} else {
+					if !v.skipManual {
+						if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
+							return fmt.Errorf("error adding: %v", err)
+						}
 					}
-				}
 
-				if v.tsConfig != nil {
-					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
-						return fmt.Errorf("error saving: %v", err)
+					if v.tsConfig != nil {
+						if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
+							return fmt.Errorf("error saving: %v", err)
+						}
 					}
 				}
 			}

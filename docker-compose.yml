@@ -9,10 +9,11 @@ services:
       - POSTGRES_USER=fieldkit
       - POSTGRES_PASSWORD=password
     volumes:
+      - ./.db:/var/lib/postgresql/data
       - ./active-schema:/docker-entrypoint-initdb.d/:ro
 
   tsdb:
-    image: timescale/timescaledb:latest-pg13
+    image: timescale/timescaledb:2.4.2-pg13
     ports:
       - "5433:5432"
     environment:

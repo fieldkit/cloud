@@ -55,7 +55,10 @@ func TestCreateStationNotes(t *testing.T) {
 			"author": "<<PRESENCE>>",
 			"media": []
 		}],
-		"media": []
+		"media": [],
+		"station": {
+			"readOnly": false
+		}
 	}`)
 }
 
@@ -110,6 +113,9 @@ func TestUpdateStationNotes(t *testing.T) {
 			"version": "<<PRESENCE>>",
 			"author": "<<PRESENCE>>",
 			"media": []
-		}]
+		}],
+		"station": {
+			"readOnly": false
+		}
 	}`, int64(id.Num))
 }

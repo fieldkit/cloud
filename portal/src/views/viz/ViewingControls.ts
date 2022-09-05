@@ -11,7 +11,7 @@ import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
 
 interface VueDatepickerStyles {
-    // this type might be extended with other customisations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
+    // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
     highlight: {
         start: {
             style: {
@@ -65,12 +65,12 @@ export const SensorSelectionRow = Vue.extend({
         },
     },
     computed: {
-        selectedStation(): number | null {
+        selectedStation(): string | null {
             if (this.disabled) {
                 return null;
             }
             const originalStationId = this.ds.vizSensor[0]; // TODO VizSensor
-            return originalStationId;
+            return `${originalStationId}`;
         },
         selectedSensor(): string | null {
             if (this.disabled) {
@@ -85,11 +85,15 @@ export const SensorSelectionRow = Vue.extend({
             }
             return this.viz.busy;
         },
+        searchable(): boolean {
+            return !(window.screen.availWidth <= 768);
+        },
     },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
-                const newSeries = this.workspace.makeSeries(Number(node.id), null);
+                if (!node.stationId) throw new Error();
+                const newSeries = this.workspace.makeSeries(Number(node.stationId), null);
                 console.log("raising viz-change-series", newSeries);
                 this.$emit("viz-change-series", newSeries);
             });
@@ -106,7 +110,7 @@ export const SensorSelectionRow = Vue.extend({
     },
     template: `
 		<div class="tree-pair">
-            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="true" :disable-branch-nodes="true" />
+            <treeselect :disabled="disabled" :value="selectedStation" :options="stationOptions" open-direction="bottom" @select="raiseChangeStation" :clearable="false" :searchable="searchable" :disable-branch-nodes="true" />
             <treeselect :disabled="disabled" :value="selectedSensor" :options="sensorOptions" open-direction="bottom" @select="raiseChangeSensor" :default-expand-level="3" :clearable="false" :searchable="false" :disable-branch-nodes="true" />
 		</div>
     `,
@@ -264,7 +268,7 @@ export const ViewingControls = Vue.extend({
                 return color + _opacity.toString(16).toUpperCase();
             };
 
-            // for calendar range selection
+            // For calendar range selection
             return {
                 highlight: {
                     start: {
@@ -320,27 +324,39 @@ export const ViewingControls = Vue.extend({
                 // the viz changes the visible time, which we're bound to
                 // so we do this to avoid raising a duplicate and querying
                 // twice. I dunno if there's a better way.
-
                 if (!this.manualRangeValue) {
                     return;
                 }
+
+                const rangeViz = this.viz.visibleTimeRange;
 
                 let pickerStart: Date = new Date();
                 let pickerEnd: Date = new Date();
 
                 if (pickerType === "start") {
-                    pickerStart = fromPicker;
+                    if (fromPicker.getTime() === rangeViz.start) {
+                        console.log("viz: swallow(same-start)");
+                        return;
+                    }
+
+                    pickerStart = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate(), 0, 0, 0, 0);
                     pickerEnd = this.manualRangeValue.end;
                 }
+
                 if (pickerType === "end") {
+                    if (fromPicker.getTime() == rangeViz.end) {
+                        console.log("viz: swallow(same-end)");
+                        return;
+                    }
+
                     pickerStart = this.manualRangeValue.start;
-                    pickerEnd = fromPicker;
+                    pickerEnd = new Date(fromPicker.getFullYear(), fromPicker.getMonth(), fromPicker.getDate(), 23, 59, 59, 999);
                 }
 
-                const rangeViz = this.viz.visibleTimeRange;
                 const rangePicker = new TimeRange(pickerStart.getTime(), pickerEnd.getTime());
+
                 if (rangeViz.start != rangePicker.start || rangeViz.end != rangePicker.end) {
-                    console.log("viz: raising viz-time-zoomed", rangeViz, rangePicker);
+                    console.log("viz: raising viz-time-zoomed", "viz", rangeViz.describe(), "picked", rangePicker.describe());
                     this.$emit("viz-time-zoomed", new TimeZoom(null, rangePicker));
                 } else {
                     console.log("viz: swallowing viz-time-zoomed");
@@ -354,13 +370,15 @@ export const ViewingControls = Vue.extend({
 				<div class="left">
 				</div>
 				<div class="right time">
-					<span class="view-by">View By:</span>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }">Week</div>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }">2 Week</div>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }">Month</div>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
-					<div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
+                    <div class="fast-time-container">
+                        <span class="view-by">View By:</span>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }">Week</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }">2 Week</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }">Month</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
+                    </div>
 					<div class="date-picker flex" v-if="manualRangeValue">
 						<v-date-picker :value="manualRangeValue.start" @input="raiseManualTime($event, 'start')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
                                        :drag-attribute="datepickerStyles" :maxDate="manualRangeValue.end" is-inline

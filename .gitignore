@@ -27,3 +27,4 @@ fk-saml.key
 fkserver.json
 influxdb
 .tsdb
+.db

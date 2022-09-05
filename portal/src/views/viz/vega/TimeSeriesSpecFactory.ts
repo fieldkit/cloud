@@ -55,48 +55,45 @@ export class TimeSeriesSpecFactory {
             const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
             const original = series.queried.data;
 
-            function sanitize(original: DataRow[]): DataRow[] {
-                // This was the first approach we tried to prevent
-                // the infilled missing values from creating
-                // distracting graphs of too many valid data
-                // islands.
-                /*
-                const valid = original.filter((datum) => _.isNumber(datum.value));
-                const deltas = calculateTimeDeltas(valid);
+            // If a sensor has a custom filter, that information will be in the vizInfo object.
+            const afterCustomFilter = series.vizInfo.applyCustomFilter(original);
 
-                // console.log("viz: gaps", calculateGaps(original));
-                // console.log("viz: deltas", _.mean(deltas) / 60000);
+            // Decorate the rows with information about the series and the vizInfo details necessary for rendering/tooltips.
+            const afterProperties = afterCustomFilter.map((datum) => _.extend(datum, properties));
 
-                // Very simple heuristic for enabling re-bin. We
-                // basically rebin to the average interval if more
-                // of the data is invalid than valid. I think we can
-                // do better.
-                if (original.length - valid.length > valid.length) {
-                    const meanBetweenValid = _.mean(deltas);
-                    const interval = Math.ceil(meanBetweenValid / 60000) * 60000;
-                    console.log("viz: rebin", interval);
-                    return rebin(original, interval);
-                } else {
-                    console.log("viz: rebin-skip", original.length - valid.length, valid.length);
+            // Add gap information so we can determine where missing data lies.
+            const addGaps = (rows) => {
+                for (let i = 0; i < rows.length; ++i) {
+                    if (i == rows.length - 1) {
+                        rows[i].gap = 0;
+                    } else {
+                        rows[i].gap = (rows[i + 1].time - rows[i].time) / 1000;
+                    }
                 }
-                */
+                return rows;
+            };
 
-                // This is the another approach we're trying,
-                // basically remove missing data if the queried
-                // resolution is finer than the expected sensor
-                // data's resolution.
-                if (series.queried.shouldIgnoreMissing) {
-                    return original.filter((datum) => _.isNumber(datum.value));
+            const afterGapsAdded = addGaps(afterProperties);
+
+            // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
+
+            const maybeMinimumGap = series.vizInfo.minimumGap;
+
+            const addMinimumGap = (rows) => {
+                if (!maybeMinimumGap || !series.queried.bucketSize) {
+                    return rows;
                 }
 
-                return original;
-            }
+                if (series.queried.bucketSize > maybeMinimumGap) {
+                    return rows.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
+                }
 
-            function applyCustomFilter(rows: DataRow[]): DataRow[] {
-                return series.vizInfo.applyCustomFilter(rows);
-            }
+                return rows.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
+            };
 
-            return sanitize(applyCustomFilter(original)).map((datum) => _.extend(datum, properties));
+            const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded);
+
+            return afterMostMinimumGapAdded;
         });
 
         // This returns the domain for a single series. Primarily responsible
@@ -130,9 +127,11 @@ export class TimeSeriesSpecFactory {
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
 
+        const timeLabel = "Time (" + Intl.DateTimeFormat().resolvedOptions().timeZone + ")";
+
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {
-                console.log("viz: identical-y", dataRangeAll);
+                // console.log("viz: identical-y", dataRangeAll);
                 return dataRangeAll;
             }
             return makeSeriesDomain(series, i);
@@ -147,7 +146,7 @@ export class TimeSeriesSpecFactory {
                 : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
 
         if (timeRangeAll) {
-            console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+            // console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
         }
 
         const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
@@ -301,23 +300,27 @@ export class TimeSeriesSpecFactory {
         );
 
         const tinyXAxis = () => {
-            const formatMonth = (v: number): string => {
-                return moment(new Date(v)).format("M/D/YYYY");
-            };
-
             return [
                 {
                     orient: "bottom",
                     scale: "x",
                     domain: xDomain || [0, 1],
-                    tickCount: 0,
-                    // values: xDomain,
+                    tickCount: undefined,
+                    values: xDomain,
                     titleFontSize: 12,
                     titlePadding: 4,
                     titleFontWeight: "normal",
-                    labelPadding: 5,
-                    title: xDomain?.map((v) => formatMonth(v)).join(" - ") || "",
-                    format: "%m/%d/%Y",
+                    labelPadding: 0,
+                    format: "%m/%d/%Y %H:%M",
+                    encode: {
+                        labels: {
+                            update: {
+                                align: {
+                                    signal: "item === item.mark.items[0] ? 'left' : 'right'",
+                                },
+                            },
+                        },
+                    },
                 },
             ];
         };
@@ -327,26 +330,42 @@ export class TimeSeriesSpecFactory {
                 return [];
             }
 
+            if (this.settings.mobile) {
+                return tinyXAxis();
+            }
+
+            const getTimeTicks = () => {
+                if (this.settings.estimated && xDomain) {
+                    const number = Math.ceil(this.settings.estimated.w / 250);
+                    const range = xDomain[1] - xDomain[0];
+                    const step = range / number;
+                    return _.range(0, number + 1).map((n) => xDomain[0] + n * step);
+                }
+                return xDomain;
+            };
+            const values = getTimeTicks();
+
             return [
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain,
-                    tickCount: 6,
+                    domain: xDomain || [0, 1],
+                    tickCount: undefined,
                     labelPadding: -24,
                     tickSize: 30,
                     tickDash: [2, 2],
-                    title: "Time",
-                    format: {
-                        year: "%m/%d/%Y",
-                        quarter: "%m/%d/%Y",
-                        month: "%m/%d/%Y",
-                        week: "%m/%d/%Y",
-                        date: "%m/%d/%Y",
-                        hours: "%m/%d/%Y %H:%M",
-                        minutes: "%m/%d/%Y %H:%M",
-                        seconds: "%m/%d/%Y %H:%M",
-                        milliseconds: "%m/%d/%Y %H:%M",
+                    title: timeLabel,
+                    values: values,
+                    format: "%m/%d/%Y %H:%M",
+                    encode: {
+                        labels: {
+                            update: {
+                                align: {
+                                    signal:
+                                        "item === item.mark.items[0] ? 'left' : item === item.mark.items[item.mark.items.length - 1] ? 'right' : 'center'",
+                                },
+                            },
+                        },
                     },
                 },
             ];
@@ -445,6 +464,8 @@ export class TimeSeriesSpecFactory {
                     };
                 } else {
                     return {
+                        domain: [""],
+                        range: [i == 0 ? "#003F5C" : "#6ef0da"], // primaryLine, secondaryLine
                         name: strokeName,
                         type: "ordinal",
                     };
@@ -682,7 +703,7 @@ export class TimeSeriesSpecFactory {
                     },
                 };
 
-                const firstLineMark = {
+                const dashedLineMark = {
                     type: "line",
                     from: {
                         data: makeValidDataName(i),
@@ -730,7 +751,7 @@ export class TimeSeriesSpecFactory {
 
                             return {
                                 type: "line",
-                                from: { data: makeDataName(i) },
+                                from: { data: makeValidDataName(i) },
                                 encode: {
                                     enter: {
                                         interpolate: { value: "cardinal" },
@@ -739,7 +760,7 @@ export class TimeSeriesSpecFactory {
                                         x: { scale: scales.x, field: "time" },
                                         y: { scale: scales.y, field: alias },
                                         strokeWidth: { value: strokeWidth },
-                                        defined: { signal: `isValid(datum.${alias})` },
+                                        defined: { signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap` },
                                     },
                                     update: {
                                         strokeOpacity: {
@@ -754,7 +775,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: _.concat([firstLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                            marks: _.concat([dashedLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
                         },
                     ];
                 } else {
@@ -771,7 +792,7 @@ export class TimeSeriesSpecFactory {
                                 x: { scale: scales.x, field: "time" },
                                 y: { scale: scales.y, field: "value" },
                                 strokeWidth: { value: 2 },
-                                defined: { signal: "isValid(datum.value)" },
+                                defined: { signal: `!datum.minimumGap || datum.gap <= datum.minimumGap` },
                             },
                             update: {
                                 strokeOpacity: {
@@ -783,7 +804,7 @@ export class TimeSeriesSpecFactory {
                     return [
                         {
                             type: "group",
-                            marks: [firstLineMark, lineMark, symbolMark],
+                            marks: [dashedLineMark, lineMark, symbolMark],
                         },
                     ];
                 }
@@ -870,7 +891,8 @@ export class TimeSeriesSpecFactory {
                             tooltip: {
                                 signal: `{
                                 title: datum.vizInfo.label,
-                                Value: join([round(datum.value*10)/10, datum.vizInfo.unitOfMeasure || ''], ' '),
+                                unitOfMeasure: datum.vizInfo.unitOfMeasure,
+                                value: datum.value,
                                 time: timeFormat(datum.time, '%m/%d/%Y %H:%M'),
                                 name: datum.name
                             }`,
@@ -1180,7 +1202,7 @@ export class TimeSeriesSpecFactory {
             ...staticSignals,
         ];
 
-        const allSignals = this.settings.tiny ? tinySignals : this.settings.w == 0 ? interactiveSignals : staticSignals;
+        const allSignals = this.settings.tiny ? tinySignals : this.settings.size.w == 0 ? interactiveSignals : staticSignals;
 
         return this.buildSpec(
             allSignals as never[],
@@ -1224,6 +1246,15 @@ export class TimeSeriesSpecFactory {
                     gridDash: [],
                 },
                 style: chartStyles,
+                legend: {
+                    layout: {
+                        top: {
+                            anchor: "left",
+                            direction: this.settings.mobile ? "vertical" : "horizontal",
+                            margin: 0,
+                        },
+                    },
+                },
             },
             signals: signals,
             data: data,
