@@ -204,7 +204,7 @@ export default Vue.extend({
     white-space: nowrap;
 }
 .reading .uom {
-    font-size: 10px;
+    font-size: 12px;
     margin-bottom: -3px;
 }
 .reading.degrees .uom {

@@ -168,7 +168,7 @@ export default Vue.extend({
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
-        font-size: 10px;
+        font-size: 12px;
         min-width: 50px;
     }
 
