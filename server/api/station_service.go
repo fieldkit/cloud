@@ -671,8 +671,6 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	media := findStaticImageOrGif(allMedia)
 
-	photoCache := NewPhotoCache(c.options.MediaFiles)
-
 	var resize *PhotoResizeSettings
 	if payload.Size != nil {
 		resize = &PhotoResizeSettings{
@@ -680,7 +678,7 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		}
 	}
 
-	photo, err := photoCache.Load(ctx, &ExternalMedia{
+	photo, err := c.options.photoCache.Load(ctx, &ExternalMedia{
 		URL:         media.URL,
 		ContentType: media.ContentType,
 	},

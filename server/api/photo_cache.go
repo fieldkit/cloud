@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/files"
 )
 
@@ -21,7 +22,8 @@ const (
 )
 
 type PhotoCache struct {
-	mr *repositories.MediaRepository
+	mr   *repositories.MediaRepository
+	pile *Pile
 }
 
 type ExternalMedia struct {
@@ -46,9 +48,10 @@ type PhotoFromCache struct {
 	EtagMatch   bool
 }
 
-func NewPhotoCache(originals files.FileArchive) *PhotoCache {
+func NewPhotoCache(originals files.FileArchive, metrics *logging.Metrics) *PhotoCache {
 	return &PhotoCache{
-		mr: repositories.NewMediaRepository(originals),
+		mr:   repositories.NewMediaRepository(originals),
+		pile: NewPile(metrics, "photos"),
 	}
 }
 
@@ -70,6 +73,30 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 		}
 	}
 
+	// Local cache
+	if !pc.pile.IsOpen() {
+		if err := pc.pile.Open(ctx); err != nil {
+			return nil, err
+		}
+	}
+
+	if cached, size, err := pc.pile.Find(ctx, PileKey(etag)); err != nil {
+		return nil, err
+	} else if cached != nil {
+		buffer := make([]byte, size)
+		_, err := io.ReadFull(cached, buffer)
+		if err != nil {
+			return nil, err
+		}
+
+		return &PhotoFromCache{
+			Etag:        etag,
+			Bytes:       buffer,
+			ContentType: media.ContentType,
+			Size:        uint(size),
+		}, nil
+	}
+
 	lm, err := pc.mr.LoadByURL(ctx, media.URL)
 	if err != nil {
 		return nil, err
@@ -84,6 +111,10 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 			return nil, err
 		}
 
+		if err := pc.pile.AddBytes(ctx, PileKey(etag), buffer); err != nil {
+			return nil, err // TODO Reconsider
+		}
+
 		return &PhotoFromCache{
 			Etag:        etag,
 			Bytes:       buffer,
@@ -92,10 +123,14 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 		}, nil
 	}
 
-	if resize != nil && media.ContentType == MimeTypeJpeg || media.ContentType == MimeTypePng {
+	if resize != nil && (media.ContentType == MimeTypeJpeg || media.ContentType == MimeTypePng) {
 		resized, err := resizeLoadedMedia(ctx, lm, uint(resize.Size), 0)
 		if err != nil {
 			return nil, err
+		}
+
+		if err := pc.pile.AddBytes(ctx, PileKey(etag), resized.Data); err != nil {
+			return nil, err // TODO Reconsider
 		}
 
 		return &PhotoFromCache{
@@ -126,6 +161,10 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 
 		data := buf.Bytes()
 
+		if err := pc.pile.AddBytes(ctx, PileKey(etag), data); err != nil {
+			return nil, err // TODO Reconsider
+		}
+
 		return &PhotoFromCache{
 			Etag:        etag,
 			Bytes:       data,
@@ -136,6 +175,10 @@ func (pc *PhotoCache) Load(ctx context.Context, media *ExternalMedia, resize *Ph
 		data, err := ioutil.ReadAll(lm.Reader)
 		if err != nil {
 			return nil, err
+		}
+
+		if err := pc.pile.AddBytes(ctx, PileKey(etag), data); err != nil {
+			return nil, err // TODO Reconsider
 		}
 
 		return &PhotoFromCache{

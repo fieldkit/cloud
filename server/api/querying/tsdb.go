@@ -675,9 +675,11 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	allRows := make([]*backend.DataRow, 0)
 	stations := make(map[int32]*StationTailInfo)
 	for _, tailed := range byStation {
-		allRows = append(allRows, tailed.Rows...)
-		stations[tailed.StationID] = &StationTailInfo{
-			BucketSize: tailed.BucketSize,
+		if tailed != nil { // Just in case this station had an error.
+			allRows = append(allRows, tailed.Rows...)
+			stations[tailed.StationID] = &StationTailInfo{
+				BucketSize: tailed.BucketSize,
+			}
 		}
 	}
 
