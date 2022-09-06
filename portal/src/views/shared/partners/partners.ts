@@ -154,7 +154,7 @@ function getDeploymentDate(station: DisplayStation): string | null {
 export function getPartnerCustomization(): PartnerCustomization | null {
     // dataviz.floodnet.nyc, floodnet.fieldkit.org
     const hostname = Config.partners.hostOverride || window.location.hostname;
-    if (hostname.indexOf("floodnet.") <= 0) {
+    if (hostname.indexOf("floodnet.") >= 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
