@@ -329,8 +329,7 @@ export default Vue.extend({
 ::v-deep .stations-list {
     @include flex();
     flex-wrap: wrap;
-    padding: 100px 70px;
-    margin: -20px;
+    padding: 100px 40px;
     width: 100%;
     box-sizing: border-box;
 
