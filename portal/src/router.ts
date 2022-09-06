@@ -261,7 +261,7 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/projects/:id/map/list",
+        path: "/dashboard/projects/:id/list",
         name: "viewProjectBigMapList",
         component: ProjectBigMap,
         props: (route) => {
