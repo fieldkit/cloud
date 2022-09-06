@@ -214,7 +214,7 @@ export default Vue.extend({
     }
 }
 .save-label {
-    font-size: 10px;
+    font-size: 12px;
     margin-left: 5px;
 }
 </style>
