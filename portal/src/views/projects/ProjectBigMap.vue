@@ -421,8 +421,7 @@ export default Vue.extend({
 .stations-list {
     @include flex();
     flex-wrap: wrap;
-    padding: 160px 70px;
-    margin: -20px;
+    padding: 160px 40px;
     width: 100%;
     box-sizing: border-box;
 
