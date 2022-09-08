@@ -1163,23 +1163,23 @@ export class TimeSeriesSpecFactory {
                     {
                         events: {
                             source: "view",
-                            type: "mousedown",
+                            type: "touchstart",
                         },
                         update: "[x(unit), x(unit), 0]",
                     },
                     {
                         events: {
                             source: "view",
-                            type: "mousemove",
+                            type: "touchmove",
                             consume: true,
                             between: [
                                 {
                                     source: "view",
-                                    type: "mousedown",
+                                    type: "touchstart",
                                 },
                                 {
                                     source: "view",
-                                    type: "mouseup",
+                                    type: "touchend",
                                 },
                             ],
                         },
@@ -1188,7 +1188,7 @@ export class TimeSeriesSpecFactory {
                     {
                         events: {
                             source: "view",
-                            type: "mouseup",
+                            type: "touchend",
                         },
                         update: "[drag_x[0], x(unit), 2]",
                     },
