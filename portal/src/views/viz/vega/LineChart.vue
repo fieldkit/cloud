@@ -63,7 +63,7 @@ export default Vue.extend({
                 return;
             }
 
-            const brushable = false;
+            const brushable = !this.settings.mobile;
             const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable);
 
             const spec = factory.create();
@@ -155,7 +155,7 @@ export default Vue.extend({
                                 // throttled(zoomed);
                             }
                         } else {
-                            // console.log("drag_time", value);
+                            console.log("drag-time", value);
                         }
                     });
                 }

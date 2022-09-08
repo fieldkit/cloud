@@ -90,7 +90,7 @@ export const VizGroup = Vue.extend({
                 </component>
             </div>
             <div>
-                <VegaScrubber :allSeries="workspace.allGroupSeries(group)" :visible="group.visible" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+                <VegaScrubber :allSeries="workspace.allGroupSeries(group)" :visible="group.visible" :dragging="group.dragging" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
             </div>
         </div>
 	`,

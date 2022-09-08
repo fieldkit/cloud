@@ -1201,7 +1201,7 @@ export class TimeSeriesSpecFactory {
                         events: {
                             signal: "drag_x",
                         },
-                        update: 'drag_x[0] === drag_x[1] ? null : [invert("x", drag_x[0]), invert("x", drag_x[1]), drag_x]',
+                        update: '[invert("x", drag_x[0]), invert("x", drag_x[1]), drag_x]',
                     },
                 ],
             },

@@ -25,8 +25,14 @@ export default {
             type: Object as PropType<TimeRange>,
             required: true,
         },
+        dragging: {
+            type: Boolean,
+            required: true,
+        },
     },
-    data(): { vega: unknown | null } {
+    data(): {
+        vega: unknown | null;
+    } {
         return { vega: null };
     },
     async mounted(): Promise<void> {
@@ -34,15 +40,26 @@ export default {
     },
     watch: {
         async series(): Promise<void> {
+            console.log("viz:", "scrubber: refresh(ignored, series)");
             // await this.refresh();
         },
-        async visible() {
+        async visible(): Promise<void> {
+            this.pickRange(this.visible);
+        },
+        async dragging(dragging): Promise<void> {
+            console.log("viz:", "scrubber: dragging", dragging);
+            if (dragging) {
+                const test = this.visible.expand(4).toArray();
+                await this.vega.view.signal("visible_times", test).runAsync();
+            } else {
+                await this.vega.view.signal("visible_times", this.series[0].queried.timeRange).runAsync();
+            }
             this.pickRange(this.visible);
         },
     },
     methods: {
         async refresh(): Promise<void> {
-            console.log("scrubber: refresh");
+            console.log("viz:", "scrubber: refresh");
 
             const factory = new ScrubberSpecFactory(
                 this.series,
@@ -80,8 +97,8 @@ export default {
                 console.log("viz: vega:scrubber:brushing-ignore");
                 return;
             }
-            const x = times.toArray().map((v) => this.vega.view.scale("x")(v));
             // console.log("viz: vega:scrubber:brushing", times, x);
+            const x = times.toArray().map((v) => this.vega.view.scale("x")(v));
             try {
                 await this.vega.view
                     .signal("brush_x", x)

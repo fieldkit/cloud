@@ -360,6 +360,7 @@ export class Graph extends Viz {
         if (this.dragged) {
             return this.dragged;
         }
+
         const range = this.timeRangeOfAll;
         const visible = this.visible;
         if (range && visible.isExtreme()) {
@@ -425,6 +426,10 @@ export class Graph extends Viz {
         } else {
             this.dragged = null;
         }
+    }
+
+    public get dragging(): boolean {
+        return this.dragged !== null;
     }
 
     public geoZoomed(zoom: GeoZoom): GeoZoom {
@@ -598,8 +603,12 @@ export class Group {
             });
     }
 
+    public get dragging(): boolean {
+        return this.numberedChildren.filter((row) => row.graph.dragging).length > 0;
+    }
+
     public get visible(): TimeRange {
-        return TimeRange.mergeArrays(this.numberedChildren.map((v) => v.graph.visibleTimeRange.toArray()));
+        return TimeRange.fromArrayIntersections(this.numberedChildren.map((v) => v.graph.visibleTimeRange.toArray()));
     }
 
     public bookmark(): GroupBookmark {
@@ -957,7 +966,7 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
 
-    public addStandardGraph(vizSensor: VizSensor): Workspace {
+    private addStandardGraph(vizSensor: VizSensor): Workspace {
         return this.addGraph(new Graph(TimeRange.eternity, [new DataSetSeries(vizSensor)]));
     }
 

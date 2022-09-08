@@ -63,6 +63,10 @@ export class TimeRange {
         return new TimeRange(min, max);
     }
 
+    public static fromArrayIntersections(ranges: number[][]): TimeRange {
+        return TimeRange.mergeArrays(ranges);
+    }
+
     public static mergeArraysIgnoreExtreme(ranges: number[][]): TimeRange {
         return TimeRange.mergeArrays(ranges.filter((r) => r[0] != Time.Min && r[1] != Time.Max));
     }
@@ -79,6 +83,14 @@ export class TimeRange {
         const rewound = new Date(this.start);
         rewound.setDate(rewound.getDate() - days);
         return new TimeRange(rewound.getTime(), this.end);
+    }
+
+    public expand(days: number): TimeRange {
+        const newStart = new Date(this.start);
+        const newEnd = new Date(this.end);
+        newStart.setDate(newStart.getDate() - days);
+        newEnd.setDate(newEnd.getDate() + days);
+        return new TimeRange(newStart.getTime(), newEnd.getTime());
     }
 }
 

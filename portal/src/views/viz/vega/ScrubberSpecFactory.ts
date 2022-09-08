@@ -10,14 +10,15 @@ export class ScrubberSpecFactory {
     create() {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        // We ignore extreme ranges here because of this.settings.timeRange
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
+        // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
         const interactiveMarks = () => {
             if (this.settings.mobile) {
                 return [];
             }
+
             return [
                 {
                     type: "rect",
@@ -198,6 +199,10 @@ export class ScrubberSpecFactory {
                 },
             ],
             signals: [
+                {
+                    name: "visible_times",
+                    value: timeRangeAll,
+                },
                 {
                     name: "width",
                     init: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
@@ -710,7 +715,9 @@ export class ScrubberSpecFactory {
                 {
                     name: "x",
                     type: "time",
-                    domain: timeRangeAll,
+                    domain: {
+                        signal: "visible_times",
+                    },
                     range: [
                         0,
                         {
