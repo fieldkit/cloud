@@ -981,12 +981,14 @@ export class TimeSeriesSpecFactory {
                         },
                         update: "[brush_x[0], clamp(x(unit), 0, width)]",
                     },
+                    /*
                     {
                         events: {
                             signal: "brush_scale_trigger",
                         },
                         update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
                     },
+                    */
                     {
                         events: [
                             {
