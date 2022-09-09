@@ -118,7 +118,6 @@ type DataMetaStation struct {
 	ID         string                   `json:"id"`
 	Name       string                   `json:"name"`
 	Firmware   *DataMetaStationFirmware `json:"firmware"`
-	Modules    []*DataMetaModule        `json:"modules"`
 	AllModules []*DataMetaModule        `json:"all_modules"`
 }
 
