@@ -37,7 +37,7 @@ ALTER DATABASE "fk-restore" SET search_path TO fieldkit, public;
 					sh "docker run --rm -i postgres psql '${adminUrl}' < create.sql"
 
 					sh "echo 'SET session_replication_role TO replica;' > restore.sql"
-					sh "xz -dc db-*.sql.xz >> restore.sql"
+					sh "xz -dc *.sql.xz >> restore.sql"
 					sh "echo 'DELETE FROM que_jobs;' >> restore.sql"
 					sh "echo 'SET session_replication_role TO default;' >> restore.sql"
 
