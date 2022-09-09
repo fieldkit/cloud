@@ -136,11 +136,7 @@ export default Vue.extend({
                         });
                     });
                 } else {
-                    const throttled = _.throttle((zoomed: TimeZoom) => {
-                        this.$emit("time-dragged", zoomed);
-                    }, 25);
-
-                    vegaInfo.view.addSignalListener("drag_time", (_, value: DragTimeSignal) => {
+                    vegaInfo.view.addSignalListener("drag_time", async (_, value: DragTimeSignal) => {
                         if (value) {
                             const delta = value[1] - value[0];
                             const state = value[2][2];
@@ -152,7 +148,7 @@ export default Vue.extend({
                                 // console.log("drag-time", value, delta, visible, viewing, delta);
                             } else {
                                 this.$emit("time-dragged", zoomed);
-                                // throttled(zoomed);
+                                await vegaInfo.view.signal("visible_times", viewing.toArray()).runAsync();
                             }
                         } else {
                             console.log("drag-time", value);

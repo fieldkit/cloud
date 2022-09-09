@@ -323,9 +323,13 @@ export class TimeSeriesSpecFactory {
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain || [0, 1],
+                    domain: {
+                        signal: "visible_times",
+                    },
                     tickCount: undefined,
-                    values: xDomain,
+                    values: {
+                        signal: "visible_times",
+                    },
                     titleFontSize: 12,
                     titlePadding: 4,
                     titleFontWeight: "normal",
@@ -368,7 +372,9 @@ export class TimeSeriesSpecFactory {
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain || [0, 1],
+                    domain: {
+                        signal: "visible_times",
+                    },
                     tickCount: undefined,
                     labelPadding: -24,
                     tickSize: 30,
@@ -448,7 +454,9 @@ export class TimeSeriesSpecFactory {
                     type: "time",
                     range: "width",
                     domain: xDomain
-                        ? xDomain
+                        ? {
+                              signal: "visible_times",
+                          }
                         : {
                               data: makeDataName(i),
                               field: "time",
@@ -633,34 +641,20 @@ export class TimeSeriesSpecFactory {
                                 },
                                 encode: {
                                     enter: {
-                                        x: {
-                                            scale: scales.x,
-                                            field: "barMiddle",
-                                        },
-                                        y: {
-                                            scale: scales.y,
-                                            field: "value",
-                                        },
-                                        stroke: {
-                                            value: null,
-                                        },
-                                        strokeWidth: {
-                                            value: 2,
-                                        },
-                                        size: {
-                                            value: 100,
-                                        },
-                                        fill: {
-                                            value: "blue",
-                                        },
-                                        fillOpacity: {
-                                            value: 0.5,
-                                        },
+                                        stroke: { value: null },
+                                        strokeWidth: { value: 2 },
+                                        size: { value: 100 },
+                                        fill: { value: "blue" },
+                                        fillOpacity: { value: 0.5 },
+                                        x: { scale: scales.x, field: "barMiddle" },
+                                        y: { scale: scales.y, field: "value" },
                                     },
                                     update: {
                                         fillOpacity: {
                                             signal: `hover && hover.series == datum.series && hover.time >= datum.barStart && hover.time <= datum.barEnd ? 1 : 0`,
                                         },
+                                        x: { scale: scales.x, field: "barMiddle" },
+                                        y: { scale: scales.y, field: "value" },
                                     },
                                 },
                             },
@@ -682,6 +676,10 @@ export class TimeSeriesSpecFactory {
                                                 strokeOpacity: {
                                                     signal: hoverCheck,
                                                 },
+                                                x: { scale: scales.x, field: "barStart" },
+                                                x2: { scale: scales.x, field: "barEnd" },
+                                                y: { scale: scales.y, field: "value" },
+                                                y2: { scale: scales.y, value: 0 },
                                             },
                                         },
                                     },
@@ -697,34 +695,20 @@ export class TimeSeriesSpecFactory {
                         },
                         encode: {
                             enter: {
-                                x: {
-                                    scale: scales.x,
-                                    field: "time",
-                                },
-                                y: {
-                                    scale: scales.y,
-                                    field: "value",
-                                },
-                                stroke: {
-                                    value: null,
-                                },
-                                strokeWidth: {
-                                    value: 2,
-                                },
-                                size: {
-                                    value: 100,
-                                },
-                                fill: {
-                                    value: "blue",
-                                },
-                                fillOpacity: {
-                                    value: 0.5,
-                                },
+                                stroke: { value: null },
+                                strokeWidth: { value: 2 },
+                                size: { value: 100 },
+                                fill: { value: "blue" },
+                                fillOpacity: { value: 0.5 },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
                             },
                             update: {
                                 fillOpacity: {
                                     signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
                                 },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
                             },
                         },
                     };
@@ -736,34 +720,20 @@ export class TimeSeriesSpecFactory {
                         },
                         encode: {
                             enter: {
-                                interpolate: {
-                                    value: "cardinal",
-                                },
-                                tension: {
-                                    value: 0.9,
-                                },
-                                x: {
-                                    scale: scales.x,
-                                    field: "time",
-                                },
-                                y: {
-                                    scale: scales.y,
-                                    field: "value",
-                                },
-                                stroke: {
-                                    value: "#cccccc",
-                                },
-                                strokeWidth: {
-                                    value: 1,
-                                },
-                                strokeDash: {
-                                    value: [4, 4],
-                                },
+                                interpolate: { value: "cardinal" },
+                                tension: { value: 0.9 },
+                                stroke: { value: "#cccccc" },
+                                strokeWidth: { value: 1 },
+                                strokeDash: { value: [4, 4] },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
                             },
                             update: {
                                 strokeOpacity: {
                                     signal: hoverCheck,
                                 },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
                             },
                         },
                     };
@@ -783,15 +753,17 @@ export class TimeSeriesSpecFactory {
                                             interpolate: { value: "cardinal" },
                                             tension: { value: 0.9 },
                                             strokeCap: { value: "round" },
-                                            x: { scale: scales.x, field: "time" },
-                                            y: { scale: scales.y, field: alias },
                                             strokeWidth: { value: strokeWidth },
                                             defined: { signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap` },
+                                            x: { scale: scales.x, field: "time" },
+                                            y: { scale: scales.y, field: alias },
                                         },
                                         update: {
                                             strokeOpacity: {
                                                 signal: hoverCheck,
                                             },
+                                            x: { scale: scales.x, field: "time" },
+                                            y: { scale: scales.y, field: alias },
                                         },
                                     },
                                 };
@@ -815,15 +787,17 @@ export class TimeSeriesSpecFactory {
                                     interpolate: { value: "cardinal" },
                                     tension: { value: 0.9 },
                                     strokeCap: { value: "round" },
-                                    x: { scale: scales.x, field: "time" },
-                                    y: { scale: scales.y, field: "value" },
                                     strokeWidth: { value: 2 },
                                     defined: { signal: `!datum.minimumGap || datum.gap <= datum.minimumGap` },
-                                },
-                                update: {
                                     strokeOpacity: {
                                         signal: hoverCheck,
                                     },
+                                    x: { scale: scales.x, field: "time" },
+                                    y: { scale: scales.y, field: "value" },
+                                },
+                                update: {
+                                    x: { scale: scales.x, field: "time" },
+                                    y: { scale: scales.y, field: "value" },
                                 },
                             },
                         };
@@ -924,6 +898,9 @@ export class TimeSeriesSpecFactory {
                                 name: datum.name
                             }`,
                             },
+                        },
+                        update: {
+                            path: { field: "layout_path" },
                         },
                     },
                 },
@@ -1212,6 +1189,10 @@ export class TimeSeriesSpecFactory {
         const interactiveSignals = () => {
             const standard = [
                 {
+                    name: "visible_times",
+                    value: xDomain || [0, 1],
+                },
+                {
                     name: "width",
                     init: "containerSize()[0]",
                     on: [
@@ -1273,6 +1254,10 @@ export class TimeSeriesSpecFactory {
             {
                 name: "brush_x",
                 value: [],
+            },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
             },
         ];
 
