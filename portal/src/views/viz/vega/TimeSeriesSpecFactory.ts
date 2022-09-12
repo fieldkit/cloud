@@ -1153,6 +1153,10 @@ export class TimeSeriesSpecFactory {
                     },
                 ],
             },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
+            },
         ];
 
         const dragSignals = [
@@ -1260,12 +1264,22 @@ export class TimeSeriesSpecFactory {
                     ],
                 },
                 {
-                    name: "chart_clip",
-                    init: "'M 0 0 H ' + (containerSize()[0] - 50) + ' V ' + (containerSize()[1] - 0) + ' H 0 Z'",
+                    name: "chart_clip_size",
+                    init: '[scale("x", visible_times[1]), containerSize()[1]]',
                     on: [
                         {
-                            events: "window:resize",
-                            update: "'M 0 0 H ' + (containerSize()[0] - 50) + ' V ' + (containerSize()[1] - 0) + ' H 0 Z'",
+                            events: { scale: "x" },
+                            update: '[scale("x", visible_times[1]), containerSize()[1]]',
+                        },
+                    ],
+                },
+                {
+                    name: "chart_clip",
+                    init: "'M 0 0 H ' + (chart_clip_size[0]) + ' V ' + (chart_clip_size[1]) + ' H 0 Z'",
+                    on: [
+                        {
+                            events: { signal: "chart_clip_size" },
+                            update: "'M 0 0 H ' + (chart_clip_size[0]) + ' V ' + (chart_clip_size[1]) + ' H 0 Z'",
                         },
                     ],
                 },

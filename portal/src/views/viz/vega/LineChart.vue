@@ -147,6 +147,10 @@ export default Vue.extend({
                     vegaInfo.view.addSignalListener("drag_delta", async (_, value: DragTimeSignal) => {
                         console.log("delta", value);
                     });
+
+                    vegaInfo.view.addSignalListener("chart_clip_size", async (_, value) => {
+                        console.log("chart_clip_size", value);
+                    });
                     */
 
                     vegaInfo.view.addSignalListener("visible_times_calc", async (_, value: DragTimeSignal) => {
@@ -163,14 +167,12 @@ export default Vue.extend({
                 }
             }
 
-            /*
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
-                graph: vegaInfo.view.scenegraph(),
-                runtime: vegaInfo.view._runtime,
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
-            */
+            /*
+             */
         },
         getFileName(series): string {
             const stationName = series.vizInfo.station.name;
