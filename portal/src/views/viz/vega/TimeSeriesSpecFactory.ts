@@ -982,33 +982,10 @@ export class TimeSeriesSpecFactory {
                     /*
                     {
                         events: {
-                            signal: "brush_scale_trigger",
-                        },
-                        update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
-                    },
-                    */
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "dblclick",
-                            },
-                        ],
-                        update: "[0, 0]",
-                    },
-                    {
-                        events: {
                             signal: "brush_translate_delta",
                         },
                         update:
                             "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
-                    },
-                    /*
-                    {
-                        events: {
-                            signal: "brush_zoom_delta",
-                        },
-                        update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
                     },
                     */
                 ],
@@ -1024,23 +1001,6 @@ export class TimeSeriesSpecFactory {
                     },
                 ],
             },
-            /*
-            {
-                name: "brush_scale_trigger",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                scale: "x",
-                            },
-                        ],
-                        update:
-                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
-                    },
-                ],
-            },
-            */
             {
                 name: "brush_tuple",
                 on: [
@@ -1064,6 +1024,7 @@ export class TimeSeriesSpecFactory {
                     },
                 ],
             },
+            /*
             {
                 name: "brush_translate_anchor",
                 value: {},
@@ -1104,40 +1065,6 @@ export class TimeSeriesSpecFactory {
                             },
                         ],
                         update: "{x: brush_translate_anchor.x - x(unit), y: brush_translate_anchor.y - y(unit)}",
-                    },
-                ],
-            },
-            /*
-            {
-                name: "brush_zoom_anchor",
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "wheel",
-                                consume: true,
-                                markname: "brush_brush",
-                            },
-                        ],
-                        update: "{x: x(unit), y: y(unit)}",
-                    },
-                ],
-            },
-            {
-                name: "brush_zoom_delta",
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "wheel",
-                                consume: true,
-                                markname: "brush_brush",
-                            },
-                        ],
-                        force: true,
-                        update: "pow(1.001, event.deltaY * pow(16, event.deltaMode))",
                     },
                 ],
             },
