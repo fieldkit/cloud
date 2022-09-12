@@ -43,17 +43,11 @@ export default {
             console.log("viz:", "scrubber: refresh(ignored, series)");
             // await this.refresh();
         },
-        async visible(): Promise<void> {
+        async dragging(dragging): Promise<void> {
+            console.log("viz:", "scrubber: dragging", dragging, this.visible);
             this.pickRange(this.visible);
         },
-        async dragging(dragging): Promise<void> {
-            console.log("viz:", "scrubber: dragging", dragging);
-            if (dragging) {
-                const test = this.visible.expand(4).toArray();
-                await this.vega.view.signal("visible_times", test).runAsync();
-            } else {
-                await this.vega.view.signal("visible_times", this.series[0].queried.timeRange).runAsync();
-            }
+        async visible(): Promise<void> {
             this.pickRange(this.visible);
         },
     },

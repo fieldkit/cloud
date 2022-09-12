@@ -16,8 +16,7 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
-type DragXSignal = [number, number, number];
-type DragTimeSignal = [number, number, DragXSignal];
+type DragTimeSignal = [number, number] | null;
 
 function roundForDisplay(value: number): number {
     for (let i = 1; i < 6; ++i) {
@@ -136,22 +135,29 @@ export default Vue.extend({
                         });
                     });
                 } else {
+                    /*
+                    vegaInfo.view.addSignalListener("down", async (_, value: DragTimeSignal) => {
+                        console.log("down", value);
+                    });
+
+                    vegaInfo.view.addSignalListener("xcur", async (_, value: DragTimeSignal) => {
+                        console.log("xcur", value);
+                    });
+
+                    vegaInfo.view.addSignalListener("drag_delta", async (_, value: DragTimeSignal) => {
+                        console.log("delta", value);
+                    });
+                    */
+
+                    vegaInfo.view.addSignalListener("visible_times_calc", async (_, value: DragTimeSignal) => {
+                        if (value) {
+                            this.$emit("time-dragged", new TimeZoom(null, new TimeRange(value[0], value[1])));
+                        }
+                    });
+
                     vegaInfo.view.addSignalListener("drag_time", async (_, value: DragTimeSignal) => {
                         if (value) {
-                            const delta = value[1] - value[0];
-                            const state = value[2][2];
-                            const visible = this.series[0].visible;
-                            const viewing = visible.rewind(delta);
-                            const zoomed = new TimeZoom(null, viewing);
-                            if (state == 2) {
-                                this.$emit("time-zoomed", zoomed);
-                                // console.log("drag-time", value, delta, visible, viewing, delta);
-                            } else {
-                                this.$emit("time-dragged", zoomed);
-                                await vegaInfo.view.signal("visible_times", viewing.toArray()).runAsync();
-                            }
-                        } else {
-                            console.log("drag-time", value);
+                            this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(value[0], value[1])));
                         }
                     });
                 }

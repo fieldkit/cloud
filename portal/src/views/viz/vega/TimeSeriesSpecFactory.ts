@@ -209,10 +209,17 @@ export class TimeSeriesSpecFactory {
                                 name: makeDataName(i),
                                 values: filteredData[i],
                                 transform: [
+                                    /*
+                                    This breaks dragging, for some reason.
+                                    Instead of this we're using the clip
+                                    functionality, which didn't work w/o custom
+                                    SVG paths. The clip path otherwise was just
+                                    an empty rect.
                                     {
                                         type: "filter",
                                         expr: "inrange(datum.time, visible_times)",
                                     },
+                                    */
                                     ...transforms,
                                 ],
                             },
@@ -781,6 +788,9 @@ export class TimeSeriesSpecFactory {
                         return [
                             {
                                 type: "group",
+                                clip: {
+                                    path: { signal: "chart_clip" },
+                                },
                                 marks: _.concat([dashedLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
                             },
                         ];
@@ -812,6 +822,9 @@ export class TimeSeriesSpecFactory {
                         return [
                             {
                                 type: "group",
+                                clip: {
+                                    path: { signal: "chart_clip" },
+                                },
                                 marks: [dashedLineMark, lineMark, symbolMark],
                             },
                         ];
@@ -1144,40 +1157,70 @@ export class TimeSeriesSpecFactory {
 
         const dragSignals = [
             {
+                name: "down",
+                value: null,
+                on: [
+                    { events: "touchend", update: "null" },
+                    { events: "mousedown, touchstart", update: "xy()" },
+                ],
+            },
+            {
+                name: "drag_delta",
+                value: [0, 0],
+                on: [
+                    {
+                        events: [
+                            {
+                                type: "touchmove",
+                                consume: true,
+                                filter: "event.touches.length === 1",
+                            },
+                        ],
+                        update: "down ? [down[0] - x(), y() - down[1]] : [0, 0]",
+                    },
+                ],
+            },
+            {
                 name: "drag_x",
                 value: [],
                 on: [
                     {
                         events: {
-                            source: "view",
-                            type: "touchstart",
+                            signal: "drag_delta",
                         },
-                        update: "[x(unit), x(unit), 0]",
+                        update: "[down[0] + drag_delta[0], down[1] + drag_delta[1]]",
                     },
+                ],
+            },
+            {
+                name: "xcur",
+                value: xDomain || [0, 1],
+                on: [
+                    /*
                     {
-                        events: {
-                            source: "view",
-                            type: "touchmove",
-                            consume: true,
-                            between: [
-                                {
-                                    source: "view",
-                                    type: "touchstart",
-                                },
-                                {
-                                    source: "view",
-                                    type: "touchend",
-                                },
-                            ],
-                        },
-                        update: "[drag_x[0], x(unit), 1]",
+                        events: "mousedown, touchstart, touchend",
+                        update: "slice(xdom)",
                     },
+                    */
+                ],
+            },
+            {
+                name: "visible_times_calc",
+                value: xDomain || [0, 1],
+                on: [
                     {
-                        events: {
-                            source: "view",
-                            type: "touchend",
-                        },
-                        update: "[drag_x[0], x(unit), 2]",
+                        events: { signal: "drag_delta" },
+                        update: "[ceil(xcur[0] + span(xcur) * drag_delta[0] / width), ceil(xcur[1] + span(xcur) * drag_delta[0] / width)]",
+                    },
+                ],
+            },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
+                on: [
+                    {
+                        events: { signal: "visible_times_calc" },
+                        update: "visible_times_calc",
                     },
                 ],
             },
@@ -1186,20 +1229,16 @@ export class TimeSeriesSpecFactory {
                 on: [
                     {
                         events: {
-                            signal: "drag_x",
+                            signal: "down",
                         },
-                        update: '[invert("x", drag_x[0]), invert("x", drag_x[1]), drag_x]',
+                        update: "down === null ? visible_times : null",
                     },
                 ],
             },
         ];
 
-        const interactiveSignals = () => {
-            const standard = [
-                {
-                    name: "visible_times",
-                    value: xDomain || [0, 1],
-                },
+        const containerSignals = () => {
+            return [
                 {
                     name: "width",
                     init: "containerSize()[0]",
@@ -1220,6 +1259,21 @@ export class TimeSeriesSpecFactory {
                         },
                     ],
                 },
+                {
+                    name: "chart_clip",
+                    init: "'M 0 0 H ' + (containerSize()[0] - 50) + ' V ' + (containerSize()[1] - 0) + ' H 0 Z'",
+                    on: [
+                        {
+                            events: "window:resize",
+                            update: "'M 0 0 H ' + (containerSize()[0] - 50) + ' V ' + (containerSize()[1] - 0) + ' H 0 Z'",
+                        },
+                    ],
+                },
+            ];
+        };
+
+        const interactiveSignals = () => {
+            const standard = [
                 {
                     name: "hover",
                     on: [
@@ -1246,9 +1300,9 @@ export class TimeSeriesSpecFactory {
             ];
 
             if (this.brushable) {
-                return [...standard, ...brushSignals];
+                return [...containerSignals(), ...standard, ...brushSignals];
             } else {
-                return [...standard, ...dragSignals];
+                return [...containerSignals(), ...standard, ...dragSignals];
             }
         };
 
@@ -1269,29 +1323,7 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
-        const tinySignals = [
-            {
-                name: "width",
-                init: "containerSize()[0]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[0]",
-                    },
-                ],
-            },
-            {
-                name: "height",
-                init: "containerSize()[1]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[1]",
-                    },
-                ],
-            },
-            ...staticSignals,
-        ];
+        const tinySignals = [...containerSignals(), ...staticSignals];
 
         const allSignals = this.settings.tiny ? tinySignals : this.settings.size.w == 0 ? interactiveSignals() : staticSignals;
 
