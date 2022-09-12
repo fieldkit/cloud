@@ -131,6 +131,12 @@ export class ScrubberSpecFactory {
                 {
                     name: "table",
                     values: first.queried.data,
+                    transform: [
+                        {
+                            type: "filter",
+                            expr: "inrange(datum.time, visible_times)",
+                        },
+                    ],
                 },
                 {
                     name: "data_0",
@@ -138,7 +144,7 @@ export class ScrubberSpecFactory {
                     transform: [
                         {
                             type: "formula",
-                            expr: 'toDate(datum["time"])',
+                            expr: "toDate(datum.time)",
                             as: "time",
                         },
                     ],

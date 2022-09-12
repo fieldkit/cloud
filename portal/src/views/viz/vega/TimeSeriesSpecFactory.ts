@@ -202,13 +202,19 @@ export class TimeSeriesSpecFactory {
                                       as: makeThresholdLevelAlias(i, l),
                                   };
                               })
-                            : null;
+                            : [];
 
                         return [
                             {
                                 name: makeDataName(i),
                                 values: filteredData[i],
-                                transform: transforms,
+                                transform: [
+                                    {
+                                        type: "filter",
+                                        expr: "inrange(datum.time, visible_times)",
+                                    },
+                                    ...transforms,
+                                ],
                             },
                             {
                                 name: makeValidDataName(i),
@@ -754,7 +760,9 @@ export class TimeSeriesSpecFactory {
                                             tension: { value: 0.9 },
                                             strokeCap: { value: "round" },
                                             strokeWidth: { value: strokeWidth },
-                                            defined: { signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap` },
+                                            defined: {
+                                                signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap`,
+                                            },
                                             x: { scale: scales.x, field: "time" },
                                             y: { scale: scales.y, field: alias },
                                         },
