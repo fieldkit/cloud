@@ -993,7 +993,7 @@ export default Vue.extend({
     visibility: hidden;
     opacity: 0;
     padding: 14px;
-    font-size: 10px;
+    font-size: 12px;
     color: #6a6d71;
     position: absolute;
     top: 100%;
