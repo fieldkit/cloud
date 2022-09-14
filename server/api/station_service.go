@@ -540,7 +540,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 		if err := projectPermissions.CanView(); err == nil {
 			return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
-				ProjectID: projects[0].ID,
+				ProjectID: project.ID,
 			})
 		}
 	}

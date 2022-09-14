@@ -17,6 +17,8 @@ timestamps {
 			def now = new Date()
 			def stamp = now.format("yyyyMMdd-HHmmss", TimeZone.getTimeZone('UTC'))
 
+			def file = "${name}-${stamp}.sql"
+
 			stage ('dbcopy') {
 				sh "rm -rf *.bz2 *.xz"
 
@@ -29,7 +31,6 @@ timestamps {
 					def excluding = exclusions.split(",").collect { it.replaceAll("\\s", "") }.collect { "-T '${it}'" }
 					def extraArgs = excluding.join(" ")
 
-					def file = "${name}-${stamp}.sql"
 					sh "docker run --log-driver none --rm postgres pg_dump --schema-only '${url}' > ${file}"
 					sh "docker run --log-driver none --rm postgres pg_dump --data-only --disable-triggers ${extraArgs} '${url}' >> ${file}"
 				}
