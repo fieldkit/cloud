@@ -185,6 +185,18 @@ func (m *Metrics) HandleMessage() *Timing {
 	}
 }
 
+func (m *Metrics) PileHit(pile string) {
+	m.SC.Increment(fmt.Sprintf("api.pile.%s.hit", pile))
+}
+
+func (m *Metrics) PileMiss(pile string) {
+	m.SC.Increment(fmt.Sprintf("api.pile.%s.miss", pile))
+}
+
+func (m *Metrics) PileBytes(pile string, bytes int64) {
+	m.SC.Gauge(fmt.Sprintf("api.pile.%s.bytes", pile), bytes)
+}
+
 func (m *Metrics) UserValidated() {
 	m.SC.Increment("api.users.validated")
 }

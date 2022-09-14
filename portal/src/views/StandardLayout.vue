@@ -153,7 +153,6 @@ export default Vue.extend({
     bottom: 8px;
     left: 6px;
     text-align: left;
-    display: none;
 
     @include bp-down($sm) {
         position: initial;
@@ -168,7 +167,7 @@ export default Vue.extend({
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
-        font-size: 10px;
+        font-size: 12px;
         min-width: 50px;
     }
 

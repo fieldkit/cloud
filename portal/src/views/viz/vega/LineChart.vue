@@ -80,7 +80,7 @@ export default Vue.extend({
                     },
                 },
                 actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
-                scaleFactor: isMobile() ? 2 : 1,
+                scaleFactor: 2,
             });
 
             this.vega = vegaInfo;
@@ -168,7 +168,7 @@ export default Vue.extend({
 
 .vega-embed summary {
     border-radius: 0px !important;
-    width: 60px;
+    width: 70px;
     height: 1em;
     display: flex;
     align-items: center;
@@ -214,7 +214,7 @@ export default Vue.extend({
     }
 }
 .save-label {
-    font-size: 10px;
+    font-size: 12px;
     margin-left: 5px;
 }
 </style>

@@ -49,6 +49,8 @@ type ControllerOptions struct {
 
 	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
+
+	photoCache *PhotoCache
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
@@ -85,6 +87,7 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		subscriptions:   NewSubscriptions(),
 		influxConfig:    influxConfig,
 		timeScaleConfig: timeScaleConfig,
+		photoCache:      NewPhotoCache(mediaFiles, metrics),
 	}
 
 	return

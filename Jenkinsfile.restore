@@ -31,20 +31,23 @@ timestamps {
 
 					writeFile(file: "create.sql", text: """
 CREATE DATABASE "fk-restore";
-ALTER DATABASE "fk-restore" SET search_path TO fieldkit, public;
-					""")
+ALTER DATABASE "fk-restore" SET search_path TO "$user", public;
+""")
 
 					sh "docker run --rm -i postgres psql '${adminUrl}' < create.sql"
 
-					// sh "bunzip2 -c db-*.sql.bz2 | docker run --rm -i postgres psql '${temporaryUrl}'"
+					sh "echo 'SET session_replication_role TO replica;' > restore.sql"
+					sh "xz -dc *.sql.xz >> restore.sql"
+					sh "echo 'DELETE FROM que_jobs;' >> restore.sql"
+					sh "echo 'SET session_replication_role TO default;' >> restore.sql"
 
-					sh "xz -c db-*.sql.xz | docker run --rm -i postgres psql '${temporaryUrl}'"
+					sh "docker run --rm -i postgres psql '${temporaryUrl}' < restore.sql"
 
 					writeFile(file: "swap.sql", text: """
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fk';
 ALTER DATABASE fk RENAME TO "fk-${stamp}";
 ALTER DATABASE "fk-restore" RENAME TO "fk";
-					""")
+""")
 
 					sh "docker run --rm -i postgres psql '${adminUrl}' < swap.sql"
 

@@ -55,13 +55,13 @@ export default Vue.extend({
     margin-right: 5px;
 
     @include bp-down($xs) {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
 
 .small-light {
     @include bp-down($xs) {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
 

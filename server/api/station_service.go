@@ -540,7 +540,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 		if err := projectPermissions.CanView(); err == nil {
 			return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
-				ProjectID: projects[0].ID,
+				ProjectID: project.ID,
 			})
 		}
 	}
@@ -671,8 +671,6 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 
 	media := findStaticImageOrGif(allMedia)
 
-	photoCache := NewPhotoCache(c.options.MediaFiles)
-
 	var resize *PhotoResizeSettings
 	if payload.Size != nil {
 		resize = &PhotoResizeSettings{
@@ -680,7 +678,7 @@ func (c *StationService) DownloadPhoto(ctx context.Context, payload *station.Dow
 		}
 	}
 
-	photo, err := photoCache.Load(ctx, &ExternalMedia{
+	photo, err := c.options.photoCache.Load(ctx, &ExternalMedia{
 		URL:         media.URL,
 		ContentType: media.ContentType,
 	},

@@ -564,7 +564,8 @@ const actions = (services: Services) => {
             await dispatch(ActionTypes.NEED_COMMON);
         },
         [ActionTypes.NEED_COMMON]: async ({ dispatch, commit }: { dispatch: any; commit: any }) => {
-            await Promise.all([dispatch(ActionTypes.NEED_PROJECTS), dispatch(ActionTypes.NEED_STATIONS), dispatch(NEED_SENSOR_META)]);
+            await dispatch(NEED_SENSOR_META);
+            await Promise.all([dispatch(ActionTypes.NEED_PROJECTS), dispatch(ActionTypes.NEED_STATIONS)]);
         },
         [NEED_SENSOR_META]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
             const meta = await services.api.getAllSensorsMemoized()(); // TODO  Why?
