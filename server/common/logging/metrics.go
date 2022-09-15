@@ -174,14 +174,14 @@ func (m *Metrics) DataQuery(aggregate string) *Timing {
 	}
 }
 
-func (m *Metrics) HandleMessage() *Timing {
+func (m *Metrics) HandleMessage(jobType string) *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
 		sc:          m.SC,
 		timer:       timer,
-		timingKeys:  []string{"messages.handling.time"},
-		counterKeys: []string{"messages.processed"},
+		timingKeys:  []string{"messages.handling.time", fmt.Sprintf("messages.%s.handling.time", jobType)},
+		counterKeys: []string{"messages.processed", fmt.Sprintf("messages.%s.processed", jobType)},
 	}
 }
 

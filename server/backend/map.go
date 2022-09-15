@@ -29,7 +29,7 @@ func wrapContext(h OurWorkFunc) que.WorkFunc {
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
 	return func(ctx context.Context, j *que.Job) error {
-		timer := services.metrics.HandleMessage()
+		timer := services.metrics.HandleMessage(j.Type)
 
 		defer timer.Send()
 
