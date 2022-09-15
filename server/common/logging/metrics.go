@@ -185,6 +185,28 @@ func (m *Metrics) HandleMessage(jobType string) *Timing {
 	}
 }
 
+func (m *Metrics) ThirdPartyLocationDescribe() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.thirdparty.location.describe.time"},
+		counterKeys: []string{"api.thirdparty.location.describe.queries"},
+	}
+}
+
+func (m *Metrics) ThirdPartyLocation(provider string) *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{fmt.Sprintf("api.thirdparty.location.%s.time", provider)},
+		counterKeys: []string{fmt.Sprintf("api.thirdparty.location.%s.queries", provider)},
+	}
+}
+
 func (m *Metrics) PileHit(pile string) {
 	m.SC.Increment(fmt.Sprintf("api.pile.%s.hit", pile))
 }
