@@ -56,12 +56,15 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		}
 
 		if station.Location != nil && c.options.locations != nil {
-			if err := c.options.Publisher.Publish(ctx, &messages.StationLocationUpdated{
-				StationID: station.ID,
-				Time:      now,
-				Location:  station.Location.Coordinates(),
-			}); err != nil {
-				return err
+			lastUpdated := now.Sub(station.UpdatedAt)
+			if lastUpdated > time.Hour {
+				if err := c.options.Publisher.Publish(ctx, &messages.StationLocationUpdated{
+					StationID: station.ID,
+					Time:      now,
+					Location:  station.Location.Coordinates(),
+				}); err != nil {
+					return err
+				}
 			}
 		}
 
