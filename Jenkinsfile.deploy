@@ -43,22 +43,30 @@ timestamps {
 				def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 
 				sshagent (credentials: ['ssh-fkdev-deploy']) {
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${server.ip}"
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} whoami"
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo rm -f ${stackName}.tar"
-					}
+					def known_hosts = "/var/jenkins_home/.ssh/known_hosts"
+					def prepare = ws.servers.value.collectEntries {
+			            if (fileExists(known_hosts)) {
+    		                sh "ssh-keygen -f ${known_hosts} -R ${it.ip}"
+			            }
 
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${server.sshAt}:"
-					}
+			            [(it): {
+			                println(it.sshAt)
+			                sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} whoami"
+							sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} sudo rm -f ${stackName}.tar"
+							sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${it.sshAt}:"
+			            }]
+			        }
+			        
+			        parallel(prepare)
 
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
-					}
+					def deploy = ws.servers.value.collectEntries {
+			            [(it): {
+			                println(it.sshAt)
+							sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
+			            }]
+			        }
+
+					parallel(deploy)
 				}
 
 				if (stackName == "portal-stack") {

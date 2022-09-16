@@ -135,6 +135,10 @@ func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) (
 func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs) ([]*DataRow, error) {
 	log := Logger(ctx).Sugar()
 
+	queryMetrics := tsdb.metrics.DataRangesQuery()
+
+	defer queryMetrics.Send()
+
 	log.Infow("tsdb:query-ranges", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "modules", ids.ModuleIDs, "sensors", ids.SensorIDs)
 
 	pgRows, err := tsdb.pool.Query(ctx, `
