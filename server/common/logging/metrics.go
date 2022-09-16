@@ -141,6 +141,17 @@ func (m *Metrics) LastTimesQuery(batch int) *Timing {
 	}
 }
 
+func (m *Metrics) DataRangesQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.ranges.query.time"},
+		counterKeys: []string{"api.data.ranges.query"},
+	}
+}
+
 func (m *Metrics) DailyQuery() *Timing {
 	timer := m.SC.NewTiming()
 
