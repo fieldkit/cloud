@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/data"
 
 	"github.com/govau/que-go"
 
@@ -29,7 +30,7 @@ func wrapContext(h OurWorkFunc) que.WorkFunc {
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
 	return func(ctx context.Context, j *que.Job) error {
-		timer := services.metrics.HandleMessage()
+		timer := services.metrics.HandleMessage(j.Type)
 
 		defer timer.Send()
 
@@ -122,6 +123,16 @@ func sensorDataModified(ctx context.Context, j *que.Job, services *BackgroundSer
 	return handler.Handle(ctx, message, j)
 }
 
+func describeStationLocation(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.StationLocationUpdated{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewDescribeStationLocationHandler(services.database, services.metrics, publisher, services.locations)
+	return handler.Handle(ctx, message, j)
+}
+
 func CreateMap(services *BackgroundServices) que.WorkMap {
 	return que.WorkMap{
 		"Example":                wrapContext(wrapTransportMessage(services, exampleJob)),
@@ -133,6 +144,7 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 		"WebHookMessageReceived": wrapContext(wrapTransportMessage(services, webHookMessageReceived)),
 		"ProcessSchema":          wrapContext(wrapTransportMessage(services, processSchema)),
 		"SensorDataModified":     wrapContext(wrapTransportMessage(services, sensorDataModified)),
+		"StationLocationUpdated": wrapContext(wrapTransportMessage(services, describeStationLocation)),
 	}
 }
 
@@ -148,14 +160,16 @@ type BackgroundServices struct {
 	fileArchives    *FileArchives
 	que             *que.Client
 	timeScaleConfig *storage.TimeScaleDBConfig
+	locations       *data.DescribeLocations
 }
 
-func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client, timeScaleConfig *storage.TimeScaleDBConfig) *BackgroundServices {
+func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client, timeScaleConfig *storage.TimeScaleDBConfig, locations *data.DescribeLocations) *BackgroundServices {
 	return &BackgroundServices{
 		database:        database,
 		fileArchives:    fileArchives,
 		metrics:         metrics,
 		que:             que,
 		timeScaleConfig: timeScaleConfig,
+		locations:       locations,
 	}
 }
