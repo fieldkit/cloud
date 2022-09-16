@@ -34,6 +34,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/api"
 	"github.com/fieldkit/cloud/server/backend"
+	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/ingester"
 	"github.com/fieldkit/cloud/server/social"
@@ -289,13 +290,15 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	log.Infow("starting", "workers", config.Workers, "live", config.Live)
 
+	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
+
 	qc := que.NewClient(pgxpool)
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, &backend.FileArchives{
 		Ingestion: ingestionFiles,
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
-	}, qc, timeScaleConfig))
+	}, qc, timeScaleConfig, locations))
 	workers := que.NewWorkerPool(qc, workMap, config.Workers)
 
 	go workers.Start()
