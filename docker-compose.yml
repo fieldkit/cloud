@@ -2,6 +2,7 @@ version: "3.7"
 services:
   postgres:
     image: postgis/postgis:12-2.5-alpine
+    command: postgres -c stats_temp_directory=/tmp
     ports:
       - "5432:5432"
     environment:
@@ -14,6 +15,7 @@ services:
 
   tsdb:
     image: timescale/timescaledb:2.4.2-pg13
+    command: postgres -c stats_temp_directory=/tmp
     ports:
       - "5433:5432"
     environment:
