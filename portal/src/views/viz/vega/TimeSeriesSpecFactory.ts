@@ -855,33 +855,26 @@ export class TimeSeriesSpecFactory {
                             .map((level) => {
                                 return {
                                     type: "rule",
-                                    from: { data: makeDataName(i) },
                                     encode: {
                                         enter: {
-                                            x: {
-                                                scale: scales.x,
-                                                value: timeRangeAll[0],
-                                            },
-                                            x2: {
-                                                scale: scales.x,
-                                                value: timeRangeAll[1],
-                                            },
-                                            y: {
-                                                scale: scales.y,
-                                                value: level.start,
-                                            },
-                                            y2: {
-                                                scale: scales.y,
-                                                value: level.start,
-                                            },
+                                            x: { scale: scales.x, value: timeRangeAll[0] },
+                                            x2: { scale: scales.x, value: timeRangeAll[1] },
+                                            y: { scale: scales.y, value: level.start },
+                                            y2: { scale: scales.y, value: level.start },
                                             stroke: { value: level.color },
                                             strokeDash: { value: [1, 4] },
                                             strokeCap: { value: "round" },
-                                            opacity: { value: 0.1 },
-                                            strokeOpacity: { value: 0.1 },
+                                            opacity: { value: 0.5 },
+                                            strokeOpacity: { value: 0.5 },
                                             strokeWidth: {
                                                 value: 1.5,
                                             },
+                                        },
+                                        update: {
+                                            x: { scale: scales.x, value: timeRangeAll[0] },
+                                            x2: { scale: scales.x, value: timeRangeAll[1] },
+                                            y: { scale: scales.y, value: level.start },
+                                            y2: { scale: scales.y, value: level.start },
                                         },
                                     },
                                 };
