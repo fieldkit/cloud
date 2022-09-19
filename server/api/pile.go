@@ -63,7 +63,8 @@ func (pile *Pile) Open(ctx context.Context) error {
 	defer pile.lock.Unlock()
 
 	if pile.meta != nil {
-		return fmt.Errorf("already opened")
+		pile.log.Infow("already opened")
+		return nil
 	}
 
 	pile.log.Infow("opening")
