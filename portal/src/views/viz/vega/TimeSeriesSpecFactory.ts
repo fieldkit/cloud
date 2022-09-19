@@ -183,32 +183,81 @@ export class TimeSeriesSpecFactory {
             };
         };
 
-        const data = [
-            {
-                name: "brush_store",
-            },
-        ]
-            .concat(
-                _.flatten(
-                    this.allSeries.map((series, i) => {
-                        const thresholds = makeSeriesThresholds(series);
-                        const scales = makeScales(i);
-                        const transforms = thresholds
-                            ? thresholds.levels.map((level, l: number) => {
-                                  return {
-                                      type: "formula",
-                                      expr: "datum.value <= " + level.value + " ? datum.value : null",
-                                      as: makeThresholdLevelAlias(i, l),
-                                  };
-                              })
-                            : [];
+        const barChartData = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    if (isBarChart(series)) {
+                        return [];
+                    }
 
-                        return [
-                            {
-                                name: makeDataName(i),
-                                values: filteredData[i],
-                                transform: [
-                                    /*
+                    return [
+                        {
+                            name: makeBarDataName(i),
+                            source: makeValidDataName(i),
+                            transform: [
+                                _.extend(
+                                    {
+                                        field: "time",
+                                        type: "timeunit",
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    getBarConfiguration(i, timeRangeAll)
+                                ),
+                                {
+                                    type: "formula",
+                                    expr: timeRangeAll
+                                        ? `time(clamp(datum.barStartDate , ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                        : `time(datum.barStartDate)`,
+                                    as: "barStart",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: timeRangeAll
+                                        ? `time(clamp(datum.barEndDate, ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                        : `time(datum.barEndDate)`,
+                                    as: "barEnd",
+                                },
+                                {
+                                    type: "aggregate",
+                                    groupby: ["barStart", "barEnd"],
+                                    ops: ["mean"],
+                                    fields: ["value"],
+                                    as: ["value"],
+                                },
+                                {
+                                    type: "formula",
+                                    expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
+                                    as: "barMiddle",
+                                },
+                                { type: "formula", expr: i, as: "series" },
+                            ],
+                        },
+                    ];
+                })
+            );
+        };
+
+        const regularData = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    const thresholds = makeSeriesThresholds(series);
+                    const scales = makeScales(i);
+                    const transforms = thresholds
+                        ? thresholds.levels.map((level, l: number) => {
+                              return {
+                                  type: "formula",
+                                  expr: "datum.value <= " + level.value + " ? datum.value : null",
+                                  as: makeThresholdLevelAlias(i, l),
+                              };
+                          })
+                        : [];
+
+                    return [
+                        {
+                            name: makeDataName(i),
+                            values: filteredData[i],
+                            transform: [
+                                /*
                                     This breaks dragging, for some reason.
                                     Instead of this we're using the clip
                                     functionality, which didn't work w/o custom
@@ -219,93 +268,63 @@ export class TimeSeriesSpecFactory {
                                         expr: "inrange(datum.time, visible_times)",
                                     },
                                     */
-                                    ...transforms,
-                                ],
-                            },
-                            {
-                                name: makeValidDataName(i),
-                                source: makeDataName(i),
-                                transform: [
-                                    {
-                                        type: "filter",
-                                        expr: "isValid(datum.value)",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: `scale('${scales.x}', datum.time)`,
-                                        as: "layout_x",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: `scale('${scales.y}', datum.value)`,
-                                        as: "layout_y",
-                                    },
-                                ],
-                            },
-                            {
-                                name: makeBarDataName(i),
-                                source: makeValidDataName(i),
-                                transform: [
-                                    _.extend(
-                                        {
-                                            field: "time",
-                                            type: "timeunit",
-                                            as: ["barStartDate", "barEndDate"],
-                                        },
-                                        getBarConfiguration(i, timeRangeAll)
-                                    ),
-                                    {
-                                        type: "formula",
-                                        expr: timeRangeAll
-                                            ? `time(clamp(datum.barStartDate , ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
-                                            : `time(datum.barStartDate)`,
-                                        as: "barStart",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: timeRangeAll
-                                            ? `time(clamp(datum.barEndDate, ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
-                                            : `time(datum.barEndDate)`,
-                                        as: "barEnd",
-                                    },
-                                    {
-                                        type: "aggregate",
-                                        groupby: ["barStart", "barEnd"],
-                                        ops: ["mean"],
-                                        fields: ["value"],
-                                        as: ["value"],
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
-                                        as: "barMiddle",
-                                    },
-                                    { type: "formula", expr: i, as: "series" },
-                                ],
-                            },
-                        ];
-                    })
-                )
-            )
-            .concat(
-                this.settings.tiny
-                    ? []
-                    : ([
-                          {
-                              name: "all_layouts",
-                              source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
-                              transform: [
-                                  {
-                                      type: "voronoi",
-                                      x: "layout_x",
-                                      y: "layout_y",
-                                      size: [{ signal: "width" }, { signal: "height" }],
-                                      as: "layout_path",
-                                  },
-                              ],
-                          },
-                      ] as any[])
+                                ...transforms,
+                            ],
+                        },
+                        {
+                            name: makeValidDataName(i),
+                            source: makeDataName(i),
+                            transform: [
+                                {
+                                    type: "filter",
+                                    expr: "isValid(datum.value)",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: `scale('${scales.x}', datum.time)`,
+                                    as: "layout_x",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: `scale('${scales.y}', datum.value)`,
+                                    as: "layout_y",
+                                },
+                            ],
+                        },
+                    ];
+                })
             );
+        };
+
+        const layoutData = () => {
+            if (this.settings.tiny) {
+                return [];
+            }
+            return [
+                {
+                    name: "all_layouts",
+                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
+                    transform: [
+                        {
+                            type: "voronoi",
+                            x: "layout_x",
+                            y: "layout_y",
+                            size: [{ signal: "width" }, { signal: "height" }],
+                            as: "layout_path",
+                        },
+                    ],
+                },
+            ];
+        };
+
+        const data = [
+            {
+                name: "brush_store",
+            },
+            ...regularData(),
+            ...barChartData(),
+            ...layoutData(),
+        ];
 
         const legends = _.flatten(
             this.allSeries.map((series, i) => {
