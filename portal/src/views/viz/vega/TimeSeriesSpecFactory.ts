@@ -1092,6 +1092,10 @@ export class TimeSeriesSpecFactory {
                 name: "visible_times",
                 value: xDomain || [0, 1],
             },
+            {
+                name: "chart_background",
+                value: "transparent",
+            },
         ];
 
         const dragSignals = [
@@ -1171,6 +1175,18 @@ export class TimeSeriesSpecFactory {
                             signal: "down",
                         },
                         update: "down === null ? visible_times : null",
+                    },
+                ],
+            },
+            {
+                name: "chart_background",
+                value: "transparent",
+                on: [
+                    {
+                        events: {
+                            signal: "down",
+                        },
+                        update: "down === null ? 'transparent' : '#efefef'",
                     },
                 ],
             },
@@ -1270,6 +1286,10 @@ export class TimeSeriesSpecFactory {
                 name: "visible_times",
                 value: xDomain || [0, 1],
             },
+            {
+                name: "chart_background",
+                value: "transparent",
+            },
         ];
 
         const tinySignals = [...containerSignals(), ...staticSignals];
@@ -1302,7 +1322,12 @@ export class TimeSeriesSpecFactory {
             description: "FK Time Series",
             padding: 5,
             config: {
-                background: "white",
+                background: "#ffffff",
+                group: {
+                    fill: {
+                        signal: "chart_background",
+                    },
+                },
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
