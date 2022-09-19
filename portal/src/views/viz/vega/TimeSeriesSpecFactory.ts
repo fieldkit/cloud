@@ -1041,15 +1041,6 @@ export class TimeSeriesSpecFactory {
                         },
                         update: "[brush_x[0], clamp(x(unit), 0, width)]",
                     },
-                    /*
-                    {
-                        events: {
-                            signal: "brush_translate_delta",
-                        },
-                        update:
-                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
-                    },
-                    */
                 ],
             },
             {
@@ -1086,51 +1077,6 @@ export class TimeSeriesSpecFactory {
                     },
                 ],
             },
-            /*
-            {
-                name: "brush_translate_anchor",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "mousedown",
-                                markname: "brush_brush",
-                            },
-                        ],
-                        update: "{x: x(unit), y: y(unit), extent_x: slice(brush_x)}",
-                    },
-                ],
-            },
-            {
-                name: "brush_translate_delta",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "window",
-                                type: "mousemove",
-                                consume: true,
-                                between: [
-                                    {
-                                        source: "view",
-                                        type: "mousedown",
-                                        markname: "brush_brush",
-                                    },
-                                    {
-                                        source: "window",
-                                        type: "mouseup",
-                                    },
-                                ],
-                            },
-                        ],
-                        update: "{x: brush_translate_anchor.x - x(unit), y: brush_translate_anchor.y - y(unit)}",
-                    },
-                ],
-            },
-            */
             {
                 name: "brush_modify",
                 on: [
