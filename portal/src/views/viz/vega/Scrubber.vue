@@ -86,13 +86,26 @@ export default {
 
             this.pickRange(this.visible);
         },
+        inflatedBrushTimes(times: TimeRange): number[] {
+            const x = times.toArray().map((v) => this.vega.view.scale("x")(v));
+            const minimumWidth = 5;
+            const halfMinimumWidth = minimumWidth / 2;
+            const width = x[1] - x[0];
+            if (width > minimumWidth) {
+                return x;
+            }
+            const middle = x[0] + width / 2;
+            return [middle - halfMinimumWidth, middle + halfMinimumWidth];
+        },
         async brush(times: TimeRange): Promise<void> {
             if (!this.vega || !this.series[0].queried) {
                 console.log("viz: vega:scrubber:brushing-ignore");
                 return;
             }
+
             // console.log("viz: vega:scrubber:brushing", times, x);
-            const x = times.toArray().map((v) => this.vega.view.scale("x")(v));
+            const x = this.inflatedBrushTimes(times);
+
             try {
                 await this.vega.view
                     .signal("brush_x", x)
