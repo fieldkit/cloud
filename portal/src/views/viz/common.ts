@@ -257,6 +257,22 @@ export function makeRange(values: number[]): [number, number] {
     return [min, max];
 }
 
+export function addDays(original: Date, days: number): Date {
+    const temp = original;
+    temp.setDate(temp.getDate() + days);
+    return temp;
+}
+
+export function addSeconds(original: Date, seconds: number): Date {
+    const temp = original;
+    temp.setSeconds(temp.getSeconds() + seconds);
+    return temp;
+}
+
+export function truncateTime(original: Date): Date {
+    return new Date(original.getFullYear(), original.getMonth(), original.getDate());
+}
+
 export class QueriedData {
     empty = true;
     dataRange: number[] = [];

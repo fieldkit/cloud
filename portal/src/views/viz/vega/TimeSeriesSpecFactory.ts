@@ -1,8 +1,7 @@
 import _ from "lodash";
-import moment from "moment";
-import { MapFunction, ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
+import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
-import { makeRange } from "../common";
+import { makeRange, truncateTime, addDays, addSeconds } from "../common";
 
 export interface TimeSeriesDataRow extends DataRow {
     gap: number;
@@ -843,54 +842,110 @@ export class TimeSeriesSpecFactory {
         };
 
         // TODO Unique by thresholds and perhaps y value?
-        const ruleMarks = _.flatten(
-            this.allSeries.map((series, i) => {
-                const domain = makeSeriesDomain(series, i);
-                const scales = makeScales(i);
-                const thresholds = getSeriesThresholds(series);
-                if (thresholds && timeRangeAll) {
-                    return thresholds.levels
-                        .filter((level) => level.label != null && !level.hidden)
-                        .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
-                        .map((level) => {
+        const ruleMarks = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    const domain = makeSeriesDomain(series, i);
+                    const scales = makeScales(i);
+                    const thresholds = getSeriesThresholds(series);
+                    if (thresholds && timeRangeAll) {
+                        return thresholds.levels
+                            .filter((level) => level.label != null && !level.hidden)
+                            .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
+                            .map((level) => {
+                                return {
+                                    type: "rule",
+                                    from: { data: makeDataName(i) },
+                                    encode: {
+                                        enter: {
+                                            x: {
+                                                scale: scales.x,
+                                                value: timeRangeAll[0],
+                                            },
+                                            x2: {
+                                                scale: scales.x,
+                                                value: timeRangeAll[1],
+                                            },
+                                            y: {
+                                                scale: scales.y,
+                                                value: level.start,
+                                            },
+                                            y2: {
+                                                scale: scales.y,
+                                                value: level.start,
+                                            },
+                                            stroke: { value: level.color },
+                                            strokeDash: { value: [1, 4] },
+                                            strokeCap: { value: "round" },
+                                            opacity: { value: 0.1 },
+                                            strokeOpacity: { value: 0.1 },
+                                            strokeWidth: {
+                                                value: 1.5,
+                                            },
+                                        },
+                                    },
+                                };
+                            });
+                    }
+
+                    return [];
+                })
+            );
+        };
+
+        const twelveHourMarks = () => {
+            if (!this.settings.mobile) {
+                return [];
+            }
+
+            if (!timeRangeAll) {
+                return [];
+            }
+
+            const marksStart = addDays(truncateTime(new Date(timeRangeAll[0])), -2);
+            const marksEnd = addDays(truncateTime(new Date(timeRangeAll[1])), 2);
+            const elapsed = marksEnd.getTime() - marksStart.getTime();
+            const halves = (elapsed / 1000 / 86400) * 2;
+
+            const scales = makeScales(0);
+
+            return [
+                {
+                    type: "group",
+                    clip: {
+                        path: { signal: "chart_clip" },
+                    },
+                    marks: _.range(0, halves)
+                        .map((i) => {
+                            return addSeconds(new Date(marksStart), i * (86400 / 2));
+                        })
+                        .map((mark) => {
+                            // console.log("viz:", mark, mark.getTime());
+
                             return {
                                 type: "rule",
-                                from: { data: makeDataName(i) },
                                 encode: {
                                     enter: {
-                                        x: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[0],
-                                        },
-                                        x2: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[1],
-                                        },
-                                        y: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        y2: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        stroke: { value: level.color },
-                                        strokeDash: { value: [1, 4] },
-                                        strokeCap: { value: "round" },
-                                        opacity: { value: 0.1 },
-                                        strokeOpacity: { value: 0.1 },
-                                        strokeWidth: {
-                                            value: 1.5,
-                                        },
+                                        x: { scale: scales.x, value: mark.getTime() },
+                                        x2: { scale: scales.x, value: mark.getTime() },
+                                        y: { value: 0 },
+                                        y2: { signal: "height" },
+                                        stroke: { value: "#afafaf" },
+                                        strokeDash: { value: [4, 4] },
+                                        strokeWidth: { value: 1.5 },
+                                    },
+                                    update: {
+                                        x: { scale: scales.x, value: mark.getTime() },
+                                        x2: { scale: scales.x, value: mark.getTime() },
+                                        y: { value: 0 },
+                                        y2: { signal: "height" },
                                     },
                                 },
                             };
-                        });
-                }
-
-                return [];
-            })
-        );
+                        }),
+                },
+            ];
+        };
 
         const cellMarks = () => {
             if (this.settings.tiny) {
@@ -928,16 +983,11 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
-        /*
-        console.log(seriesMarks.sort((a,b) => {
-            return getMarkSortIndex(a) - getMarkSortIndex(b);
-        }))
-        */
-
         const marks = [
             ...cellMarks(),
             ...brushMarks(),
-            ...ruleMarks,
+            ...ruleMarks(),
+            ...twelveHourMarks(),
             ...seriesMarks.sort((a, b) => {
                 return getMarkSortIndex(b) - getMarkSortIndex(a);
             }),
