@@ -942,9 +942,8 @@ export class TimeSeriesSpecFactory {
                                         x2: { scale: scales.x, value: mark.getTime() },
                                         y: { value: 0 },
                                         y2: { signal: "height" },
-                                        stroke: { value: "#afafaf" },
-                                        strokeDash: { value: [4, 4] },
-                                        strokeWidth: { value: 1.5 },
+                                        stroke: { value: "#ddd" },
+                                        strokeWidth: { value: 1 },
                                     },
                                     update: {
                                         x: { scale: scales.x, value: mark.getTime() },
