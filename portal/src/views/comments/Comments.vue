@@ -44,22 +44,22 @@
                 </div>
             </template>
             <template #right>
-                <div class="event-sensor-selector">
-                    <label for="allProjectRadio">
-                        <div class="event-sensor-radio">
-                            <input type="radio" id="allProjectRadio" name="eventLevel" checked />
-                            <span class="radio-label">All Project Sensors</span>
-                            <p>People will see this event when viewing data for any stations that belong to these projects</p>
-                        </div>
-                    </label>
-                    <label for="allSensorsRadio">
-                        <div class="event-sensor-radio">
-                            <input type="radio" id="allSensorsRadio" name="eventLevel" />
-                            <span class="radio-label">Just These Sensors</span>
-                            <p>People will see this event only when viewing data for these stations</p>
-                        </div>
-                    </label>
-                </div>
+<!--                <div class="event-sensor-selector">-->
+<!--                    <label for="allProjectRadio">-->
+<!--                        <div class="event-sensor-radio">-->
+<!--                            <input type="radio" id="allProjectRadio" name="eventLevel" checked />-->
+<!--                            <span class="radio-label">All Project Sensors</span>-->
+<!--                            <p>People will see this event when viewing data for any stations that belong to these projects</p>-->
+<!--                        </div>-->
+<!--                    </label>-->
+<!--                    <label for="allSensorsRadio">-->
+<!--                        <div class="event-sensor-radio">-->
+<!--                            <input type="radio" id="allSensorsRadio" name="eventLevel" />-->
+<!--                            <span class="radio-label">Just These Sensors</span>-->
+<!--                            <p>People will see this event only when viewing data for these stations</p>-->
+<!--                        </div>-->
+<!--                    </label>-->
+<!--                </div>-->
                 <div class="new-comment" :class="{ 'align-center': !user }">
                     <UserPhoto :user="user"></UserPhoto>
                     <template v-if="user">
@@ -323,7 +323,7 @@ export default Vue.extend({
     watch: {
         parentData(): Promise<void> {
             this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) }).then(() => {
-                this.dataEvents = [...this.$getters.dataEvents, ...this.dataEvents];
+                this.dataEvents = this.$getters.dataEvents;
             });
             return this.getComments();
         },

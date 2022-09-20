@@ -86,6 +86,46 @@ export class ScrubberSpecFactory {
                         },
                     },
                 },
+                {
+                    name: "de_circle",
+                    type: "symbol",
+                    interactive: true,
+                    from:
+                        {
+                            data: "data_events"
+                        },
+                    encode: {
+                        enter: {
+                            yc: {value: 50},
+                            fill: {value: "white"},
+                            stroke: {value: "#999"},
+                            size: {value: 700},
+                        },
+                        update: {
+                            "x": {"scale": "x", "field": "start"}
+                        }
+                    }
+                },
+                {
+                    name: "de_flag",
+                    type: "path",
+                    interactive: false,
+                    from:
+                        {
+                            data: "data_events"
+                        },
+                    encode: {
+                        enter: {
+                            yc: {value: 50},
+                            fill: {value: "#52b5e4"},
+                            size: {value: 100},
+                            path: {value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z"}
+                        },
+                        update: {
+                            "x": {"scale": "x", "field": "start"}
+                        }
+                    }
+                },
             ];
         };
 
