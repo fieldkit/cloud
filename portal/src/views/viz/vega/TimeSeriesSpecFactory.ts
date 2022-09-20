@@ -358,9 +358,12 @@ export class TimeSeriesSpecFactory {
                         signal: "visible_times",
                     },
                     tickCount: undefined,
+                    /*
                     values: {
                         signal: "visible_times",
                     },
+                    */
+                    values: xDomain,
                     titleFontSize: 12,
                     titlePadding: 4,
                     titleFontWeight: "normal",
