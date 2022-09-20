@@ -9,7 +9,8 @@ import (
 )
 
 type StationTailInfo struct {
-	BucketSize int `json:"bucketSize"`
+	BucketSize    int `json:"bucketSize"`
+	BucketSamples int `json:"bucketSamples"`
 }
 
 type SensorTailData struct {
@@ -26,8 +27,9 @@ type AggregateInfo struct {
 }
 
 type QueriedData struct {
-	Data       []*backend.DataRow `json:"data"`
-	BucketSize int                `json:"bucketSize"`
+	Data          []*backend.DataRow `json:"data"`
+	BucketSize    int                `json:"bucketSize"`
+	BucketSamples int                `json:"bucketSamples"`
 }
 
 type StationLastTime struct {

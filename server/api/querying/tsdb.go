@@ -280,7 +280,9 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 
 func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	queriedData := &QueriedData{
-		Data: make([]*backend.DataRow, 0),
+		Data:          make([]*backend.DataRow, 0),
+		BucketSize:    0,
+		BucketSamples: 0,
 	}
 
 	return queriedData, nil
@@ -382,8 +384,9 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	tsdb.metrics.RecordsViewed(len(backendRows))
 
 	queriedData := &QueriedData{
-		Data:       backendRows,
-		BucketSize: aggregate.BucketSize,
+		Data:          backendRows,
+		BucketSize:    aggregate.BucketSize,
+		BucketSamples: len(backendRows),
 	}
 
 	return queriedData, nil
@@ -688,7 +691,8 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 		if tailed != nil { // Just in case this station had an error.
 			allRows = append(allRows, tailed.Rows...)
 			stations[tailed.StationID] = &StationTailInfo{
-				BucketSize: tailed.BucketSize,
+				BucketSize:    tailed.BucketSize,
+				BucketSamples: len(tailed.Rows),
 			}
 		}
 	}
