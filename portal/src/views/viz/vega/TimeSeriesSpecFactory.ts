@@ -917,6 +917,11 @@ export class TimeSeriesSpecFactory {
                 return [];
             }
 
+            const timeRange = (timeRangeAll[1] - timeRangeAll[0]) / 1000;
+            if (timeRange > 86400 * 4) {
+                return [];
+            }
+
             const marksStart = addDays(truncateTime(new Date(timeRangeAll[0])), -2);
             const marksEnd = addDays(truncateTime(new Date(timeRangeAll[1])), 2);
             const elapsed = marksEnd.getTime() - marksStart.getTime();
