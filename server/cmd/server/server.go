@@ -235,11 +235,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	be, err := backend.New(config.PostgresURL)
-	if err != nil {
-		return nil, err
-	}
-
 	awsSessionOptions := getAwsSessionOptions(ctx, config)
 
 	awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
@@ -315,7 +310,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Buckets:       bucketNames,
 	}
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, be, publisher, mediaFiles, awsSession, metrics, qc, nil, timeScaleConfig)
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, publisher, mediaFiles, awsSession, metrics, qc, nil, timeScaleConfig)
 	if err != nil {
 		return nil, err
 	}
