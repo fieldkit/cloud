@@ -300,7 +300,7 @@ export class TimeSeriesSpecFactory {
         };
 
         const layoutData = () => {
-            if (this.settings.tiny) {
+            if (this.settings.tiny || this.settings.mobile) {
                 return [];
             }
             return [
@@ -970,7 +970,7 @@ export class TimeSeriesSpecFactory {
         };
 
         const cellMarks = () => {
-            if (this.settings.tiny) {
+            if (this.settings.tiny || this.settings.mobile) {
                 return [];
             }
 
