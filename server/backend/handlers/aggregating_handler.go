@@ -16,6 +16,10 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 )
 
+/**
+ * This type is deprecated.
+ */
+
 type TimeScaleRecord struct {
 	Time      time.Time
 	StationID int32

@@ -65,10 +65,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler, err := NewAllHandlers(h.db, h.tsConfig)
-	if err != nil {
-		return err
-	}
+	handler := NewAllHandlers(h.db, h.tsConfig)
 
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose)
 
@@ -93,9 +90,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 			return err
 		}
 
-		if info.StationID != nil {
-			if m.Refresh {
-				now := time.Now()
+		if info.StationID != nil && m.Refresh {
+			now := time.Now()
+			/*
 				howFarBack := time.Hour * 48
 				if !info.DataStart.IsZero() {
 					if now.After(info.DataStart) {
@@ -110,17 +107,17 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 						log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
 					}
 				}
+			*/
 
-				if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
-					ModifiedAt:  now,
-					PublishedAt: now,
-					StationID:   *info.StationID,
-					UserID:      i.UserID,
-					Start:       info.DataStart,
-					End:         info.DataEnd,
-				}); err != nil {
-					return err
-				}
+			if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
+				ModifiedAt:  now,
+				PublishedAt: now,
+				StationID:   *info.StationID,
+				UserID:      i.UserID,
+				Start:       info.DataStart,
+				End:         info.DataEnd,
+			}); err != nil {
+				return err
 			}
 		}
 	}

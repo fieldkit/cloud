@@ -346,6 +346,18 @@ func (e *TestEnv) AddProjectActivity(project *data.Project, station *data.Statio
 	return nil
 }
 
+func (e *TestEnv) AddRandomSensors() error {
+	sensors := repositories.NewSensorsRepository(e.DB)
+
+	for i := 0; i < 10; i += 1 {
+		if err := sensors.AddSensor(e.Ctx, fmt.Sprintf("fk.random.random%d", i)); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (e *TestEnv) NewRandomData(n int) ([]byte, error) {
 	data := make([]byte, n)
 	actual, err := crand.Read(data)

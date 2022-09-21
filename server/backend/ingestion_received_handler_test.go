@@ -70,6 +70,11 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	user, err := e.AddUser()
 	assert.NoError(err)
 
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	deviceID := fd.Stations[0].DeviceID
+
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
 
@@ -80,7 +85,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
-	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, e.MustDeviceID(), len(files.Meta))
+	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -99,7 +104,12 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	user, err := e.AddUser()
 	assert.NoError(err)
 
-	deviceID := e.MustDeviceID()
+	assert.NoError(e.AddRandomSensors())
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	deviceID := fd.Stations[0].DeviceID
 
 	files, err := e.NewFilePair(1, 16)
 	assert.NoError(err)
@@ -161,7 +171,12 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	user, err := e.AddUser()
 	assert.NoError(err)
 
-	deviceID := e.MustDeviceID()
+	assert.NoError(e.AddRandomSensors())
+
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	deviceID := fd.Stations[0].DeviceID
 
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
@@ -212,7 +227,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 
 	found := 0
 	assert.NoError(e.DB.GetContext(e.Ctx, &found, "SELECT COUNT(*) FROM fieldkit.station_ingestion WHERE data_ingestion_id = $1", diAfter.ID))
-	assert.Equal(0, found)
+	assert.Equal(1, found)
 }
 
 func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *testing.T) {

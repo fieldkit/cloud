@@ -30,6 +30,8 @@ func NewStationModelRecordHandler(db *sqlxcache.DB) *stationModelRecordHandler {
 }
 
 func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
+	log := Logger(ctx).Sugar()
+
 	sr := repositories.NewStationRepository(h.db)
 
 	configuration := &data.StationConfiguration{
@@ -40,6 +42,8 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 	if _, err := sr.UpsertConfiguration(ctx, configuration); err != nil {
 		return err
 	}
+
+	log.Infow("station-model:meta", "configuration_id", configuration.ID, "meta_record_id", db.ID)
 
 	for moduleIndex, m := range r.Modules {
 		if m.Header == nil {
@@ -59,6 +63,8 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
 			return err
 		}
+
+		log.Infow("station-model:module", "module_id", module.ID, "configuration_id", configuration.ID, "hardware_id", m.Id, "meta_record_id", db.ID)
 
 		for sensorIndex, s := range m.Sensors {
 			sensor := &data.ModuleSensor{
