@@ -202,6 +202,10 @@ func (v *TsDBHandler) flushTs(ctx context.Context) error {
 
 	v.records = make([][]interface{}, 0)
 
+	if v.tsConfig == nil {
+		return nil
+	}
+
 	pgPool, err := v.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
