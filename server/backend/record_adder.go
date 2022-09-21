@@ -174,7 +174,9 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 			// record with a record number to anchor things. Notice that
 			// non-single file meta records will come in via SignedMetaRecords.
 			record := int64(pr.DataRecord.Metadata.Record)
-			if record == 0 {
+			if record == 0 || len(ra.queue) > 0 {
+				log.Infow("adder:queue-meta")
+
 				ra.queue = append(ra.queue, pr)
 			} else {
 				metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes)
