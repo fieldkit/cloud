@@ -56,8 +56,8 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataR
 	if _, ok := v.stationIDs[p.ID]; !ok {
 		station, err := v.stationRepository.QueryStationByDeviceID(ctx, p.DeviceID)
 		if err != nil || station == nil {
-			log.Infow("tsdb-handler:station-missing", "device_id", p.DeviceID)
-			return nil
+			log.Warnw("tsdb-handler:station-missing", "device_id", p.DeviceID)
+			return fmt.Errorf("tsdb-handler:station-missing")
 		}
 
 		v.stationIDs[p.ID] = station.ID
