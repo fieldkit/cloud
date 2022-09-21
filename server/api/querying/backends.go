@@ -27,9 +27,10 @@ type AggregateInfo struct {
 }
 
 type QueriedData struct {
-	Data          []*backend.DataRow `json:"data"`
-	BucketSize    int                `json:"bucketSize"`
-	BucketSamples int                `json:"bucketSamples"`
+	Data          []*backend.DataRow    `json:"data"`
+	BucketSize    int                   `json:"bucketSize"`
+	BucketSamples int                   `json:"bucketSamples"`
+	DataEnd       *data.NumericWireTime `json:"dataEnd"`
 }
 
 type StationLastTime struct {

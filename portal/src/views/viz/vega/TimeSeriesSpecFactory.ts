@@ -63,6 +63,9 @@ export class TimeSeriesSpecFactory {
             .filter((series: SeriesData) => series.queried.data.length > 0)
             .map((series: SeriesData) => series.visible.toArray());
 
+        const eachDataEnd = this.allSeries.map((series) => series.queried.dataEnd).filter((v) => v !== null);
+        const dataEnd = eachDataEnd.length > 0 ? _.max(eachDataEnd) : new Date().getTime();
+
         const timeRangeAll =
             xDomainsAll.length == 0
                 ? null
@@ -1115,6 +1118,14 @@ export class TimeSeriesSpecFactory {
                 ],
             },
             {
+                name: "drag_maximum_start",
+                value: dataEnd && timeRangeAll ? dataEnd - (timeRangeAll[1] - timeRangeAll[0]) : null,
+            },
+            {
+                name: "drag_maximum_end",
+                value: dataEnd,
+            },
+            {
                 name: "drag_delta",
                 value: [0, 0],
                 on: [
@@ -1160,7 +1171,8 @@ export class TimeSeriesSpecFactory {
                 on: [
                     {
                         events: { signal: "drag_delta" },
-                        update: "[ceil(xcur[0] + span(xcur) * drag_delta[0] / width), ceil(xcur[1] + span(xcur) * drag_delta[0] / width)]",
+                        update:
+                            "[ceil(min(xcur[0] + span(xcur) * drag_delta[0] / width, drag_maximum_start)), ceil(min(xcur[1] + span(xcur) * drag_delta[0] / width, drag_maximum_end))]",
                     },
                 ],
             },
