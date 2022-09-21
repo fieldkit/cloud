@@ -52,7 +52,7 @@ func NewTestEnv() (e *TestEnv, err error) {
 
 	ctx := context.Background()
 
-	originalDb, err := sqlxcache.Open("postgres", config.PostgresURL)
+	originalDb, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func NewTestEnv() (e *TestEnv, err error) {
 		}
 	}
 
-	testDb, err := sqlxcache.Open("postgres", testUrl)
+	testDb, err := sqlxcache.Open(ctx, "postgres", testUrl)
 	if err != nil {
 		return nil, err
 	}

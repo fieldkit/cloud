@@ -25,7 +25,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Address: "",
 	})
 
-	database, err := sqlxcache.Open("postgres", e.PostgresURL)
+	database, err := sqlxcache.Open(e.Ctx, "postgres", e.PostgresURL)
 	if err != nil {
 		return nil, fmt.Errorf("error opening pg: %v", err)
 	}

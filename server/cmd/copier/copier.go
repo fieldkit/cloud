@@ -183,7 +183,7 @@ func NewCopierTool(ctx context.Context, o *options) (copier *CopierTool, err err
 		panic(err)
 	}
 
-	sourceDb, err := sqlxcache.Open("postgres", o.SourceURL)
+	sourceDb, err := sqlxcache.Open(ctx, "postgres", o.SourceURL)
 	if err != nil {
 		panic(err)
 	}
@@ -195,7 +195,7 @@ func NewCopierTool(ctx context.Context, o *options) (copier *CopierTool, err err
 		panic(err)
 	}
 
-	destinyDb, err := sqlxcache.Open("postgres", o.DestinyURL)
+	destinyDb, err := sqlxcache.Open(ctx, "postgres", o.DestinyURL)
 	if err != nil {
 		panic(err)
 	}

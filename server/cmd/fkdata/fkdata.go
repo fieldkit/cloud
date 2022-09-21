@@ -116,7 +116,7 @@ func main() {
 		fail(ctx, err)
 	}
 
-	db, err := sqlxcache.Open("postgres", config.PostgresURL)
+	db, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
 	if err != nil {
 		fail(ctx, err)
 	}

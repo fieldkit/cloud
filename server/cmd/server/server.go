@@ -230,7 +230,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Address: config.StatsdAddress,
 	})
 
-	database, err := sqlxcache.Open("postgres", config.PostgresURL)
+	database, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}

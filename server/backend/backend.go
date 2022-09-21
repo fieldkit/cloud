@@ -1,7 +1,7 @@
 package backend
 
 import (
-	_ "context"
+	"context"
 
 	_ "github.com/lib/pq"
 	_ "github.com/paulmach/go.geo"
@@ -17,11 +17,11 @@ type Backend struct {
 }
 
 func OpenDatabase(url string) (*sqlxcache.DB, error) {
-	return sqlxcache.Open("postgres", url)
+	return sqlxcache.Open(context.TODO(), "postgres", url)
 }
 
 func New(url string) (*Backend, error) {
-	db, err := sqlxcache.Open("postgres", url)
+	db, err := sqlxcache.Open(context.TODO(), "postgres", url)
 	if err != nil {
 		return nil, err
 	}
