@@ -37,6 +37,7 @@ type RecordAdder struct {
 	ingestion           *data.Ingestion
 	provision           *data.Provision
 	keyRecord           *keyRecord
+	metaID              int64
 }
 
 type ParsedRecord struct {
@@ -60,6 +61,7 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		keyRecord:           nil,
 		provision:           nil,
 		ingestion:           nil,
+		metaID:              0,
 	}
 }
 
@@ -104,35 +106,45 @@ func (ra *RecordAdder) findProvision(ctx context.Context, ingestion *data.Ingest
 }
 
 func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
+	log := Logger(ctx).Sugar()
+
 	// Do we have queued meta records in need of a record number?
-	if len(ra.queue) > 0 {
-		// If we're missing a key record, we can't import this file.
-		if ra.keyRecord == nil {
-			return fmt.Errorf("error flushing queue: no key record")
-		}
-
-		// Ignore harder scenarios for now, only working with having
-		// file offset be what the record number should be. We started
-		// at the first record.
-		if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
-			return fmt.Errorf("error flushing queue: mid-file")
-		}
-
-		// So we can safetly process the queued meta records using their
-		// file offset for the record number.
-		for _, queued := range ra.queue {
-			metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes)
-			if err != nil {
-				return err
-			}
-
-			if err := ra.handler.OnMeta(ctx, ra.provision, queued.DataRecord, metaRecord); err != nil {
-				return err
-			}
-		}
-
-		ra.queue = make([]*ParsedRecord, 0)
+	if len(ra.queue) == 0 {
+		return nil
 	}
+
+	// If we're missing a key record, we can't import this file.
+	if ra.keyRecord == nil {
+		return fmt.Errorf("error flushing queue: no key record")
+	}
+
+	// Ignore harder scenarios for now, only working with having
+	// file offset be what the record number should be. We started
+	// at the first record.
+	if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
+		return fmt.Errorf("error flushing queue: mid-file")
+	}
+
+	// So we can safetly process the queued meta records using their
+	// file offset for the record number.
+	for _, queued := range ra.queue {
+		metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes)
+		if err != nil {
+			return err
+		}
+
+		log.Infow("adder:flush-on-meta", "meta_record_id", metaRecord.ID)
+
+		if err := ra.handler.OnMeta(ctx, ra.provision, queued.DataRecord, metaRecord); err != nil {
+			return err
+		}
+
+		ra.metaID = metaRecord.ID
+	}
+
+	log.Infow("adder:flushed", "nrecords", len(ra.queue))
+
+	ra.queue = make([]*ParsedRecord, 0)
 
 	return nil
 }
@@ -147,9 +159,13 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 			return nil, err
 		}
 
+		log.Infow("adder:on-meta-signed", "meta_record_id", metaRecord.ID)
+
 		if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
 			return nil, err
 		}
+
+		ra.metaID = metaRecord.ID
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Metadata != nil {
 			// Check to see if this record has a record number. Some older
@@ -166,9 +182,13 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 					return nil, err
 				}
 
+				log.Infow("adder:on-meta", "meta_record_id", metaRecord.ID)
+
 				if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
 					return nil, err
 				}
+
+				ra.metaID = metaRecord.ID
 			}
 		} else {
 			// Are we need of a key record and does this record have one? Notice
@@ -202,6 +222,16 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 			}
 
 			ra.statistics.addTime(dataRecord.Time)
+
+			if ra.metaID != metaRecord.ID {
+				log.Infow("adder:on-meta-unvisisted", "meta_record_id", metaRecord.ID)
+
+				if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
+					return nil, err
+				}
+
+				ra.metaID = metaRecord.ID
+			}
 
 			if err := ra.handler.OnData(ctx, ra.provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
 				return nil, err
