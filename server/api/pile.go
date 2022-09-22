@@ -200,7 +200,7 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 
 	// Ok, everything seems fine so append to the tail.
 	if len(pile.meta.Tail) == TailLength {
-		for i := 0; i < TailLength; i++ {
+		for i := 0; i < TailLength-1; i++ {
 			pile.meta.Tail[i] = pile.meta.Tail[i+1]
 		}
 		pile.meta.Tail[TailLength-1] = entry
