@@ -602,6 +602,7 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 	}
 
 	byWindow := make(map[time.Duration][]*backend.DataRow)
+	mapLock := sync.Mutex{}
 	wg := new(sync.WaitGroup)
 
 	for _, duration := range windows {
@@ -617,7 +618,9 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 				log := Logger(ctx).Sugar()
 				log.Errorw("tsdb:error", "error", err)
 			} else {
+				mapLock.Lock()
 				byWindow[key] = daily
+				mapLock.Unlock()
 			}
 
 			wg.Done()
@@ -651,6 +654,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}
 
 	byStation := make([]*TailedStation, len(stationIDs))
+	mapLock := sync.Mutex{}
 	wg := new(sync.WaitGroup)
 
 	for index, stationID := range stationIDs {
@@ -664,7 +668,9 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 				if err != nil {
 					log.Errorw("tsdb:error", "error", err, "station_id", stationID)
 				} else {
+					mapLock.Lock()
 					byStation[index] = tailed
+					mapLock.Unlock()
 				}
 
 				wg.Done()
