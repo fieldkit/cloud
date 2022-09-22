@@ -174,7 +174,7 @@ func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, in
 		ra.metaID = metaRecord.ID
 	}
 
-	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, dataRecord, metaRecord); err != nil {
+	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, nil, dataRecord, metaRecord); err != nil {
 		return err
 	}
 

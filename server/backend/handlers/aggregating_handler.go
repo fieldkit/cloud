@@ -131,7 +131,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	log := Logger(ctx).Sugar()
 
 	aggregator := v.stations[p.ID]

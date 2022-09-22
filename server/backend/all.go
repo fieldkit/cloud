@@ -30,18 +30,18 @@ func NewHandlerCollectionHandler(handlers []RecordHandler) *HandlerCollectionHan
 	}
 }
 
-func (v *HandlerCollectionHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+func (v *HandlerCollectionHandler) OnMeta(ctx context.Context, provision *data.Provision, rawMeta *pb.DataRecord, meta *data.MetaRecord) error {
 	for _, h := range v.handlers {
-		if err := h.OnMeta(ctx, p, r, meta); err != nil {
+		if err := h.OnMeta(ctx, provision, rawMeta, meta); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (v *HandlerCollectionHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (v *HandlerCollectionHandler) OnData(ctx context.Context, provision *data.Provision, rawData *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	for _, h := range v.handlers {
-		if err := h.OnData(ctx, p, r, db, meta); err != nil {
+		if err := h.OnData(ctx, provision, rawData, rawMeta, db, meta); err != nil {
 			return err
 		}
 	}

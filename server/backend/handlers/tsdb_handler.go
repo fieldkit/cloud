@@ -26,7 +26,6 @@ type TsDBHandler struct {
 	provisionID       int64
 	metaID            int64
 	stationIDs        map[int64]int32
-	stationConfig     *data.StationConfiguration
 	stationModules    map[uint32]*data.StationModule
 	sensors           map[string]*data.Sensor
 	records           [][]interface{}
@@ -39,28 +38,27 @@ func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig) *TsDB
 		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
 		stationIDs:        make(map[int64]int32),
-		stationConfig:     nil,
 		records:           make([][]interface{}, 0),
 		provisionID:       0,
 		metaID:            0,
 	}
 }
 
-func (v *TsDBHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, meta *data.MetaRecord) error {
+func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, rawMeta *pb.DataRecord, meta *data.MetaRecord) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("tsdb-handler:meta", "meta_record_id", meta.ID)
 
-	v.provisionID = p.ID
+	v.provisionID = provision.ID
 
-	if _, ok := v.stationIDs[p.ID]; !ok {
-		station, err := v.stationRepository.QueryStationByDeviceID(ctx, p.DeviceID)
+	if _, ok := v.stationIDs[provision.ID]; !ok {
+		station, err := v.stationRepository.QueryStationByDeviceID(ctx, provision.DeviceID)
 		if err != nil || station == nil {
-			log.Warnw("tsdb-handler:station-missing", "device_id", p.DeviceID)
+			log.Warnw("tsdb-handler:station-missing", "device_id", provision.DeviceID)
 			return fmt.Errorf("tsdb-handler:station-missing")
 		}
 
-		v.stationIDs[p.ID] = station.ID
+		v.stationIDs[provision.ID] = station.ID
 	}
 
 	if _, err := v.metaFactory.Add(ctx, meta, true); err != nil {
@@ -70,27 +68,17 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataR
 	return nil
 }
 
-func (v *TsDBHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
-	log := Logger(ctx).Sugar().With("data_record_id", db.ID, "meta_record_id", meta.ID, "provision_id", p.ID)
+func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, rawData *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+	log := Logger(ctx).Sugar().With("data_record_id", db.ID, "meta_record_id", meta.ID, "provision_id", provision.ID)
 
 	if v.metaID != meta.ID {
-		stationConfig, err := v.stationRepository.QueryStationConfigurationByMetaID(ctx, meta.ID)
-		if err != nil {
-			return err
-		}
-		if stationConfig == nil {
-			log.Warnw("missing-station-configuration", "meta_record_id", meta.ID)
-			return fmt.Errorf("missing station_configuration")
-		}
-
 		modules, err := v.stationRepository.QueryStationModulesByMetaID(ctx, meta.ID)
 		if err != nil {
 			return err
 		}
 
-		log.Infow("station-modules", "meta_record_id", meta.ID, "station_configuration_id", stationConfig.ID, "provision_id", p.ID, "modules", modules)
+		log.Infow("station-modules", "meta_record_id", meta.ID, "provision_id", provision.ID, "modules", modules)
 
-		v.stationConfig = stationConfig
 		v.stationModules = make(map[uint32]*data.StationModule)
 		for _, sm := range modules {
 			v.stationModules[sm.Index] = sm

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -29,13 +28,13 @@ func NewStationModelRecordHandler(db *sqlxcache.DB) *stationModelRecordHandler {
 	}
 }
 
-func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.MetaRecord) error {
+func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.Provision, rawMeta *pb.DataRecord, db *data.MetaRecord) error {
 	log := Logger(ctx).Sugar()
 
 	sr := repositories.NewStationRepository(h.db)
 
 	configuration := &data.StationConfiguration{
-		ProvisionID:  p.ID,
+		ProvisionID:  provision.ID,
 		MetaRecordID: &db.ID,
 		UpdatedAt:    time.Now(),
 	}
@@ -45,7 +44,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 
 	log.Infow("station-model:meta", "configuration_id", configuration.ID, "meta_record_id", db.ID)
 
-	for moduleIndex, m := range r.Modules {
+	for moduleIndex, m := range rawMeta.Modules {
 		if m.Header == nil {
 			m.Header = &pb.ModuleHeader{}
 		}
@@ -87,12 +86,9 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, p *data.Provisio
 	return nil
 }
 
-func (h *stationModelRecordHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, dbData *data.DataRecord, dbMeta *data.MetaRecord) error {
-	if r == nil {
-		return fmt.Errorf("protobuf record required")
-	}
-	h.provision = p
-	h.dataRecord = r
+func (h *stationModelRecordHandler) OnData(ctx context.Context, provision *data.Provision, rawData *pb.DataRecord, rawMeta *pb.DataRecord, dbData *data.DataRecord, dbMeta *data.MetaRecord) error {
+	h.provision = provision
+	h.dataRecord = rawData
 	h.dbData = dbData
 	h.dbMeta = dbMeta
 	return nil
