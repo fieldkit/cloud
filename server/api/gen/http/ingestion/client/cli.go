@@ -132,6 +132,19 @@ func BuildProcessIngestionPayload(ingestionProcessIngestionIngestionID string, i
 	return v, nil
 }
 
+// BuildRefreshViewsPayload builds the payload for the ingestion refresh views
+// endpoint from CLI flags.
+func BuildRefreshViewsPayload(ingestionRefreshViewsAuth string) (*ingestion.RefreshViewsPayload, error) {
+	var auth string
+	{
+		auth = ingestionRefreshViewsAuth
+	}
+	v := &ingestion.RefreshViewsPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildDeletePayload builds the payload for the ingestion delete endpoint from
 // CLI flags.
 func BuildDeletePayload(ingestionDeleteIngestionID string, ingestionDeleteAuth string) (*ingestion.DeletePayload, error) {

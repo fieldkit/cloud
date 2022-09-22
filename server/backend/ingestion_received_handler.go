@@ -112,7 +112,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 			if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
 				ModifiedAt:  now,
 				PublishedAt: now,
-				StationID:   *info.StationID,
+				StationID:   info.StationID,
 				UserID:      i.UserID,
 				Start:       info.DataStart,
 				End:         info.DataEnd,

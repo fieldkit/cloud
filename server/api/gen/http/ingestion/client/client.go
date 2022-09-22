@@ -37,6 +37,10 @@ type Client struct {
 	// process ingestion endpoint.
 	ProcessIngestionDoer goahttp.Doer
 
+	// RefreshViews Doer is the HTTP client used to make requests to the refresh
+	// views endpoint.
+	RefreshViewsDoer goahttp.Doer
+
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
 
@@ -68,6 +72,7 @@ func NewClient(
 		ProcessStationDoer:           doer,
 		ProcessStationIngestionsDoer: doer,
 		ProcessIngestionDoer:         doer,
+		RefreshViewsDoer:             doer,
 		DeleteDoer:                   doer,
 		CORSDoer:                     doer,
 		RestoreResponseBody:          restoreBody,
@@ -193,6 +198,30 @@ func (c *Client) ProcessIngestion() goa.Endpoint {
 		resp, err := c.ProcessIngestionDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("ingestion", "process ingestion", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// RefreshViews returns an endpoint that makes HTTP requests to the ingestion
+// service refresh views server.
+func (c *Client) RefreshViews() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeRefreshViewsRequest(c.encoder)
+		decodeResponse = DecodeRefreshViewsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildRefreshViewsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.RefreshViewsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("ingestion", "refresh views", err)
 		}
 		return decodeResponse(resp)
 	}

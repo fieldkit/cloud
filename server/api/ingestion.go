@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"goa.design/goa/v3/security"
 
@@ -194,6 +195,26 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
+	}
+
+	return nil
+}
+
+func (c *IngestionService) RefreshViews(ctx context.Context, payload *ingestion.RefreshViewsPayload) (err error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.SensorDataModified{
+		ModifiedAt:  time.Now(),
+		PublishedAt: time.Now(),
+		StationID:   nil,
+		UserID:      p.UserID(),
+		Start:       time.Time{},
+		End:         time.Time{},
+	}); err != nil {
+		return err
 	}
 
 	return nil
