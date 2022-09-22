@@ -105,6 +105,71 @@ func (ra *RecordAdder) findProvision(ctx context.Context, ingestion *data.Ingest
 	}
 }
 
+func (ra *RecordAdder) onSignedMeta(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, signedRecord *pb.SignedRecord, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
+
+	metaRecord, err := ra.recordRepository.AddSignedMetaRecord(ctx, ra.provision, ra.ingestion, signedRecord, rawRecord, bytes)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("adder:on-meta-signed", "meta_record_id", metaRecord.ID)
+
+	if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.metaID = metaRecord.ID
+
+	return nil
+}
+
+func (ra *RecordAdder) onMeta(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, recordNumber int64, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
+
+	metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, recordNumber, rawRecord, bytes)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("adder:on-meta", "meta_record_id", metaRecord.ID)
+
+	if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.metaID = metaRecord.ID
+
+	return nil
+}
+
+func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
+
+	dataRecord, metaRecord, err := ra.recordRepository.AddDataRecord(ctx, ra.provision, ra.ingestion, rawRecord, bytes)
+	if err != nil {
+		return err
+	}
+
+	if ra.metaID != metaRecord.ID {
+		log.Infow("adder:on-meta-unvisisted", "meta_record_id", metaRecord.ID)
+
+		if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+			return err
+		}
+
+		ra.metaID = metaRecord.ID
+	}
+
+	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, dataRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.statistics.addTime(dataRecord.Time)
+
+	return nil
+}
+
 func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
 	log := Logger(ctx).Sugar()
 
@@ -128,18 +193,9 @@ func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
 	// So we can safetly process the queued meta records using their
 	// file offset for the record number.
 	for _, queued := range ra.queue {
-		metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes)
-		if err != nil {
+		if err := ra.onMeta(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes); err != nil {
 			return err
 		}
-
-		log.Infow("adder:flush-on-meta", "meta_record_id", metaRecord.ID)
-
-		if err := ra.handler.OnMeta(ctx, ra.provision, queued.DataRecord, metaRecord); err != nil {
-			return err
-		}
-
-		ra.metaID = metaRecord.ID
 	}
 
 	log.Infow("adder:flushed", "nrecords", len(ra.queue))
@@ -151,21 +207,11 @@ func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
 
 func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
-	verboseLog := logging.OnlyLogIf(log, ra.verbose)
 
 	if pr.SignedRecord != nil {
-		metaRecord, err := ra.recordRepository.AddSignedMetaRecord(ctx, ra.provision, ra.ingestion, pr.SignedRecord, pr.DataRecord, pr.Bytes)
-		if err != nil {
+		if err := ra.onSignedMeta(ctx, ra.provision, ra.ingestion, pr.SignedRecord, pr.DataRecord, pr.Bytes); err != nil {
 			return nil, err
 		}
-
-		log.Infow("adder:on-meta-signed", "meta_record_id", metaRecord.ID)
-
-		if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
-			return nil, err
-		}
-
-		ra.metaID = metaRecord.ID
 	} else if pr.DataRecord != nil {
 		if pr.DataRecord.Metadata != nil {
 			// Check to see if this record has a record number. Some older
@@ -179,18 +225,9 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 
 				ra.queue = append(ra.queue, pr)
 			} else {
-				metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes)
-				if err != nil {
+				if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
 					return nil, err
 				}
-
-				log.Infow("adder:on-meta", "meta_record_id", metaRecord.ID)
-
-				if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
-					return nil, err
-				}
-
-				ra.metaID = metaRecord.ID
 			}
 		} else {
 			// Are we need of a key record and does this record have one? Notice
@@ -208,34 +245,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 				return nil, err
 			}
 
-			dataRecord, metaRecord, err := ra.recordRepository.AddDataRecord(ctx, ra.provision, ra.ingestion, pr.DataRecord, pr.Bytes)
-			if err != nil {
-				if err == repositories.ErrMalformedRecord {
-					verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
-					ra.metrics.DataErrorsUnknown()
-					return err, nil
-				}
-				if err == repositories.ErrMetaMissing {
-					verboseLog.Errorw("error finding meta record", "provision_id", ra.provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
-					ra.metrics.DataErrorsMissingMeta()
-					return err, nil
-				}
-				return nil, err
-			}
-
-			ra.statistics.addTime(dataRecord.Time)
-
-			if ra.metaID != metaRecord.ID {
-				log.Infow("adder:on-meta-unvisisted", "meta_record_id", metaRecord.ID)
-
-				if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
-					return nil, err
-				}
-
-				ra.metaID = metaRecord.ID
-			}
-
-			if err := ra.handler.OnData(ctx, ra.provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
+			if err := ra.onData(ctx, ra.provision, ra.ingestion, pr.DataRecord, pr.Bytes); err != nil {
 				return nil, err
 			}
 		}
@@ -394,7 +404,11 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		return nil, nil
 	})
 
-	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
+	if _, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc); err != nil {
+		newErr := fmt.Errorf("error reading collection: %v", err)
+		log.Errorw("error", "error", newErr)
+		return nil, newErr
+	}
 
 	if err := ra.flushQueue(ctx); err != nil {
 		return nil, err
@@ -420,12 +434,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 
 	if err := ra.handler.OnDone(ctx); err != nil {
 		return nil, fmt.Errorf("error in done handler: %v", err)
-	}
-
-	if err != nil {
-		newErr := fmt.Errorf("error reading collection: %v", err)
-		log.Errorw("error", "error", newErr)
-		return nil, newErr
 	}
 
 	info = &WriteInfo{

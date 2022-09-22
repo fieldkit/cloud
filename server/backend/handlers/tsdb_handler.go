@@ -112,8 +112,6 @@ func (v *TsDBHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataR
 		return nil
 	}
 
-	// log.Infow("resolved")
-
 	for key, value := range filtered.Record.Readings {
 		if sm, ok := v.stationModules[key.ModuleIndex]; !ok {
 			log.Warnw("tsdb-handler:missing-module", "nmodules", len(v.stationModules))
