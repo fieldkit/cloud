@@ -23,6 +23,19 @@ type keyRecord struct {
 	recordNumber int64
 }
 
+type WriteInfo struct {
+	IngestionID   int64
+	TotalRecords  int64
+	DataRecords   int64
+	MetaRecords   int64
+	MetaErrors    int64
+	DataErrors    int64
+	FutureIgnores int64
+	StationID     *int32
+	DataStart     time.Time
+	DataEnd       time.Time
+}
+
 type RecordAdder struct {
 	verbose             bool
 	handler             RecordHandler
@@ -254,23 +267,6 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 	return nil, nil
 }
 
-type WriteInfo struct {
-	IngestionID   int64
-	TotalRecords  int64
-	DataRecords   int64
-	MetaRecords   int64
-	MetaErrors    int64
-	DataErrors    int64
-	FutureIgnores int64
-	StationID     *int32
-	DataStart     time.Time
-	DataEnd       time.Time
-}
-
-func (ra *RecordAdder) fixDataRecord(ctx context.Context, record *pb.DataRecord) (bool, error) {
-	return false, nil
-}
-
 func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingestion) (info *WriteInfo, err error) {
 	log := Logger(ctx).Sugar().With("ingestion_id", ingestion.ID, "device_id", ingestion.DeviceID, "user_id", ingestion.UserID, "blocks", ingestion.Blocks)
 
@@ -300,7 +296,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 	totalRecords := 0
 	dataProcessed := 0
 	dataErrors := 0
-	dataFixed := 0
 	metaProcessed := 0
 	metaErrors := 0
 	records := 0
@@ -323,33 +318,22 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				unmarshalError = err
 			} else {
 				data = true
-				if fixed, err := ra.fixDataRecord(ctx, &dataRecord); err != nil {
+				warning, fatal := ra.Handle(ctx, &ParsedRecord{
+					FileOffset: recordNumber,
+					DataRecord: &dataRecord,
+					Bytes:      b,
+				})
+				if fatal != nil {
+					return nil, fatal
+				}
+				if warning == nil {
+					dataProcessed += 1
+					records += 1
+				} else {
 					dataErrors += 1
 					if records > 0 {
 						log.Infow("processed", "record_run", records)
 						records = 0
-					}
-				} else {
-					warning, fatal := ra.Handle(ctx, &ParsedRecord{
-						FileOffset: recordNumber,
-						DataRecord: &dataRecord,
-						Bytes:      b,
-					})
-					if fatal != nil {
-						return nil, fatal
-					}
-					if fixed {
-						dataFixed += 1
-					}
-					if warning == nil {
-						dataProcessed += 1
-						records += 1
-					} else {
-						dataErrors += 1
-						if records > 0 {
-							log.Infow("processed", "record_run", records)
-							records = 0
-						}
 					}
 				}
 			}
@@ -418,7 +402,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		"data_processed", dataProcessed,
 		"meta_errors", metaErrors,
 		"data_errors", dataErrors,
-		"data_fixed", dataFixed,
 		"record_run", records,
 		"future_ignores", ra.statistics.futureIgnores,
 		"start_human", prettyTime(ra.statistics.start),
