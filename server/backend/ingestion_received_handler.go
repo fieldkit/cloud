@@ -67,7 +67,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	handler := NewAllHandlers(h.db, h.tsConfig)
 
-	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose)
+	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 

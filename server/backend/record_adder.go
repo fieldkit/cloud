@@ -60,7 +60,7 @@ type ParsedRecord struct {
 	FileOffset   int64
 }
 
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool, saveData bool) (ra *RecordAdder) {
 	return &RecordAdder{
 		verbose:             verbose,
 		db:                  db,
@@ -69,7 +69,7 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		handler:             handler,
 		stationRepository:   repositories.NewStationRepository(db),
 		provisionRepository: repositories.NewProvisionRepository(db),
-		recordRepository:    repositories.NewRecordRepository(db),
+		recordRepository:    repositories.NewRecordRepository(db, saveData),
 		statistics:          &newRecordStatistics{},
 		keyRecord:           nil,
 		provision:           nil,

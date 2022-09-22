@@ -805,7 +805,7 @@ type MetaAndData struct {
 }
 
 func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User, numberData int) (*MetaAndData, error) {
-	recordRepository := repositories.NewRecordRepository(e.DB)
+	recordRepository := repositories.NewRecordRepository(e.DB, true)
 
 	_, di, err := e.AddIngestion(user, "url", data.DataTypeName, station.DeviceID, 0)
 	if err != nil {
