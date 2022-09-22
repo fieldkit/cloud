@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/govau/que-go"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
+	"github.com/vgarvardt/gue/v4"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/messages"
@@ -32,7 +32,7 @@ func NewSensorDataBatchHandler(db *sqlxcache.DB, metrics *logging.Metrics, publi
 	}
 }
 
-func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *que.Job) error {
+func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job) error {
 	log := logging.Logger(ctx).Sugar()
 
 	batch := &pgx.Batch{}

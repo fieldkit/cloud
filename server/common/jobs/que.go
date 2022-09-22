@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/govau/que-go"
+	"github.com/vgarvardt/gue/v4"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 )
@@ -17,10 +17,10 @@ var (
 
 type QueMessagePublisher struct {
 	metrics *logging.Metrics
-	que     *que.Client
+	que     *gue.Client
 }
 
-func NewQueMessagePublisher(metrics *logging.Metrics, q *que.Client) *QueMessagePublisher {
+func NewQueMessagePublisher(metrics *logging.Metrics, q *gue.Client) *QueMessagePublisher {
 	return &QueMessagePublisher{
 		metrics: metrics,
 		que:     q,
@@ -53,11 +53,11 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) 
 		return fmt.Errorf("json marshal: %v", err)
 	}
 
-	j := &que.Job{
+	j := &gue.Job{
 		Type: messageType.Name(),
 		Args: bytes,
 	}
-	if err := p.que.Enqueue(j); err != nil {
+	if err := p.que.Enqueue(ctx, j); err != nil {
 		return err
 	}
 

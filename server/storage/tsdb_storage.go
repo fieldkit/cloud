@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type TimeScaleDBConfig struct {
@@ -15,7 +15,7 @@ type TimeScaleDBConfig struct {
 
 func (tsc *TimeScaleDBConfig) Acquire(ctx context.Context) (*pgxpool.Pool, error) {
 	if tsc.pool == nil {
-		opened, err := pgxpool.Connect(ctx, tsc.Url)
+		opened, err := pgxpool.New(ctx, tsc.Url)
 		if err != nil {
 			return nil, fmt.Errorf("(tsdb) error connecting: %v", err)
 		}
