@@ -16,7 +16,8 @@ export class TimeSeriesSpecFactory {
     constructor(
         private readonly allSeries: SeriesData[],
         private readonly settings: ChartSettings = ChartSettings.Container,
-        private readonly brushable = true
+        private readonly brushable = true,
+        private readonly draggable = true
     ) {}
 
     create() {
@@ -1256,6 +1257,35 @@ export class TimeSeriesSpecFactory {
             ];
         };
 
+        const staticSignals = [
+            {
+                name: "hover",
+                value: {
+                    name: makeHoverName(0),
+                },
+            },
+            {
+                name: "brush_x",
+                value: [],
+            },
+            {
+                name: "visible_times_calc",
+                value: xDomain || [0, 1],
+            },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
+            },
+            {
+                name: "chart_background",
+                value: "transparent",
+            },
+            {
+                name: "drag_time",
+                value: null,
+            },
+        ];
+
         const interactiveSignals = () => {
             const standard = [
                 {
@@ -1285,38 +1315,32 @@ export class TimeSeriesSpecFactory {
 
             if (this.brushable) {
                 return [...containerSignals(), ...standard, ...brushSignals];
-            } else {
+            }
+
+            if (this.draggable) {
                 return [...containerSignals(), ...standard, ...dragSignals];
             }
+
+            throw new Error();
         };
 
-        const staticSignals = [
-            {
-                name: "hover",
-                value: {
-                    name: makeHoverName(0),
-                },
-            },
-            {
-                name: "brush_x",
-                value: [],
-            },
-            {
-                name: "visible_times",
-                value: xDomain || [0, 1],
-            },
-            {
-                name: "chart_background",
-                value: "transparent",
-            },
-        ];
+        const allSignals = () => {
+            if (this.settings.tiny) {
+                const tinySignals = [...containerSignals(), ...staticSignals];
+                return tinySignals;
+            }
 
-        const tinySignals = [...containerSignals(), ...staticSignals];
+            if (this.settings.size.w == 0) {
+                if (this.brushable || this.draggable) {
+                    return interactiveSignals();
+                }
+            }
 
-        const allSignals = this.settings.tiny ? tinySignals : this.settings.size.w == 0 ? interactiveSignals() : staticSignals;
+            return [...containerSignals(), ...staticSignals];
+        };
 
         return this.buildSpec(
-            allSignals as never[],
+            allSignals() as never[],
             data as never[],
             scales as never[],
             axes as never[],

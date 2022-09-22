@@ -63,7 +63,8 @@ export default Vue.extend({
             }
 
             const brushable = !this.settings.mobile;
-            const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable);
+            const draggable = false; // !brushable;
+            const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable, draggable);
 
             const spec = factory.create();
 
