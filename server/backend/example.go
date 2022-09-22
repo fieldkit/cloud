@@ -3,13 +3,12 @@ package backend
 import (
 	"context"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/vgarvardt/gue/v4"
 
-	// "github.com/bgentry/que-go"
-	"github.com/govau/que-go"
+	"github.com/fieldkit/cloud/server/common/jobs"
 )
 
-func exampleJob(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func exampleJob(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	log := Logger(ctx).Sugar()
 	log.Infow("example")
 	return nil

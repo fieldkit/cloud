@@ -7,17 +7,17 @@ import (
 
 	"github.com/pkg/profile"
 
+	"github.com/vgarvardt/gue/v4"
+
 	"github.com/golang/protobuf/proto"
 
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
-
-	"github.com/govau/que-go"
 )
 
-func walkEverything(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func walkEverything(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	log := Logger(ctx).Sugar()
 
 	if false {

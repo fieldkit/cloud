@@ -12,20 +12,21 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
+	"github.com/vgarvardt/gue/v4"
+	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
+
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
 	"github.com/fieldkit/cloud/server/files"
 
-	// "github.com/bgentry/que-go"
-	"github.com/govau/que-go"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Ingester struct {
 	Handler http.Handler
 	Options *IngesterOptions
-	pgxpool *pgx.ConnPool
+	pgxpool *pgxpool.Pool
 }
 
 func NewIngester(ctx context.Context, config *Config) (*Ingester, error) {
@@ -54,20 +55,20 @@ func NewIngester(ctx context.Context, config *Config) (*Ingester, error) {
 		return nil, err
 	}
 
-	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+	pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}
 
-	pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-		ConnConfig:   pgxcfg,
-		AfterConnect: que.PrepareStatements,
-	})
+	pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
 	if err != nil {
 		return nil, err
 	}
 
-	qc := que.NewClient(pgxpool)
+	qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool))
+	if err != nil {
+		return nil, err
+	}
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 
 	options := &IngesterOptions{

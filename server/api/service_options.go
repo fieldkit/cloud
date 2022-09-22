@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 
+	"github.com/vgarvardt/gue/v4"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-
-	"github.com/govau/que-go"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -40,7 +40,7 @@ type ControllerOptions struct {
 	// Services
 	signer    *Signer
 	locations *data.DescribeLocations
-	que       *que.Client
+	que       *gue.Client
 
 	// Subscribed listeners
 	subscriptions *Subscriptions
@@ -52,7 +52,7 @@ type ControllerOptions struct {
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {

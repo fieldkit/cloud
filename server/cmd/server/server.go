@@ -26,6 +26,11 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/vgarvardt/gue/v4"
+	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
+	"github.com/vgarvardt/gue/v4/adapter/zap"
+
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/fieldkit/cloud/server/common/health"
@@ -41,9 +46,6 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 
 	_ "github.com/fieldkit/cloud/server/messages"
-
-	"github.com/govau/que-go"
-	"github.com/jackc/pgx"
 )
 
 type Options struct {
@@ -221,7 +223,7 @@ func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
 type Api struct {
 	services *api.ControllerOptions
 	handler  http.Handler
-	pgxpool  *pgx.ConnPool
+	pgxpool  *pgxpool.Pool
 }
 
 func createApi(ctx context.Context, config *Config) (*Api, error) {
@@ -270,15 +272,12 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		log.Infow("timescaledb-enabled")
 	}
 
-	pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+	pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}
 
-	pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-		ConnConfig:   pgxcfg,
-		AfterConnect: que.PrepareStatements,
-	})
+	pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
 	if err != nil {
 		return nil, err
 	}
@@ -287,16 +286,22 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
 
-	qc := que.NewClient(pgxpool)
+	qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool), gue.WithClientLogger(zap.New(logging.Logger(ctx).Named("gue"))))
+	if err != nil {
+		return nil, err
+	}
 	publisher := jobs.NewQueMessagePublisher(metrics, qc)
 	workMap := backend.CreateMap(backend.NewBackgroundServices(database, metrics, &backend.FileArchives{
 		Ingestion: ingestionFiles,
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
 	}, qc, timeScaleConfig, locations))
-	workers := que.NewWorkerPool(qc, workMap, config.Workers)
+	workers, err := gue.NewWorkerPool(qc, workMap, config.Workers)
+	if err != nil {
+		return nil, err
+	}
 
-	go workers.Start()
+	go workers.Run(ctx)
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,

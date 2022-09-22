@@ -19,8 +19,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/govau/que-go"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/vgarvardt/gue/v4"
+	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/handlers"
@@ -158,22 +159,22 @@ func main() {
 			reading = append(reading, s3)
 		}
 
-		pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+		pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
 		if err != nil {
 			fail(ctx, err)
 		}
 
-		pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-			ConnConfig:   pgxcfg,
-			AfterConnect: que.PrepareStatements,
-		})
+		pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
 		if err != nil {
 			fail(ctx, err)
 		}
 
 		fa := files.NewPrioritizedFilesArchive(reading, writing)
 
-		qc := que.NewClient(pgxpool)
+		qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool))
+		if err != nil {
+			fail(ctx, err)
+		}
 		publisher := jobs.NewQueMessagePublisher(metrics, qc)
 
 		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, tsConfig)

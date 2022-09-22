@@ -9,7 +9,7 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	_ "github.com/govau/que-go"
+	_ "github.com/vgarvardt/gue"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	_ "github.com/fieldkit/cloud/server/common/logging"
