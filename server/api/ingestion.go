@@ -116,13 +116,43 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 		return err
 	}
 
-	if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
-		StationID: int32(payload.StationID),
-		UserID:    p.UserID(),
-		Verbose:   true,
-	}); err != nil {
-		log.Errorw("publishing", "err", err)
+	if false {
+		if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
+			StationID: int32(payload.StationID),
+			UserID:    p.UserID(),
+			Verbose:   true,
+		}); err != nil {
+			return err
+		}
+	} else {
+		ir, err := repositories.NewIngestionRepository(c.options.Database)
+		if err != nil {
+			return err
+		}
+
+		ingestions, err := ir.QueryByStationID(ctx, int32(payload.StationID))
+		if err != nil {
+			return err
+		}
+
+		for _, ingestion := range ingestions {
+			log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
+
+			if id, err := ir.Enqueue(ctx, ingestion.ID); err != nil {
+				return err
+			} else {
+				if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+					QueuedID: id,
+					UserID:   p.UserID(),
+					Verbose:  true,
+					Refresh:  false,
+				}); err != nil {
+					return err
+				}
+			}
+		}
 	}
+
 	return nil
 }
 
