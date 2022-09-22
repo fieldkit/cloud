@@ -164,6 +164,9 @@ func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, in
 		return err
 	}
 
+	// Something to remember, is that AddDataRecord is returning the persisted
+	// meta record for this data record, found by looking for the record by
+	// number. This is especially important when ingesting partial files.
 	if ra.metaID != metaRecord.ID {
 		log.Infow("adder:on-meta-unvisisted", "meta_record_id", metaRecord.ID)
 
@@ -174,7 +177,12 @@ func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, in
 		ra.metaID = metaRecord.ID
 	}
 
-	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, nil, dataRecord, metaRecord); err != nil {
+	var rawMeta pb.DataRecord
+	if err := metaRecord.Unmarshal(&rawMeta); err != nil {
+		return err
+	}
+
+	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, &rawMeta, dataRecord, metaRecord); err != nil {
 		return err
 	}
 
