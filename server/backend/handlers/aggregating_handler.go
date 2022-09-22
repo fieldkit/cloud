@@ -162,7 +162,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 			log.Warnw("missing-station-module", "data_record_id", db.ID, "provision_id", p.ID, "meta_record_id", db.MetaRecordID, "nmodules", len(v.stationModules))
 			return fmt.Errorf("missing station module")
 		} else {
-			if !filtered.Filters.IsFiltered(key) {
+			if filtered.Filters == nil || !filtered.Filters.IsFiltered(key) {
 				ask := AggregateSensorKey{
 					SensorKey: key.SensorKey,
 					ModuleID:  sm.ID,

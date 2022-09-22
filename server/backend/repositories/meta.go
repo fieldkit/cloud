@@ -34,7 +34,7 @@ type MissingSensorMetaError struct {
 }
 
 func (e *MissingSensorMetaError) Error() string {
-	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
+	return fmt.Sprintf("MissingSensorMetaError(missing-record-id=%v)", e.MetaRecordID)
 }
 
 type MalformedMetaError struct {
@@ -43,7 +43,7 @@ type MalformedMetaError struct {
 }
 
 func (e *MalformedMetaError) Error() string {
-	return fmt.Sprintf("MalformedMetaError(missing-record--id=%v, '%v')", e.MetaRecordID, e.Malformed)
+	return fmt.Sprintf("MalformedMetaError(missing-record-id=%v, '%v')", e.MetaRecordID, e.Malformed)
 }
 
 type MetaFactory struct {
@@ -104,6 +104,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		}
 
 		if module.Sensors == nil {
+			log.Infow("meta:malformed-sensors")
 			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
 		}
 
@@ -279,7 +280,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		Readings: readings,
 	}
 
-	filtered := mf.filtering.Apply(ctx, resolved)
+	// filtered := mf.filtering.Apply(ctx, resolved)
+
+	filtered := &FilteredRecord{
+		Record:  resolved,
+		Filters: nil,
+	}
 
 	return filtered, nil
 }

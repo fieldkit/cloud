@@ -105,7 +105,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 			log.Warnw("tsdb-handler:missing-module", "nmodules", len(v.stationModules))
 			return fmt.Errorf("missing-module")
 		} else {
-			if !filtered.Filters.IsFiltered(key) {
+			if filtered.Filters == nil || !filtered.Filters.IsFiltered(key) {
 				ask := AggregateSensorKey{
 					SensorKey: key.SensorKey,
 					ModuleID:  sm.ID,
