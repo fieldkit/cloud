@@ -3,15 +3,16 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
 	pb "github.com/fieldkit/data-protocol"
-	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 type TsDBHandler struct {
 	db                *sqlxcache.DB
 	tsConfig          *storage.TimeScaleDBConfig
+	publisher         jobs.MessagePublisher
 	metaFactory       *repositories.MetaFactory
 	stationRepository *repositories.StationRepository
 	provisionID       int64
@@ -28,17 +30,18 @@ type TsDBHandler struct {
 	stationIDs        map[int64]int32
 	stationModules    map[uint32]*data.StationModule
 	sensors           map[string]*data.Sensor
-	records           [][]interface{}
+	records           []messages.SensorDataBatchRow
 }
 
-func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig) *TsDBHandler {
+func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher) *TsDBHandler {
 	return &TsDBHandler{
 		db:                db,
 		tsConfig:          tsConfig,
+		publisher:         publisher,
 		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
 		stationIDs:        make(map[int64]int32),
-		records:           make([][]interface{}, 0),
+		records:           make([]messages.SensorDataBatchRow, 0),
 		provisionID:       0,
 		metaID:            0,
 	}
@@ -97,7 +100,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 		return fmt.Errorf("error resolving: %v", err)
 	}
 	if filtered == nil {
-		return nil
+		return fmt.Errorf("error resolving: %v", err)
 	}
 
 	for key, value := range filtered.Record.Readings {
@@ -111,8 +114,10 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 					ModuleID:  sm.ID,
 				}
 
-				if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
-					return fmt.Errorf("error saving: %v", err)
+				if !math.IsNaN(value.Value) {
+					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
+						return fmt.Errorf("error saving: %v", err)
+					}
 				}
 			}
 		}
@@ -152,13 +157,13 @@ func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, locati
 		return fmt.Errorf("unknown sensor: '%s'", sensorKey.SensorKey)
 	}
 
-	// TODO location
-	v.records = append(v.records, []interface{}{
-		sampled,
-		stationID,
-		sensorKey.ModuleID,
-		meta.ID,
-		value,
+	v.records = append(v.records, messages.SensorDataBatchRow{
+		Time:      sampled,
+		StationID: stationID,
+		ModuleID:  sensorKey.ModuleID,
+		SensorID:  meta.ID,
+		Location:  nil, // TODO Populate and save.
+		Value:     &value,
 	})
 
 	if len(v.records) == BatchSize {
@@ -171,50 +176,11 @@ func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, locati
 }
 
 func (v *TsDBHandler) flushTs(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	err := v.publisher.Publish(ctx, &messages.SensorDataBatch{
+		Rows: v.records,
+	})
 
-	batch := &pgx.Batch{}
+	v.records = v.records[:0]
 
-	// TODO location
-	for _, row := range v.records {
-		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
-				VALUES ($1, $2, $3, $4, $5)
-				ON CONFLICT (time, station_id, module_id, sensor_id)
-				DO UPDATE SET value = EXCLUDED.value`
-		batch.Queue(sql, row...)
-	}
-
-	log.Infow("tsdb-handler:flushing", "records", len(v.records))
-
-	v.records = make([][]interface{}, 0)
-
-	if v.tsConfig == nil {
-		return nil
-	}
-
-	pgPool, err := v.tsConfig.Acquire(ctx)
-	if err != nil {
-		return err
-	}
-
-	tx, err := pgPool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-
-	br := tx.SendBatch(ctx, batch)
-
-	if _, err := br.Exec(); err != nil {
-		return fmt.Errorf("(tsdb-exec) %v", err)
-	}
-
-	if err := br.Close(); err != nil {
-		return fmt.Errorf("(tsdb-close) %v", err)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %v", err)
-	}
-
-	return nil
+	return err
 }

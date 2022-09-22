@@ -65,7 +65,7 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler := NewAllHandlers(h.db, h.tsConfig)
+	handler := NewAllHandlers(h.db, h.tsConfig, h.publisher)
 
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 

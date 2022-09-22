@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 
+	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/storage"
@@ -11,11 +12,11 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
-func NewAllHandlers(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig) RecordHandler {
+func NewAllHandlers(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher) RecordHandler {
 	return NewHandlerCollectionHandler(
 		[]RecordHandler{
 			handlers.NewStationModelRecordHandler(db),
-			handlers.NewTsDbHandler(db, tsConfig),
+			handlers.NewTsDbHandler(db, tsConfig, publisher),
 		},
 	)
 }
