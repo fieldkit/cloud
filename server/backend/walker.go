@@ -291,7 +291,7 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
 			return fmt.Errorf("(load-meta) error handling row: %v", err)
 		} else {
-			if err := handler.OnData(ctx, provision, nil, record, meta); err != nil {
+			if err := handler.OnData(ctx, provision, nil, nil, record, meta); err != nil {
 				return fmt.Errorf("(on-data) error handling row: %v", err)
 			}
 		}

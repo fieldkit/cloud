@@ -14,7 +14,6 @@ import (
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/files"
@@ -26,7 +25,6 @@ type ControllerOptions struct {
 	Session      *session.Session
 	Database     *sqlxcache.DB
 	Querier      *data.Querier
-	Backend      *backend.Backend
 	JWTHMACKey   []byte
 	Emailer      email.Emailer
 	Domain       string
@@ -53,7 +51,7 @@ type ControllerOptions struct {
 	photoCache *PhotoCache
 }
 
-func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
+func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
 	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
@@ -72,7 +70,6 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		Session:         awsSession,
 		Database:        database,
 		Querier:         data.NewQuerier(database),
-		Backend:         be,
 		Emailer:         emailer,
 		JWTHMACKey:      jwtHMACKey,
 		Domain:          config.Domain,

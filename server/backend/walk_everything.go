@@ -75,7 +75,7 @@ func (h *fixingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.Dat
 	return nil
 }
 
-func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	if db.PB == nil {
 		r := &pb.DataRecord{}
 		if err := db.Unmarshal(r); err != nil {

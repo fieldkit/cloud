@@ -128,7 +128,7 @@ func TestGetDataRecordResolved(t *testing.T) {
 	ja.Assertf(rr.Body.String(), `
 	{
 		"filtered": {
-			"filters": "<<PRESENCE>>",
+			"filters": null,
 			"record": "<<PRESENCE>>"
 		},
 		"meta": {
