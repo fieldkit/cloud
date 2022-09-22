@@ -103,6 +103,23 @@ var _ = Service("ingestion", func() {
 		})
 	})
 
+	Method("refresh views", func() {
+		Security(JWTAuth, func() {
+			Scope("api:admin")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		HTTP(func() {
+			POST("data/refresh-views")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("delete", func() {
 		Security(JWTAuth, func() {
 			Scope("api:admin")

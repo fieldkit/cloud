@@ -181,7 +181,7 @@ func (e *Exporter) OnMeta(ctx context.Context, p *data.Provision, r *pb.DataReco
 	return nil
 }
 
-func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	info := e.byProvision[p.ID]
 	if info == nil {
 		// This should never happen, we should error in OnMeta if

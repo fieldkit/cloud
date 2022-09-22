@@ -16,6 +16,10 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 )
 
+/**
+ * This type is deprecated.
+ */
+
 type TimeScaleRecord struct {
 	Time      time.Time
 	StationID int32
@@ -127,7 +131,7 @@ func (v *AggregatingHandler) OnMeta(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	log := Logger(ctx).Sugar()
 
 	aggregator := v.stations[p.ID]
@@ -158,7 +162,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 			log.Warnw("missing-station-module", "data_record_id", db.ID, "provision_id", p.ID, "meta_record_id", db.MetaRecordID, "nmodules", len(v.stationModules))
 			return fmt.Errorf("missing station module")
 		} else {
-			if !filtered.Filters.IsFiltered(key) {
+			if filtered.Filters == nil || !filtered.Filters.IsFiltered(key) {
 				ask := AggregateSensorKey{
 					SensorKey: key.SensorKey,
 					ModuleID:  sm.ID,

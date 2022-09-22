@@ -34,8 +34,6 @@ func (tsc *TimeScaleDBConfig) RefreshViews(ctx context.Context) error {
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1h', NULL, NOW() - INTERVAL '3 hours');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_6h', NULL, NOW() - INTERVAL '21 hours');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_24h', NULL, NOW() - INTERVAL '72 hours');",
-		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_7d', NULL, NOW() - INTERVAL '21 days');",
-		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_365d', NULL, NOW() - INTERVAL '730 days');",
 	}
 
 	pgPool, err := tsc.Acquire(ctx)

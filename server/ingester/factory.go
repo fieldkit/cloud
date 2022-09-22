@@ -29,7 +29,7 @@ type Ingester struct {
 }
 
 func NewIngester(ctx context.Context, config *Config) (*Ingester, error) {
-	database, err := sqlxcache.Open("postgres", config.PostgresURL)
+	database, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
 	if err != nil {
 		return nil, err
 	}

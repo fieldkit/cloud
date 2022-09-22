@@ -36,6 +36,11 @@ func ProcessIngestionIngestionPath(ingestionID int64) string {
 	return fmt.Sprintf("/data/ingestions/%v/process", ingestionID)
 }
 
+// RefreshViewsIngestionPath returns the URL path to the ingestion service refresh views HTTP endpoint.
+func RefreshViewsIngestionPath() string {
+	return "/data/refresh-views"
+}
+
 // DeleteIngestionPath returns the URL path to the ingestion service delete HTTP endpoint.
 func DeleteIngestionPath(ingestionID int64) string {
 	return fmt.Sprintf("/data/ingestions/%v", ingestionID)

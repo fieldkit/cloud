@@ -113,6 +113,16 @@ func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
+func sensorDataBatch(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.SensorDataBatch{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewSensorDataBatchHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
+	return handler.Handle(ctx, message, j)
+}
+
 func sensorDataModified(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.SensorDataModified{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
@@ -143,6 +153,7 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 		"IngestStation":          wrapContext(wrapTransportMessage(services, ingestStation)),
 		"WebHookMessageReceived": wrapContext(wrapTransportMessage(services, webHookMessageReceived)),
 		"ProcessSchema":          wrapContext(wrapTransportMessage(services, processSchema)),
+		"SensorDataBatch":        wrapContext(wrapTransportMessage(services, sensorDataBatch)),
 		"SensorDataModified":     wrapContext(wrapTransportMessage(services, sensorDataModified)),
 		"StationLocationUpdated": wrapContext(wrapTransportMessage(services, describeStationLocation)),
 	}

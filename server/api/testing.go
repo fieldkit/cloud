@@ -10,8 +10,6 @@ import (
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend"
-
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -25,24 +23,19 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Address: "",
 	})
 
-	database, err := sqlxcache.Open("postgres", e.PostgresURL)
+	database, err := sqlxcache.Open(e.Ctx, "postgres", e.PostgresURL)
 	if err != nil {
 		return nil, fmt.Errorf("error opening pg: %v", err)
 	}
 
 	jq := jobs.NewDevNullMessagePublisher()
 
-	be, err := backend.New(e.PostgresURL)
-	if err != nil {
-		return nil, fmt.Errorf("error creating backend: %v", err)
-	}
-
 	apiConfig := &ApiConfiguration{
 		SessionKey: e.SessionKey,
 		Emailer:    "default",
 	}
 
-	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil, nil, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, jq, nil, nil, metrics, nil, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating service options: %v", err)
 	}
