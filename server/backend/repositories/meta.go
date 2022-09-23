@@ -97,15 +97,13 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
-		sensors := make([]*DataMetaSensor, 0)
-
 		if module.Header == nil {
 			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "header"}
 		}
 
 		if module.Sensors == nil {
-			log.Infow("meta:malformed-sensors")
-			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
+			log.Infow("meta:malformed-sensors-nil")
+			continue
 		}
 
 		hf := HeaderFields{
@@ -120,6 +118,8 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		if extraModule == nil {
 			return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 		}
+
+		sensors := make([]*DataMetaSensor, 0)
 
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
