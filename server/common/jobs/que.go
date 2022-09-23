@@ -15,6 +15,13 @@ var (
 	ids = logging.NewIdGenerator()
 )
 
+type MessageContext struct {
+}
+
+func (mc *MessageContext) Reply(message interface{}) error {
+	return nil
+}
+
 type QueMessagePublisher struct {
 	metrics *logging.Metrics
 	que     *gue.Client

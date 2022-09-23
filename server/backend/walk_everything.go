@@ -17,7 +17,7 @@ import (
 	"github.com/fieldkit/cloud/server/data"
 )
 
-func walkEverything(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func walkEverything(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	log := Logger(ctx).Sugar()
 
 	if false {

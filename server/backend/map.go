@@ -18,7 +18,7 @@ import (
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
-func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.IngestionReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -28,7 +28,7 @@ func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServ
 	return handler.Handle(ctx, message)
 }
 
-func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.RefreshStation{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -37,7 +37,7 @@ func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundService
 	return handler.Handle(ctx, message)
 }
 
-func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.ExportData{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -46,7 +46,7 @@ func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, t
 	return handler.Handle(ctx, message)
 }
 
-func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.IngestStation{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -56,7 +56,7 @@ func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
-func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &webhook.WebHookMessageReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -66,7 +66,7 @@ func webHookMessageReceived(ctx context.Context, j *gue.Job, services *Backgroun
 	return handler.Handle(ctx, message)
 }
 
-func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &webhook.ProcessSchema{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -76,7 +76,7 @@ func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
-func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.SensorDataBatch{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -86,7 +86,7 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 	return handler.Handle(ctx, message, j)
 }
 
-func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.SensorDataModified{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -96,7 +96,7 @@ func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundSer
 	return handler.Handle(ctx, message, j)
 }
 
-func describeStationLocation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func describeStationLocation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.StationLocationUpdated{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -108,7 +108,6 @@ func describeStationLocation(ctx context.Context, j *gue.Job, services *Backgrou
 
 func CreateMap(services *BackgroundServices) gue.WorkMap {
 	return gue.WorkMap{
-		"Example":                wrapTransportMessage(services, exampleJob),
 		"WalkEverything":         wrapTransportMessage(services, walkEverything),
 		"IngestionReceived":      wrapTransportMessage(services, ingestionReceived),
 		"RefreshStation":         wrapTransportMessage(services, refreshStation),
@@ -122,7 +121,7 @@ func CreateMap(services *BackgroundServices) gue.WorkMap {
 	}
 }
 
-type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
+type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) gue.WorkFunc {
 	return func(ctx context.Context, j *gue.Job) error {
@@ -139,8 +138,9 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 		messageLog := Logger(messageCtx).Sugar()
+		mc := &jobs.MessageContext{}
 
-		err := h(messageCtx, j, services, transport)
+		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
 			messageLog.Errorw("error", "error", err)
 		}
