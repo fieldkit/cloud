@@ -96,6 +96,7 @@ export class DataEvent extends DiscussionBase {
 export interface NewDataEvent extends NewComment {
     title: string;
     description: string;
+    allProjectSensors?: boolean;
 }
 
 export enum CommentsErrorsEnum {

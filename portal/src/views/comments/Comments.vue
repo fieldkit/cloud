@@ -44,22 +44,22 @@
                 </div>
             </template>
             <template #right>
-<!--                <div class="event-sensor-selector">-->
-<!--                    <label for="allProjectRadio">-->
-<!--                        <div class="event-sensor-radio">-->
-<!--                            <input type="radio" id="allProjectRadio" name="eventLevel" checked />-->
-<!--                            <span class="radio-label">All Project Sensors</span>-->
-<!--                            <p>People will see this event when viewing data for any stations that belong to these projects</p>-->
-<!--                        </div>-->
-<!--                    </label>-->
-<!--                    <label for="allSensorsRadio">-->
-<!--                        <div class="event-sensor-radio">-->
-<!--                            <input type="radio" id="allSensorsRadio" name="eventLevel" />-->
-<!--                            <span class="radio-label">Just These Sensors</span>-->
-<!--                            <p>People will see this event only when viewing data for these stations</p>-->
-<!--                        </div>-->
-<!--                    </label>-->
-<!--                </div>-->
+                <div class="event-sensor-selector">
+                    <label for="allProjectRadio">
+                        <div class="event-sensor-radio">
+                            <input type="radio" id="allProjectRadio" name="eventLevel" v-model="newDataEvent.allProjectSensors" :value=true :checked="newDataEvent.allProjectSensors"/>
+                            <span class="radio-label">All Project Sensors</span>
+                            <p>People will see this event when viewing data for any stations that belong to these projects</p>
+                        </div>
+                    </label>
+                    <label for="allSensorsRadio">
+                        <div class="event-sensor-radio">
+                            <input type="radio" id="allSensorsRadio" name="eventLevel" v-model="newDataEvent.allProjectSensors" :value=false :checked="!newDataEvent.allProjectSensors"/>
+                            <span class="radio-label">Just These Sensors</span>
+                            <p>People will see this event only when viewing data for these stations</p>
+                        </div>
+                    </label>
+                </div>
                 <div class="new-comment" :class="{ 'align-center': !user }">
                     <UserPhoto :user="user"></UserPhoto>
                     <template v-if="user">
@@ -154,7 +154,7 @@
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
-                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }} - {{post.createdAt}}</span>
                             </div>
                             <Tiptap
                                 v-if="post.body"
@@ -285,7 +285,7 @@ export default Vue.extend({
             threadId: number | null;
         };
         newDataEvent: {
-            projectId: number | null;
+            allProjectSensors: boolean;
             bookmark: string | null;
             body: string | null;
             title: string | null;
@@ -311,7 +311,7 @@ export default Vue.extend({
                 threadId: null,
             },
             newDataEvent: {
-                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                allProjectSensors: false,
                 bookmark: null,
                 body: "",
                 title: "",

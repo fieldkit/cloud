@@ -1495,6 +1495,7 @@ class FKApi {
                     body: JSON.stringify(dataEvent.body),
                     description: dataEvent.description['content'][0].content[0].text,
                     title: dataEvent.title['content'][0].content[0].text,
+                    allProjectSensors: dataEvent.allProjectSensors
                 }),
             },
         });
