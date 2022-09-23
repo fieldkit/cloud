@@ -117,6 +117,10 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 	return nil, nil
 }
 
+func (ls *DescribeLocations) IsEnabled() bool {
+	return ls.MapboxToken != ""
+}
+
 func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *LocationDescription, err error) {
 	log := Logger(ctx).Sugar()
 
@@ -124,7 +128,7 @@ func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *Loc
 
 	defer timing.Send()
 
-	if ls.MapboxToken == "" {
+	if !ls.IsEnabled() {
 		return nil, fmt.Errorf("location description disabled")
 	}
 
