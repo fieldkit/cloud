@@ -1579,3 +1579,14 @@ func (r *StationRepository) QueryAssociatedStations(ctx context.Context, station
 		return byID, nil
 	}
 }
+
+
+func (r *StationRepository) QueryStationProjectIds(ctx context.Context, stationID int32) ([]int32, error) {
+	ids := make([]int32, 0)
+	if err := r.db.SelectContext(ctx, &ids, `
+	    SELECT project_id FROM fieldkit.project_station WHERE station_id = $1
+		`, stationID); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}

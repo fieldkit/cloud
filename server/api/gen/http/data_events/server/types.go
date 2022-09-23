@@ -368,12 +368,12 @@ type AuthorPhotoResponseBody struct {
 
 // NewDataEventRequestBody is used to define fields on request body types.
 type NewDataEventRequestBody struct {
-	ProjectID   *int32  `form:"projectId,omitempty" json:"projectId,omitempty" xml:"projectId,omitempty"`
-	Bookmark    *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
-	Title       *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	Description *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Start       *int64  `form:"start,omitempty" json:"start,omitempty" xml:"start,omitempty"`
-	End         *int64  `form:"end,omitempty" json:"end,omitempty" xml:"end,omitempty"`
+	AllProjectSensors *bool   `form:"allProjectSensors,omitempty" json:"allProjectSensors,omitempty" xml:"allProjectSensors,omitempty"`
+	Bookmark          *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	Title             *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description       *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Start             *int64  `form:"start,omitempty" json:"start,omitempty" xml:"start,omitempty"`
+	End               *int64  `form:"end,omitempty" json:"end,omitempty" xml:"end,omitempty"`
 }
 
 // NewDataEventsResponseBody builds the HTTP response body from the result of
@@ -715,6 +715,9 @@ func ValidateUpdateDataEventRequestBody(body *UpdateDataEventRequestBody) (err e
 // ValidateNewDataEventRequestBody runs the validations defined on
 // NewDataEventRequestBody
 func ValidateNewDataEventRequestBody(body *NewDataEventRequestBody) (err error) {
+	if body.AllProjectSensors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("allProjectSensors", "body"))
+	}
 	if body.Title == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
 	}

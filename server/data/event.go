@@ -12,7 +12,7 @@ import (
 type DataEvent struct {
 	ID          int64           `db:"id"`
 	UserID      int32           `db:"user_id"`
-	ProjectID   *int32          `db:"project_id"`
+	ProjectIDs  pq.Int64Array   `db:"project_ids"`
 	StationIDs  pq.Int64Array   `db:"station_ids"`
 	CreatedAt   time.Time       `db:"created_at"`
 	UpdatedAt   time.Time       `db:"updated_at"`

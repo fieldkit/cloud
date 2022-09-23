@@ -115,12 +115,12 @@ type AuthorPhoto struct {
 }
 
 type NewDataEvent struct {
-	ProjectID   *int32
-	Bookmark    *string
-	Title       string
-	Description string
-	Start       int64
-	End         int64
+	AllProjectSensors bool
+	Bookmark          *string
+	Title             string
+	Description       string
+	Start             int64
+	End               int64
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.

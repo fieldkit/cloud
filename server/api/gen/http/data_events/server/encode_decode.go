@@ -538,12 +538,12 @@ func marshalDataeventsviewsAuthorPhotoViewToAuthorPhotoResponseBody(v *dataevent
 // type *dataevents.NewDataEvent from a value of type *NewDataEventRequestBody.
 func unmarshalNewDataEventRequestBodyToDataeventsNewDataEvent(v *NewDataEventRequestBody) *dataevents.NewDataEvent {
 	res := &dataevents.NewDataEvent{
-		ProjectID:   v.ProjectID,
-		Bookmark:    v.Bookmark,
-		Title:       *v.Title,
-		Description: *v.Description,
-		Start:       *v.Start,
-		End:         *v.End,
+		AllProjectSensors: *v.AllProjectSensors,
+		Bookmark:          v.Bookmark,
+		Title:             *v.Title,
+		Description:       *v.Description,
+		Start:             *v.Start,
+		End:               *v.End,
 	}
 
 	return res

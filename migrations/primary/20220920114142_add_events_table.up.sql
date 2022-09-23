@@ -1,7 +1,7 @@
 CREATE TABLE fieldkit.data_event (
     id serial PRIMARY KEY,
     user_id integer REFERENCES fieldkit.user (id) NOT NULL,
-    project_id integer REFERENCES fieldkit.project (id),
+    project_ids integer[] NOT NULL DEFAULT '{}',
 	station_ids integer[] NOT NULL DEFAULT '{}',
     created_at timestamp NOT NULL,
     updated_at timestamp NOT NULL,
@@ -12,4 +12,4 @@ CREATE TABLE fieldkit.data_event (
 	context json
 );
 
-CREATE INDEX ON fieldkit.data_event (project_id, start_time, end_time)
+CREATE INDEX ON fieldkit.data_event (start_time, end_time)

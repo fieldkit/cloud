@@ -368,12 +368,12 @@ type AuthorPhotoResponseBody struct {
 
 // NewDataEventRequestBody is used to define fields on request body types.
 type NewDataEventRequestBody struct {
-	ProjectID   *int32  `form:"projectId,omitempty" json:"projectId,omitempty" xml:"projectId,omitempty"`
-	Bookmark    *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
-	Title       string  `form:"title" json:"title" xml:"title"`
-	Description string  `form:"description" json:"description" xml:"description"`
-	Start       int64   `form:"start" json:"start" xml:"start"`
-	End         int64   `form:"end" json:"end" xml:"end"`
+	AllProjectSensors bool    `form:"allProjectSensors" json:"allProjectSensors" xml:"allProjectSensors"`
+	Bookmark          *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	Title             string  `form:"title" json:"title" xml:"title"`
+	Description       string  `form:"description" json:"description" xml:"description"`
+	Start             int64   `form:"start" json:"start" xml:"start"`
+	End               int64   `form:"end" json:"end" xml:"end"`
 }
 
 // NewAddDataEventRequestBody builds the HTTP request body from the payload of

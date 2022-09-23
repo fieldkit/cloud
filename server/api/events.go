@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jmoiron/sqlx/types"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
@@ -47,22 +47,55 @@ func (c *EventsService) DataEventsEndpoint(ctx context.Context, payload *eventsS
 
 	er := repositories.NewEventRepository(c.db)
 	stationIDs, err := bookmark.StationIDs()
+
 	if err != nil {
 		return nil, err
 	}
 
-	all, err := er.QueryByStationIDs(ctx, stationIDs)
+	sr := repositories.NewStationRepository(c.db)
+
+	uniqueProjectIDS := make(map[int32]int32)
+	for _, id := range stationIDs {
+		pIDs, err := sr.QueryStationProjectIds(ctx, id)
+
+		if err == nil {
+			for _, pID := range pIDs {
+				uniqueProjectIDS[pID] = pID
+			}
+		}
+	}
+
+	projectIDs := make([]int32, 0)
+
+	for _, v := range uniqueProjectIDS {
+		projectIDs = append(projectIDs, v)
+	}
+
+	projectEvents, err := er.QueryByProjectIDs(ctx, projectIDs)
+
 	if err != nil {
 		return nil, err
 	}
 
-	des, err := ViewDataEvents(all.Events, all.UsersByID)
+	stationEvents, err := er.QueryByStationIDs(ctx, stationIDs)
 	if err != nil {
 		return nil, err
 	}
+
+	dep, err := ViewDataEvents(projectEvents.Events, projectEvents.UsersByID)
+	if err != nil {
+		return nil, err
+	}
+
+	des, err := ViewDataEvents(stationEvents.Events, stationEvents.UsersByID)
+	if err != nil {
+		return nil, err
+	}
+
+	dea := append(dep, des...)
 
 	return &eventsService.DataEvents{
-		Events: des,
+		Events: dea,
 	}, nil
 }
 
@@ -77,7 +110,7 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 		return nil, err
 	}
 
-	if payload.Event.ProjectID == nil && payload.Event.Bookmark == nil {
+	if payload.Event.Bookmark == nil {
 		return nil, eventsService.MakeBadRequest(fmt.Errorf("malformed request: missing project or bookmark"))
 	}
 
@@ -94,6 +127,7 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 	}
 
 	stationIDs := []int64{}
+	projectIDs := []int64{}
 	var context *types.JSONText
 	if payload.Event.Bookmark != nil && len(*payload.Event.Bookmark) > 0 {
 		bytes := types.JSONText([]byte(*payload.Event.Bookmark))
@@ -110,6 +144,27 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 		for _, id := range bookmarkStationIDs {
 			stationIDs = append(stationIDs, int64(id))
 		}
+
+		if payload.Event.AllProjectSensors == true {
+			sr := repositories.NewStationRepository(c.db)
+
+			uniqueProjectIDS := make(map[int32]int32)
+			for _, id := range stationIDs {
+				pIDs, err := sr.QueryStationProjectIds(ctx, int32(id))
+
+				if err == nil {
+					for _, pID := range pIDs {
+						uniqueProjectIDS[pID] = pID
+					}
+				}
+			}
+
+			for _, v := range uniqueProjectIDS {
+				projectIDs = append(projectIDs, int64(v))
+			}
+
+			stationIDs = stationIDs[:0]
+		}
 	}
 
 	er := repositories.NewEventRepository(c.db)
@@ -117,7 +172,7 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 		UserID:      user.ID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		ProjectID:   payload.Event.ProjectID,
+		ProjectIDs:  projectIDs,
 		StationIDs:  stationIDs,
 		Context:     context,
 		Title:       payload.Event.Title,

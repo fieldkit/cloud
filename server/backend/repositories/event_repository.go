@@ -47,8 +47,8 @@ func (r *EventRepository) UpdateEventByID(ctx context.Context, event *data.DataE
 
 func (r *EventRepository) AddDataEvent(ctx context.Context, event *data.DataEvent) (*data.DataEvent, error) {
 	if err := r.db.NamedGetContext(ctx, event, `
-		INSERT INTO fieldkit.data_event (user_id, project_id, station_ids, created_at, updated_at, start_time, end_time, title, description, context)
-		VALUES (:user_id, :project_id, :station_ids, :created_at, :updated_at, :start_time, :end_time, :title, :description, :context)
+		INSERT INTO fieldkit.data_event (user_id, project_ids, station_ids, created_at, updated_at, start_time, end_time, title, description, context)
+		VALUES (:user_id, :project_ids, :station_ids, :created_at, :updated_at, :start_time, :end_time, :title, :description, :context)
 		RETURNING id
 		`, event); err != nil {
 		return nil, err
@@ -56,21 +56,32 @@ func (r *EventRepository) AddDataEvent(ctx context.Context, event *data.DataEven
 	return event, nil
 }
 
-func (r *EventRepository) QueryByProjectID(ctx context.Context, id int32) (*data.DataEvents, error) {
+func (r *EventRepository) QueryByProjectIDs(ctx context.Context, ids []int32) (*data.DataEvents, error) {
 	events := []*data.DataEvent{}
-	if err := r.db.SelectContext(ctx, &events, `
-		SELECT * FROM fieldkit.data_event WHERE project_id = $1 ORDER BY created_at ASC
-		`, id); err != nil {
-		return nil, err
+	if len(ids) > 0 {
+    		query, args, err := sqlx.In(`SELECT * FROM fieldkit.data_event WHERE project_ids && array[?]::integer[] ORDER BY created_at ASC`, ids)
+    		if err != nil {
+    			return nil, err
+    		}
+    		if err := r.db.SelectContext(ctx, &events, r.db.Rebind(query), args...); err != nil {
+    			return nil, err
+    		}
+    	}
+
+    userIDs := make([]int32, 0)
+	for _, event := range events {
+		userIDs = append(userIDs, event.UserID)
 	}
 
 	users := []*data.User{}
-	if err := r.db.SelectContext(ctx, &users, `
-		SELECT * FROM fieldkit.user WHERE id IN (
-			SELECT user_id FROM fieldkit.data_event WHERE project_id = $1
-		)
-		`, id); err != nil {
-		return nil, err
+	if len(userIDs) > 0 {
+		query, args, err := sqlx.In(`SELECT * FROM fieldkit.user WHERE id IN (?)`, userIDs)
+		if err != nil {
+			return nil, err
+		}
+		if err := r.db.SelectContext(ctx, &users, r.db.Rebind(query), args...); err != nil {
+			return nil, err
+		}
 	}
 
 	eventsByID := make(map[int64]*data.DataEvent)

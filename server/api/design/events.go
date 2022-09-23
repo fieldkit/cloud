@@ -54,19 +54,18 @@ var DataEvents = ResultType("application/vnd.app.events.data", func() {
 	})
 })
 
-var NewDataEvent = ResultType("application/vnd.app.events.data.new", func() {
+var NewDataEvent = ResultType("application/vnd.app.events.data.new+json", func() {
 	TypeName("NewDataEvent")
 	Attributes(func() {
-		Attribute("projectId", Int32)
+		Attribute("allProjectSensors", Boolean)
 		Attribute("bookmark", String)
 		Attribute("title", String)
 		Attribute("description", String)
 		Attribute("start", Int64)
 		Attribute("end", Int64)
-		Required("title", "description", "start", "end")
+		Required("allProjectSensors", "title", "description", "start", "end")
 	})
 	View("default", func() {
-		Attribute("projectId")
 		Attribute("bookmark")
 		Attribute("title")
 		Attribute("description")
