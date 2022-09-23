@@ -100,7 +100,8 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 		return fmt.Errorf("error resolving: %v", err)
 	}
 	if filtered == nil {
-		return fmt.Errorf("error resolving: %v", err)
+		log.Warnw("tsdb-handler:empty")
+		return nil
 	}
 
 	for key, value := range filtered.Record.Readings {
