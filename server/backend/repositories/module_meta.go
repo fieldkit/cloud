@@ -63,8 +63,12 @@ func (moduleMeta *AllModuleMeta) FindSensorByFullKey(fullKey string) *SensorAndM
 
 func (moduleMeta *AllModuleMeta) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
 	for _, module := range moduleMeta.all {
-		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
-			return module, nil
+		if module.Header.Manufacturer == m.Manufacturer {
+			for _, kind := range module.Header.AllKinds {
+				if kind == m.Kind {
+					return module, nil
+				}
+			}
 		}
 	}
 
