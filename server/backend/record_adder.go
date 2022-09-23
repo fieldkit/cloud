@@ -328,7 +328,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if data { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing data record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing data record: %w", err)
 				}
 				unmarshalError = err
 			} else {
@@ -359,7 +359,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if meta { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 				unmarshalError = err
 			} else {
@@ -367,7 +367,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				bytes, err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 
 				warning, fatal := ra.Handle(ctx, &ParsedRecord{
@@ -404,7 +404,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 	})
 
 	if _, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc); err != nil {
-		newErr := fmt.Errorf("adder:error: %v", err)
+		newErr := fmt.Errorf("adder:error: %w", err)
 		log.Errorw("adder:error", "error", newErr)
 		return nil, newErr
 	}
@@ -431,7 +431,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 	withInfo.Infow("adder:processed")
 
 	if err := ra.handler.OnDone(ctx); err != nil {
-		return nil, fmt.Errorf("adder:done handler error: %v", err)
+		return nil, fmt.Errorf("adder:done handler error: %w", err)
 	}
 
 	info = &WriteInfo{

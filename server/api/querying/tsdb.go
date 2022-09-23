@@ -256,7 +256,7 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 
 	aggregate, err := tsdb.pickAggregate(ctx, qp, ids)
 	if err != nil {
-		return "", nil, nil, fmt.Errorf("(pick-aggregate) %v", err)
+		return "", nil, nil, fmt.Errorf("(pick-aggregate) %w", err)
 	}
 
 	if aggregate == nil {
@@ -292,14 +292,14 @@ func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
 	if tsdb.pool == nil {
 		config, err := pgxpool.ParseConfig(tsdb.config.Url)
 		if err != nil {
-			return fmt.Errorf("(tsdb) configuration error: %v", err)
+			return fmt.Errorf("(tsdb) configuration error: %w", err)
 		}
 
 		log.Infow("tsdb:config", "pg_max_conns", config.MaxConns)
 
 		opened, err := pgxpool.ConnectConfig(ctx, config)
 		if err != nil {
-			return fmt.Errorf("(tsdb) error connecting: %v", err)
+			return fmt.Errorf("(tsdb) error connecting: %w", err)
 		}
 
 		tsdb.pool = opened
@@ -434,7 +434,7 @@ func (tsdb *TimeScaleDBBackend) tailStation(ctx context.Context, last *LastTimeR
 
 	pgRows, err := tsdb.pool.Query(ctx, dataSql, []int32{last.StationID}, last.LastTime)
 	if err != nil {
-		return nil, fmt.Errorf("(tail-station) %v", err)
+		return nil, fmt.Errorf("(tail-station) %w", err)
 	}
 
 	defer pgRows.Close()
@@ -485,7 +485,7 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 	`
 	lastTimeRows, err := tsdb.pool.Query(ctx, sql, stationIDs)
 	if err != nil {
-		return nil, fmt.Errorf("(last-times) %v", err)
+		return nil, fmt.Errorf("(last-times) %w", err)
 	}
 
 	defer lastTimeRows.Close()
@@ -536,7 +536,7 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 
 	pgRows, err := tsdb.pool.Query(ctx, sql, stationIDs, since)
 	if err != nil {
-		return nil, fmt.Errorf("(daily-agg) %v", err)
+		return nil, fmt.Errorf("(daily-agg) %w", err)
 	}
 
 	defer pgRows.Close()

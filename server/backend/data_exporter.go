@@ -191,7 +191,7 @@ func (e *Exporter) OnData(ctx context.Context, p *data.Provision, r *pb.DataReco
 
 	filtered, err := e.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return fmt.Errorf("resolving: %v", err)
+		return fmt.Errorf("resolving: %w", err)
 	}
 	if filtered == nil {
 		e.errors += 1

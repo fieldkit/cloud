@@ -251,7 +251,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 
 	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
-		return fmt.Errorf("error parsing url: %v", err)
+		return fmt.Errorf("error parsing url: %w", err)
 	}
 
 	log.Infow("deleting", "url", i.URL)

@@ -92,7 +92,7 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 
 	qp, err := rawParams.BuildQueryParams()
 	if err != nil {
-		return fmt.Errorf("invalid query params: %v", err)
+		return fmt.Errorf("invalid query params: %w", err)
 	}
 
 	format, err := h.createFormat(m.Format)

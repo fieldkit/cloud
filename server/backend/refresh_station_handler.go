@@ -35,7 +35,7 @@ func (h *RefreshStationHandler) Handle(ctx context.Context, m *messages.RefreshS
 	}
 
 	if err := sr.Refresh(ctx, m.StationID, m.HowRecently, m.Completely, m.SkipManual); err != nil {
-		return fmt.Errorf("partial refresh failed: %v", err)
+		return fmt.Errorf("partial refresh failed: %w", err)
 	}
 
 	log.Infow("done")

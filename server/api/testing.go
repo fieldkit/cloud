@@ -25,7 +25,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 
 	database, err := sqlxcache.Open(e.Ctx, "postgres", e.PostgresURL)
 	if err != nil {
-		return nil, fmt.Errorf("error opening pg: %v", err)
+		return nil, fmt.Errorf("error opening pg: %w", err)
 	}
 
 	jq := jobs.NewDevNullMessagePublisher()
@@ -37,7 +37,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 
 	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, jq, nil, nil, metrics, nil, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error creating service options: %v", err)
+		return nil, fmt.Errorf("error creating service options: %w", err)
 	}
 
 	return services, err
@@ -56,7 +56,7 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 
 	handler, err := CreateApi(e.Ctx, services)
 	if err != nil {
-		return nil, fmt.Errorf("error creating service api: %v", err)
+		return nil, fmt.Errorf("error creating service api: %w", err)
 	}
 
 	testHandler = logging.LoggingAndInfrastructure("tests")(handler)

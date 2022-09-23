@@ -161,7 +161,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 	}
 
 	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
-		return fmt.Errorf("error updating station: %v", err)
+		return fmt.Errorf("error updating station: %w", err)
 	}
 
 	if err := database.NamedGetContext(ctx, activity, `
@@ -170,7 +170,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		ON CONFLICT (data_ingestion_id) DO UPDATE SET data_records = EXCLUDED.data_records, errors = EXCLUDED.errors
 		RETURNING id
 		`, activity); err != nil {
-		return fmt.Errorf("error upserting activity: %v", err)
+		return fmt.Errorf("error upserting activity: %w", err)
 	}
 
 	log.Infow("upserted", "activity_id", activity.ID)
