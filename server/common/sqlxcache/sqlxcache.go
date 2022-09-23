@@ -224,6 +224,10 @@ type transactionContextKey string
 
 var TxContextKey = transactionContextKey("sqlx.tx")
 
+func (db *DB) Begin(ctx context.Context) (*sqlx.Tx, error) {
+	return db.db.Beginx()
+}
+
 func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) error) error {
 	tx, err := db.db.Beginx()
 	if err != nil {
