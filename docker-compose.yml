@@ -1,8 +1,8 @@
 version: "3.7"
 services:
   postgres:
-#    image: postgis/postgis:12-2.5-alpine
-    image: kartoza/postgis:14-3
+    image: postgis/postgis:12-2.5-alpine
+#    image: kartoza/postgis:14-3
     ports:
       - "5432:5432"
     environment:
