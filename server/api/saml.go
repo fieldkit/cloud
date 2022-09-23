@@ -68,7 +68,7 @@ func (sa *SamlAuth) initialize(ctx context.Context) error {
 		IDPMetadataURL: idpMetadataURL,
 	})
 	if err != nil {
-		return fmt.Errorf("saml error: %v (%v)", err, idpMetadataURL)
+		return fmt.Errorf("saml error: %w (%v)", err, idpMetadataURL)
 	}
 
 	sa.sp = samlSP
@@ -88,7 +88,7 @@ func (sa *SamlAuth) Mount(ctx context.Context, app http.Handler) (http.Handler, 
 
 	keyPair, err := tls.LoadX509KeyPair(sa.config.CertPath, sa.config.KeyPath)
 	if err != nil {
-		return app, fmt.Errorf("error creating keypair: %v (%s, %s)", err, sa.config.CertPath, sa.config.KeyPath)
+		return app, fmt.Errorf("error creating keypair: %w (%s, %s)", err, sa.config.CertPath, sa.config.KeyPath)
 	}
 
 	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])

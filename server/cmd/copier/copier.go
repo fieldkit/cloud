@@ -54,7 +54,7 @@ func createAwsSession() (s *session.Session, err error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Error creating AWS session: %v", err)
+	return nil, fmt.Errorf("Error creating AWS session: %w", err)
 }
 
 type EnvServices struct {

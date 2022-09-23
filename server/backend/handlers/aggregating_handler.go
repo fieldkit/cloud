@@ -146,7 +146,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return fmt.Errorf("error resolving: %v", err)
+		return fmt.Errorf("error resolving: %w", err)
 	}
 	if filtered == nil {
 		return nil
@@ -154,7 +154,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 
 	if !v.skipManual {
 		if err := aggregator.NextTime(ctx, db.Time); err != nil {
-			return fmt.Errorf("error adding: %v", err)
+			return fmt.Errorf("error adding: %w", err)
 		}
 	}
 
@@ -174,13 +174,13 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 				} else {
 					if !v.skipManual {
 						if err := aggregator.AddSample(ctx, db.Time, filtered.Record.Location, ask, value.Value); err != nil {
-							return fmt.Errorf("error adding: %v", err)
+							return fmt.Errorf("error adding: %w", err)
 						}
 					}
 
 					if v.tsConfig != nil {
 						if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
-							return fmt.Errorf("error saving: %v", err)
+							return fmt.Errorf("error saving: %w", err)
 						}
 					}
 				}
@@ -262,15 +262,15 @@ func (v *AggregatingHandler) flushTs(ctx context.Context) error {
 	br := tx.SendBatch(ctx, batch)
 
 	if _, err := br.Exec(); err != nil {
-		return fmt.Errorf("(tsdb-exec) %v", err)
+		return fmt.Errorf("(tsdb-exec) %w", err)
 	}
 
 	if err := br.Close(); err != nil {
-		return fmt.Errorf("(tsdb-close) %v", err)
+		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %v", err)
+		return fmt.Errorf("(tsdb-commit) %w", err)
 	}
 
 	return nil

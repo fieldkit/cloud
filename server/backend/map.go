@@ -18,42 +18,6 @@ import (
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
-type OurWorkFunc func(ctx context.Context, j *gue.Job) error
-type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
-
-func wrapContext(h OurWorkFunc) gue.WorkFunc {
-	return func(ctx context.Context, j *gue.Job) error {
-		return h(ctx, j)
-	}
-}
-
-func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
-	return func(ctx context.Context, j *gue.Job) error {
-		timer := services.metrics.HandleMessage(j.Type)
-
-		defer timer.Send()
-
-		startedAt := time.Now()
-
-		transport := &jobs.TransportMessage{}
-		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
-			return err
-		}
-
-		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
-		messageLog := Logger(messageCtx).Sugar()
-
-		err := h(messageCtx, j, services, transport)
-		if err != nil {
-			messageLog.Errorw("error", "error", err)
-		}
-
-		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
-
-		return err
-	}
-}
-
 func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.IngestionReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
@@ -144,17 +108,46 @@ func describeStationLocation(ctx context.Context, j *gue.Job, services *Backgrou
 
 func CreateMap(services *BackgroundServices) gue.WorkMap {
 	return gue.WorkMap{
-		"Example":                wrapContext(wrapTransportMessage(services, exampleJob)),
-		"WalkEverything":         wrapContext(wrapTransportMessage(services, walkEverything)),
-		"IngestionReceived":      wrapContext(wrapTransportMessage(services, ingestionReceived)),
-		"RefreshStation":         wrapContext(wrapTransportMessage(services, refreshStation)),
-		"ExportData":             wrapContext(wrapTransportMessage(services, exportData)),
-		"IngestStation":          wrapContext(wrapTransportMessage(services, ingestStation)),
-		"WebHookMessageReceived": wrapContext(wrapTransportMessage(services, webHookMessageReceived)),
-		"ProcessSchema":          wrapContext(wrapTransportMessage(services, processSchema)),
-		"SensorDataBatch":        wrapContext(wrapTransportMessage(services, sensorDataBatch)),
-		"SensorDataModified":     wrapContext(wrapTransportMessage(services, sensorDataModified)),
-		"StationLocationUpdated": wrapContext(wrapTransportMessage(services, describeStationLocation)),
+		"Example":                wrapTransportMessage(services, exampleJob),
+		"WalkEverything":         wrapTransportMessage(services, walkEverything),
+		"IngestionReceived":      wrapTransportMessage(services, ingestionReceived),
+		"RefreshStation":         wrapTransportMessage(services, refreshStation),
+		"ExportData":             wrapTransportMessage(services, exportData),
+		"IngestStation":          wrapTransportMessage(services, ingestStation),
+		"WebHookMessageReceived": wrapTransportMessage(services, webHookMessageReceived),
+		"ProcessSchema":          wrapTransportMessage(services, processSchema),
+		"SensorDataBatch":        wrapTransportMessage(services, sensorDataBatch),
+		"SensorDataModified":     wrapTransportMessage(services, sensorDataModified),
+		"StationLocationUpdated": wrapTransportMessage(services, describeStationLocation),
+	}
+}
+
+type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
+
+func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) gue.WorkFunc {
+	return func(ctx context.Context, j *gue.Job) error {
+		timer := services.metrics.HandleMessage(j.Type)
+
+		defer timer.Send()
+
+		startedAt := time.Now()
+
+		transport := &jobs.TransportMessage{}
+		if err := json.Unmarshal([]byte(j.Args), transport); err != nil {
+			return err
+		}
+
+		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
+		messageLog := Logger(messageCtx).Sugar()
+
+		err := h(messageCtx, j, services, transport)
+		if err != nil {
+			messageLog.Errorw("error", "error", err)
+		}
+
+		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
+
+		return err
 	}
 }
 

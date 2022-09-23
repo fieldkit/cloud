@@ -30,7 +30,7 @@ func NewQueMessagePublisher(metrics *logging.Metrics, q *gue.Client) *QueMessage
 func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) error {
 	body, err := json.Marshal(message)
 	if err != nil {
-		return fmt.Errorf("json marshal: %v", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
 	p.metrics.MessagePublished()
@@ -50,7 +50,7 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) 
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {
-		return fmt.Errorf("json marshal: %v", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
 	j := &gue.Job{

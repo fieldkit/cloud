@@ -17,7 +17,7 @@ func (tsc *TimeScaleDBConfig) Acquire(ctx context.Context) (*pgxpool.Pool, error
 	if tsc.pool == nil {
 		opened, err := pgxpool.New(ctx, tsc.Url)
 		if err != nil {
-			return nil, fmt.Errorf("(tsdb) error connecting: %v", err)
+			return nil, fmt.Errorf("(tsdb) error connecting: %w", err)
 		}
 
 		tsc.pool = opened

@@ -63,8 +63,12 @@ func (moduleMeta *AllModuleMeta) FindSensorByFullKey(fullKey string) *SensorAndM
 
 func (moduleMeta *AllModuleMeta) FindModuleMeta(m *HeaderFields) (mm *ModuleMeta, err error) {
 	for _, module := range moduleMeta.all {
-		if module.Header.Manufacturer == m.Manufacturer && module.Header.Kind == m.Kind {
-			return module, nil
+		if module.Header.Manufacturer == m.Manufacturer {
+			for _, kind := range module.Header.AllKinds {
+				if kind == m.Kind {
+					return module, nil
+				}
+			}
 		}
 	}
 
@@ -93,6 +97,12 @@ func (moduleMeta *AllModuleMeta) FindSensorMeta(m *HeaderFields, sensor string) 
 				}
 				if s.Key == weNeedToCleanThisUp || s.FirmwareKey == weNeedToCleanThisUp {
 					return module, s, nil
+				}
+
+				for _, alias := range s.Aliases {
+					if alias == sensor {
+						return module, s, nil
+					}
 				}
 			}
 		}
@@ -158,7 +168,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 	}
 
 	sensors := []*PersistedSensorMeta{}
-	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aggregation_function FROM fieldkit.sensor_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aliases, aggregation_function FROM fieldkit.sensor_meta`); err != nil {
 		return nil, err
 	}
 
@@ -202,6 +212,11 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 				function = *psm.AggregationFunction
 			}
 
+			aliases := make([]string, 0)
+			if psm.Aliases != nil {
+				aliases = *psm.Aliases
+			}
+
 			mm.Sensors = append(mm.Sensors, &SensorMeta{
 				Key:                 psm.SensorKey,
 				FullKey:             psm.FullKey,
@@ -212,6 +227,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 				Ranges:              ranges,
 				Strings:             strings,
 				VizConfigs:          viz,
+				Aliases:             aliases,
 				AggregationFunction: function,
 			})
 		}

@@ -255,11 +255,11 @@ func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.Tim
 
 	if recently {
 		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
-			return fmt.Errorf("recently refresh failed: %v", err)
+			return fmt.Errorf("recently refresh failed: %w", err)
 		}
 	} else {
 		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
-			return fmt.Errorf("complete refresh failed: %v", err)
+			return fmt.Errorf("complete refresh failed: %w", err)
 		}
 	}
 
@@ -299,7 +299,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 	for sampled.Before(end) {
 		if err := aggregator.NextTime(ctx, sampled); err != nil {
-			return fmt.Errorf("error adding: %v", err)
+			return fmt.Errorf("error adding: %w", err)
 		}
 
 		location.Move(sampled)

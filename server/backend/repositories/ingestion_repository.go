@@ -26,7 +26,7 @@ func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.
 		FROM fieldkit.ingestion
 		WHERE id = $1
 		`, id); err != nil {
-		return nil, fmt.Errorf("error querying for ingestion: %v", err)
+		return nil, fmt.Errorf("error querying for ingestion: %w", err)
 	}
 	if len(found) == 0 {
 		return nil, nil
@@ -52,7 +52,7 @@ func (r *IngestionRepository) QueryByStationID(ctx context.Context, id int32) (a
         WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE id = $1)
 		ORDER BY q.type_ordered, q.time
 		`, id); err != nil {
-		return nil, fmt.Errorf("error querying for ingestions: %v", err)
+		return nil, fmt.Errorf("error querying for ingestions: %w", err)
 	}
 	return pending, nil
 }
@@ -76,7 +76,7 @@ func (r *IngestionRepository) QueryPending(ctx context.Context) (all []*data.Que
 		ORDER BY type_ordered, queued
 		LIMIT 10
 		`); err != nil {
-		return nil, fmt.Errorf("error querying for ingestions: %v", err)
+		return nil, fmt.Errorf("error querying for ingestions: %w", err)
 	}
 	return pending, nil
 }
@@ -85,7 +85,7 @@ func (r *IngestionRepository) MarkProcessedHasOtherErrors(ctx context.Context, q
 	if _, err := r.db.ExecContext(ctx, `
 		UPDATE fieldkit.ingestion_queue SET other_errors = 1, completed = NOW() WHERE id = $1
 		`, queuedID); err != nil {
-		return fmt.Errorf("error updating queued ingestion: %v", err)
+		return fmt.Errorf("error updating queued ingestion: %w", err)
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (r *IngestionRepository) MarkProcessedDone(ctx context.Context, queuedID, t
 	if _, err := r.db.ExecContext(ctx, `
 		UPDATE fieldkit.ingestion_queue SET total_records = $1, meta_errors = $2, data_errors = $3, other_errors = 0, completed = NOW() WHERE id = $4
 		`, totalRecords, metaErrors, dataErrors, queuedID); err != nil {
-		return fmt.Errorf("error updating queued ingestion: %v", err)
+		return fmt.Errorf("error updating queued ingestion: %w", err)
 	}
 	return nil
 }
@@ -118,7 +118,7 @@ func (r *IngestionRepository) Enqueue(ctx context.Context, ingestionID int64) (i
 	if err := r.db.NamedGetContext(ctx, queued, `
 		INSERT INTO fieldkit.ingestion_queue (queued, ingestion_id) VALUES (:queued, :ingestion_id) RETURNING id
 		`, queued); err != nil {
-		return 0, fmt.Errorf("error inserting queued ingestion: %v", err)
+		return 0, fmt.Errorf("error inserting queued ingestion: %w", err)
 	}
 
 	return queued.ID, nil
@@ -131,7 +131,7 @@ func (r *IngestionRepository) QueryQueuedByID(ctx context.Context, queuedID int6
 			id, ingestion_id, queued, attempted, completed, total_records, other_errors, meta_errors, data_errors
 		FROM fieldkit.ingestion_queue WHERE id = $1
 		`, queuedID); err != nil {
-		return nil, fmt.Errorf("error querying for queued ingestion: %v", err)
+		return nil, fmt.Errorf("error querying for queued ingestion: %w", err)
 	}
 	if len(found) == 0 {
 		return nil, nil
@@ -145,7 +145,7 @@ func (r *IngestionRepository) AddAndQueue(ctx context.Context, ingestion *data.I
 			VALUES (:time, :upload_id, :user_id, :device_id, :generation, :type, :size, :url, :blocks, :flags)
 			RETURNING id
 			`, ingestion); err != nil {
-		return 0, fmt.Errorf("error inserting ingestion: %v", err)
+		return 0, fmt.Errorf("error inserting ingestion: %w", err)
 	}
 	if queuedID, err := r.Enqueue(ctx, ingestion.ID); err != nil {
 		return 0, err

@@ -191,7 +191,7 @@ func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, in
 	return nil
 }
 
-func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
+func (ra *RecordAdder) flushQueue(ctx context.Context, required bool) (fatal error) {
 	log := Logger(ctx).Sugar()
 
 	// Do we have queued meta records in need of a record number?
@@ -201,14 +201,21 @@ func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
 
 	// If we're missing a key record, we can't import this file.
 	if ra.keyRecord == nil {
-		return fmt.Errorf("error flushing queue: no key record")
+		if !required {
+			// Right now the only way this can happen is if we have a partial
+			// file with no data and just meta records.
+			log.Warnw("adder:unrequired-flush no-key-record")
+			return nil
+		}
+
+		return fmt.Errorf("adder:flush error: no key record")
 	}
 
 	// Ignore harder scenarios for now, only working with having
 	// file offset be what the record number should be. We started
 	// at the first record.
 	if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
-		return fmt.Errorf("error flushing queue: mid-file")
+		return fmt.Errorf("adder:flush error: mid-file")
 	}
 
 	// So we can safetly process the queued meta records using their
@@ -262,7 +269,7 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 				log.Infow("key-record", "file_offset", ra.keyRecord.fileOffset, "record_number", ra.keyRecord.recordNumber)
 			}
 
-			if err := ra.flushQueue(ctx); err != nil {
+			if err := ra.flushQueue(ctx, true); err != nil {
 				return nil, err
 			}
 
@@ -321,7 +328,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if data { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing data record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing data record: %w", err)
 				}
 				unmarshalError = err
 			} else {
@@ -340,7 +347,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				} else {
 					dataErrors += 1
 					if records > 0 {
-						log.Infow("processed", "record_run", records)
+						log.Infow("adder:processed", "record_run", records)
 						records = 0
 					}
 				}
@@ -352,7 +359,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if meta { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 				unmarshalError = err
 			} else {
@@ -360,7 +367,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				bytes, err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 
 				warning, fatal := ra.Handle(ctx, &ParsedRecord{
@@ -378,7 +385,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				} else {
 					metaErrors += 1
 					if records > 0 {
-						log.Infow("processed", "record_run", records)
+						log.Infow("adder:processed", "record_run", records)
 						records = 0
 					}
 				}
@@ -397,12 +404,12 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 	})
 
 	if _, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc); err != nil {
-		newErr := fmt.Errorf("error reading collection: %v", err)
-		log.Errorw("error", "error", newErr)
+		newErr := fmt.Errorf("adder:error: %w", err)
+		log.Errorw("adder:error", "error", newErr)
 		return nil, newErr
 	}
 
-	if err := ra.flushQueue(ctx); err != nil {
+	if err := ra.flushQueue(ctx, false); err != nil {
 		return nil, err
 	}
 
@@ -421,10 +428,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		stationID = &station.ID
 	}
 
-	withInfo.Infow("processed")
+	withInfo.Infow("adder:processed")
 
 	if err := ra.handler.OnDone(ctx); err != nil {
-		return nil, fmt.Errorf("error in done handler: %v", err)
+		return nil, fmt.Errorf("adder:done handler error: %w", err)
 	}
 
 	info = &WriteInfo{
@@ -440,7 +447,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		DataEnd:       ra.statistics.end,
 	}
 
-	withInfo.Infow("done")
+	withInfo.Infow("adder:done")
 
 	return
 }

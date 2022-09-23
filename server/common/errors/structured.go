@@ -41,6 +41,10 @@ func (e StructuredError) Cause() error {
 	return e.source
 }
 
+func (e StructuredError) Unwrap() error {
+	return e.source
+}
+
 func (e StructuredError) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	for _, f := range e.fields {
 		f.AddTo(enc)

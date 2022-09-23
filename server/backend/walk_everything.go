@@ -69,7 +69,7 @@ func (h *fixingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.Dat
 		if _, err := h.services.database.ExecContext(ctx, `
 			UPDATE fieldkit.meta_record SET pb = $1 WHERE id = $2
 		`, data.Bytes(), db.ID); err != nil {
-			return fmt.Errorf("error updating pb: %v", err)
+			return fmt.Errorf("error updating pb: %w", err)
 		}
 	}
 	return nil
@@ -88,7 +88,7 @@ func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.Dat
 		if _, err := h.services.database.ExecContext(ctx, `
 			UPDATE fieldkit.data_record SET pb = $1 WHERE id = $2
 		`, data.Bytes(), db.ID); err != nil {
-			return fmt.Errorf("error updating pb: %v", err)
+			return fmt.Errorf("error updating pb: %w", err)
 		}
 	}
 	return nil

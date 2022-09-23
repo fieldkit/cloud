@@ -97,10 +97,11 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 
 	filtered, err := v.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return fmt.Errorf("error resolving: %v", err)
+		return fmt.Errorf("error resolving: %w", err)
 	}
 	if filtered == nil {
-		return fmt.Errorf("error resolving: %v", err)
+		log.Warnw("tsdb-handler:empty")
+		return nil
 	}
 
 	for key, value := range filtered.Record.Readings {
@@ -116,7 +117,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 
 				if !math.IsNaN(value.Value) {
 					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
-						return fmt.Errorf("error saving: %v", err)
+						return fmt.Errorf("error saving: %w", err)
 					}
 				}
 			}

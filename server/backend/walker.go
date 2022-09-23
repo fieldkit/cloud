@@ -286,13 +286,13 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 
 func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, record *data.DataRecord) error {
 	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
-		return fmt.Errorf("error loading provision: %v", err)
+		return fmt.Errorf("error loading provision: %w", err)
 	} else {
 		if meta, err := rw.loadMeta(ctx, provision, record.MetaRecordID, handler); err != nil {
-			return fmt.Errorf("(load-meta) error handling row: %v", err)
+			return fmt.Errorf("(load-meta) error handling row: %w", err)
 		} else {
 			if err := handler.OnData(ctx, provision, nil, nil, record, meta); err != nil {
-				return fmt.Errorf("(on-data) error handling row: %v", err)
+				return fmt.Errorf("(on-data) error handling row: %w", err)
 			}
 		}
 	}
@@ -320,7 +320,7 @@ func (rw *RecordWalker) loadProvision(ctx context.Context, id int64) (*data.Prov
 
 	records := []*data.Provision{}
 	if err := rw.db.SelectContext(ctx, &records, `SELECT * FROM fieldkit.provision WHERE id = $1`, id); err != nil {
-		return nil, fmt.Errorf("error querying for provision: %v", err)
+		return nil, fmt.Errorf("error querying for provision: %w", err)
 	}
 
 	if len(records) != 1 {
@@ -339,14 +339,14 @@ func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision,
 		// handler a chance to make sure things are still expecting
 		// this meta information.
 		if err := handler.OnMeta(ctx, provision, nil, rw.metas[id]); err != nil {
-			return nil, fmt.Errorf("(on-meta) error: %v", err)
+			return nil, fmt.Errorf("(on-meta) error: %w", err)
 		}
 		return rw.metas[id], nil
 	}
 
 	records := []*data.MetaRecord{}
 	if err := rw.db.SelectContext(ctx, &records, `SELECT * FROM fieldkit.meta_record WHERE id = $1`, id); err != nil {
-		return nil, fmt.Errorf("error querying for meta: %v", err)
+		return nil, fmt.Errorf("error querying for meta: %w", err)
 	}
 
 	if len(records) != 1 {
@@ -354,7 +354,7 @@ func (rw *RecordWalker) loadMeta(ctx context.Context, provision *data.Provision,
 	}
 
 	if err := handler.OnMeta(ctx, provision, nil, records[0]); err != nil {
-		return nil, fmt.Errorf("(on-meta) error: %v", err)
+		return nil, fmt.Errorf("(on-meta) error: %w", err)
 	}
 
 	rw.metas[id] = records[0]

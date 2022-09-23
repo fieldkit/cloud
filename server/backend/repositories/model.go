@@ -49,6 +49,7 @@ type SensorMeta struct {
 	Internal            bool                         `json:"internal"`
 	VizConfigs          []VizConfig                  `json:"viz"`
 	Strings             map[string]map[string]string `json:"strings"`
+	Aliases             []string                     `json:"aliases"`
 	AggregationFunction string                       `json:"aggregationFunction"`
 }
 
@@ -209,16 +210,17 @@ type PersistedModuleMeta struct {
 
 // TODO Fix JSON keys
 type PersistedSensorMeta struct {
-	ID                  int32          `db:"id" json:"id"`
-	ModuleID            int32          `db:"module_id" json:"module_id"`
-	SensorKey           string         `db:"sensor_key" json:"sensor_key"`
-	FirmwareKey         string         `db:"firmware_key" json:"firmware_key"`
-	FullKey             string         `db:"full_key" json:"full_key"`
-	UnitOfMeasure       string         `db:"uom" json:"uom"`
-	Ordering            int            `db:"ordering" json:"ordering"`
-	Internal            bool           `db:"internal" json:"internal"`
-	Strings             types.JSONText `db:"strings" json:"strings"`
-	Viz                 types.JSONText `db:"viz" json:"viz"`
-	Ranges              types.JSONText `db:"ranges" json:"ranges"`
-	AggregationFunction *string        `db:"aggregation_function" json:"aggregationFunction"`
+	ID                  int32           `db:"id" json:"id"`
+	ModuleID            int32           `db:"module_id" json:"module_id"`
+	SensorKey           string          `db:"sensor_key" json:"sensor_key"`
+	FirmwareKey         string          `db:"firmware_key" json:"firmware_key"`
+	FullKey             string          `db:"full_key" json:"full_key"`
+	UnitOfMeasure       string          `db:"uom" json:"uom"`
+	Ordering            int             `db:"ordering" json:"ordering"`
+	Internal            bool            `db:"internal" json:"internal"`
+	Strings             types.JSONText  `db:"strings" json:"strings"`
+	Viz                 types.JSONText  `db:"viz" json:"viz"`
+	Ranges              types.JSONText  `db:"ranges" json:"ranges"`
+	Aliases             *pq.StringArray `db:"aliases" json:"aliases"`
+	AggregationFunction *string         `db:"aggregation_function" json:"aggregationFunction"`
 }

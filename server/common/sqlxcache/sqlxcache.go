@@ -40,7 +40,7 @@ func (db *DB) prepare(ctx context.Context, query string) (*sqlx.Stmt, error) {
 func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, error) {
 	stmt, err := db.prepare(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("(prepare) %v", err)
+		return nil, fmt.Errorf("(prepare) %w", err)
 	}
 
 	return db.stmtWithTx(ctx, stmt), nil
@@ -57,7 +57,7 @@ func (db *DB) prepareNamed(ctx context.Context, query string) (*sqlx.NamedStmt, 
 func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.NamedStmt, error) {
 	namedStmt, err := db.prepareNamed(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("(prepare) %v", err)
+		return nil, fmt.Errorf("(prepare) %w", err)
 	}
 
 	return db.namedStmtWithTx(ctx, namedStmt), nil
@@ -110,7 +110,7 @@ func Open(ctx context.Context, driverName, url string) (*DB, error) {
 
 	pool, err := pgxpool.Connect(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("(tsdb) error connecting: %v", err)
+		return nil, fmt.Errorf("(tsdb) error connecting: %w", err)
 	}
 
 	return newDB(db, pool), nil

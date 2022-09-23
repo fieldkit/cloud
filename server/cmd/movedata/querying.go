@@ -122,7 +122,7 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 
 	filtered, err := h.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return fmt.Errorf("resolving: %v", err)
+		return fmt.Errorf("resolving: %w", err)
 	}
 	if filtered == nil {
 		return nil
