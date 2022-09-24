@@ -285,6 +285,10 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	return gue.WorkMap(work)
 }
 
+type WorkFailed struct {
+	Work *jobs.TransportMessage `json:"work"`
+}
+
 type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) gue.WorkFunc {
@@ -308,6 +312,14 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
 			messageLog.Errorw("error", "error", err)
+
+			failed := WorkFailed{
+				Work: transport,
+			}
+
+			if err := services.publisher.Publish(ctx, &failed); err != nil {
+				return err
+			}
 		}
 
 		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())
