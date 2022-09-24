@@ -10,6 +10,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -22,6 +23,7 @@ import (
 type TestEnv struct {
 	Ctx         context.Context
 	DB          *sqlxcache.DB
+	DbPool      *pgxpool.Pool
 	PostgresURL string
 	SessionKey  string
 	JWTHMACKey  []byte
@@ -86,6 +88,16 @@ func NewTestEnv() (e *TestEnv, err error) {
 		return nil, err
 	}
 
+	pgxcfg, err := pgxpool.ParseConfig(testUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	dbpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
+	if err != nil {
+		return nil, err
+	}
+
 	testSessionKey := "AzhG6aOqy2jbx7KSrmkOJGe+RY75nsZsr+ByneiMLBo="
 	jwtHMACKey, err := base64.StdEncoding.DecodeString(testSessionKey)
 	if err != nil {
@@ -97,6 +109,7 @@ func NewTestEnv() (e *TestEnv, err error) {
 	e = &TestEnv{
 		Ctx:         ctx,
 		DB:          testDb,
+		DbPool:      dbpool,
 		PostgresURL: testUrl,
 		SessionKey:  testSessionKey,
 		JWTHMACKey:  jwtHMACKey,
