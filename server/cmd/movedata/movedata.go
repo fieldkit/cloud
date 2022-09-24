@@ -356,6 +356,7 @@ func (config *Options) getAwsSessionOptions() session.Options {
 
 func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(ctx, publisher, nil)
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
 
 	awsSessionOptions := options.getAwsSessionOptions()
@@ -397,7 +398,7 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, r
 			UserID:   2,
 			Verbose:  true,
 			Refresh:  true,
-		}); err != nil {
+		}, mc); err != nil {
 			return err
 		}
 	}

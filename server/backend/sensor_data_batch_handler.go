@@ -46,7 +46,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		batch.Queue(sql, row.Time, row.StationID, row.ModuleID, row.SensorID, row.Value)
 	}
 
-	log.Infow("tsdb-handler:flushing", "records", len(m.Rows))
+	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID())
 
 	pgPool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
@@ -73,6 +73,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 	}
 
 	return mc.Reply(&messages.SensorDataBatchCommitted{
-		Time: time.Now(),
+		BatchID: m.BatchID,
+		Time:    time.Now(),
 	})
 }

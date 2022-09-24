@@ -21,24 +21,22 @@ import (
 )
 
 type IngestionReceivedHandler struct {
-	db        *sqlxcache.DB
-	files     files.FileArchive
-	metrics   *logging.Metrics
-	publisher jobs.MessagePublisher
-	tsConfig  *storage.TimeScaleDBConfig
+	db       *sqlxcache.DB
+	files    files.FileArchive
+	metrics  *logging.Metrics
+	tsConfig *storage.TimeScaleDBConfig
 }
 
 func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestionReceivedHandler {
 	return &IngestionReceivedHandler{
-		db:        db,
-		files:     files,
-		metrics:   metrics,
-		publisher: publisher,
-		tsConfig:  tsConfig,
+		db:       db,
+		files:    files,
+		metrics:  metrics,
+		tsConfig: tsConfig,
 	}
 }
 
-func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
+func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
 	log := Logger(ctx).Sugar().With("queued_ingestion_id", m.QueuedID)
 
 	log.Infow("processing")
@@ -56,6 +54,15 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
 	}
 
+	sagaID := mc.StartSaga()
+
+	if err := mc.Event(&messages.IngestionStarted{
+		QueuedID:    m.QueuedID,
+		IngestionID: queued.IngestionID,
+	}); err != nil {
+		return err
+	}
+
 	i, err := ir.QueryByID(ctx, queued.IngestionID)
 	if err != nil {
 		return err
@@ -63,9 +70,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
 	}
 
-	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
+	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", sagaID)
 
-	handler := NewAllHandlers(h.db, h.tsConfig, h.publisher)
+	handler := NewAllHandlers(h.db, h.tsConfig, mc)
 
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
@@ -92,24 +99,8 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 		if info.StationID != nil && m.Refresh {
 			now := time.Now()
-			/*
-				howFarBack := time.Hour * 48
-				if !info.DataStart.IsZero() {
-					if now.After(info.DataStart) {
-						howFarBack += now.Sub(info.DataStart)
-						if howFarBack < 0 {
-							log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
-							howFarBack = time.Hour * 48
-						} else {
-							log.Infow("refreshing", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
-						}
-					} else {
-						log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
-					}
-				}
-			*/
 
-			if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
+			if err := mc.Event(&messages.SensorDataModified{
 				ModifiedAt:  now,
 				PublishedAt: now,
 				StationID:   info.StationID,

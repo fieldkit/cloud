@@ -8,6 +8,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
@@ -30,6 +31,7 @@ type TsDBHandler struct {
 	stationIDs        map[int64]int32
 	stationModules    map[uint32]*data.StationModule
 	sensors           map[string]*data.Sensor
+	batchIDs          []string
 	records           []messages.SensorDataBatchRow
 }
 
@@ -133,6 +135,11 @@ func (v *TsDBHandler) OnDone(ctx context.Context) error {
 			return err
 		}
 	}
+
+	v.publisher.Publish(ctx, messages.SensorDataBatchesStarted{
+		BatchIDs: v.batchIDs,
+	}, jobs.StartSaga())
+
 	return nil
 }
 
@@ -176,11 +183,18 @@ func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, locati
 	return nil
 }
 
+var (
+	batchIDs = logging.NewIdGenerator()
+)
+
 func (v *TsDBHandler) flushTs(ctx context.Context) error {
+	batchID := batchIDs.Generate()
 	err := v.publisher.Publish(ctx, &messages.SensorDataBatch{
-		Rows: v.records,
+		BatchID: batchID,
+		Rows:    v.records,
 	})
 
+	v.batchIDs = append(v.batchIDs, batchID)
 	v.records = v.records[:0]
 
 	return err

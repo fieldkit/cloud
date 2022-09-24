@@ -53,6 +53,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -70,14 +71,14 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		UserID:   user.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))

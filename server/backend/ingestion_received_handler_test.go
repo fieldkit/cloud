@@ -23,6 +23,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
@@ -30,7 +31,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 		QueuedID: int64(30342),
 		Verbose:  true,
 		Refresh:  true,
-	})
+	}, mc)
 
 	assert.Errorf(err, "queued ingestion missing: %d", 30342)
 }
@@ -47,6 +48,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	files := tests.NewInMemoryArchive(map[string][]byte{
 		"/file": []byte{},
 	})
@@ -60,7 +62,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 		QueuedID: queued.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 }
 func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert := assert.New(t)
@@ -79,6 +81,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -93,7 +96,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 		QueuedID: queued.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 }
 
 func TestIngestionReceivedMetaAndData(t *testing.T) {
@@ -115,6 +118,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -134,14 +138,14 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
@@ -182,6 +186,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -199,14 +204,14 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
@@ -244,6 +249,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -263,14 +269,14 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
 		UserID:   fd.Owner.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)

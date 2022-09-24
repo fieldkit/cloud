@@ -176,7 +176,7 @@ func main() {
 			fail(ctx, err)
 		}
 		publisher := jobs.NewQueMessagePublisher(metrics, qc)
-
+		mc := jobs.NewMessageContext(ctx, publisher, nil)
 		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, tsConfig)
 
 		process := func(ctx context.Context, id int32) error {
@@ -184,7 +184,7 @@ func main() {
 				StationID: id,
 				UserID:    2, // Jacob
 				Verbose:   true,
-			})
+			}, mc)
 		}
 
 		if options.All {

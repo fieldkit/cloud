@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -26,7 +27,7 @@ func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServ
 		return err
 	}
 	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
-	return handler.Handle(ctx, message)
+	return handler.Handle(ctx, message, mc)
 }
 
 func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
@@ -53,7 +54,7 @@ func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices
 		return err
 	}
 	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
-	return handler.Handle(ctx, message)
+	return handler.Handle(ctx, message, mc)
 }
 
 func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
@@ -120,6 +121,10 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	log.Infow("work-map:register", "message_type", name)
 }
 
+type IngestionSaga struct {
+	Batches map[string]bool `json:"batches"`
+}
+
 func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	work := make(map[string]gue.WorkFunc)
 
@@ -166,6 +171,112 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 		if m.Counter > 0 {
 			// return mc.Schedule(messages.Wakeup{Counter: m.Counter - 1}, time.Millisecond*100)
 			return mc.Reply(messages.Wakeup{Counter: m.Counter - 1})
+		}
+
+		return nil
+	})
+
+	Register(ctx, services, work, messages.SensorDataBatchesStarted{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		log := Logger(ctx).Sugar()
+
+		m := &messages.SensorDataBatchesStarted{}
+		if err := json.Unmarshal(tm.Body, m); err != nil {
+			return err
+		}
+
+		log.Infow("sensor-batches:started", "saga_id", mc.SagaID(), "batches", m.BatchIDs)
+
+		sagas := jobs.NewSagaRepository(services.dbpool)
+
+		// We should usually have to create the saga here, though never hurts to
+		// check, if we do find that the saga exists, we need to handle that, though.
+		saga, err := sagas.FindByID(ctx, mc.SagaID())
+		if err != nil {
+			return err
+		}
+
+		if saga == nil {
+			log.Infow("sensor-batches:create-saga", "saga_id", mc.SagaID())
+
+			body := IngestionSaga{
+				Batches: make(map[string]bool),
+			}
+
+			for _, id := range m.BatchIDs {
+				body.Batches[id] = false
+			}
+
+			saga = jobs.NewSaga(jobs.WithID(mc.SagaID()))
+			if err := saga.SetBody(body); err != nil {
+				return err
+			}
+
+			if err := sagas.Upsert(ctx, saga); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	Register(ctx, services, work, messages.SensorDataBatchCommitted{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		log := Logger(ctx).Sugar()
+
+		m := &messages.SensorDataBatchCommitted{}
+		if err := json.Unmarshal(tm.Body, m); err != nil {
+			return err
+		}
+
+		log.Infow("sensor-batches:committed", "saga_id", mc.SagaID(), "batch_id", m.BatchID)
+
+		sagas := jobs.NewSagaRepository(services.dbpool)
+
+		// We should usually have to create the saga here, though never hurts to
+		// check, if we do find that the saga exists, we need to handle that, though.
+		saga, err := sagas.FindByID(ctx, mc.SagaID())
+		if err != nil {
+			return err
+		}
+
+		if saga == nil {
+			log.Warnw("sensor-batches:saga-missing", "saga_id", mc.SagaID(), "batch_id", m.BatchID)
+			return fmt.Errorf("saga missing")
+		}
+
+		body := IngestionSaga{}
+		if err := saga.GetBody(&body); err != nil {
+			return err
+		}
+
+		if _, ok := body.Batches[m.BatchID]; !ok {
+			log.Warnw("sensor-batches:unexpected batch-id", "saga_id", mc.SagaID(), "batch_id", m.BatchID)
+			return fmt.Errorf("unexpected batch-id")
+		}
+
+		body.Batches[m.BatchID] = true
+
+		completed := true
+		for _, value := range body.Batches {
+			if !value {
+				completed = false
+				break
+			}
+		}
+
+		if completed {
+			if err := sagas.DeleteByID(ctx, saga.ID); err != nil {
+				return err
+			}
+
+			log.Infow("sensor-batches:completed", "saga_id", mc.SagaID())
+		} else {
+			if err := saga.SetBody(body); err != nil {
+				return err
+			}
+
+			if err := sagas.Upsert(ctx, saga); err != nil {
+				return err
+			}
 		}
 
 		return nil

@@ -33,7 +33,7 @@ func NewIngestStationHandler(db *sqlxcache.DB, files files.FileArchive, metrics 
 	}
 }
 
-func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestStation) error {
+func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestStation, mc *jobs.MessageContext) error {
 	log := Logger(ctx).Sugar().With("station_id", m.StationID)
 
 	log.Infow("processing")
@@ -61,7 +61,7 @@ func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestSta
 				UserID:   m.UserID,
 				Verbose:  m.Verbose,
 				Refresh:  false,
-			}); err != nil {
+			}, mc); err != nil {
 				log.Warnw("publishing", "err", err)
 			}
 		}
