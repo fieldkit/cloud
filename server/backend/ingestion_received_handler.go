@@ -72,7 +72,8 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", sagaID)
 
-	handler := NewAllHandlers(h.db, h.tsConfig, mc)
+	completions := jobs.NewCompletionIDs()
+	handler := NewAllHandlers(h.db, h.tsConfig, mc, completions)
 
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
