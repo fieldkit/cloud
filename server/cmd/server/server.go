@@ -296,12 +296,20 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Media:     mediaFiles,
 		Exported:  exportedFiles,
 	}, qc, timeScaleConfig, locations))
+
 	workers, err := gue.NewWorkerPool(qc, workMap, config.Workers)
 	if err != nil {
 		return nil, err
 	}
 
 	go workers.Run(ctx)
+
+	serialized, err := gue.NewWorkerPool(qc, workMap, 1, gue.WithPoolQueue("serialized"))
+	if err != nil {
+		return nil, err
+	}
+
+	go serialized.Run(ctx)
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,

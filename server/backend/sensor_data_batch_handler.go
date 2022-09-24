@@ -75,5 +75,5 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 	return mc.Reply(&messages.SensorDataBatchCommitted{
 		BatchID: m.BatchID,
 		Time:    time.Now(),
-	})
+	}, jobs.ToQueue("serialized"))
 }
