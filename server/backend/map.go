@@ -24,8 +24,7 @@ func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServ
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher, services.timeScaleConfig)
+	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 
@@ -52,8 +51,7 @@ func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, publisher, services.timeScaleConfig)
+	handler := NewIngestStationHandler(services.database, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message)
 }
 
@@ -62,8 +60,7 @@ func webHookMessageReceived(ctx context.Context, j *gue.Job, services *Backgroun
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, publisher, services.timeScaleConfig, false)
+	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig, false)
 	return handler.Handle(ctx, message)
 }
 
@@ -72,8 +69,7 @@ func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := webhook.NewProcessSchemaHandler(services.database, services.metrics, publisher)
+	handler := webhook.NewProcessSchemaHandler(services.database, services.metrics, services.publisher)
 	return handler.Handle(ctx, message)
 }
 
@@ -82,8 +78,7 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewSensorDataBatchHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
+	handler := NewSensorDataBatchHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message, j, mc)
 }
 
@@ -92,8 +87,7 @@ func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundSer
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewSensorDataModifiedHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
+	handler := NewSensorDataModifiedHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message, j)
 }
 
@@ -102,8 +96,7 @@ func describeStationLocation(ctx context.Context, j *gue.Job, services *Backgrou
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
-	handler := NewDescribeStationLocationHandler(services.database, services.metrics, publisher, services.locations)
+	handler := NewDescribeStationLocationHandler(services.database, services.metrics, services.publisher, services.locations)
 	return handler.Handle(ctx, message, j)
 }
 
@@ -167,6 +160,7 @@ type BackgroundServices struct {
 	que             *gue.Client
 	timeScaleConfig *storage.TimeScaleDBConfig
 	locations       *data.DescribeLocations
+	publisher       *jobs.QueMessagePublisher
 }
 
 func NewBackgroundServices(database *sqlxcache.DB, dbpool *pgxpool.Pool, metrics *logging.Metrics, fileArchives *FileArchives, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig, locations *data.DescribeLocations) *BackgroundServices {
@@ -178,5 +172,6 @@ func NewBackgroundServices(database *sqlxcache.DB, dbpool *pgxpool.Pool, metrics
 		que:             que,
 		timeScaleConfig: timeScaleConfig,
 		locations:       locations,
+		publisher:       jobs.NewQueMessagePublisher(metrics, que),
 	}
 }
