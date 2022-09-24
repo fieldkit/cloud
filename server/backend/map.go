@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"reflect"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -100,19 +101,77 @@ func describeStationLocation(ctx context.Context, j *gue.Job, services *Backgrou
 	return handler.Handle(ctx, message, j)
 }
 
-func CreateMap(services *BackgroundServices) gue.WorkMap {
-	return gue.WorkMap{
-		"WalkEverything":         wrapTransportMessage(services, walkEverything),
-		"IngestionReceived":      wrapTransportMessage(services, ingestionReceived),
-		"RefreshStation":         wrapTransportMessage(services, refreshStation),
-		"ExportData":             wrapTransportMessage(services, exportData),
-		"IngestStation":          wrapTransportMessage(services, ingestStation),
-		"WebHookMessageReceived": wrapTransportMessage(services, webHookMessageReceived),
-		"ProcessSchema":          wrapTransportMessage(services, processSchema),
-		"SensorDataBatch":        wrapTransportMessage(services, sensorDataBatch),
-		"SensorDataModified":     wrapTransportMessage(services, sensorDataModified),
-		"StationLocationUpdated": wrapTransportMessage(services, describeStationLocation),
-	}
+func Register(ctx context.Context, services *BackgroundServices, work map[string]gue.WorkFunc, message interface{}, handler OurTransportMessageFunc) {
+	messageType := reflect.TypeOf(message)
+	name := messageType.Name()
+
+	work[name] = wrapTransportMessage(services, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		/*
+			v := reflect.New(messageType)
+			m := v.Interface()
+			if err := json.Unmarshal(tm.Body, m); err != nil {
+				return err
+			}
+		*/
+		return handler(ctx, j, services, tm, mc)
+	})
+
+	log := Logger(ctx).Sugar()
+	log.Infow("work-map:register", "message_type", name)
+}
+
+func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
+	work := make(map[string]gue.WorkFunc)
+
+	Register(ctx, services, work, messages.IngestionReceived{}, ingestionReceived)
+	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
+	Register(ctx, services, work, messages.ExportData{}, exportData)
+	Register(ctx, services, work, messages.IngestStation{}, exportData)
+	Register(ctx, services, work, messages.SensorDataBatch{}, sensorDataBatch)
+	Register(ctx, services, work, messages.SensorDataModified{}, sensorDataModified)
+	Register(ctx, services, work, messages.StationLocationUpdated{}, describeStationLocation)
+
+	Register(ctx, services, work, webhook.WebHookMessageReceived{}, webHookMessageReceived)
+	Register(ctx, services, work, webhook.ProcessSchema{}, processSchema)
+
+	Register(ctx, services, work, messages.IngestAll{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		log := Logger(ctx).Sugar()
+		log.Infow("ingest-all", "saga_id", mc.SagaID())
+
+		sagas := jobs.NewSagaRepository(services.dbpool)
+
+		saga, err := sagas.FindByID(ctx, mc.SagaID())
+		if err != nil {
+			return err
+		}
+		if saga == nil {
+			saga = jobs.NewSaga(jobs.WithID(mc.SagaID()))
+			if err := sagas.Upsert(ctx, saga); err != nil {
+				return err
+			}
+		}
+
+		return mc.Schedule(messages.Wakeup{Counter: 100}, time.Second*1)
+	})
+
+	Register(ctx, services, work, messages.Wakeup{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		log := Logger(ctx).Sugar()
+		log.Infow("wake-up", "saga_id", mc.SagaID())
+
+		m := &messages.Wakeup{}
+		if err := json.Unmarshal(tm.Body, m); err != nil {
+			return err
+		}
+
+		if m.Counter > 0 {
+			// return mc.Schedule(messages.Wakeup{Counter: m.Counter - 1}, time.Millisecond*100)
+			return mc.Reply(messages.Wakeup{Counter: m.Counter - 1})
+		}
+
+		return nil
+	})
+
+	return gue.WorkMap(work)
 }
 
 type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
