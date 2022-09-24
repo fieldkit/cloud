@@ -30,6 +30,7 @@ require (
 	github.com/influxdata/influxdb-client-go/v2 v2.8.1
 	github.com/itchyny/gojq v0.12.5
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
+	github.com/jackc/pgx v3.6.2+incompatible // indirect
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/jackc/pgx/v5 v5.0.0
 	github.com/jmoiron/sqlx v1.2.0
