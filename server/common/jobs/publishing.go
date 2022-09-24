@@ -17,6 +17,17 @@ type MessagePublisher interface {
 	Publish(ctx context.Context, message interface{}, options ...PublishOption) error
 }
 
+type devNullPublisher struct {
+}
+
+func (p *devNullPublisher) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
+	return nil
+}
+
+func NewDevNullMessagePublisher() MessagePublisher {
+	return &devNullPublisher{}
+}
+
 func WithTags(tags map[string]string) PublishOption {
 	return func(tm *TransportMessage, job *gue.Job) {
 		tm.Tags = tags
@@ -39,17 +50,12 @@ func At(when time.Time) PublishOption {
 	}
 }
 
+func ToQueue(queue string) PublishOption {
+	return func(tm *TransportMessage, job *gue.Job) {
+		job.Queue = queue
+	}
+}
+
 func FromNowAt(duration time.Duration) PublishOption {
 	return At(time.Now().Add(duration))
-}
-
-type devNullPublisher struct {
-}
-
-func (p *devNullPublisher) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
-	return nil
-}
-
-func NewDevNullMessagePublisher() MessagePublisher {
-	return &devNullPublisher{}
 }

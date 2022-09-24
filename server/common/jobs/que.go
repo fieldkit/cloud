@@ -19,7 +19,7 @@ var (
 type MessageContext struct {
 	ctx       context.Context
 	publisher MessagePublisher
-	handling  *TransportMessage
+	handling  bool
 	tags      map[string]string
 }
 
@@ -31,7 +31,7 @@ func NewMessageContext(ctx context.Context, publisher MessagePublisher, handling
 	return &MessageContext{
 		ctx:       ctx,
 		publisher: publisher,
-		handling:  handling,
+		handling:  handling != nil,
 		tags:      tags,
 	}
 }
@@ -52,23 +52,23 @@ func (mc *MessageContext) ScheduleAt(message interface{}, duration time.Time) er
 	return mc.publish(message, At(duration))
 }
 
-func (mc *MessageContext) Reply(message interface{}) error {
-	if mc.handling == nil {
-		return fmt.Errorf("reply is only allowed from a handler")
-	}
-	return mc.publish(message)
-}
-
 func (mc *MessageContext) Event(message interface{}, options ...PublishOption) error {
 	return mc.publish(message, options...)
 }
 
-func (mc *MessageContext) publish(message interface{}, options ...PublishOption) error {
-	return mc.Publish(mc.ctx, message, options...)
+func (mc *MessageContext) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
+	return mc.publish(message, options...)
 }
 
-func (mc *MessageContext) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
-	if mc.handling != nil {
+func (mc *MessageContext) Reply(message interface{}, options ...PublishOption) error {
+	if !mc.handling {
+		return fmt.Errorf("reply is only allowed from a handler")
+	}
+	return mc.publish(message, options...)
+}
+
+func (mc *MessageContext) publish(message interface{}, options ...PublishOption) error {
+	if mc.handling {
 		options = append(options, WithTags(mc.tags))
 	}
 	return mc.publisher.Publish(mc.ctx, message, options...)
