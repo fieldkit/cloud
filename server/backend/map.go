@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vgarvardt/gue/v4"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -160,6 +161,7 @@ type FileArchives struct {
 
 type BackgroundServices struct {
 	database        *sqlxcache.DB
+	dbpool          *pgxpool.Pool
 	metrics         *logging.Metrics
 	fileArchives    *FileArchives
 	que             *gue.Client
@@ -167,9 +169,10 @@ type BackgroundServices struct {
 	locations       *data.DescribeLocations
 }
 
-func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig, locations *data.DescribeLocations) *BackgroundServices {
+func NewBackgroundServices(database *sqlxcache.DB, dbpool *pgxpool.Pool, metrics *logging.Metrics, fileArchives *FileArchives, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig, locations *data.DescribeLocations) *BackgroundServices {
 	return &BackgroundServices{
 		database:        database,
+		dbpool:          dbpool,
 		fileArchives:    fileArchives,
 		metrics:         metrics,
 		que:             que,
