@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/vgarvardt/gue/v4"
@@ -32,7 +33,7 @@ func NewSensorDataBatchHandler(db *sqlxcache.DB, metrics *logging.Metrics, publi
 	}
 }
 
-func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job) error {
+func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job, mc *jobs.MessageContext) error {
 	log := logging.Logger(ctx).Sugar()
 
 	batch := &pgx.Batch{}
@@ -46,10 +47,6 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 	}
 
 	log.Infow("tsdb-handler:flushing", "records", len(m.Rows))
-
-	if h.tsConfig == nil {
-		return nil
-	}
 
 	pgPool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
@@ -75,5 +72,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return fmt.Errorf("(tsdb-commit) %w", err)
 	}
 
-	return nil
+	return mc.Reply(&messages.SensorDataBatchCommitted{
+		Time: time.Now(),
+	})
 }

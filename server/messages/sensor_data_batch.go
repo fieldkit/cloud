@@ -16,3 +16,13 @@ type SensorDataBatchRow struct {
 type SensorDataBatch struct {
 	Rows []SensorDataBatchRow `json:"rows"`
 }
+
+type SensorDataBatchCommitted struct {
+	Time time.Time `json:"time"`
+}
+
+type IngestAll struct {
+}
+
+type Wakeup struct {
+}

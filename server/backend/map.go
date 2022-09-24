@@ -83,7 +83,7 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 	}
 	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
 	handler := NewSensorDataBatchHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
-	return handler.Handle(ctx, message, j)
+	return handler.Handle(ctx, message, j, mc)
 }
 
 func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
@@ -138,7 +138,8 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 		messageLog := Logger(messageCtx).Sugar()
-		mc := &jobs.MessageContext{}
+
+		mc := jobs.NewMessageContext(messageCtx, jobs.NewQueMessagePublisher(services.metrics, services.que), transport)
 
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
