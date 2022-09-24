@@ -36,7 +36,7 @@ func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metr
 	}
 }
 
-func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
+func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
 	log := Logger(ctx).Sugar().With("queued_ingestion_id", m.QueuedID)
 
 	log.Infow("processing")
@@ -125,6 +125,10 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		}
 	}
 
+	return nil
+}
+
+func (h *IngestionReceivedHandler) BatchCompleted(ctx context.Context, m *messages.SensorDataBatchCommitted, mc *jobs.MessageContext) error {
 	return nil
 }
 

@@ -27,7 +27,7 @@ func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServ
 		return err
 	}
 	handler := NewIngestionReceivedHandler(services.database, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
-	return handler.Handle(ctx, message, mc)
+	return handler.Start(ctx, message, mc)
 }
 
 func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {

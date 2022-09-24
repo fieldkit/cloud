@@ -393,7 +393,7 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, r
 	if id, err := ir.Enqueue(ctx, ingestionID); err != nil {
 		return err
 	} else {
-		if err := ingestionReceived.Handle(ctx, &messages.IngestionReceived{
+		if err := ingestionReceived.Start(ctx, &messages.IngestionReceived{
 			QueuedID: id,
 			UserID:   2,
 			Verbose:  true,

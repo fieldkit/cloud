@@ -56,7 +56,7 @@ func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestSta
 		if id, err := ir.Enqueue(ctx, ingestion.ID); err != nil {
 			return err
 		} else {
-			if err := handler.Handle(ctx, &messages.IngestionReceived{
+			if err := handler.Start(ctx, &messages.IngestionReceived{
 				QueuedID: id,
 				UserID:   m.UserID,
 				Verbose:  m.Verbose,
