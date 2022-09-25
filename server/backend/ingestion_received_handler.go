@@ -22,6 +22,27 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
+type IngestionSaga struct {
+	QueuedID  int64           `json:"queued_id"`
+	UserID    int32           `json:"user_id"`
+	Refresh   bool            `json:"refresh"`
+	StationID *int32          `json:"station_id"`
+	DataStart time.Time       `json:"data_start"`
+	DataEnd   time.Time       `json:"data_end"`
+	Required  map[string]bool `json:"required"`
+	Completed map[string]bool `json:"completed"`
+}
+
+func (s *IngestionSaga) IsCompleted() bool {
+	for key := range s.Required {
+		if !s.Completed[key] {
+			return false
+		}
+	}
+
+	return true
+}
+
 type IngestionReceivedHandler struct {
 	db       *sqlxcache.DB
 	dbpool   *pgxpool.Pool
@@ -40,32 +61,19 @@ func NewIngestionReceivedHandler(db *sqlxcache.DB, dbpool *pgxpool.Pool, files f
 	}
 }
 
-type IngestionSaga struct {
-	QueuedID  int64           `json:"queued_id"`
-	UserID    int32           `json:"user_id"`
-	StationID *int32          `json:"station_id"`
-	DataStart time.Time       `json:"data_start"`
-	DataEnd   time.Time       `json:"data_end"`
-	Required  map[string]bool `json:"required"`
-	Completed map[string]bool `json:"completed"`
-}
-
-func (s *IngestionSaga) IsCompleted() bool {
-	for key := range s.Required {
-		if !s.Completed[key] {
-			return false
-		}
-	}
-
-	return true
-}
-
 func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
+	log := Logger(ctx).Sugar()
+
+	// We do this because we may be a part of a saga already and so we need to
+	// start a new one.
 	mc.StartSaga()
+
+	log.Infow("ingestion-saga:started", "saga_id", mc.SagaID())
 
 	body := IngestionSaga{
 		QueuedID:  m.QueuedID,
 		UserID:    m.UserID,
+		Refresh:   m.Refresh,
 		Required:  make(map[string]bool),
 		Completed: make(map[string]bool),
 	}
@@ -78,6 +86,36 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 	sagas := jobs.NewSagaRepository(h.dbpool)
 	if err := sagas.Upsert(ctx, saga); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
+	now := time.Now()
+
+	if err := mc.Event(&messages.IngestionCompleted{
+		QueuedID:    saga.QueuedID,
+		CompletedAt: now,
+		StationID:   saga.StationID,
+		UserID:      saga.UserID,
+		Start:       saga.DataStart,
+		End:         saga.DataEnd,
+	}, jobs.PopSaga()); err != nil {
+		return err
+	}
+
+	if saga.Refresh {
+		if err := mc.Event(&messages.SensorDataModified{
+			ModifiedAt:  now,
+			PublishedAt: now,
+			StationID:   saga.StationID,
+			UserID:      saga.UserID,
+			Start:       saga.DataStart,
+			End:         saga.DataEnd,
+		}, jobs.PopSaga()); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -107,34 +145,6 @@ func (h *IngestionReceivedHandler) amendSagaRequired(ctx context.Context, mc *jo
 		}
 
 		return saga, nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
-	now := time.Now()
-
-	if err := mc.Event(&messages.IngestionCompleted{
-		QueuedID:    saga.QueuedID,
-		CompletedAt: now,
-		StationID:   saga.StationID,
-		UserID:      saga.UserID,
-		Start:       saga.DataStart,
-		End:         saga.DataEnd,
-	}); err != nil {
-		return err
-	}
-
-	if err := mc.Event(&messages.SensorDataModified{
-		ModifiedAt:  now,
-		PublishedAt: now,
-		StationID:   saga.StationID,
-		UserID:      saga.UserID,
-		Start:       saga.DataStart,
-		End:         saga.DataEnd,
 	}); err != nil {
 		return err
 	}

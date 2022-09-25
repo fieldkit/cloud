@@ -177,10 +177,10 @@ func main() {
 		}
 		publisher := jobs.NewQueMessagePublisher(metrics, qc)
 		mc := jobs.NewMessageContext(ctx, publisher, nil)
-		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, tsConfig)
+		isHandler := backend.NewIngestStationHandler(db, pgxpool, fa, metrics, publisher, tsConfig)
 
 		process := func(ctx context.Context, id int32) error {
-			return isHandler.Handle(ctx, &messages.IngestStation{
+			return isHandler.Start(ctx, &messages.IngestStation{
 				StationID: id,
 				UserID:    2, // Jacob
 				Verbose:   true,

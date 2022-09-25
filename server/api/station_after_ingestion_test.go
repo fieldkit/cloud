@@ -58,7 +58,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := backend.NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
 	assert.NoError(err)
@@ -66,14 +66,14 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, station.DeviceID, len(files.Data))
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
 		Verbose:  true,
 		Refresh:  true,
 	}, mc))
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,

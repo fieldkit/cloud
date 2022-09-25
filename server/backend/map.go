@@ -38,15 +38,6 @@ func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, t
 	return handler.Handle(ctx, message)
 }
 
-func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
-	message := &messages.IngestStation{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
-		return err
-	}
-	handler := NewIngestStationHandler(services.database, services.dbpool, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig)
-	return handler.Handle(ctx, message, mc)
-}
-
 func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &webhook.WebHookMessageReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
@@ -115,6 +106,10 @@ func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServ
 	return NewIngestionReceivedHandler(services.database, services.dbpool, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig), nil
 }
 
+func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) (*IngestStationHandler, error) {
+	return NewIngestStationHandler(services.database, services.dbpool, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig), nil
+}
+
 func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	work := make(map[string]gue.WorkFunc)
 
@@ -141,9 +136,31 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 		}
 	})
 
+	Register(ctx, services, work, messages.IngestStation{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := ingestStation(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.IngestStation{}
+			if err := json.Unmarshal(tm.Body, m); err != nil {
+				return err
+			}
+			return h.Start(ctx, m, mc)
+		}
+	})
+	Register(ctx, services, work, messages.IngestionCompleted{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := ingestStation(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.IngestionCompleted{}
+			if err := json.Unmarshal(tm.Body, m); err != nil {
+				return err
+			}
+			return h.IngestionCompleted(ctx, m, mc)
+		}
+	})
+
 	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
 	Register(ctx, services, work, messages.ExportData{}, exportData)
-	Register(ctx, services, work, messages.IngestStation{}, exportData)
 	Register(ctx, services, work, messages.SensorDataBatch{}, sensorDataBatch)
 	Register(ctx, services, work, messages.SensorDataModified{}, sensorDataModified)
 	Register(ctx, services, work, messages.StationLocationUpdated{}, describeStationLocation)

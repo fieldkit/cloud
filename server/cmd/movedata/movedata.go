@@ -13,6 +13,8 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -313,7 +315,7 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolv
 	return nil
 }
 
-func processStationIngestions(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler, stationID int32) error {
+func processStationIngestions(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, resolver *Resolver, handler MoveDataHandler, stationID int32) error {
 	ir, err := repositories.NewIngestionRepository(db)
 	if err != nil {
 		return err
@@ -325,7 +327,7 @@ func processStationIngestions(ctx context.Context, options *Options, db *sqlxcac
 	}
 
 	for _, ingestion := range ingestions {
-		if err := processIngestion(ctx, options, db, resolver, handler, ingestion.ID); err != nil {
+		if err := processIngestion(ctx, options, db, dbpool, resolver, handler, ingestion.ID); err != nil {
 			return err
 		}
 	}
@@ -354,7 +356,7 @@ func (config *Options) getAwsSessionOptions() session.Options {
 	}
 }
 
-func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
+func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
 	publisher := jobs.NewDevNullMessagePublisher()
 	mc := jobs.NewMessageContext(ctx, publisher, nil)
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
@@ -383,7 +385,7 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, r
 
 	archive := files.NewPrioritizedFilesArchive(reading, writing)
 
-	ingestionReceived := backend.NewIngestionReceivedHandler(db, archive, metrics, publisher, options.timeScaleConfig())
+	ingestionReceived := backend.NewIngestionReceivedHandler(db, dbpool, archive, metrics, publisher, options.timeScaleConfig())
 
 	ir, err := repositories.NewIngestionRepository(db)
 	if err != nil {
@@ -456,6 +458,16 @@ func process(ctx context.Context, options *Options) error {
 		return err
 	}
 
+	pgxcfg, err := pgxpool.ParseConfig(options.PostgresURL)
+	if err != nil {
+		return err
+	}
+
+	dbpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
+	if err != nil {
+		return err
+	}
+
 	resolver := NewResolver(db)
 	if err := resolver.Open(ctx); err != nil {
 		return err
@@ -484,12 +496,12 @@ func process(ctx context.Context, options *Options) error {
 
 	if options.Ingestions {
 		if options.ID > 0 {
-			if err := processIngestion(ctx, options, db, resolver, destination, int64(options.ID)); err != nil {
+			if err := processIngestion(ctx, options, db, dbpool, resolver, destination, int64(options.ID)); err != nil {
 				return err
 			}
 		}
 		if options.StationID > 0 {
-			if err := processStationIngestions(ctx, options, db, resolver, destination, int32(options.StationID)); err != nil {
+			if err := processStationIngestions(ctx, options, db, dbpool, resolver, destination, int32(options.StationID)); err != nil {
 				return err
 			}
 		}
