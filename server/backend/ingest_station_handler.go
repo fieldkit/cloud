@@ -5,6 +5,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/storage"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -17,15 +18,17 @@ import (
 
 type IngestStationHandler struct {
 	db        *sqlxcache.DB
+	dbpool    *pgxpool.Pool
 	files     files.FileArchive
 	metrics   *logging.Metrics
 	publisher jobs.MessagePublisher
 	tsConfig  *storage.TimeScaleDBConfig
 }
 
-func NewIngestStationHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestStationHandler {
+func NewIngestStationHandler(db *sqlxcache.DB, dbpool *pgxpool.Pool, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestStationHandler {
 	return &IngestStationHandler{
 		db:        db,
+		dbpool:    dbpool,
 		files:     files,
 		metrics:   metrics,
 		publisher: publisher,
@@ -51,7 +54,7 @@ func (h *IngestStationHandler) Handle(ctx context.Context, m *messages.IngestSta
 	for _, ingestion := range ingestions {
 		log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
 
-		handler := NewIngestionReceivedHandler(h.db, h.files, h.metrics, h.publisher, h.tsConfig)
+		handler := NewIngestionReceivedHandler(h.db, h.dbpool, h.files, h.metrics, h.publisher, h.tsConfig)
 
 		if id, err := ir.Enqueue(ctx, ingestion.ID); err != nil {
 			return err

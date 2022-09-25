@@ -116,6 +116,40 @@ func (r *SagaRepository) FindByID(ctx context.Context, id SagaID) (*Saga, error)
 	return all[0], nil
 }
 
+type LoadSaveFunc = func(ctx context.Context, body *json.RawMessage) (interface{}, error)
+
+func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFunc LoadSaveFunc) error {
+
+	loaded, err := r.FindByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("load and save load failed: %w", err)
+	}
+
+	if loaded == nil {
+		return fmt.Errorf("load and save no such saga")
+	}
+
+	if updated, err := loadSaveFunc(ctx, loaded.Body); err != nil {
+		return fmt.Errorf("load and save op failed: %w", err)
+	} else {
+		if updated != nil {
+			if err := loaded.SetBody(updated); err != nil {
+				return err
+			}
+
+			if err := r.Upsert(ctx, loaded); err != nil {
+				return err
+			}
+		} else {
+			if err := r.Delete(ctx, loaded); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	oldVersion := saga.Version
 	saga.Version += 1
