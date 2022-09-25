@@ -199,12 +199,18 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		if err != nil {
 			messageLog.Errorw("error", "error", err)
 
-			failed := WorkFailed{
-				Work: transport,
-			}
+			if j.ErrorCount >= 3 {
+				failed := WorkFailed{
+					Work: transport,
+				}
 
-			if err := services.publisher.Publish(ctx, &failed); err != nil {
-				return err
+				if err := mc.Publish(ctx, &failed); err != nil {
+					return err
+				}
+
+				messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
+
+				return nil
 			}
 		}
 
