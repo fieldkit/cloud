@@ -41,6 +41,7 @@ func NewIngestionReceivedHandler(db *sqlxcache.DB, dbpool *pgxpool.Pool, files f
 }
 
 type IngestionSaga struct {
+	QueuedID  int64           `json:"queued_id"`
 	UserID    int32           `json:"user_id"`
 	StationID *int32          `json:"station_id"`
 	DataStart time.Time       `json:"data_start"`
@@ -63,6 +64,7 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 	mc.StartSaga()
 
 	body := IngestionSaga{
+		QueuedID:  m.QueuedID,
 		UserID:    m.UserID,
 		Required:  make(map[string]bool),
 		Completed: make(map[string]bool),
@@ -91,8 +93,6 @@ func (h *IngestionReceivedHandler) amendSagaRequired(ctx context.Context, mc *jo
 			return nil, err
 		}
 
-		fmt.Printf("\n\nupdate-saga %v %v\n", completions.IDs(), saga)
-
 		saga.StationID = info.StationID
 		saga.DataStart = info.DataStart
 		saga.DataEnd = info.DataEnd
@@ -116,6 +116,17 @@ func (h *IngestionReceivedHandler) amendSagaRequired(ctx context.Context, mc *jo
 
 func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
 	now := time.Now()
+
+	if err := mc.Event(&messages.IngestionCompleted{
+		QueuedID:    saga.QueuedID,
+		CompletedAt: now,
+		StationID:   saga.StationID,
+		UserID:      saga.UserID,
+		Start:       saga.DataStart,
+		End:         saga.DataEnd,
+	}); err != nil {
+		return err
+	}
 
 	if err := mc.Event(&messages.SensorDataModified{
 		ModifiedAt:  now,
