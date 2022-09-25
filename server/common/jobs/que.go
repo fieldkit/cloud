@@ -20,11 +20,11 @@ type MessageContext struct {
 	ctx       context.Context
 	publisher MessagePublisher
 	handling  bool
-	tags      map[string]string
+	tags      map[string][]string
 }
 
 func NewMessageContext(ctx context.Context, publisher MessagePublisher, handling *TransportMessage) *MessageContext {
-	tags := make(map[string]string)
+	tags := make(map[string][]string)
 	if handling != nil {
 		tags = handling.Tags
 	}
@@ -37,8 +37,8 @@ func NewMessageContext(ctx context.Context, publisher MessagePublisher, handling
 }
 
 func (mc *MessageContext) SagaID() SagaID {
-	if id, ok := mc.tags[SagaIDTag]; ok {
-		return SagaID(id)
+	if ids, ok := mc.tags[SagaIDTag]; ok {
+		return SagaID(ids[len(ids)-1])
 	}
 
 	return ""
@@ -69,14 +69,22 @@ func (mc *MessageContext) Reply(message interface{}, options ...PublishOption) e
 
 func (mc *MessageContext) publish(message interface{}, options ...PublishOption) error {
 	if mc.handling {
-		options = append(options, WithTags(mc.tags))
+		// Right now we prepend the WithTags option so that options after can
+		// affect the tags. For example, the PopSaga option requires the sagas
+		// tag to be populated.
+		options = append([]PublishOption{WithTags(mc.tags)}, options...)
 	}
 	return mc.publisher.Publish(mc.ctx, message, options...)
 }
 
 func (mc *MessageContext) StartSaga() SagaID {
+	// Generate a new saga identifier and append to the active saga identifiers.
 	id := NewSagaID()
-	mc.tags[SagaIDTag] = string(id)
+	if ids, ok := mc.tags[SagaIDTag]; ok {
+		mc.tags[SagaIDTag] = append(ids, string(id))
+	} else {
+		mc.tags[SagaIDTag] = []string{string(id)}
+	}
 	return id
 }
 
@@ -93,6 +101,8 @@ func NewQueMessagePublisher(metrics *logging.Metrics, q *gue.Client) *QueMessage
 }
 
 func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
+	log := Logger(ctx).Sugar()
+
 	body, err := json.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("json marshal: %w", err)
@@ -110,7 +120,7 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 		Package: messageType.PkgPath(),
 		Type:    messageType.Name(),
 		Trace:   logging.ServiceTrace(ctx),
-		Tags:    make(map[string]string),
+		Tags:    make(map[string][]string),
 		Body:    body,
 	}
 
@@ -128,6 +138,8 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 	}
 
 	job.Args = bytes
+
+	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags)
 
 	if err := p.que.Enqueue(ctx, job); err != nil {
 		return err

@@ -28,7 +28,7 @@ type Saga struct {
 	UpdatedAt   time.Time
 	ScheduledAt *time.Time
 	Version     int
-	Tags        map[string]string
+	Tags        map[string][]string
 	Type        string
 	Body        *json.RawMessage
 }
@@ -71,7 +71,7 @@ func NewSaga(options ...SagaOption) *Saga {
 		UpdatedAt:   now,
 		ScheduledAt: nil,
 		Version:     0,
-		Tags:        make(map[string]string),
+		Tags:        make(map[string][]string),
 		Type:        "",
 		Body:        nil,
 	}
@@ -151,10 +151,14 @@ func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFun
 }
 
 func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
+	log := Logger(ctx).Sugar().With("saga_id", saga.ID)
+
 	oldVersion := saga.Version
 	saga.Version += 1
 
 	if saga.Version == 1 {
+		log.Infow("saga:inserting")
+
 		rows, err := r.dbpool.Exec(ctx, `INSERT INTO fieldkit.sagas (id, version, created_at, updated_at, scheduled_at, tags, type, body) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 			&saga.ID, &saga.Version, &saga.CreatedAt, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Type, &saga.Body)
 		if err != nil {
@@ -165,6 +169,8 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 			return fmt.Errorf("saga insert failed")
 		}
 	} else {
+		log.Infow("saga:updating")
+
 		rows, err := r.dbpool.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, type = $7, body = $8 WHERE id = $1 AND version = $2`,
 			saga.ID, oldVersion, saga.Version, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Type, &saga.Body)
 		if err != nil {
@@ -180,6 +186,10 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 }
 
 func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
+	log := Logger(ctx).Sugar().With("saga_id", saga.ID)
+
+	log.Infow("saga:deleting")
+
 	rows, err := r.dbpool.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1 AND version = $2`, saga.ID, saga.Version)
 	if err != nil {
 		return err
@@ -193,6 +203,10 @@ func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
 }
 
 func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
+	log := Logger(ctx).Sugar().With("saga_id", id)
+
+	log.Infow("saga:deleting")
+
 	rows, err := r.dbpool.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1`, id)
 	if err != nil {
 		return err

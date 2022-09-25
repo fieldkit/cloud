@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	SagaIDTag = "saga-id"
+	SagaIDTag = "saga-ids"
 )
 
 type PublishOption func(*TransportMessage, *gue.Job)
@@ -28,7 +28,7 @@ func NewDevNullMessagePublisher() MessagePublisher {
 	return &devNullPublisher{}
 }
 
-func WithTags(tags map[string]string) PublishOption {
+func WithTags(tags map[string][]string) PublishOption {
 	return func(tm *TransportMessage, job *gue.Job) {
 		tm.Tags = tags
 	}
@@ -40,7 +40,17 @@ func StartSaga() PublishOption {
 
 func ForSaga(id SagaID) PublishOption {
 	return func(tm *TransportMessage, job *gue.Job) {
-		tm.Tags[SagaIDTag] = string(id)
+		tm.Tags[SagaIDTag] = []string{string(id)}
+	}
+}
+
+func PopSaga() PublishOption {
+	return func(tm *TransportMessage, job *gue.Job) {
+		if ids, ok := tm.Tags[SagaIDTag]; ok {
+			tm.Tags[SagaIDTag] = ids[:len(ids)-1]
+		} else {
+			// TODO Warn?
+		}
 	}
 }
 
