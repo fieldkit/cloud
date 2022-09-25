@@ -151,7 +151,7 @@ func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFun
 }
 
 func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
-	log := Logger(ctx).Sugar().With("saga_id", saga.ID)
+	log := Logger(ctx).Sugar().With("saga_id", saga.ID, "saga_type", saga.Type)
 
 	oldVersion := saga.Version
 	saga.Version += 1
@@ -186,7 +186,7 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 }
 
 func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
-	log := Logger(ctx).Sugar().With("saga_id", saga.ID)
+	log := Logger(ctx).Sugar().With("saga_id", saga.ID, "saga_type", saga.Type, "saga_tags", saga.Tags)
 
 	log.Infow("saga:deleting")
 
