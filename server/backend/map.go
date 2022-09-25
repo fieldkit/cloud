@@ -157,42 +157,6 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	Register(ctx, services, work, webhook.WebHookMessageReceived{}, webHookMessageReceived)
 	Register(ctx, services, work, webhook.ProcessSchema{}, processSchema)
 
-	Register(ctx, services, work, messages.IngestAll{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
-		log := Logger(ctx).Sugar()
-		log.Infow("ingest-all", "saga_id", mc.SagaID())
-
-		sagas := jobs.NewSagaRepository(services.dbpool)
-
-		saga, err := sagas.FindByID(ctx, mc.SagaID())
-		if err != nil {
-			return err
-		}
-		if saga == nil {
-			saga = jobs.NewSaga(jobs.WithID(mc.SagaID()))
-			if err := sagas.Upsert(ctx, saga); err != nil {
-				return err
-			}
-		}
-
-		return mc.Schedule(messages.Wakeup{Counter: 100}, time.Second*1)
-	})
-
-	Register(ctx, services, work, messages.Wakeup{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
-		log := Logger(ctx).Sugar()
-		log.Infow("wake-up", "saga_id", mc.SagaID())
-
-		m := &messages.Wakeup{}
-		if err := json.Unmarshal(tm.Body, m); err != nil {
-			return err
-		}
-
-		if m.Counter > 0 {
-			return mc.Schedule(messages.Wakeup{Counter: m.Counter - 1}, time.Millisecond*100)
-		}
-
-		return nil
-	})
-
 	return gue.WorkMap(work)
 }
 
