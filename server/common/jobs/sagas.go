@@ -171,8 +171,8 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	} else {
 		log.Infow("saga:updating")
 
-		rows, err := r.dbpool.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, type = $7, body = $8 WHERE id = $1 AND version = $2`,
-			saga.ID, oldVersion, saga.Version, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Type, &saga.Body)
+		rows, err := r.dbpool.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, body = $7 WHERE id = $1 AND version = $2`,
+			saga.ID, oldVersion, saga.Version, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Body)
 		if err != nil {
 			return err
 		}
