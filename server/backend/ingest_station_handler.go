@@ -160,6 +160,13 @@ func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messag
 		saga.Completed[m.QueuedID] = true
 
 		if saga.IsCompleted() {
+			if err := mc.Event(&messages.StationIngested{
+				StationID: saga.StationID,
+				UserID:    saga.UserID,
+			}, jobs.PopSaga()); err != nil {
+				return nil, err
+			}
+
 			return nil, nil
 		} else {
 			if err := h.startIngestion(ctx, mc, saga, saga.NextIngestionID()); err != nil {

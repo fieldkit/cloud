@@ -119,7 +119,6 @@ func (r *SagaRepository) FindByID(ctx context.Context, id SagaID) (*Saga, error)
 type LoadSaveFunc = func(ctx context.Context, body *json.RawMessage) (interface{}, error)
 
 func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFunc LoadSaveFunc) error {
-
 	loaded, err := r.FindByID(ctx, id)
 	if err != nil {
 		return fmt.Errorf("load and save load failed: %w", err)
