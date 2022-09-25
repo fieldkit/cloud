@@ -129,7 +129,9 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 	}
 
 	for _, option := range options {
-		option(transport, job)
+		if err := option(transport, job); err != nil {
+			return fmt.Errorf("publish option: %w", err)
+		}
 	}
 
 	bytes, err := json.Marshal(transport)
