@@ -29,7 +29,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vgarvardt/gue/v4"
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
-	"github.com/vgarvardt/gue/v4/adapter/zap"
+	guezap "github.com/vgarvardt/gue/v4/adapter/zap"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
@@ -272,45 +272,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		log.Infow("timescaledb-enabled")
 	}
 
-	pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
-	if err != nil {
-		return nil, err
-	}
-
-	pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Infow("starting", "workers", config.Workers, "live", config.Live)
-
-	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
-
-	qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool), gue.WithClientLogger(zap.New(logging.Logger(ctx).Named("gue"))))
-	if err != nil {
-		return nil, err
-	}
-	publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
-	workMap := backend.CreateMap(ctx, backend.NewBackgroundServices(database, pgxpool, metrics, &backend.FileArchives{
-		Ingestion: ingestionFiles,
-		Media:     mediaFiles,
-		Exported:  exportedFiles,
-	}, qc, timeScaleConfig, locations))
-
-	workers, err := gue.NewWorkerPool(qc, workMap, config.Workers)
-	if err != nil {
-		return nil, err
-	}
-
-	go workers.Run(ctx)
-
-	serialized, err := gue.NewWorkerPool(qc, workMap, 1, gue.WithPoolQueue("serialized"))
-	if err != nil {
-		return nil, err
-	}
-
-	go serialized.Run(ctx)
-
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
 		ApiDomain:     config.ApiDomain,
@@ -323,6 +284,28 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Buckets:       bucketNames,
 	}
 
+	pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
+	if err != nil {
+		return nil, err
+	}
+
+	pgxcfg.MaxConns = 16
+
+	log.Infow("db:config", "pg_max_conns", pgxcfg.MaxConns)
+
+	pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
+	if err != nil {
+		return nil, err
+	}
+
+	gueLoggerAdapter := guezap.New(logging.Logger(ctx).Named("gue"))
+	qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool), gue.WithClientLogger(gueLoggerAdapter))
+	if err != nil {
+		return nil, err
+	}
+
+	publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
+
 	services, err := api.CreateServiceOptions(ctx, apiConfig, database, publisher, mediaFiles, awsSession, metrics, qc, nil, timeScaleConfig)
 	if err != nil {
 		return nil, err
@@ -332,6 +315,29 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Infow("starting", "workers", config.Workers, "live", config.Live)
+
+	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
+	workMap := backend.CreateMap(ctx, backend.NewBackgroundServices(database, pgxpool, metrics, &backend.FileArchives{
+		Ingestion: ingestionFiles,
+		Media:     mediaFiles,
+		Exported:  exportedFiles,
+	}, qc, timeScaleConfig, locations))
+
+	workers, err := gue.NewWorkerPool(qc, workMap, config.Workers, gue.WithPoolLogger(gueLoggerAdapter))
+	if err != nil {
+		return nil, err
+	}
+
+	go workers.Run(ctx)
+
+	serialized, err := gue.NewWorkerPool(qc, workMap, 1, gue.WithPoolLogger(gueLoggerAdapter), gue.WithPoolQueue("serialized"))
+	if err != nil {
+		return nil, err
+	}
+
+	go serialized.Run(ctx)
 
 	return &Api{
 		services: services,
