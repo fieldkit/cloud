@@ -82,6 +82,10 @@ func ToQueue(queue string) PublishOption {
 	}
 }
 
+func ToSerializedQueue() PublishOption {
+	return ToQueue("serialized")
+}
+
 func FromNowAt(duration time.Duration) PublishOption {
 	return At(time.Now().Add(duration))
 }

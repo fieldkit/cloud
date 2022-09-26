@@ -183,7 +183,7 @@ func (v *TsDBHandler) flushTs(ctx context.Context) error {
 	err := v.publisher.Publish(ctx, &messages.SensorDataBatch{
 		BatchID: v.completions.Generate(),
 		Rows:    v.records,
-	}, jobs.ToQueue("serialized"))
+	})
 
 	v.records = v.records[:0]
 

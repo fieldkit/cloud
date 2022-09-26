@@ -20,36 +20,28 @@ import (
 type StationIngestionSaga struct {
 	UserID     int32           `json:"user_id"`
 	StationID  int32           `json:"station_id"`
-	Ingestions map[int64]bool  `json:"ingestions"`
+	Ingestions []int64         `json:"ingestions"`
 	Required   map[int64]int64 `json:"required"`
 	Completed  map[int64]bool  `json:"completed"`
 }
 
 func (s *StationIngestionSaga) HasMoreIngestions() bool {
-	for _, value := range s.Ingestions {
-		if !value {
-			return true
-		}
-	}
-
-	return false
+	return len(s.Ingestions) > 0
 }
 
 func (s *StationIngestionSaga) NextIngestionID() int64 {
-	for key, value := range s.Ingestions {
-		if !value {
-			return key
-		}
+	if len(s.Ingestions) > 0 {
+		id := s.Ingestions[0]
+		s.Ingestions = s.Ingestions[1:]
+		return id
 	}
 
 	return 0
 }
 
 func (s *StationIngestionSaga) IsCompleted() bool {
-	for _, value := range s.Ingestions {
-		if !value {
-			return false
-		}
+	if len(s.Ingestions) > 0 {
+		return false
 	}
 
 	for _, value := range s.Required {
@@ -99,7 +91,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 	body := StationIngestionSaga{
 		UserID:     m.UserID,
 		StationID:  m.StationID,
-		Ingestions: make(map[int64]bool),
+		Ingestions: make([]int64, 0),
 		Required:   make(map[int64]int64),
 		Completed:  make(map[int64]bool),
 	}
@@ -110,7 +102,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 				return err
 			}
 		} else {
-			body.Ingestions[ingestion.ID] = false
+			body.Ingestions = append(body.Ingestions, ingestion.ID)
 		}
 	}
 
@@ -128,14 +120,19 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 }
 
 func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.MessageContext, body *StationIngestionSaga, ingestionID int64) error {
-	body.Ingestions[ingestionID] = true
-
-	// log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
-
 	ir, err := repositories.NewIngestionRepository(h.db)
 	if err != nil {
 		return err
 	}
+
+	ingestion, err := ir.QueryByID(ctx, ingestionID)
+	if err != nil {
+		return err
+	}
+
+	log := Logger(ctx).Sugar().With("station_id", body.StationID, "saga_id", mc.SagaID())
+
+	log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
 
 	if id, err := ir.Enqueue(ctx, ingestionID); err != nil {
 		return err
