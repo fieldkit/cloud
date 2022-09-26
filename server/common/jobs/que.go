@@ -39,9 +39,19 @@ func NewMessageContext(ctx context.Context, publisher MessagePublisher, handling
 	}
 }
 
+func (mc *MessageContext) HasParentSaga() bool {
+	if ids, ok := mc.tags[SagaIDTag]; ok {
+		return len(ids) > 1
+	}
+
+	return false
+}
+
 func (mc *MessageContext) SagaID() SagaID {
 	if ids, ok := mc.tags[SagaIDTag]; ok {
-		return SagaID(ids[len(ids)-1])
+		if len(ids) > 0 {
+			return SagaID(ids[len(ids)-1])
+		}
 	}
 
 	return ""
