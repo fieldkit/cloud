@@ -25,6 +25,16 @@ type IngestionStationSaga struct {
 	Completed  map[int64]bool  `json:"completed"`
 }
 
+func (s *IngestionStationSaga) HasMoreIngestions() bool {
+	for _, value := range s.Ingestions {
+		if !value {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (s *IngestionStationSaga) NextIngestionID() int64 {
 	for key, value := range s.Ingestions {
 		if !value {
@@ -32,7 +42,7 @@ func (s *IngestionStationSaga) NextIngestionID() int64 {
 		}
 	}
 
-	panic("completed call to next-ingestion-id")
+	return 0
 }
 
 func (s *IngestionStationSaga) IsCompleted() bool {
@@ -145,10 +155,10 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 	return nil
 }
 
-func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messages.IngestionCompleted, mc *jobs.MessageContext) error {
-	log := Logger(ctx).Sugar().With("queued_id", m.QueuedID, "saga_id", mc.SagaID())
+func (h *IngestStationHandler) markCompleted(ctx context.Context, mc *jobs.MessageContext, queuedID int64) error {
+	log := Logger(ctx).Sugar().With("queued_id", queuedID, "saga_id", mc.SagaID())
 
-	log.Infow("ingestion-completed")
+	log.Infow("ingestion-completed-or-failed")
 
 	sagas := jobs.NewSagaRepository(h.dbpool)
 	if err := sagas.LoadAndSave(ctx, mc.SagaID(), func(ctx context.Context, body *json.RawMessage) (interface{}, error) {
@@ -157,7 +167,7 @@ func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messag
 			return nil, err
 		}
 
-		saga.Completed[m.QueuedID] = true
+		saga.Completed[queuedID] = true
 
 		if saga.IsCompleted() {
 			if err := mc.Event(&messages.StationIngested{
@@ -168,8 +178,9 @@ func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messag
 			}
 
 			return nil, nil
-		} else {
-			if err := h.startIngestion(ctx, mc, saga, saga.NextIngestionID()); err != nil {
+		} else if saga.HasMoreIngestions() {
+			ingestionID := saga.NextIngestionID()
+			if err := h.startIngestion(ctx, mc, saga, ingestionID); err != nil {
 				return nil, err
 			}
 		}
@@ -180,4 +191,12 @@ func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messag
 	}
 
 	return nil
+}
+
+func (h *IngestStationHandler) IngestionFailed(ctx context.Context, m *messages.IngestionFailed, mc *jobs.MessageContext) error {
+	return h.markCompleted(ctx, mc, m.QueuedID)
+}
+
+func (h *IngestStationHandler) IngestionCompleted(ctx context.Context, m *messages.IngestionCompleted, mc *jobs.MessageContext) error {
+	return h.markCompleted(ctx, mc, m.QueuedID)
 }

@@ -18,3 +18,7 @@ type IngestionCompleted struct { // Event
 	Start       time.Time `json:"start"`
 	End         time.Time `json:"end"`
 }
+
+type IngestionFailed struct { // Event
+	QueuedID int64 `json:"queued_id"`
+}

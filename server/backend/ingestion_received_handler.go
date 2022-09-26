@@ -185,18 +185,24 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 	completions := jobs.NewCompletionIDs()
 	handler := NewAllHandlers(h.db, h.tsConfig, mc, completions)
-
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
-	hasOtherErrors := false
 	info, err := recordAdder.WriteRecords(ctx, i)
 	if err != nil {
 		log.Errorw("ingestion", "error", err)
+
 		if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
 			return err
 		}
+
+		if err := mc.Event(&messages.IngestionFailed{
+			QueuedID: m.QueuedID,
+		}, jobs.PopSaga(), jobs.Untransacted()); err != nil {
+			return err
+		}
+
 		return err
 	}
 
@@ -210,15 +216,8 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 		}
 	}
 
-	if hasOtherErrors {
-		err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID)
-		if err != nil {
-			return err
-		}
-	} else {
-		if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
-			return err
-		}
+	if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
+		return err
 	}
 
 	if err := h.amendSagaRequired(ctx, mc, info, completions); err != nil {

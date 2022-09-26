@@ -159,6 +159,17 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return h.IngestionCompleted(ctx, m, mc)
 		}
 	})
+	Register(ctx, services, work, messages.IngestionFailed{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := ingestStation(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.IngestionFailed{}
+			if err := json.Unmarshal(tm.Body, m); err != nil {
+				return err
+			}
+			return h.IngestionFailed(ctx, m, mc)
+		}
+	})
 
 	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
 	Register(ctx, services, work, messages.ExportData{}, exportData)
