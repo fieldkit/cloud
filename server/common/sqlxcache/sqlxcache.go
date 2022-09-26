@@ -87,7 +87,7 @@ func Open(ctx context.Context, driverName, url string) (*DB, error) {
 
 	pool, err := pgxpool.New(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("(tsdb) error connecting: %w", err)
+		return nil, fmt.Errorf("(pgx) error connecting: %w", err)
 	}
 
 	return newDB(db, pool), nil
