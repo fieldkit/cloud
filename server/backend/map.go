@@ -21,6 +21,10 @@ import (
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
+const (
+	MaximumRetriesBeforeTrash = 3
+)
+
 func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.RefreshStation{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
@@ -237,21 +241,19 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		if err != nil {
 			messageLog.Errorw("error", "error", err)
 
-			/*
-				if j.ErrorCount >= 3 {
-					failed := WorkFailed{
-						Work: transport,
-					}
+			if j.ErrorCount >= MaximumRetriesBeforeTrash {
+				messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
 
-					if err := mc.Publish(ctx, &failed); err != nil {
-						return err
-					}
-
-					messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
-
-					return nil
+				failed := WorkFailed{
+					Work: transport,
 				}
-			*/
+
+				if err := mc.Publish(ctx, &failed, jobs.ToQueue("errors")); err != nil {
+					return err
+				}
+
+				return nil
+			}
 		}
 
 		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())

@@ -199,7 +199,12 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 		if err := mc.Event(&messages.IngestionFailed{
 			QueuedID: m.QueuedID,
-		}, jobs.PopSaga(), jobs.Untransacted()); err != nil {
+		}, jobs.PopSaga()); err != nil {
+			return err
+		}
+
+		sagas := jobs.NewSagaRepository(h.dbpool)
+		if err := sagas.DeleteByID(ctx, mc.SagaID()); err != nil {
 			return err
 		}
 
@@ -208,7 +213,6 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 	if info != nil {
 		if err := recordIngestionActivity(ctx, log, h.db, m, info); err != nil {
-			log.Errorw("ingestion", "error", err)
 			if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
 				return err
 			}
