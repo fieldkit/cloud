@@ -24,8 +24,11 @@ type TransactionScope struct {
 }
 
 func (scope *TransactionScope) Rollback(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
 	var errs *multierror.Error
 	for _, value := range scope.txs {
+		log.Infow("txs:rollback")
 		errs = multierror.Append(errs, value.Rollback(ctx))
 	}
 
@@ -33,8 +36,11 @@ func (scope *TransactionScope) Rollback(ctx context.Context) error {
 }
 
 func (scope *TransactionScope) Commit(ctx context.Context) error {
+	log := logging.Logger(ctx).Sugar()
+
 	var errs *multierror.Error
 	for _, value := range scope.txs {
+		log.Infow("txs:commit")
 		errs = multierror.Append(errs, value.Commit(ctx))
 	}
 
@@ -65,15 +71,19 @@ var (
 )
 
 func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
+	log := logging.Logger(ctx).Sugar()
+
 	scope := ScopeIfAny(ctx)
 	if scope == nil {
 		return nil, ErrNoScope
 	}
 
 	if scope.txs[pool] != nil {
+		log.Infow("txs:existing")
 		return scope.txs[pool], nil
 	}
 
+	log.Infow("txs:begin")
 	started, err := pool.Begin(ctx)
 	if err != nil {
 		return nil, err

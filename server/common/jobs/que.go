@@ -133,11 +133,16 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 		Type: messageType.Name(),
 	}
 
+	jobOptions := &JobOptions{}
+
 	for _, option := range options {
-		if err := option(transport, job); err != nil {
-			return fmt.Errorf("publish option: %w", err)
+		if err := option(transport, jobOptions); err != nil {
+			return fmt.Errorf("publish option failed: %w", err)
 		}
 	}
+
+	job.RunAt = jobOptions.RunAt
+	job.Queue = jobOptions.Queue
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {
@@ -150,9 +155,9 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 
 	insideTx := scope != nil && scope.Tx(p.db) != nil
 
-	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags, "tx_inside", insideTx)
+	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags, "tx_inside", insideTx, "untransacted", jobOptions.Untransacted)
 
-	if insideTx {
+	if insideTx && !jobOptions.Untransacted {
 		if err := p.que.EnqueueTx(ctx, job, pgxv5.NewTx(scope.Tx(p.db))); err != nil {
 			return err
 		}
