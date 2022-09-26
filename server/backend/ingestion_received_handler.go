@@ -94,15 +94,18 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
 	now := time.Now()
 
-	if err := mc.Event(&messages.IngestionCompleted{
-		QueuedID:    saga.QueuedID,
-		CompletedAt: now,
-		StationID:   saga.StationID,
-		UserID:      saga.UserID,
-		Start:       saga.DataStart,
-		End:         saga.DataEnd,
-	}, jobs.PopSaga()); err != nil {
-		return err
+	// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
+	if mc.HasParentSaga() {
+		if err := mc.Event(&messages.IngestionCompleted{
+			QueuedID:    saga.QueuedID,
+			CompletedAt: now,
+			StationID:   saga.StationID,
+			UserID:      saga.UserID,
+			Start:       saga.DataStart,
+			End:         saga.DataEnd,
+		}, jobs.PopSaga()); err != nil {
+			return err
+		}
 	}
 
 	if saga.Refresh {
@@ -197,10 +200,13 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 			return err
 		}
 
-		if err := mc.Event(&messages.IngestionFailed{
-			QueuedID: m.QueuedID,
-		}, jobs.PopSaga()); err != nil {
-			return err
+		// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
+		if mc.HasParentSaga() {
+			if err := mc.Event(&messages.IngestionFailed{
+				QueuedID: m.QueuedID,
+			}, jobs.PopSaga()); err != nil {
+				return err
+			}
 		}
 
 		sagas := jobs.NewSagaRepository(h.dbpool)

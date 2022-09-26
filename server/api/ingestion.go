@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
-	"github.com/fieldkit/cloud/server/common/jobs"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
@@ -65,7 +64,7 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 				Verbose:  true,
 				Refresh:  false,
 			},
-		}, jobs.StartSaga()); err != nil {
+		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
 	}
@@ -101,7 +100,7 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 		Completely:  completely,
 		SkipManual:  skipManual,
 		UserID:      p.UserID(),
-	}, jobs.StartSaga()); err != nil {
+	}); err != nil {
 		log.Errorw("publishing", "err", err)
 	}
 
@@ -122,7 +121,7 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 		StationID: int32(payload.StationID),
 		UserID:    p.UserID(),
 		Verbose:   true,
-	}, jobs.StartSaga()); err != nil {
+	}); err != nil {
 		return err
 	}
 
@@ -166,7 +165,7 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 				Verbose:  true,
 				Refresh:  true,
 			},
-		}, jobs.StartSaga()); err != nil {
+		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
 	}
