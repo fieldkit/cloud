@@ -50,7 +50,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return err
 	}
 
-	tx, err := txs.RequireTransactionFromPool(ctx, pool)
+	tx, err := txs.RequireTransaction(ctx, pool)
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vgarvardt/gue/v4"
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
@@ -92,12 +93,14 @@ func (mc *MessageContext) StartSaga() SagaID {
 
 type QueMessagePublisher struct {
 	metrics *logging.Metrics
+	db      *pgxpool.Pool
 	que     *gue.Client
 }
 
-func NewQueMessagePublisher(metrics *logging.Metrics, q *gue.Client) *QueMessagePublisher {
+func NewQueMessagePublisher(metrics *logging.Metrics, db *pgxpool.Pool, q *gue.Client) *QueMessagePublisher {
 	return &QueMessagePublisher{
 		metrics: metrics,
+		db:      db,
 		que:     q,
 	}
 }
@@ -145,12 +148,12 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 
 	scope := txs.ScopeIfAny(ctx)
 
-	insideTx := scope != nil && scope.Tx() != nil
+	insideTx := scope != nil && scope.Tx(p.db) != nil
 
 	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags, "tx_inside", insideTx)
 
 	if insideTx {
-		if err := p.que.EnqueueTx(ctx, job, pgxv5.NewTx(scope.Tx())); err != nil {
+		if err := p.que.EnqueueTx(ctx, job, pgxv5.NewTx(scope.Tx(p.db))); err != nil {
 			return err
 		}
 	} else {

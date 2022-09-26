@@ -156,7 +156,7 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	oldVersion := saga.Version
 	saga.Version += 1
 
-	tx, err := txs.RequireTransaction(ctx)
+	tx, err := txs.RequireQueryable(ctx, r.dbpool)
 	if err != nil {
 		return err
 	}
@@ -195,7 +195,7 @@ func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
 
 	log.Infow("saga:deleting")
 
-	tx, err := txs.RequireTransaction(ctx)
+	tx, err := txs.RequireQueryable(ctx, r.dbpool)
 	if err != nil {
 		return err
 	}
@@ -217,7 +217,7 @@ func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
 
 	log.Infow("saga:deleting")
 
-	tx, err := txs.RequireTransaction(ctx)
+	tx, err := txs.RequireQueryable(ctx, r.dbpool)
 	if err != nil {
 		return err
 	}
@@ -235,7 +235,7 @@ func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
 }
 
 func (r *SagaRepository) findQuery(ctx context.Context, sql string, args ...interface{}) ([]*Saga, error) {
-	tx, err := txs.RequireTransaction(ctx)
+	tx, err := txs.RequireQueryable(ctx, r.dbpool)
 	if err != nil {
 		return nil, err
 	}

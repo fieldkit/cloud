@@ -290,7 +290,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 	if err != nil {
 		return nil, err
 	}
-	publisher := jobs.NewQueMessagePublisher(metrics, qc)
+	publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
 	workMap := backend.CreateMap(ctx, backend.NewBackgroundServices(database, pgxpool, metrics, &backend.FileArchives{
 		Ingestion: ingestionFiles,
 		Media:     mediaFiles,

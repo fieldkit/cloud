@@ -175,7 +175,7 @@ func main() {
 		if err != nil {
 			fail(ctx, err)
 		}
-		publisher := jobs.NewQueMessagePublisher(metrics, qc)
+		publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
 		mc := jobs.NewMessageContext(ctx, publisher, nil)
 		isHandler := backend.NewIngestStationHandler(db, pgxpool, fa, metrics, publisher, tsConfig)
 

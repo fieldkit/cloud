@@ -2,12 +2,15 @@ package txs
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/fieldkit/cloud/server/common/logging"
 )
 
 type TransactionScopeKey string
@@ -17,7 +20,6 @@ const (
 )
 
 type TransactionScope struct {
-	db  *pgxpool.Pool
 	txs map[*pgxpool.Pool]pgx.Tx
 }
 
@@ -39,13 +41,12 @@ func (scope *TransactionScope) Commit(ctx context.Context) error {
 	return errs.ErrorOrNil()
 }
 
-func (scope *TransactionScope) Tx() pgx.Tx {
-	return scope.txs[scope.db]
+func (scope *TransactionScope) Tx(db *pgxpool.Pool) pgx.Tx {
+	return scope.txs[db]
 }
 
 func NewTransactionScope(ctx context.Context, db *pgxpool.Pool) (context.Context, *TransactionScope) {
 	scope := &TransactionScope{
-		db:  db,
 		txs: make(map[*pgxpool.Pool]pgx.Tx),
 	}
 	return context.WithValue(ctx, transactionScopeKey, scope), scope
@@ -59,14 +60,14 @@ func ScopeIfAny(ctx context.Context) *TransactionScope {
 	return maybe.(*TransactionScope)
 }
 
-func RequireTransactionFromPool(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
+var (
+	ErrNoScope = errors.New("no transaction scope")
+)
+
+func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
 	scope := ScopeIfAny(ctx)
 	if scope == nil {
-		return nil, fmt.Errorf("no transaction scope")
-	}
-
-	if pool == nil {
-		pool = scope.db
+		return nil, ErrNoScope
 	}
 
 	if scope.txs[pool] != nil {
@@ -83,6 +84,20 @@ func RequireTransactionFromPool(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx
 	return started, nil
 }
 
-func RequireTransaction(ctx context.Context) (pgx.Tx, error) {
-	return RequireTransactionFromPool(ctx, nil)
+type Queryable interface {
+	Exec(context.Context, string, ...any) (pgconn.CommandTag, error)
+	Query(context.Context, string, ...any) (pgx.Rows, error)
+	SendBatch(context.Context, *pgx.Batch) pgx.BatchResults
+}
+
+func RequireQueryable(ctx context.Context, pool *pgxpool.Pool) (Queryable, error) {
+	if tx, err := RequireTransaction(ctx, pool); err != nil {
+		if err == ErrNoScope {
+			logging.Logger(ctx).Sugar().Warnw("txs:unscoped")
+			return pool, nil
+		}
+		return nil, err
+	} else {
+		return tx, nil
+	}
 }

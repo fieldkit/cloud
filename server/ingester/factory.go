@@ -69,7 +69,7 @@ func NewIngester(ctx context.Context, config *Config) (*Ingester, error) {
 	if err != nil {
 		return nil, err
 	}
-	publisher := jobs.NewQueMessagePublisher(metrics, qc)
+	publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
 
 	options := &IngesterOptions{
 		Database:   database,

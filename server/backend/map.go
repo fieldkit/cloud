@@ -220,7 +220,7 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 		messageLog := Logger(messageCtx).Sugar()
 
-		mc := jobs.NewMessageContext(messageCtx, jobs.NewQueMessagePublisher(services.metrics, services.que), transport)
+		mc := jobs.NewMessageContext(messageCtx, jobs.NewQueMessagePublisher(services.metrics, services.dbpool, services.que), transport)
 
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
@@ -275,6 +275,6 @@ func NewBackgroundServices(database *sqlxcache.DB, dbpool *pgxpool.Pool, metrics
 		que:             que,
 		timeScaleConfig: timeScaleConfig,
 		locations:       locations,
-		publisher:       jobs.NewQueMessagePublisher(metrics, que),
+		publisher:       jobs.NewQueMessagePublisher(metrics, dbpool, que),
 	}
 }
