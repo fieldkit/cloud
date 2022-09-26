@@ -35,7 +35,10 @@ func NewDevNullMessagePublisher() MessagePublisher {
 
 func WithTags(tags map[string][]string) PublishOption {
 	return func(tm *TransportMessage, job *JobOptions) error {
-		tm.Tags = tags
+		tm.Tags = make(map[string][]string)
+		for key, value := range tags {
+			tm.Tags[key] = value
+		}
 		return nil
 	}
 }
