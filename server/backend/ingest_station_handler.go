@@ -17,7 +17,7 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
-type IngestionStationSaga struct {
+type StationIngestionSaga struct {
 	UserID     int32           `json:"user_id"`
 	StationID  int32           `json:"station_id"`
 	Ingestions map[int64]bool  `json:"ingestions"`
@@ -25,7 +25,7 @@ type IngestionStationSaga struct {
 	Completed  map[int64]bool  `json:"completed"`
 }
 
-func (s *IngestionStationSaga) HasMoreIngestions() bool {
+func (s *StationIngestionSaga) HasMoreIngestions() bool {
 	for _, value := range s.Ingestions {
 		if !value {
 			return true
@@ -35,7 +35,7 @@ func (s *IngestionStationSaga) HasMoreIngestions() bool {
 	return false
 }
 
-func (s *IngestionStationSaga) NextIngestionID() int64 {
+func (s *StationIngestionSaga) NextIngestionID() int64 {
 	for key, value := range s.Ingestions {
 		if !value {
 			return key
@@ -45,7 +45,7 @@ func (s *IngestionStationSaga) NextIngestionID() int64 {
 	return 0
 }
 
-func (s *IngestionStationSaga) IsCompleted() bool {
+func (s *StationIngestionSaga) IsCompleted() bool {
 	for _, value := range s.Ingestions {
 		if !value {
 			return false
@@ -96,7 +96,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 		return err
 	}
 
-	body := IngestionStationSaga{
+	body := StationIngestionSaga{
 		UserID:     m.UserID,
 		StationID:  m.StationID,
 		Ingestions: make(map[int64]bool),
@@ -127,7 +127,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 	return nil
 }
 
-func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.MessageContext, body *IngestionStationSaga, ingestionID int64) error {
+func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.MessageContext, body *StationIngestionSaga, ingestionID int64) error {
 	body.Ingestions[ingestionID] = true
 
 	// log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
@@ -162,7 +162,7 @@ func (h *IngestStationHandler) markCompleted(ctx context.Context, mc *jobs.Messa
 
 	sagas := jobs.NewSagaRepository(h.dbpool)
 	if err := sagas.LoadAndSave(ctx, mc.SagaID(), func(ctx context.Context, body *json.RawMessage) (interface{}, error) {
-		saga := &IngestionStationSaga{}
+		saga := &StationIngestionSaga{}
 		if err := json.Unmarshal(*body, saga); err != nil {
 			return nil, err
 		}
