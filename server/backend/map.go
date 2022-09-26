@@ -27,7 +27,7 @@ const (
 
 func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.RefreshStation{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := NewRefreshStationHandler(services.database, services.timeScaleConfig)
@@ -36,7 +36,7 @@ func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundService
 
 func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.ExportData{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := NewExportDataHandler(services.database, services.fileArchives.Exported, services.metrics)
@@ -45,7 +45,7 @@ func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, t
 
 func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &webhook.WebHookMessageReceived{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := webhook.NewWebHookMessageReceivedHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig, false)
@@ -54,7 +54,7 @@ func webHookMessageReceived(ctx context.Context, j *gue.Job, services *Backgroun
 
 func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &webhook.ProcessSchema{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := webhook.NewProcessSchemaHandler(services.database, services.metrics, services.publisher)
@@ -63,7 +63,7 @@ func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices
 
 func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.SensorDataBatch{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := NewSensorDataBatchHandler(services.metrics, services.publisher, services.timeScaleConfig)
@@ -72,7 +72,7 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 
 func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.SensorDataModified{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := NewSensorDataModifiedHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
@@ -81,7 +81,7 @@ func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundSer
 
 func describeStationLocation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.StationLocationUpdated{}
-	if err := json.Unmarshal(tm.Body, message); err != nil {
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
 		return err
 	}
 	handler := NewDescribeStationLocationHandler(services.database, services.metrics, services.publisher, services.locations)
@@ -123,7 +123,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.ProcessIngestion{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.Start(ctx, &m.IngestionReceived, mc)
@@ -134,7 +134,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.IngestionReceived{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.Start(ctx, m, mc)
@@ -145,7 +145,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.SensorDataBatchCommitted{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.BatchCompleted(ctx, m, mc)
@@ -157,7 +157,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.IngestStation{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.Start(ctx, m, mc)
@@ -168,7 +168,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.IngestionCompleted{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.IngestionCompleted(ctx, m, mc)
@@ -179,7 +179,7 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return err
 		} else {
 			m := &messages.IngestionFailed{}
-			if err := json.Unmarshal(tm.Body, m); err != nil {
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
 				return err
 			}
 			return h.IngestionFailed(ctx, m, mc)

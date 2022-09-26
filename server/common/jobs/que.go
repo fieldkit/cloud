@@ -113,6 +113,8 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 		return fmt.Errorf("json marshal: %w", err)
 	}
 
+	rawBody := json.RawMessage(body)
+
 	p.metrics.MessagePublished()
 
 	messageType := reflect.TypeOf(message)
@@ -126,7 +128,7 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 		Type:    messageType.Name(),
 		Trace:   logging.ServiceTrace(ctx),
 		Tags:    make(map[string][]string),
-		Body:    body,
+		Body:    &rawBody,
 	}
 
 	job := &gue.Job{
