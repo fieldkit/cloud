@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 )
 
 var (
@@ -155,10 +156,15 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	oldVersion := saga.Version
 	saga.Version += 1
 
+	tx, err := txs.RequireTransaction(ctx)
+	if err != nil {
+		return err
+	}
+
 	if saga.Version == 1 {
 		log.Infow("saga:inserting")
 
-		rows, err := r.dbpool.Exec(ctx, `INSERT INTO fieldkit.sagas (id, version, created_at, updated_at, scheduled_at, tags, type, body) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		rows, err := tx.Exec(ctx, `INSERT INTO fieldkit.sagas (id, version, created_at, updated_at, scheduled_at, tags, type, body) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 			&saga.ID, &saga.Version, &saga.CreatedAt, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Type, &saga.Body)
 		if err != nil {
 			return err
@@ -170,7 +176,7 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	} else {
 		log.Infow("saga:updating")
 
-		rows, err := r.dbpool.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, body = $7 WHERE id = $1 AND version = $2`,
+		rows, err := tx.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, body = $7 WHERE id = $1 AND version = $2`,
 			saga.ID, oldVersion, saga.Version, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Body)
 		if err != nil {
 			return err
@@ -189,7 +195,12 @@ func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
 
 	log.Infow("saga:deleting")
 
-	rows, err := r.dbpool.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1 AND version = $2`, saga.ID, saga.Version)
+	tx, err := txs.RequireTransaction(ctx)
+	if err != nil {
+		return err
+	}
+
+	rows, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1 AND version = $2`, saga.ID, saga.Version)
 	if err != nil {
 		return err
 	}
@@ -206,7 +217,12 @@ func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
 
 	log.Infow("saga:deleting")
 
-	rows, err := r.dbpool.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1`, id)
+	tx, err := txs.RequireTransaction(ctx)
+	if err != nil {
+		return err
+	}
+
+	rows, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
@@ -219,7 +235,12 @@ func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
 }
 
 func (r *SagaRepository) findQuery(ctx context.Context, sql string, args ...interface{}) ([]*Saga, error) {
-	pgRows, err := r.dbpool.Query(ctx, sql, args...)
+	tx, err := txs.RequireTransaction(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	pgRows, err := tx.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}

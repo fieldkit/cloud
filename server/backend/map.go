@@ -14,6 +14,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
@@ -87,7 +88,7 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	messageType := reflect.TypeOf(message)
 	name := messageType.Name()
 
-	work[name] = wrapTransportMessage(services, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+	work[name] = wrapTransactionScope(services.dbpool, wrapTransportMessage(services, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		/*
 			v := reflect.New(messageType)
 			m := v.Interface()
@@ -96,7 +97,7 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 			}
 		*/
 		return handler(ctx, j, services, tm, mc)
-	})
+	}))
 
 	log := Logger(ctx).Sugar()
 	log.Infow("work-map:register", "message_type", name)
@@ -177,6 +178,32 @@ type WorkFailed struct {
 
 type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
 
+func wrapTransactionScope(dbpool *pgxpool.Pool, next gue.WorkFunc) gue.WorkFunc {
+	return func(ctx context.Context, j *gue.Job) error {
+		log := Logger(ctx).Sugar()
+
+		scopeCtx, scope := txs.NewTransactionScope(ctx, dbpool)
+
+		ok := false
+
+		defer func() {
+			if !ok {
+				if err := scope.Rollback(ctx); err != nil {
+					log.Errorw("tx:rollback", "error", err)
+				}
+			}
+		}()
+
+		if err := next(scopeCtx, j); err != nil {
+			return err
+		}
+
+		ok = true
+
+		return scope.Commit(ctx)
+	}
+}
+
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) gue.WorkFunc {
 	return func(ctx context.Context, j *gue.Job) error {
 		timer := services.metrics.HandleMessage(j.Type)
@@ -199,19 +226,21 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		if err != nil {
 			messageLog.Errorw("error", "error", err)
 
-			if j.ErrorCount >= 3 {
-				failed := WorkFailed{
-					Work: transport,
+			/*
+				if j.ErrorCount >= 3 {
+					failed := WorkFailed{
+						Work: transport,
+					}
+
+					if err := mc.Publish(ctx, &failed); err != nil {
+						return err
+					}
+
+					messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
+
+					return nil
 				}
-
-				if err := mc.Publish(ctx, &failed); err != nil {
-					return err
-				}
-
-				messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
-
-				return nil
-			}
+			*/
 		}
 
 		messageLog.Infow("completed", "message_type", transport.Package+"."+transport.Type, "time", time.Since(startedAt).String())

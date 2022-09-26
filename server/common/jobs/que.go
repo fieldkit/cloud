@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/vgarvardt/gue/v4"
+	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
 	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 )
 
 var (
@@ -141,10 +143,20 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 
 	job.Args = bytes
 
-	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags)
+	scope := txs.ScopeIfAny(ctx)
 
-	if err := p.que.Enqueue(ctx, job); err != nil {
-		return err
+	insideTx := scope != nil && scope.Tx() != nil
+
+	log.Infow("que:enqueue", "queue", job.Queue, "package", transport.Package, "name", transport.Type, "tags", transport.Tags, "tx_inside", insideTx)
+
+	if insideTx {
+		if err := p.que.EnqueueTx(ctx, job, pgxv5.NewTx(scope.Tx())); err != nil {
+			return err
+		}
+	} else {
+		if err := p.que.Enqueue(ctx, job); err != nil {
+			return err
+		}
 	}
 
 	return nil
