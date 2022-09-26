@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/vgarvardt/gue/v4"
 
-	"github.com/govau/que-go"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/data"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -17,19 +18,18 @@ import (
 	"github.com/fieldkit/cloud/server/webhook"
 )
 
-type OurWorkFunc func(ctx context.Context, j *que.Job) error
-type OurTransportMessageFunc func(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
+type OurWorkFunc func(ctx context.Context, j *gue.Job) error
+type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error
 
-func wrapContext(h OurWorkFunc) que.WorkFunc {
-	return func(j *que.Job) error {
-		ctx := context.Background()
+func wrapContext(h OurWorkFunc) gue.WorkFunc {
+	return func(ctx context.Context, j *gue.Job) error {
 		return h(ctx, j)
 	}
 }
 
 func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFunc) OurWorkFunc {
-	return func(ctx context.Context, j *que.Job) error {
-		timer := services.metrics.HandleMessage()
+	return func(ctx context.Context, j *gue.Job) error {
+		timer := services.metrics.HandleMessage(j.Type)
 
 		defer timer.Send()
 
@@ -54,7 +54,7 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 	}
 }
 
-func ingestionReceived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.IngestionReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -64,7 +64,7 @@ func ingestionReceived(ctx context.Context, j *que.Job, services *BackgroundServ
 	return handler.Handle(ctx, message)
 }
 
-func refreshStation(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func refreshStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.RefreshStation{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -73,7 +73,7 @@ func refreshStation(ctx context.Context, j *que.Job, services *BackgroundService
 	return handler.Handle(ctx, message)
 }
 
-func exportData(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func exportData(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.ExportData{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -82,7 +82,7 @@ func exportData(ctx context.Context, j *que.Job, services *BackgroundServices, t
 	return handler.Handle(ctx, message)
 }
 
-func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.IngestStation{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -92,7 +92,7 @@ func ingestStation(ctx context.Context, j *que.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
-func webHookMessageReceived(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func webHookMessageReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &webhook.WebHookMessageReceived{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -102,7 +102,7 @@ func webHookMessageReceived(ctx context.Context, j *que.Job, services *Backgroun
 	return handler.Handle(ctx, message)
 }
 
-func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func processSchema(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &webhook.ProcessSchema{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -112,7 +112,17 @@ func processSchema(ctx context.Context, j *que.Job, services *BackgroundServices
 	return handler.Handle(ctx, message)
 }
 
-func sensorDataModified(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.SensorDataBatch{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewSensorDataBatchHandler(services.database, services.metrics, publisher, services.timeScaleConfig)
+	return handler.Handle(ctx, message, j)
+}
+
+func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	message := &messages.SensorDataModified{}
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
@@ -122,8 +132,18 @@ func sensorDataModified(ctx context.Context, j *que.Job, services *BackgroundSer
 	return handler.Handle(ctx, message, j)
 }
 
-func CreateMap(services *BackgroundServices) que.WorkMap {
-	return que.WorkMap{
+func describeStationLocation(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+	message := &messages.StationLocationUpdated{}
+	if err := json.Unmarshal(tm.Body, message); err != nil {
+		return err
+	}
+	publisher := jobs.NewQueMessagePublisher(services.metrics, services.que)
+	handler := NewDescribeStationLocationHandler(services.database, services.metrics, publisher, services.locations)
+	return handler.Handle(ctx, message, j)
+}
+
+func CreateMap(services *BackgroundServices) gue.WorkMap {
+	return gue.WorkMap{
 		"Example":                wrapContext(wrapTransportMessage(services, exampleJob)),
 		"WalkEverything":         wrapContext(wrapTransportMessage(services, walkEverything)),
 		"IngestionReceived":      wrapContext(wrapTransportMessage(services, ingestionReceived)),
@@ -132,7 +152,9 @@ func CreateMap(services *BackgroundServices) que.WorkMap {
 		"IngestStation":          wrapContext(wrapTransportMessage(services, ingestStation)),
 		"WebHookMessageReceived": wrapContext(wrapTransportMessage(services, webHookMessageReceived)),
 		"ProcessSchema":          wrapContext(wrapTransportMessage(services, processSchema)),
+		"SensorDataBatch":        wrapContext(wrapTransportMessage(services, sensorDataBatch)),
 		"SensorDataModified":     wrapContext(wrapTransportMessage(services, sensorDataModified)),
+		"StationLocationUpdated": wrapContext(wrapTransportMessage(services, describeStationLocation)),
 	}
 }
 
@@ -146,16 +168,18 @@ type BackgroundServices struct {
 	database        *sqlxcache.DB
 	metrics         *logging.Metrics
 	fileArchives    *FileArchives
-	que             *que.Client
+	que             *gue.Client
 	timeScaleConfig *storage.TimeScaleDBConfig
+	locations       *data.DescribeLocations
 }
 
-func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *que.Client, timeScaleConfig *storage.TimeScaleDBConfig) *BackgroundServices {
+func NewBackgroundServices(database *sqlxcache.DB, metrics *logging.Metrics, fileArchives *FileArchives, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig, locations *data.DescribeLocations) *BackgroundServices {
 	return &BackgroundServices{
 		database:        database,
 		fileArchives:    fileArchives,
 		metrics:         metrics,
 		que:             que,
 		timeScaleConfig: timeScaleConfig,
+		locations:       locations,
 	}
 }

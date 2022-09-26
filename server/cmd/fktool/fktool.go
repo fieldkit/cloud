@@ -75,7 +75,7 @@ func getMetaFromEnvironment(moduleOverride, profileOverride, version, file strin
 	if moduleOverride == "" {
 		module, err = getModuleFromJobName(jobName)
 		if err != nil {
-			return nil, fmt.Errorf("Error getting module from job name: %v", err)
+			return nil, fmt.Errorf("error getting module from job name: %w", err)
 		}
 		log.Printf("found module name: '%s'", module)
 	} else {
@@ -143,7 +143,7 @@ func createAwsSession() (s *session.Session, err error) {
 		}
 	}
 
-	return nil, fmt.Errorf("error creating AWS session: %v", err)
+	return nil, fmt.Errorf("error creating AWS session: %w", err)
 }
 
 func getFileHash(filename string) (string, error) {
@@ -192,12 +192,12 @@ func hasFile(session *session.Session, id string) (string, error) {
 func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileOverride, version, filename string, dryRun bool) error {
 	id, err := getFileHash(filename)
 	if err != nil {
-		return fmt.Errorf("error getting file hash: %v", filename)
+		return fmt.Errorf("error getting file hash: %s", filename)
 	}
 
 	file, err := os.Open(filename)
 	if err != nil {
-		return fmt.Errorf("error opening file: %v", filename)
+		return fmt.Errorf("error opening file: %s", filename)
 	}
 
 	defer file.Close()
@@ -238,7 +238,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 				Tagging:     nil,
 			})
 			if err != nil {
-				return fmt.Errorf("error uploading firmware: %v", err)
+				return fmt.Errorf("error uploading firmware: %w", err)
 			}
 
 			log.Printf("uploaded %s", r.Location)
@@ -251,7 +251,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 
 	jsonData, err := json.Marshal(metadata.Map)
 	if err != nil {
-		return fmt.Errorf("error serializing metadata: %v", err)
+		return fmt.Errorf("error serializing metadata: %w", err)
 	}
 
 	addFirmwarePayload := AddFirmwarePayload{
@@ -266,7 +266,7 @@ func uploadFirmware(ctx context.Context, fkc *FkClient, moduleOverride, profileO
 	if !dryRun {
 		err := fkc.AddFirmware(ctx, &addFirmwarePayload)
 		if err != nil {
-			return fmt.Errorf("error adding firmware: %v", err)
+			return fmt.Errorf("error adding firmware: %w", err)
 		}
 
 		log.Printf("added")

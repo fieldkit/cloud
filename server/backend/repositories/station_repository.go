@@ -1357,8 +1357,8 @@ func (sr *StationRepository) QueryStationProgress(ctx context.Context, stationID
 
 	queued := []*data.QueJob{}
 	if err := sr.db.SelectContext(ctx, &queued, `
-		SELECT priority, run_at, job_id, job_class, args, error_count, last_error, queue
-		FROM que_jobs
+		SELECT priority, run_at, job_id, job_type, args, error_count, last_error, queue
+		FROM gue_jobs
         WHERE run_at - interval '1' hour > NOW()
 		ORDER BY run_at`); err != nil {
 		return nil, err

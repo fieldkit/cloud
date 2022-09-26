@@ -83,7 +83,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.DeviceID)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			return nil, fmt.Errorf("querying station: %v", err)
+			return nil, fmt.Errorf("querying station: %w", err)
 		}
 	}
 
@@ -367,7 +367,7 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 		}
 
 		if err := m.sr.UpdateStation(ctx, station); err != nil {
-			return fmt.Errorf("error saving station: %v", err)
+			return fmt.Errorf("error saving station: %w", err)
 		}
 
 		for _, moduleSensor := range cacheEntry.station.Sensors {
@@ -385,7 +385,7 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 		// to update that and those that aren't? TODO
 		if len(cacheEntry.station.Associated) > 0 {
 			if err := m.sr.ClearAssociatedStations(ctx, station.ID); err != nil {
-				return fmt.Errorf("clear associated stations: %v", err)
+				return fmt.Errorf("clear associated stations: %w", err)
 			}
 		}
 
@@ -397,13 +397,13 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 
 			if associating, err := m.sr.QueryStationByDeviceID(ctx, deviceID); err != nil {
 				if err != sql.ErrNoRows {
-					return fmt.Errorf("querying associated station: %v", err)
+					return fmt.Errorf("querying associated station: %w", err)
 				} else {
 					log.Infow("saving:unknown-associated", "device_id", deviceIDString)
 				}
 			} else if associating != nil {
 				if err := m.sr.AssociateStations(ctx, station.ID, associating.ID, associated.Priority); err != nil {
-					return fmt.Errorf("associated station: %v", err)
+					return fmt.Errorf("associated station: %w", err)
 				}
 
 				if associated.Attribute != nil {

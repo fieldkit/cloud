@@ -52,7 +52,7 @@ discussion (project|data|post- message|update- message|delete- message)
 export (list- mine|status|download|csv|json- lines)
 firmware (download|add|list|delete)
 following (follow|unfollow|followers)
-ingestion (process- pending|walk- everything|process- station|process- station- ingestions|process- ingestion|delete)
+ingestion (process- pending|walk- everything|process- station|process- station- ingestions|process- ingestion|refresh- views|delete)
 modules meta
 notes (update|get|download- media|upload- media|delete- media)
 notifications (listen|seen)
@@ -237,6 +237,9 @@ func ParseEndpoint(
 		ingestionProcessIngestionFlags           = flag.NewFlagSet("process- ingestion", flag.ExitOnError)
 		ingestionProcessIngestionIngestionIDFlag = ingestionProcessIngestionFlags.String("ingestion-id", "REQUIRED", "")
 		ingestionProcessIngestionAuthFlag        = ingestionProcessIngestionFlags.String("auth", "REQUIRED", "")
+
+		ingestionRefreshViewsFlags    = flag.NewFlagSet("refresh- views", flag.ExitOnError)
+		ingestionRefreshViewsAuthFlag = ingestionRefreshViewsFlags.String("auth", "REQUIRED", "")
 
 		ingestionDeleteFlags           = flag.NewFlagSet("delete", flag.ExitOnError)
 		ingestionDeleteIngestionIDFlag = ingestionDeleteFlags.String("ingestion-id", "REQUIRED", "")
@@ -686,6 +689,7 @@ func ParseEndpoint(
 	ingestionProcessStationFlags.Usage = ingestionProcessStationUsage
 	ingestionProcessStationIngestionsFlags.Usage = ingestionProcessStationIngestionsUsage
 	ingestionProcessIngestionFlags.Usage = ingestionProcessIngestionUsage
+	ingestionRefreshViewsFlags.Usage = ingestionRefreshViewsUsage
 	ingestionDeleteFlags.Usage = ingestionDeleteUsage
 
 	modulesFlags.Usage = modulesUsage
@@ -990,6 +994,9 @@ func ParseEndpoint(
 
 			case "process- ingestion":
 				epf = ingestionProcessIngestionFlags
+
+			case "refresh- views":
+				epf = ingestionRefreshViewsFlags
 
 			case "delete":
 				epf = ingestionDeleteFlags
@@ -1448,6 +1455,9 @@ func ParseEndpoint(
 			case "process- ingestion":
 				endpoint = c.ProcessIngestion()
 				data, err = ingestionc.BuildProcessIngestionPayload(*ingestionProcessIngestionIngestionIDFlag, *ingestionProcessIngestionAuthFlag)
+			case "refresh- views":
+				endpoint = c.RefreshViews()
+				data, err = ingestionc.BuildRefreshViewsPayload(*ingestionRefreshViewsAuthFlag)
 			case "delete":
 				endpoint = c.Delete()
 				data, err = ingestionc.BuildDeletePayload(*ingestionDeleteIngestionIDFlag, *ingestionDeleteAuthFlag)
@@ -2225,6 +2235,7 @@ COMMAND:
     process- station: ProcessStation implements process station.
     process- station- ingestions: ProcessStationIngestions implements process station ingestions.
     process- ingestion: ProcessIngestion implements process ingestion.
+    refresh- views: RefreshViews implements refresh views.
     delete: Delete implements delete.
 
 Additional help:
@@ -2291,6 +2302,17 @@ Example:
 `, os.Args[0])
 }
 
+func ingestionRefreshViewsUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] ingestion refresh- views -auth STRING
+
+RefreshViews implements refresh views.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` ingestion refresh- views --auth "Ab numquam."
+`, os.Args[0])
+}
+
 func ingestionDeleteUsage() {
 	fmt.Fprintf(os.Stderr, `%s [flags] ingestion delete -ingestion-id INT64 -auth STRING
 
@@ -2299,7 +2321,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --ingestion-id 2724830864783876504 --auth "Nemo fugiat natus eum."
+    `+os.Args[0]+` ingestion delete --ingestion-id 6584931014216702226 --auth "Impedit quam."
 `, os.Args[0])
 }
 
@@ -2356,80 +2378,64 @@ Example:
       "notes": {
          "creating": [
             {
-               "body": "Ut sapiente nobis quaerat nesciunt.",
-               "key": "Ab aut provident eaque iusto.",
+               "body": "Laudantium eos soluta distinctio repellat.",
+               "key": "Nobis quaerat nesciunt ut.",
                "mediaIds": [
-                  7152199726839613078,
-                  2971278919859511622,
-                  9179457146160618455,
-                  1588252295222034353
+                  2943012989969916972,
+                  2435064384007041379,
+                  2270616053821177199
                ]
             },
             {
-               "body": "Ut sapiente nobis quaerat nesciunt.",
-               "key": "Ab aut provident eaque iusto.",
+               "body": "Laudantium eos soluta distinctio repellat.",
+               "key": "Nobis quaerat nesciunt ut.",
                "mediaIds": [
-                  7152199726839613078,
-                  2971278919859511622,
-                  9179457146160618455,
-                  1588252295222034353
+                  2943012989969916972,
+                  2435064384007041379,
+                  2270616053821177199
                ]
             },
             {
-               "body": "Ut sapiente nobis quaerat nesciunt.",
-               "key": "Ab aut provident eaque iusto.",
+               "body": "Laudantium eos soluta distinctio repellat.",
+               "key": "Nobis quaerat nesciunt ut.",
                "mediaIds": [
-                  7152199726839613078,
-                  2971278919859511622,
-                  9179457146160618455,
-                  1588252295222034353
-               ]
-            },
-            {
-               "body": "Ut sapiente nobis quaerat nesciunt.",
-               "key": "Ab aut provident eaque iusto.",
-               "mediaIds": [
-                  7152199726839613078,
-                  2971278919859511622,
-                  9179457146160618455,
-                  1588252295222034353
+                  2943012989969916972,
+                  2435064384007041379,
+                  2270616053821177199
                ]
             }
          ],
          "notes": [
             {
-               "body": "Debitis beatae.",
-               "id": 8299627002827774540,
-               "key": "Ut quasi nihil.",
+               "body": "Aut provident.",
+               "id": 8533501338479540862,
+               "key": "Quam voluptatem illum ea dolorem adipisci.",
                "mediaIds": [
-                  4300119959110271883,
-                  871442854556851626,
-                  6529196959326738177
+                  198119773969228544,
+                  7719255109471820193
                ]
             },
             {
-               "body": "Debitis beatae.",
-               "id": 8299627002827774540,
-               "key": "Ut quasi nihil.",
+               "body": "Aut provident.",
+               "id": 8533501338479540862,
+               "key": "Quam voluptatem illum ea dolorem adipisci.",
                "mediaIds": [
-                  4300119959110271883,
-                  871442854556851626,
-                  6529196959326738177
+                  198119773969228544,
+                  7719255109471820193
                ]
             },
             {
-               "body": "Debitis beatae.",
-               "id": 8299627002827774540,
-               "key": "Ut quasi nihil.",
+               "body": "Aut provident.",
+               "id": 8533501338479540862,
+               "key": "Quam voluptatem illum ea dolorem adipisci.",
                "mediaIds": [
-                  4300119959110271883,
-                  871442854556851626,
-                  6529196959326738177
+                  198119773969228544,
+                  7719255109471820193
                ]
             }
          ]
       }
-   }' --station-id 566001959 --auth "Ut quo incidunt quibusdam."
+   }' --station-id 1994792261 --auth "Et eos dolor."
 `, os.Args[0])
 }
 
@@ -2441,7 +2447,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 1734782437 --auth "Non dolores ea et."
+    `+os.Args[0]+` notes get --station-id 1574759260 --auth "Tempora quod error non dolores ea et."
 `, os.Args[0])
 }
 

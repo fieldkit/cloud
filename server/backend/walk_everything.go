@@ -7,17 +7,17 @@ import (
 
 	"github.com/pkg/profile"
 
+	"github.com/vgarvardt/gue/v4"
+
 	"github.com/golang/protobuf/proto"
 
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/data"
-
-	"github.com/govau/que-go"
 )
 
-func walkEverything(ctx context.Context, j *que.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
+func walkEverything(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage) error {
 	log := Logger(ctx).Sugar()
 
 	if false {
@@ -69,13 +69,13 @@ func (h *fixingHandler) OnMeta(ctx context.Context, p *data.Provision, r *pb.Dat
 		if _, err := h.services.database.ExecContext(ctx, `
 			UPDATE fieldkit.meta_record SET pb = $1 WHERE id = $2
 		`, data.Bytes(), db.ID); err != nil {
-			return fmt.Errorf("error updating pb: %v", err)
+			return fmt.Errorf("error updating pb: %w", err)
 		}
 	}
 	return nil
 }
 
-func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	if db.PB == nil {
 		r := &pb.DataRecord{}
 		if err := db.Unmarshal(r); err != nil {
@@ -88,7 +88,7 @@ func (h *fixingHandler) OnData(ctx context.Context, p *data.Provision, r *pb.Dat
 		if _, err := h.services.database.ExecContext(ctx, `
 			UPDATE fieldkit.data_record SET pb = $1 WHERE id = $2
 		`, data.Bytes(), db.ID); err != nil {
-			return fmt.Errorf("error updating pb: %v", err)
+			return fmt.Errorf("error updating pb: %w", err)
 		}
 	}
 	return nil

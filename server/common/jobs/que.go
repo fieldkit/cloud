@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/govau/que-go"
+	"github.com/vgarvardt/gue/v4"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 )
@@ -17,10 +17,10 @@ var (
 
 type QueMessagePublisher struct {
 	metrics *logging.Metrics
-	que     *que.Client
+	que     *gue.Client
 }
 
-func NewQueMessagePublisher(metrics *logging.Metrics, q *que.Client) *QueMessagePublisher {
+func NewQueMessagePublisher(metrics *logging.Metrics, q *gue.Client) *QueMessagePublisher {
 	return &QueMessagePublisher{
 		metrics: metrics,
 		que:     q,
@@ -30,7 +30,7 @@ func NewQueMessagePublisher(metrics *logging.Metrics, q *que.Client) *QueMessage
 func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) error {
 	body, err := json.Marshal(message)
 	if err != nil {
-		return fmt.Errorf("json marshal: %v", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
 	p.metrics.MessagePublished()
@@ -50,14 +50,14 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}) 
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {
-		return fmt.Errorf("json marshal: %v", err)
+		return fmt.Errorf("json marshal: %w", err)
 	}
 
-	j := &que.Job{
+	j := &gue.Job{
 		Type: messageType.Name(),
 		Args: bytes,
 	}
-	if err := p.que.Enqueue(j); err != nil {
+	if err := p.que.Enqueue(ctx, j); err != nil {
 		return err
 	}
 

@@ -26,6 +26,8 @@ type Service interface {
 	ProcessStationIngestions(context.Context, *ProcessStationIngestionsPayload) (err error)
 	// ProcessIngestion implements process ingestion.
 	ProcessIngestion(context.Context, *ProcessIngestionPayload) (err error)
+	// RefreshViews implements refresh views.
+	RefreshViews(context.Context, *RefreshViewsPayload) (err error)
 	// Delete implements delete.
 	Delete(context.Context, *DeletePayload) (err error)
 }
@@ -44,7 +46,7 @@ const ServiceName = "ingestion"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"process pending", "walk everything", "process station", "process station ingestions", "process ingestion", "delete"}
+var MethodNames = [7]string{"process pending", "walk everything", "process station", "process station ingestions", "process ingestion", "refresh views", "delete"}
 
 // ProcessPendingPayload is the payload type of the ingestion service process
 // pending method.
@@ -79,6 +81,12 @@ type ProcessStationIngestionsPayload struct {
 type ProcessIngestionPayload struct {
 	Auth        string
 	IngestionID int64
+}
+
+// RefreshViewsPayload is the payload type of the ingestion service refresh
+// views method.
+type RefreshViewsPayload struct {
+	Auth string
 }
 
 // DeletePayload is the payload type of the ingestion service delete method.

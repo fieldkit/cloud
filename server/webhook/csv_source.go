@@ -34,7 +34,7 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 
 		file, err := os.Open(s.path)
 		if err != nil {
-			return fmt.Errorf("opening %v (%v)", s.path, err)
+			return fmt.Errorf("opening %v (%w)", s.path, err)
 		}
 
 		s.reader = csv.NewReader(file)
@@ -73,7 +73,7 @@ func (s *CsvMessageSource) NextBatch(ctx context.Context, batch *MessageBatch) e
 
 		body, err := json.Marshal(jsonMap)
 		if err != nil {
-			return fmt.Errorf("marshal json (%v)", err)
+			return fmt.Errorf("marshal json (%w)", err)
 		}
 
 		message := &WebHookMessage{

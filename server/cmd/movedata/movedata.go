@@ -450,7 +450,7 @@ func process(ctx context.Context, options *Options) error {
 
 	log.Infow("starting")
 
-	db, err := sqlxcache.Open("postgres", options.PostgresURL)
+	db, err := sqlxcache.Open(ctx, "postgres", options.PostgresURL)
 	if err != nil {
 		return err
 	}

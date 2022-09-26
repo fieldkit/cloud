@@ -108,7 +108,7 @@ func (h *MoveBinaryDataHandler) OnMeta(ctx context.Context, p *data.Provision, r
 	return nil
 }
 
-func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
+func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
 	if v, ok := h.skipping[p.ID]; ok && v {
 		return nil
 	}
@@ -122,7 +122,7 @@ func (h *MoveBinaryDataHandler) OnData(ctx context.Context, p *data.Provision, r
 
 	filtered, err := h.metaFactory.Resolve(ctx, db, false, true)
 	if err != nil {
-		return fmt.Errorf("resolving: %v", err)
+		return fmt.Errorf("resolving: %w", err)
 	}
 	if filtered == nil {
 		return nil

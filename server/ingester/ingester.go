@@ -202,17 +202,17 @@ func newIncomingHeaders(req *http.Request) (*IncomingHeaders, error) {
 
 	deviceID, err := data.DecodeBinaryString(deviceIDRaw)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", common.FkDeviceIdHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%w)", common.FkDeviceIdHeaderName, err)
 	}
 
 	generationID, err := data.DecodeBinaryString(generationIDRaw)
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", common.FkGenerationHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%w)", common.FkGenerationHeaderName, err)
 	}
 
 	blocks, err := data.ParseBlocks(req.Header.Get(common.FkBlocksHeaderName))
 	if err != nil {
-		return nil, fmt.Errorf("invalid %s (%v)", common.FkBlocksHeaderName, err)
+		return nil, fmt.Errorf("invalid %s (%w)", common.FkBlocksHeaderName, err)
 	}
 
 	name := req.Header.Get(common.FkDeviceNameHeaderName)

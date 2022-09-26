@@ -381,6 +381,78 @@ type ProcessIngestionBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// RefreshViewsUnauthorizedResponseBody is the type of the "ingestion" service
+// "refresh views" endpoint HTTP response body for the "unauthorized" error.
+type RefreshViewsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RefreshViewsForbiddenResponseBody is the type of the "ingestion" service
+// "refresh views" endpoint HTTP response body for the "forbidden" error.
+type RefreshViewsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RefreshViewsNotFoundResponseBody is the type of the "ingestion" service
+// "refresh views" endpoint HTTP response body for the "not-found" error.
+type RefreshViewsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// RefreshViewsBadRequestResponseBody is the type of the "ingestion" service
+// "refresh views" endpoint HTTP response body for the "bad-request" error.
+type RefreshViewsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // DeleteUnauthorizedResponseBody is the type of the "ingestion" service
 // "delete" endpoint HTTP response body for the "unauthorized" error.
 type DeleteUnauthorizedResponseBody struct {
@@ -738,6 +810,62 @@ func NewProcessIngestionBadRequestResponseBody(res *goa.ServiceError) *ProcessIn
 	return body
 }
 
+// NewRefreshViewsUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "refresh views" endpoint of the "ingestion" service.
+func NewRefreshViewsUnauthorizedResponseBody(res *goa.ServiceError) *RefreshViewsUnauthorizedResponseBody {
+	body := &RefreshViewsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRefreshViewsForbiddenResponseBody builds the HTTP response body from the
+// result of the "refresh views" endpoint of the "ingestion" service.
+func NewRefreshViewsForbiddenResponseBody(res *goa.ServiceError) *RefreshViewsForbiddenResponseBody {
+	body := &RefreshViewsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRefreshViewsNotFoundResponseBody builds the HTTP response body from the
+// result of the "refresh views" endpoint of the "ingestion" service.
+func NewRefreshViewsNotFoundResponseBody(res *goa.ServiceError) *RefreshViewsNotFoundResponseBody {
+	body := &RefreshViewsNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewRefreshViewsBadRequestResponseBody builds the HTTP response body from the
+// result of the "refresh views" endpoint of the "ingestion" service.
+func NewRefreshViewsBadRequestResponseBody(res *goa.ServiceError) *RefreshViewsBadRequestResponseBody {
+	body := &RefreshViewsBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewDeleteUnauthorizedResponseBody builds the HTTP response body from the
 // result of the "delete" endpoint of the "ingestion" service.
 func NewDeleteUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUnauthorizedResponseBody {
@@ -839,6 +967,15 @@ func NewProcessStationIngestionsPayload(stationID int64, auth string) *ingestion
 func NewProcessIngestionPayload(ingestionID int64, auth string) *ingestion.ProcessIngestionPayload {
 	v := &ingestion.ProcessIngestionPayload{}
 	v.IngestionID = ingestionID
+	v.Auth = auth
+
+	return v
+}
+
+// NewRefreshViewsPayload builds a ingestion service refresh views endpoint
+// payload.
+func NewRefreshViewsPayload(auth string) *ingestion.RefreshViewsPayload {
+	v := &ingestion.RefreshViewsPayload{}
 	v.Auth = auth
 
 	return v
