@@ -185,6 +185,9 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 			return h.IngestionFailed(ctx, m, mc)
 		}
 	})
+	Register(ctx, services, work, messages.StationIngested{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		return nil
+	})
 
 	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
 	Register(ctx, services, work, messages.ExportData{}, exportData)
