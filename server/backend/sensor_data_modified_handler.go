@@ -3,10 +3,11 @@ package backend
 import (
 	"context"
 
+	"github.com/vgarvardt/gue/v4"
+
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
-	"github.com/govau/que-go"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -29,8 +30,12 @@ func NewSensorDataModifiedHandler(db *sqlxcache.DB, metrics *logging.Metrics, pu
 	}
 }
 
-func (h *SensorDataModifiedHandler) Handle(ctx context.Context, m *messages.SensorDataModified, j *que.Job) error {
-	log := Logger(ctx).Sugar().With("station_id", m.StationID).With("user_id", m.UserID)
+func (h *SensorDataModifiedHandler) Handle(ctx context.Context, m *messages.SensorDataModified, j *gue.Job) error {
+	log := Logger(ctx).Sugar().With("user_id", m.UserID)
+
+	if m.StationID != nil {
+		log = log.With("station_id", m.StationID)
+	}
 
 	if j.ErrorCount > 0 {
 		log.Infow("sensor-data-modified:ignored", "modified_at", m.ModifiedAt, "published_at", m.PublishedAt, "start", m.Start, "end", m.End, "errors", j.ErrorCount)

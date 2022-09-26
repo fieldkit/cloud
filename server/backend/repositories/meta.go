@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/iancoleman/strcase"
 
 	"go.uber.org/zap"
 
@@ -34,7 +33,7 @@ type MissingSensorMetaError struct {
 }
 
 func (e *MissingSensorMetaError) Error() string {
-	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
+	return fmt.Sprintf("MissingSensorMetaError(missing-record-id=%v)", e.MetaRecordID)
 }
 
 type MalformedMetaError struct {
@@ -43,7 +42,7 @@ type MalformedMetaError struct {
 }
 
 func (e *MalformedMetaError) Error() string {
-	return fmt.Sprintf("MalformedMetaError(missing-record--id=%v, '%v')", e.MetaRecordID, e.Malformed)
+	return fmt.Sprintf("MalformedMetaError(missing-record-id=%v, '%v')", e.MetaRecordID, e.Malformed)
 }
 
 type MetaFactory struct {
@@ -97,14 +96,13 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
-		sensors := make([]*DataMetaSensor, 0)
-
 		if module.Header == nil {
 			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "header"}
 		}
 
 		if module.Sensors == nil {
-			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
+			log.Infow("meta:malformed-sensors-nil")
+			continue
 		}
 
 		hf := HeaderFields{
@@ -120,16 +118,19 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 		}
 
+		sensors := make([]*DataMetaSensor, 0)
+
 		for _, sensor := range module.Sensors {
-			key := strcase.ToLowerCamel(sensor.Name)
-			extraModule, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
+			_, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, err
 			}
 			if extraModule == nil || extraSensor == nil {
+				log.Warnw("meta:missing-sensor", "sensor_name", sensor.Name, "module_key", extraModule.Key, "header", hf)
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
 
+			key := extraSensor.Key
 			fullKey := extraModule.Key + "." + key
 			if fq {
 				key = fullKey
@@ -279,7 +280,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		Readings: readings,
 	}
 
-	filtered := mf.filtering.Apply(ctx, resolved)
+	// filtered := mf.filtering.Apply(ctx, resolved)
+
+	filtered := &FilteredRecord{
+		Record:  resolved,
+		Filters: nil,
+	}
 
 	return filtered, nil
 }

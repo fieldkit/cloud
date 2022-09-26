@@ -188,7 +188,7 @@ func (d *DataRecord) Unmarshal(r *pb.DataRecord) error {
 	}
 	err := json.Unmarshal(d.Data, r)
 	if err != nil {
-		return fmt.Errorf("error parsing data record json: %v", err)
+		return fmt.Errorf("error parsing data record json: %w", err)
 	}
 	return nil
 }
@@ -223,13 +223,13 @@ func (d *MetaRecord) Unmarshal(r *pb.DataRecord) error {
 	if d.PB != nil {
 		buffer := proto.NewBuffer(d.PB)
 		if err := buffer.Unmarshal(r); err != nil {
-			return fmt.Errorf("error parsing meta record pb: %v", err)
+			return fmt.Errorf("error parsing meta record pb: %w", err)
 		}
 		return nil
 	}
 	err := json.Unmarshal(d.Data, r)
 	if err != nil {
-		return fmt.Errorf("error parsing meta record json: %v", err)
+		return fmt.Errorf("error parsing meta record json: %w", err)
 	}
 	return nil
 }

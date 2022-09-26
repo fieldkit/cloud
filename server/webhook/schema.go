@@ -70,7 +70,7 @@ func (r *MessageSchemaRegistration) Parse() (*MessageSchema, error) {
 	if r.parsed == nil {
 		parsed := &MessageSchema{}
 		if err := json.Unmarshal(r.Body, parsed); err != nil {
-			return nil, fmt.Errorf("error parsing schema-id %d: %v", r.ID, err)
+			return nil, fmt.Errorf("error parsing schema-id %d: %w", r.ID, err)
 		}
 
 		if parsed.Station != nil {

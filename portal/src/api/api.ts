@@ -1423,7 +1423,7 @@ class FKApi {
         if (typeof projectIDOrBookmark === "number") {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
-            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
+            apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
         }
 
         const returned = await this.invoke({

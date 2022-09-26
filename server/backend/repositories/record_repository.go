@@ -2,11 +2,11 @@ package repositories
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math"
 	"time"
 
+	"github.com/fieldkit/cloud/server/common/errors"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
 	pb "github.com/fieldkit/data-protocol"
@@ -17,12 +17,14 @@ import (
 type RecordRepository struct {
 	db        *sqlxcache.DB
 	metaCache map[int64]*data.MetaRecord
+	saveData  bool
 }
 
-func NewRecordRepository(db *sqlxcache.DB) *RecordRepository {
+func NewRecordRepository(db *sqlxcache.DB, saveData bool) *RecordRepository {
 	return &RecordRepository{
 		db:        db,
 		metaCache: make(map[int64]*data.MetaRecord),
+		saveData:  saveData,
 	}
 }
 
@@ -88,7 +90,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 
 	// TODO Sanitize
 	if err := metaRecord.SetData(dr); err != nil {
-		return nil, fmt.Errorf("error setting meta json: %v", err)
+		return nil, fmt.Errorf("error setting meta json: %w", err)
 	}
 
 	if err := r.db.NamedGetContext(ctx, metaRecord, `
@@ -118,7 +120,7 @@ func (r *RecordRepository) AddSignedMetaRecord(ctx context.Context, p *data.Prov
 
 	// TODO Sanitize
 	if err := metaRecord.SetData(dr); err != nil {
-		return nil, fmt.Errorf("error setting meta json: %v", err)
+		return nil, fmt.Errorf("error setting meta json: %w", err)
 	}
 
 	if err := r.db.NamedGetContext(ctx, metaRecord, `
@@ -202,12 +204,9 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 	return dr
 }
 
-var ErrMalformedRecord = errors.New("malformed record")
-var ErrMetaMissing = errors.New("error finding meta record")
-
 func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision, i *data.Ingestion, dr *pb.DataRecord, pb []byte) (*data.DataRecord, *data.MetaRecord, error) {
 	if dr.Readings == nil {
-		return nil, nil, ErrMalformedRecord
+		return nil, nil, errors.Structured("malformed record")
 	}
 
 	metaRecord, err := r.findMeta(ctx, p.ID, int64(dr.Readings.Meta))
@@ -215,7 +214,9 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 		return nil, nil, err
 	}
 	if metaRecord == nil {
-		return nil, nil, ErrMetaMissing
+		log := Logger(ctx).Sugar()
+		log.Warnw("meta-missing", "meta_record_number", dr.Readings.Meta, "data_record_number", dr.Readings.Reading, "provision_id", p.ID)
+		return nil, nil, errors.Structured("meta-missing", "meta_record_number", dr.Readings.Meta, "data_record_number", dr.Readings.Reading, "provision_id", p.ID)
 	}
 
 	dataTime := i.Time
@@ -239,16 +240,18 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 
 	// TODO Sanitize
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
-		return nil, nil, fmt.Errorf("error setting data json: %v", err)
+		return nil, nil, fmt.Errorf("error setting data json: %w", err)
 	}
 
-	if err := r.db.NamedGetContext(ctx, dataRecord, `
-		INSERT INTO fieldkit.data_record (provision_id, time, number, meta_record_id, location, raw, pb)
-		VALUES (:provision_id, :time, :number, :meta_record_id, ST_SetSRID(ST_GeomFromText(:location), 4326), :raw, :pb)
-		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, location = EXCLUDED.location, raw = EXCLUDED.raw, pb = EXCLUDED.pb
-		RETURNING id
-		`, dataRecord); err != nil {
-		return nil, nil, err
+	if r.saveData {
+		if err := r.db.NamedGetContext(ctx, dataRecord, `
+			INSERT INTO fieldkit.data_record (provision_id, time, number, meta_record_id, location, raw, pb)
+			VALUES (:provision_id, :time, :number, :meta_record_id, ST_SetSRID(ST_GeomFromText(:location), 4326), :raw, :pb)
+			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, location = EXCLUDED.location, raw = EXCLUDED.raw, pb = EXCLUDED.pb
+			RETURNING id
+			`, dataRecord); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return dataRecord, metaRecord, nil

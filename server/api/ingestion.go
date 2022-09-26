@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"goa.design/goa/v3/security"
 
@@ -56,11 +57,13 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 	log.Infow("queued", "queued", len(queued), "user_id", p.UserID())
 
 	for _, q := range queued {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: q.ID,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  false,
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: q.ID,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  false,
+			},
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
@@ -105,8 +108,6 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 }
 
 func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload *ingestion.ProcessStationIngestionsPayload) (err error) {
-	log := Logger(ctx).Sugar()
-
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
 	if err != nil {
 		return err
@@ -121,8 +122,9 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 		UserID:    p.UserID(),
 		Verbose:   true,
 	}); err != nil {
-		log.Errorw("publishing", "err", err)
+		return err
 	}
+
 	return nil
 }
 
@@ -156,14 +158,36 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 	if id, err := ir.Enqueue(ctx, i.ID); err != nil {
 		return err
 	} else {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: id,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  true,
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: id,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  true,
+			},
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
+	}
+
+	return nil
+}
+
+func (c *IngestionService) RefreshViews(ctx context.Context, payload *ingestion.RefreshViewsPayload) (err error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.SensorDataModified{
+		ModifiedAt:  time.Now(),
+		PublishedAt: time.Now(),
+		StationID:   nil,
+		UserID:      p.UserID(),
+		Start:       time.Time{},
+		End:         time.Time{},
+	}); err != nil {
+		return err
 	}
 
 	return nil
@@ -200,7 +224,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 
 	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
-		return fmt.Errorf("error parsing url: %v", err)
+		return fmt.Errorf("error parsing url: %w", err)
 	}
 
 	log.Infow("deleting", "url", i.URL)

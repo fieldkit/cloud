@@ -97,7 +97,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 	if !ok {
 		parsed, err := gojq.Parse(query)
 		if err != nil {
-			return "", fmt.Errorf("error parsing query '%s': %v", query, err)
+			return "", fmt.Errorf("error parsing query '%s': %w", query, err)
 		}
 
 		compiled, err = gojq.Compile(parsed,
@@ -138,7 +138,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 			}),
 		)
 		if err != nil {
-			return "", fmt.Errorf("error compiling query '%s': %v", query, err)
+			return "", fmt.Errorf("error compiling query '%s': %w", query, err)
 		}
 
 		if cache.compiled == nil {
@@ -156,7 +156,7 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 		}
 
 		if err, ok := v.(error); ok {
-			return "", fmt.Errorf("query returned error '%s': %v", query, err)
+			return "", fmt.Errorf("query returned error '%s': %w", query, err)
 		}
 
 		if v != nil {
@@ -173,7 +173,7 @@ func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, 
 			// No luck, skipping and maybe another stationSchema will cover this message.
 			return false, nil
 		}
-		return false, fmt.Errorf("evaluating condition-expression: %v", err)
+		return false, fmt.Errorf("evaluating condition-expression: %w", err)
 	} else if value == nil {
 		return false, nil
 	} else if stringValue, ok := value.(string); ok {
@@ -199,7 +199,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 
 	deviceIDRaw, err := m.evaluate(ctx, cache, source, stationSchema.IdentifierExpression)
 	if err != nil {
-		return nil, fmt.Errorf("evaluating identifier-expression: %v", err)
+		return nil, fmt.Errorf("evaluating identifier-expression: %w", err)
 	}
 
 	var deviceName *string
@@ -207,7 +207,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	if stationSchema.NameExpression != "" {
 		if deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression); err != nil {
 			if _, ok := err.(*EvaluationError); !ok {
-				return nil, fmt.Errorf("evaluating device-name-expression: %v", err)
+				return nil, fmt.Errorf("evaluating device-name-expression: %w", err)
 			}
 		} else {
 			if deviceNameString, ok := deviceNameRaw.(string); !ok {
@@ -224,7 +224,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
 		if err != nil {
 			if _, ok := err.(*EvaluationError); !ok {
-				return nil, fmt.Errorf("evaluating received-at-expression: %v", err)
+				return nil, fmt.Errorf("evaluating received-at-expression: %w", err)
 			}
 		} else {
 			if receivedAtString, ok := receivedAtRaw.(string); ok {
@@ -334,7 +334,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			jsonValue, err := m.evaluate(ctx, cache, source, attribute.Expression)
 			if err != nil {
 				if _, ok := err.(*EvaluationError); !ok {
-					return nil, fmt.Errorf("evaluating attribute expression '%s': %v", attribute.Name, err)
+					return nil, fmt.Errorf("evaluating attribute expression '%s': %w", attribute.Name, err)
 				}
 			}
 
@@ -381,12 +381,12 @@ func (m *WebHookMessage) Parse(ctx context.Context, cache *JqCache, schemas map[
 
 	schema, err := schemaRegistration.Parse()
 	if err != nil {
-		return nil, fmt.Errorf("error parsing schema: %v", err)
+		return nil, fmt.Errorf("error parsing schema: %w", err)
 	}
 
 	var source interface{}
 	if err := json.Unmarshal(m.Body, &source); err != nil {
-		return nil, fmt.Errorf("error parsing message: %v", err)
+		return nil, fmt.Errorf("error parsing message: %w", err)
 	}
 
 	unrolled, err := m.unrollArrays(ctx, source)

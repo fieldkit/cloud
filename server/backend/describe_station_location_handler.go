@@ -3,7 +3,7 @@ package backend
 import (
 	"context"
 
-	"github.com/govau/que-go"
+	"github.com/vgarvardt/gue/v4"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common/jobs"
@@ -29,8 +29,13 @@ func NewDescribeStationLocationHandler(db *sqlxcache.DB, metrics *logging.Metric
 	}
 }
 
-func (h *DescribeStationLocationHandler) Handle(ctx context.Context, m *messages.StationLocationUpdated, j *que.Job) error {
+func (h *DescribeStationLocationHandler) Handle(ctx context.Context, m *messages.StationLocationUpdated, j *gue.Job) error {
 	log := Logger(ctx).Sugar().With("station_id", m.StationID)
+
+	if !h.locations.IsEnabled() {
+		log.Infow("describing-location:disabled")
+		return nil
+	}
 
 	log.Infow("describing-location")
 

@@ -4,17 +4,16 @@ import (
 	"context"
 	"encoding/base64"
 
+	"github.com/vgarvardt/gue/v4"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/fieldkit/cloud/server/api/querying"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/govau/que-go"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/email"
 	"github.com/fieldkit/cloud/server/files"
@@ -26,7 +25,6 @@ type ControllerOptions struct {
 	Session      *session.Session
 	Database     *sqlxcache.DB
 	Querier      *data.Querier
-	Backend      *backend.Backend
 	JWTHMACKey   []byte
 	Emailer      email.Emailer
 	Domain       string
@@ -42,7 +40,7 @@ type ControllerOptions struct {
 	// Services
 	signer    *Signer
 	locations *data.DescribeLocations
-	que       *que.Client
+	que       *gue.Client
 
 	// Subscribed listeners
 	subscriptions *Subscriptions
@@ -53,8 +51,8 @@ type ControllerOptions struct {
 	photoCache *PhotoCache
 }
 
-func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, be *backend.Backend, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *que.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
+	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
@@ -72,7 +70,6 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		Session:         awsSession,
 		Database:        database,
 		Querier:         data.NewQuerier(database),
-		Backend:         be,
 		Emailer:         emailer,
 		JWTHMACKey:      jwtHMACKey,
 		Domain:          config.Domain,

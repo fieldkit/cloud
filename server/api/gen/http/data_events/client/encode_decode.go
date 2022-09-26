@@ -62,11 +62,11 @@ func EncodeDataEventsEndpointRequest(encoder func(*http.Request) goahttp.Encoder
 // the data events data events endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeDataEventsEndpointResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDataEventsEndpointResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -205,11 +205,11 @@ func EncodeAddDataEventRequest(encoder func(*http.Request) goahttp.Encoder) func
 // data events add data event endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeAddDataEventResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeAddDataEventResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -356,11 +356,11 @@ func EncodeUpdateDataEventRequest(encoder func(*http.Request) goahttp.Encoder) f
 // the data events update data event endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeUpdateDataEventResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeUpdateDataEventResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -503,11 +503,11 @@ func EncodeDeleteDataEventRequest(encoder func(*http.Request) goahttp.Encoder) f
 // the data events delete data event endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeDeleteDataEventResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDeleteDataEventResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

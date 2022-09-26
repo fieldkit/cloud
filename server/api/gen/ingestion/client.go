@@ -20,17 +20,19 @@ type Client struct {
 	ProcessStationEndpoint           goa.Endpoint
 	ProcessStationIngestionsEndpoint goa.Endpoint
 	ProcessIngestionEndpoint         goa.Endpoint
+	RefreshViewsEndpoint             goa.Endpoint
 	DeleteEndpoint                   goa.Endpoint
 }
 
 // NewClient initializes a "ingestion" service client given the endpoints.
-func NewClient(processPending, walkEverything, processStation, processStationIngestions, processIngestion, delete_ goa.Endpoint) *Client {
+func NewClient(processPending, walkEverything, processStation, processStationIngestions, processIngestion, refreshViews, delete_ goa.Endpoint) *Client {
 	return &Client{
 		ProcessPendingEndpoint:           processPending,
 		WalkEverythingEndpoint:           walkEverything,
 		ProcessStationEndpoint:           processStation,
 		ProcessStationIngestionsEndpoint: processStationIngestions,
 		ProcessIngestionEndpoint:         processIngestion,
+		RefreshViewsEndpoint:             refreshViews,
 		DeleteEndpoint:                   delete_,
 	}
 }
@@ -67,6 +69,12 @@ func (c *Client) ProcessStationIngestions(ctx context.Context, p *ProcessStation
 // service.
 func (c *Client) ProcessIngestion(ctx context.Context, p *ProcessIngestionPayload) (err error) {
 	_, err = c.ProcessIngestionEndpoint(ctx, p)
+	return
+}
+
+// RefreshViews calls the "refresh views" endpoint of the "ingestion" service.
+func (c *Client) RefreshViews(ctx context.Context, p *RefreshViewsPayload) (err error) {
+	_, err = c.RefreshViewsEndpoint(ctx, p)
 	return
 }
 

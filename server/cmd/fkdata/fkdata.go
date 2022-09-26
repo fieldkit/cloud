@@ -19,8 +19,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/govau/que-go"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/vgarvardt/gue/v4"
+	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/backend/handlers"
@@ -116,7 +117,7 @@ func main() {
 		fail(ctx, err)
 	}
 
-	db, err := sqlxcache.Open("postgres", config.PostgresURL)
+	db, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
 	if err != nil {
 		fail(ctx, err)
 	}
@@ -158,32 +159,32 @@ func main() {
 			reading = append(reading, s3)
 		}
 
-		pgxcfg, err := pgx.ParseURI(config.PostgresURL)
+		pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
 		if err != nil {
 			fail(ctx, err)
 		}
 
-		pgxpool, err := pgx.NewConnPool(pgx.ConnPoolConfig{
-			ConnConfig:   pgxcfg,
-			AfterConnect: que.PrepareStatements,
-		})
+		pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
 		if err != nil {
 			fail(ctx, err)
 		}
 
 		fa := files.NewPrioritizedFilesArchive(reading, writing)
 
-		qc := que.NewClient(pgxpool)
-		publisher := jobs.NewQueMessagePublisher(metrics, qc)
-
-		isHandler := backend.NewIngestStationHandler(db, fa, metrics, publisher, tsConfig)
+		qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool))
+		if err != nil {
+			fail(ctx, err)
+		}
+		publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
+		mc := jobs.NewMessageContext(ctx, publisher, nil)
+		isHandler := backend.NewIngestStationHandler(db, pgxpool, fa, metrics, publisher, tsConfig)
 
 		process := func(ctx context.Context, id int32) error {
-			return isHandler.Handle(ctx, &messages.IngestStation{
+			return isHandler.Start(ctx, &messages.IngestStation{
 				StationID: id,
 				UserID:    2, // Jacob
 				Verbose:   true,
-			})
+			}, mc)
 		}
 
 		if options.All {
@@ -254,11 +255,11 @@ func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.Tim
 
 	if recently {
 		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
-			return fmt.Errorf("recently refresh failed: %v", err)
+			return fmt.Errorf("recently refresh failed: %w", err)
 		}
 	} else {
 		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
-			return fmt.Errorf("complete refresh failed: %v", err)
+			return fmt.Errorf("complete refresh failed: %w", err)
 		}
 	}
 
@@ -298,7 +299,7 @@ func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error 
 
 	for sampled.Before(end) {
 		if err := aggregator.NextTime(ctx, sampled); err != nil {
-			return fmt.Errorf("error adding: %v", err)
+			return fmt.Errorf("error adding: %w", err)
 		}
 
 		location.Move(sampled)
