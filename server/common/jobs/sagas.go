@@ -164,25 +164,25 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 	if saga.Version == 1 {
 		log.Infow("saga:inserting")
 
-		rows, err := tx.Exec(ctx, `INSERT INTO fieldkit.sagas (id, version, created_at, updated_at, scheduled_at, tags, type, body) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		res, err := tx.Exec(ctx, `INSERT INTO fieldkit.sagas (id, version, created_at, updated_at, scheduled_at, tags, type, body) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 			&saga.ID, &saga.Version, &saga.CreatedAt, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Type, &saga.Body)
 		if err != nil {
 			return err
 		}
 
-		if rows.RowsAffected() != 1 {
+		if res.RowsAffected() != 1 {
 			return fmt.Errorf("saga insert failed")
 		}
 	} else {
 		log.Infow("saga:updating")
 
-		rows, err := tx.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, body = $7 WHERE id = $1 AND version = $2`,
+		res, err := tx.Exec(ctx, `UPDATE fieldkit.sagas SET version = $3, updated_at = $4, scheduled_at = $5, tags = $6, body = $7 WHERE id = $1 AND version = $2`,
 			saga.ID, oldVersion, saga.Version, &saga.UpdatedAt, &saga.ScheduledAt, &saga.Tags, &saga.Body)
 		if err != nil {
 			return err
 		}
 
-		if rows.RowsAffected() != 1 {
+		if res.RowsAffected() != 1 {
 			return fmt.Errorf("saga optimistic lock failed")
 		}
 	}
@@ -200,12 +200,12 @@ func (r *SagaRepository) Delete(ctx context.Context, saga *Saga) error {
 		return err
 	}
 
-	rows, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1 AND version = $2`, saga.ID, saga.Version)
+	res, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1 AND version = $2`, saga.ID, saga.Version)
 	if err != nil {
 		return err
 	}
 
-	if rows.RowsAffected() != 1 {
+	if res.RowsAffected() != 1 {
 		return fmt.Errorf("saga delete failed")
 	}
 
@@ -222,12 +222,12 @@ func (r *SagaRepository) DeleteByID(ctx context.Context, id SagaID) error {
 		return err
 	}
 
-	rows, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1`, id)
+	res, err := tx.Exec(ctx, `DELETE FROM fieldkit.sagas WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
 
-	if rows.RowsAffected() != 1 {
+	if res.RowsAffected() != 1 {
 		return fmt.Errorf("saga delete failed")
 	}
 
