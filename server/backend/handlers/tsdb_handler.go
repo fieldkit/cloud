@@ -23,6 +23,7 @@ type TsDBHandler struct {
 	db                *sqlxcache.DB
 	tsConfig          *storage.TimeScaleDBConfig
 	publisher         jobs.MessagePublisher
+	completions       *jobs.CompletionIDs
 	metaFactory       *repositories.MetaFactory
 	stationRepository *repositories.StationRepository
 	provisionID       int64
@@ -33,11 +34,12 @@ type TsDBHandler struct {
 	records           []messages.SensorDataBatchRow
 }
 
-func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher) *TsDBHandler {
+func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher, completions *jobs.CompletionIDs) *TsDBHandler {
 	return &TsDBHandler{
 		db:                db,
 		tsConfig:          tsConfig,
 		publisher:         publisher,
+		completions:       completions,
 		metaFactory:       repositories.NewMetaFactory(db),
 		stationRepository: repositories.NewStationRepository(db),
 		stationIDs:        make(map[int64]int32),
@@ -133,6 +135,7 @@ func (v *TsDBHandler) OnDone(ctx context.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -178,7 +181,8 @@ func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, locati
 
 func (v *TsDBHandler) flushTs(ctx context.Context) error {
 	err := v.publisher.Publish(ctx, &messages.SensorDataBatch{
-		Rows: v.records,
+		BatchID: v.completions.Generate(),
+		Rows:    v.records,
 	})
 
 	v.records = v.records[:0]

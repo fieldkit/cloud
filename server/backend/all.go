@@ -12,11 +12,11 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
-func NewAllHandlers(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher) RecordHandler {
+func NewAllHandlers(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher, completions *jobs.CompletionIDs) RecordHandler {
 	return NewHandlerCollectionHandler(
 		[]RecordHandler{
 			handlers.NewStationModelRecordHandler(db),
-			handlers.NewTsDbHandler(db, tsConfig, publisher),
+			handlers.NewTsDbHandler(db, tsConfig, publisher, completions),
 		},
 	)
 }

@@ -23,14 +23,15 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	handler := NewIngestionReceivedHandler(e.DB, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
-	err = handler.Handle(e.Ctx, &messages.IngestionReceived{
+	err = handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: int64(30342),
 		Verbose:  true,
 		Refresh:  true,
-	})
+	}, mc)
 
 	assert.Errorf(err, "queued ingestion missing: %d", 30342)
 }
@@ -47,20 +48,21 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	files := tests.NewInMemoryArchive(map[string][]byte{
 		"/file": []byte{},
 	})
-	handler := NewIngestionReceivedHandler(e.DB, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queued.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 }
 func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert := assert.New(t)
@@ -79,21 +81,22 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queued, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queued.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 }
 
 func TestIngestionReceivedMetaAndData(t *testing.T) {
@@ -115,11 +118,12 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NotNil(queuedMeta)
@@ -129,19 +133,19 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NotNil(queuedData)
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
@@ -182,11 +186,12 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -194,19 +199,19 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, deviceID, len(files.Data))
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   user.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
@@ -244,11 +249,12 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, metaIngestion, err := e.AddIngestion(fd.Owner, "/meta", data.MetaTypeName, deviceID, len(files.Meta))
 	assert.NoError(err)
@@ -258,19 +264,19 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NoError(err)
 	assert.NotNil(dataIngestion)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   fd.Owner.ID,
 		QueuedID: queuedMeta.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		UserID:   fd.Owner.ID,
 		QueuedID: queuedData.ID,
 		Verbose:  true,
 		Refresh:  true,
-	}))
+	}, mc))
 
 	ir, err := repositories.NewIngestionRepository(e.DB)
 	assert.NoError(err)
