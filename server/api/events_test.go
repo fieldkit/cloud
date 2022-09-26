@@ -29,12 +29,13 @@ func TestEventsUpdateMyEvent(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[[%d,[2]]],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
 	payload1, err := json.Marshal(
 		struct {
 			Event eventsService.NewDataEvent `json:"event"`
 		}{
 			Event: eventsService.NewDataEvent{
-				ProjectID:   &fd.Project.ID,
+				Bookmark:    &bookmark,
 				Title:       "Event #1",
 				Description: "More about Event #1",
 				Start:       time.Now().Unix() * 1000,
@@ -55,6 +56,7 @@ func TestEventsUpdateMyEvent(t *testing.T) {
 				"id": "<<PRESENCE>>",
 				"createdAt": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"bookmark": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
 					"name": "<<PRESENCE>>"
@@ -88,14 +90,13 @@ func TestEventsUpdateMyEvent(t *testing.T) {
 	rrUpdate := tests.ExecuteRequest(reqUpdate, api)
 	assert.Equal(http.StatusOK, rrUpdate.Code)
 
-	fmt.Printf(rrUpdate.Body.String())
-
 	ja.Assertf(rrUpdate.Body.String(), `
 		{
 			"event": {
 				"id": "<<PRESENCE>>",
 				"createdAt": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"bookmark": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
 					"name": "<<PRESENCE>>"
@@ -123,12 +124,13 @@ func TestEventsUpdateStrangersEvent(t *testing.T) {
 	stranger, err := e.AddUser()
 	assert.NoError(err)
 
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[[%d,[2]]],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
 	payload1, err := json.Marshal(
 		struct {
 			Event eventsService.NewDataEvent `json:"event"`
 		}{
 			Event: eventsService.NewDataEvent{
-				ProjectID:   &fd.Project.ID,
+				Bookmark:    &bookmark,
 				Title:       "Event #1",
 				Description: "More about Event #1",
 				Start:       time.Now().Unix() * 1000,
@@ -149,6 +151,7 @@ func TestEventsUpdateStrangersEvent(t *testing.T) {
 				"id": "<<PRESENCE>>",
 				"createdAt": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"bookmark": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
 					"name": "<<PRESENCE>>"
@@ -195,12 +198,13 @@ func TestEventsDeleteMyEvent(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[[%d,[2]]],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
 	payload1, err := json.Marshal(
 		struct {
 			Event eventsService.NewDataEvent `json:"event"`
 		}{
 			Event: eventsService.NewDataEvent{
-				ProjectID:   &fd.Project.ID,
+				Bookmark:    &bookmark,
 				Title:       "Event #1",
 				Description: "More about Event #1",
 				Start:       time.Now().Unix() * 1000,
@@ -221,6 +225,7 @@ func TestEventsDeleteMyEvent(t *testing.T) {
 				"id": "<<PRESENCE>>",
 				"createdAt": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"bookmark": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
 					"name": "<<PRESENCE>>"
@@ -255,12 +260,13 @@ func TestEventsDeleteStrangersEvent(t *testing.T) {
 	stranger, err := e.AddUser()
 	assert.NoError(err)
 
+	bookmark := fmt.Sprintf(`{"v":1,"g":[[[[[[%d,[2]]],[-8640000000000000,8640000000000000],[],0,0]]]],"s":[]}`, fd.Stations[0].ID)
 	payload1, err := json.Marshal(
 		struct {
 			Event eventsService.NewDataEvent `json:"event"`
 		}{
 			Event: eventsService.NewDataEvent{
-				ProjectID:   &fd.Project.ID,
+				Bookmark:    &bookmark,
 				Title:       "Event #1",
 				Description: "More about Event #1",
 				Start:       time.Now().Unix() * 1000,
@@ -281,6 +287,7 @@ func TestEventsDeleteStrangersEvent(t *testing.T) {
 				"id": "<<PRESENCE>>",
 				"createdAt": "<<PRESENCE>>",
 				"updatedAt": "<<PRESENCE>>",
+				"bookmark": "<<PRESENCE>>",
 				"author": {
 					"id": "<<PRESENCE>>",
 					"name": "<<PRESENCE>>"
