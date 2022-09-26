@@ -140,11 +140,13 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 	if id, err := ir.Enqueue(ctx, ingestionID); err != nil {
 		return err
 	} else {
-		if err := mc.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: id,
-			UserID:   body.UserID,
-			Verbose:  false,
-			Refresh:  false,
+		if err := mc.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: id,
+				UserID:   body.UserID,
+				Verbose:  false,
+				Refresh:  false,
+			},
 		}); err != nil {
 			return err
 		}

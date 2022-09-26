@@ -10,6 +10,10 @@ type IngestionReceived struct {
 	SaveData bool  `json:"save_data"` // TODO Remove this
 }
 
+type ProcessIngestion struct {
+	IngestionReceived
+}
+
 type IngestionCompleted struct { // Event
 	QueuedID    int64     `json:"queued_id"`
 	CompletedAt time.Time `json:"completed_at"`

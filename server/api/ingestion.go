@@ -58,11 +58,13 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 	log.Infow("queued", "queued", len(queued), "user_id", p.UserID())
 
 	for _, q := range queued {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: q.ID,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  false,
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: q.ID,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  false,
+			},
 		}, jobs.StartSaga()); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
@@ -157,11 +159,13 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 	if id, err := ir.Enqueue(ctx, i.ID); err != nil {
 		return err
 	} else {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: id,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  true,
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: id,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  true,
+			},
 		}, jobs.StartSaga()); err != nil {
 			log.Warnw("publishing", "err", err)
 		}

@@ -118,6 +118,17 @@ func ingestStation(ctx context.Context, j *gue.Job, services *BackgroundServices
 func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	work := make(map[string]gue.WorkFunc)
 
+	Register(ctx, services, work, messages.ProcessIngestion{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := ingestionReceived(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.ProcessIngestion{}
+			if err := json.Unmarshal(tm.Body, m); err != nil {
+				return err
+			}
+			return h.Start(ctx, &m.IngestionReceived, mc)
+		}
+	})
 	Register(ctx, services, work, messages.IngestionReceived{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		if h, err := ingestionReceived(ctx, j, services, tm, mc); err != nil {
 			return err
