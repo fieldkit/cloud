@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/storage"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 
@@ -20,25 +22,137 @@ import (
 	"github.com/fieldkit/cloud/server/backend/repositories"
 )
 
-type IngestionReceivedHandler struct {
-	db        *sqlxcache.DB
-	files     files.FileArchive
-	metrics   *logging.Metrics
-	publisher jobs.MessagePublisher
-	tsConfig  *storage.TimeScaleDBConfig
+type IngestionSaga struct {
+	QueuedID  int64           `json:"queued_id"`
+	UserID    int32           `json:"user_id"`
+	Refresh   bool            `json:"refresh"`
+	StationID *int32          `json:"station_id"`
+	DataStart time.Time       `json:"data_start"`
+	DataEnd   time.Time       `json:"data_end"`
+	Required  map[string]bool `json:"required"`
+	Completed map[string]bool `json:"completed"`
 }
 
-func NewIngestionReceivedHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestionReceivedHandler {
+func (s *IngestionSaga) IsCompleted() bool {
+	for key := range s.Required {
+		if !s.Completed[key] {
+			return false
+		}
+	}
+
+	return true
+}
+
+type IngestionReceivedHandler struct {
+	db       *sqlxcache.DB
+	dbpool   *pgxpool.Pool
+	files    files.FileArchive
+	metrics  *logging.Metrics
+	tsConfig *storage.TimeScaleDBConfig
+}
+
+func NewIngestionReceivedHandler(db *sqlxcache.DB, dbpool *pgxpool.Pool, files files.FileArchive, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *IngestionReceivedHandler {
 	return &IngestionReceivedHandler{
-		db:        db,
-		files:     files,
-		metrics:   metrics,
-		publisher: publisher,
-		tsConfig:  tsConfig,
+		db:       db,
+		dbpool:   dbpool,
+		files:    files,
+		metrics:  metrics,
+		tsConfig: tsConfig,
 	}
 }
 
-func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.IngestionReceived) error {
+func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
+	log := Logger(ctx).Sugar()
+
+	// We do this because we may be a part of a saga already and so we need to
+	// start a new one.
+	mc.StartSaga()
+
+	log.Infow("ingestion-saga:started", "saga_id", mc.SagaID())
+
+	body := IngestionSaga{
+		QueuedID:  m.QueuedID,
+		UserID:    m.UserID,
+		Refresh:   m.Refresh,
+		Required:  make(map[string]bool),
+		Completed: make(map[string]bool),
+	}
+
+	saga := jobs.NewSaga(jobs.WithID(mc.SagaID()))
+	if err := saga.SetBody(body); err != nil {
+		return err
+	}
+
+	sagas := jobs.NewSagaRepository(h.dbpool)
+	if err := sagas.Upsert(ctx, saga); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
+	now := time.Now()
+
+	if err := mc.Event(&messages.IngestionCompleted{
+		QueuedID:    saga.QueuedID,
+		CompletedAt: now,
+		StationID:   saga.StationID,
+		UserID:      saga.UserID,
+		Start:       saga.DataStart,
+		End:         saga.DataEnd,
+	}, jobs.PopSaga()); err != nil {
+		return err
+	}
+
+	if saga.Refresh {
+		if err := mc.Event(&messages.SensorDataModified{
+			ModifiedAt:  now,
+			PublishedAt: now,
+			StationID:   saga.StationID,
+			UserID:      saga.UserID,
+			Start:       saga.DataStart,
+			End:         saga.DataEnd,
+		}, jobs.PopSaga()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (h *IngestionReceivedHandler) amendSagaRequired(ctx context.Context, mc *jobs.MessageContext, info *WriteInfo, completions *jobs.CompletionIDs) error {
+	log := Logger(ctx).Sugar()
+
+	sagas := jobs.NewSagaRepository(h.dbpool)
+	if err := sagas.LoadAndSave(ctx, mc.SagaID(), func(ctx context.Context, body *json.RawMessage) (interface{}, error) {
+		saga := &IngestionSaga{}
+		if err := json.Unmarshal(*body, saga); err != nil {
+			return nil, err
+		}
+
+		saga.StationID = info.StationID
+		saga.DataStart = info.DataStart
+		saga.DataEnd = info.DataEnd
+
+		for _, id := range completions.IDs() {
+			saga.Required[id] = true
+		}
+
+		if saga.IsCompleted() {
+			log.Warnw("ingestion-saga: already completed")
+			return nil, h.completed(ctx, saga, mc)
+		}
+
+		return saga, nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.IngestionReceived, mc *jobs.MessageContext) error {
 	log := Logger(ctx).Sugar().With("queued_ingestion_id", m.QueuedID)
 
 	log.Infow("processing")
@@ -56,6 +170,10 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
 	}
 
+	if err := h.startSaga(ctx, m, mc); err != nil {
+		return err
+	}
+
 	i, err := ir.QueryByID(ctx, queued.IngestionID)
 	if err != nil {
 		return err
@@ -63,74 +181,77 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
 	}
 
-	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
+	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", mc.SagaID())
 
-	handler := NewAllHandlers(h.db, h.tsConfig, h.publisher)
-
+	completions := jobs.NewCompletionIDs()
+	handler := NewAllHandlers(h.db, h.tsConfig, mc, completions)
 	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
-	hasOtherErrors := false
 	info, err := recordAdder.WriteRecords(ctx, i)
 	if err != nil {
 		log.Errorw("ingestion", "error", err)
+
 		if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
 			return err
 		}
+
+		if err := mc.Event(&messages.IngestionFailed{
+			QueuedID: m.QueuedID,
+		}, jobs.PopSaga()); err != nil {
+			return err
+		}
+
+		sagas := jobs.NewSagaRepository(h.dbpool)
+		if err := sagas.DeleteByID(ctx, mc.SagaID()); err != nil {
+			return err
+		}
+
 		return err
 	}
 
 	if info != nil {
 		if err := recordIngestionActivity(ctx, log, h.db, m, info); err != nil {
-			log.Errorw("ingestion", "error", err)
 			if err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID); err != nil {
 				return err
 			}
 			return err
 		}
-
-		if info.StationID != nil && m.Refresh {
-			now := time.Now()
-			/*
-				howFarBack := time.Hour * 48
-				if !info.DataStart.IsZero() {
-					if now.After(info.DataStart) {
-						howFarBack += now.Sub(info.DataStart)
-						if howFarBack < 0 {
-							log.Infow("refreshing-error", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
-							howFarBack = time.Hour * 48
-						} else {
-							log.Infow("refreshing", "how_far_back", howFarBack, "data_end", info.DataEnd, "now", now)
-						}
-					} else {
-						log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
-					}
-				}
-			*/
-
-			if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
-				ModifiedAt:  now,
-				PublishedAt: now,
-				StationID:   info.StationID,
-				UserID:      i.UserID,
-				Start:       info.DataStart,
-				End:         info.DataEnd,
-			}); err != nil {
-				return err
-			}
-		}
 	}
 
-	if hasOtherErrors {
-		err := ir.MarkProcessedHasOtherErrors(ctx, queued.ID)
-		if err != nil {
-			return err
+	if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
+		return err
+	}
+
+	if err := h.amendSagaRequired(ctx, mc, info, completions); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *IngestionReceivedHandler) BatchCompleted(ctx context.Context, m *messages.SensorDataBatchCommitted, mc *jobs.MessageContext) error {
+	log := Logger(ctx).Sugar().With("batch_id", m.BatchID)
+
+	log.Infow("sensor-batches:committed", "saga_id", mc.SagaID())
+
+	sagas := jobs.NewSagaRepository(h.dbpool)
+	if err := sagas.LoadAndSave(ctx, mc.SagaID(), func(ctx context.Context, body *json.RawMessage) (interface{}, error) {
+		saga := &IngestionSaga{}
+		if err := json.Unmarshal(*body, saga); err != nil {
+			return nil, err
 		}
-	} else {
-		if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
-			return err
+
+		saga.Completed[m.BatchID] = true
+
+		if saga.IsCompleted() {
+			return nil, h.completed(ctx, saga, mc)
 		}
+
+		return saga, nil
+	}); err != nil {
+		return err
 	}
 
 	return nil

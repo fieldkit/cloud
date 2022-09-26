@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -79,38 +79,15 @@ func (db *DB) namedStmtWithTx(ctx context.Context, stmt *sqlx.NamedStmt) *sqlx.N
 	return tx.NamedStmt(stmt)
 }
 
-/*
-func Connect(driverName, dataSourceName string) (*DB, error) {
-	db, err := sqlx.Connect(driverName, dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-
-	return newDB(db), nil
-}
-
-func MustConnect(driverName, dataSourceName string) *DB {
-	return newDB(sqlx.MustConnect(driverName, dataSourceName))
-}
-
-func MustOpen(driverName, dataSourceName string) *DB {
-	return newDB(sqlx.MustOpen(driverName, dataSourceName))
-}
-
-func NewDb(db *sql.DB, driverName string) *DB {
-	return newDB(sqlx.NewDb(db, driverName))
-}
-*/
-
 func Open(ctx context.Context, driverName, url string) (*DB, error) {
 	db, err := sqlx.Open(driverName, url)
 	if err != nil {
 		return nil, err
 	}
 
-	pool, err := pgxpool.Connect(ctx, url)
+	pool, err := pgxpool.New(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("(tsdb) error connecting: %w", err)
+		return nil, fmt.Errorf("(pgx) error connecting: %w", err)
 	}
 
 	return newDB(db, pool), nil
@@ -213,12 +190,6 @@ func (db *DB) SelectContext(ctx context.Context, dest interface{}, query string,
 
 	return stmt.SelectContext(ctx, dest, args...)
 }
-
-/*
-func (db *DB) Unsafe() *DB {
-	return newDB(db.db.Unsafe())
-}
-*/
 
 type transactionContextKey string
 

@@ -3,36 +3,34 @@ package backend
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/vgarvardt/gue/v4"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 )
 
 type SensorDataBatchHandler struct {
-	db        *sqlxcache.DB
 	metrics   *logging.Metrics
 	publisher jobs.MessagePublisher
 	tsConfig  *storage.TimeScaleDBConfig
 }
 
-func NewSensorDataBatchHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
+func NewSensorDataBatchHandler(metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
 	return &SensorDataBatchHandler{
-		db:        db,
 		metrics:   metrics,
 		publisher: publisher,
 		tsConfig:  tsConfig,
 	}
 }
 
-func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job) error {
+func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job, mc *jobs.MessageContext) error {
 	log := logging.Logger(ctx).Sugar()
 
 	batch := &pgx.Batch{}
@@ -45,18 +43,14 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		batch.Queue(sql, row.Time, row.StationID, row.ModuleID, row.SensorID, row.Value)
 	}
 
-	log.Infow("tsdb-handler:flushing", "records", len(m.Rows))
+	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID())
 
-	if h.tsConfig == nil {
-		return nil
-	}
-
-	pgPool, err := h.tsConfig.Acquire(ctx)
+	pool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	tx, err := pgPool.Begin(ctx)
+	tx, err := txs.RequireTransaction(ctx, pool)
 	if err != nil {
 		return err
 	}
@@ -71,9 +65,8 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %w", err)
-	}
-
-	return nil
+	return mc.Reply(&messages.SensorDataBatchCommitted{
+		BatchID: m.BatchID,
+		Time:    time.Now(),
+	}, jobs.ToSerializedQueue())
 }

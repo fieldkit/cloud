@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 
 	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	"github.com/fieldkit/cloud/server/common/jobs"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
@@ -57,12 +58,14 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 	log.Infow("queued", "queued", len(queued), "user_id", p.UserID())
 
 	for _, q := range queued {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: q.ID,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  false,
-		}); err != nil {
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: q.ID,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  false,
+			},
+		}, jobs.StartSaga()); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
 	}
@@ -98,7 +101,7 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 		Completely:  completely,
 		SkipManual:  skipManual,
 		UserID:      p.UserID(),
-	}); err != nil {
+	}, jobs.StartSaga()); err != nil {
 		log.Errorw("publishing", "err", err)
 	}
 
@@ -106,8 +109,6 @@ func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestio
 }
 
 func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload *ingestion.ProcessStationIngestionsPayload) (err error) {
-	log := Logger(ctx).Sugar()
-
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
 	if err != nil {
 		return err
@@ -117,41 +118,12 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 		return err
 	}
 
-	if false {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
-			StationID: int32(payload.StationID),
-			UserID:    p.UserID(),
-			Verbose:   true,
-		}); err != nil {
-			return err
-		}
-	} else {
-		ir, err := repositories.NewIngestionRepository(c.options.Database)
-		if err != nil {
-			return err
-		}
-
-		ingestions, err := ir.QueryByStationID(ctx, int32(payload.StationID))
-		if err != nil {
-			return err
-		}
-
-		for _, ingestion := range ingestions {
-			log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
-
-			if id, err := ir.Enqueue(ctx, ingestion.ID); err != nil {
-				return err
-			} else {
-				if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-					QueuedID: id,
-					UserID:   p.UserID(),
-					Verbose:  true,
-					Refresh:  false,
-				}); err != nil {
-					return err
-				}
-			}
-		}
+	if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
+		StationID: int32(payload.StationID),
+		UserID:    p.UserID(),
+		Verbose:   true,
+	}, jobs.StartSaga()); err != nil {
+		return err
 	}
 
 	return nil
@@ -187,12 +159,14 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 	if id, err := ir.Enqueue(ctx, i.ID); err != nil {
 		return err
 	} else {
-		if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: id,
-			UserID:   p.UserID(),
-			Verbose:  true,
-			Refresh:  true,
-		}); err != nil {
+		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
+			messages.IngestionReceived{
+				QueuedID: id,
+				UserID:   p.UserID(),
+				Verbose:  true,
+				Refresh:  true,
+			},
+		}, jobs.StartSaga()); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
 	}
