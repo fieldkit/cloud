@@ -8,25 +8,22 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/vgarvardt/gue/v4"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 )
 
 type SensorDataBatchHandler struct {
-	db        *sqlxcache.DB
 	metrics   *logging.Metrics
 	publisher jobs.MessagePublisher
 	tsConfig  *storage.TimeScaleDBConfig
 }
 
-func NewSensorDataBatchHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
+func NewSensorDataBatchHandler(metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
 	return &SensorDataBatchHandler{
-		db:        db,
 		metrics:   metrics,
 		publisher: publisher,
 		tsConfig:  tsConfig,
@@ -48,12 +45,12 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 
 	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID())
 
-	pgPool, err := h.tsConfig.Acquire(ctx)
+	pool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	tx, err := pgPool.Begin(ctx)
+	tx, err := txs.RequireTransactionFromPool(ctx, pool)
 	if err != nil {
 		return err
 	}
@@ -66,10 +63,6 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 
 	if err := br.Close(); err != nil {
 		return fmt.Errorf("(tsdb-close) %w", err)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %w", err)
 	}
 
 	return mc.Reply(&messages.SensorDataBatchCommitted{

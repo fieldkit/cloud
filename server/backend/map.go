@@ -62,7 +62,7 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 	if err := json.Unmarshal(tm.Body, message); err != nil {
 		return err
 	}
-	handler := NewSensorDataBatchHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
+	handler := NewSensorDataBatchHandler(services.metrics, services.publisher, services.timeScaleConfig)
 	return handler.Handle(ctx, message, j, mc)
 }
 
