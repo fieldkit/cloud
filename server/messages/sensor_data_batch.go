@@ -23,8 +23,10 @@ type SensorDataBatchesStarted struct {
 }
 
 type SensorDataBatchCommitted struct {
-	BatchID string    `json:"batch_id"`
-	Time    time.Time `json:"time"`
+	BatchID   string    `json:"batch_id"`
+	Time      time.Time `json:"time"`
+	DataStart time.Time `json:"data_start"`
+	DataEnd   time.Time `json:"data_end"`
 }
 
 type IngestAll struct {

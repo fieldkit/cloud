@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"reflect"
 	"time"
 
@@ -253,20 +254,24 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
-			messageLog.Errorw("error", "error", err)
+			if errors.Is(err, jobs.ErrNoOptimisticLock) {
+				messageLog.Warnw("error", "error", err)
+			} else {
+				messageLog.Errorw("error", "error", err)
 
-			if j.ErrorCount >= MaximumRetriesBeforeTrash {
-				messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
+				if j.ErrorCount >= MaximumRetriesBeforeTrash {
+					messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
 
-				failed := WorkFailed{
-					Work: transport,
+					failed := WorkFailed{
+						Work: transport,
+					}
+
+					if err := mc.Publish(ctx, &failed, jobs.ToQueue("errors")); err != nil {
+						return err
+					}
+
+					return nil
 				}
-
-				if err := mc.Publish(ctx, &failed, jobs.ToQueue("errors")); err != nil {
-					return err
-				}
-
-				return nil
 			}
 		}
 

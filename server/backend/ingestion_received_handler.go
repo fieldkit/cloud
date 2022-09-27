@@ -68,7 +68,7 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 	// start a new one.
 	mc.StartSaga()
 
-	log.Infow("ingestion-saga:started", "saga_id", mc.SagaID())
+	log.Infow("ingestion-saga: started", "saga_id", mc.SagaID())
 
 	body := IngestionSaga{
 		QueuedID:  m.QueuedID,
