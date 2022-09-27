@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/iancoleman/strcase"
 
 	"go.uber.org/zap"
 
@@ -122,15 +121,16 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		sensors := make([]*DataMetaSensor, 0)
 
 		for _, sensor := range module.Sensors {
-			key := strcase.ToLowerCamel(sensor.Name)
-			extraModule, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
+			_, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, err
 			}
 			if extraModule == nil || extraSensor == nil {
+				log.Warnw("meta:missing-sensor", "sensor_name", sensor.Name, "module_key", extraModule.Key, "header", hf)
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
 
+			key := extraSensor.Key
 			fullKey := extraModule.Key + "." + key
 			if fq {
 				key = fullKey

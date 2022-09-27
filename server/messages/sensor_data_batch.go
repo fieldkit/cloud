@@ -14,5 +14,24 @@ type SensorDataBatchRow struct {
 }
 
 type SensorDataBatch struct {
-	Rows []SensorDataBatchRow `json:"rows"`
+	BatchID string               `json:"batch_id"`
+	Rows    []SensorDataBatchRow `json:"rows"`
+}
+
+type SensorDataBatchesStarted struct {
+	BatchIDs []string `json:"batch_ids"`
+}
+
+type SensorDataBatchCommitted struct {
+	BatchID   string    `json:"batch_id"`
+	Time      time.Time `json:"time"`
+	DataStart time.Time `json:"data_start"`
+	DataEnd   time.Time `json:"data_end"`
+}
+
+type IngestAll struct {
+}
+
+type Wakeup struct {
+	Counter int `json:"counter"`
 }

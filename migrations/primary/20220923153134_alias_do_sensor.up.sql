@@ -1,0 +1,1 @@
+UPDATE fieldkit.sensor_meta SET aliases = ARRAY['dox'] WHERE sensor_key = 'do'

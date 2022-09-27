@@ -3,39 +3,40 @@ package backend
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/vgarvardt/gue/v4"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/messages"
 	"github.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
+	"github.com/fieldkit/cloud/server/common/txs"
 )
 
 type SensorDataBatchHandler struct {
-	db        *sqlxcache.DB
 	metrics   *logging.Metrics
 	publisher jobs.MessagePublisher
 	tsConfig  *storage.TimeScaleDBConfig
 }
 
-func NewSensorDataBatchHandler(db *sqlxcache.DB, metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
+func NewSensorDataBatchHandler(metrics *logging.Metrics, publisher jobs.MessagePublisher, tsConfig *storage.TimeScaleDBConfig) *SensorDataBatchHandler {
 	return &SensorDataBatchHandler{
-		db:        db,
 		metrics:   metrics,
 		publisher: publisher,
 		tsConfig:  tsConfig,
 	}
 }
 
-func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job) error {
+func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job, mc *jobs.MessageContext) error {
 	log := logging.Logger(ctx).Sugar()
 
 	batch := &pgx.Batch{}
+
+	dataStart := time.Time{}
+	dataEnd := time.Time{}
 
 	for _, row := range m.Rows {
 		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
@@ -43,20 +44,23 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 				ON CONFLICT (time, station_id, module_id, sensor_id)
 				DO UPDATE SET value = EXCLUDED.value`
 		batch.Queue(sql, row.Time, row.StationID, row.ModuleID, row.SensorID, row.Value)
+
+		if row.Time.Before(dataStart) || dataStart.IsZero() {
+			dataStart = row.Time
+		}
+		if row.Time.After(dataEnd) || dataEnd.IsZero() {
+			dataEnd = row.Time
+		}
 	}
 
-	log.Infow("tsdb-handler:flushing", "records", len(m.Rows))
+	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID(), "data_start", dataStart, "data_end", dataEnd)
 
-	if h.tsConfig == nil {
-		return nil
-	}
-
-	pgPool, err := h.tsConfig.Acquire(ctx)
+	pool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 
-	tx, err := pgPool.Begin(ctx)
+	tx, err := txs.RequireTransaction(ctx, pool)
 	if err != nil {
 		return err
 	}
@@ -71,9 +75,10 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %w", err)
-	}
-
-	return nil
+	return mc.Reply(&messages.SensorDataBatchCommitted{
+		BatchID:   m.BatchID,
+		Time:      time.Now(),
+		DataStart: dataStart,
+		DataEnd:   dataEnd,
+	}, jobs.ToSerializedQueue())
 }
