@@ -42,18 +42,28 @@ func (s *Saga) Schedule(duration time.Duration) {
 	s.ScheduledAt = &when
 }
 
+func getSagaType(body interface{}) string {
+	sagaType := reflect.TypeOf(body)
+	if sagaType.Kind() == reflect.Ptr {
+		sagaType = sagaType.Elem()
+	}
+	return sagaType.PkgPath() + "." + sagaType.Name()
+}
+
 func (s *Saga) SetBody(body interface{}) error {
 	if body == nil {
 		return fmt.Errorf("saga body is required")
 	}
-	sagaType := reflect.TypeOf(body)
+
 	bytes, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 	raw := json.RawMessage(bytes)
-	s.Type = sagaType.PkgPath() + "." + sagaType.Name()
+
+	s.Type = getSagaType(body)
 	s.Body = &raw
+
 	return nil
 }
 
