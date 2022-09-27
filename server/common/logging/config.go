@@ -77,6 +77,12 @@ func getOurDevelopmentConfig() *zap.Config {
 	}
 }
 
+var isProduction bool
+
+func IsServiceTraceEnabled() bool {
+	return isProduction
+}
+
 func getConfiguration(production bool) *zap.Config {
 	if production {
 		return getOurProductionConfig()
@@ -85,6 +91,8 @@ func getConfiguration(production bool) *zap.Config {
 }
 
 func Configure(production bool, name string) (*zap.SugaredLogger, error) {
+	isProduction = production
+
 	config := getConfiguration(production)
 
 	logger, err := config.Build()
