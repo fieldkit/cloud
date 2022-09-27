@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -14,7 +15,9 @@ import (
 )
 
 var (
-	sagaIDs = logging.NewIdGenerator()
+	sagaIDs             = logging.NewIdGenerator()
+	ErrNoOptimisticLock = errors.New("saga optimistic lock failed")
+	ErrNoSaga           = errors.New("saga not found")
 )
 
 type SagaID string
@@ -126,7 +129,7 @@ func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFun
 	}
 
 	if loaded == nil {
-		return fmt.Errorf("load and save no such saga")
+		return ErrNoSaga
 	}
 
 	if updated, err := loadSaveFunc(ctx, loaded.Body); err != nil {
@@ -183,7 +186,7 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 		}
 
 		if res.RowsAffected() != 1 {
-			return fmt.Errorf("saga optimistic lock failed")
+			return ErrNoOptimisticLock
 		}
 	}
 
