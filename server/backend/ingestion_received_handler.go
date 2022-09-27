@@ -92,6 +92,8 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 }
 
 func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
+	log := Logger(ctx).Sugar()
+
 	now := time.Now()
 
 	// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
@@ -106,6 +108,8 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 		}, jobs.PopSaga()); err != nil {
 			return err
 		}
+	} else {
+		log.Infow("ingestion-saga: solo")
 	}
 
 	if saga.Refresh {

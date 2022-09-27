@@ -88,6 +88,12 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 		return err
 	}
 
+	// We do this because we may be a part of a saga already and so we need to
+	// start a new one. Also, notice we do this before we start sending messages.
+	mc.StartSaga()
+
+	log.Infow("ingest-station:started", "new_saga_id", mc.SagaID())
+
 	body := StationIngestionSaga{
 		UserID:     m.UserID,
 		StationID:  m.StationID,
