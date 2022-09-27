@@ -20,6 +20,10 @@ const (
 	BatchSize = 1000
 )
 
+var (
+	EarliestPlausibleTime = time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC)
+)
+
 type TsDBHandler struct {
 	db                *sqlxcache.DB
 	tsConfig          *storage.TimeScaleDBConfig
@@ -109,6 +113,11 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 
 	if db.Time.After(time.Now()) {
 		log.Warnw("tsdb-handler:ignored-future-sample", "future_time", db.Time)
+		return nil
+	}
+
+	if db.Time.Before(EarliestPlausibleTime) {
+		log.Warnw("tsdb-handler:ignored-inplausible-sample", "implausible_time", db.Time)
 		return nil
 	}
 
