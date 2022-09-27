@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"time"
@@ -28,6 +29,7 @@ type TsDBHandler struct {
 	stationRepository *repositories.StationRepository
 	provisionID       int64
 	metaID            int64
+	skippingMetaID    int64
 	stationIDs        map[int64]int32
 	stationModules    map[uint32]*data.StationModule
 	sensors           map[string]*data.Sensor
@@ -44,8 +46,9 @@ func NewTsDbHandler(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publi
 		stationRepository: repositories.NewStationRepository(db),
 		stationIDs:        make(map[int64]int32),
 		records:           make([]messages.SensorDataBatchRow, 0),
-		provisionID:       0,
-		metaID:            0,
+		provisionID:       -1,
+		metaID:            -1,
+		skippingMetaID:    -1,
 	}
 }
 
@@ -55,6 +58,7 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, raw
 	log.Infow("tsdb-handler:meta", "meta_record_id", meta.ID)
 
 	v.provisionID = provision.ID
+	v.skippingMetaID = -1
 
 	if _, ok := v.stationIDs[provision.ID]; !ok {
 		station, err := v.stationRepository.QueryStationByDeviceID(ctx, provision.DeviceID)
@@ -67,7 +71,13 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, raw
 	}
 
 	if _, err := v.metaFactory.Add(ctx, meta, true); err != nil {
-		return err
+		var malformedErr *repositories.MalformedMetaError
+		if errors.As(err, &malformedErr) {
+			v.skippingMetaID = meta.ID
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	return nil
@@ -90,6 +100,11 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 		}
 
 		v.metaID = meta.ID
+	}
+
+	if v.skippingMetaID == v.metaID {
+		log.Infow("tsdb-handler:skip-meta")
+		return nil
 	}
 
 	if db.Time.After(time.Now()) {
