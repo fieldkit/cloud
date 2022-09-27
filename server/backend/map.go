@@ -108,6 +108,10 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	log.Infow("work-map:register", "message_type", name)
 }
 
+func refreshMaterializedViews(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) (*RefreshMaterializedViewsHandler, error) {
+	return NewRefreshMaterializedViewsHandler(services.metrics, services.timeScaleConfig), nil
+}
+
 func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) (*IngestionReceivedHandler, error) {
 	return NewIngestionReceivedHandler(services.database, services.dbpool, services.fileArchives.Ingestion, services.metrics, services.publisher, services.timeScaleConfig), nil
 }
@@ -187,6 +191,31 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 		}
 	})
 	Register(ctx, services, work, messages.StationIngested{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		return nil
+	})
+
+	Register(ctx, services, work, messages.RefreshAllMaterializedViews{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := refreshMaterializedViews(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.RefreshAllMaterializedViews{}
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
+				return err
+			}
+			return h.Start(ctx, m, mc)
+		}
+		return nil
+	})
+	Register(ctx, services, work, messages.RefreshMaterializedView{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := refreshMaterializedViews(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.RefreshMaterializedView{}
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
+				return err
+			}
+			return h.RefreshView(ctx, m, mc)
+		}
 		return nil
 	})
 
