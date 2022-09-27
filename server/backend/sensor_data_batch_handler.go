@@ -31,7 +31,7 @@ func NewSensorDataBatchHandler(metrics *logging.Metrics, publisher jobs.MessageP
 }
 
 func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job, mc *jobs.MessageContext) error {
-	log := logging.Logger(ctx).Sugar()
+	log := logging.Logger(ctx).Sugar().With("saga_id", mc.SagaID(), "batch_id", m.BatchID)
 
 	batch := &pgx.Batch{}
 
@@ -53,7 +53,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		}
 	}
 
-	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID(), "data_start", dataStart, "data_end", dataEnd)
+	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "data_start", dataStart, "data_end", dataEnd)
 
 	pool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
@@ -76,8 +76,8 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 	}
 
 	return mc.Reply(&messages.SensorDataBatchCommitted{
-		BatchID:   m.BatchID,
 		Time:      time.Now(),
+		BatchID:   m.BatchID,
 		DataStart: dataStart,
 		DataEnd:   dataEnd,
 	}, jobs.ToSerializedQueue())
