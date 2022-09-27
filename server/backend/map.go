@@ -93,7 +93,7 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	messageType := reflect.TypeOf(message)
 	name := messageType.Name()
 
-	work[name] = wrapTransactionScope(services.dbpool, wrapTransportMessage(services, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+	work[name] = wrapTransportMessage(services, wrapTransactionScope(func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		/*
 			v := reflect.New(messageType)
 			m := v.Interface()
@@ -208,11 +208,15 @@ type WorkFailed struct {
 
 type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
 
-func wrapTransactionScope(dbpool *pgxpool.Pool, next gue.WorkFunc) gue.WorkFunc {
-	return func(ctx context.Context, j *gue.Job) error {
+func wrapTransactionScope(h OurTransportMessageFunc) OurTransportMessageFunc {
+	return func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		log := Logger(ctx).Sugar()
 
-		scopeCtx, scope := txs.NewTransactionScope(ctx, dbpool)
+		scopeCtx, scope := txs.NewTransactionScope(ctx, services.dbpool)
+
+		if _, err := txs.RequireTransaction(scopeCtx, services.dbpool); err != nil {
+			return err
+		}
 
 		ok := false
 
@@ -224,7 +228,7 @@ func wrapTransactionScope(dbpool *pgxpool.Pool, next gue.WorkFunc) gue.WorkFunc 
 			}
 		}()
 
-		if err := next(scopeCtx, j); err != nil {
+		if err := h(scopeCtx, j, services, tm, mc); err != nil {
 			return err
 		}
 
@@ -250,7 +254,7 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 		messageLog := Logger(messageCtx).Sugar()
 
-		mc := jobs.NewMessageContext(messageCtx, jobs.NewQueMessagePublisher(services.metrics, services.dbpool, services.que), transport)
+		mc := jobs.NewMessageContext(jobs.NewQueMessagePublisher(services.metrics, services.dbpool, services.que), transport)
 
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {

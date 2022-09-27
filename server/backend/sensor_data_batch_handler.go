@@ -75,7 +75,7 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
-	return mc.Reply(&messages.SensorDataBatchCommitted{
+	return mc.Reply(ctx, &messages.SensorDataBatchCommitted{
 		Time:      time.Now(),
 		BatchID:   m.BatchID,
 		DataStart: dataStart,
