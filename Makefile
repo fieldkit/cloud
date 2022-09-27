@@ -127,7 +127,7 @@ schema-production:
 	@echo "CREATE USER server;" >> schema-production/0.sql
 	@echo "CREATE USER rdsadmin;" >> schema-production/0.sql
 	@echo "CREATE DATABASE keycloak;" >> schema-production/0.sql
-	@echo "UPDATE que_jobs SET run_at = run_at + INTERVAL '10 year' WHERE run_at <= NOW();" >> schema-production/2.sql
+	@echo "UPDATE fieldkit.gue_jobs SET run_at = run_at + INTERVAL '10 year' WHERE run_at <= NOW();" >> schema-production/2.sql
 	@for f in `find schema-production -name "*.xz"`; do                   \
 		echo $$f                                                     ;\
 		xz -d < $$f > schema-production/1.sql                        ;\
