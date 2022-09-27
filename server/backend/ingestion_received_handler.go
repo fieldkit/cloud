@@ -12,9 +12,8 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
@@ -98,7 +97,7 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 
 	// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
 	if mc.HasParentSaga() {
-		if err := mc.Event(&messages.IngestionCompleted{
+		if err := mc.Event(ctx, &messages.IngestionCompleted{
 			QueuedID:    saga.QueuedID,
 			CompletedAt: now,
 			StationID:   saga.StationID,
@@ -113,7 +112,7 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 	}
 
 	if saga.Refresh {
-		if err := mc.Event(&messages.SensorDataModified{
+		if err := mc.Event(ctx, &messages.SensorDataModified{
 			ModifiedAt:  now,
 			PublishedAt: now,
 			StationID:   saga.StationID,
@@ -206,7 +205,7 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 		// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
 		if mc.HasParentSaga() {
-			if err := mc.Event(&messages.IngestionFailed{
+			if err := mc.Event(ctx, &messages.IngestionFailed{
 				QueuedID: m.QueuedID,
 			}, jobs.PopSaga()); err != nil {
 				return err

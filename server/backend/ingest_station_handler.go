@@ -175,7 +175,7 @@ func (h *IngestStationHandler) markCompleted(ctx context.Context, mc *jobs.Messa
 		saga.Completed[queuedID] = true
 
 		if saga.IsCompleted() {
-			if err := mc.Event(&messages.StationIngested{
+			if err := mc.Event(ctx, &messages.StationIngested{
 				StationID: saga.StationID,
 				UserID:    saga.UserID,
 			}, jobs.PopSaga()); err != nil {
