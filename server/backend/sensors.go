@@ -252,7 +252,7 @@ func NewDataQuerier(db *sqlxcache.DB) *DataQuerier {
 func (dq *DataQuerier) QueryMeta(ctx context.Context, qp *QueryParams) (qm *QueryMeta, err error) {
 	sensors := []*SensorMeta{}
 	if err := dq.db.SelectContext(ctx, &sensors, `SELECT id, key FROM fieldkit.aggregated_sensor`); err != nil {
-		return nil, fmt.Errorf("error querying for sensor meta: %v", err)
+		return nil, fmt.Errorf("error querying for sensor meta: %w", err)
 	}
 
 	query, args, err := sqlx.In(`SELECT id, name FROM fieldkit.station WHERE id IN (?)`, qp.Stations)
@@ -314,12 +314,12 @@ func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*
 		WHERE s.id IN (?)
 	`, stationIDs)
 	if err != nil {
-		return nil, fmt.Errorf("(station-ids) %v", err)
+		return nil, fmt.Errorf("(station-ids) %w", err)
 	}
 
 	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, fmt.Errorf("(station-ids) %v", err)
+		return nil, fmt.Errorf("(station-ids) %w", err)
 	}
 
 	keyToHardwareID := make(map[int64]string)
@@ -368,12 +368,12 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		WHERE m.hardware_id IN (?)
 	`, moduleHardwareIDs)
 	if err != nil {
-		return nil, fmt.Errorf("(get-ids) %v", err)
+		return nil, fmt.Errorf("(get-ids) %w", err)
 	}
 
 	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, fmt.Errorf("(get-ids) %v", err)
+		return nil, fmt.Errorf("(get-ids) %w", err)
 	}
 
 	log := Logger(ctx).Sugar()
@@ -445,7 +445,7 @@ func (row *DataRow) CoerceNaNs() {
 
 func scanRow(queried *sqlx.Rows, row *DataRow) error {
 	if err := queried.StructScan(row); err != nil {
-		return fmt.Errorf("error scanning row: %v", err)
+		return fmt.Errorf("error scanning row: %w", err)
 	}
 
 	if row.Value != nil && math.IsNaN(*row.Value) {

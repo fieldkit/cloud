@@ -23,7 +23,9 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/messages"
 )
 
 type StationService struct {
@@ -41,7 +43,7 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 
 	sr := repositories.NewStationRepository(c.options.Database)
 
-	station.UpdatedAt = time.Now()
+	now := time.Now().UTC()
 
 	if rawStatusPb != nil {
 		log.Infow("updating station from status", "station_id", station.ID)
@@ -55,18 +57,22 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 		}
 
 		if station.Location != nil && c.options.locations != nil {
-			log.Infow("describing location", "station_id", station.ID)
-			names, err := c.options.locations.Describe(ctx, station.Location)
-			if err != nil {
-				log.Errorw("error updating from location", "error", err)
-			} else if names != nil {
-				station.PlaceOther = names.OtherLandName
-				station.PlaceNative = names.NativeLandName
+			lastUpdated := now.Sub(station.UpdatedAt)
+			if lastUpdated > time.Hour {
+				if err := c.options.Publisher.Publish(ctx, &messages.StationLocationUpdated{
+					StationID: station.ID,
+					Time:      now,
+					Location:  station.Location.Coordinates(),
+				}); err != nil {
+					return err
+				}
 			}
 		}
 
-		station.SyncedAt = &station.UpdatedAt
+		station.SyncedAt = &now
 	}
+
+	station.UpdatedAt = now
 
 	if err := sr.UpdateStation(ctx, station); err != nil {
 		return err
@@ -76,6 +82,24 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 }
 
 func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
+	tx, err := c.options.Database.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	txCtx := context.WithValue(ctx, sqlxcache.TxContextKey, tx)
+	response, err = c.add(txCtx, payload)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
+
+	return response, err
+}
+
+func (c *StationService) add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
 	deviceId, err := hex.DecodeString(payload.DeviceID)
@@ -540,7 +564,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 		if err := projectPermissions.CanView(); err == nil {
 			return c.ListProjectAssociated(ctx, &station.ListProjectAssociatedPayload{
-				ProjectID: projects[0].ID,
+				ProjectID: project.ID,
 			})
 		}
 	}
@@ -727,15 +751,6 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 	if err := p.CanView(); err != nil {
 		return nil, err
 	}
-
-	sr := repositories.NewStationRepository(c.options.Database)
-
-	jobs, err := sr.QueryStationProgress(ctx, payload.StationID)
-	if err != nil {
-		return nil, err
-	}
-
-	_ = jobs
 
 	jobsWm := make([]*station.StationJob, 0)
 

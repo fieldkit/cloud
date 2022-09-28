@@ -136,7 +136,7 @@ func (pgb *PostgresBackend) QueryTail(ctx context.Context, stationIDs []int32) (
 
 func scanRow(queried *sqlx.Rows, row *backend.DataRow) error {
 	if err := queried.StructScan(row); err != nil {
-		return fmt.Errorf("error scanning row: %v", err)
+		return fmt.Errorf("error scanning row: %w", err)
 	}
 
 	if row.Value != nil && math.IsNaN(*row.Value) {

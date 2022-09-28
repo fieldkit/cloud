@@ -24,15 +24,15 @@ func main() {
 			log.Printf("Creating schema...")
 
 			if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
-				return fmt.Errorf("error creating: %v", err)
+				return fmt.Errorf("error creating: %w", err)
 			}
 
 			if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-				return fmt.Errorf("error granting: %v", err)
+				return fmt.Errorf("error granting: %w", err)
 			}
 
 			if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-				return fmt.Errorf("error granting: %v", err)
+				return fmt.Errorf("error granting: %w", err)
 			}
 
 			log.Printf("Done creating schema...")

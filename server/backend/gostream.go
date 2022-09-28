@@ -43,7 +43,7 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 				if io.EOF == err {
 					return pbs, position, nil
 				} else if err != nil {
-					return pbs, position, fmt.Errorf("error reading length (position = %d) (%v)", position, err)
+					return pbs, position, fmt.Errorf("stream:read (position = %d): %w", position, err)
 				}
 				// A Reader should not return (0, nil), but if it does,
 				// it should be treated as no-op (according to the
@@ -58,7 +58,7 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 		}
 
 		if messageLength > maximumMessageLength {
-			return pbs, position, fmt.Errorf("refusing to allocate %d bytes (position = %d)", messageLength, position)
+			return pbs, position, fmt.Errorf("stream:message-too-big (%d bytes) (position = %d)", messageLength, position)
 		}
 
 		beforeRead := position
@@ -66,13 +66,13 @@ func ReadLengthPrefixedCollection(ctx context.Context, maximumMessageLength uint
 		newBytesRead, err := io.ReadFull(r, messageBuf)
 		bytesRead += newBytesRead
 		if err != nil {
-			return pbs, position, fmt.Errorf("unable to read full message (length = %d) (started = %d) (bytes-read = %d) (position = %d) (read-end = %d) (%v)",
+			return pbs, position, fmt.Errorf("stream:incomplete-message (length = %d) (started = %d) (bytes-read = %d) (position = %d) (read-end = %d): %w",
 				messageLength, beforeRead, newBytesRead, position, position+newBytesRead, err)
 		}
 
 		pb, err := f(messageBuf)
 		if nil != err {
-			return nil, position, fmt.Errorf("error handling raw message (position = %d) (%v)", position, err)
+			return nil, position, fmt.Errorf("stream:error (position = %d): %w", position, err)
 		}
 
 		position += newBytesRead

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/storage"
@@ -90,15 +90,15 @@ func (h *MoveDataToTimeScaleDBHandler) flush(ctx context.Context) error {
 	br := tx.SendBatch(ctx, batch)
 
 	if _, err := br.Exec(); err != nil {
-		return fmt.Errorf("(tsdb-exec) %v", err)
+		return fmt.Errorf("(tsdb-exec) %w", err)
 	}
 
 	if err := br.Close(); err != nil {
-		return fmt.Errorf("(tsdb-close) %v", err)
+		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %v", err)
+		return fmt.Errorf("(tsdb-commit) %w", err)
 	}
 
 	return nil

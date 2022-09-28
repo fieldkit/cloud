@@ -11,6 +11,8 @@ export FIELDKIT_MEDIA_BUCKETS=fk-media,fkprod-media
 export FIELDKIT_STREAMS_BUCKETS=fk-streams,fkprod-streams
 export FIELDKIT_ARCHIVER=default
 
+export FIELDKIT_WORKERS=5
+
 # export FIELDKIT_INFLUX_DB_URL=http://127.0.0.1:8086
 # export FIELDKIT_INFLUX_DB_USERNAME=admin
 # export FIELDKIT_INFLUX_DB_PASSWORD=asdfasdf

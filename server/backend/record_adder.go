@@ -23,6 +23,19 @@ type keyRecord struct {
 	recordNumber int64
 }
 
+type WriteInfo struct {
+	IngestionID   int64
+	TotalRecords  int64
+	DataRecords   int64
+	MetaRecords   int64
+	MetaErrors    int64
+	DataErrors    int64
+	FutureIgnores int64
+	StationID     *int32
+	DataStart     time.Time
+	DataEnd       time.Time
+}
+
 type RecordAdder struct {
 	verbose             bool
 	handler             RecordHandler
@@ -37,6 +50,7 @@ type RecordAdder struct {
 	ingestion           *data.Ingestion
 	provision           *data.Provision
 	keyRecord           *keyRecord
+	metaID              int64
 }
 
 type ParsedRecord struct {
@@ -46,7 +60,7 @@ type ParsedRecord struct {
 	FileOffset   int64
 }
 
-func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool) (ra *RecordAdder) {
+func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics, handler RecordHandler, verbose bool, saveData bool) (ra *RecordAdder) {
 	return &RecordAdder{
 		verbose:             verbose,
 		db:                  db,
@@ -55,11 +69,12 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		handler:             handler,
 		stationRepository:   repositories.NewStationRepository(db),
 		provisionRepository: repositories.NewProvisionRepository(db),
-		recordRepository:    repositories.NewRecordRepository(db),
+		recordRepository:    repositories.NewRecordRepository(db, saveData),
 		statistics:          &newRecordStatistics{},
 		keyRecord:           nil,
 		provision:           nil,
 		ingestion:           nil,
+		metaID:              0,
 	}
 }
 
@@ -103,51 +118,126 @@ func (ra *RecordAdder) findProvision(ctx context.Context, ingestion *data.Ingest
 	}
 }
 
-func (ra *RecordAdder) flushQueue(ctx context.Context) (fatal error) {
-	// Do we have queued meta records in need of a record number?
-	if len(ra.queue) > 0 {
-		// If we're missing a key record, we can't import this file.
-		if ra.keyRecord == nil {
-			return fmt.Errorf("error flushing queue: no key record")
-		}
+func (ra *RecordAdder) onSignedMeta(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, signedRecord *pb.SignedRecord, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
 
-		// Ignore harder scenarios for now, only working with having
-		// file offset be what the record number should be. We started
-		// at the first record.
-		if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
-			return fmt.Errorf("error flushing queue: mid-file")
-		}
-
-		// So we can safetly process the queued meta records using their
-		// file offset for the record number.
-		for _, queued := range ra.queue {
-			metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes)
-			if err != nil {
-				return err
-			}
-
-			if err := ra.handler.OnMeta(ctx, ra.provision, queued.DataRecord, metaRecord); err != nil {
-				return err
-			}
-		}
-
-		ra.queue = make([]*ParsedRecord, 0)
+	metaRecord, err := ra.recordRepository.AddSignedMetaRecord(ctx, ra.provision, ra.ingestion, signedRecord, rawRecord, bytes)
+	if err != nil {
+		return err
 	}
+
+	log.Infow("adder:on-meta-signed", "meta_record_id", metaRecord.ID)
+
+	if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.metaID = metaRecord.ID
+
+	return nil
+}
+
+func (ra *RecordAdder) onMeta(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, recordNumber int64, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
+
+	metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, recordNumber, rawRecord, bytes)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("adder:on-meta", "meta_record_id", metaRecord.ID)
+
+	if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.metaID = metaRecord.ID
+
+	return nil
+}
+
+func (ra *RecordAdder) onData(ctx context.Context, provision *data.Provision, ingestion *data.Ingestion, rawRecord *pb.DataRecord, bytes []byte) error {
+	log := Logger(ctx).Sugar()
+
+	dataRecord, metaRecord, err := ra.recordRepository.AddDataRecord(ctx, ra.provision, ra.ingestion, rawRecord, bytes)
+	if err != nil {
+		return err
+	}
+
+	// Something to remember, is that AddDataRecord is returning the persisted
+	// meta record for this data record, found by looking for the record by
+	// number. This is especially important when ingesting partial files.
+	if ra.metaID != metaRecord.ID {
+		log.Infow("adder:on-meta-unvisisted", "meta_record_id", metaRecord.ID)
+
+		if err := ra.handler.OnMeta(ctx, ra.provision, rawRecord, metaRecord); err != nil {
+			return err
+		}
+
+		ra.metaID = metaRecord.ID
+	}
+
+	var rawMeta pb.DataRecord
+	if err := metaRecord.Unmarshal(&rawMeta); err != nil {
+		return err
+	}
+
+	if err := ra.handler.OnData(ctx, ra.provision, rawRecord, &rawMeta, dataRecord, metaRecord); err != nil {
+		return err
+	}
+
+	ra.statistics.addTime(dataRecord.Time)
+
+	return nil
+}
+
+func (ra *RecordAdder) flushQueue(ctx context.Context, required bool) (fatal error) {
+	log := Logger(ctx).Sugar()
+
+	// Do we have queued meta records in need of a record number?
+	if len(ra.queue) == 0 {
+		return nil
+	}
+
+	// If we're missing a key record, we can't import this file.
+	if ra.keyRecord == nil {
+		if !required {
+			// Right now the only way this can happen is if we have a partial
+			// file with no data and just meta records.
+			log.Warnw("adder:unrequired-flush no-key-record")
+			return nil
+		}
+
+		return fmt.Errorf("adder:flush error: no key record")
+	}
+
+	// Ignore harder scenarios for now, only working with having
+	// file offset be what the record number should be. We started
+	// at the first record.
+	if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
+		return fmt.Errorf("adder:flush error: mid-file")
+	}
+
+	// So we can safetly process the queued meta records using their
+	// file offset for the record number.
+	for _, queued := range ra.queue {
+		if err := ra.onMeta(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes); err != nil {
+			return err
+		}
+	}
+
+	log.Infow("adder:flushed", "nrecords", len(ra.queue))
+
+	ra.queue = make([]*ParsedRecord, 0)
 
 	return nil
 }
 
 func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning error, fatal error) {
 	log := Logger(ctx).Sugar()
-	verboseLog := logging.OnlyLogIf(log, ra.verbose)
 
 	if pr.SignedRecord != nil {
-		metaRecord, err := ra.recordRepository.AddSignedMetaRecord(ctx, ra.provision, ra.ingestion, pr.SignedRecord, pr.DataRecord, pr.Bytes)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
+		if err := ra.onSignedMeta(ctx, ra.provision, ra.ingestion, pr.SignedRecord, pr.DataRecord, pr.Bytes); err != nil {
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
@@ -158,15 +248,12 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 			// record with a record number to anchor things. Notice that
 			// non-single file meta records will come in via SignedMetaRecords.
 			record := int64(pr.DataRecord.Metadata.Record)
-			if record == 0 {
+			if record == 0 || len(ra.queue) > 0 {
+				log.Infow("adder:queue-meta")
+
 				ra.queue = append(ra.queue, pr)
 			} else {
-				metaRecord, err := ra.recordRepository.AddMetaRecord(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes)
-				if err != nil {
-					return nil, err
-				}
-
-				if err := ra.handler.OnMeta(ctx, ra.provision, pr.DataRecord, metaRecord); err != nil {
+				if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
 					return nil, err
 				}
 			}
@@ -182,51 +269,17 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 				log.Infow("key-record", "file_offset", ra.keyRecord.fileOffset, "record_number", ra.keyRecord.recordNumber)
 			}
 
-			if err := ra.flushQueue(ctx); err != nil {
+			if err := ra.flushQueue(ctx, true); err != nil {
 				return nil, err
 			}
 
-			dataRecord, metaRecord, err := ra.recordRepository.AddDataRecord(ctx, ra.provision, ra.ingestion, pr.DataRecord, pr.Bytes)
-			if err != nil {
-				if err == repositories.ErrMalformedRecord {
-					verboseLog.Infow("data reading missing readings", "record", pr.DataRecord)
-					ra.metrics.DataErrorsUnknown()
-					return err, nil
-				}
-				if err == repositories.ErrMetaMissing {
-					verboseLog.Errorw("error finding meta record", "provision_id", ra.provision.ID, "meta_record_number", pr.DataRecord.Readings.Meta)
-					ra.metrics.DataErrorsMissingMeta()
-					return err, nil
-				}
-				return nil, err
-			}
-
-			ra.statistics.addTime(dataRecord.Time)
-
-			if err := ra.handler.OnData(ctx, ra.provision, pr.DataRecord, dataRecord, metaRecord); err != nil {
+			if err := ra.onData(ctx, ra.provision, ra.ingestion, pr.DataRecord, pr.Bytes); err != nil {
 				return nil, err
 			}
 		}
 	}
 
 	return nil, nil
-}
-
-type WriteInfo struct {
-	IngestionID   int64
-	TotalRecords  int64
-	DataRecords   int64
-	MetaRecords   int64
-	MetaErrors    int64
-	DataErrors    int64
-	FutureIgnores int64
-	StationID     *int32
-	DataStart     time.Time
-	DataEnd       time.Time
-}
-
-func (ra *RecordAdder) fixDataRecord(ctx context.Context, record *pb.DataRecord) (bool, error) {
-	return false, nil
 }
 
 func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingestion) (info *WriteInfo, err error) {
@@ -258,7 +311,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 	totalRecords := 0
 	dataProcessed := 0
 	dataErrors := 0
-	dataFixed := 0
 	metaProcessed := 0
 	metaErrors := 0
 	records := 0
@@ -276,38 +328,27 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if data { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing data record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing data record: %w", err)
 				}
 				unmarshalError = err
 			} else {
 				data = true
-				if fixed, err := ra.fixDataRecord(ctx, &dataRecord); err != nil {
+				warning, fatal := ra.Handle(ctx, &ParsedRecord{
+					FileOffset: recordNumber,
+					DataRecord: &dataRecord,
+					Bytes:      b,
+				})
+				if fatal != nil {
+					return nil, fatal
+				}
+				if warning == nil {
+					dataProcessed += 1
+					records += 1
+				} else {
 					dataErrors += 1
 					if records > 0 {
-						log.Infow("processed", "record_run", records)
+						log.Infow("adder:processed", "record_run", records)
 						records = 0
-					}
-				} else {
-					warning, fatal := ra.Handle(ctx, &ParsedRecord{
-						FileOffset: recordNumber,
-						DataRecord: &dataRecord,
-						Bytes:      b,
-					})
-					if fatal != nil {
-						return nil, fatal
-					}
-					if fixed {
-						dataFixed += 1
-					}
-					if warning == nil {
-						dataProcessed += 1
-						records += 1
-					} else {
-						dataErrors += 1
-						if records > 0 {
-							log.Infow("processed", "record_run", records)
-							records = 0
-						}
 					}
 				}
 			}
@@ -318,7 +359,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 			if err != nil {
 				if meta { // If we expected this record, return the error
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 				unmarshalError = err
 			} else {
@@ -326,7 +367,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				bytes, err := ra.tryParseSignedRecord(&signedRecord, &dataRecord)
 				if err != nil {
 					ra.metrics.DataErrorsParsing()
-					return nil, fmt.Errorf("error parsing signed record: %v", err)
+					return nil, fmt.Errorf("adder:error parsing signed record: %w", err)
 				}
 
 				warning, fatal := ra.Handle(ctx, &ParsedRecord{
@@ -344,7 +385,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 				} else {
 					metaErrors += 1
 					if records > 0 {
-						log.Infow("processed", "record_run", records)
+						log.Infow("adder:processed", "record_run", records)
 						records = 0
 					}
 				}
@@ -362,9 +403,13 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		return nil, nil
 	})
 
-	_, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc)
+	if _, _, err = ReadLengthPrefixedCollection(ctx, MaximumDataRecordLength, reader, unmarshalFunc); err != nil {
+		newErr := fmt.Errorf("adder:error: %w", err)
+		log.Errorw("adder:error", "error", newErr)
+		return nil, newErr
+	}
 
-	if err := ra.flushQueue(ctx); err != nil {
+	if err := ra.flushQueue(ctx, false); err != nil {
 		return nil, err
 	}
 
@@ -372,7 +417,6 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		"data_processed", dataProcessed,
 		"meta_errors", metaErrors,
 		"data_errors", dataErrors,
-		"data_fixed", dataFixed,
 		"record_run", records,
 		"future_ignores", ra.statistics.futureIgnores,
 		"start_human", prettyTime(ra.statistics.start),
@@ -384,16 +428,10 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		stationID = &station.ID
 	}
 
-	withInfo.Infow("processed")
+	withInfo.Infow("adder:processed")
 
 	if err := ra.handler.OnDone(ctx); err != nil {
-		return nil, fmt.Errorf("error in done handler: %v", err)
-	}
-
-	if err != nil {
-		newErr := fmt.Errorf("error reading collection: %v", err)
-		log.Errorw("error", "error", newErr)
-		return nil, newErr
+		return nil, fmt.Errorf("adder:done handler error: %w", err)
 	}
 
 	info = &WriteInfo{
@@ -409,7 +447,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		DataEnd:       ra.statistics.end,
 	}
 
-	withInfo.Infow("done")
+	withInfo.Infow("adder:done")
 
 	return
 }

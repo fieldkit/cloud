@@ -141,6 +141,17 @@ func (m *Metrics) LastTimesQuery(batch int) *Timing {
 	}
 }
 
+func (m *Metrics) DataRangesQuery() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.data.ranges.query.time"},
+		counterKeys: []string{"api.data.ranges.query"},
+	}
+}
+
 func (m *Metrics) DailyQuery() *Timing {
 	timer := m.SC.NewTiming()
 
@@ -174,14 +185,36 @@ func (m *Metrics) DataQuery(aggregate string) *Timing {
 	}
 }
 
-func (m *Metrics) HandleMessage() *Timing {
+func (m *Metrics) HandleMessage(jobType string) *Timing {
 	timer := m.SC.NewTiming()
 
 	return &Timing{
 		sc:          m.SC,
 		timer:       timer,
-		timingKeys:  []string{"messages.handling.time"},
-		counterKeys: []string{"messages.processed"},
+		timingKeys:  []string{"messages.handling.time", fmt.Sprintf("messages.%s.handling.time", jobType)},
+		counterKeys: []string{"messages.processed", fmt.Sprintf("messages.%s.processed", jobType)},
+	}
+}
+
+func (m *Metrics) ThirdPartyLocationDescribe() *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{"api.thirdparty.location.describe.time"},
+		counterKeys: []string{"api.thirdparty.location.describe.queries"},
+	}
+}
+
+func (m *Metrics) ThirdPartyLocation(provider string) *Timing {
+	timer := m.SC.NewTiming()
+
+	return &Timing{
+		sc:          m.SC,
+		timer:       timer,
+		timingKeys:  []string{fmt.Sprintf("api.thirdparty.location.%s.time", provider)},
+		counterKeys: []string{fmt.Sprintf("api.thirdparty.location.%s.queries", provider)},
 	}
 }
 

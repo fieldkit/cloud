@@ -56,7 +56,7 @@ func NewOidcAuth(ctx context.Context, options *ControllerOptions, config *OidcAu
 
 	provider, err := oidc.NewProvider(ctx, config.ConfigURL)
 	if err != nil {
-		return nil, fmt.Errorf("odci provider error: %v (%v)", err, config.ConfigURL)
+		return nil, fmt.Errorf("odci provider error: %w (%v)", err, config.ConfigURL)
 	}
 
 	oauth2Config := &oauth2.Config{
@@ -136,7 +136,7 @@ func (s *OidcService) ready(ctx context.Context) error {
 	if s.auth == nil {
 		auth, err := NewOidcAuth(ctx, s.options, s.config)
 		if err != nil {
-			return fmt.Errorf("oidc initialize error: %v", err)
+			return fmt.Errorf("oidc initialize error: %w", err)
 		}
 		if auth == nil {
 			return oidcService.MakeNotFound(fmt.Errorf("not found"))
@@ -222,17 +222,17 @@ func (s *OidcService) Authenticate(ctx context.Context, payload *oidcService.Aut
 
 	oauth2Token, err := s.auth.oauth2Config.Exchange(ctx, payload.Code)
 	if err != nil {
-		return nil, fmt.Errorf("failed to exchange token: %v", err)
+		return nil, fmt.Errorf("failed to exchange token: %w", err)
 	}
 
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
 	if !ok {
-		return nil, fmt.Errorf("no id_token to verify: %v", err)
+		return nil, fmt.Errorf("no id_token to verify: %w", err)
 	}
 
 	idToken, err := s.auth.verifier.Verify(ctx, rawIDToken)
 	if err != nil {
-		return nil, fmt.Errorf("failed to verify id token: %v", err)
+		return nil, fmt.Errorf("failed to verify id token: %w", err)
 	}
 
 	claims := Claims{}
