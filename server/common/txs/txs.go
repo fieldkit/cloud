@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -79,7 +80,8 @@ var (
 
 func getPoolDescription(pool *pgxpool.Pool) string {
 	cfg := pool.Config().ConnConfig
-	return fmt.Sprintf("%s:%d/%s", cfg.Host, cfg.Port, cfg.Database)
+	hostParts := strings.Split(cfg.Host, ".")
+	return fmt.Sprintf("%s:%d/%s", hostParts[0], cfg.Port, cfg.Database)
 }
 
 func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
