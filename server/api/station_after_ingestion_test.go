@@ -70,14 +70,12 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
 		Verbose:  true,
-		Refresh:  true,
 	}, mc))
 
 	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,
-		Refresh:  true,
 	}, mc))
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
