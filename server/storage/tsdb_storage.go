@@ -49,8 +49,20 @@ type MaterializedView struct {
 	EndOffsetDuration time.Duration
 }
 
-func (mv *MaterializedView) MakeRefreshAllSQL() string {
-	return fmt.Sprintf("CALL refresh_continuous_aggregate('%s', NULL, NOW() - INTERVAL '%s');", mv.Name, mv.EndOffsetSQL)
+func (mv *MaterializedView) MakeRefreshAllSQL() (string, []interface{}, error) {
+	return fmt.Sprintf("CALL refresh_continuous_aggregate('%s', NULL, NOW() - INTERVAL '%s');", mv.Name, mv.EndOffsetSQL), []interface{}{}, nil
+}
+
+func (mv *MaterializedView) MakeRefreshWindowSQL(start time.Time, end time.Time) (string, []interface{}, error) {
+	return fmt.Sprintf("CALL refresh_continuous_aggregate('%s', $1::TIMESTAMPTZ, $2::TIMESTAMPTZ);", mv.Name), []interface{}{start, end}, nil
+}
+
+func (mv *MaterializedView) TimeBucket(original time.Time) time.Time {
+	return time.Unix(0, int64(time.Duration(original.Unix())*time.Second/mv.BucketWidth*mv.BucketWidth))
+}
+
+func (mv *MaterializedView) HorizonTime(now time.Time) time.Time {
+	return now.Add(-mv.EndOffsetDuration)
 }
 
 type TimeScaleDBConfig struct {
