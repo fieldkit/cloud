@@ -44,6 +44,11 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	user, err := e.AddUser()
 	assert.NoError(err)
 
+	fd, err := e.AddStations(1)
+	assert.NoError(err)
+
+	deviceID := fd.Stations[0].DeviceID
+
 	randomData, err := e.NewRandomData(1024)
 	assert.NoError(err)
 
@@ -54,7 +59,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	})
 	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
-	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, e.MustDeviceID(), len(randomData))
+	queued, _, err := e.AddIngestion(user, "/file", data.MetaTypeName, deviceID, len(randomData))
 	assert.NoError(err)
 
 	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
