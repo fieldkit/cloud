@@ -80,21 +80,26 @@ func (m *Metrics) MessagePublished() {
 	m.SC.Incr(m.name("messages.published"), []string{}, 1)
 }
 
+type KeyMeta struct {
+	key  string
+	tags []string
+}
+
 type Timing struct {
 	m           *Metrics
 	start       time.Time
-	timingKeys  []string
-	counterKeys []string
+	timingKeys  []KeyMeta
+	counterKeys []KeyMeta
 }
 
 func (t *Timing) Send() {
 	elapsed := time.Now().UTC().Sub(t.start)
 
-	for _, key := range t.timingKeys {
-		t.m.SC.Timing(t.m.name(key), elapsed, []string{}, 1)
+	for _, keyMeta := range t.timingKeys {
+		t.m.SC.Timing(t.m.name(keyMeta.key), elapsed, keyMeta.tags, 1)
 	}
-	for _, key := range t.counterKeys {
-		t.m.SC.Incr(t.m.name(key), []string{}, 1)
+	for _, keyMeta := range t.counterKeys {
+		t.m.SC.Incr(t.m.name(keyMeta.key), keyMeta.tags, 1)
 	}
 }
 
@@ -102,8 +107,8 @@ func (m *Metrics) FileUpload() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"files.uploading.time"},
-		counterKeys: []string{"files.uploaded"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "files.uploading.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "files.uploaded", tags: []string{}}},
 	}
 }
 
@@ -113,8 +118,8 @@ func (m *Metrics) TailMultiQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.tail.multi.query.time"},
-		counterKeys: []string{"api.data.tail.multi.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.tail.multi.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.tail.multi.query", tags: []string{}}},
 	}
 }
 
@@ -124,8 +129,8 @@ func (m *Metrics) RecentlyMultiQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.recently.multi.query.time"},
-		counterKeys: []string{"api.data.recently.multi.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.recently.multi.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.recently.multi.query", tags: []string{}}},
 	}
 }
 
@@ -135,8 +140,8 @@ func (m *Metrics) LastTimesQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.lasttimes.query.time"},
-		counterKeys: []string{"api.data.lasttimes.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.lasttimes.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.lasttimes.query", tags: []string{}}},
 	}
 }
 
@@ -144,8 +149,8 @@ func (m *Metrics) DataRangesQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.ranges.query.time"},
-		counterKeys: []string{"api.data.ranges.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.ranges.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.ranges.query", tags: []string{}}},
 	}
 }
 
@@ -153,8 +158,8 @@ func (m *Metrics) DailyQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.daily.query.time"},
-		counterKeys: []string{"api.data.daily.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.daily.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.daily.query", tags: []string{}}},
 	}
 }
 
@@ -162,26 +167,28 @@ func (m *Metrics) TailQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.tail.query.time"},
-		counterKeys: []string{"api.data.tail.query"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.tail.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.tail.query", tags: []string{}}},
 	}
 }
 
 func (m *Metrics) DataQuery(aggregate string) *Timing {
+	aggregateTag := fmt.Sprintf("aggregate:%s", aggregate)
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.data.query.time", fmt.Sprintf("api.data.query.%s.time", aggregate)},
-		counterKeys: []string{"api.data.query", fmt.Sprintf("api.data.query.%s", aggregate)},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.query.time", tags: []string{aggregateTag}}, KeyMeta{key: fmt.Sprintf("api.data.query.%s.time", aggregate), tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.data.query", tags: []string{aggregateTag}}, KeyMeta{key: fmt.Sprintf("api.data.query.%s", aggregate), tags: []string{}}},
 	}
 }
 
 func (m *Metrics) HandleMessage(jobType string) *Timing {
+	jobTypeTag := fmt.Sprintf("job_type:%s", jobType)
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"messages.handling.time", fmt.Sprintf("messages.%s.handling.time", jobType)},
-		counterKeys: []string{"messages.processed", fmt.Sprintf("messages.%s.processed", jobType)},
+		timingKeys:  []KeyMeta{KeyMeta{key: "messages.handling.time", tags: []string{jobTypeTag}}, KeyMeta{key: fmt.Sprintf("messages.%s.handling.time", jobType), tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "messages.processed", tags: []string{jobTypeTag}}, KeyMeta{key: fmt.Sprintf("messages.%s.processed", jobType), tags: []string{}}},
 	}
 }
 
@@ -189,8 +196,8 @@ func (m *Metrics) ThirdPartyLocationDescribe() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{"api.thirdparty.location.describe.time"},
-		counterKeys: []string{"api.thirdparty.location.describe.queries"},
+		timingKeys:  []KeyMeta{KeyMeta{key: "api.thirdparty.location.describe.time", tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: "api.thirdparty.location.describe.queries", tags: []string{}}},
 	}
 }
 
@@ -198,8 +205,8 @@ func (m *Metrics) ThirdPartyLocation(provider string) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []string{fmt.Sprintf("api.thirdparty.location.%s.time", provider)},
-		counterKeys: []string{fmt.Sprintf("api.thirdparty.location.%s.queries", provider)},
+		timingKeys:  []KeyMeta{KeyMeta{key: fmt.Sprintf("api.thirdparty.location.%s.time", provider), tags: []string{}}},
+		counterKeys: []KeyMeta{KeyMeta{key: fmt.Sprintf("api.thirdparty.location.%s.queries", provider), tags: []string{}}},
 	}
 }
 
