@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -14,7 +15,9 @@ import (
 )
 
 var (
-	sagaIDs = logging.NewIdGenerator()
+	sagaIDs             = logging.NewIdGenerator()
+	ErrNoOptimisticLock = errors.New("saga optimistic lock failed")
+	ErrNoSaga           = errors.New("saga not found")
 )
 
 type SagaID string
@@ -39,18 +42,28 @@ func (s *Saga) Schedule(duration time.Duration) {
 	s.ScheduledAt = &when
 }
 
+func getSagaType(body interface{}) string {
+	sagaType := reflect.TypeOf(body)
+	if sagaType.Kind() == reflect.Ptr {
+		sagaType = sagaType.Elem()
+	}
+	return sagaType.PkgPath() + "." + sagaType.Name()
+}
+
 func (s *Saga) SetBody(body interface{}) error {
 	if body == nil {
 		return fmt.Errorf("saga body is required")
 	}
-	sagaType := reflect.TypeOf(body)
+
 	bytes, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 	raw := json.RawMessage(bytes)
-	s.Type = sagaType.PkgPath() + "." + sagaType.Name()
+
+	s.Type = getSagaType(body)
 	s.Body = &raw
+
 	return nil
 }
 
@@ -126,7 +139,7 @@ func (r *SagaRepository) LoadAndSave(ctx context.Context, id SagaID, loadSaveFun
 	}
 
 	if loaded == nil {
-		return fmt.Errorf("load and save no such saga")
+		return ErrNoSaga
 	}
 
 	if updated, err := loadSaveFunc(ctx, loaded.Body); err != nil {
@@ -183,7 +196,7 @@ func (r *SagaRepository) Upsert(ctx context.Context, saga *Saga) error {
 		}
 
 		if res.RowsAffected() != 1 {
-			return fmt.Errorf("saga optimistic lock failed")
+			return ErrNoOptimisticLock
 		}
 	}
 

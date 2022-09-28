@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"go.uber.org/zap"
+
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/jackc/pgx/v5"
@@ -23,8 +25,12 @@ type TransactionScope struct {
 	txs map[*pgxpool.Pool]pgx.Tx
 }
 
+func Logger(ctx context.Context) *zap.SugaredLogger {
+	return logging.Logger(ctx).Named("txs").Sugar()
+}
+
 func (scope *TransactionScope) Rollback(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx)
 
 	var errs *multierror.Error
 	for _, value := range scope.txs {
@@ -36,7 +42,7 @@ func (scope *TransactionScope) Rollback(ctx context.Context) error {
 }
 
 func (scope *TransactionScope) Commit(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx)
 
 	var errs *multierror.Error
 	for _, value := range scope.txs {
@@ -71,7 +77,7 @@ var (
 )
 
 func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx)
 
 	scope := ScopeIfAny(ctx)
 	if scope == nil {
@@ -103,7 +109,7 @@ type Queryable interface {
 func RequireQueryable(ctx context.Context, pool *pgxpool.Pool) (Queryable, error) {
 	if tx, err := RequireTransaction(ctx, pool); err != nil {
 		if err == ErrNoScope {
-			logging.Logger(ctx).Sugar().Warnw("txs:unscoped")
+			Logger(ctx).Warnw("txs:unscoped")
 			return pool, nil
 		}
 		return nil, err

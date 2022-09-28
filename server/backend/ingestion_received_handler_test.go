@@ -23,7 +23,7 @@ func TestIngestionReceivedNoSuchIngestion(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, tests.NewInMemoryArchive(map[string][]byte{}), logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	err = handler.Start(e.Ctx, &messages.IngestionReceived{
@@ -48,7 +48,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	files := tests.NewInMemoryArchive(map[string][]byte{
 		"/file": []byte{},
 	})
@@ -81,7 +81,7 @@ func TestIngestionReceivedMetaOnly(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -118,7 +118,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -186,7 +186,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
@@ -249,7 +249,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,

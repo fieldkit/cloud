@@ -53,7 +53,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
-	mc := jobs.NewMessageContext(e.Ctx, publisher, nil)
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
