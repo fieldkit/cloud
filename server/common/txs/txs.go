@@ -3,6 +3,7 @@ package txs
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -33,8 +34,8 @@ func (scope *TransactionScope) Rollback(ctx context.Context) error {
 	log := Logger(ctx)
 
 	var errs *multierror.Error
-	for _, value := range scope.txs {
-		log.Infow("txs:rollback")
+	for pool, value := range scope.txs {
+		log.Infow("txs:rollback", "pool", getPoolDescription(pool))
 		errs = multierror.Append(errs, value.Rollback(ctx))
 	}
 
@@ -45,8 +46,8 @@ func (scope *TransactionScope) Commit(ctx context.Context) error {
 	log := Logger(ctx)
 
 	var errs *multierror.Error
-	for _, value := range scope.txs {
-		log.Infow("txs:commit")
+	for pool, value := range scope.txs {
+		log.Infow("txs:commit", "pool", getPoolDescription(pool))
 		errs = multierror.Append(errs, value.Commit(ctx))
 	}
 
@@ -76,8 +77,13 @@ var (
 	ErrNoScope = errors.New("no transaction scope")
 )
 
+func getPoolDescription(pool *pgxpool.Pool) string {
+	cfg := pool.Config().ConnConfig
+	return fmt.Sprintf("%s:%d/%s", cfg.Host, cfg.Port, cfg.Database)
+}
+
 func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
-	log := Logger(ctx)
+	log := Logger(ctx).With("pool", getPoolDescription(pool))
 
 	scope := ScopeIfAny(ctx)
 	if scope == nil {
