@@ -5,8 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"time"
 
-	"gopkg.in/alexcesaro/statsd.v2"
+	"github.com/DataDog/datadog-go/v5/statsd"
 )
 
 type MetricsSettings struct {
@@ -21,9 +22,9 @@ type Metrics struct {
 
 func newClient(ms *MetricsSettings) (*statsd.Client, error) {
 	if ms.Address == "" {
-		return statsd.New(statsd.Prefix(ms.Prefix))
+		return statsd.New(ms.Address)
 	}
-	return statsd.New(statsd.Prefix(ms.Prefix), statsd.Address(ms.Address))
+	return statsd.New(ms.Address)
 }
 
 func NewMetrics(ctx context.Context, ms *MetricsSettings) *Metrics {
@@ -42,246 +43,232 @@ func NewMetrics(ctx context.Context, ms *MetricsSettings) *Metrics {
 	}
 }
 
+func (m *Metrics) name(path string) string {
+	return m.Settings.Prefix + "." + path
+}
+
 func (m *Metrics) AuthTry() {
-	m.SC.Increment("api.auth.try")
+	m.SC.Incr(m.name("api.auth.try"), []string{}, 1)
 }
 
 func (m *Metrics) AuthSuccess() {
-	m.SC.Increment("api.auth.success")
+	m.SC.Incr(m.name("api.auth.success"), []string{}, 1)
 }
 
 func (m *Metrics) AuthRefreshTry() {
-	m.SC.Increment("api.auth.refresh.try")
+	m.SC.Incr(m.name("api.auth.refresh.try"), []string{}, 1)
 }
 
 func (m *Metrics) AuthRefreshSuccess() {
-	m.SC.Increment("api.auth.refresh.success")
+	m.SC.Incr(m.name("api.auth.refresh.success"), []string{}, 1)
 }
 
 func (m *Metrics) Ingested(blocks, bytes int) {
-	m.SC.Count("api.ingestion.blocks", blocks)
-	m.SC.Count("api.ingestion.bytes", bytes)
+	m.SC.Count(m.name("api.ingestion.blocks"), int64(blocks), []string{}, 1)
+	m.SC.Count(m.name("api.ingestion.bytes"), int64(bytes), []string{}, 1)
 }
 
 func (m *Metrics) DataErrorsParsing() {
-	m.SC.Increment("api.data.errors.parsing")
+	m.SC.Incr(m.name("api.data.errors.parsing"), []string{}, 1)
 }
 
 func (m *Metrics) DataErrorsMissingMeta() {
-	m.SC.Increment("api.data.errors.meta")
+	m.SC.Incr(m.name("api.data.errors.meta"), []string{}, 1)
 }
 
 func (m *Metrics) MessagePublished() {
-	m.SC.Increment("messages.published")
+	m.SC.Incr(m.name("messages.published"), []string{}, 1)
 }
 
 type Timing struct {
-	sc          *statsd.Client
-	timer       statsd.Timing
+	m           *Metrics
+	start       time.Time
 	timingKeys  []string
 	counterKeys []string
 }
 
 func (t *Timing) Send() {
+	elapsed := time.Now().UTC().Sub(t.start)
+
 	for _, key := range t.timingKeys {
-		t.timer.Send(key)
+		t.m.SC.Timing(t.m.name(key), elapsed, []string{}, 1)
 	}
 	for _, key := range t.counterKeys {
-		t.sc.Increment(key)
+		t.m.SC.Incr(t.m.name(key), []string{}, 1)
 	}
 }
 
 func (m *Metrics) FileUpload() *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"files.uploading.time"},
 		counterKeys: []string{"files.uploaded"},
 	}
 }
 
 func (m *Metrics) TailMultiQuery(batch int) *Timing {
-	m.SC.Count("api.data.tail.multi.query.batch", batch)
-
-	timer := m.SC.NewTiming()
+	m.SC.Count(m.name("api.data.tail.multi.query.batch"), int64(batch), []string{}, 1)
 
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.tail.multi.query.time"},
 		counterKeys: []string{"api.data.tail.multi.query"},
 	}
 }
 
 func (m *Metrics) RecentlyMultiQuery(batch int) *Timing {
-	m.SC.Count("api.data.recently.multi.query.time", batch)
-
-	timer := m.SC.NewTiming()
+	m.SC.Count(m.name("api.data.recently.multi.query.time"), int64(batch), []string{}, 1)
 
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.recently.multi.query.time"},
 		counterKeys: []string{"api.data.recently.multi.query"},
 	}
 }
 
 func (m *Metrics) LastTimesQuery(batch int) *Timing {
-	m.SC.Count("api.data.lasttimes.multi.query.time", batch)
-
-	timer := m.SC.NewTiming()
+	m.SC.Count(m.name("api.data.lasttimes.multi.query.time"), int64(batch), []string{}, 1)
 
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.lasttimes.query.time"},
 		counterKeys: []string{"api.data.lasttimes.query"},
 	}
 }
 
 func (m *Metrics) DataRangesQuery() *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.ranges.query.time"},
 		counterKeys: []string{"api.data.ranges.query"},
 	}
 }
 
 func (m *Metrics) DailyQuery() *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.daily.query.time"},
 		counterKeys: []string{"api.data.daily.query"},
 	}
 }
 
 func (m *Metrics) TailQuery() *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.tail.query.time"},
 		counterKeys: []string{"api.data.tail.query"},
 	}
 }
 
 func (m *Metrics) DataQuery(aggregate string) *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.data.query.time", fmt.Sprintf("api.data.query.%s.time", aggregate)},
 		counterKeys: []string{"api.data.query", fmt.Sprintf("api.data.query.%s", aggregate)},
 	}
 }
 
 func (m *Metrics) HandleMessage(jobType string) *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"messages.handling.time", fmt.Sprintf("messages.%s.handling.time", jobType)},
 		counterKeys: []string{"messages.processed", fmt.Sprintf("messages.%s.processed", jobType)},
 	}
 }
 
 func (m *Metrics) ThirdPartyLocationDescribe() *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{"api.thirdparty.location.describe.time"},
 		counterKeys: []string{"api.thirdparty.location.describe.queries"},
 	}
 }
 
 func (m *Metrics) ThirdPartyLocation(provider string) *Timing {
-	timer := m.SC.NewTiming()
-
 	return &Timing{
-		sc:          m.SC,
-		timer:       timer,
+		m:           m,
+		start:       time.Now().UTC(),
 		timingKeys:  []string{fmt.Sprintf("api.thirdparty.location.%s.time", provider)},
 		counterKeys: []string{fmt.Sprintf("api.thirdparty.location.%s.queries", provider)},
 	}
 }
 
 func (m *Metrics) PileHit(pile string) {
-	m.SC.Increment(fmt.Sprintf("api.pile.%s.hit", pile))
+	m.SC.Incr(m.name(fmt.Sprintf("api.pile.%s.hit", pile)), []string{}, 1)
 }
 
 func (m *Metrics) PileMiss(pile string) {
-	m.SC.Increment(fmt.Sprintf("api.pile.%s.miss", pile))
+	m.SC.Incr(m.name(fmt.Sprintf("api.pile.%s.miss", pile)), []string{}, 1)
 }
 
 func (m *Metrics) PileBytes(pile string, bytes int64) {
-	m.SC.Gauge(fmt.Sprintf("api.pile.%s.bytes", pile), bytes)
+	m.SC.Gauge(m.name(fmt.Sprintf("api.pile.%s.bytes", pile)), float64(bytes), []string{}, 1)
 }
 
 func (m *Metrics) UserValidated() {
-	m.SC.Increment("api.users.validated")
+	m.SC.Incr(m.name("api.users.validated"), []string{}, 1)
 }
 
 func (m *Metrics) UserAdded() {
-	m.SC.Increment("api.users.added")
+	m.SC.Incr(m.name("api.users.added"), []string{}, 1)
 }
 
 func (m *Metrics) EmailVerificationSent() {
-	m.SC.Increment("emails.verification")
+	m.SC.Incr(m.name("emails.verification"), []string{}, 1)
 }
 
 func (m *Metrics) EmailRecoverPasswordSent() {
-	m.SC.Increment("emails.password.recover")
+	m.SC.Incr(m.name("emails.password.recover"), []string{}, 1)
 }
 
 func (m *Metrics) DataErrorsUnknown() {
-	m.SC.Increment("api.data.errors.unknown")
+	m.SC.Incr(m.name("api.data.errors.unknown"), []string{}, 1)
 }
 
 func (m *Metrics) IngestionDevice(id []byte) {
-	m.SC.Unique("api.ingestion.devices", hex.EncodeToString(id))
+	m.SC.Set(m.name("api.ingestion.devices"), hex.EncodeToString(id), []string{}, 1)
 }
 
 func (m *Metrics) UserID(id int32) {
-	m.SC.Unique("api.users", fmt.Sprintf("%d", id))
+	m.SC.Set(m.name("api.users"), fmt.Sprintf("%d", id), []string{}, 1)
 }
 
 func (m *Metrics) GatherMetrics(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t := m.SC.NewTiming()
+		start := time.Now().UTC()
 
 		h.ServeHTTP(w, r)
 
+		elapsed := time.Now().UTC().Sub(start)
+
 		if IsWebSocket(r) {
-			t.Send("ws.req.time")
+			m.SC.Timing(m.name("ws.req.time"), elapsed, []string{}, 1)
 		} else {
 			if IsIngestion(r) {
-				t.Send("http.ingestion.time")
+				m.SC.Timing(m.name("http.ingestion.time"), elapsed, []string{}, 1)
 			} else {
-				t.Send("http.req.time")
+				m.SC.Timing(m.name("http.req.time"), elapsed, []string{}, 1)
 			}
 		}
 	})
 }
 
 func (m *Metrics) RecordsViewed(records int) {
-	m.SC.Count("api.data.records.viewed", records)
+	m.SC.Count(m.name("api.data.records.viewed"), int64(records), []string{}, 1)
 }
 
 func (m *Metrics) ReadingsViewed(readings int) {
-	m.SC.Count("api.data.readings.viewed", readings)
+	m.SC.Count(m.name("api.data.readings.viewed"), int64(readings), []string{}, 1)
 }
 
 func IsWebSocket(r *http.Request) bool {
