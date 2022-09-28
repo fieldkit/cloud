@@ -53,6 +53,8 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		}
 	}
 
+	batch.Queue(`INSERT INTO fieldkit.sensor_data_dirty (modified, data_start, data_end) VALUES ($1, $2, $3)`, time.Now(), dataStart, dataEnd)
+
 	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "data_start", dataStart, "data_end", dataEnd)
 
 	pool, err := h.tsConfig.Acquire(ctx)
