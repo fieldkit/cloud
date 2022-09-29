@@ -24,6 +24,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 
+export enum MapViewType {
+    map = "map",
+    list = "list",
+}
+
 export default Vue.extend({
     name: "MapViewTypeToggle",
     props: {
@@ -40,11 +45,11 @@ export default Vue.extend({
         },
     },
     computed: {
-        viewType(): string {
+        viewType(): MapViewType {
             if (this.$route.meta?.viewType) {
                 return this.$route.meta.viewType;
             }
-            return "map";
+            return MapViewType.map;
         },
     },
 });

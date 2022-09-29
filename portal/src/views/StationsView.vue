@@ -74,7 +74,7 @@ import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
-import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
+import MapViewTypeToggle, {MapViewType} from "@/views/shared/MapViewTypeToggle.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -133,11 +133,11 @@ export default Vue.extend({
             }
             return this.$getters.mapped;
         },
-        viewType(): string {
+        viewType(): MapViewType {
             if (this.$route.meta?.viewType) {
                 return this.$route.meta.viewType;
             }
-            return "map";
+            return MapViewType.map;
         },
     },
     beforeMount(): Promise<any> {

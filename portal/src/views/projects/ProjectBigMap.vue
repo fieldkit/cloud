@@ -79,18 +79,18 @@
 import _ from "lodash";
 import * as utils from "../../utilities";
 
-import { mapState, mapGetters } from "vuex";
+import {mapGetters, mapState} from "vuex";
 import {
-    ActionTypes,
-    GlobalState,
-    ProjectModule,
-    DisplayStation,
-    Project,
-    MappedStations,
-    BoundingRectangle,
-    VisibleReadings,
+  ActionTypes,
+  BoundingRectangle,
+  DisplayStation,
+  GlobalState,
+  MappedStations,
+  Project,
+  ProjectModule,
+  VisibleReadings,
 } from "@/store";
-import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
+import {SensorDataQuerier} from "@/views/shared/sensor_data_querier";
 
 import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
@@ -99,10 +99,10 @@ import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
-import { ExploreContext } from "@/views/viz/common";
+import {ExploreContext} from "@/views/viz/common";
 
-import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
-import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
+import {getPartnerCustomizationWithDefault, isCustomisationEnabled} from "@/views/shared/partners";
+import MapViewTypeToggle, {MapViewType} from "@/views/shared/MapViewTypeToggle.vue";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -213,11 +213,11 @@ export default Vue.extend({
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
         },
-        viewType(): string {
+        viewType(): MapViewType {
             if (this.$route.meta?.viewType) {
                 return this.$route.meta.viewType;
             }
-            return "map";
+            return MapViewType.map;
         },
     },
     watch: {
