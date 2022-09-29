@@ -18,11 +18,6 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 )
 
-type keyRecord struct {
-	fileOffset   int64
-	recordNumber int64
-}
-
 type WriteInfo struct {
 	IngestionID   int64
 	TotalRecords  int64
@@ -34,6 +29,15 @@ type WriteInfo struct {
 	StationID     *int32
 	DataStart     time.Time
 	DataEnd       time.Time
+}
+
+type keyRecord struct {
+	fileOffset   int64
+	recordNumber int64
+}
+
+func (kr *keyRecord) adjustRecordNumber(fileOffset int64) int64 {
+	return kr.recordNumber + (fileOffset - kr.fileOffset)
 }
 
 type RecordAdder struct {
@@ -211,17 +215,10 @@ func (ra *RecordAdder) flushQueue(ctx context.Context, required bool) (fatal err
 		return fmt.Errorf("adder:flush error: no key record")
 	}
 
-	// Ignore harder scenarios for now, only working with having
-	// file offset be what the record number should be. We started
-	// at the first record.
-	if ra.keyRecord.fileOffset != ra.keyRecord.recordNumber {
-		return fmt.Errorf("adder:flush error: mid-file")
-	}
-
 	// So we can safetly process the queued meta records using their
 	// file offset for the record number.
 	for _, queued := range ra.queue {
-		if err := ra.onMeta(ctx, ra.provision, ra.ingestion, queued.FileOffset, queued.DataRecord, queued.Bytes); err != nil {
+		if err := ra.onMeta(ctx, ra.provision, ra.ingestion, ra.keyRecord.adjustRecordNumber(queued.FileOffset), queued.DataRecord, queued.Bytes); err != nil {
 			return err
 		}
 	}
@@ -253,8 +250,15 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 
 				ra.queue = append(ra.queue, pr)
 			} else {
-				if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
-					return nil, err
+				// I'm not sure if this is entirely necessary, just better safe than sorry.
+				if ra.keyRecord != nil {
+					if err := ra.onMeta(ctx, ra.provision, ra.ingestion, ra.keyRecord.adjustRecordNumber(record), pr.DataRecord, pr.Bytes); err != nil {
+						return nil, err
+					}
+				} else {
+					if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
+						return nil, err
+					}
 				}
 			}
 		} else {
