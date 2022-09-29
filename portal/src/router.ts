@@ -320,13 +320,25 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/stations",
+        path: "/dashboard/stations/map",
         name: "mapAllStations",
         component: StationsView,
         props: true,
         meta: {
             bodyClass: "map-view",
             secured: true,
+            viewType: "map",
+        },
+    },
+    {
+        path: "/dashboard/stations/list",
+        name: "listAllStations",
+        component: StationsView,
+        props: true,
+        meta: {
+            bodyClass: "map-view",
+            secured: true,
+            viewType: "list",
         },
     },
     {

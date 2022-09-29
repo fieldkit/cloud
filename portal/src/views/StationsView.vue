@@ -51,16 +51,13 @@
                 <img alt="Google Play" src="@/assets/googleplay.svg" width="147" />
             </a>
         </div>
-        <div class="view-type-container">
-            <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
-                    <i class="icon icon-map"></i>
-                </div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
-                    <i class="icon icon-list"></i>
-                </div>
-            </div>
-        </div>
+
+        <MapViewTypeToggle
+            :routes="[
+                { name: 'mapAllStations', label: 'map.toggle.map', viewType: 'map' },
+                { name: 'listAllStations', label: 'map.toggle.list', viewType: 'list' },
+            ]"
+        ></MapViewTypeToggle>
     </StandardLayout>
 </template>
 
@@ -77,6 +74,7 @@ import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
+import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -85,6 +83,7 @@ export default Vue.extend({
         StationsMap,
         StationHoverSummary,
         TinyChart,
+        MapViewTypeToggle,
     },
     props: {
         id: {
@@ -98,14 +97,12 @@ export default Vue.extend({
     },
     data(): {
         showNoStationsMessage: boolean;
-        viewType: string;
         layoutChanges: number;
         sensorDataQuerier: SensorDataQuerier;
     } {
         // console.log("stations-view:data", this.stations);
         return {
             showNoStationsMessage: true,
-            viewType: "map",
             layoutChanges: 0,
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
@@ -135,6 +132,12 @@ export default Vue.extend({
                 return this.$getters.mapped.focusOn(this.id);
             }
             return this.$getters.mapped;
+        },
+        viewType(): string {
+            if (this.$route.meta?.viewType) {
+                return this.$route.meta.viewType;
+            }
+            return "map";
         },
     },
     beforeMount(): Promise<any> {
@@ -193,10 +196,6 @@ export default Vue.extend({
                     },
                 });
             }
-        },
-        switchView(type: string): void {
-            this.viewType = type;
-            this.layoutChanges++;
         },
         layoutChange() {
             this.layoutChanges++;
@@ -381,5 +380,17 @@ export default Vue.extend({
             right: 0;
         }
     }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder {
+    margin: 24px 0 0 25px;
+
+    @include bp-down($sm) {
+        margin: 13px 0 0 10px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-bottom-left {
+    margin-left: 20px;
 }
 </style>

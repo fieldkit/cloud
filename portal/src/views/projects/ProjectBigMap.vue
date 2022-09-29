@@ -466,35 +466,12 @@ export default Vue.extend({
 }
 
 ::v-deep .mapboxgl-ctrl-geocoder {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-    border: solid 1px #f4f5f7;
-    border-radius: 0;
-    height: 40px;
     margin: 30px 0 0 30px;
 
     @include bp-down($sm) {
         margin: 61px 0 0 10px;
-        width: 40px;
-    }
-
-    &.mapboxgl-ctrl-geocoder--collapsed {
-        min-width: 40px;
-    }
-
-    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
-        @include bp-down($xs) {
-            min-width: calc(100vw - 20px) !important;
-        }
-    }
-
-    input {
-        outline: none;
-        height: 37px;
-        padding-left: 38px;
-        font-size: 16px;
     }
 }
-
 ::v-deep .mapboxgl-ctrl-geocoder--icon-search {
     top: 9px;
     left: 8px;
@@ -509,6 +486,6 @@ export default Vue.extend({
 }
 
 ::v-deep .mapboxgl-ctrl-bottom-left {
-    margin-left: 30px;
+    margin-left: 25px;
 }
 </style>
