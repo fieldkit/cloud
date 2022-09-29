@@ -148,7 +148,6 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 				QueuedID: id,
 				UserID:   body.UserID,
 				Verbose:  false,
-				Refresh:  false,
 			},
 		}); err != nil {
 			return err

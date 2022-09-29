@@ -82,5 +82,5 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		BatchID:   m.BatchID,
 		DataStart: dataStart,
 		DataEnd:   dataEnd,
-	}, jobs.ToSerializedQueue())
+	})
 }

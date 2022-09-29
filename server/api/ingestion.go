@@ -61,7 +61,6 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 				QueuedID: q.ID,
 				UserID:   p.UserID(),
 				Verbose:  true,
-				Refresh:  false,
 			},
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
@@ -162,7 +161,6 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 				QueuedID: id,
 				UserID:   p.UserID(),
 				Verbose:  true,
-				Refresh:  true,
 			},
 		}); err != nil {
 			log.Warnw("publishing", "err", err)

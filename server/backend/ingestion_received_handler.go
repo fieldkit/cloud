@@ -161,15 +161,29 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
 	}
 
-	if err := h.startSaga(ctx, m, mc); err != nil {
-		return err
-	}
-
 	i, err := ir.QueryByID(ctx, queued.IngestionID)
 	if err != nil {
 		return err
 	} else if i == nil {
 		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
+	}
+
+	sr := repositories.NewStationRepository(h.db)
+	if err != nil {
+		return err
+	}
+
+	station, err := sr.QueryStationByDeviceID(ctx, i.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	if station == nil {
+		return fmt.Errorf("ingestion:missing-station")
+	}
+
+	if err := h.startSaga(ctx, m, mc); err != nil {
+		return err
 	}
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", mc.SagaID())
