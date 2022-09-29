@@ -454,7 +454,7 @@ export default Vue.extend({
 
 .map-expand {
     background-color: #ffffff;
-    z-index: $z-index-top;
+    z-index: #{$z-index-top} + 1;
     position: absolute;
     right: 10px;
     top: 10px;
