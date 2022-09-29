@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -175,9 +176,11 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 	station, err := sr.QueryStationByDeviceID(ctx, i.DeviceID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("ingestion:missing-station")
+		}
 		return err
 	}
-
 	if station == nil {
 		return fmt.Errorf("ingestion:missing-station")
 	}
