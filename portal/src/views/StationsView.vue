@@ -25,19 +25,19 @@
                     v-if="mapped"
                     :showStations="true"
                 />
+
+                <StationHoverSummary
+                    v-if="activeStation"
+                    class="summary-container"
+                    @close="closeSummary"
+                    :station="activeStation"
+                    :sensorDataQuerier="sensorDataQuerier"
+                    :hasCupertinoPane="true"
+                    v-slot="{ sensorDataQuerier }"
+                >
+                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                </StationHoverSummary>
             </div>
-            <StationHoverSummary
-                v-if="activeStation"
-                class="summary-container"
-                @close="closeSummary"
-                :station="activeStation"
-                v-bind:key="activeStation.id"
-                @layoutChange="layoutChange"
-                :sensorDataQuerier="sensorDataQuerier"
-                v-slot="{ sensorDataQuerier }"
-            >
-                <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
-            </StationHoverSummary>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
@@ -222,11 +222,9 @@ export default Vue.extend({
 ::v-deep .station-hover-summary {
     left: 360px;
     top: 170px;
-    border-radius: 3px;
 }
 
 ::v-deep .summary-container {
-    border-radius: 3px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 2px #d8dce0;
     background-color: #fff;
@@ -280,48 +278,6 @@ export default Vue.extend({
         font-size: 14px;
         max-width: 320px;
         margin: 0 auto 35px;
-    }
-}
-
-.view-type {
-    width: 100px;
-    height: 39px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-    border: solid 1px #f4f5f7;
-    background-color: #ffffff;
-    cursor: pointer;
-    @include flex(center, center);
-
-    &-container {
-        z-index: $z-index-top;
-        margin: 0;
-        @include position(absolute, 90px 25px null null);
-
-        @include bp-down($sm) {
-            @include position(absolute, 67px 10px null null);
-        }
-    }
-
-    > div {
-        flex-basis: 50%;
-
-        &.active {
-            i:before {
-                color: var(--color-dark);
-            }
-        }
-    }
-
-    &-list {
-    }
-
-    &-map {
-        flex-basis: 50%;
-        border-right: solid 1px #f4f5f7;
-    }
-
-    .icon {
-        font-size: 18px;
     }
 }
 
@@ -392,5 +348,11 @@ export default Vue.extend({
 
 ::v-deep .mapboxgl-ctrl-bottom-left {
     margin-left: 20px;
+}
+
+::v-deep .view-type-container {
+    @include bp-down($xs) {
+        top: 68px;
+    }
 }
 </style>

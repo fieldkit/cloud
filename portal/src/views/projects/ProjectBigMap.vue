@@ -364,43 +364,6 @@ export default Vue.extend({
     width: 359px;
     top: calc(50% - 100px);
     left: calc(50% - 180px);
-
-    @include bp-down($xs) {
-        width: 100%;
-        left: 0;
-        border-radius: 10px;
-        padding: 25px 10px 12px 10px;
-
-        &.is-pane {
-            top: 0;
-        }
-
-        .close-button {
-            display: none;
-        }
-
-        .navigate-button {
-            width: 14px;
-            height: 14px;
-            right: -3px;
-            top: -17px;
-        }
-
-        .image-container {
-            flex-basis: 62px;
-            height: 62px;
-            margin-right: 10px;
-        }
-
-        .station-name {
-            font-size: 14px;
-        }
-
-        .explore-button {
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-    }
 }
 
 .stations-list {
@@ -470,18 +433,6 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         margin: 61px 0 0 10px;
-    }
-}
-::v-deep .mapboxgl-ctrl-geocoder--icon-search {
-    top: 9px;
-    left: 8px;
-}
-
-::v-deep .mapboxgl-ctrl-geocoder--icon-close {
-    margin-top: 4px;
-
-    @include bp-down($sm) {
-        margin-top: 3px;
     }
 }
 

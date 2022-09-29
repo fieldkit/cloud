@@ -82,6 +82,7 @@
                     :sensorDataQuerier="sensorDataQuerier"
                     :station="activeStation"
                     :exploreContext="exploreContext"
+                    :hasCupertinoPane="true"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"
                 />
