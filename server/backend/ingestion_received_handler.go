@@ -24,7 +24,6 @@ import (
 type IngestionSaga struct {
 	QueuedID  int64           `json:"queued_id"`
 	UserID    int32           `json:"user_id"`
-	Refresh   bool            `json:"refresh"`
 	StationID *int32          `json:"station_id"`
 	DataStart time.Time       `json:"data_start"`
 	DataEnd   time.Time       `json:"data_end"`
@@ -72,7 +71,6 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 	body := IngestionSaga{
 		QueuedID:  m.QueuedID,
 		UserID:    m.UserID,
-		Refresh:   m.Refresh,
 		Required:  make(map[string]bool),
 		Completed: make(map[string]bool),
 	}
@@ -109,19 +107,6 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 		}
 	} else {
 		log.Infow("ingestion-saga: solo")
-	}
-
-	if saga.Refresh {
-		if err := mc.Event(ctx, &messages.SensorDataModified{
-			ModifiedAt:  now,
-			PublishedAt: now,
-			StationID:   saga.StationID,
-			UserID:      saga.UserID,
-			Start:       saga.DataStart,
-			End:         saga.DataEnd,
-		}, jobs.PopSaga()); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -176,15 +161,29 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
 	}
 
-	if err := h.startSaga(ctx, m, mc); err != nil {
-		return err
-	}
-
 	i, err := ir.QueryByID(ctx, queued.IngestionID)
 	if err != nil {
 		return err
 	} else if i == nil {
 		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
+	}
+
+	sr := repositories.NewStationRepository(h.db)
+	if err != nil {
+		return err
+	}
+
+	station, err := sr.QueryStationByDeviceID(ctx, i.DeviceID)
+	if err != nil {
+		return err
+	}
+
+	if station == nil {
+		return fmt.Errorf("ingestion:missing-station")
+	}
+
+	if err := h.startSaga(ctx, m, mc); err != nil {
+		return err
 	}
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", mc.SagaID())

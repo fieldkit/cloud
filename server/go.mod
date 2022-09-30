@@ -3,6 +3,7 @@ module github.com/fieldkit/cloud/server
 go 1.18
 
 require (
+	github.com/DataDog/datadog-go/v5 v5.1.1
 	github.com/Nerzal/gocloak/v7 v7.11.0
 	github.com/O-C-R/singlepage v0.0.0-20170327184421-bbbe2159ecec
 	github.com/aws/aws-sdk-go v1.29.20
@@ -25,7 +26,6 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/influxdata/influxdb-client-go/v2 v2.8.1
 	github.com/itchyny/gojq v0.12.5
-	github.com/jackc/pgx/v4 v4.17.2
 	github.com/jackc/pgx/v5 v5.0.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kelseyhightower/envconfig v0.0.0-20170206223400-8bf4bbfc795e
@@ -50,10 +50,10 @@ require (
 	goa.design/plugins/v3 v3.1.1
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	gopkg.in/alexcesaro/statsd.v2 v2.0.0
 )
 
 require (
+	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
@@ -81,14 +81,10 @@ require (
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect
 	github.com/itchyny/timefmt-go v0.1.3 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.13.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.12.0 // indirect
-	github.com/jackc/puddle v1.3.0 // indirect
 	github.com/jackc/puddle/v2 v2.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
@@ -137,12 +133,12 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
-	golang.org/x/mod v0.3.0 // indirect
+	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.0.0-20200815165600-90abf76919f3 // indirect
+	golang.org/x/tools v0.1.1 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect

@@ -399,7 +399,6 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, d
 			QueuedID: id,
 			UserID:   2,
 			Verbose:  true,
-			Refresh:  true,
 		}, mc); err != nil {
 			return err
 		}

@@ -153,6 +153,7 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 
 	job.RunAt = jobOptions.RunAt
 	job.Queue = jobOptions.Queue
+	job.Priority = jobOptions.Priority
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {
