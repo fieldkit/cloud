@@ -150,7 +150,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,

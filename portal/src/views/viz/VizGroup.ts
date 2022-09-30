@@ -27,11 +27,6 @@ export const VizGroup = Vue.extend({
     mounted() {
         this.group.log("mounted", this.group, this.topGroup);
     },
-    computed: {
-        busy(): boolean {
-            return this.group.busy;
-        },
-    },
     methods: {
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
             return this.$emit("group-time-zoomed", zoom, ...args);
