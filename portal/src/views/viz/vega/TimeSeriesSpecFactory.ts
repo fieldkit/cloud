@@ -726,29 +726,36 @@ export class TimeSeriesSpecFactory {
                         ];
                     }
 
-                    const symbolMark = {
-                        type: "symbol",
-                        from: {
-                            data: makeValidDataName(i),
-                        },
-                        encode: {
-                            enter: {
-                                stroke: { value: null },
-                                strokeWidth: { value: 2 },
-                                size: { value: 100 },
-                                fill: { value: "blue" },
-                                fillOpacity: { value: 0.5 },
-                                x: { scale: scales.x, field: "time" },
-                                y: { scale: scales.y, field: "value" },
-                            },
-                            update: {
-                                fillOpacity: {
-                                    signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                    const symbolMarks = () => {
+                        if (this.settings.mobile || this.settings.tiny) {
+                            return [];
+                        }
+                        return [
+                            {
+                                type: "symbol",
+                                from: {
+                                    data: makeValidDataName(i),
                                 },
-                                x: { scale: scales.x, field: "time" },
-                                y: { scale: scales.y, field: "value" },
+                                encode: {
+                                    enter: {
+                                        stroke: { value: null },
+                                        strokeWidth: { value: 2 },
+                                        size: { value: 100 },
+                                        fill: { value: "blue" },
+                                        fillOpacity: { value: 0.5 },
+                                        x: { scale: scales.x, field: "time" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                    update: {
+                                        fillOpacity: {
+                                            signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                                        },
+                                        x: { scale: scales.x, field: "time" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                },
                             },
-                        },
+                        ];
                     };
 
                     const dashedLineMark = {
@@ -816,7 +823,7 @@ export class TimeSeriesSpecFactory {
                                 clip: {
                                     path: { signal: "chart_clip" },
                                 },
-                                marks: _.concat([dashedLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                                marks: [dashedLineMark, ...thresholdsMarks, ...symbolMarks()],
                             },
                         ];
                     } else {
@@ -850,7 +857,7 @@ export class TimeSeriesSpecFactory {
                                 clip: {
                                     path: { signal: "chart_clip" },
                                 },
-                                marks: [dashedLineMark, lineMark, symbolMark],
+                                marks: [dashedLineMark, lineMark, ...symbolMarks()],
                             },
                         ];
                     }
