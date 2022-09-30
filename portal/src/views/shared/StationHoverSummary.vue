@@ -167,7 +167,7 @@ export default Vue.extend({
         latestPrimaryColor(): string {
             const reading: DecoratedReading | null = this.decoratedReading;
             if (reading === null) {
-                return "#cccccc";
+                return "#777a80";
             }
             if (reading) {
                 return reading?.color;
@@ -348,7 +348,7 @@ export default Vue.extend({
     }
 
     .no-data {
-        color: #cccccc;
+        color: #777a80;
         font-family: $font-family-bold;
     }
 }
