@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/vgarvardt/gue/v4"
 )
 
 const (
@@ -14,6 +16,7 @@ type JobOptions struct {
 	RunAt        time.Time
 	Queue        string
 	Untransacted bool
+	Priority     gue.JobPriority
 }
 
 type PublishOption func(*TransportMessage, *JobOptions) error
@@ -57,6 +60,20 @@ func PopSaga() PublishOption {
 		} else {
 			return fmt.Errorf("publish: no sagas to pop")
 		}
+		return nil
+	}
+}
+
+func WithHigherPriority() PublishOption {
+	return func(tm *TransportMessage, job *JobOptions) error {
+		job.Priority = -1
+		return nil
+	}
+}
+
+func WithLowerPriority() PublishOption {
+	return func(tm *TransportMessage, job *JobOptions) error {
+		job.Priority = 1
 		return nil
 	}
 }

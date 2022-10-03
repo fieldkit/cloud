@@ -22,9 +22,9 @@ type Metrics struct {
 
 func newClient(ms *MetricsSettings) (*statsd.Client, error) {
 	if ms.Address == "" {
-		return statsd.New(ms.Address)
+		return statsd.New(ms.Address, statsd.WithoutOriginDetection())
 	}
-	return statsd.New(ms.Address)
+	return statsd.New(ms.Address, statsd.WithoutOriginDetection())
 }
 
 func NewMetrics(ctx context.Context, ms *MetricsSettings) *Metrics {
