@@ -56,10 +56,11 @@ type LastTimeRow struct {
 }
 
 type TimeScaleDBBackend struct {
-	config  *storage.TimeScaleDBConfig
-	db      *sqlxcache.DB
-	pool    *pgxpool.Pool
-	metrics *logging.Metrics
+	config    *storage.TimeScaleDBConfig
+	db        *sqlxcache.DB
+	pool      *pgxpool.Pool
+	metrics   *logging.Metrics
+	querySpec *data.QueryingSpec
 }
 
 type DataRow struct {
@@ -82,11 +83,12 @@ type SelectedAggregate struct {
 	DataEnd    *time.Time
 }
 
-func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB, metrics *logging.Metrics) (*TimeScaleDBBackend, error) {
+func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB, metrics *logging.Metrics, querySpec *data.QueryingSpec) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
-		config:  config,
-		db:      db,
-		metrics: metrics,
+		config:    config,
+		db:        db,
+		metrics:   metrics,
+		querySpec: querySpec,
 	}, nil
 }
 
@@ -381,12 +383,19 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	for _, row := range dataRows {
 		moduleID := ids.KeyToHardwareID[row.ModuleID]
 
+		value := &row.MaximumValue
+
+		sensorSpec := tsdb.querySpec.Sensors[row.SensorID]
+		if sensorSpec != nil && sensorSpec.Function == data.AverageFunctionName {
+			value = &row.AverageValue
+		}
+
 		dataRow := &backend.DataRow{
 			Time:         data.NumericWireTime(row.Time),
 			StationID:    &row.StationID,
 			ModuleID:     &moduleID,
 			SensorID:     &row.SensorID,
-			Value:        &row.MaximumValue, // TODO
+			Value:        value,
 			MinimumValue: &row.MinimumValue,
 			AverageValue: &row.AverageValue,
 			MaximumValue: &row.MaximumValue,
