@@ -98,8 +98,8 @@ import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolat
 import { mapState, mapGetters } from "vuex";
 import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-import { SensorsResponse, AssociatedStation } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
+import { SensorsResponse } from "./api";
+import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
@@ -160,6 +160,9 @@ export default Vue.extend({
             return this.$loadAsset("icon-compare.svg");
         },
         busy(): boolean {
+            if (isMobile()) {
+                return !this.workspace;
+            }
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
