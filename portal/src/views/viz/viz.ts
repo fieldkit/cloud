@@ -301,6 +301,10 @@ export class NewParams implements HasSensorParams {
     constructor(public readonly sensorParams: SensorParams) {}
 }
 
+export class VizSettings {
+    constructor(public readonly mobile: boolean) {}
+}
+
 export class Graph extends Viz {
     public visible: TimeRange = TimeRange.eternity;
     public dragged: TimeRange | null = null;
@@ -309,7 +313,7 @@ export class Graph extends Viz {
     public fastTime: FastTime = FastTime.All;
     public geo: GeoZoom | null = null;
 
-    constructor(public readonly when: TimeRange, public dataSets: DataSetSeries[]) {
+    constructor(private readonly settings: VizSettings, public readonly when: TimeRange, public dataSets: DataSetSeries[]) {
         super();
     }
 
@@ -344,7 +348,7 @@ export class Graph extends Viz {
     }
 
     private get draggable(): boolean {
-        return true;
+        return this.settings.mobile;
     }
 
     public get timeRangeOfAll(): TimeRange | null {
@@ -399,7 +403,7 @@ export class Graph extends Viz {
     }
 
     public clone(): Viz {
-        const c = new Graph(this.when, this.dataSets);
+        const c = new Graph(this.settings, this.when, this.dataSets);
         c.visible = this.visible;
         c.chartType = this.chartType;
         c.fastTime = this.fastTime;
@@ -497,10 +501,10 @@ export class Graph extends Viz {
         return new NewParams(new SensorParams(updated));
     }
 
-    public static fromBookmark(bm: VizBookmark): Viz {
+    public static fromBookmark(bm: VizBookmark, settings: VizSettings): Viz {
         const visible = new TimeRange(bm[1][0], bm[1][1]);
         const dataSets = bm[0].map((vizSensor) => new DataSetSeries(vizSensor));
-        const graph = new Graph(visible, dataSets);
+        const graph = new Graph(settings, visible, dataSets);
         graph.geo = bm[2].length ? new GeoZoom(bm[2]) : null;
         graph.chartType = bm[3];
         graph.fastTime = bm[4];
@@ -615,8 +619,8 @@ export class Group {
         return [this.vizes.map((v) => v.bookmark())];
     }
 
-    public static fromBookmark(bm: GroupBookmark): Group {
-        return new Group(bm[0].map((vm) => Graph.fromBookmark(vm)));
+    public static fromBookmark(bm: GroupBookmark, settings: VizSettings): Group {
+        return new Group(bm[0].map((vm) => Graph.fromBookmark(vm, settings)));
     }
 }
 
@@ -697,6 +701,7 @@ export class Workspace implements VizInfoFactory {
 
     constructor(
         private readonly meta: SensorsResponse,
+        private readonly settings: VizSettings,
         private groups: Group[] = [],
         public readonly projects: number[] = [],
         public readonly bookmarkStations: number[] | null = null,
@@ -966,9 +971,11 @@ export class Workspace implements VizInfoFactory {
         return this;
     }
 
+    /*
     private addStandardGraph(vizSensor: VizSensor): Workspace {
         return this.addGraph(new Graph(TimeRange.eternity, [new DataSetSeries(vizSensor)]));
     }
+    */
 
     private get selectedAssociated(): AssociatedStation {
         const found = this.associated.find((a) => a.station.id == this.selectedStationId);
@@ -1280,13 +1287,14 @@ export class Workspace implements VizInfoFactory {
         );
     }
 
-    public static fromBookmark(meta: SensorsResponse, bm: Bookmark): Workspace {
+    public static fromBookmark(meta: SensorsResponse, bm: Bookmark, settings: VizSettings): Workspace {
         if (bm.v !== 1) {
             throw new Error("viz: Unexpected bookmark version");
         }
         return new Workspace(
             meta,
-            bm.g.map((gm) => Group.fromBookmark(gm)),
+            settings,
+            bm.g.map((gm) => Group.fromBookmark(gm, settings)),
             bm.p,
             bm.s,
             bm.c
@@ -1301,7 +1309,7 @@ export class Workspace implements VizInfoFactory {
 
         console.log(`viz: update-from-bookmark`, bm);
         await this.addStationIds(bm.s);
-        this.groups = bm.g.map((gm) => Group.fromBookmark(gm));
+        this.groups = bm.g.map((gm) => Group.fromBookmark(gm, this.settings));
         await this.query();
         return;
     }

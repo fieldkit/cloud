@@ -99,7 +99,7 @@ import { mapState, mapGetters } from "vuex";
 import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime } from "./viz";
+import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
@@ -265,8 +265,9 @@ export default Vue.extend({
 
             console.log("viz: workspace-creating");
 
+            const settings = new VizSettings(isMobile());
             const allSensors: SensorsResponse = await this.$services.api.getAllSensorsMemoized()();
-            const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
+            const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark, settings) : new Workspace(allSensors, settings);
 
             this.workspace = await ws.initialize();
 
