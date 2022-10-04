@@ -127,14 +127,7 @@ export class TimeSeriesSpecFactory {
 
             const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded);
 
-            const withinTimeDomain = afterMostMinimumGapAdded.filter((row) => {
-                if (xDomain) {
-                    return row.time > xDomain[0] && row.time < xDomain[1];
-                }
-                return true;
-            });
-
-            return withinTimeDomain;
+            return afterMostMinimumGapAdded;
         });
 
         // This returns the domain for a single series. Primarily responsible

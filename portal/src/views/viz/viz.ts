@@ -344,7 +344,7 @@ export class Graph extends Viz {
     }
 
     private get draggable(): boolean {
-        return false;
+        return true;
     }
 
     public get timeRangeOfAll(): TimeRange | null {
@@ -373,7 +373,7 @@ export class Graph extends Viz {
 
     private get timeRangeToQuery(): TimeRange {
         if (this.draggable) {
-            return this.visible.rewindStart(7);
+            return this.visible.expand(3);
         }
         return this.visible;
     }

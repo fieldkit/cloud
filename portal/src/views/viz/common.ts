@@ -79,7 +79,7 @@ export class TimeRange {
         return new TimeRange(this.start - delta, this.end - delta);
     }
 
-    public rewindStart(days: number): TimeRange {
+    private rewindStart(days: number): TimeRange {
         const rewound = new Date(this.start);
         rewound.setDate(rewound.getDate() - days);
         return new TimeRange(rewound.getTime(), this.end);
