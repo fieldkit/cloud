@@ -60,9 +60,7 @@ export class TimeSeriesSpecFactory {
             return getSeriesThresholds(series);
         };
 
-        const xDomainsAll: number[][] = this.allSeries
-            .filter((series: SeriesData) => series.queried.data.length > 0)
-            .map((series: SeriesData) => series.visible.toArray());
+        const xDomainsAll: number[][] = this.allSeries.map((series: SeriesData) => series.visible.toArray());
 
         const eachDataEnd = this.allSeries.map((series) => series.queried.dataEnd).filter((v) => v !== null);
         const dataEnd = eachDataEnd.length > 0 ? _.max(eachDataEnd) : new Date().getTime();
