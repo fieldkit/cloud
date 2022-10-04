@@ -16,6 +16,8 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 
+type DragTimeSignal = [number, number] | null;
+
 function roundForDisplay(value: number): number {
     for (let i = 1; i < 6; ++i) {
         const factor = Math.pow(10, i);
@@ -60,7 +62,9 @@ export default Vue.extend({
                 return;
             }
 
-            const factory = new TimeSeriesSpecFactory(this.series, this.settings);
+            const brushable = !this.settings.mobile;
+            const draggable = !brushable;
+            const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable, draggable);
 
             const spec = factory.create();
 
@@ -110,34 +114,66 @@ export default Vue.extend({
             }
 
             if (!this.settings.tiny) {
-                let scrubbed = [];
+                if (brushable) {
+                    let scrubbed = [];
 
-                vegaInfo.view.addSignalListener("brush", (_, value) => {
-                    scrubbed = value.time;
-                });
+                    vegaInfo.view.addSignalListener("brush", (_, value) => {
+                        scrubbed = value.time;
+                    });
 
-                vegaInfo.view.addEventListener("mouseup", () => {
-                    if (scrubbed.length == 2) {
-                        this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
-                    }
-                });
-
-                // Watch for brush drag outside the window
-                vegaInfo.view.addEventListener("mousedown", (e) => {
-                    window.addEventListener("mouseup", (e) => {
-                        if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                    vegaInfo.view.addEventListener("mouseup", () => {
+                        if (scrubbed.length == 2) {
                             this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                         }
                     });
-                });
+
+                    // Watch for brush drag outside the window
+                    vegaInfo.view.addEventListener("mousedown", (e) => {
+                        window.addEventListener("mouseup", (e) => {
+                            if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                            }
+                        });
+                    });
+                } else {
+                    /*
+                    vegaInfo.view.addSignalListener("down", async (_, value: DragTimeSignal) => {
+                        console.log("down", value);
+                    });
+
+                    vegaInfo.view.addSignalListener("xcur", async (_, value: DragTimeSignal) => {
+                        console.log("xcur", value);
+                    });
+
+                    vegaInfo.view.addSignalListener("drag_delta", async (_, value: DragTimeSignal) => {
+                        console.log("delta", value);
+                    });
+
+                    vegaInfo.view.addSignalListener("chart_clip_size", async (_, value) => {
+                        console.log("chart_clip_size", value);
+                    });
+                    */
+
+                    vegaInfo.view.addSignalListener("visible_times_calc", async (_, value: DragTimeSignal) => {
+                        if (value) {
+                            this.$emit("time-dragged", new TimeZoom(null, new TimeRange(value[0], value[1])));
+                        }
+                    });
+
+                    vegaInfo.view.addSignalListener("drag_time", async (_, value: DragTimeSignal) => {
+                        if (value) {
+                            this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(value[0], value[1])));
+                        }
+                    });
+                }
             }
 
             console.log("viz: vega:ready", {
                 state: vegaInfo.view.getState(),
-                graph: vegaInfo.view.scenegraph(),
-                runtime: vegaInfo.view._runtime,
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
+            /*
+             */
         },
         getFileName(series): string {
             const stationName = series.vizInfo.station.name;

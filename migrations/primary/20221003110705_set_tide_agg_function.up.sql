@@ -1,0 +1,1 @@
+UPDATE fieldkit.sensor_meta SET aggregation_function = 'max' WHERE full_key = 'wh.floodnet.tideFeet';
