@@ -79,7 +79,7 @@ func (a *prioritizedFilesArchive) DeleteByURL(ctx context.Context, url string) e
 }
 
 func (a *prioritizedFilesArchive) Info(ctx context.Context, key string) (info *FileInfo, err error) {
-	var errors *multierror.Error
+	var errs *multierror.Error
 	for _, a := range a.reading {
 		info, err := a.Info(ctx, key)
 		if err == nil {
@@ -89,7 +89,7 @@ func (a *prioritizedFilesArchive) Info(ctx context.Context, key string) (info *F
 		log := Logger(ctx).Sugar()
 		log.Warnw("error", "error", err)
 
-		errors = multierror.Append(err)
+		errs = multierror.Append(errs, err)
 	}
-	return nil, errors.ErrorOrNil()
+	return nil, errs.ErrorOrNil()
 }

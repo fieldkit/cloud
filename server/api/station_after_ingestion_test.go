@@ -23,6 +23,8 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
+	assert.NoError(e.AddRandomSensors())
+
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
@@ -51,11 +53,12 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	assert.NoError(err)
 
 	publisher := jobs.NewDevNullMessagePublisher()
+	mc := jobs.NewMessageContext(publisher, nil)
 	memoryFiles := tests.NewInMemoryArchive(map[string][]byte{
 		"/meta": files.Meta,
 		"/data": files.Data,
 	})
-	handler := backend.NewIngestionReceivedHandler(e.DB, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
+	handler := backend.NewIngestionReceivedHandler(e.DB, e.DbPool, memoryFiles, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 
 	queuedMeta, _, err := e.AddIngestion(user, "/meta", data.MetaTypeName, station.DeviceID, len(files.Meta))
 	assert.NoError(err)
@@ -63,19 +66,17 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, station.DeviceID, len(files.Data))
 	assert.NoError(err)
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
 		Verbose:  true,
-		Refresh:  true,
-	}))
+	}, mc))
 
-	assert.NoError(handler.Handle(e.Ctx, &messages.IngestionReceived{
+	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,
-		Refresh:  true,
-	}))
+	}, mc))
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))

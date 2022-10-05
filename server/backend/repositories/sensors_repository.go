@@ -32,3 +32,34 @@ func (r *SensorsRepository) QueryAllSensors(ctx context.Context) (map[string]*da
 
 	return mapped, nil
 }
+
+func (r *SensorsRepository) AddSensor(ctx context.Context, key string) error {
+	if _, err := r.db.ExecContext(ctx, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES ($1) ON CONFLICT DO NOTHING`, key); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *SensorsRepository) QueryQueryingSpec(ctx context.Context) (*data.QueryingSpec, error) {
+	specs := []*data.SensorQueryingSpec{}
+	if err := r.db.SelectContext(ctx, &specs, `
+		SELECT
+			agg_sensor.id AS sensor_id, aggregation_function AS function
+		FROM
+			fieldkit.aggregated_sensor AS agg_sensor JOIN
+			fieldkit.sensor_meta AS sensor_meta ON (agg_sensor.key = sensor_meta.full_key)
+		`); err != nil {
+		return nil, err
+	}
+
+	mapped := make(map[int64]*data.SensorQueryingSpec)
+
+	for _, sensor := range specs {
+		mapped[sensor.SensorID] = sensor
+	}
+
+	return &data.QueryingSpec{
+		Sensors: mapped,
+	}, nil
+}

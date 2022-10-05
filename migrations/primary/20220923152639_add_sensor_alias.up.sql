@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.sensor_meta ADD COLUMN aliases TEXT[];

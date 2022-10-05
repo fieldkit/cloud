@@ -26,6 +26,7 @@ type Server struct {
 	ProcessStation           http.Handler
 	ProcessStationIngestions http.Handler
 	ProcessIngestion         http.Handler
+	RefreshViews             http.Handler
 	Delete                   http.Handler
 	CORS                     http.Handler
 }
@@ -68,12 +69,14 @@ func New(
 			{"ProcessStation", "POST", "/data/stations/{stationId}/process"},
 			{"ProcessStationIngestions", "POST", "/data/stations/{stationId}/ingestions/process"},
 			{"ProcessIngestion", "POST", "/data/ingestions/{ingestionId}/process"},
+			{"RefreshViews", "POST", "/data/refresh-views"},
 			{"Delete", "DELETE", "/data/ingestions/{ingestionId}"},
 			{"CORS", "OPTIONS", "/data/process"},
 			{"CORS", "OPTIONS", "/data/walk"},
 			{"CORS", "OPTIONS", "/data/stations/{stationId}/process"},
 			{"CORS", "OPTIONS", "/data/stations/{stationId}/ingestions/process"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}/process"},
+			{"CORS", "OPTIONS", "/data/refresh-views"},
 			{"CORS", "OPTIONS", "/data/ingestions/{ingestionId}"},
 		},
 		ProcessPending:           NewProcessPendingHandler(e.ProcessPending, mux, decoder, encoder, errhandler, formatter),
@@ -81,6 +84,7 @@ func New(
 		ProcessStation:           NewProcessStationHandler(e.ProcessStation, mux, decoder, encoder, errhandler, formatter),
 		ProcessStationIngestions: NewProcessStationIngestionsHandler(e.ProcessStationIngestions, mux, decoder, encoder, errhandler, formatter),
 		ProcessIngestion:         NewProcessIngestionHandler(e.ProcessIngestion, mux, decoder, encoder, errhandler, formatter),
+		RefreshViews:             NewRefreshViewsHandler(e.RefreshViews, mux, decoder, encoder, errhandler, formatter),
 		Delete:                   NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
 		CORS:                     NewCORSHandler(),
 	}
@@ -96,6 +100,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ProcessStation = m(s.ProcessStation)
 	s.ProcessStationIngestions = m(s.ProcessStationIngestions)
 	s.ProcessIngestion = m(s.ProcessIngestion)
+	s.RefreshViews = m(s.RefreshViews)
 	s.Delete = m(s.Delete)
 	s.CORS = m(s.CORS)
 }
@@ -107,6 +112,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountProcessStationHandler(mux, h.ProcessStation)
 	MountProcessStationIngestionsHandler(mux, h.ProcessStationIngestions)
 	MountProcessIngestionHandler(mux, h.ProcessIngestion)
+	MountRefreshViewsHandler(mux, h.RefreshViews)
 	MountDeleteHandler(mux, h.Delete)
 	MountCORSHandler(mux, h.CORS)
 }
@@ -367,6 +373,57 @@ func NewProcessIngestionHandler(
 	})
 }
 
+// MountRefreshViewsHandler configures the mux to serve the "ingestion" service
+// "refresh views" endpoint.
+func MountRefreshViewsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleIngestionOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/data/refresh-views", f)
+}
+
+// NewRefreshViewsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "ingestion" service "refresh views" endpoint.
+func NewRefreshViewsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeRefreshViewsRequest(mux, decoder)
+		encodeResponse = EncodeRefreshViewsResponse(encoder)
+		encodeError    = EncodeRefreshViewsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "refresh views")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "ingestion")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountDeleteHandler configures the mux to serve the "ingestion" service
 // "delete" endpoint.
 func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
@@ -433,6 +490,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/data/stations/{stationId}/process", f)
 	mux.Handle("OPTIONS", "/data/stations/{stationId}/ingestions/process", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}/process", f)
+	mux.Handle("OPTIONS", "/data/refresh-views", f)
 	mux.Handle("OPTIONS", "/data/ingestions/{ingestionId}", f)
 }
 
@@ -448,6 +506,7 @@ func NewCORSHandler() http.Handler {
 func handleIngestionOrigin(h http.Handler) http.Handler {
 	spec0 := regexp.MustCompile("(.+[.])?fklocal.org:\\d+")
 	spec1 := regexp.MustCompile("127.0.0.1:\\d+")
+	spec2 := regexp.MustCompile("192.168.(\\d+).(\\d+):\\d+")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -470,6 +529,19 @@ func handleIngestionOrigin(h http.Handler) http.Handler {
 			return
 		}
 		if cors.MatchOriginRegexp(origin, spec1) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "false")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS, POST, DELETE, PATCH, PUT")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+			}
+			origHndlr(w, r)
+			return
+		}
+		if cors.MatchOriginRegexp(origin, spec2) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")

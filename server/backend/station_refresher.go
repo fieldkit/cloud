@@ -10,6 +10,10 @@ import (
 	"github.com/fieldkit/cloud/server/backend/handlers"
 )
 
+/**
+ * This type is deprecated.
+ */
+
 type StationRefresher struct {
 	db          *sqlxcache.DB
 	tsConfig    *storage.TimeScaleDBConfig

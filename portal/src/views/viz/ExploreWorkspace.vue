@@ -100,8 +100,8 @@ import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolat
 import { mapState, mapGetters } from "vuex";
 import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-import { SensorsResponse, AssociatedStation } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, TimeRange, ChartType, FastTime, serializeBookmark } from "./viz";
+import { SensorsResponse } from "./api";
+import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
@@ -154,7 +154,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => s.stations.user.stations,
@@ -164,6 +164,9 @@ export default Vue.extend({
             return this.$loadAsset("icon-compare.svg");
         },
         busy(): boolean {
+            if (isMobile()) {
+                return !this.workspace;
+            }
             return !this.workspace || this.workspace.busy;
         },
         backLabelKey(): string {
@@ -241,7 +244,7 @@ export default Vue.extend({
         },
         async onChange(bookmark: Bookmark): Promise<void> {
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
-                console.log("viz: bookmark-no-change", bookmark);
+                // console.log("viz: bookmark-no-change", bookmark);
                 return Promise.resolve(this.workspace);
             }
             console.log("viz: bookmark-change", bookmark);
@@ -266,8 +269,9 @@ export default Vue.extend({
 
             console.log("viz: workspace-creating");
 
+            const settings = new VizSettings(isMobile());
             const allSensors: SensorsResponse = await this.$services.api.getAllSensorsMemoized()();
-            const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark) : new Workspace(allSensors);
+            const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark, settings) : new Workspace(allSensors, settings);
 
             this.workspace = await ws.initialize();
 

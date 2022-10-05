@@ -157,8 +157,8 @@ export default Vue.extend({
 
     @include bp-down($sm) {
         position: initial;
+        z-index: initial;
         padding: 30px;
-        display: block;
     }
 
     @include bp-down($xs) {
@@ -168,7 +168,7 @@ export default Vue.extend({
     span {
         font-family: var(--font-family-bold);
         margin-bottom: 5px;
-        font-size: 10px;
+        font-size: 12px;
         min-width: 50px;
     }
 

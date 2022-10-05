@@ -1,12 +1,5 @@
 @Library('conservify') _
 
-def getJobWithArtifacts(stackName, branch) {
-	if (stackName == "portal-stack") {
-		return "cloud"
-	}
-	return "aws-build-stacks"
-}
-
 def getCopyArtifactsJob(stackName, branch) {
 	if (stackName == "portal-stack") {
 		return "cloud/" + branch
@@ -17,11 +10,6 @@ def getCopyArtifactsJob(stackName, branch) {
 	return "aws-build-stacks/" + branch
 }
 
-def getStackURL(user, password, branch, stackName) {
-	def job = getJobWithArtifacts(stackName, branch)
-	return "https://${user}:${password}@code.conservify.org/jenkins/job/fk/job/${job}/job/${branch}/lastSuccessfulBuild/artifact/dev-ops/amis/build/${stackName}.tar"
-}
-
 timestamps {
 	node ("main") {
 		try {
@@ -29,12 +17,13 @@ timestamps {
 			def stackName = params.DeployStack ?: "portal-stack"
 			def branchName = params.DeployBranch ?: "main"
 			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
+			def selector = params.WhichBuild ? specific(params.WhichBuild) : lastSuccessful()
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
 			stage ('prepare') {
 				def job = getCopyArtifactsJob(stackName, branchName)
-				copyArtifacts(projectName: job, flatten: true)
+				copyArtifacts(projectName: job, flatten: true, selector: selector)
 				sh "ls -alh"
 				sh "ls -alh ${stackName}.tar"
 			}
@@ -43,22 +32,30 @@ timestamps {
 				def ws = conservifyTerraformWorkspace(env: params.WorkEnv)
 
 				sshagent (credentials: ['ssh-fkdev-deploy']) {
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "ssh-keygen -f '/var/jenkins_home/.ssh/known_hosts' -R ${server.ip}"
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} whoami"
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo rm -f ${stackName}.tar"
-					}
+					def known_hosts = "/var/jenkins_home/.ssh/known_hosts"
+					def prepare = ws.servers.value.collectEntries {
+			            if (fileExists(known_hosts)) {
+    		                sh "ssh-keygen -f ${known_hosts} -R ${it.ip}"
+			            }
 
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${server.sshAt}:"
-					}
+			            [(it): {
+			                println(it.sshAt)
+			                sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} whoami"
+							sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} sudo rm -f ${stackName}.tar"
+							sh "scp -o StrictHostKeyChecking=no ${stackName}.tar ${it.sshAt}:"
+			            }]
+			        }
+			        
+			        parallel(prepare)
 
-					for (def server in ws.servers.value) {
-						println(server.sshAt)
-						sh "ssh -o StrictHostKeyChecking=no ${server.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
-					}
+					def deploy = ws.servers.value.collectEntries {
+			            [(it): {
+			                println(it.sshAt)
+							sh "ssh -o StrictHostKeyChecking=no ${it.sshAt} sudo mv ${stackName}.tar /tmp/incoming-stacks"
+			            }]
+			        }
+
+					parallel(deploy)
 				}
 
 				if (stackName == "portal-stack") {

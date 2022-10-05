@@ -40,6 +40,10 @@ export const VizWorkspace = Vue.extend({
                 .with((this as any).signal)
                 .query();
         },
+        onGraphTimeDragged(group: Group, viz: Viz, zoom: TimeZoom) {
+            viz.log("dragged", zoom);
+            return this.workspace.graphTimeDragged(viz, zoom).with((this as any).signal);
+        },
         onGraphGeoZoomed(group: Group, viz: Viz, zoom: GeoZoom) {
             viz.log("zooming(geo)", zoom.bounds);
             return this.workspace
@@ -89,6 +93,7 @@ export const VizWorkspace = Vue.extend({
                 <VizGroup :group="group" :workspace="workspace" :topGroup="index == 0"
                     @group-time-zoomed="(...args) => onGroupTimeZoomed(group, ...args)"
                     @viz-time-zoomed="(...args) => onGraphTimeZoomed(group, ...args)"
+                    @viz-time-dragged="(...args) => onGraphTimeDragged(group, ...args)"
                     @viz-geo-zoomed="(...args) => onGraphGeoZoomed(group, ...args)"
                     @viz-remove="(...args) => onRemove(group, ...args)"
                     @viz-compare="(...args) => onCompare(group, ...args)"

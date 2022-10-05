@@ -10,8 +10,6 @@ import (
 	"github.com/fieldkit/cloud/server/common/jobs"
 	"github.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend"
-
 	"github.com/fieldkit/cloud/server/tests"
 )
 
@@ -25,26 +23,21 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Address: "",
 	})
 
-	database, err := sqlxcache.Open("postgres", e.PostgresURL)
+	database, err := sqlxcache.Open(e.Ctx, "postgres", e.PostgresURL)
 	if err != nil {
-		return nil, fmt.Errorf("error opening pg: %v", err)
+		return nil, fmt.Errorf("error opening pg: %w", err)
 	}
 
 	jq := jobs.NewDevNullMessagePublisher()
-
-	be, err := backend.New(e.PostgresURL)
-	if err != nil {
-		return nil, fmt.Errorf("error creating backend: %v", err)
-	}
 
 	apiConfig := &ApiConfiguration{
 		SessionKey: e.SessionKey,
 		Emailer:    "default",
 	}
 
-	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, be, jq, nil, nil, metrics, nil, nil, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, jq, nil, nil, metrics, nil, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error creating service options: %v", err)
+		return nil, fmt.Errorf("error creating service options: %w", err)
 	}
 
 	return services, err
@@ -63,7 +56,7 @@ func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 
 	handler, err := CreateApi(e.Ctx, services)
 	if err != nil {
-		return nil, fmt.Errorf("error creating service api: %v", err)
+		return nil, fmt.Errorf("error creating service api: %w", err)
 	}
 
 	testHandler = logging.LoggingAndInfrastructure("tests")(handler)

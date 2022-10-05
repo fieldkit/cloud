@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/iancoleman/strcase"
 
 	"go.uber.org/zap"
 
@@ -34,7 +33,7 @@ type MissingSensorMetaError struct {
 }
 
 func (e *MissingSensorMetaError) Error() string {
-	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
+	return fmt.Sprintf("MissingSensorMetaError(missing-record-id=%v)", e.MetaRecordID)
 }
 
 type MalformedMetaError struct {
@@ -43,7 +42,7 @@ type MalformedMetaError struct {
 }
 
 func (e *MalformedMetaError) Error() string {
-	return fmt.Sprintf("MalformedMetaError(missing-record--id=%v, '%v')", e.MetaRecordID, e.Malformed)
+	return fmt.Sprintf("MalformedMetaError(missing-record-id=%v, '%v')", e.MetaRecordID, e.Malformed)
 }
 
 type MetaFactory struct {
@@ -90,22 +89,20 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	}
 
 	if meta.Identity == nil {
-		return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID}
+		return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "identity"}
 	}
 
 	allModules := make([]*DataMetaModule, 0)
-	modules := make([]*DataMetaModule, 0)
 	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
-		sensors := make([]*DataMetaSensor, 0)
-
 		if module.Header == nil {
 			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "header"}
 		}
 
 		if module.Sensors == nil {
-			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
+			log.Infow("meta:malformed-sensors-nil")
+			continue
 		}
 
 		hf := HeaderFields{
@@ -121,16 +118,19 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 		}
 
+		sensors := make([]*DataMetaSensor, 0)
+
 		for _, sensor := range module.Sensors {
-			key := strcase.ToLowerCamel(sensor.Name)
-			extraModule, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
+			_, extraSensor, err := mf.moduleMeta.FindSensorMeta(&hf, sensor.Name)
 			if err != nil {
 				return nil, err
 			}
 			if extraModule == nil || extraSensor == nil {
+				log.Warnw("meta:missing-sensor", "sensor_name", sensor.Name, "module_key", extraModule.Key, "header", hf)
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
 
+			key := extraSensor.Key
 			fullKey := extraModule.Key + "." + key
 			if fq {
 				key = fullKey
@@ -162,11 +162,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			Sensors:      sensors,
 		}
 
-		if len(moduleMeta.Sensors) > 0 {
-			if !moduleMeta.Internal {
-				modules = append(modules, moduleMeta)
-			}
-		} else {
+		if len(moduleMeta.Sensors) == 0 {
 			numberEmptyModules += 1
 		}
 
@@ -183,7 +179,6 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			ID:         hex.EncodeToString(meta.Metadata.DeviceId),
 			Name:       meta.Identity.Name,
 			AllModules: allModules,
-			Modules:    modules,
 			Firmware: &DataMetaStationFirmware{
 				Version:   meta.Metadata.Firmware.Version,
 				Build:     meta.Metadata.Firmware.Build,
@@ -229,37 +224,37 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 			if len(sensorGroup.Readings) > 0 {
 				numberOfNonVirtualModulesWithData += 1
 			}
+		}
 
-			for sensorIndex, reading := range sensorGroup.Readings {
-				if sensorIndex >= len(module.Sensors) {
-					if verbose {
-						vl := verboseLoggerFor(ctx, databaseRecord, verbose)
-						vl.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
-					}
-					continue
+		for sensorIndex, reading := range sensorGroup.Readings {
+			if sensorIndex >= len(module.Sensors) {
+				if verbose {
+					vl := verboseLoggerFor(ctx, databaseRecord, verbose)
+					vl.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
 				}
+				continue
+			}
 
-				sensor := module.Sensors[sensorIndex]
+			sensor := module.Sensors[sensorIndex]
 
-				// This is only happening on one single record, so far.
-				if reading == nil {
-					if verbose {
-						log := verboseLoggerFor(ctx, databaseRecord, verbose)
-						log.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
-					}
-					continue
+			// This is only happening on one single record, so far.
+			if reading == nil {
+				if verbose {
+					log := verboseLoggerFor(ctx, databaseRecord, verbose)
+					log.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
 				}
+				continue
+			}
 
-				key := SensorKey{
-					ModuleIndex: uint32(moduleIndex),
-					SensorKey:   sensor.Key,
-				}
+			key := SensorKey{
+				ModuleIndex: uint32(moduleIndex),
+				SensorKey:   sensor.Key,
+			}
 
-				readings[key] = &ReadingValue{
-					Sensor: sensor,
-					Module: module,
-					Value:  float64(reading.Value),
-				}
+			readings[key] = &ReadingValue{
+				Sensor: sensor,
+				Module: module,
+				Value:  float64(reading.Value),
 			}
 		}
 	}
@@ -285,7 +280,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		Readings: readings,
 	}
 
-	filtered := mf.filtering.Apply(ctx, resolved)
+	// filtered := mf.filtering.Apply(ctx, resolved)
+
+	filtered := &FilteredRecord{
+		Record:  resolved,
+		Filters: nil,
+	}
 
 	return filtered, nil
 }

@@ -888,8 +888,6 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 		return nil, project.MakeNotFound(errors.New("not found"))
 	}
 
-	photoCache := NewPhotoCache(s.options.MediaFiles)
-
 	var resize *PhotoResizeSettings
 	if payload.Size != nil {
 		resize = &PhotoResizeSettings{
@@ -897,7 +895,7 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 		}
 	}
 
-	photo, err := photoCache.Load(ctx, &ExternalMedia{
+	photo, err := s.options.photoCache.Load(ctx, &ExternalMedia{
 		URL:         *resource.MediaURL,
 		ContentType: *resource.MediaContentType,
 	},

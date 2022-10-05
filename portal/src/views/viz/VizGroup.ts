@@ -3,12 +3,12 @@ import Vue from "vue";
 
 import { Workspace, Viz, Group, TimeZoom } from "./viz";
 import { VizGraph } from "./VizGraph";
-import { VegaScrubber as Scrubber } from "./VegaScrubber";
+import { VegaScrubber } from "./VegaScrubber";
 
 export const VizGroup = Vue.extend({
     components: {
         VizGraph,
-        Scrubber,
+        VegaScrubber,
     },
     props: {
         group: {
@@ -27,17 +27,15 @@ export const VizGroup = Vue.extend({
     mounted() {
         this.group.log("mounted", this.group, this.topGroup);
     },
-    computed: {
-        busy(): boolean {
-            return this.group.busy;
-        },
-    },
     methods: {
         raiseGroupZoomed(zoom: TimeZoom, ...args) {
             return this.$emit("group-time-zoomed", zoom, ...args);
         },
         raiseVizTimeZoomed(...args) {
             return this.$emit("viz-time-zoomed", ...args);
+        },
+        raiseVizTimeDragged(...args) {
+            return this.$emit("viz-time-dragged", ...args);
         },
         raiseVizGeoZoomed(...args) {
             return this.$emit("viz-geo-zoomed", ...args);
@@ -77,6 +75,7 @@ export const VizGroup = Vue.extend({
 
                 <VizGraph :viz="viz" :workspace="workspace"
                     @viz-time-zoomed="(...args) => raiseVizTimeZoomed(viz, ...args)"
+                    @viz-time-dragged="(...args) => raiseVizTimeDragged(viz, ...args)"
                     @viz-geo-zoomed="(...args) => raiseVizGeoZoomed(viz, ...args)"
                     @viz-remove="(...args) => raiseRemove(viz, ...args)"
                     @viz-compare="(...args) => raiseCompare(viz, ...args)"
@@ -85,8 +84,8 @@ export const VizGroup = Vue.extend({
                     />
                 </component>
             </div>
-            <div v-if="group.scrubbers && !group.scrubbers.empty">
-                <Scrubber :scrubbers="group.scrubbers" :workspace="workspace" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
+            <div>
+                <VegaScrubber :allSeries="workspace.allGroupSeries(group)" :visible="group.visible" :dragging="group.dragging" @viz-time-zoomed="(...args) => raiseGroupZoomed(...args)" />
             </div>
         </div>
 	`,

@@ -29,9 +29,31 @@ func WithDeviceID(ctx context.Context, deviceID string) context.Context {
 	return context.WithValue(ctx, deviceIDKey, deviceID)
 }
 
+const (
+	MaximumServiceTrace = 10
+)
+
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
+	if !IsServiceTraceEnabled() {
+		return ctx
+	}
+
 	existing := ServiceTrace(ctx)
-	return context.WithValue(ctx, serviceTraceKey, append(existing, value...))
+	narrowed := existing
+	for _, part := range value {
+		if len(narrowed) >= MaximumServiceTrace {
+			narrowed := make([]string, MaximumServiceTrace)
+			narrowed[0] = existing[0]
+			narrowed[1] = existing[1]
+			for i := 2; i <= MaximumServiceTrace-3; i += 1 {
+				narrowed[i] = existing[i+1]
+			}
+			narrowed[MaximumServiceTrace-1] = part
+		} else {
+			narrowed = append(narrowed, part)
+		}
+	}
+	return context.WithValue(ctx, serviceTraceKey, narrowed)
 }
 
 func WithFacility(ctx context.Context, facility string) context.Context {

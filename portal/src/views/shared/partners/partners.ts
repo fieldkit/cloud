@@ -108,6 +108,11 @@ export interface PartnerCustomization {
                 map: { label: string };
             };
         };
+        project: {
+            back: {
+                label: string;
+            };
+        };
     };
     projectId: number | null;
     interpolate: (base: string) => string;
@@ -164,6 +169,11 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                         map: { label: "layout.backToSensors" },
                     },
                 },
+                project: {
+                    back: {
+                        label: "",
+                    },
+                },
             },
             projectId: 174,
             interpolate: (baseString: string) => {
@@ -211,6 +221,11 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
                 back: {
                     // project: "layout.backProjectDashboard",
                     map: { label: "layout.backToStations" },
+                },
+            },
+            project: {
+                back: {
+                    label: "layout.backProjects",
                 },
             },
         },

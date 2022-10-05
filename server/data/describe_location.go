@@ -7,10 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/fieldkit/cloud/server/common/logging"
 )
 
 type DescribeLocations struct {
 	MapboxToken string
+	metrics     *logging.Metrics
 }
 
 type LocationDescription struct {
@@ -18,9 +21,10 @@ type LocationDescription struct {
 	NativeLandName *string
 }
 
-func NewDescribeLocations(mapboxToken string) (ls *DescribeLocations) {
+func NewDescribeLocations(mapboxToken string, metrics *logging.Metrics) (ls *DescribeLocations) {
 	return &DescribeLocations{
 		MapboxToken: mapboxToken,
+		metrics:     metrics,
 	}
 }
 
@@ -34,6 +38,10 @@ type OtherLandResponse struct {
 }
 
 func (ls *DescribeLocations) queryOther(ctx context.Context, l *Location) (name *string, err error) {
+	timing := ls.metrics.ThirdPartyLocation("mapbox")
+
+	defer timing.Send()
+
 	query := fmt.Sprintf("%f,%f", l.Longitude(), l.Latitude())
 	url := "https://api.mapbox.com/geocoding/v5/mapbox.places/" + query + ".json?types=place&access_token=" + ls.MapboxToken
 	response, err := http.Get(url)
@@ -74,6 +82,10 @@ type NativeLandInfo struct {
 type NativeLandResponse = []*NativeLandInfo
 
 func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name *string, err error) {
+	timing := ls.metrics.ThirdPartyLocation("nativeland")
+
+	defer timing.Send()
+
 	query := fmt.Sprintf("%f,%f", l.Latitude(), l.Longitude())
 	url := "https://native-land.ca/api/index.php?maps=territories&position=" + query
 	response, err := http.Get(url)
@@ -105,10 +117,18 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 	return nil, nil
 }
 
+func (ls *DescribeLocations) IsEnabled() bool {
+	return ls.MapboxToken != ""
+}
+
 func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *LocationDescription, err error) {
 	log := Logger(ctx).Sugar()
 
-	if ls.MapboxToken == "" {
+	timing := ls.metrics.ThirdPartyLocationDescribe()
+
+	defer timing.Send()
+
+	if !ls.IsEnabled() {
 		return nil, fmt.Errorf("location description disabled")
 	}
 
