@@ -60,6 +60,9 @@ export const VizGraph = Vue.extend({
         raiseTimeZoomed(...args: unknown[]): void {
             this.$emit("viz-time-zoomed", ...args);
         },
+        raiseTimeDragged(...args: unknown[]): void {
+            this.$emit("viz-time-dragged", ...args);
+        },
         raiseGeoZoomed(...args: unknown[]): void {
             this.$emit("viz-geo-zoomed", ...args);
         },
@@ -113,7 +116,8 @@ export const VizGraph = Vue.extend({
 
 			<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
 				@viz-geo-zoomed="raiseGeoZoomed"
-				@viz-time-zoomed="raiseTimeZoomed" />
+				@viz-time-zoomed="raiseTimeZoomed"
+                @viz-time-dragged="raiseTimeDragged" />
 
             <DebuggingPanel :viz="viz" :workspace="workspace" v-if="debug" />
 		</div>

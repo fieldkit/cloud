@@ -152,7 +152,15 @@ export default Vue.extend({
 
             console.log("tiny-chart", { stationId: this.stationId, station: this.station, sensor, quickSensors, meta });
 
-            this.series = [new SeriesData("key", new DataSetSeries(vizSensor, queried, queried), queried, vizInfo)];
+            this.series = [
+                new SeriesData(
+                    "key",
+                    new TimeRange(queried.timeRange[0], queried.timeRange[1]),
+                    new DataSetSeries(vizSensor, queried, queried),
+                    queried,
+                    vizInfo
+                ),
+            ];
         },
     },
 });

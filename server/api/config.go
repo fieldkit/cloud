@@ -15,7 +15,6 @@ type BucketNames struct {
 }
 
 type ApiConfiguration struct {
-	ApiDomain     string
 	ApiHost       string
 	SessionKey    string
 	MapboxToken   string

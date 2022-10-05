@@ -75,7 +75,14 @@ func (c *SensorService) chooseBackend(ctx context.Context, backend *string) (que
 				log := Logger(ctx).Sugar()
 				log.Errorw("tsdb:no-configuration")
 			} else {
-				if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db, c.options.Metrics); err != nil {
+				sensors := repositories.NewSensorsRepository(c.db)
+
+				queryingSpec, err := sensors.QueryQueryingSpec(ctx)
+				if err != nil {
+					return nil, fmt.Errorf("error querying for querying spec: %w", err)
+				}
+
+				if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db, c.options.Metrics, queryingSpec); err != nil {
 					return nil, err
 				} else {
 					c.tsdb = tsdb

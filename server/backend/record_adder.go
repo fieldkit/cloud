@@ -238,7 +238,10 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 			return nil, err
 		}
 	} else if pr.DataRecord != nil {
-		if pr.DataRecord.Metadata != nil {
+		// Older versions of firmware were using a nanopb version that wouldn't
+		// allow us to elide empty child messages, so we need to check for a
+		// field.
+		if pr.DataRecord.Metadata != nil && pr.DataRecord.Metadata.DeviceId != nil {
 			// Check to see if this record has a record number. Some older
 			// firmware was never setting this which causes some headaches. What
 			// we do is queue this up, and hope that we come across a data

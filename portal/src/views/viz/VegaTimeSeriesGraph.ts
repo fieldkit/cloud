@@ -29,7 +29,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
             return this.viz.loadedDataSets.map((ds) => {
                 if (!ds.graphing) throw new Error(`viz: No data`);
                 const vizInfo = this.workspace.vizInfo(this.viz, ds);
-                return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
+                return new SeriesData(ds.graphing.key, this.viz.visible, ds, ds.graphing, vizInfo);
             });
         },
         key(): string {
@@ -46,11 +46,14 @@ export const VegaTimeSeriesGraph = Vue.extend({
         raiseTimeZoomed(newTimes: TimeZoom): void {
             this.$emit("viz-time-zoomed", newTimes);
         },
+        raiseTimeDragged(newTimes: TimeZoom): void {
+            this.$emit("viz-time-dragged", newTimes);
+        },
     },
     template: `
         <div class="viz time-series-graph">
             <div class="chart" @dblclick="onDouble">
-                <LineChart :series="allSeries" v-bind:key="key" @time-zoomed="raiseTimeZoomed" />
+                <LineChart :series="allSeries" v-bind:key="key" @time-zoomed="raiseTimeZoomed" @time-dragged="raiseTimeDragged" />
             </div>
         </div>
     `,

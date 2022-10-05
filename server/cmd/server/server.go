@@ -274,7 +274,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
-		ApiDomain:     config.ApiDomain,
 		SessionKey:    config.SessionKey,
 		MapboxToken:   config.MapboxToken,
 		Emailer:       config.Emailer,
