@@ -168,7 +168,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 	}
 
 	sensors := []*PersistedSensorMeta{}
-	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aliases, aggregation_function FROM fieldkit.sensor_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &sensors, `SELECT id, module_id, ordering, sensor_key, firmware_key, full_key, internal, uom, strings, viz, ranges, aliases, aggregation_function, bucket_widths FROM fieldkit.sensor_meta`); err != nil {
 		return nil, err
 	}
 
