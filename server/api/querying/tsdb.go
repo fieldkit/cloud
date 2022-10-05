@@ -754,13 +754,6 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 }
 
 func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, *SelectedAggregate, error) {
-	adjusted := &SelectedAggregate{
-		Specifier:  Window1h.Specifier,
-		Interval:   duration,
-		BucketSize: int(duration.Seconds()),
-		DataEnd:    source.DataEnd,
-	}
-
 	sql := fmt.Sprintf(`
 		SELECT
 			time_bucket('%f seconds', "bucket_time") AS bucket_time,
@@ -778,9 +771,16 @@ func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, qp *backend.
 		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3) AND bucket_time >= $4 AND bucket_time < $5
 		GROUP BY bucket_time, station_id, module_id, sensor_id
 		ORDER BY bucket_time
-	`, duration.Seconds(), adjusted.Specifier)
+	`, duration.Seconds(), source.Specifier)
 
 	args := []interface{}{qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End}
+
+	adjusted := &SelectedAggregate{
+		Specifier:  fmt.Sprintf("custom_%ds", duration/time.Second),
+		Interval:   duration,
+		BucketSize: int(duration.Seconds()),
+		DataEnd:    source.DataEnd,
+	}
 
 	return sql, args, adjusted, nil
 }
