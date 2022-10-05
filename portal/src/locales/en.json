@@ -428,6 +428,7 @@
         "survey": "Community Flood Watch Project Survey"
     },
     "dataView": {
-        "computerTip": " For a better data analysis experience, view this data on your computer."
+        "computerTip": "For a better data analysis experience, view this data on your computer.",
+        "swipeTip": "Swipe the chart to see more data."
     }
 }

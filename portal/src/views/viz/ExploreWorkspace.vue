@@ -19,12 +19,6 @@
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
-                            <span class="info">
-                                <span class="info-icon">?</span>
-                                <span class="info-content">
-                                    For a better data analysis experience, view this data on your computer.
-                                </span>
-                            </span>
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
                                 <div>Add Chart</div>
@@ -1006,5 +1000,16 @@ export default Vue.extend({
 
 ::v-deep .groups-container {
     position: relative;
+}
+
+::v-deep .time-series-graph {
+    position: relative;
+
+    .info {
+        z-index: $z-index-top;
+        position: absolute;
+        top: 19px;
+        left: 22px;
+    }
 }
 </style>
