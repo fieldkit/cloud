@@ -105,7 +105,6 @@ import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
-        InfoTooltip,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -115,6 +114,7 @@ export default Vue.extend({
         StationSummaryContent,
         PaginationControls,
         StationBattery,
+        InfoTooltip,
     },
     props: {
         token: {
