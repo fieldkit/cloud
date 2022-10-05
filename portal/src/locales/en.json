@@ -426,5 +426,8 @@
     "floodnet": {
         "reportFlood": "Report a Flood",
         "survey": "Community Flood Watch Project Survey"
+    },
+    "dataView": {
+        "computerTip": " For a better data analysis experience, view this data on your computer."
     }
 }

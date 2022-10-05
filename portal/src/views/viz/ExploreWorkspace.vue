@@ -17,6 +17,8 @@
                         <div class="one">
                             Data View
 
+                            <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
+
                             <span class="info">
                                 <span class="info-icon">?</span>
                                 <span class="info-content">
@@ -104,10 +106,12 @@ import { VizWorkspace } from "./VizWorkspace";
 import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
+import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
+        InfoTooltip,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -964,53 +968,6 @@ export default Vue.extend({
     @include bp-down($sm) {
         margin-left: auto;
         margin-right: 0;
-    }
-}
-
-.info-icon {
-    display: block;
-    background-color: #6a6d71;
-    color: #fff;
-    text-align: center;
-    text-indent: -1px;
-    line-height: 14px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    opacity: 0.3;
-    font-size: 10px;
-    font-family: $font-family-medium;
-
-    @include bp-up($sm) {
-        display: none;
-    }
-}
-
-.info-content {
-    visibility: hidden;
-    opacity: 0;
-    padding: 14px;
-    font-size: 10px;
-    color: #6a6d71;
-    position: absolute;
-    top: 100%;
-    border-radius: 2px;
-    border: solid 1px #cccdcf;
-    background-color: #fff;
-    width: 200px;
-    z-index: $z-index-top;
-}
-
-.info {
-    position: relative;
-    padding: 5px;
-    margin-top: -3px;
-
-    &:hover {
-        .info-content {
-            visibility: visible;
-            opacity: 1;
-        }
     }
 }
 </style>
