@@ -7,6 +7,11 @@ import (
 	"database/sql/driver"
 )
 
+const (
+	AverageFunctionName = "avg"
+	MaximumFunctionName = "max"
+)
+
 type Sensor struct {
 	ID                      int64  `db:"id"`
 	Key                     string `db:"key"`
@@ -54,4 +59,13 @@ type AggregatedReading struct {
 	Location      *Location       `db:"location" json:"location"`
 	Value         float64         `db:"value" json:"value"`
 	NumberSamples int32           `db:"nsamples" json:"nsamples"`
+}
+
+type SensorQueryingSpec struct {
+	SensorID int64  `db:"sensor_id" json:"sensor_id"`
+	Function string `db:"function" json:"function"`
+}
+
+type QueryingSpec struct {
+	Sensors map[int64]*SensorQueryingSpec `json:"sensors"`
 }
