@@ -1108,14 +1108,14 @@ export class TimeSeriesSpecFactory {
         ];
 
         const calculateDragLimits = () => {
+            const timeNow = new Date().getTime();
             if (timeRangeAll && dataEnd) {
                 if (timeRangeAll[0] > dataEnd || timeRangeAll[1] > dataEnd) {
-                    console.log("past-end");
-                    return { start: Number.MAX_SAFE_INTEGER, end: Number.MAX_SAFE_INTEGER };
+                    return { start: timeNow, end: timeNow };
                 }
             }
-            const start = dataEnd && timeRangeAll ? dataEnd - (timeRangeAll[1] - timeRangeAll[0]) : Number.MAX_SAFE_INTEGER;
-            const end = dataEnd || Number.MAX_SAFE_INTEGER;
+            const start = dataEnd && timeRangeAll ? dataEnd - (timeRangeAll[1] - timeRangeAll[0]) : timeNow;
+            const end = dataEnd || timeNow;
             return { start, end };
         };
 
