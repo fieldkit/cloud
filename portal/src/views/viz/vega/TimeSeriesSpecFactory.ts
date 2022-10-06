@@ -1109,12 +1109,13 @@ export class TimeSeriesSpecFactory {
 
         const calculateDragLimits = () => {
             const timeNow = new Date().getTime();
+            const endOffset = timeRangeAll ? timeRangeAll[1] - timeRangeAll[0] : 0;
             if (timeRangeAll && dataEnd) {
                 if (timeRangeAll[0] > dataEnd || timeRangeAll[1] > dataEnd) {
-                    return { start: timeNow, end: timeNow };
+                    return { start: timeNow - endOffset, end: timeNow };
                 }
             }
-            const start = dataEnd && timeRangeAll ? dataEnd - (timeRangeAll[1] - timeRangeAll[0]) : timeNow;
+            const start = dataEnd && timeRangeAll ? dataEnd - endOffset : timeNow;
             const end = dataEnd || timeNow;
             return { start, end };
         };
