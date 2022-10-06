@@ -31,7 +31,7 @@ timestamps {
 
 					writeFile(file: "create.sql", text: """
 CREATE DATABASE "fk-restore";
-ALTER DATABASE "fk-restore" SET search_path TO "$user", public;
+ALTER DATABASE "fk-restore" SET search_path TO "\$user", fieldkit, public;
 """)
 
 					sh "docker run --rm -i postgres psql '${adminUrl}' < create.sql"

@@ -22,7 +22,7 @@ endif
 ifeq (, $(shell which yarn))
 JSPKG ?= npm
 else
-JSPKG ?= yarn
+JSPKG ?= yarn --mutex network
 endif
 
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go
