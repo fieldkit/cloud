@@ -4,11 +4,13 @@ import Vue from "vue";
 import { Graph, Workspace, FastTime, TimeZoom, VizInfo, SeriesData } from "./viz";
 
 import LineChart from "./vega/LineChart.vue";
+import InfoTooltip from '@/views/shared/InfoTooltip.vue';
 
 export const VegaTimeSeriesGraph = Vue.extend({
     name: "VegaTimeSeriesGraph",
     components: {
         LineChart,
+        InfoTooltip,
     },
     data(): {} {
         return {};
@@ -52,6 +54,7 @@ export const VegaTimeSeriesGraph = Vue.extend({
     },
     template: `
         <div class="viz time-series-graph">
+            <InfoTooltip :message="$tc('dataView.swipeTip')"></InfoTooltip>
             <div class="chart" @dblclick="onDouble">
                 <LineChart :series="allSeries" v-bind:key="key" @time-zoomed="raiseTimeZoomed" @time-dragged="raiseTimeDragged" />
             </div>

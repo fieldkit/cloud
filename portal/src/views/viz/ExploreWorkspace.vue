@@ -17,12 +17,8 @@
                         <div class="one">
                             Data View
 
-                            <span class="info">
-                                <span class="info-icon">?</span>
-                                <span class="info-content">
-                                    For a better data analysis experience, view this data on your computer.
-                                </span>
-                            </span>
+                            <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
+
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
                                 <div>Add Chart</div>
@@ -104,6 +100,7 @@ import { VizWorkspace } from "./VizWorkspace";
 import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
+import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
@@ -117,6 +114,7 @@ export default Vue.extend({
         StationSummaryContent,
         PaginationControls,
         StationBattery,
+        InfoTooltip,
     },
     props: {
         token: {
@@ -970,53 +968,6 @@ export default Vue.extend({
         margin-right: 0;
     }
 }
-
-.info-icon {
-    display: block;
-    background-color: #6a6d71;
-    color: #fff;
-    text-align: center;
-    text-indent: -1px;
-    line-height: 14px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    opacity: 0.3;
-    font-size: 10px;
-    font-family: $font-family-medium;
-
-    @include bp-up($sm) {
-        display: none;
-    }
-}
-
-.info-content {
-    visibility: hidden;
-    opacity: 0;
-    padding: 14px;
-    font-size: 12px;
-    color: #6a6d71;
-    position: absolute;
-    top: 100%;
-    border-radius: 2px;
-    border: solid 1px #cccdcf;
-    background-color: #fff;
-    width: 200px;
-    z-index: $z-index-top;
-}
-
-.info {
-    position: relative;
-    padding: 5px;
-    margin-top: -3px;
-
-    &:hover {
-        .info-content {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-}
 </style>
 
 <style scoped lang="scss">
@@ -1050,4 +1001,16 @@ export default Vue.extend({
 ::v-deep .groups-container {
     position: relative;
 }
+
+::v-deep .time-series-graph {
+    position: relative;
+
+    .info {
+        z-index: $z-index-top;
+        position: absolute;
+        top: 17px;
+        left: 20px;
+    }
+}
+
 </style>
