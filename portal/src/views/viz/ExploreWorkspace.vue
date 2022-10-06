@@ -1008,8 +1008,9 @@ export default Vue.extend({
     .info {
         z-index: $z-index-top;
         position: absolute;
-        top: 19px;
-        left: 22px;
+        top: 17px;
+        left: 20px;
     }
 }
+
 </style>

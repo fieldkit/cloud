@@ -1,5 +1,5 @@
 <template>
-    <span class="info">
+    <span class="info" @click="$event.stopPropagation()">
         <span class="info-icon">?</span>
         <span class="info-content">{{ message }}</span>
     </span>
@@ -24,8 +24,9 @@ export default Vue.extend({
 
 .info {
     position: relative;
-    padding: 5px;
+    padding: 7px;
     margin-top: -3px;
+    font-family: $font-family-bold;
 
     &:hover {
         .info-content {
