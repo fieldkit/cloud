@@ -181,7 +181,7 @@ export class TimeSeriesSpecFactory {
         const barChartData = () => {
             return _.flatten(
                 this.allSeries.map((series, i) => {
-                    if (isBarChart(series)) {
+                    if (!isBarChart(series)) {
                         return [];
                     }
 
