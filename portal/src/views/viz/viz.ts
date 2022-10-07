@@ -421,6 +421,8 @@ export class Graph extends Viz {
         } else if (zoom.fast !== null) {
             this.visible = this.getFastRange(zoom.fast);
             this.fastTime = zoom.fast;
+
+            console.log("FAST FAST", this.visible, zoom.fast);
         }
     }
 
@@ -442,11 +444,11 @@ export class Graph extends Viz {
     }
 
     private getFastRange(fastTime: FastTime) {
+        const sensorRange = this.timeRangeOfAll;
+        if (sensorRange == null) throw new Error(`viz: No timeRangeOfAll`);
         if (fastTime === FastTime.All) {
-            return TimeRange.eternity;
+            return sensorRange;
         } else {
-            const sensorRange = this.timeRangeOfAll;
-            if (sensorRange == null) throw new Error(`viz: No timeRangeOfAll`);
             const days = fastTime as number;
             const start = new Date(sensorRange.end);
             start.setDate(start.getDate() - days);
