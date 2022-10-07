@@ -25,19 +25,19 @@
                     v-if="mapped"
                     :showStations="true"
                 />
+
+                <StationHoverSummary
+                    v-if="activeStation"
+                    class="summary-container"
+                    @close="closeSummary"
+                    :station="activeStation"
+                    :sensorDataQuerier="sensorDataQuerier"
+                    :hasCupertinoPane="true"
+                    v-slot="{ sensorDataQuerier }"
+                >
+                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                </StationHoverSummary>
             </div>
-            <StationHoverSummary
-                v-if="activeStation"
-                class="summary-container"
-                @close="closeSummary"
-                :station="activeStation"
-                v-bind:key="activeStation.id"
-                @layoutChange="layoutChange"
-                :sensorDataQuerier="sensorDataQuerier"
-                v-slot="{ sensorDataQuerier }"
-            >
-                <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
-            </StationHoverSummary>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
             <h1 class="heading">Add a New Station</h1>
@@ -51,16 +51,13 @@
                 <img alt="Google Play" src="@/assets/googleplay.svg" width="147" />
             </a>
         </div>
-        <div class="view-type-container">
-            <div class="view-type">
-                <div class="view-type-map" v-bind:class="{ active: viewType === 'map' }" v-on:click="switchView('map')">
-                    <i class="icon icon-map"></i>
-                </div>
-                <div class="view-type-list" v-bind:class="{ active: viewType === 'list' }" v-on:click="switchView('list')">
-                    <i class="icon icon-list"></i>
-                </div>
-            </div>
-        </div>
+
+        <MapViewTypeToggle
+            :routes="[
+                { name: 'mapAllStations', label: 'map.toggle.map', viewType: 'map' },
+                { name: 'listAllStations', label: 'map.toggle.list', viewType: 'list' },
+            ]"
+        ></MapViewTypeToggle>
     </StandardLayout>
 </template>
 
@@ -77,6 +74,7 @@ import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
+import MapViewTypeToggle, {MapViewType} from "@/views/shared/MapViewTypeToggle.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -85,6 +83,7 @@ export default Vue.extend({
         StationsMap,
         StationHoverSummary,
         TinyChart,
+        MapViewTypeToggle,
     },
     props: {
         id: {
@@ -98,14 +97,12 @@ export default Vue.extend({
     },
     data(): {
         showNoStationsMessage: boolean;
-        viewType: string;
         layoutChanges: number;
         sensorDataQuerier: SensorDataQuerier;
     } {
         // console.log("stations-view:data", this.stations);
         return {
             showNoStationsMessage: true,
-            viewType: "map",
             layoutChanges: 0,
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
@@ -135,6 +132,12 @@ export default Vue.extend({
                 return this.$getters.mapped.focusOn(this.id);
             }
             return this.$getters.mapped;
+        },
+        viewType(): MapViewType {
+            if (this.$route.meta?.viewType) {
+                return this.$route.meta.viewType;
+            }
+            return MapViewType.map;
         },
     },
     beforeMount(): Promise<any> {
@@ -194,10 +197,6 @@ export default Vue.extend({
                 });
             }
         },
-        switchView(type: string): void {
-            this.viewType = type;
-            this.layoutChanges++;
-        },
         layoutChange() {
             this.layoutChanges++;
         },
@@ -223,11 +222,9 @@ export default Vue.extend({
 ::v-deep .station-hover-summary {
     left: 360px;
     top: 170px;
-    border-radius: 3px;
 }
 
 ::v-deep .summary-container {
-    border-radius: 3px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 2px #d8dce0;
     background-color: #fff;
@@ -281,48 +278,6 @@ export default Vue.extend({
         font-size: 14px;
         max-width: 320px;
         margin: 0 auto 35px;
-    }
-}
-
-.view-type {
-    width: 100px;
-    height: 39px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-    border: solid 1px #f4f5f7;
-    background-color: #ffffff;
-    cursor: pointer;
-    @include flex(center, center);
-
-    &-container {
-        z-index: $z-index-top;
-        margin: 0;
-        @include position(absolute, 90px 25px null null);
-
-        @include bp-down($sm) {
-            @include position(absolute, 67px 10px null null);
-        }
-    }
-
-    > div {
-        flex-basis: 50%;
-
-        &.active {
-            i:before {
-                color: var(--color-dark);
-            }
-        }
-    }
-
-    &-list {
-    }
-
-    &-map {
-        flex-basis: 50%;
-        border-right: solid 1px #f4f5f7;
-    }
-
-    .icon {
-        font-size: 18px;
     }
 }
 
@@ -380,6 +335,24 @@ export default Vue.extend({
         .navigate-button {
             right: 0;
         }
+    }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder {
+    margin: 24px 0 0 25px;
+
+    @include bp-down($sm) {
+        margin: 13px 0 0 10px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-bottom-left {
+    margin-left: 20px;
+}
+
+::v-deep .view-type-container {
+    @include bp-down($xs) {
+        top: 68px;
     }
 }
 </style>

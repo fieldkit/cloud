@@ -65,30 +65,13 @@
                 </div>
             </template>
         </div>
-        <div class="view-type-container" :class="{ 'list-toggled': viewType === 'list' }">
-            <!--            <label class="toggle-btn">
-                <input type="checkbox" v-model="recentMapMode" />
-                <span :class="{ active: !recentMapMode }">{{ $t("map.toggle.current") }}</span>
-                <i></i>
-                <span :class="{ active: recentMapMode }">{{ $t("map.toggle.recent") }}</span>
-            </label>-->
-            <div class="view-type">
-                <router-link
-                    :to="{ name: 'viewProjectBigMap', params: { id: id } }"
-                    class="view-type-map"
-                    v-bind:class="{ active: viewType === 'map' }"
-                >
-                    {{ $t("map.toggle.map") }}
-                </router-link>
-                <router-link
-                    :to="{ name: 'viewProjectBigMapList', params: { id: id } }"
-                    class="view-type-map"
-                    v-bind:class="{ active: viewType === 'list' }"
-                >
-                    {{ $t("map.toggle.list") }}
-                </router-link>
-            </div>
-        </div>
+
+        <MapViewTypeToggle
+            :routes="[
+                { name: 'viewProjectBigMap', label: 'map.toggle.map', viewType: 'map', params: { id: id } },
+                { name: 'viewProjectBigMapList', label: 'map.toggle.list', viewType: 'list', params: { id: id } },
+            ]"
+        ></MapViewTypeToggle>
     </StandardLayout>
 </template>
 
@@ -96,15 +79,15 @@
 import _ from "lodash";
 import * as utils from "../../utilities";
 
-import { mapState, mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import {
     ActionTypes,
-    GlobalState,
-    ProjectModule,
-    DisplayStation,
-    Project,
-    MappedStations,
     BoundingRectangle,
+    DisplayStation,
+    GlobalState,
+    MappedStations,
+    Project,
+    ProjectModule,
     VisibleReadings,
 } from "@/store";
 import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
@@ -119,6 +102,7 @@ import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 import { ExploreContext } from "@/views/viz/common";
 
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
+import MapViewTypeToggle, { MapViewType } from "@/views/shared/MapViewTypeToggle.vue";
 
 export default Vue.extend({
     name: "ProjectBigMap",
@@ -129,6 +113,7 @@ export default Vue.extend({
         StandardLayout,
         ProjectDetailCard,
         TinyChart,
+        MapViewTypeToggle,
     },
     data(): {
         layoutChanges: number;
@@ -228,11 +213,11 @@ export default Vue.extend({
         partnerCustomization() {
             return getPartnerCustomizationWithDefault();
         },
-        viewType(): string {
+        viewType(): MapViewType {
             if (this.$route.meta?.viewType) {
                 return this.$route.meta.viewType;
             }
-            return "map";
+            return MapViewType.map;
         },
     },
     watch: {
@@ -379,43 +364,6 @@ export default Vue.extend({
     width: 359px;
     top: calc(50% - 100px);
     left: calc(50% - 180px);
-
-    @include bp-down($xs) {
-        width: 100%;
-        left: 0;
-        border-radius: 10px;
-        padding: 25px 10px 12px 10px;
-
-        &.is-pane {
-            top: 0;
-        }
-
-        .close-button {
-            display: none;
-        }
-
-        .navigate-button {
-            width: 14px;
-            height: 14px;
-            right: -3px;
-            top: -17px;
-        }
-
-        .image-container {
-            flex-basis: 62px;
-            height: 62px;
-            margin-right: 10px;
-        }
-
-        .station-name {
-            font-size: 14px;
-        }
-
-        .explore-button {
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-    }
 }
 
 .stations-list {
@@ -480,209 +428,15 @@ export default Vue.extend({
     }
 }
 
-.view-type {
-    width: 115px;
-    height: 38px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-    border: solid 1px #f4f5f7;
-    background-color: #ffffff;
-    cursor: pointer;
-    margin-left: 30px;
-    @include flex(center, center);
-
-    @include bp-down($sm) {
-        width: 98px;
-        margin-left: 5px;
-    }
-
-    @media screen and (max-width: 350px) {
-        width: 88px;
-    }
-
-    &-container {
-        z-index: $z-index-top;
-        margin: 0;
-        box-sizing: border-box;
-        @include flex(center, center);
-        @include position(absolute, 90px 25px null null);
-
-        @include bp-down($sm) {
-            @include position(absolute, 115px 10px null null);
-        }
-
-        &.list-toggled {
-            @include bp-down($sm) {
-                left: 0;
-                width: 100%;
-                justify-content: flex-end;
-                padding: 0 10px;
-            }
-        }
-    }
-
-    > a {
-        flex-basis: 50%;
-        height: 100%;
-        font-family: $font-family-light;
-        @include flex(center, center);
-
-        @include bp-down($sm) {
-            font-size: 14px;
-        }
-
-        &.active {
-            font-family: $font-family-bold;
-        }
-    }
-
-    &-map {
-        flex-basis: 50%;
-        border-right: solid 1px $color-border;
-    }
-
-    .icon {
-        font-size: 18px;
-    }
-}
-
-.toggle-btn {
-    cursor: pointer;
-    z-index: $z-index-top;
-    position: relative;
-    font-size: 14px;
-    -webkit-tap-highlight-color: transparent;
-    font-family: $font-family-medium !important;
-    height: 38px;
-    display: flex;
-    align-items: center;
-
-    @include bp-down($sm) {
-        .view-type-container:not(.list-toggled) & {
-            background-color: #fff;
-            padding: 0 10px;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-            border: solid 1px #f4f5f7;
-        }
-    }
-
-    @media screen and (max-width: 350px) {
-        padding: 0 8px;
-    }
-
-    * {
-        font-family: $font-family-medium !important;
-    }
-
-    span {
-        opacity: 0.5;
-
-        &.active {
-            opacity: 1;
-            color: $color-fieldkit-primary;
-
-            body.floodnet & {
-                color: $color-dark;
-            }
-        }
-    }
-}
-.toggle-btn i {
-    position: relative;
-    display: inline-block;
-    margin: 0 10px;
-    width: 27px;
-    height: 16px;
-    background-color: #e6e6e6;
-    border-radius: 20px;
-    vertical-align: text-bottom;
-    transition: all 0.3s linear;
-    user-select: none;
-}
-.toggle-btn i::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    width: 27px;
-    background-color: #fff;
-    border-radius: 11px;
-    transform: translate3d(2px, 2px, 0) scale3d(1, 1, 1);
-    transition: all 0.25s linear;
-}
-.toggle-btn i::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    width: 12px;
-    height: 12px;
-    background-color: #fff;
-    border-radius: 50%;
-    transform: translate3d(2px, 2px, 0);
-    transition: all 0.2s ease-in-out;
-}
-.toggle-btn:active i::after {
-    width: 28px;
-    transform: translate3d(2px, 2px, 0);
-}
-.toggle-btn:active input:checked ~ i::after {
-    transform: translate3d(16px, 2px, 0);
-}
-.toggle-btn input {
-    display: none;
-}
-.toggle-btn input ~ i {
-    background-color: $color-primary;
-}
-.toggle-btn input:checked ~ i::before {
-    transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0);
-}
-.toggle-btn input:checked ~ i::after {
-    transform: translate3d(13px, 2px, 0);
-}
-
 ::v-deep .mapboxgl-ctrl-geocoder {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
-    border: solid 1px #f4f5f7;
-    border-radius: 0;
-    height: 40px;
     margin: 30px 0 0 30px;
 
     @include bp-down($sm) {
         margin: 61px 0 0 10px;
-        width: 40px;
-    }
-
-    &.mapboxgl-ctrl-geocoder--collapsed {
-        min-width: 40px;
-    }
-
-    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
-        @include bp-down($xs) {
-            min-width: calc(100vw - 20px) !important;
-        }
-    }
-
-    input {
-        outline: none;
-        height: 37px;
-        padding-left: 38px;
-        font-size: 16px;
-    }
-}
-
-::v-deep .mapboxgl-ctrl-geocoder--icon-search {
-    top: 9px;
-    left: 8px;
-}
-
-::v-deep .mapboxgl-ctrl-geocoder--icon-close {
-    margin-top: 4px;
-
-    @include bp-down($sm) {
-        margin-top: 3px;
     }
 }
 
 ::v-deep .mapboxgl-ctrl-bottom-left {
-    margin-left: 30px;
+    margin-left: 25px;
 }
 </style>
