@@ -1107,6 +1107,21 @@ export class TimeSeriesSpecFactory {
             },
         ];
 
+        const calculateDragLimits = () => {
+            const timeNow = new Date().getTime();
+            const endOffset = timeRangeAll ? timeRangeAll[1] - timeRangeAll[0] : 0;
+            if (timeRangeAll && dataEnd) {
+                if (timeRangeAll[0] > dataEnd || timeRangeAll[1] > dataEnd) {
+                    return { start: timeNow - endOffset, end: timeNow };
+                }
+            }
+            const start = dataEnd && timeRangeAll ? dataEnd - endOffset : timeNow;
+            const end = dataEnd || timeNow;
+            return { start, end };
+        };
+
+        const { start: dragMaximumStart, end: dragMaximumEnd } = calculateDragLimits();
+
         const dragSignals = [
             {
                 name: "down",
@@ -1118,11 +1133,11 @@ export class TimeSeriesSpecFactory {
             },
             {
                 name: "drag_maximum_start",
-                value: dataEnd && timeRangeAll ? dataEnd - (timeRangeAll[1] - timeRangeAll[0]) : null,
+                value: dragMaximumStart,
             },
             {
                 name: "drag_maximum_end",
-                value: dataEnd,
+                value: dragMaximumEnd,
             },
             {
                 name: "drag_delta",
