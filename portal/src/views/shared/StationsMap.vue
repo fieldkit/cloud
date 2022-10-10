@@ -1,21 +1,23 @@
 <template v-if="mapped.valid && ready">
-    <mapbox
-        class="stations-map"
-        :access-token="mapbox.token"
-        :map-options="{
-            style: mapbox.style,
-            bounds: bounds,
-            zoom: 10,
-        }"
-        :nav-control="{
-            show: !isMobileView,
-            position: 'bottom-left',
-        }"
-        @map-init="onMapInitialized"
-        @map-load="onMapLoaded"
-        @zoomend="newBounds"
-        @dragend="newBounds"
-    />
+    <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
+        <mapbox
+            class="stations-map"
+            :access-token="mapbox.token"
+            :map-options="{
+                style: mapbox.style,
+                bounds: bounds,
+                zoom: 10,
+            }"
+            :nav-control="{
+                show: !isMobileView,
+                position: 'bottom-left',
+            }"
+            @map-init="onMapInitialized"
+            @map-load="onMapLoaded"
+            @zoomend="newBounds"
+            @dragend="newBounds"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -107,9 +109,6 @@ export default Vue.extend({
         },
         mapped(): void {
             console.log("map: mapped changed", this.mapped);
-            this.updateMap();
-        },
-        showStations(): void {
             this.updateMap();
         },
         visibleReadings(): void {
@@ -284,7 +283,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .map-view #map {
     height: 100%;
     position: relative;
@@ -298,5 +297,17 @@ export default Vue.extend({
 .marker {
     height: 10px;
     width: 10px;
+}
+
+.map-wrap {
+    height: 100%;
+
+    &.hide-markers ::v-deep .mapboxgl-marker {
+        display: none;
+    }
+}
+
+.stations-map {
+    height: 100%;
 }
 </style>
