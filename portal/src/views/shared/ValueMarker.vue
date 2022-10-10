@@ -27,7 +27,6 @@ export default Vue.extend({
     },
     methods: {
         onClick() {
-            console.log("radoi color", this.color);
             this.$emit("marker-click", { id: this.id });
         },
     },
