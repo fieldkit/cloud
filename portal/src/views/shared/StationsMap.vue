@@ -265,9 +265,9 @@ export default Vue.extend({
                 const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
                 const instance = new ValueMarkerCtor({
                     propsData: {
-                        color: readings && readings.length > 0 ? readings[0].color : "#ccc",
-                        value: readings && readings.length > 0 ? readings[0].value : null,
-                        id: feature.properties.id,
+                        ...(readings && readings.length > 0 && { color: readings[0].color }),
+                        ...{ value: readings && readings.length > 0 ? readings[0].value : null },
+                        ...{ id: feature.properties.id },
                     },
                 });
                 instance.$mount();
