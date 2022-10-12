@@ -752,15 +752,6 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 		return nil, err
 	}
 
-	sr := repositories.NewStationRepository(c.options.Database)
-
-	jobs, err := sr.QueryStationProgress(ctx, payload.StationID)
-	if err != nil {
-		return nil, err
-	}
-
-	_ = jobs
-
 	jobsWm := make([]*station.StationJob, 0)
 
 	return &station.StationProgress{

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/fieldkit/cloud/server/backend"
 	"github.com/fieldkit/cloud/server/common/logging"
@@ -297,7 +297,7 @@ func (tsdb *TimeScaleDBBackend) initialize(ctx context.Context) error {
 
 		log.Infow("tsdb:config", "pg_max_conns", config.MaxConns)
 
-		opened, err := pgxpool.ConnectConfig(ctx, config)
+		opened, err := pgxpool.NewWithConfig(ctx, config)
 		if err != nil {
 			return fmt.Errorf("(tsdb) error connecting: %w", err)
 		}
