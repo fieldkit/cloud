@@ -23,7 +23,7 @@ func (r *ExportRepository) QueryByUserID(ctx context.Context, userID int32) (i [
 	if err := r.db.SelectContext(ctx, &found, `
 		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, message, format, args FROM fieldkit.data_export WHERE user_id = $1 ORDER BY completed_at DESC LIMIT 20
 		`, userID); err != nil {
-		return nil, fmt.Errorf("error querying for export: %v", err)
+		return nil, fmt.Errorf("error querying for export: %w", err)
 	}
 
 	return found, nil
@@ -34,7 +34,7 @@ func (r *ExportRepository) QueryByID(ctx context.Context, id int64) (i *data.Dat
 	if err := r.db.SelectContext(ctx, &found, `
 		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, message, format, args FROM fieldkit.data_export WHERE id = $1
 		`, id); err != nil {
-		return nil, fmt.Errorf("error querying for export: %v", err)
+		return nil, fmt.Errorf("error querying for export: %w", err)
 	}
 
 	if len(found) != 1 {
@@ -53,7 +53,7 @@ func (r *ExportRepository) QueryByToken(ctx context.Context, token string) (i *d
 	if err := r.db.SelectContext(ctx, &found, `
 		SELECT id, token, user_id, created_at, completed_at, download_url, size, progress, message, format, args FROM fieldkit.data_export WHERE token = $1
 		`, tokenBytes); err != nil {
-		return nil, fmt.Errorf("error querying for export: %v", err)
+		return nil, fmt.Errorf("error querying for export: %w", err)
 	}
 
 	if len(found) != 1 {
@@ -68,7 +68,7 @@ func (r *ExportRepository) AddDataExport(ctx context.Context, de *data.DataExpor
 		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :size, :progress, :message, :format, :args)
 		RETURNING *
 		`, de); err != nil {
-		return nil, fmt.Errorf("error inserting export: %v", err)
+		return nil, fmt.Errorf("error inserting export: %w", err)
 	}
 	return de, nil
 }
@@ -86,7 +86,7 @@ func (r *ExportRepository) AddDataExportWithArgs(ctx context.Context, de *data.D
 		VALUES (:token, :user_id, :created_at, :completed_at, :download_url, :size, :progress, :message, :format, :args)
 		RETURNING *
 		`, de); err != nil {
-		return nil, fmt.Errorf("error inserting export: %v", err)
+		return nil, fmt.Errorf("error inserting export: %w", err)
 	}
 	return de, nil
 }
@@ -95,7 +95,7 @@ func (r *ExportRepository) UpdateDataExport(ctx context.Context, de *data.DataEx
 	if err := r.db.NamedGetContext(ctx, de, `
 		UPDATE fieldkit.data_export SET progress = :progress, message = :message, completed_at = :completed_at, download_url = :download_url, size = :size WHERE id = :id RETURNING *
 		`, de); err != nil {
-		return nil, fmt.Errorf("error updating export: %v", err)
+		return nil, fmt.Errorf("error updating export: %w", err)
 	}
 	return de, nil
 }

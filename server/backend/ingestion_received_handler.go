@@ -65,12 +65,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID)
 
-	handler, err := NewAllHandlers(h.db, h.tsConfig)
-	if err != nil {
-		return err
-	}
+	handler := NewAllHandlers(h.db, h.tsConfig, h.publisher)
 
-	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose)
+	recordAdder := NewRecordAdder(h.db, h.files, h.metrics, handler, m.Verbose, m.SaveData)
 
 	log.Infow("pending", "file_id", i.UploadID, "ingestion_url", i.URL, "blocks", i.Blocks)
 
@@ -93,9 +90,9 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 			return err
 		}
 
-		if info.StationID != nil {
-			if m.Refresh {
-				now := time.Now()
+		if info.StationID != nil && m.Refresh {
+			now := time.Now()
+			/*
 				howFarBack := time.Hour * 48
 				if !info.DataStart.IsZero() {
 					if now.After(info.DataStart) {
@@ -110,17 +107,17 @@ func (h *IngestionReceivedHandler) Handle(ctx context.Context, m *messages.Inges
 						log.Warnw("data-after-now", "data_start", info.DataStart, "data_end", info.DataEnd, "now", now)
 					}
 				}
+			*/
 
-				if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
-					ModifiedAt:  now,
-					PublishedAt: now,
-					StationID:   *info.StationID,
-					UserID:      i.UserID,
-					Start:       info.DataStart,
-					End:         info.DataEnd,
-				}); err != nil {
-					return err
-				}
+			if err := h.publisher.Publish(ctx, &messages.SensorDataModified{
+				ModifiedAt:  now,
+				PublishedAt: now,
+				StationID:   info.StationID,
+				UserID:      i.UserID,
+				Start:       info.DataStart,
+				End:         info.DataEnd,
+			}); err != nil {
+				return err
 			}
 		}
 	}
@@ -164,7 +161,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 	}
 
 	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {
-		return fmt.Errorf("error updating station: %v", err)
+		return fmt.Errorf("error updating station: %w", err)
 	}
 
 	if err := database.NamedGetContext(ctx, activity, `
@@ -173,7 +170,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		ON CONFLICT (data_ingestion_id) DO UPDATE SET data_records = EXCLUDED.data_records, errors = EXCLUDED.errors
 		RETURNING id
 		`, activity); err != nil {
-		return fmt.Errorf("error upserting activity: %v", err)
+		return fmt.Errorf("error upserting activity: %w", err)
 	}
 
 	log.Infow("upserted", "activity_id", activity.ID)

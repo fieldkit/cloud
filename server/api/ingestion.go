@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"goa.design/goa/v3/security"
 
@@ -116,13 +117,43 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 		return err
 	}
 
-	if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
-		StationID: int32(payload.StationID),
-		UserID:    p.UserID(),
-		Verbose:   true,
-	}); err != nil {
-		log.Errorw("publishing", "err", err)
+	if false {
+		if err := c.options.Publisher.Publish(ctx, &messages.IngestStation{
+			StationID: int32(payload.StationID),
+			UserID:    p.UserID(),
+			Verbose:   true,
+		}); err != nil {
+			return err
+		}
+	} else {
+		ir, err := repositories.NewIngestionRepository(c.options.Database)
+		if err != nil {
+			return err
+		}
+
+		ingestions, err := ir.QueryByStationID(ctx, int32(payload.StationID))
+		if err != nil {
+			return err
+		}
+
+		for _, ingestion := range ingestions {
+			log.Infow("ingestion", "ingestion_id", ingestion.ID, "type", ingestion.Type, "time", ingestion.Time, "size", ingestion.Size, "device_id", ingestion.DeviceID)
+
+			if id, err := ir.Enqueue(ctx, ingestion.ID); err != nil {
+				return err
+			} else {
+				if err := c.options.Publisher.Publish(ctx, &messages.IngestionReceived{
+					QueuedID: id,
+					UserID:   p.UserID(),
+					Verbose:  true,
+					Refresh:  false,
+				}); err != nil {
+					return err
+				}
+			}
+		}
 	}
+
 	return nil
 }
 
@@ -169,6 +200,26 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 	return nil
 }
 
+func (c *IngestionService) RefreshViews(ctx context.Context, payload *ingestion.RefreshViewsPayload) (err error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if err := c.options.Publisher.Publish(ctx, &messages.SensorDataModified{
+		ModifiedAt:  time.Now(),
+		PublishedAt: time.Now(),
+		StationID:   nil,
+		UserID:      p.UserID(),
+		Start:       time.Time{},
+		End:         time.Time{},
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.DeletePayload) (err error) {
 	log := Logger(ctx).Sugar()
 
@@ -200,7 +251,7 @@ func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.Delete
 
 	object, err := common.GetBucketAndKey(i.URL)
 	if err != nil {
-		return fmt.Errorf("error parsing url: %v", err)
+		return fmt.Errorf("error parsing url: %w", err)
 	}
 
 	log.Infow("deleting", "url", i.URL)

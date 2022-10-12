@@ -480,7 +480,7 @@ var _ = Service("project", func() {
 
 		HTTP(func() {
 			PATCH("projects/{projectId}/roles")
-            Body("edit")
+			Body("edit")
 			httpAuthentication()
 		})
 	})

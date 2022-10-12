@@ -122,7 +122,7 @@ func (a *aggregation) close() (*Aggregated, error) {
 		if len(values) > 0 {
 			aggregated_value, err := a.config.Apply(key, values)
 			if err != nil {
-				return nil, fmt.Errorf("error taking mean: %v", err)
+				return nil, fmt.Errorf("error taking mean: %w", err)
 			}
 
 			agg[key] = aggregated_value
@@ -280,7 +280,7 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 			if err := v.db.NamedGetContext(ctx, newSensor, `
 				INSERT INTO fieldkit.aggregated_sensor (key) VALUES (:key) RETURNING id
 				`, newSensor); err != nil {
-				return fmt.Errorf("error adding aggregated sensor: %v", err)
+				return fmt.Errorf("error adding aggregated sensor: %w", err)
 			}
 			v.sensors[key.SensorKey] = newSensor
 		}
@@ -302,7 +302,7 @@ func (v *Aggregator) upsertSingle(ctx context.Context, a *aggregation, d *Aggreg
 			DO UPDATE SET value = EXCLUDED.value, location = EXCLUDED.location, nsamples = EXCLUDED.nsamples
 			RETURNING id
 			`, a.table), row); err != nil {
-			return fmt.Errorf("error upserting sensor reading: %v", err)
+			return fmt.Errorf("error upserting sensor reading: %w", err)
 		}
 	}
 
@@ -316,7 +316,7 @@ func (v *Aggregator) ClearNumberSamples(ctx context.Context) error {
 
 	for _, child := range v.aggregations {
 		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`UPDATE %s SET nsamples = 0 WHERE station_id = $1`, child.table), v.stationID); err != nil {
-			return fmt.Errorf("error updating aggregate nsamples: %v", err)
+			return fmt.Errorf("error updating aggregate nsamples: %w", err)
 		}
 	}
 
@@ -329,13 +329,13 @@ func (v *Aggregator) DeleteEmptyAggregates(ctx context.Context) error {
 	for _, child := range v.aggregations {
 		total := int32(0)
 		if err := v.db.GetContext(ctx, &total, fmt.Sprintf(`SELECT COUNT(*) FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
-			return fmt.Errorf("error deleting empty aggregates: %v", err)
+			return fmt.Errorf("error deleting empty aggregates: %w", err)
 		}
 
 		log.Infow("nsamples-delete", "table", child.table, "records", total)
 
 		if _, err := v.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM %s WHERE nsamples = 0 AND station_id = $1`, child.table), v.stationID); err != nil {
-			return fmt.Errorf("error deleting empty aggregates: %v", err)
+			return fmt.Errorf("error deleting empty aggregates: %w", err)
 		}
 	}
 
@@ -351,7 +351,7 @@ func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location 
 		}
 
 		if err := child.add(time, sensorKey, location, value); err != nil {
-			return fmt.Errorf("error adding: %v", err)
+			return fmt.Errorf("error adding: %w", err)
 		}
 	}
 
@@ -370,7 +370,7 @@ func (v *Aggregator) addMap(ctx context.Context, sampled time.Time, location []f
 
 		for key, value := range data {
 			if err := child.add(time, key, location, value); err != nil {
-				return fmt.Errorf("error adding: %v", err)
+				return fmt.Errorf("error adding: %w", err)
 			}
 		}
 	}
@@ -397,7 +397,7 @@ func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error
 	aggregation := v.aggregations[index]
 
 	if values, err := aggregation.close(); err != nil {
-		return fmt.Errorf("error closing aggregation: %v", err)
+		return fmt.Errorf("error closing aggregation: %w", err)
 	} else {
 		if v.batchSize > 1 {
 			if len(v.batches[index]) == v.batchSize || tail {
@@ -414,7 +414,7 @@ func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error
 			}
 		} else {
 			if err := v.upsertSingle(ctx, aggregation, values); err != nil {
-				return fmt.Errorf("error upserting aggregated: %v", err)
+				return fmt.Errorf("error upserting aggregated: %w", err)
 			}
 		}
 	}

@@ -23,6 +23,8 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	e, err := tests.NewTestEnv()
 	assert.NoError(err)
 
+	assert.NoError(e.AddRandomSensors())
+
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 

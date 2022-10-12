@@ -32,3 +32,11 @@ func (r *SensorsRepository) QueryAllSensors(ctx context.Context) (map[string]*da
 
 	return mapped, nil
 }
+
+func (r *SensorsRepository) AddSensor(ctx context.Context, key string) error {
+	if _, err := r.db.ExecContext(ctx, `INSERT INTO fieldkit.aggregated_sensor (key) VALUES ($1) ON CONFLICT DO NOTHING`, key); err != nil {
+		return err
+	}
+
+	return nil
+}

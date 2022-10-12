@@ -61,7 +61,7 @@ func (s *UserService) loggedInReturnToken(ctx context.Context, authed *data.User
 	token := authed.NewToken(now, refreshToken)
 	signedToken, err := token.SignedString(s.options.JWTHMACKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to sign token: %s", err) // internal error
+		return "", fmt.Errorf("failed to sign token: %w", err) // internal error
 	}
 
 	s.options.Metrics.AuthSuccess()
@@ -539,7 +539,7 @@ func (s *UserService) Refresh(ctx context.Context, payload *user.RefreshPayload)
 	jwtToken := trying.NewToken(now, newRefreshToken)
 	signedToken, err := jwtToken.SignedString(s.options.JWTHMACKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %s", err)
+		return nil, fmt.Errorf("failed to sign token: %w", err)
 	}
 
 	s.options.Metrics.AuthRefreshSuccess()
@@ -660,7 +660,7 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 	transmissionToken := NewTransmissionToken(now, authed)
 	signedToken, err := transmissionToken.SignedString(s.options.JWTHMACKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to sign token: %s", err)
+		return nil, fmt.Errorf("failed to sign token: %w", err)
 	}
 
 	url := fmt.Sprintf("https://api.%s/ingestion", s.options.Domain)
@@ -1138,7 +1138,7 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 	client := gocloak.NewClient(as.config.URL)
 	token, err := client.LoginAdmin(ctx, as.config.ApiUser, as.config.ApiPassword, as.config.ApiRealm)
 	if err != nil {
-		return fmt.Errorf("keycloak-login: %v", err)
+		return fmt.Errorf("keycloak-login: %w", err)
 	}
 
 	params := gocloak.GetUsersParams{
@@ -1147,7 +1147,7 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 
 	users, err := client.GetUsers(ctx, token.AccessToken, as.config.Realm, params)
 	if err != nil {
-		return fmt.Errorf("keycloak-get-users: %v", err)
+		return fmt.Errorf("keycloak-get-users: %w", err)
 	}
 
 	if len(users) > 1 {
@@ -1172,10 +1172,10 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 		ku.Attributes = &attrs
 
 		if err := client.UpdateUser(ctx, token.AccessToken, as.config.Realm, *ku); err != nil {
-			return fmt.Errorf("keycloak-update: %v", err)
+			return fmt.Errorf("keycloak-update: %w", err)
 		}
 		if err = client.SetPassword(ctx, token.AccessToken, *ku.ID, as.config.Realm, password, false); err != nil {
-			return fmt.Errorf("keycloak-setpw: %v", err)
+			return fmt.Errorf("keycloak-setpw: %w", err)
 		}
 		updated = true
 		log.Infow("updated", "keycloak_user_id", ku.ID)
@@ -1195,11 +1195,11 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 
 		createdID, err := client.CreateUser(ctx, token.AccessToken, as.config.Realm, cloaked)
 		if err != nil {
-			return fmt.Errorf("keycloak-create: %v", err)
+			return fmt.Errorf("keycloak-create: %w", err)
 		}
 
 		if err = client.SetPassword(ctx, token.AccessToken, createdID, as.config.Realm, password, false); err != nil {
-			return fmt.Errorf("keycloak-setpw: %v", err)
+			return fmt.Errorf("keycloak-setpw: %w", err)
 		}
 
 		log.Infow("created", "keycloak_user_id", createdID)

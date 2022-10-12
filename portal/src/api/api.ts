@@ -1423,7 +1423,7 @@ class FKApi {
         if (typeof projectIDOrBookmark === "number") {
             apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         } else {
-            apiURL = this.baseUrl + "/discussion?bookmark=" + JSON.stringify(projectIDOrBookmark);
+            apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
         }
 
         const returned = await this.invoke({
@@ -1493,27 +1493,50 @@ class FKApi {
             data: {
                 event: _.extend({}, dataEvent, {
                     body: JSON.stringify(dataEvent.body),
-                    description: dataEvent.description['content'][0].content[0].text,
-                    title: dataEvent.title['content'][0].content[0].text,
-                    allProjectSensors: dataEvent.allProjectSensors
+                    description: JSON.stringify(dataEvent.description),
+                    title: JSON.stringify(dataEvent.title),
+                    allProjectSensors: dataEvent.allProjectSensors,
                 }),
             },
         });
-
-        console.log("comments", returned);
 
         return {
             event: returned.event,
         };
     }
 
+    public async updateDataEvent(dataEvent: DataEvent): Promise<{ event: DataEvent }> {
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events/" + dataEvent.id,
+            data: {
+                eventId: dataEvent.id,
+                title: typeof dataEvent.title === "object" ? JSON.stringify(dataEvent.title) : dataEvent.title,
+                description: typeof dataEvent.description === "object" ? JSON.stringify(dataEvent.description) : dataEvent.description,
+                start: dataEvent.start,
+                end: dataEvent.end,
+            },
+        });
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async deleteDataEvent(dataEventID: number): Promise<boolean> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/data-events/" + dataEventID,
+        });
+    }
+
     public async getDataEvents(payload) {
-        const qp = new URLSearchParams();
-        qp.append("bookmark", payload);
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
-            url: this.baseUrl + `/data-events?${qp.toString()}`,
+            url: this.baseUrl + "/data-events?bookmark=" + encodeURIComponent(payload),
         });
     }
 

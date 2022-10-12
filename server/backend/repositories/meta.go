@@ -34,7 +34,7 @@ type MissingSensorMetaError struct {
 }
 
 func (e *MissingSensorMetaError) Error() string {
-	return fmt.Sprintf("MissingSensorMetaError(missing-record--id=%v)", e.MetaRecordID)
+	return fmt.Sprintf("MissingSensorMetaError(missing-record-id=%v)", e.MetaRecordID)
 }
 
 type MalformedMetaError struct {
@@ -43,7 +43,7 @@ type MalformedMetaError struct {
 }
 
 func (e *MalformedMetaError) Error() string {
-	return fmt.Sprintf("MalformedMetaError(missing-record--id=%v, '%v')", e.MetaRecordID, e.Malformed)
+	return fmt.Sprintf("MalformedMetaError(missing-record-id=%v, '%v')", e.MetaRecordID, e.Malformed)
 }
 
 type MetaFactory struct {
@@ -97,14 +97,13 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	numberEmptyModules := 0
 
 	for _, module := range meta.Modules {
-		sensors := make([]*DataMetaSensor, 0)
-
 		if module.Header == nil {
 			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "header"}
 		}
 
 		if module.Sensors == nil {
-			return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "sensors"}
+			log.Infow("meta:malformed-sensors-nil")
+			continue
 		}
 
 		hf := HeaderFields{
@@ -119,6 +118,8 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 		if extraModule == nil {
 			return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 		}
+
+		sensors := make([]*DataMetaSensor, 0)
 
 		for _, sensor := range module.Sensors {
 			key := strcase.ToLowerCamel(sensor.Name)
@@ -279,7 +280,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		Readings: readings,
 	}
 
-	filtered := mf.filtering.Apply(ctx, resolved)
+	// filtered := mf.filtering.Apply(ctx, resolved)
+
+	filtered := &FilteredRecord{
+		Record:  resolved,
+		Filters: nil,
+	}
 
 	return filtered, nil
 }

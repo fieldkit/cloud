@@ -59,11 +59,11 @@ func EncodeProcessPendingRequest(encoder func(*http.Request) goahttp.Encoder) fu
 // ingestion process pending endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessPendingResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeProcessPendingResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -183,11 +183,11 @@ func EncodeWalkEverythingRequest(encoder func(*http.Request) goahttp.Encoder) fu
 // ingestion walk everything endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeWalkEverythingResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeWalkEverythingResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -325,11 +325,11 @@ func EncodeProcessStationRequest(encoder func(*http.Request) goahttp.Encoder) fu
 // ingestion process station endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessStationResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeProcessStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -460,11 +460,11 @@ func EncodeProcessStationIngestionsRequest(encoder func(*http.Request) goahttp.E
 // returned by the ingestion process station ingestions endpoint. restoreBody
 // controls whether the response body should be restored after having been read.
 // DecodeProcessStationIngestionsResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeProcessStationIngestionsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -594,11 +594,11 @@ func EncodeProcessIngestionRequest(encoder func(*http.Request) goahttp.Encoder) 
 // the ingestion process ingestion endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeProcessIngestionResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -679,6 +679,130 @@ func DecodeProcessIngestionResponse(decoder func(*http.Response) goahttp.Decoder
 	}
 }
 
+// BuildRefreshViewsRequest instantiates a HTTP request object with method and
+// path set to call the "ingestion" service "refresh views" endpoint
+func (c *Client) BuildRefreshViewsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: RefreshViewsIngestionPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("ingestion", "refresh views", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeRefreshViewsRequest returns an encoder for requests sent to the
+// ingestion refresh views server.
+func EncodeRefreshViewsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*ingestion.RefreshViewsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("ingestion", "refresh views", "*ingestion.RefreshViewsPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeRefreshViewsResponse returns a decoder for responses returned by the
+// ingestion refresh views endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeRefreshViewsResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeRefreshViewsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body RefreshViewsUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "refresh views", err)
+			}
+			err = ValidateRefreshViewsUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "refresh views", err)
+			}
+			return nil, NewRefreshViewsUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body RefreshViewsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "refresh views", err)
+			}
+			err = ValidateRefreshViewsForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "refresh views", err)
+			}
+			return nil, NewRefreshViewsForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body RefreshViewsNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "refresh views", err)
+			}
+			err = ValidateRefreshViewsNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "refresh views", err)
+			}
+			return nil, NewRefreshViewsNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body RefreshViewsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("ingestion", "refresh views", err)
+			}
+			err = ValidateRefreshViewsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("ingestion", "refresh views", err)
+			}
+			return nil, NewRefreshViewsBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("ingestion", "refresh views", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildDeleteRequest instantiates a HTTP request object with method and path
 // set to call the "ingestion" service "delete" endpoint
 func (c *Client) BuildDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {
@@ -728,11 +852,11 @@ func EncodeDeleteRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // ingestion delete endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

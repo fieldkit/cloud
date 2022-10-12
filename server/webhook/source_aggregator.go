@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -161,15 +161,15 @@ func (i *SourceAggregator) flush(ctx context.Context) error {
 	br := tx.SendBatch(ctx, batch)
 
 	if _, err := br.Exec(); err != nil {
-		return fmt.Errorf("(tsdb-exec) %v", err)
+		return fmt.Errorf("(tsdb-exec) %w", err)
 	}
 
 	if err := br.Close(); err != nil {
-		return fmt.Errorf("(tsdb-close) %v", err)
+		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("(tsdb-commit) %v", err)
+		return fmt.Errorf("(tsdb-commit) %w", err)
 	}
 
 	return nil
@@ -205,7 +205,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 		_, err := schemas.QuerySchemas(ctx, batch)
 		if err != nil {
-			return fmt.Errorf("message schemas (%v)", err)
+			return fmt.Errorf("message schemas (%w)", err)
 		}
 
 		for _, row := range batch.Messages {
@@ -230,7 +230,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 						if i.legacy {
 							if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
-								return fmt.Errorf("adding: %v", err)
+								return fmt.Errorf("adding: %w", err)
 							}
 						}
 
@@ -255,7 +255,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 								if i.legacy {
 									if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
-										return fmt.Errorf("adding: %v", err)
+										return fmt.Errorf("adding: %w", err)
 									}
 								}
 

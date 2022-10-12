@@ -4,6 +4,7 @@ export interface DiscussionBase {
     bookmark?: string;
     createdAt: number;
     updatedAt: number;
+    readonly?: boolean;
 }
 
 export class DiscussionBase {
@@ -12,6 +13,7 @@ export class DiscussionBase {
     bookmark?: string;
     createdAt: number;
     updatedAt: number;
+    readonly?: boolean;
 
     constructor(
         id: number,
@@ -32,6 +34,7 @@ export interface Comment extends DiscussionBase {
     body: string;
     replies: Comment[];
     readonly: boolean;
+    type?: string;
 }
 
 export class Comment extends DiscussionBase {
@@ -51,6 +54,7 @@ export class Comment extends DiscussionBase {
         this.body = body;
         this.replies = [];
         this.readonly = true;
+        this.type = 'comment';
     }
 }
 
@@ -66,6 +70,8 @@ export interface DataEvent extends DiscussionBase {
     description: string;
     start: number;
     end: number;
+    readonly?: boolean;
+    type?: string;
 }
 
 export class DataEvent extends DiscussionBase {
@@ -73,6 +79,8 @@ export class DataEvent extends DiscussionBase {
     description: string;
     start: number;
     end: number;
+    readonly?: boolean;
+    type?: string;
 
     constructor(
         id: number,
@@ -90,6 +98,8 @@ export class DataEvent extends DiscussionBase {
         this.description = description;
         this.start = start;
         this.end = end;
+        this.readonly = true;
+        this.type = 'event';
     }
 }
 
@@ -104,4 +114,11 @@ export enum CommentsErrorsEnum {
     postComment = "Something went wrong saving your comment.",
     deleteComment = "Something went wrong deleting your comment.",
     editComment = "Something went wrong editing your comment. Your changes will are not saved.",
+}
+
+export enum DataEventsErrorsEnum {
+    getDataEvents = "Something went wrong loading the events",
+    postDataEvent = "Something went wrong saving your event.",
+    deleteDataEvent = "Something went wrong deleting your event.",
+    editDataEvent = "Something went wrong editing your event. Your changes will are not saved.",
 }

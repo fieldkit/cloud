@@ -108,7 +108,7 @@ func (s *FirmwareService) Download(ctx context.Context, payload *firmware.Downlo
 
 	obj, err := svc.GetObject(goi)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error reading object %v: %v", bucketAndKey.Key, err)
+		return nil, nil, fmt.Errorf("error reading object %v: %w", bucketAndKey.Key, err)
 	}
 
 	contentLength := int64(0)
@@ -263,14 +263,14 @@ func (s *FirmwareService) Delete(ctx context.Context, payload *firmware.DeletePa
 	for _, fw := range firmwares {
 		object, err := common.GetBucketAndKey(fw.URL)
 		if err != nil {
-			return fmt.Errorf("error parsing URL: %v", err)
+			return fmt.Errorf("error parsing URL: %w", err)
 		}
 
 		log.Infow("deleting", "url", fw.URL)
 
 		_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(object.Bucket), Key: aws.String(object.Key)})
 		if err != nil {
-			return fmt.Errorf("unable to delete object %q from bucket %q, %v", object.Key, object.Bucket, err)
+			return fmt.Errorf("unable to delete object %q from bucket %q, %w", object.Key, object.Bucket, err)
 		}
 
 		err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{

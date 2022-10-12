@@ -23,6 +23,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/common"
+	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/messages"
 )
@@ -81,6 +82,24 @@ func (c *StationService) updateStation(ctx context.Context, station *data.Statio
 }
 
 func (c *StationService) Add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
+	tx, err := c.options.Database.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	txCtx := context.WithValue(ctx, sqlxcache.TxContextKey, tx)
+	response, err = c.add(txCtx, payload)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
+
+	return response, err
+}
+
+func (c *StationService) add(ctx context.Context, payload *station.AddPayload) (response *station.StationFull, err error) {
 	log := Logger(ctx).Sugar()
 
 	deviceId, err := hex.DecodeString(payload.DeviceID)

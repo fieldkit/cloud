@@ -37,7 +37,6 @@ type Pile struct {
 	metrics *logging.Metrics
 	name    string
 	path    string
-	log     *zap.SugaredLogger
 	meta    *PileMeta
 }
 
@@ -47,7 +46,6 @@ func NewPile(metrics *logging.Metrics, name string) *Pile {
 		name:    name,
 		path:    path.Join("/tmp/pile", name),
 		meta:    nil,
-		log:     nil,
 	}
 }
 
@@ -55,18 +53,24 @@ func (pile *Pile) IsOpen() bool {
 	return pile.meta != nil
 }
 
+func (pile *Pile) logger(ctx context.Context) *zap.SugaredLogger {
+	return logging.Logger(ctx).Named("pile").Sugar().With("pile", pile.path)
+
+}
+
 func (pile *Pile) Open(ctx context.Context) error {
-	pile.log = logging.Logger(ctx).Named("pile").Sugar().With("pile", pile.path)
+	log := pile.logger(ctx)
 
 	pile.lock.Lock()
 
 	defer pile.lock.Unlock()
 
 	if pile.meta != nil {
-		return fmt.Errorf("already opened")
+		log.Infow("already opened")
+		return nil
 	}
 
-	pile.log.Infow("opening")
+	log.Infow("opening")
 
 	if err := os.MkdirAll(pile.path, 0755); err != nil {
 		return err
@@ -75,7 +79,7 @@ func (pile *Pile) Open(ctx context.Context) error {
 	pathMeta := path.Join(pile.path, "pile.json")
 
 	if _, err := os.Stat(pathMeta); os.IsNotExist(err) {
-		pile.log.Infow("created")
+		log.Infow("created")
 
 		pile.meta = &PileMeta{}
 
@@ -92,13 +96,15 @@ func (pile *Pile) Open(ctx context.Context) error {
 		pile.meta = meta
 	}
 
-	pile.log.Infow("opened")
+	log.Infow("opened")
 
 	return nil
 }
 
 func (pile *Pile) flush(ctx context.Context) error {
-	pile.log.Infow("saving")
+	log := pile.logger(ctx)
+
+	log.Infow("saving")
 
 	pathMeta := path.Join(pile.path, "pile.json")
 
@@ -118,6 +124,8 @@ func (pile *Pile) getNeedlePath(key PileKey) string {
 }
 
 func (pile *Pile) Find(ctx context.Context, key PileKey) (io.Reader, int64, error) {
+	log := pile.logger(ctx)
+
 	pile.lock.RLock()
 
 	defer pile.lock.RUnlock()
@@ -128,13 +136,13 @@ func (pile *Pile) Find(ctx context.Context, key PileKey) (io.Reader, int64, erro
 
 	needlePath := pile.getNeedlePath(key)
 	if info, err := os.Stat(needlePath); os.IsNotExist(err) {
-		pile.log.Infow("miss", "key", key)
+		log.Infow("miss", "key", key)
 
 		pile.metrics.PileMiss(pile.name)
 
 		return nil, 0, nil
 	} else {
-		pile.log.Infow("hit", "key", key)
+		log.Infow("hit", "key", key)
 
 		pile.metrics.PileHit(pile.name)
 
@@ -152,7 +160,9 @@ func (pile *Pile) AddBytes(ctx context.Context, key PileKey, data []byte) error 
 }
 
 func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error {
-	pile.log.Infow("adding", "key", key)
+	log := pile.logger(ctx)
+
+	log.Infow("adding", "key", key)
 
 	pile.lock.Lock()
 
@@ -165,7 +175,7 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 	// CHeck to see if this is already in the pile, if so we log a warning and move on.
 	needlePath := pile.getNeedlePath(key)
 	if _, err := os.Stat(needlePath); !os.IsNotExist(err) {
-		pile.log.Warnw("adding:collision", "key", key, "path", needlePath)
+		log.Warnw("adding:collision", "key", key, "path", needlePath)
 		return nil
 	}
 
@@ -199,7 +209,7 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 
 	// Ok, everything seems fine so append to the tail.
 	if len(pile.meta.Tail) == TailLength {
-		for i := 0; i < TailLength; i++ {
+		for i := 0; i < TailLength-1; i++ {
 			pile.meta.Tail[i] = pile.meta.Tail[i+1]
 		}
 		pile.meta.Tail[TailLength-1] = entry
@@ -217,13 +227,15 @@ func (pile *Pile) Add(ctx context.Context, key PileKey, reader io.Reader) error 
 
 	pile.metrics.PileBytes(pile.name, pile.meta.Size)
 
-	pile.log.Infow("added", "pile", pile.path, "key", key, "size", copied)
+	log.Infow("added", "pile", pile.path, "key", key, "size", copied)
 
 	return nil
 }
 
 func (pile *Pile) Delete(ctx context.Context) error {
-	pile.log.Infow("deleting")
+	log := pile.logger(ctx)
+
+	log.Infow("deleting")
 
 	pile.lock.Lock()
 

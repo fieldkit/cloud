@@ -68,15 +68,15 @@ func tryMigrate(url string) error {
 		log.Printf("creating schema...")
 
 		if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
-			return fmt.Errorf("error creating: %v", err)
+			return fmt.Errorf("error creating: %w", err)
 		}
 
 		if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-			return fmt.Errorf("error granting: %v", err)
+			return fmt.Errorf("error granting: %w", err)
 		}
 
 		if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-			return fmt.Errorf("error granting: %v", err)
+			return fmt.Errorf("error granting: %w", err)
 		}
 
 		log.Printf("done creating schema...")
@@ -88,7 +88,7 @@ func tryMigrate(url string) error {
 
 	if err := migrations.Run(db, migrationsDir, []string{"", "migrate"}); err != nil {
 		log.Printf("migration error: %v", err)
-		return fmt.Errorf("migration error: %v", err)
+		return fmt.Errorf("migration error: %w", err)
 	}
 
 	return nil
@@ -97,7 +97,7 @@ func tryMigrate(url string) error {
 func findMigrationsDirectory(relative string) (string, error) {
 	path, err := os.Getwd()
 	if err != nil {
-		return "", fmt.Errorf("unable to find migrations directory: %v", err)
+		return "", fmt.Errorf("unable to find migrations directory: %w", err)
 	}
 
 	for {

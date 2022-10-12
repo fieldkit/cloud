@@ -47,14 +47,28 @@
                 <div class="event-sensor-selector">
                     <label for="allProjectRadio">
                         <div class="event-sensor-radio">
-                            <input type="radio" id="allProjectRadio" name="eventLevel" v-model="newDataEvent.allProjectSensors" :value=true :checked="newDataEvent.allProjectSensors"/>
+                            <input
+                                type="radio"
+                                id="allProjectRadio"
+                                name="eventLevel"
+                                v-model="newDataEvent.allProjectSensors"
+                                :value="true"
+                                :checked="newDataEvent.allProjectSensors"
+                            />
                             <span class="radio-label">All Project Sensors</span>
                             <p>People will see this event when viewing data for any stations that belong to these projects</p>
                         </div>
                     </label>
                     <label for="allSensorsRadio">
                         <div class="event-sensor-radio">
-                            <input type="radio" id="allSensorsRadio" name="eventLevel" v-model="newDataEvent.allProjectSensors" :value=false :checked="!newDataEvent.allProjectSensors"/>
+                            <input
+                                type="radio"
+                                id="allSensorsRadio"
+                                name="eventLevel"
+                                v-model="newDataEvent.allProjectSensors"
+                                :value="false"
+                                :checked="!newDataEvent.allProjectSensors"
+                            />
                             <span class="radio-label">Just These Sensors</span>
                             <p>People will see this event only when viewing data for these stations</p>
                         </div>
@@ -137,35 +151,48 @@
             <transition-group name="fade">
                 <div
                     class="comment comment-first-level"
-                    v-for="post in postsAndEvents"
-                    v-bind:key="post.id"
-                    v-bind:id="(post.body ? 'comment-id-' : 'event-id-') + post.id"
-                    :ref="post.id"
+                    v-for="item in postsAndEvents"
+                    v-bind:key="(item.type === 'comment' ? 'c' : 'e') + item.id"
+                    v-bind:id="(item.body ? 'comment-id-' : 'event-id-') + item.id"
+                    :ref="item.id"
                 >
                     <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
-                        <UserPhoto :user="post.author"></UserPhoto>
+                        <UserPhoto :user="item.author"></UserPhoto>
                         <div class="column-post">
                             <div class="post-header">
                                 <span class="author">
-                                    {{ post.author.name }}
+                                    {{ item.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user && (user.id === post.author.id || user.admin)"
-                                    @listItemOptionClick="onListItemOptionClick($event, post)"
-                                    :options="getCommentOptions(post)"
+                                    v-if="user && (user.id === item.author.id || user.admin)"
+                                    @listItemOptionClick="onListItemOptionClick($event, item)"
+                                    :options="getCommentOptions(item)"
                                 />
-                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }} - {{post.createdAt}}</span>
+                                <span class="timestamp">{{ formatTimestamp(item.createdAt) }}</span>
                             </div>
                             <Tiptap
-                                v-if="post.body"
-                                v-model="post.body"
-                                :readonly="post.readonly"
+                                v-if="item.body"
+                                v-model="item.body"
+                                :readonly="item.readonly"
                                 saveLabel="Save"
-                                @save="saveEdit(post.id, post.body)"
+                                @save="saveEdit(item.id, item.body)"
                             />
-                            <div v-else>
-                                <h3>{{ post.title }}</h3>
-                                {{ post.description }}
+                            <div v-else class="edit-event">
+                                <Tiptap
+                                    v-model="item.title"
+                                    :readonly="item.readonly"
+                                    placeholder="Event Title"
+                                    saveLabel="Save"
+                                    @save="saveEditDataEvent(item)"
+                                />
+                                <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
+                                <Tiptap
+                                    v-model="item.description"
+                                    :readonly="item.readonly"
+                                    placeholder="Event Description"
+                                    saveLabel="Save"
+                                    @save="saveEditDataEvent(item)"
+                                />
                             </div>
                         </div>
                     </div>
@@ -173,7 +200,7 @@
                         <transition-group name="fade" class="comment-replies">
                             <div
                                 class="comment"
-                                v-for="reply in post.replies"
+                                v-for="reply in item.replies"
                                 v-bind:key="reply.id"
                                 v-bind:id="'comment-id-' + reply.id"
                                 :ref="reply.id"
@@ -203,7 +230,7 @@
                         </transition-group>
 
                         <transition name="fade">
-                            <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
+                            <div class="new-comment reply" v-if="newReply && newReply.threadId === item.id">
                                 <div class="new-comment-wrap">
                                     <UserPhoto :user="user"></UserPhoto>
                                     <Tiptap
@@ -217,11 +244,11 @@
                         </transition>
 
                         <div class="actions">
-                            <button v-if="user && post.body" @click="addReply(post)">
+                            <button v-if="user && item.body" @click="addReply(item)">
                                 <i class="icon icon-reply"></i>
                                 {{ $t("comments.actions.reply") }}
                             </button>
-                            <button v-if="viewType === 'data'" @click="viewDataClick(post)">
+                            <button v-if="viewType === 'data'" @click="viewDataClick(item)">
                                 <i class="icon icon-view-data"></i>
                                 {{ $t("comments.actions.viewData") }}
                             </button>
@@ -237,7 +264,7 @@
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import { NewComment, NewDataEvent } from "@/views/comments/model";
+import { DataEventsErrorsEnum, NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
 import { CurrentUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
@@ -321,22 +348,17 @@ export default Vue.extend({
         };
     },
     watch: {
-        parentData(): Promise<void> {
-            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) }).then(() => {
-                this.dataEvents = this.$getters.dataEvents;
-            });
+        async parentData(): Promise<void> {
+            await this.getDataEvents();
             return this.getComments();
         },
         $route() {
             this.highlightComment();
         },
     },
-    mounted(): Promise<void> {
-        this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) }).then(() => {
-            this.dataEvents = [...this.$getters.dataEvents, ...this.dataEvents];
-        });
-
+    async mounted(): Promise<void> {
         this.placeholder = this.getNewCommentPlaceholder();
+        await this.getDataEvents();
         return this.getComments();
     },
     computed: {
@@ -366,27 +388,12 @@ export default Vue.extend({
 
             await this.$services.api
                 .postDataEvent(dataEvent)
-                .then((response: { event: DataEvent }) => {
-                    // add data-event to the posts array
-                    if (this.dataEvents) {
-                        const de = new DataEvent(
-                            response.event.id,
-                            response.event.author,
-                            response.event.bookmark,
-                            response.event.createdAt,
-                            response.event.updatedAt,
-                            response.event.title,
-                            response.event.description,
-                            response.event.start,
-                            response.event.end
-                        );
-                        this.dataEvents.unshift(de);
+                .then((response) => {
+                    if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
 
-                        this.$store.dispatch(ActionTypes.NEW_DATA_EVENT, { dataEvent: de });
-                    } else {
-                        console.log(`posts is null`);
+                        this.getDataEvents();
                     }
                 })
                 .catch((e) => {
@@ -503,8 +510,8 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.deleteComment;
                 });
         },
-        startEditing(post: Comment) {
-            post.readonly = false;
+        startEditing(item: Comment | DataEvent) {
+            item.readonly = false;
         },
         saveEdit(commentID: number, body: Record<string, unknown>) {
             this.$services.api
@@ -520,12 +527,74 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.editComment;
                 });
         },
-        onListItemOptionClick(event: string, post: Comment): void {
+        async getDataEvents(): Promise<void> {
+            this.isLoading = true;
+            await this.$store
+                .dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) })
+                .catch(() => {
+                    this.errorMessage = DataEventsErrorsEnum.getDataEvents;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+            const dataEvents = this.$getters.dataEvents;
+            this.dataEvents = [];
+            dataEvents.forEach((event) => {
+                this.dataEvents.push(
+                    new DataEvent(
+                        event.id,
+                        event.author,
+                        event.bookmark,
+                        event.createdAt,
+                        event.updatedAt,
+                        JSON.parse(event.title),
+                        JSON.parse(event.description),
+                        event.start,
+                        event.end
+                    )
+                );
+            });
+        },
+        saveEditDataEvent(dataEvent: DataEvent) {
+            this.$services.api
+                .updateDataEvent(dataEvent)
+                .then((response) => {
+                    if (response) {
+                        this.newDataEvent.title = "";
+                        this.newDataEvent.description = "";
+                        this.getDataEvents();
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.errorMessage = DataEventsErrorsEnum.postDataEvent;
+                });
+        },
+        deleteDataEvent(dataEventID: number) {
+            this.$services.api
+                .deleteDataEvent(dataEventID)
+                .then((response) => {
+                    if (response) {
+                        this.getDataEvents();
+                    } else {
+                        this.errorMessage = DataEventsErrorsEnum.deleteDataEvent;
+                    }
+                })
+                .catch(() => {
+                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                });
+        },
+        onListItemOptionClick(event: string, item: Comment | DataEvent): void {
             if (event === "edit-comment") {
-                this.startEditing(post);
+                this.startEditing(item);
             }
             if (event === "delete-comment") {
-                this.deleteComment(post.id);
+                if (item.type === "comment") {
+                    this.deleteComment(item.id);
+                }
+                if (item.type === "event") {
+                    this.deleteDataEvent(item.id);
+                }
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
@@ -671,9 +740,11 @@ header {
 }
 
 ::v-deep .new-comment {
-    @include flex(flex-end);
+    @include flex(flex-start);
     padding: 22px 20px;
     position: relative;
+    margin-left: 20px;
+    margin-right: 20px;
 
     @include bp-down($xs) {
         margin: 0 -10px;
@@ -935,7 +1006,7 @@ header {
     margin-left: 20px;
 
     @include bp-down($xs) {
-      margin-left: 10px;
+        margin-left: 10px;
     }
 }
 .event-sensor-selector {
@@ -946,7 +1017,7 @@ header {
     margin-bottom: 15px;
 }
 .event-sensor-radio {
-    max-width: 100vh;
+    width: 340px;
     height: 115px;
     border: solid 1px #d8dce0;
     padding: 15px;
@@ -977,6 +1048,17 @@ header {
 }
 .comment-toggle {
     margin-top: 20px;
-    margin-left: 20px;
+    //margin-left: 20px;
+}
+
+.edit-event {
+    > * {
+        margin-top: 10px;
+    }
+}
+
+.event-range {
+    margin-top: 10px;
+    font-size: 12px;
 }
 </style>

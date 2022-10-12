@@ -30,46 +30,46 @@ func TestQueryStationByID(t *testing.T) {
 }
 
 /*
-func TestQueryNearbyProjectStations(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
+	func TestQueryNearbyProjectStations(t *testing.T) {
+		assert := assert.New(t)
+		e, err := tests.NewTestEnv()
+		assert.NoError(err)
 
-	_, err = e.AddStations(5)
-	assert.NoError(err)
+		_, err = e.AddStations(5)
+		assert.NoError(err)
 
-	fd, err := e.AddStations(5)
-	assert.NoError(err)
+		fd, err := e.AddStations(5)
+		assert.NoError(err)
 
-	r := repositories.NewStationRepository(e.DB)
+		r := repositories.NewStationRepository(e.DB)
 
-	location := data.NewLocation([]float64{-73.881775, 40.8283})
-	sfs, err := r.QueryNearbyProjectStations(e.Ctx, fd.Project.ID, location)
-	assert.NoError(err)
+		location := data.NewLocation([]float64{-73.881775, 40.8283})
+		sfs, err := r.QueryNearbyProjectStations(e.Ctx, fd.Project.ID, location)
+		assert.NoError(err)
 
-	assert.NotNil(sfs)
-	assert.Equal(len(sfs), len(fd.Stations))
-}
+		assert.NotNil(sfs)
+		assert.Equal(len(sfs), len(fd.Stations))
+	}
 
-func TestQueryStationsByQueriedStations(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
+	func TestQueryStationsByQueriedStations(t *testing.T) {
+		assert := assert.New(t)
+		e, err := tests.NewTestEnv()
+		assert.NoError(err)
 
-	_, err = e.AddStations(5)
-	assert.NoError(err)
+		_, err = e.AddStations(5)
+		assert.NoError(err)
 
-	fd, err := e.AddStations(5)
-	assert.NoError(err)
+		fd, err := e.AddStations(5)
+		assert.NoError(err)
 
-	r := repositories.NewStationRepository(e.DB)
+		r := repositories.NewStationRepository(e.DB)
 
-	sfs, err := r.QueryStationFullFromQueriedStations(e.Ctx)
-	assert.NoError(err)
+		sfs, err := r.QueryStationFullFromQueriedStations(e.Ctx)
+		assert.NoError(err)
 
-	assert.NotNil(sfs)
-	assert.Equal(len(sfs), len(fd.Stations))
-}
+		assert.NotNil(sfs)
+		assert.Equal(len(sfs), len(fd.Stations))
+	}
 */
 func TestQueryStationsByOwnerID(t *testing.T) {
 	assert := assert.New(t)
