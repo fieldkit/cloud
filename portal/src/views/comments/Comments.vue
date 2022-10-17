@@ -1,11 +1,11 @@
 <template>
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
-        <header v-if="viewType === 'project'">Notes & Comments</header>
+        <header v-if="viewType === 'project'">{{ $tc("comments.projectHeader") }}</header>
 
         <SectionToggle
             class="comment-toggle"
-            leftLabel="Comment"
-            rightLabel="Log an Event"
+            :leftLabel="$tc('comments.sectionToggle.leftLabel')"
+            :rightLabel="$tc('comments.sectionToggle.rightLabel')"
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
@@ -17,8 +17,8 @@
                         <div class="new-comment-wrap">
                             <Tiptap
                                 v-model="newComment.body"
-                                placeholder="Join the discussion!"
-                                saveLabel="Post"
+                                :placeholder="$tc('comments.commentForm.placeholder')"
+                                :saveLabel="$tc('comments.commentForm.saveLabel')"
                                 @save="save(newComment)"
                             />
                         </div>
@@ -44,9 +44,9 @@
                 </div>
             </template>
             <template #right>
-                <div class="event-sensor-selector">
+                <div class="event-level-selector">
                     <label for="allProjectRadio">
-                        <div class="event-sensor-radio">
+                        <div class="event-level-radio">
                             <input
                                 type="radio"
                                 id="allProjectRadio"
@@ -55,12 +55,13 @@
                                 :value="true"
                                 :checked="newDataEvent.allProjectSensors"
                             />
-                            <span class="radio-label">All Project Sensors</span>
-                            <p>People will see this event when viewing data for any stations that belong to these projects</p>
+                            <span class="radio-label">{{ $tc("comments.eventTypeSelector.allProjectSensors.radioLabel") }}</span>
+                            <p v-if="!isPartnerCustomisationEnabled()">{{ $tc("comments.eventTypeSelector.allProjectSensors.description") }}</p>
+                            <p v-if="isPartnerCustomisationEnabled()">{{ $tc("floodnet.comments.eventTypeSelector.allProjectSensors.description") }}</p>
                         </div>
                     </label>
                     <label for="allSensorsRadio">
-                        <div class="event-sensor-radio">
+                        <div class="event-level-radio">
                             <input
                                 type="radio"
                                 id="allSensorsRadio"
@@ -69,8 +70,9 @@
                                 :value="false"
                                 :checked="!newDataEvent.allProjectSensors"
                             />
-                            <span class="radio-label">Just These Sensors</span>
-                            <p>People will see this event only when viewing data for these stations</p>
+                            <span class="radio-label">{{ $tc("comments.eventTypeSelector.justTheseSensors.radioLabel") }}</span>
+                            <p v-if="!isPartnerCustomisationEnabled()">{{ $tc("comments.eventTypeSelector.justTheseSensors.description") }}</p>
+                            <p v-if="isPartnerCustomisationEnabled()">{{ $tc("floodnet.comments.eventTypeSelector.justTheseSensors.description") }}</p>
                         </div>
                     </label>
                 </div>
@@ -80,14 +82,14 @@
                         <div class="new-comment-wrap">
                             <Tiptap
                                 v-model="newDataEvent.title"
-                                placeholder="Event Title"
-                                saveLabel="Post"
+                                :placeholder="$tc('comments.eventForm.title.placeholder')"
+                                :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                             <Tiptap
                                 v-model="newDataEvent.description"
-                                placeholder="Event Description"
-                                saveLabel="Post"
+                                :placeholder="$tc('comments.eventForm.description.placeholder')"
+                                :saveLabel="$tc('comments.eventForm.description.saveLabel')"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                         </div>
@@ -118,7 +120,7 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                    <Tiptap v-model="newComment.body" :placeholder="$tc('comments.commentForm.placeholder')" :saveLabel="$tc('comments.commentForm.saveLabel')" @save="save(newComment)" />
                 </div>
             </template>
             <template v-else>
@@ -140,13 +142,13 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
-        <div v-if="isLoading" class="no-comments">Loading comments...</div>
+        <div v-if="!isLoading && posts.length === 0" class="no-comments">{{ $tc("comments.noComments") }}</div>
+        <div v-if="isLoading" class="no-comments">{{ $tc("comments.loadingComments") }}</div>
 
         <div class="list" v-if="postsAndEvents && postsAndEvents.length > 0">
             <div class="subheader">
-                <span class="comments-counter" v-if="viewType === 'project'">{{ postsAndEvents.length }} comments</span>
-                <header v-if="viewType === 'data'">Events & Comments</header>
+                <span class="comments-counter" v-if="viewType === 'project'">{{ postsAndEvents.length }} {{ $tc("comments.comments") }}</span>
+                <header v-if="viewType === 'data'">{{ $tc("comments.dataHeader") }}</header>
             </div>
             <transition-group name="fade">
                 <div
@@ -181,16 +183,16 @@
                                 <Tiptap
                                     v-model="item.title"
                                     :readonly="item.readonly"
-                                    placeholder="Event Title"
-                                    saveLabel="Save"
+                                    :placeholder="$tc('comments.eventForm.title.placeholder')"
+                                    :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                     @save="saveEditDataEvent(item)"
                                 />
                                 <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
                                 <Tiptap
                                     v-model="item.description"
                                     :readonly="item.readonly"
-                                    placeholder="Event Description"
-                                    saveLabel="Save"
+                                    :placeholder="$tc('comments.eventForm.description.placeholder')"
+                                    :saveLabel="$tc('comments.eventForm.description.saveLabel')"
                                     @save="saveEditDataEvent(item)"
                                 />
                             </div>
@@ -221,7 +223,7 @@
                                         <Tiptap
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
-                                            saveLabel="Save"
+                                            :saveLabel="$tc('comments.reply.saveLabel')"
                                             @save="saveEdit(reply.id, reply.body)"
                                         />
                                     </div>
@@ -235,9 +237,9 @@
                                     <UserPhoto :user="user"></UserPhoto>
                                     <Tiptap
                                         v-model="newReply.body"
-                                        placeholder="Reply to comment"
+                                        :placeholder="$tc('comments.reply.placeholder')"
+                                        :saveLabel="$tc('comments.reply.saveLabel')"
                                         @save="save(newReply)"
-                                        saveLabel="Post"
                                     />
                                 </div>
                             </div>
@@ -275,6 +277,7 @@ import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
 import { ActionTypes } from "@/store";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "Comments",
@@ -327,7 +330,7 @@ export default Vue.extend({
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
-                projectId: typeof this.parentData === "number" ? this.parentData : null,
+                Id: typeof this.parentData === "number" ? this.parentData : null,
                 bookmark: null,
                 body: "",
             },
@@ -528,6 +531,10 @@ export default Vue.extend({
                 });
         },
         async getDataEvents(): Promise<void> {
+            if (typeof this.parentData === "number") {
+              this.dataEvents = [];
+              return;
+            }
             this.isLoading = true;
             await this.$store
                 .dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) })
@@ -643,6 +650,9 @@ export default Vue.extend({
         },
         sortRecent(a, b) {
             return b.createdAt - a.createdAt;
+        },
+        isPartnerCustomisationEnabled(): boolean {
+          return isCustomisationEnabled();
         },
     },
 });
@@ -1009,14 +1019,14 @@ header {
         margin-left: 10px;
     }
 }
-.event-sensor-selector {
+.event-level-selector {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
 }
-.event-sensor-radio {
+.event-level-radio {
     width: 340px;
     height: 115px;
     border: solid 1px #d8dce0;
