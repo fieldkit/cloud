@@ -38,7 +38,7 @@ import { ActionTypes } from "@/store";
 
 import { getPartnerCustomization } from "@/views/shared/partners";
 import StationPhotosView from "@/views/station/StationPhotosView.vue";
-import {MapViewType} from '@/views/shared/MapViewTypeToggle.vue';
+import { MapViewType } from "@/api/api";
 
 Vue.use(Router);
 
