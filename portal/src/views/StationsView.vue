@@ -74,7 +74,8 @@ import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
-import MapViewTypeToggle, {MapViewType} from "@/views/shared/MapViewTypeToggle.vue";
+import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
+import { MapViewType } from "@/api/api";
 
 export default Vue.extend({
     name: "StationsView",

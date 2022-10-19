@@ -23,11 +23,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-
-export enum MapViewType {
-    map = "map",
-    list = "list",
-}
+import {MapViewType} from '@/api';
 
 export default Vue.extend({
     name: "MapViewTypeToggle",

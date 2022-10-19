@@ -102,7 +102,8 @@ import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 import { ExploreContext } from "@/views/viz/common";
 
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
-import MapViewTypeToggle, { MapViewType } from "@/views/shared/MapViewTypeToggle.vue";
+import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
+import { MapViewType } from "@/api/api";
 
 export default Vue.extend({
     name: "ProjectBigMap",
