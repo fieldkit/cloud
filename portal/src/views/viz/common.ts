@@ -63,12 +63,28 @@ export class TimeRange {
         return new TimeRange(min, max);
     }
 
+    public static fromArrayIntersections(ranges: number[][]): TimeRange {
+        return TimeRange.mergeArrays(ranges);
+    }
+
     public static mergeArraysIgnoreExtreme(ranges: number[][]): TimeRange {
         return TimeRange.mergeArrays(ranges.filter((r) => r[0] != Time.Min && r[1] != Time.Max));
     }
 
     public static mergeRanges(ranges: TimeRange[]): TimeRange {
         return TimeRange.mergeArrays(ranges.map((r) => r.array));
+    }
+
+    public rewind(delta: number): TimeRange {
+        return new TimeRange(this.start - delta, this.end - delta);
+    }
+
+    public expand(days: number): TimeRange {
+        const newStart = new Date(this.start);
+        const newEnd = new Date(this.end);
+        newStart.setDate(newStart.getDate() - days);
+        newEnd.setDate(newEnd.getDate() + days);
+        return new TimeRange(newStart.getTime(), newEnd.getTime());
     }
 }
 
@@ -235,6 +251,22 @@ export function makeRange(values: number[]): [number, number] {
     return [min, max];
 }
 
+export function addDays(original: Date, days: number): Date {
+    const temp = original;
+    temp.setDate(temp.getDate() + days);
+    return temp;
+}
+
+export function addSeconds(original: Date, seconds: number): Date {
+    const temp = original;
+    temp.setSeconds(temp.getSeconds() + seconds);
+    return temp;
+}
+
+export function truncateTime(original: Date): Date {
+    return new Date(original.getFullYear(), original.getMonth(), original.getDate());
+}
+
 export class QueriedData {
     empty = true;
     dataRange: number[] = [];
@@ -268,6 +300,10 @@ export class QueriedData {
 
     get bucketSize(): number {
         return this.sdr.bucketSize;
+    }
+
+    get dataEnd(): number | null {
+        return this.sdr.dataEnd;
     }
 
     private getAverageTimeBetweenSample(): number | null {
@@ -305,7 +341,9 @@ export class QueriedData {
     public sorted(): QueriedData {
         const sorted = {
             data: _.sortBy(this.sdr.data, (d) => d.time),
+            dataEnd: this.sdr.dataEnd,
             bucketSize: this.sdr.bucketSize,
+            bucketSamples: this.sdr.bucketSamples,
         };
         return new QueriedData(this.key, this.timeRangeQueried, sorted);
     }
@@ -313,7 +351,9 @@ export class QueriedData {
     public removeMalformed(): QueriedData {
         const filtered = {
             data: this.sdr.data.filter((d) => d.sensorId),
+            dataEnd: this.sdr.dataEnd,
             bucketSize: this.sdr.bucketSize,
+            bucketSamples: this.sdr.bucketSamples,
         };
         // console.log(`viz: malformed`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
@@ -322,7 +362,9 @@ export class QueriedData {
     public removeDuplicates(): QueriedData {
         const filtered = {
             data: _.sortedUniqBy(this.sdr.data, (d) => d.time),
+            dataEnd: this.sdr.dataEnd,
             bucketSize: this.sdr.bucketSize,
+            bucketSamples: this.sdr.bucketSamples,
         };
         // console.log(`viz: duplicates`, this.sdr.data.length, filtered.data.length);
         return new QueriedData(this.key, this.timeRangeQueried, filtered);
@@ -360,6 +402,7 @@ export class DataSetSeries {
 export class SeriesData {
     constructor(
         public readonly key: string,
+        public readonly visible: TimeRange,
         public readonly ds: DataSetSeries,
         public readonly queried: QueriedData,
         public readonly vizInfo: VizInfo

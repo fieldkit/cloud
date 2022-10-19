@@ -2,7 +2,7 @@
     <div class="marker-container" @click="onClick">
         <span class="value-label">{{ value === null || value === undefined ? "&ndash;" : value | prettyReadingNarrowSpace }}</span>
         <svg viewBox="0 0 36 36">
-            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="value !== null ? color : '#ccc'" />
+            <circle class="marker-circle" cx="18" cy="18" r="16" :fill="value !== null ? color : '#777a80'" />
         </svg>
     </div>
 </template>
@@ -15,7 +15,7 @@ export default Vue.extend({
     props: {
         color: {
             type: String,
-            default: "#ccc",
+            default: "#777a80",
         },
         value: {
             type: Number,

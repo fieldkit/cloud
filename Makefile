@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_PATCH = 25
+VERSION_PATCH = 31
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -22,7 +22,7 @@ endif
 ifeq (, $(shell which yarn))
 JSPKG ?= npm
 else
-JSPKG ?= yarn
+JSPKG ?= yarn --mutex network
 endif
 
 GO ?= env GOOS=$(GOOS) GOARCH=$(GOARCH) go

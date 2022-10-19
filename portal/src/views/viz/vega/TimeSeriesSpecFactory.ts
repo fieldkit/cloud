@@ -1,15 +1,26 @@
 import _ from "lodash";
-import moment from "moment";
-import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
+import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
-import { DataRow } from "../api";
-import { makeRange } from "../common";
+import { makeRange, truncateTime, addDays, addSeconds } from "../common";
+
+export interface TimeSeriesDataRow extends DataRow {
+    gap: number;
+    minimumGap: number;
+}
+
+export class TimeSeriesData {
+    constructor(private readonly allSeries: SeriesData[]) {}
+}
 
 export class TimeSeriesSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
+    constructor(
+        private readonly allSeries: SeriesData[],
+        private readonly settings: ChartSettings = ChartSettings.Container,
+        private readonly brushable = true,
+        private readonly draggable = true
+    ) {}
 
     create() {
-        const mapSeries = (mapFn: MapFunction<unknown>) => this.allSeries.map(mapFn);
         const makeDataName = (i: number) => `table${i + 1}`;
         const makeValidDataName = (i: number) => `table${i + 1}Valid`;
         const makeBarDataName = (i: number) => `table${i + 1}Bar`;
@@ -49,7 +60,28 @@ export class TimeSeriesSpecFactory {
             return getSeriesThresholds(series);
         };
 
-        const filteredData = mapSeries((series, i) => {
+        const xDomainsAll: number[][] = this.allSeries.map((series: SeriesData) => series.visible.toArray());
+
+        const eachDataEnd = this.allSeries.map((series) => series.queried.dataEnd).filter((v) => v !== null);
+        const dataEnd = eachDataEnd.length > 0 ? _.max(eachDataEnd) : new Date().getTime();
+
+        const timeRangeAll =
+            xDomainsAll.length == 0
+                ? null
+                : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
+
+        if (timeRangeAll) {
+            // console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
+        }
+
+        const makeDomainX = (): number[] | null => {
+            // I can't think of a good reason to just always specify this.
+            return timeRangeAll;
+        };
+
+        const xDomain: number[] | null = makeDomainX();
+
+        const filteredData = this.allSeries.map((series, i): TimeSeriesDataRow[] => {
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
             const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
@@ -100,7 +132,7 @@ export class TimeSeriesSpecFactory {
         // for constraining the axis domains to whatever minimums have been
         // configured for that sensor.
         const makeSeriesDomain = (series, i: number) => {
-            const data = filteredData[i].filter((datum) => _.isNumber(datum.value)).map((datum) => datum.value);
+            const data = filteredData[i].map((datum) => datum.value).filter((value): value is number => _.isNumber(value));
             const filteredRange = data.length > 0 ? makeRange(data) : [0, 0];
             const constrained = series.vizInfo.constrainedRanges;
             if (series.ds.graphing && constrained.length > 0) {
@@ -137,18 +169,6 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const xDomainsAll: number[][] = this.allSeries
-            .filter((series: SeriesData) => series.queried.data.length > 0)
-            .map((series: SeriesData) => series.queried.timeRange);
-        const timeRangeAll =
-            xDomainsAll.length == 0
-                ? null
-                : ([_.min(xDomainsAll.map((dr: number[]) => dr[0])), _.max(xDomainsAll.map((dr: number[]) => dr[1]))] as number[]);
-
-        if (timeRangeAll) {
-            // console.log("viz: time-domain", xDomainsAll, timeRangeAll, timeRangeAll[1] - timeRangeAll[0]);
-        }
-
         const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
             const bucketSize = this.allSeries[i].queried.bucketSize;
             const step = bucketSize > 300 ? bucketSize / 60 : 5;
@@ -158,126 +178,151 @@ export class TimeSeriesSpecFactory {
             };
         };
 
-        const makeDomainX = (): number[] | null => {
-            // I can't think of a good reason to just always specify this.
-            return timeRangeAll;
+        const barChartData = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    if (!isBarChart(series)) {
+                        return [];
+                    }
+
+                    return [
+                        {
+                            name: makeBarDataName(i),
+                            source: makeValidDataName(i),
+                            transform: [
+                                _.extend(
+                                    {
+                                        field: "time",
+                                        type: "timeunit",
+                                        as: ["barStartDate", "barEndDate"],
+                                    },
+                                    getBarConfiguration(i, timeRangeAll)
+                                ),
+                                {
+                                    type: "formula",
+                                    expr: timeRangeAll
+                                        ? `time(clamp(datum.barStartDate , ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                        : `time(datum.barStartDate)`,
+                                    as: "barStart",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: timeRangeAll
+                                        ? `time(clamp(datum.barEndDate, ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
+                                        : `time(datum.barEndDate)`,
+                                    as: "barEnd",
+                                },
+                                {
+                                    type: "aggregate",
+                                    groupby: ["barStart", "barEnd"],
+                                    ops: ["mean"],
+                                    fields: ["value"],
+                                    as: ["value"],
+                                },
+                                {
+                                    type: "formula",
+                                    expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
+                                    as: "barMiddle",
+                                },
+                                { type: "formula", expr: i, as: "series" },
+                            ],
+                        },
+                    ];
+                })
+            );
         };
 
-        const xDomain: number[] | null = makeDomainX();
+        const regularData = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    const thresholds = makeSeriesThresholds(series);
+                    const scales = makeScales(i);
+                    const transforms = thresholds
+                        ? thresholds.levels.map((level, l: number) => {
+                              return {
+                                  type: "formula",
+                                  expr: "datum.value <= " + level.value + " ? datum.value : null",
+                                  as: makeThresholdLevelAlias(i, l),
+                              };
+                          })
+                        : [];
+
+                    return [
+                        {
+                            name: makeDataName(i),
+                            values: filteredData[i],
+                            transform: [
+                                /*
+                                    This breaks dragging, for some reason.
+                                    Instead of this we're using the clip
+                                    functionality, which didn't work w/o custom
+                                    SVG paths. The clip path otherwise was just
+                                    an empty rect.
+                                    {
+                                        type: "filter",
+                                        expr: "inrange(datum.time, visible_times)",
+                                    },
+                                    */
+                                ...transforms,
+                            ],
+                        },
+                        {
+                            name: makeValidDataName(i),
+                            source: makeDataName(i),
+                            transform: [
+                                {
+                                    type: "filter",
+                                    expr: "isValid(datum.value)",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: `scale('${scales.x}', datum.time)`,
+                                    as: "layout_x",
+                                },
+                                {
+                                    type: "formula",
+                                    expr: `scale('${scales.y}', datum.value)`,
+                                    as: "layout_y",
+                                },
+                            ],
+                        },
+                    ];
+                })
+            );
+        };
+
+        const layoutData = () => {
+            if (this.settings.tiny || this.settings.mobile) {
+                return [];
+            }
+            return [
+                {
+                    name: "all_layouts",
+                    source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
+                    transform: [
+                        {
+                            type: "voronoi",
+                            x: "layout_x",
+                            y: "layout_y",
+                            size: [{ signal: "width" }, { signal: "height" }],
+                            as: "layout_path",
+                        },
+                    ],
+                },
+            ];
+        };
 
         const data = [
             {
                 name: "brush_store",
             },
-        ]
-            .concat(
-                _.flatten(
-                    mapSeries((series, i) => {
-                        const thresholds = makeSeriesThresholds(series);
-                        const scales = makeScales(i);
-                        const transforms = thresholds
-                            ? thresholds.levels.map((level, l: number) => {
-                                  return {
-                                      type: "formula",
-                                      expr: "datum.value <= " + level.value + " ? datum.value : null",
-                                      as: makeThresholdLevelAlias(i, l),
-                                  };
-                              })
-                            : null;
-
-                        return [
-                            {
-                                name: makeDataName(i),
-                                values: filteredData[i],
-                                transform: transforms,
-                            },
-                            {
-                                name: makeValidDataName(i),
-                                source: makeDataName(i),
-                                transform: [
-                                    {
-                                        type: "filter",
-                                        expr: "isValid(datum.value)",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: `scale('${scales.x}', datum.time)`,
-                                        as: "layout_x",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: `scale('${scales.y}', datum.value)`,
-                                        as: "layout_y",
-                                    },
-                                ],
-                            },
-                            {
-                                name: makeBarDataName(i),
-                                source: makeValidDataName(i),
-                                transform: [
-                                    _.extend(
-                                        {
-                                            field: "time",
-                                            type: "timeunit",
-                                            as: ["barStartDate", "barEndDate"],
-                                        },
-                                        getBarConfiguration(i, timeRangeAll)
-                                    ),
-                                    {
-                                        type: "formula",
-                                        expr: timeRangeAll
-                                            ? `time(clamp(datum.barStartDate , ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
-                                            : `time(datum.barStartDate)`,
-                                        as: "barStart",
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: timeRangeAll
-                                            ? `time(clamp(datum.barEndDate, ${timeRangeAll[0]}, ${timeRangeAll[1]}))`
-                                            : `time(datum.barEndDate)`,
-                                        as: "barEnd",
-                                    },
-                                    {
-                                        type: "aggregate",
-                                        groupby: ["barStart", "barEnd"],
-                                        ops: ["mean"],
-                                        fields: ["value"],
-                                        as: ["value"],
-                                    },
-                                    {
-                                        type: "formula",
-                                        expr: "time(datum.barStart) + ((time(datum.barEnd) - time(datum.barStart)) / 2)",
-                                        as: "barMiddle",
-                                    },
-                                    { type: "formula", expr: i, as: "series" },
-                                ],
-                            },
-                        ];
-                    })
-                )
-            )
-            .concat(
-                this.settings.tiny
-                    ? []
-                    : ([
-                          {
-                              name: "all_layouts",
-                              source: this.allSeries.map((series: SeriesData, i: number) => makeValidDataName(i)),
-                              transform: [
-                                  {
-                                      type: "voronoi",
-                                      x: "layout_x",
-                                      y: "layout_y",
-                                      size: [{ signal: "width" }, { signal: "height" }],
-                                      as: "layout_path",
-                                  },
-                              ],
-                          },
-                      ] as any[])
-            );
+            ...regularData(),
+            ...barChartData(),
+            ...layoutData(),
+        ];
 
         const legends = _.flatten(
-            mapSeries((series, i) => {
+            this.allSeries.map((series, i) => {
                 if (this.settings.tiny) {
                     return [];
                 }
@@ -304,8 +349,15 @@ export class TimeSeriesSpecFactory {
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain || [0, 1],
+                    domain: {
+                        signal: "visible_times",
+                    },
                     tickCount: undefined,
+                    /*
+                    values: {
+                        signal: "visible_times",
+                    },
+                    */
                     values: xDomain,
                     titleFontSize: 12,
                     titlePadding: 4,
@@ -349,7 +401,9 @@ export class TimeSeriesSpecFactory {
                 {
                     orient: "bottom",
                     scale: "x",
-                    domain: xDomain || [0, 1],
+                    domain: {
+                        signal: "visible_times",
+                    },
                     tickCount: undefined,
                     labelPadding: -24,
                     tickSize: 30,
@@ -374,7 +428,7 @@ export class TimeSeriesSpecFactory {
         const axes = [
             ...(this.settings.tiny ? tinyXAxis() : optionalXAxis()),
             ..._.flatten(
-                mapSeries((series, i) => {
+                this.allSeries.map((series, i) => {
                     if (i > 2) throw new Error(`viz: Too many axes`);
                     const hoverCheck = ifHovering(i, 1, 0.2);
                     const hoverCheckGrid = ifHovering(i, 0.5, 0.2);
@@ -420,395 +474,386 @@ export class TimeSeriesSpecFactory {
             ),
         ];
 
-        const scales = _.flatten(
-            mapSeries((series, i) => {
-                const yDomain = makeDomainY(i, series);
+        const standardScales = this.allSeries.map((series, i) => {
+            const yDomain = makeDomainY(i, series);
 
-                return [
-                    {
-                        name: makeScales(i).x,
-                        type: "time",
-                        range: "width",
-                        domain: xDomain
-                            ? xDomain
-                            : {
-                                  data: makeDataName(i),
-                                  field: "time",
-                              },
-                    },
-                    {
-                        name: makeScales(i).y,
-                        type: "linear",
-                        range: "height",
-                        nice: true,
-                        zero: true,
-                        domain: yDomain
-                            ? yDomain
-                            : {
-                                  data: makeDataName(i),
-                                  field: "value",
-                              },
-                    },
-                ];
-            })
-        ).concat(
-            mapSeries((series, i) => {
-                const strokeName = makeStrokeName(i);
-                const thresholds = getSeriesThresholds(series);
-                if (thresholds) {
-                    return {
-                        name: strokeName,
-                        type: "ordinal",
-                        domain: thresholds.levels.filter((d) => d.label).map((d) => getAxisLabel(d)),
-                        range: thresholds.levels.map((d) => d.color),
-                    };
-                } else {
-                    return {
-                        domain: [""],
-                        range: [i == 0 ? "#003F5C" : "#6ef0da"], // primaryLine, secondaryLine
-                        name: strokeName,
-                        type: "ordinal",
-                    };
-                }
-            })
-        );
-
-        const brushMarks = [
-            {
-                name: "brush_brush_bg",
-                type: "rect",
-                clip: true,
-                encode: {
-                    enter: {
-                        fill: {
-                            value: "#333",
-                        },
-                        fillOpacity: {
-                            value: 0.125,
-                        },
-                    },
-                    update: {
-                        x: [
-                            {
-                                test: 'data("brush_store").length',
-                                signal: "brush_x[0]",
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        y: [
-                            {
-                                test: 'data("brush_store").length',
-                                value: 0,
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        x2: [
-                            {
-                                test: 'data("brush_store").length',
-                                signal: "brush_x[1]",
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        y2: [
-                            {
-                                test: 'data("brush_store").length',
-                                field: {
-                                    group: "height",
-                                },
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                    },
+            return [
+                {
+                    name: makeScales(i).x,
+                    type: "time",
+                    range: "width",
+                    domain: xDomain
+                        ? {
+                              signal: "visible_times",
+                          }
+                        : {
+                              data: makeDataName(i),
+                              field: "time",
+                          },
                 },
-            },
-            {
-                name: "brush_brush",
-                type: "rect",
-                clip: true,
-                encode: {
-                    enter: {
-                        fill: {
-                            value: "transparent",
-                        },
-                    },
-                    update: {
-                        x: [
-                            {
-                                test: 'data("brush_store").length',
-                                signal: "brush_x[0]",
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        y: [
-                            {
-                                test: 'data("brush_store").length',
-                                value: 0,
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        x2: [
-                            {
-                                test: 'data("brush_store").length',
-                                signal: "brush_x[1]",
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        y2: [
-                            {
-                                test: 'data("brush_store").length',
-                                field: {
-                                    group: "height",
-                                },
-                            },
-                            {
-                                value: 0,
-                            },
-                        ],
-                        stroke: [
-                            {
-                                test: "brush_x[0] !== brush_x[1]",
-                                value: "white",
-                            },
-                            {
-                                value: null,
-                            },
-                        ],
-                    },
+                {
+                    name: makeScales(i).y,
+                    type: "linear",
+                    range: "height",
+                    nice: true,
+                    zero: true,
+                    domain: yDomain
+                        ? yDomain
+                        : {
+                              data: makeDataName(i),
+                              field: "value",
+                          },
                 },
-            },
-        ];
+            ];
+        });
 
-        const seriesMarks = _.flatten(
-            mapSeries((series, i) => {
-                const hoverCheck = ifHovering(i, 1, 0.3);
-                const scales = makeScales(i);
-                const thresholds = makeSeriesThresholds(series);
+        const thresholdScales = this.allSeries.map((series, i) => {
+            const strokeName = makeStrokeName(i);
+            const thresholds = getSeriesThresholds(series);
+            if (thresholds) {
+                return {
+                    name: strokeName,
+                    type: "ordinal",
+                    domain: thresholds.levels.filter((d) => d.label).map((d) => getAxisLabel(d)),
+                    range: thresholds.levels.map((d) => d.color),
+                };
+            } else {
+                return {
+                    name: strokeName,
+                    type: "ordinal",
+                    domain: [""],
+                    range: [i == 0 ? "#003F5C" : "#6ef0da"], // primaryLine, secondaryLine
+                };
+            }
+        });
 
-                if (isBarChart(series)) {
-                    return [
-                        {
-                            type: "symbol",
-                            from: {
-                                data: makeBarDataName(i),
+        const scales = [..._.flatten(standardScales), ..._.flatten(thresholdScales)];
+
+        const brushMarks = () => {
+            if (!this.brushable) {
+                return [];
+            }
+
+            return [
+                {
+                    name: "brush_brush_bg",
+                    type: "rect",
+                    clip: true,
+                    encode: {
+                        enter: {
+                            fill: {
+                                value: "#333",
                             },
-                            encode: {
-                                enter: {
-                                    x: {
-                                        scale: scales.x,
-                                        field: "barMiddle",
-                                    },
-                                    y: {
-                                        scale: scales.y,
-                                        field: "value",
-                                    },
-                                    stroke: {
-                                        value: null,
-                                    },
-                                    strokeWidth: {
-                                        value: 2,
-                                    },
-                                    size: {
-                                        value: 100,
-                                    },
-                                    fill: {
-                                        value: "blue",
-                                    },
-                                    fillOpacity: {
-                                        value: 0.5,
-                                    },
-                                },
-                                update: {
-                                    fillOpacity: {
-                                        signal: `hover && hover.series == datum.series && hover.time >= datum.barStart && hover.time <= datum.barEnd ? 1 : 0`,
-                                    },
-                                },
+                            fillOpacity: {
+                                value: 0.125,
                             },
                         },
-                        {
-                            type: "group",
-                            marks: [
+                        update: {
+                            x: [
                                 {
-                                    type: "rect",
-                                    style: i === 0 ? "primaryBar" : "secondaryBar",
-                                    from: { data: makeBarDataName(i) },
-                                    encode: {
-                                        enter: {
-                                            x: { scale: scales.x, field: "barStart" },
-                                            x2: { scale: scales.x, field: "barEnd" },
-                                            y: { scale: scales.y, field: "value" },
-                                            y2: { scale: scales.y, value: 0 },
-                                        },
-                                        update: {
-                                            strokeOpacity: {
-                                                signal: hoverCheck,
-                                            },
-                                        },
+                                    test: 'data("brush_store").length',
+                                    signal: "brush_x[0]",
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            y: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    value: 0,
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            x2: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    signal: "brush_x[1]",
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            y2: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    field: {
+                                        group: "height",
                                     },
+                                },
+                                {
+                                    value: 0,
                                 },
                             ],
                         },
-                    ];
-                }
-
-                const symbolMark = {
-                    type: "symbol",
-                    from: {
-                        data: makeValidDataName(i),
                     },
+                },
+                {
+                    name: "brush_brush",
+                    type: "rect",
+                    clip: true,
                     encode: {
                         enter: {
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: null,
-                            },
-                            strokeWidth: {
-                                value: 2,
-                            },
-                            size: {
-                                value: 100,
-                            },
                             fill: {
-                                value: "blue",
-                            },
-                            fillOpacity: {
-                                value: 0.5,
+                                value: "transparent",
                             },
                         },
                         update: {
-                            fillOpacity: {
-                                signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
-                            },
-                        },
-                    },
-                };
-
-                const dashedLineMark = {
-                    type: "line",
-                    from: {
-                        data: makeValidDataName(i),
-                    },
-                    encode: {
-                        enter: {
-                            interpolate: {
-                                value: "cardinal",
-                            },
-                            tension: {
-                                value: 0.9,
-                            },
-                            x: {
-                                scale: scales.x,
-                                field: "time",
-                            },
-                            y: {
-                                scale: scales.y,
-                                field: "value",
-                            },
-                            stroke: {
-                                value: "#cccccc",
-                            },
-                            strokeWidth: {
-                                value: 1,
-                            },
-                            strokeDash: {
-                                value: [4, 4],
-                            },
-                        },
-                        update: {
-                            strokeOpacity: {
-                                signal: hoverCheck,
-                            },
-                        },
-                    },
-                };
-
-                if (thresholds) {
-                    const hoverCheck = ifHovering(i, 1, 0.1);
-                    const thresholdsMarks = thresholds.levels
-                        .map((level, l: number) => {
-                            const alias = makeThresholdLevelAlias(i, l);
-                            const strokeWidth = 2 + (thresholds.levels.length - l) / thresholds.levels.length;
-
-                            return {
-                                type: "line",
-                                from: { data: makeValidDataName(i) },
-                                encode: {
-                                    enter: {
-                                        interpolate: { value: "cardinal" },
-                                        tension: { value: 0.9 },
-                                        strokeCap: { value: "round" },
-                                        x: { scale: scales.x, field: "time" },
-                                        y: { scale: scales.y, field: alias },
-                                        strokeWidth: { value: strokeWidth },
-                                        defined: { signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap` },
-                                    },
-                                    update: {
-                                        strokeOpacity: {
-                                            signal: hoverCheck,
-                                        },
+                            x: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    signal: "brush_x[0]",
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            y: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    value: 0,
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            x2: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    signal: "brush_x[1]",
+                                },
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            y2: [
+                                {
+                                    test: 'data("brush_store").length',
+                                    field: {
+                                        group: "height",
                                     },
                                 },
-                            };
-                        })
-                        .reverse();
-
-                    return [
-                        {
-                            type: "group",
-                            marks: _.concat([dashedLineMark], thresholdsMarks as never[], [symbolMark] as never[]),
+                                {
+                                    value: 0,
+                                },
+                            ],
+                            stroke: [
+                                {
+                                    test: "brush_x[0] !== brush_x[1]",
+                                    value: "white",
+                                },
+                                {
+                                    value: null,
+                                },
+                            ],
                         },
-                    ];
-                } else {
-                    const hoverCheck = ifHovering(i, 1, 0.1);
-                    const lineMark = {
+                    },
+                },
+            ];
+        };
+
+        const seriesMarks = _.flatten(
+            this.allSeries
+                .map((series, i): any => /* TODO: Any */ {
+                    const hoverCheck = ifHovering(i, 1, 0.3);
+                    const scales = makeScales(i);
+                    const thresholds = makeSeriesThresholds(series);
+
+                    if (isBarChart(series)) {
+                        return [
+                            {
+                                type: "symbol",
+                                from: {
+                                    data: makeBarDataName(i),
+                                },
+                                encode: {
+                                    enter: {
+                                        stroke: { value: null },
+                                        strokeWidth: { value: 2 },
+                                        size: { value: 100 },
+                                        fill: { value: "blue" },
+                                        fillOpacity: { value: 0.5 },
+                                        x: { scale: scales.x, field: "barMiddle" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                    update: {
+                                        fillOpacity: {
+                                            signal: `hover && hover.series == datum.series && hover.time >= datum.barStart && hover.time <= datum.barEnd ? 1 : 0`,
+                                        },
+                                        x: { scale: scales.x, field: "barMiddle" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                },
+                            },
+                            {
+                                type: "group",
+                                marks: [
+                                    {
+                                        type: "rect",
+                                        style: i === 0 ? "primaryBar" : "secondaryBar",
+                                        from: { data: makeBarDataName(i) },
+                                        encode: {
+                                            enter: {
+                                                x: { scale: scales.x, field: "barStart" },
+                                                x2: { scale: scales.x, field: "barEnd" },
+                                                y: { scale: scales.y, field: "value" },
+                                                y2: { scale: scales.y, value: 0 },
+                                            },
+                                            update: {
+                                                strokeOpacity: {
+                                                    signal: hoverCheck,
+                                                },
+                                                x: { scale: scales.x, field: "barStart" },
+                                                x2: { scale: scales.x, field: "barEnd" },
+                                                y: { scale: scales.y, field: "value" },
+                                                y2: { scale: scales.y, value: 0 },
+                                            },
+                                        },
+                                    },
+                                ],
+                            },
+                        ];
+                    }
+
+                    const symbolMarks = () => {
+                        if (this.settings.mobile || this.settings.tiny) {
+                            return [];
+                        }
+                        return [
+                            {
+                                type: "symbol",
+                                from: {
+                                    data: makeValidDataName(i),
+                                },
+                                encode: {
+                                    enter: {
+                                        stroke: { value: null },
+                                        strokeWidth: { value: 2 },
+                                        size: { value: 100 },
+                                        fill: { value: "blue" },
+                                        fillOpacity: { value: 0.5 },
+                                        x: { scale: scales.x, field: "time" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                    update: {
+                                        fillOpacity: {
+                                            signal: `hover && hover.stationId == datum.stationId && hover.sensorId == datum.sensorId && hover.time == datum.time ? 1 : 0.0`,
+                                        },
+                                        x: { scale: scales.x, field: "time" },
+                                        y: { scale: scales.y, field: "value" },
+                                    },
+                                },
+                            },
+                        ];
+                    };
+
+                    const dashedLineMark = {
                         type: "line",
-                        style: i === 0 ? "primaryLine" : "secondaryLine",
-                        from: { data: makeDataName(i) },
+                        from: {
+                            data: makeValidDataName(i),
+                        },
                         encode: {
                             enter: {
                                 interpolate: { value: "cardinal" },
                                 tension: { value: 0.9 },
-                                strokeCap: { value: "round" },
+                                stroke: { value: "#cccccc" },
+                                strokeWidth: { value: 1 },
+                                strokeDash: { value: [4, 4] },
                                 x: { scale: scales.x, field: "time" },
                                 y: { scale: scales.y, field: "value" },
-                                strokeWidth: { value: 2 },
-                                defined: { signal: `!datum.minimumGap || datum.gap <= datum.minimumGap` },
                             },
                             update: {
                                 strokeOpacity: {
                                     signal: hoverCheck,
                                 },
+                                x: { scale: scales.x, field: "time" },
+                                y: { scale: scales.y, field: "value" },
                             },
                         },
                     };
-                    return [
-                        {
-                            type: "group",
-                            marks: [dashedLineMark, lineMark, symbolMark],
-                        },
-                    ];
-                }
-            }).reverse()
+
+                    if (thresholds) {
+                        const hoverCheck = ifHovering(i, 1, 0.1);
+                        const thresholdsMarks = thresholds.levels
+                            .map((level, l: number) => {
+                                const alias = makeThresholdLevelAlias(i, l);
+                                const strokeWidth = 2 + (thresholds.levels.length - l) / thresholds.levels.length;
+
+                                return {
+                                    type: "line",
+                                    from: { data: makeValidDataName(i) },
+                                    encode: {
+                                        enter: {
+                                            interpolate: { value: "cardinal" },
+                                            tension: { value: 0.9 },
+                                            strokeCap: { value: "round" },
+                                            strokeWidth: { value: strokeWidth },
+                                            defined: {
+                                                signal: `!datum.minimumGap || datum.${alias} <= datum.minimumGap`,
+                                            },
+                                            x: { scale: scales.x, field: "time" },
+                                            y: { scale: scales.y, field: alias },
+                                        },
+                                        update: {
+                                            strokeOpacity: {
+                                                signal: hoverCheck,
+                                            },
+                                            x: { scale: scales.x, field: "time" },
+                                            y: { scale: scales.y, field: alias },
+                                        },
+                                    },
+                                };
+                            })
+                            .reverse();
+
+                        return [
+                            {
+                                type: "group",
+                                clip: {
+                                    path: { signal: "chart_clip" },
+                                },
+                                marks: [dashedLineMark, ...thresholdsMarks, ...symbolMarks()],
+                            },
+                        ];
+                    } else {
+                        const hoverCheck = ifHovering(i, 1, 0.1);
+                        const lineMark = {
+                            type: "line",
+                            style: i === 0 ? "primaryLine" : "secondaryLine",
+                            from: { data: makeDataName(i) },
+                            encode: {
+                                enter: {
+                                    interpolate: { value: "cardinal" },
+                                    tension: { value: 0.9 },
+                                    strokeCap: { value: "round" },
+                                    strokeWidth: { value: 2 },
+                                    defined: { signal: `!datum.minimumGap || datum.gap <= datum.minimumGap` },
+                                    strokeOpacity: {
+                                        signal: hoverCheck,
+                                    },
+                                    x: { scale: scales.x, field: "time" },
+                                    y: { scale: scales.y, field: "value" },
+                                },
+                                update: {
+                                    x: { scale: scales.x, field: "time" },
+                                    y: { scale: scales.y, field: "value" },
+                                },
+                            },
+                        };
+                        return [
+                            {
+                                type: "group",
+                                clip: {
+                                    path: { signal: "chart_clip" },
+                                },
+                                marks: [dashedLineMark, lineMark, ...symbolMarks()],
+                            },
+                        ];
+                    }
+                })
+                .reverse()
         );
 
         // define mark stacking priority
@@ -821,57 +866,110 @@ export class TimeSeriesSpecFactory {
         };
 
         // TODO Unique by thresholds and perhaps y value?
-        const ruleMarks = _.flatten(
-            mapSeries((series, i) => {
-                const domain = makeSeriesDomain(series, i);
-                const scales = makeScales(i);
-                const thresholds = getSeriesThresholds(series);
-                if (thresholds && timeRangeAll) {
-                    return thresholds.levels
-                        .filter((level) => level.label != null && !level.hidden)
-                        .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
-                        .map((level) => {
+        const ruleMarks = () => {
+            return _.flatten(
+                this.allSeries.map((series, i) => {
+                    const domain = makeSeriesDomain(series, i);
+                    const scales = makeScales(i);
+                    const thresholds = getSeriesThresholds(series);
+                    if (thresholds && timeRangeAll) {
+                        return thresholds.levels
+                            .filter((level) => level.label != null && !level.hidden)
+                            .filter((level) => level.start != null && level.start >= domain[0] && level.start < domain[1])
+                            .map((level) => {
+                                return {
+                                    type: "rule",
+                                    encode: {
+                                        enter: {
+                                            x: { scale: scales.x, value: timeRangeAll[0] },
+                                            x2: { scale: scales.x, value: timeRangeAll[1] },
+                                            y: { scale: scales.y, value: level.start },
+                                            y2: { scale: scales.y, value: level.start },
+                                            stroke: { value: level.color },
+                                            strokeDash: { value: [1, 4] },
+                                            strokeCap: { value: "round" },
+                                            opacity: { value: 0.5 },
+                                            strokeOpacity: { value: 0.5 },
+                                            strokeWidth: {
+                                                value: 1.5,
+                                            },
+                                        },
+                                        update: {
+                                            x: { scale: scales.x, value: timeRangeAll[0] },
+                                            x2: { scale: scales.x, value: timeRangeAll[1] },
+                                            y: { scale: scales.y, value: level.start },
+                                            y2: { scale: scales.y, value: level.start },
+                                        },
+                                    },
+                                };
+                            });
+                    }
+
+                    return [];
+                })
+            );
+        };
+
+        const twelveHourMarks = () => {
+            if (!this.settings.mobile) {
+                return [];
+            }
+
+            if (!timeRangeAll) {
+                return [];
+            }
+
+            const timeRange = (timeRangeAll[1] - timeRangeAll[0]) / 1000;
+            if (timeRange > 86400 * 4) {
+                return [];
+            }
+
+            const marksStart = addDays(truncateTime(new Date(timeRangeAll[0])), -2);
+            const marksEnd = addDays(truncateTime(new Date(timeRangeAll[1])), 2);
+            const elapsed = marksEnd.getTime() - marksStart.getTime();
+            const halves = (elapsed / 1000 / 86400) * 2;
+
+            const scales = makeScales(0);
+
+            return [
+                {
+                    type: "group",
+                    clip: {
+                        path: { signal: "chart_clip" },
+                    },
+                    marks: _.range(0, halves)
+                        .map((i) => {
+                            return addSeconds(new Date(marksStart), i * (86400 / 2));
+                        })
+                        .map((mark) => {
+                            // console.log("viz:", mark, mark.getTime());
+
                             return {
                                 type: "rule",
-                                from: { data: makeDataName(i) },
                                 encode: {
                                     enter: {
-                                        x: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[0],
-                                        },
-                                        x2: {
-                                            scale: scales.x,
-                                            value: timeRangeAll[1],
-                                        },
-                                        y: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        y2: {
-                                            scale: scales.y,
-                                            value: level.start,
-                                        },
-                                        stroke: { value: level.color },
-                                        strokeDash: { value: [1, 4] },
-                                        strokeCap: { value: "round" },
-                                        opacity: { value: 0.1 },
-                                        strokeOpacity: { value: 0.1 },
-                                        strokeWidth: {
-                                            value: 1.5,
-                                        },
+                                        x: { scale: scales.x, value: mark.getTime() },
+                                        x2: { scale: scales.x, value: mark.getTime() },
+                                        y: { value: 0 },
+                                        y2: { signal: "height" },
+                                        stroke: { value: "#ddd" },
+                                        strokeWidth: { value: 1 },
+                                    },
+                                    update: {
+                                        x: { scale: scales.x, value: mark.getTime() },
+                                        x2: { scale: scales.x, value: mark.getTime() },
+                                        y: { value: 0 },
+                                        y2: { signal: "height" },
                                     },
                                 },
                             };
-                        });
-                }
-
-                return [];
-            })
-        );
+                        }),
+                },
+            ];
+        };
 
         const cellMarks = () => {
-            if (this.settings.tiny) {
+            if (this.settings.tiny || this.settings.mobile) {
                 return [];
             }
 
@@ -898,70 +996,25 @@ export class TimeSeriesSpecFactory {
                             }`,
                             },
                         },
+                        update: {
+                            path: { field: "layout_path" },
+                        },
                     },
                 },
             ];
         };
 
-        /*
-        console.log(seriesMarks.sort((a,b) => {
-            return getMarkSortIndex(a) - getMarkSortIndex(b);
-        }))
-        */
-
         const marks = [
             ...cellMarks(),
-            ...brushMarks,
-            ...ruleMarks,
+            ...brushMarks(),
+            ...ruleMarks(),
+            ...twelveHourMarks(),
             ...seriesMarks.sort((a, b) => {
                 return getMarkSortIndex(b) - getMarkSortIndex(a);
             }),
         ];
 
-        const interactiveSignals = [
-            {
-                name: "width",
-                init: "containerSize()[0]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[0]",
-                    },
-                ],
-            },
-            {
-                name: "height",
-                init: "containerSize()[1]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[1]",
-                    },
-                ],
-            },
-            {
-                name: "hover",
-                on: [
-                    {
-                        events: "@cell:mouseover",
-                        update: "datum",
-                    },
-                    {
-                        events: "@cell:mouseout",
-                        update: "null",
-                    },
-                ],
-            },
-            {
-                name: "unit",
-                value: {},
-                on: [
-                    {
-                        events: "mousemove",
-                        update: "isTuple(group()) ? group() : unit",
-                    },
-                ],
-            },
+        const brushSignals = [
             {
                 name: "brush",
                 update: 'vlSelectionResolve("brush_store", "union")',
@@ -997,34 +1050,6 @@ export class TimeSeriesSpecFactory {
                         },
                         update: "[brush_x[0], clamp(x(unit), 0, width)]",
                     },
-                    {
-                        events: {
-                            signal: "brush_scale_trigger",
-                        },
-                        update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
-                    },
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "dblclick",
-                            },
-                        ],
-                        update: "[0, 0]",
-                    },
-                    {
-                        events: {
-                            signal: "brush_translate_delta",
-                        },
-                        update:
-                            "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
-                    },
-                    {
-                        events: {
-                            signal: "brush_zoom_delta",
-                        },
-                        update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
-                    },
                 ],
             },
             {
@@ -1035,21 +1060,6 @@ export class TimeSeriesSpecFactory {
                             signal: "brush_x",
                         },
                         update: 'brush_x[0] === brush_x[1] ? null : invert("x", brush_x)',
-                    },
-                ],
-            },
-            {
-                name: "brush_scale_trigger",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                scale: "x",
-                            },
-                        ],
-                        update:
-                            '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
                     },
                 ],
             },
@@ -1077,82 +1087,6 @@ export class TimeSeriesSpecFactory {
                 ],
             },
             {
-                name: "brush_translate_anchor",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "mousedown",
-                                markname: "brush_brush",
-                            },
-                        ],
-                        update: "{x: x(unit), y: y(unit), extent_x: slice(brush_x)}",
-                    },
-                ],
-            },
-            {
-                name: "brush_translate_delta",
-                value: {},
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "window",
-                                type: "mousemove",
-                                consume: true,
-                                between: [
-                                    {
-                                        source: "view",
-                                        type: "mousedown",
-                                        markname: "brush_brush",
-                                    },
-                                    {
-                                        source: "window",
-                                        type: "mouseup",
-                                    },
-                                ],
-                            },
-                        ],
-                        update: "{x: brush_translate_anchor.x - x(unit), y: brush_translate_anchor.y - y(unit)}",
-                    },
-                ],
-            },
-            {
-                name: "brush_zoom_anchor",
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "wheel",
-                                consume: true,
-                                markname: "brush_brush",
-                            },
-                        ],
-                        update: "{x: x(unit), y: y(unit)}",
-                    },
-                ],
-            },
-            {
-                name: "brush_zoom_delta",
-                on: [
-                    {
-                        events: [
-                            {
-                                source: "view",
-                                type: "wheel",
-                                consume: true,
-                                markname: "brush_brush",
-                            },
-                        ],
-                        force: true,
-                        update: "pow(1.001, event.deltaY * pow(16, event.deltaMode))",
-                    },
-                ],
-            },
-            {
                 name: "brush_modify",
                 on: [
                     {
@@ -1163,7 +1097,178 @@ export class TimeSeriesSpecFactory {
                     },
                 ],
             },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
+            },
+            {
+                name: "chart_background",
+                value: "transparent",
+            },
         ];
+
+        const calculateDragLimits = () => {
+            const timeNow = new Date().getTime();
+            const endOffset = timeRangeAll ? timeRangeAll[1] - timeRangeAll[0] : 0;
+            if (timeRangeAll && dataEnd) {
+                if (timeRangeAll[0] > dataEnd || timeRangeAll[1] > dataEnd) {
+                    return { start: timeNow - endOffset, end: timeNow };
+                }
+            }
+            const start = dataEnd && timeRangeAll ? dataEnd - endOffset : timeNow;
+            const end = dataEnd || timeNow;
+            return { start, end };
+        };
+
+        const { start: dragMaximumStart, end: dragMaximumEnd } = calculateDragLimits();
+
+        const dragSignals = [
+            {
+                name: "down",
+                value: null,
+                on: [
+                    { events: "touchend", update: "null" },
+                    { events: "mousedown, touchstart", update: "xy()" },
+                ],
+            },
+            {
+                name: "drag_maximum_start",
+                value: dragMaximumStart,
+            },
+            {
+                name: "drag_maximum_end",
+                value: dragMaximumEnd,
+            },
+            {
+                name: "drag_delta",
+                value: [0, 0],
+                on: [
+                    {
+                        events: [
+                            {
+                                type: "touchmove",
+                                consume: true,
+                                filter: "event.touches.length === 1",
+                            },
+                        ],
+                        update: "down ? [down[0] - x(), y() - down[1]] : [0, 0]",
+                    },
+                ],
+            },
+            {
+                name: "drag_x",
+                value: [],
+                on: [
+                    {
+                        events: {
+                            signal: "drag_delta",
+                        },
+                        update: "[down[0] + drag_delta[0], down[1] + drag_delta[1]]",
+                    },
+                ],
+            },
+            {
+                name: "xcur",
+                value: xDomain || [0, 1],
+                on: [
+                    /*
+                    {
+                        events: "mousedown, touchstart, touchend",
+                        update: "slice(xdom)",
+                    },
+                    */
+                ],
+            },
+            {
+                name: "visible_times_calc",
+                value: xDomain || [0, 1],
+                on: [
+                    {
+                        events: { signal: "drag_delta" },
+                        update:
+                            "[ceil(min(xcur[0] + span(xcur) * drag_delta[0] / width, drag_maximum_start)), ceil(min(xcur[1] + span(xcur) * drag_delta[0] / width, drag_maximum_end))]",
+                    },
+                ],
+            },
+            {
+                name: "visible_times",
+                value: xDomain || [0, 1],
+                on: [
+                    {
+                        events: { signal: "visible_times_calc" },
+                        update: "visible_times_calc",
+                    },
+                ],
+            },
+            {
+                name: "drag_time",
+                on: [
+                    {
+                        events: {
+                            signal: "down",
+                        },
+                        update: "down === null ? visible_times : null",
+                    },
+                ],
+            },
+            {
+                name: "chart_background",
+                value: "transparent",
+                on: [
+                    {
+                        events: {
+                            signal: "down",
+                        },
+                        update: "down === null ? 'transparent' : '#efefef'",
+                    },
+                ],
+            },
+        ];
+
+        const containerSignals = () => {
+            return [
+                {
+                    name: "width",
+                    init: "containerSize()[0]",
+                    on: [
+                        {
+                            events: "window:resize",
+                            update: "containerSize()[0]",
+                        },
+                    ],
+                },
+                {
+                    name: "height",
+                    init: "containerSize()[1]",
+                    on: [
+                        {
+                            events: "window:resize",
+                            update: "containerSize()[1]",
+                        },
+                    ],
+                },
+                {
+                    name: "chart_clip_size",
+                    init: '[scale("x", visible_times[1]), containerSize()[1]]',
+                    on: [
+                        {
+                            events: { scale: "x" },
+                            update: '[scale("x", visible_times[1]), containerSize()[1]]',
+                        },
+                    ],
+                },
+                {
+                    name: "chart_clip",
+                    init: "'M 0 0 H ' + (chart_clip_size[0]) + ' V ' + (chart_clip_size[1]) + ' H 0 Z'",
+                    on: [
+                        {
+                            events: { signal: "chart_clip_size" },
+                            update: "'M 0 0 H ' + (chart_clip_size[0]) + ' V ' + (chart_clip_size[1]) + ' H 0 Z'",
+                        },
+                    ],
+                },
+            ];
+        };
 
         const staticSignals = [
             {
@@ -1176,36 +1281,79 @@ export class TimeSeriesSpecFactory {
                 name: "brush_x",
                 value: [],
             },
-        ];
-
-        const tinySignals = [
             {
-                name: "width",
-                init: "containerSize()[0]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[0]",
-                    },
-                ],
+                name: "visible_times_calc",
+                value: xDomain || [0, 1],
             },
             {
-                name: "height",
-                init: "containerSize()[1]",
-                on: [
-                    {
-                        events: "window:resize",
-                        update: "containerSize()[1]",
-                    },
-                ],
+                name: "visible_times",
+                value: xDomain || [0, 1],
             },
-            ...staticSignals,
+            {
+                name: "chart_background",
+                value: "transparent",
+            },
+            {
+                name: "drag_time",
+                value: null,
+            },
         ];
 
-        const allSignals = this.settings.tiny ? tinySignals : this.settings.size.w == 0 ? interactiveSignals : staticSignals;
+        const interactiveSignals = () => {
+            const standard = [
+                {
+                    name: "hover",
+                    on: [
+                        {
+                            events: "@cell:mouseover",
+                            update: "datum",
+                        },
+                        {
+                            events: "@cell:mouseout",
+                            update: "null",
+                        },
+                    ],
+                },
+                {
+                    name: "unit",
+                    value: {},
+                    on: [
+                        {
+                            events: "mousemove",
+                            update: "isTuple(group()) ? group() : unit",
+                        },
+                    ],
+                },
+            ];
+
+            if (this.brushable) {
+                return [...containerSignals(), ...standard, ...brushSignals];
+            }
+
+            if (this.draggable) {
+                return [...containerSignals(), ...standard, ...dragSignals];
+            }
+
+            throw new Error();
+        };
+
+        const allSignals = () => {
+            if (this.settings.tiny) {
+                const tinySignals = [...containerSignals(), ...staticSignals];
+                return tinySignals;
+            }
+
+            if (this.settings.size.w == 0) {
+                if (this.brushable || this.draggable) {
+                    return interactiveSignals();
+                }
+            }
+
+            return [...containerSignals(), ...staticSignals];
+        };
 
         return this.buildSpec(
-            allSignals as never[],
+            allSignals() as never[],
             data as never[],
             scales as never[],
             axes as never[],
@@ -1230,7 +1378,12 @@ export class TimeSeriesSpecFactory {
             description: "FK Time Series",
             padding: 5,
             config: {
-                background: "white",
+                background: "#ffffff",
+                group: {
+                    fill: {
+                        signal: "chart_background",
+                    },
+                },
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,

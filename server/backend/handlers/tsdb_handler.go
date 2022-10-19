@@ -66,9 +66,12 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, raw
 
 	if _, ok := v.stationIDs[provision.ID]; !ok {
 		station, err := v.stationRepository.QueryStationByDeviceID(ctx, provision.DeviceID)
-		if err != nil || station == nil {
-			log.Warnw("tsdb-handler:station-missing", "device_id", provision.DeviceID)
-			return fmt.Errorf("tsdb-handler:station-missing")
+		if err != nil {
+			return fmt.Errorf("tsdb-handler:querying station error: %w", err)
+		}
+		if station == nil {
+			log.Warnw("tsdb-handler:station-missing", "device_id", provision.DeviceID, "provision_id", provision.ID)
+			return fmt.Errorf("tsdb-handler:station-missing ")
 		}
 
 		v.stationIDs[provision.ID] = station.ID
@@ -207,7 +210,7 @@ func (v *TsDBHandler) flushTs(ctx context.Context) error {
 	err := v.publisher.Publish(ctx, &messages.SensorDataBatch{
 		BatchID: v.completions.Generate(),
 		Rows:    v.records,
-	})
+	}, jobs.WithLowerPriority())
 
 	v.records = v.records[:0]
 

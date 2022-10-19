@@ -118,7 +118,7 @@ func NewSagaRepository(dbpool *pgxpool.Pool) *SagaRepository {
 }
 
 func (r *SagaRepository) FindByID(ctx context.Context, id SagaID) (*Saga, error) {
-	all, err := r.findQuery(ctx, `SELECT id, version, created_at, updated_at, scheduled_at, tags, type, body FROM fieldkit.sagas WHERE id = $1`, id)
+	all, err := r.findQuery(ctx, `SELECT id, version, created_at, updated_at, scheduled_at, tags, type, body FROM fieldkit.sagas WHERE id = $1 FOR UPDATE`, id)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -63,6 +64,10 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 	return nil
 }
 
+var (
+	ErrEmptyRefresh = errors.New("empty refresh")
+)
+
 func (h *RefreshMaterializedViewsHandler) getRefreshSQL(ctx context.Context, m *messages.RefreshMaterializedView, view *storage.MaterializedView) (string, []interface{}, error) {
 	if m.Start.IsZero() || m.End.IsZero() {
 		return view.MakeRefreshAllSQL()
@@ -84,7 +89,13 @@ func (h *RefreshMaterializedViewsHandler) getRefreshSQL(ctx context.Context, m *
 	// NOTE: We may want this to eventually include the bin being overlapped
 	// with intentionally as part of the refresh policy.
 	if end.After(horizon) {
+		// Avoid 'refresh window too small' error from TsDB when refresh width
+		// is less than a single bucket width.
+		if horizon.Sub(start) < view.BucketWidth {
+			return "", nil, ErrEmptyRefresh
+		}
 		end = horizon
+
 	}
 
 	return view.MakeRefreshWindowSQL(start.UTC(), end.UTC())
@@ -101,9 +112,12 @@ func (h *RefreshMaterializedViewsHandler) RefreshView(ctx context.Context, m *me
 	for _, view := range h.tsConfig.MaterializedViews() {
 		if view.ShortName == m.View {
 			if sql, args, err := h.getRefreshSQL(ctx, m, view); err != nil {
-				return err
+				if err != ErrEmptyRefresh {
+					return err
+				}
+				log.Infow("refresh:empty", "start", m.Start, "end", m.End)
 			} else {
-				log.Infow("refreshing", "start", m.Start, "end", m.End, "sql", sql, "args", args)
+				log.Infow("refresh", "start", m.Start, "end", m.End, "sql", sql, "args", args)
 
 				if _, err := pgPool.Exec(ctx, sql, args...); err != nil {
 					return err
