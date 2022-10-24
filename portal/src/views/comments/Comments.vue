@@ -9,6 +9,7 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
+            :showRightLabel="user.admin || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -56,8 +57,12 @@
                                 :checked="newDataEvent.allProjectSensors"
                             />
                             <span class="radio-label">{{ $tc("comments.eventTypeSelector.allProjectSensors.radioLabel") }}</span>
-                            <p v-if="!isPartnerCustomisationEnabled()">{{ $tc("comments.eventTypeSelector.allProjectSensors.description") }}</p>
-                            <p v-if="isPartnerCustomisationEnabled()">{{ $tc("floodnet.comments.eventTypeSelector.allProjectSensors.description") }}</p>
+                            <p v-if="!isPartnerCustomisationEnabled()">
+                                {{ $tc("comments.eventTypeSelector.allProjectSensors.description") }}
+                            </p>
+                            <p v-if="isPartnerCustomisationEnabled()">
+                                {{ $tc("floodnet.comments.eventTypeSelector.allProjectSensors.description") }}
+                            </p>
                         </div>
                     </label>
                     <label for="allSensorsRadio">
@@ -71,8 +76,12 @@
                                 :checked="!newDataEvent.allProjectSensors"
                             />
                             <span class="radio-label">{{ $tc("comments.eventTypeSelector.justTheseSensors.radioLabel") }}</span>
-                            <p v-if="!isPartnerCustomisationEnabled()">{{ $tc("comments.eventTypeSelector.justTheseSensors.description") }}</p>
-                            <p v-if="isPartnerCustomisationEnabled()">{{ $tc("floodnet.comments.eventTypeSelector.justTheseSensors.description") }}</p>
+                            <p v-if="!isPartnerCustomisationEnabled()">
+                                {{ $tc("comments.eventTypeSelector.justTheseSensors.description") }}
+                            </p>
+                            <p v-if="isPartnerCustomisationEnabled()">
+                                {{ $tc("floodnet.comments.eventTypeSelector.justTheseSensors.description") }}
+                            </p>
                         </div>
                     </label>
                 </div>
@@ -120,7 +129,12 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" :placeholder="$tc('comments.commentForm.placeholder')" :saveLabel="$tc('comments.commentForm.saveLabel')" @save="save(newComment)" />
+                    <Tiptap
+                        v-model="newComment.body"
+                        :placeholder="$tc('comments.commentForm.placeholder')"
+                        :saveLabel="$tc('comments.commentForm.saveLabel')"
+                        @save="save(newComment)"
+                    />
                 </div>
             </template>
             <template v-else>
@@ -147,7 +161,9 @@
 
         <div class="list" v-if="postsAndEvents && postsAndEvents.length > 0">
             <div class="subheader">
-                <span class="comments-counter" v-if="viewType === 'project'">{{ postsAndEvents.length }} {{ $tc("comments.comments") }}</span>
+                <span class="comments-counter" v-if="viewType === 'project'">
+                    {{ postsAndEvents.length }} {{ $tc("comments.comments") }}
+                </span>
                 <header v-if="viewType === 'data'">{{ $tc("comments.dataHeader") }}</header>
             </div>
             <transition-group name="fade">
@@ -268,7 +284,7 @@ import CommonComponents from "@/views/shared";
 import moment from "moment";
 import { DataEventsErrorsEnum, NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
-import { CurrentUser } from "@/api";
+import { CurrentUser, ProjectUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
@@ -276,7 +292,7 @@ import { deserializeBookmark } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
-import { ActionTypes } from "@/store";
+import { ActionTypes, DisplayProject } from "@/store";
 import { isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
@@ -360,13 +376,30 @@ export default Vue.extend({
         },
     },
     async mounted(): Promise<void> {
+        const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+
+        if (projectId) {
+            await this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: projectId });
+            await this.$getters.projectsById[projectId];
+        }
         this.placeholder = this.getNewCommentPlaceholder();
+
         await this.getDataEvents();
         return this.getComments();
     },
     computed: {
         postsAndEvents(): DiscussionBase[] {
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
+        },
+        projectUser(): ProjectUser | null {
+            const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+
+            if (projectId) {
+                const displayProject = this.$getters.projectsById[projectId];
+                return displayProject?.users?.filter((user) => user.user.id === this.user?.id)[0];
+            }
+
+            return null;
         },
     },
     methods: {
@@ -532,8 +565,8 @@ export default Vue.extend({
         },
         async getDataEvents(): Promise<void> {
             if (typeof this.parentData === "number") {
-              this.dataEvents = [];
-              return;
+                this.dataEvents = [];
+                return;
             }
             this.isLoading = true;
             await this.$store
@@ -652,7 +685,7 @@ export default Vue.extend({
             return b.createdAt - a.createdAt;
         },
         isPartnerCustomisationEnabled(): boolean {
-          return isCustomisationEnabled();
+            return isCustomisationEnabled();
         },
     },
 });

@@ -1,11 +1,13 @@
 <template>
     <div class="section-toggle">
-        <hr class="toggle-hr">
+        <hr class="toggle-hr" />
         <div class="toggle-wrap">
             <div class="toggle-bg">
                 <div class="toggle-controls">
                     <a @click="toggleClickHandler($event, 'left')" :class="{ selected: matchSection('left') }">{{ leftLabel }}</a>
-                    <a @click="toggleClickHandler($event, 'right')" :class="{ selected: matchSection('right') }">{{ rightLabel }}</a>
+                    <a v-if="showRightLabel" @click="toggleClickHandler($event, 'right')" :class="{ selected: matchSection('right') }">
+                        {{ rightLabel }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -22,16 +24,20 @@ export default Vue.extend({
     props: {
         leftLabel: {
             type: String,
-            required: true
+            required: true,
         },
         rightLabel: {
             type: String,
-            required: true
+            required: true,
         },
         default: {
             type: String,
-            default: "left"
-        }
+            default: "left",
+        },
+        showRightLabel: {
+            type: Boolean,
+            required: false,
+        },
     },
     data(): {
         selectedSection: any;
@@ -47,17 +53,17 @@ export default Vue.extend({
         },
         matchSection(section) {
             return this.selectedSection === section;
-        }
-    }
+        },
+    },
 });
 </script>
 
 <style lang="scss" scoped>
-.toggle-wrap{
+.toggle-wrap {
     display: flex;
     justify-content: center;
 }
-.toggle-bg{
+.toggle-bg {
     background-color: none;
     border: 1px solid #d8dce0;
     border-radius: 25px;
@@ -65,7 +71,7 @@ export default Vue.extend({
     justify-content: center;
     display: flex;
     margin-bottom: 15px;
-    width: 18em;
+    //width: 18em;
     background-color: #fff;
     z-index: 100;
 }
