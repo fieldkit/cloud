@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	_ "net/http"
@@ -71,11 +72,12 @@ type Config struct {
 	PortalDomain  string `split_words:"true" default:""`
 	ApiHost       string `split_words:"true" default:""`
 
-	StatsdAddress string `split_words:"true" default:""`
-	Production    bool   `envconfig:"production"`
-	LoggingFull   bool   `envconfig:"logging_full"`
-	Workers       int    `split_words:"true" default:"1"`
-	Live          bool   `split_words:"true"`
+	StatsdAddress string   `split_words:"true" default:""`
+	Production    bool     `envconfig:"production"`
+	LoggingFull   bool     `envconfig:"logging_full"`
+	Workers       int      `split_words:"true" default:"0"`
+	Queues        []string `split_words:"true"`
+	Live          bool     `split_words:"true"`
 
 	AWSProfile        string   `envconfig:"aws_profile" default:"fieldkit" required:"true"`
 	Emailer           string   `split_words:"true" default:"default" required:"true"`
@@ -315,8 +317,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	log.Infow("starting", "workers", config.Workers, "live", config.Live)
-
 	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
 	workMap := backend.CreateMap(ctx, backend.NewBackgroundServices(database, pgxpool, metrics, &backend.FileArchives{
 		Ingestion: ingestionFiles,
@@ -324,12 +324,50 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		Exported:  exportedFiles,
 	}, qc, timeScaleConfig, locations))
 
-	workers, err := gue.NewWorkerPool(qc, workMap, config.Workers, gue.WithPoolLogger(gueLoggerAdapter))
-	if err != nil {
-		return nil, err
-	}
+	if config.Workers > 0 {
+		log.Infow("starting", "workers", config.Workers, "live", config.Live, "queue", "default")
 
-	go workers.Run(ctx)
+		workers, err := gue.NewWorkerPool(qc, workMap, config.Workers, gue.WithPoolLogger(gueLoggerAdapter))
+		if err != nil {
+			return nil, err
+		}
+
+		go workers.Run(ctx)
+	} else {
+		for _, queue := range config.Queues {
+			parts := strings.Split(queue, ":")
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("malformed-queue-configuration")
+			} else {
+				numberOfWorkers, err := strconv.Atoi(parts[1])
+				if err != nil {
+					return nil, err
+				}
+
+				if numberOfWorkers > 0 {
+					if len(parts[0]) > 0 {
+						log.Infow("starting", "live", config.Live, "workers", numberOfWorkers, "queue", parts[0])
+
+						workers, err := gue.NewWorkerPool(qc, workMap, numberOfWorkers, gue.WithPoolQueue(parts[0]), gue.WithPoolLogger(gueLoggerAdapter))
+						if err != nil {
+							return nil, err
+						}
+
+						go workers.Run(ctx)
+					} else {
+						log.Infow("starting", "live", config.Live, "workers", numberOfWorkers, "queue", "default")
+
+						workers, err := gue.NewWorkerPool(qc, workMap, numberOfWorkers, gue.WithPoolLogger(gueLoggerAdapter))
+						if err != nil {
+							return nil, err
+						}
+
+						go workers.Run(ctx)
+					}
+				}
+			}
+		}
+	}
 
 	return &Api{
 		services: services,
