@@ -473,5 +473,9 @@
                 }
             }
         }
+    },
+    "dataView": {
+        "computerTip": "For a better data analysis experience, view this data on your computer.",
+        "swipeTip": "Swipe the chart to see more data."
     }
 }

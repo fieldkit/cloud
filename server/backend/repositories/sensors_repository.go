@@ -40,3 +40,26 @@ func (r *SensorsRepository) AddSensor(ctx context.Context, key string) error {
 
 	return nil
 }
+
+func (r *SensorsRepository) QueryQueryingSpec(ctx context.Context) (*data.QueryingSpec, error) {
+	specs := []*data.SensorQueryingSpec{}
+	if err := r.db.SelectContext(ctx, &specs, `
+		SELECT
+			agg_sensor.id AS sensor_id, aggregation_function AS function
+		FROM
+			fieldkit.aggregated_sensor AS agg_sensor JOIN
+			fieldkit.sensor_meta AS sensor_meta ON (agg_sensor.key = sensor_meta.full_key)
+		`); err != nil {
+		return nil, err
+	}
+
+	mapped := make(map[int64]*data.SensorQueryingSpec)
+
+	for _, sensor := range specs {
+		mapped[sensor.SensorID] = sensor
+	}
+
+	return &data.QueryingSpec{
+		Sensors: mapped,
+	}, nil
+}

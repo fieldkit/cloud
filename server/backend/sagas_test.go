@@ -28,7 +28,7 @@ func TestQueryAndInsertSaga(t *testing.T) {
 
 	saga := jobs.NewSaga(jobs.WithID(id))
 
-	if err := saga.SetBody(ExampleSaga{Name: "Carla"}); err != nil {
+	if err := saga.SetBody(&ExampleSaga{Name: "Carla"}); err != nil {
 		assert.NoError(err)
 	}
 

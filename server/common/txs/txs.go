@@ -3,6 +3,10 @@ package txs
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/hashicorp/go-multierror"
 
@@ -23,12 +27,16 @@ type TransactionScope struct {
 	txs map[*pgxpool.Pool]pgx.Tx
 }
 
+func Logger(ctx context.Context) *zap.SugaredLogger {
+	return logging.Logger(ctx).Named("txs").Sugar()
+}
+
 func (scope *TransactionScope) Rollback(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx)
 
 	var errs *multierror.Error
-	for _, value := range scope.txs {
-		log.Infow("txs:rollback")
+	for pool, value := range scope.txs {
+		log.Infow("txs:rollback", "pool", getPoolDescription(pool))
 		errs = multierror.Append(errs, value.Rollback(ctx))
 	}
 
@@ -36,11 +44,11 @@ func (scope *TransactionScope) Rollback(ctx context.Context) error {
 }
 
 func (scope *TransactionScope) Commit(ctx context.Context) error {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx)
 
 	var errs *multierror.Error
-	for _, value := range scope.txs {
-		log.Infow("txs:commit")
+	for pool, value := range scope.txs {
+		log.Infow("txs:commit", "pool", getPoolDescription(pool))
 		errs = multierror.Append(errs, value.Commit(ctx))
 	}
 
@@ -70,8 +78,14 @@ var (
 	ErrNoScope = errors.New("no transaction scope")
 )
 
+func getPoolDescription(pool *pgxpool.Pool) string {
+	cfg := pool.Config().ConnConfig
+	hostParts := strings.Split(cfg.Host, ".")
+	return fmt.Sprintf("%s:%d/%s", hostParts[0], cfg.Port, cfg.Database)
+}
+
 func RequireTransaction(ctx context.Context, pool *pgxpool.Pool) (pgx.Tx, error) {
-	log := logging.Logger(ctx).Sugar()
+	log := Logger(ctx).With("pool", getPoolDescription(pool))
 
 	scope := ScopeIfAny(ctx)
 	if scope == nil {
@@ -103,7 +117,7 @@ type Queryable interface {
 func RequireQueryable(ctx context.Context, pool *pgxpool.Pool) (Queryable, error) {
 	if tx, err := RequireTransaction(ctx, pool); err != nil {
 		if err == ErrNoScope {
-			logging.Logger(ctx).Sugar().Warnw("txs:unscoped")
+			Logger(ctx).Warnw("txs:unscoped")
 			return pool, nil
 		}
 		return nil, err

@@ -274,7 +274,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	apiConfig := &api.ApiConfiguration{
 		ApiHost:       config.ApiHost,
-		ApiDomain:     config.ApiDomain,
 		SessionKey:    config.SessionKey,
 		MapboxToken:   config.MapboxToken,
 		Emailer:       config.Emailer,
@@ -331,13 +330,6 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 	}
 
 	go workers.Run(ctx)
-
-	serialized, err := gue.NewWorkerPool(qc, workMap, 1, gue.WithPoolLogger(gueLoggerAdapter), gue.WithPoolQueue("serialized"))
-	if err != nil {
-		return nil, err
-	}
-
-	go serialized.Run(ctx)
 
 	return &Api{
 		services: services,

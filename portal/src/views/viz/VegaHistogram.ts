@@ -28,7 +28,7 @@ export const VegaHistogram = Vue.extend({
             return this.viz.loadedDataSets.map((ds) => {
                 if (!ds.graphing) throw new Error(`viz: No data`);
                 const vizInfo = this.workspace.vizInfo(this.viz, ds);
-                return new SeriesData(ds.graphing.key, ds, ds.graphing, vizInfo);
+                return new SeriesData(ds.graphing.key, this.viz.visible, ds, ds.graphing, vizInfo);
             });
         },
         key(): string {

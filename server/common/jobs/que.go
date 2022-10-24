@@ -20,19 +20,17 @@ var (
 )
 
 type MessageContext struct {
-	ctx       context.Context
 	publisher MessagePublisher
 	handling  bool
 	tags      map[string][]string
 }
 
-func NewMessageContext(ctx context.Context, publisher MessagePublisher, handling *TransportMessage) *MessageContext {
+func NewMessageContext(publisher MessagePublisher, handling *TransportMessage) *MessageContext {
 	tags := make(map[string][]string)
 	if handling != nil {
 		tags = handling.Tags
 	}
 	return &MessageContext{
-		ctx:       ctx,
 		publisher: publisher,
 		handling:  handling != nil,
 		tags:      tags,
@@ -57,37 +55,37 @@ func (mc *MessageContext) SagaID() SagaID {
 	return ""
 }
 
-func (mc *MessageContext) Schedule(message interface{}, duration time.Duration) error {
-	return mc.publish(message, FromNowAt(duration))
+func (mc *MessageContext) Schedule(ctx context.Context, message interface{}, duration time.Duration) error {
+	return mc.publish(ctx, message, FromNowAt(duration))
 }
 
-func (mc *MessageContext) ScheduleAt(message interface{}, duration time.Time) error {
-	return mc.publish(message, At(duration))
+func (mc *MessageContext) ScheduleAt(ctx context.Context, message interface{}, duration time.Time) error {
+	return mc.publish(ctx, message, At(duration))
 }
 
-func (mc *MessageContext) Event(message interface{}, options ...PublishOption) error {
-	return mc.publish(message, options...)
+func (mc *MessageContext) Event(ctx context.Context, message interface{}, options ...PublishOption) error {
+	return mc.publish(ctx, message, options...)
 }
 
 func (mc *MessageContext) Publish(ctx context.Context, message interface{}, options ...PublishOption) error {
-	return mc.publish(message, options...)
+	return mc.publish(ctx, message, options...)
 }
 
-func (mc *MessageContext) Reply(message interface{}, options ...PublishOption) error {
+func (mc *MessageContext) Reply(ctx context.Context, message interface{}, options ...PublishOption) error {
 	if !mc.handling {
 		return fmt.Errorf("reply is only allowed from a handler")
 	}
-	return mc.publish(message, options...)
+	return mc.publish(ctx, message, options...)
 }
 
-func (mc *MessageContext) publish(message interface{}, options ...PublishOption) error {
+func (mc *MessageContext) publish(ctx context.Context, message interface{}, options ...PublishOption) error {
 	if mc.handling {
 		// Right now we prepend the WithTags option so that options after can
 		// affect the tags. For example, the PopSaga option requires the sagas
 		// tag to be populated.
 		options = append([]PublishOption{WithTags(mc.tags)}, options...)
 	}
-	return mc.publisher.Publish(mc.ctx, message, options...)
+	return mc.publisher.Publish(ctx, message, options...)
 }
 
 func (mc *MessageContext) StartSaga() SagaID {
@@ -155,6 +153,7 @@ func (p *QueMessagePublisher) Publish(ctx context.Context, message interface{}, 
 
 	job.RunAt = jobOptions.RunAt
 	job.Queue = jobOptions.Queue
+	job.Priority = jobOptions.Priority
 
 	bytes, err := json.Marshal(transport)
 	if err != nil {

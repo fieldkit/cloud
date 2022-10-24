@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"reflect"
 	"time"
 
@@ -92,7 +93,7 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	messageType := reflect.TypeOf(message)
 	name := messageType.Name()
 
-	work[name] = wrapTransactionScope(services.dbpool, wrapTransportMessage(services, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+	work[name] = wrapTransportMessage(services, wrapTransactionScope(func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		/*
 			v := reflect.New(messageType)
 			m := v.Interface()
@@ -105,6 +106,10 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 
 	log := Logger(ctx).Sugar()
 	log.Infow("work-map:register", "message_type", name)
+}
+
+func refreshMaterializedViews(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) (*RefreshMaterializedViewsHandler, error) {
+	return NewRefreshMaterializedViewsHandler(services.metrics, services.timeScaleConfig), nil
 }
 
 func ingestionReceived(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) (*IngestionReceivedHandler, error) {
@@ -189,6 +194,31 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 		return nil
 	})
 
+	Register(ctx, services, work, messages.RefreshAllMaterializedViews{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := refreshMaterializedViews(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.RefreshAllMaterializedViews{}
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
+				return err
+			}
+			return h.Start(ctx, m, mc)
+		}
+		return nil
+	})
+	Register(ctx, services, work, messages.RefreshMaterializedView{}, func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+		if h, err := refreshMaterializedViews(ctx, j, services, tm, mc); err != nil {
+			return err
+		} else {
+			m := &messages.RefreshMaterializedView{}
+			if err := json.Unmarshal(*tm.Body, m); err != nil {
+				return err
+			}
+			return h.RefreshView(ctx, m, mc)
+		}
+		return nil
+	})
+
 	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
 	Register(ctx, services, work, messages.ExportData{}, exportData)
 	Register(ctx, services, work, messages.SensorDataBatch{}, sensorDataBatch)
@@ -207,11 +237,15 @@ type WorkFailed struct {
 
 type OurTransportMessageFunc func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error
 
-func wrapTransactionScope(dbpool *pgxpool.Pool, next gue.WorkFunc) gue.WorkFunc {
-	return func(ctx context.Context, j *gue.Job) error {
+func wrapTransactionScope(h OurTransportMessageFunc) OurTransportMessageFunc {
+	return func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 		log := Logger(ctx).Sugar()
 
-		scopeCtx, scope := txs.NewTransactionScope(ctx, dbpool)
+		scopeCtx, scope := txs.NewTransactionScope(ctx, services.dbpool)
+
+		if _, err := txs.RequireTransaction(scopeCtx, services.dbpool); err != nil {
+			return err
+		}
 
 		ok := false
 
@@ -223,7 +257,7 @@ func wrapTransactionScope(dbpool *pgxpool.Pool, next gue.WorkFunc) gue.WorkFunc 
 			}
 		}()
 
-		if err := next(scopeCtx, j); err != nil {
+		if err := h(scopeCtx, j, services, tm, mc); err != nil {
 			return err
 		}
 
@@ -249,24 +283,28 @@ func wrapTransportMessage(services *BackgroundServices, h OurTransportMessageFun
 		messageCtx := logging.WithTaskID(logging.PushServiceTrace(ctx, transport.Trace...), transport.Id)
 		messageLog := Logger(messageCtx).Sugar()
 
-		mc := jobs.NewMessageContext(messageCtx, jobs.NewQueMessagePublisher(services.metrics, services.dbpool, services.que), transport)
+		mc := jobs.NewMessageContext(jobs.NewQueMessagePublisher(services.metrics, services.dbpool, services.que), transport)
 
 		err := h(messageCtx, j, services, transport, mc)
 		if err != nil {
-			messageLog.Errorw("error", "error", err)
+			if errors.Is(err, jobs.ErrNoOptimisticLock) {
+				messageLog.Warnw("error", "error", err)
+			} else {
+				messageLog.Errorw("error", "error", err)
 
-			if j.ErrorCount >= MaximumRetriesBeforeTrash {
-				messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
+				if j.ErrorCount >= MaximumRetriesBeforeTrash {
+					messageLog.Infow("giving-up", "message_type", transport.Package+"."+transport.Type)
 
-				failed := WorkFailed{
-					Work: transport,
+					failed := WorkFailed{
+						Work: transport,
+					}
+
+					if err := mc.Publish(ctx, &failed, jobs.ToQueue("errors")); err != nil {
+						return err
+					}
+
+					return nil
 				}
-
-				if err := mc.Publish(ctx, &failed, jobs.ToQueue("errors")); err != nil {
-					return err
-				}
-
-				return nil
 			}
 		}
 

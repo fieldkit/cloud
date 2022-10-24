@@ -88,6 +88,12 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 		return err
 	}
 
+	// We do this because we may be a part of a saga already and so we need to
+	// start a new one. Also, notice we do this before we start sending messages.
+	mc.StartSaga()
+
+	log.Infow("ingest-station:started", "new_saga_id", mc.SagaID())
+
 	body := StationIngestionSaga{
 		UserID:     m.UserID,
 		StationID:  m.StationID,
@@ -142,7 +148,6 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 				QueuedID: id,
 				UserID:   body.UserID,
 				Verbose:  false,
-				Refresh:  false,
 			},
 		}); err != nil {
 			return err
@@ -169,7 +174,7 @@ func (h *IngestStationHandler) markCompleted(ctx context.Context, mc *jobs.Messa
 		saga.Completed[queuedID] = true
 
 		if saga.IsCompleted() {
-			if err := mc.Event(&messages.StationIngested{
+			if err := mc.Event(ctx, &messages.StationIngested{
 				StationID: saga.StationID,
 				UserID:    saga.UserID,
 			}, jobs.PopSaga()); err != nil {

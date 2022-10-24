@@ -13,16 +13,13 @@ export FIELDKIT_ARCHIVER=default
 
 export FIELDKIT_WORKERS=5
 
-# export FIELDKIT_INFLUX_DB_URL=http://127.0.0.1:8086
-# export FIELDKIT_INFLUX_DB_USERNAME=admin
-# export FIELDKIT_INFLUX_DB_PASSWORD=asdfasdf
-# export FIELDKIT_INFLUX_DB_ORG=fk
-# export FIELDKIT_INFLUX_DB_BUCKET=sensors
-# export FIELDKIT_INFLUX_DB_TOKEN=RxdlPKjlsec_NdsTabjga3qNxBU0nAAGEuUMSZVcWX-_R3VXi1YTAtku5fZ5cO8LcbooNIh6qrmjrZRZNqVAOQ==
+# Most of the time, development should be fine using this when jumping from
+# working on a local machine to accessing that machine over the LAN for testing
+# mobile.
+export FIELDKIT_API_DOMAIN="{_:127\.0\.0\.1|192\.168\.0\.100}:8080"
 
-export FIELDKIT_API_DOMAIN=api.fklocal.org:8080
-export FIELDKIT_API_HOST=http://api.fklocal.org:8080
-export FIELDKIT_API_DOMAIN=127.0.0.1:8080
+
+# This may need adjustment for testing scenarios where the server returns a URL.
 export FIELDKIT_API_HOST=http://127.0.0.1:8080
 
 set -xe

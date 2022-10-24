@@ -56,10 +56,11 @@ type LastTimeRow struct {
 }
 
 type TimeScaleDBBackend struct {
-	config  *storage.TimeScaleDBConfig
-	db      *sqlxcache.DB
-	pool    *pgxpool.Pool
-	metrics *logging.Metrics
+	config    *storage.TimeScaleDBConfig
+	db        *sqlxcache.DB
+	pool      *pgxpool.Pool
+	metrics   *logging.Metrics
+	querySpec *data.QueryingSpec
 }
 
 type DataRow struct {
@@ -79,13 +80,15 @@ type DataRow struct {
 type SelectedAggregate struct {
 	Specifier  string
 	BucketSize int
+	DataEnd    *time.Time
 }
 
-func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB, metrics *logging.Metrics) (*TimeScaleDBBackend, error) {
+func NewTimeScaleDBBackend(config *storage.TimeScaleDBConfig, db *sqlxcache.DB, metrics *logging.Metrics, querySpec *data.QueryingSpec) (*TimeScaleDBBackend, error) {
 	return &TimeScaleDBBackend{
-		config:  config,
-		db:      db,
-		metrics: metrics,
+		config:    config,
+		db:        db,
+		metrics:   metrics,
+		querySpec: querySpec,
 	}, nil
 }
 
@@ -139,7 +142,7 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.Que
 
 	defer queryMetrics.Send()
 
-	log.Infow("tsdb:query-ranges", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "modules", ids.ModuleIDs, "sensors", ids.SensorIDs)
+	log.Infow("tsdb:query-ranges", "stations", qp.Stations, "modules", ids.ModuleIDs, "sensors", ids.SensorIDs)
 
 	pgRows, err := tsdb.pool.Query(ctx, `
 		SELECT
@@ -156,10 +159,9 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.Que
 			LAST(last_value, bucket_time) AS last_value
 		FROM fieldkit.sensor_data_24h
 		WHERE station_id = ANY($1) AND module_id = ANY($2) AND sensor_id = ANY($3)
-		AND (bucket_time, bucket_time + interval '1 year') OVERLAPS ($4, $5)
 		GROUP BY bucket_time, station_id, module_id, sensor_id
 		ORDER BY bucket_time
-		`, qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End)
+		`, qp.Stations, ids.ModuleIDs, ids.SensorIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -179,66 +181,82 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 
 	ArbitrarySamplesThreshold := 2000
 
+	// Query for the total ranges of the data, we'll need the end of the data
+	// for sure and this will also be useful if our query range is Eternity.
+	// Notice, that this used to filter the "range" by the queried range of
+	// times and this no longer happens.
 	ranges, err := tsdb.queryRanges(ctx, qp, ids)
 	if err != nil {
 		return nil, err
 	}
 
+	// No data.
 	if len(ranges) == 0 {
 		return nil, nil
 	}
 
+	// Ok, so let's calculate the start and end times of all the data, ignoring
+	// the queried ranges of time.
 	dataStart := MaxTime
 	dataEnd := MinTime
+	totalSamples := 0
+	for _, row := range ranges {
+		if row.DataStart.Before(dataStart) {
+			dataStart = row.DataStart
+		}
+		if row.DataEnd.After(dataEnd) {
+			dataEnd = row.DataEnd
+		}
+		totalSamples += row.BucketSamples
+	}
+	maybeDataEnd := &dataEnd
+	if *maybeDataEnd == MinTime {
+		maybeDataEnd = nil
+	}
+
+	log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples, "eternity", qp.Eternity)
+
+	// Initially the query start and end are the full data range. We adjust this
+	// if the queried range is finite.
+	queryStart := dataStart
+	queryEnd := dataEnd
 
 	// If we're querying for all the station's data then we need to narrow
 	// things down to the real range of time the station has data for and use
 	// that to determine which aggregate.
 	if qp.Eternity {
-		totalSamples := 0
-
-		for _, row := range ranges {
-			if row.DataStart.Before(dataStart) {
-				dataStart = row.DataStart
-			}
-			if row.DataEnd.After(dataEnd) {
-				dataEnd = row.DataEnd
-			}
-			totalSamples += row.BucketSamples
-		}
-
 		// This could be greatly improved. The idea here is that there's no point in
 		// picking one if we can easily query all of it at maximum resolution.
 		if totalSamples < ArbitrarySamplesThreshold {
-			log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "total_samples", totalSamples)
-
 			return &SelectedAggregate{
 				Specifier:  Window1m.Specifier,
 				BucketSize: Window1m.BucketSize(),
+				DataEnd:    maybeDataEnd,
 			}, nil
 		}
 	} else {
-		dataStart = qp.Start
-
-		if qp.EndOfTime {
-			dataEnd = time.Now().UTC()
+		// Use the start and end parameters as the query times.
+		now := time.Now().UTC()
+		queryStart = qp.Start
+		if qp.EndOfTime || qp.End.After(now) {
+			queryEnd = now
 		} else {
-			dataEnd = qp.End
+			queryEnd = qp.End
 		}
 	}
 
 	// This logic is primarily for sensors that are consistently producing data.
-	duration := dataEnd.Sub(dataStart)
+	duration := queryEnd.Sub(queryStart)
 	idealBucket := duration / 1000
 	nearestHour := idealBucket.Truncate(time.Hour)
 
-	log.Infow("tsdb:range", "start", dataStart, "end", dataEnd, "duration", duration, "ideal_bucket", idealBucket, "bucket_hour", nearestHour)
+	log.Infow("tsdb:range", "start", queryStart, "end", queryEnd, "duration", duration, "ideal_bucket", idealBucket, "bucket_hour", nearestHour)
 
 	selected := Window24h
 
 	for _, window := range TimeScaleWindows {
-		rows := window.CalculateMaximumRows(dataStart, dataEnd)
-		log.Infow("tsdb:preparing", "start", dataStart, "end", dataEnd, "window", window.Specifier, "rows", rows, "verbose", true)
+		rows := window.CalculateMaximumRows(queryStart, queryEnd)
+		log.Infow("tsdb:preparing", "start", queryStart, "end", queryEnd, "window", window.Specifier, "rows", rows, "verbose", true)
 
 		if rows < ArbitrarySamplesThreshold {
 			selected = window
@@ -248,6 +266,7 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 	return &SelectedAggregate{
 		Specifier:  selected.Specifier,
 		BucketSize: selected.BucketSize(),
+		DataEnd:    maybeDataEnd,
 	}, nil
 }
 
@@ -280,7 +299,10 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 
 func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
 	queriedData := &QueriedData{
-		Data: make([]*backend.DataRow, 0),
+		Data:          make([]*backend.DataRow, 0),
+		BucketSize:    0,
+		BucketSamples: 0,
+		DataEnd:       nil,
 	}
 
 	return queriedData, nil
@@ -361,12 +383,19 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	for _, row := range dataRows {
 		moduleID := ids.KeyToHardwareID[row.ModuleID]
 
+		value := &row.MaximumValue
+
+		sensorSpec := tsdb.querySpec.Sensors[row.SensorID]
+		if sensorSpec != nil && sensorSpec.Function == data.AverageFunctionName {
+			value = &row.AverageValue
+		}
+
 		dataRow := &backend.DataRow{
 			Time:         data.NumericWireTime(row.Time),
 			StationID:    &row.StationID,
 			ModuleID:     &moduleID,
 			SensorID:     &row.SensorID,
-			Value:        &row.MaximumValue, // TODO
+			Value:        value,
 			MinimumValue: &row.MinimumValue,
 			AverageValue: &row.AverageValue,
 			MaximumValue: &row.MaximumValue,
@@ -382,8 +411,10 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 	tsdb.metrics.RecordsViewed(len(backendRows))
 
 	queriedData := &QueriedData{
-		Data:       backendRows,
-		BucketSize: aggregate.BucketSize,
+		Data:          backendRows,
+		BucketSamples: len(backendRows),
+		BucketSize:    aggregate.BucketSize,
+		DataEnd:       data.NumericWireTimePtr(aggregate.DataEnd),
 	}
 
 	return queriedData, nil
@@ -688,7 +719,8 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 		if tailed != nil { // Just in case this station had an error.
 			allRows = append(allRows, tailed.Rows...)
 			stations[tailed.StationID] = &StationTailInfo{
-				BucketSize: tailed.BucketSize,
+				BucketSize:    tailed.BucketSize,
+				BucketSamples: len(tailed.Rows),
 			}
 		}
 	}

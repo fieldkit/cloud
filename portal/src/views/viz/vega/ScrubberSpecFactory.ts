@@ -10,14 +10,15 @@ export class ScrubberSpecFactory {
     create() {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
-        // We ignore extreme ranges here because of this.settings.timeRange
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
+        // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
         const interactiveMarks = () => {
             if (this.settings.mobile) {
                 return [];
             }
+
             return [
                 {
                     type: "rect",
@@ -171,6 +172,12 @@ export class ScrubberSpecFactory {
                 {
                     name: "table",
                     values: first.queried.data,
+                    transform: [
+                        {
+                            type: "filter",
+                            expr: "inrange(datum.time, visible_times)",
+                        },
+                    ],
                 },
                 {
                     name: "data_0",
@@ -178,7 +185,7 @@ export class ScrubberSpecFactory {
                     transform: [
                         {
                             type: "formula",
-                            expr: 'toDate(datum["time"])',
+                            expr: "toDate(datum.time)",
                             as: "time",
                         },
                     ],
@@ -247,6 +254,10 @@ export class ScrubberSpecFactory {
                 },
             ],
             signals: [
+                {
+                    name: "visible_times",
+                    value: timeRangeAll,
+                },
                 {
                     name: "width",
                     init: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
@@ -415,12 +426,14 @@ export class ScrubberSpecFactory {
                             },
                             update: "[clamp(x(unit), 0, width), brush_x[1]]",
                         },
+                        /*
                         {
                             events: {
                                 signal: "brush_scale_trigger",
                             },
                             update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
                         },
+                        */
                         {
                             events: [
                                 {
@@ -437,12 +450,14 @@ export class ScrubberSpecFactory {
                             update:
                                 "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                         },
+                        /*
                         {
                             events: {
                                 signal: "brush_zoom_delta",
                             },
                             update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
                         },
+                        */
                     ],
                 },
                 {
@@ -456,6 +471,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                /*
                 {
                     name: "brush_scale_trigger",
                     value: {},
@@ -471,6 +487,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                */
                 {
                     name: "brush_tuple",
                     on: [
@@ -540,6 +557,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                /*
                 {
                     name: "brush_zoom_anchor",
                     on: [
@@ -573,6 +591,7 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                */
                 {
                     name: "brush_modify",
                     on: [
@@ -792,7 +811,9 @@ export class ScrubberSpecFactory {
                 {
                     name: "x",
                     type: "time",
-                    domain: timeRangeAll,
+                    domain: {
+                        signal: "visible_times",
+                    },
                     range: [
                         0,
                         {

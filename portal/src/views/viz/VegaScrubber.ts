@@ -1,7 +1,7 @@
 import _ from "lodash";
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 
-import { Workspace, QueriedData, Scrubbers, TimeZoom, SeriesData, Graph } from "./viz";
+import { TimeRange, TimeZoom, SeriesData } from "./viz";
 
 import Scrubber from "./vega/Scrubber.vue";
 
@@ -11,36 +11,17 @@ export const VegaScrubber = Vue.extend({
         Scrubber,
     },
     props: {
-        scrubbers: {
-            type: Scrubbers,
+        allSeries: {
+            type: Array as PropType<SeriesData[]>,
             required: true,
         },
-        workspace: {
-            type: Workspace,
+        visible: {
+            type: Object as PropType<TimeRange>,
             required: true,
         },
-    },
-    computed: {
-        allSeries(): SeriesData[] | null {
-            const all = _.flatten(
-                this.scrubbers.rows.map((scrubber) => {
-                    if (!scrubber.data) throw new Error(`viz: No data`);
-                    const graph = scrubber.viz as Graph;
-                    return graph.loadedDataSets.map((ds) => {
-                        const vizInfo = this.workspace.vizInfo(graph, ds);
-                        if (ds.all == null) throw new Error("viz: Expected loaded data set");
-                        return new SeriesData(scrubber.data.key, ds, ds.all, vizInfo);
-                    });
-                })
-            );
-            // console.log("viz: scrubber:all", all, this.scrubbers);
-            return all;
-        },
-        visible(): number[] {
-            if (this.scrubbers.visible.isExtreme()) {
-                return this.scrubbers.timeRange.toArray();
-            }
-            return this.scrubbers.visible.toArray();
+        dragging: {
+            type: Boolean,
+            required: true,
         },
     },
     methods: {
@@ -53,7 +34,7 @@ export const VegaScrubber = Vue.extend({
     },
     template: `
         <div class="viz scrubber">
-            <Scrubber :series="allSeries" :visible="visible" @time-zoomed="raiseTimeZoomed" @event-clicked="eventClicked" v-if="allSeries.length > 0" />
+            <Scrubber :series="allSeries" :visible="visible" :dragging="dragging" @time-zoomed="raiseTimeZoomed" @event-clicked="eventClicked" v-if="allSeries.length > 0" />
         </div>
     `,
 });

@@ -34,6 +34,10 @@ const (
 )
 
 func PushServiceTrace(ctx context.Context, value ...string) context.Context {
+	if !IsServiceTraceEnabled() {
+		return ctx
+	}
+
 	existing := ServiceTrace(ctx)
 	narrowed := existing
 	for _, part := range value {

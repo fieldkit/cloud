@@ -335,7 +335,7 @@ export const ViewingControls = Vue.extend({
 
                 if (pickerType === "start") {
                     if (fromPicker.getTime() === rangeViz.start) {
-                        console.log("viz: swallow(same-start)");
+                        // console.log("viz: swallow(same-start)");
                         return;
                     }
 
@@ -345,7 +345,7 @@ export const ViewingControls = Vue.extend({
 
                 if (pickerType === "end") {
                     if (fromPicker.getTime() == rangeViz.end) {
-                        console.log("viz: swallow(same-end)");
+                        // console.log("viz: swallow(same-end)");
                         return;
                     }
 

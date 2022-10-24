@@ -89,7 +89,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 	}
 
 	if meta.Identity == nil {
-		return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID}
+		return nil, &MalformedMetaError{MetaRecordID: databaseRecord.ID, Malformed: "identity"}
 	}
 
 	allModules := make([]*DataMetaModule, 0)

@@ -2,6 +2,7 @@ package backend
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -12,9 +13,8 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-
 	"github.com/fieldkit/cloud/server/common/jobs"
+	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
 	"github.com/fieldkit/cloud/server/files"
 	"github.com/fieldkit/cloud/server/messages"
@@ -25,7 +25,6 @@ import (
 type IngestionSaga struct {
 	QueuedID  int64           `json:"queued_id"`
 	UserID    int32           `json:"user_id"`
-	Refresh   bool            `json:"refresh"`
 	StationID *int32          `json:"station_id"`
 	DataStart time.Time       `json:"data_start"`
 	DataEnd   time.Time       `json:"data_end"`
@@ -68,12 +67,11 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 	// start a new one.
 	mc.StartSaga()
 
-	log.Infow("ingestion-saga:started", "saga_id", mc.SagaID())
+	log.Infow("ingestion-saga: started", "saga_id", mc.SagaID())
 
 	body := IngestionSaga{
 		QueuedID:  m.QueuedID,
 		UserID:    m.UserID,
-		Refresh:   m.Refresh,
 		Required:  make(map[string]bool),
 		Completed: make(map[string]bool),
 	}
@@ -92,11 +90,13 @@ func (h *IngestionReceivedHandler) startSaga(ctx context.Context, m *messages.In
 }
 
 func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *IngestionSaga, mc *jobs.MessageContext) error {
+	log := Logger(ctx).Sugar()
+
 	now := time.Now()
 
 	// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
 	if mc.HasParentSaga() {
-		if err := mc.Event(&messages.IngestionCompleted{
+		if err := mc.Event(ctx, &messages.IngestionCompleted{
 			QueuedID:    saga.QueuedID,
 			CompletedAt: now,
 			StationID:   saga.StationID,
@@ -106,19 +106,8 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 		}, jobs.PopSaga()); err != nil {
 			return err
 		}
-	}
-
-	if saga.Refresh {
-		if err := mc.Event(&messages.SensorDataModified{
-			ModifiedAt:  now,
-			PublishedAt: now,
-			StationID:   saga.StationID,
-			UserID:      saga.UserID,
-			Start:       saga.DataStart,
-			End:         saga.DataEnd,
-		}, jobs.PopSaga()); err != nil {
-			return err
-		}
+	} else {
+		log.Infow("ingestion-saga: solo")
 	}
 
 	return nil
@@ -173,15 +162,31 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 		return fmt.Errorf("queued ingestion missing: %v", m.QueuedID)
 	}
 
-	if err := h.startSaga(ctx, m, mc); err != nil {
-		return err
-	}
-
 	i, err := ir.QueryByID(ctx, queued.IngestionID)
 	if err != nil {
 		return err
 	} else if i == nil {
 		return fmt.Errorf("ingestion missing: %v", queued.IngestionID)
+	}
+
+	sr := repositories.NewStationRepository(h.db)
+	if err != nil {
+		return err
+	}
+
+	station, err := sr.QueryStationByDeviceID(ctx, i.DeviceID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("ingestion:missing-station")
+		}
+		return err
+	}
+	if station == nil {
+		return fmt.Errorf("ingestion:missing-station")
+	}
+
+	if err := h.startSaga(ctx, m, mc); err != nil {
+		return err
 	}
 
 	log = log.With("device_id", i.DeviceID, "user_id", i.UserID, "saga_id", mc.SagaID())
@@ -202,7 +207,7 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 		// Not a huge fan of this. Feels better than PopSaga just silently ignoring.
 		if mc.HasParentSaga() {
-			if err := mc.Event(&messages.IngestionFailed{
+			if err := mc.Event(ctx, &messages.IngestionFailed{
 				QueuedID: m.QueuedID,
 			}, jobs.PopSaga()); err != nil {
 				return err

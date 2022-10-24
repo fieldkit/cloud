@@ -53,7 +53,7 @@ class Chart {
                 axisLabel
             );
 
-            return new SeriesData(data.key, new DataSetSeries(vizSensor, data), data, vizInfo);
+            return new SeriesData(data.key, data.timeRange, new DataSetSeries(vizSensor, data), data, vizInfo);
         });
 
         return this.finalize(allSeries);

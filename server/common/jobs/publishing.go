@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/vgarvardt/gue/v4"
 )
 
 const (
@@ -14,6 +16,7 @@ type JobOptions struct {
 	RunAt        time.Time
 	Queue        string
 	Untransacted bool
+	Priority     gue.JobPriority
 }
 
 type PublishOption func(*TransportMessage, *JobOptions) error
@@ -61,6 +64,20 @@ func PopSaga() PublishOption {
 	}
 }
 
+func WithHigherPriority() PublishOption {
+	return func(tm *TransportMessage, job *JobOptions) error {
+		job.Priority = -1
+		return nil
+	}
+}
+
+func WithLowerPriority() PublishOption {
+	return func(tm *TransportMessage, job *JobOptions) error {
+		job.Priority = 1
+		return nil
+	}
+}
+
 func Untransacted() PublishOption {
 	return func(tm *TransportMessage, job *JobOptions) error {
 		job.Untransacted = true
@@ -80,10 +97,6 @@ func ToQueue(queue string) PublishOption {
 		job.Queue = queue
 		return nil
 	}
-}
-
-func ToSerializedQueue() PublishOption {
-	return ToQueue("serialized")
 }
 
 func FromNowAt(duration time.Duration) PublishOption {

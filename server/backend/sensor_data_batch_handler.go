@@ -31,9 +31,12 @@ func NewSensorDataBatchHandler(metrics *logging.Metrics, publisher jobs.MessageP
 }
 
 func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorDataBatch, j *gue.Job, mc *jobs.MessageContext) error {
-	log := logging.Logger(ctx).Sugar()
+	log := logging.Logger(ctx).Sugar().With("saga_id", mc.SagaID(), "batch_id", m.BatchID)
 
 	batch := &pgx.Batch{}
+
+	dataStart := time.Time{}
+	dataEnd := time.Time{}
 
 	for _, row := range m.Rows {
 		sql := `INSERT INTO fieldkit.sensor_data (time, station_id, module_id, sensor_id, value)
@@ -41,9 +44,18 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 				ON CONFLICT (time, station_id, module_id, sensor_id)
 				DO UPDATE SET value = EXCLUDED.value`
 		batch.Queue(sql, row.Time, row.StationID, row.ModuleID, row.SensorID, row.Value)
+
+		if row.Time.Before(dataStart) || dataStart.IsZero() {
+			dataStart = row.Time
+		}
+		if row.Time.After(dataEnd) || dataEnd.IsZero() {
+			dataEnd = row.Time
+		}
 	}
 
-	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "saga_id", mc.SagaID())
+	batch.Queue(`INSERT INTO fieldkit.sensor_data_dirty (modified, data_start, data_end) VALUES ($1, $2, $3)`, time.Now(), dataStart, dataEnd)
+
+	log.Infow("tsdb-handler:flushing", "records", len(m.Rows), "data_start", dataStart, "data_end", dataEnd)
 
 	pool, err := h.tsConfig.Acquire(ctx)
 	if err != nil {
@@ -65,8 +77,10 @@ func (h *SensorDataBatchHandler) Handle(ctx context.Context, m *messages.SensorD
 		return fmt.Errorf("(tsdb-close) %w", err)
 	}
 
-	return mc.Reply(&messages.SensorDataBatchCommitted{
-		BatchID: m.BatchID,
-		Time:    time.Now(),
-	}, jobs.ToSerializedQueue())
+	return mc.Reply(ctx, &messages.SensorDataBatchCommitted{
+		Time:      time.Now(),
+		BatchID:   m.BatchID,
+		DataStart: dataStart,
+		DataEnd:   dataEnd,
+	})
 }
