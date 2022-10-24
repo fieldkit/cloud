@@ -361,7 +361,7 @@
         "loginToComment": {
             "part1": "You need to",
             "part2": "Log in",
-            "part3": "in order to leave comments or log events"
+            "part3": "in order to leave comments"
         },
         "actions": {
             "reply": "Reply",
@@ -380,11 +380,17 @@
         "eventTypeSelector": {
             "allProjectSensors": {
                 "radioLabel": "All Project Sensors",
-                "description": "People will see this event when viewing data for any stations belonging to the selected projects"
+                "description": {
+                    "fieldkit": "People will see this event when viewing data for any stations belonging to the selected projects",
+                    "floodnet": "People will see this event when viewing data for any sensors belonging to the selected projects"
+                }
             },
             "justTheseSensors": {
                 "radioLabel": "Just These Sensors",
-                "description": "People will see this event only when viewing data for the selected stations"
+                "description": {
+                    "fieldkit": "People will see this event only when viewing data for the selected stations",
+                    "floodnet": "People will see this event only when viewing data for the selected sensors"
+                }
             }
         },
         "eventForm": {
@@ -462,17 +468,7 @@
     "noRecentData": "No Recent Data",
     "floodnet": {
         "reportFlood": "Report a Flood",
-        "survey": "Community Flood Watch Project Survey",
-        "comments": {
-            "eventTypeSelector": {
-                "allProjectSensors": {
-                    "description": "People will see this event when viewing data for any sensors belonging to the selected projects"
-                },
-                "justTheseSensors": {
-                    "description": "People will see this event only when viewing data for the selected sensors"
-                }
-            }
-        }
+        "survey": "Community Flood Watch Project Survey"
     },
     "dataView": {
         "computerTip": "For a better data analysis experience, view this data on your computer.",

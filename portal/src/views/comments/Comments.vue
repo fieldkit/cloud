@@ -57,11 +57,8 @@
                                 :checked="newDataEvent.allProjectSensors"
                             />
                             <span class="radio-label">{{ $tc("comments.eventTypeSelector.allProjectSensors.radioLabel") }}</span>
-                            <p v-if="!isPartnerCustomisationEnabled()">
-                                {{ $tc("comments.eventTypeSelector.allProjectSensors.description") }}
-                            </p>
-                            <p v-if="isPartnerCustomisationEnabled()">
-                                {{ $tc("floodnet.comments.eventTypeSelector.allProjectSensors.description") }}
+                            <p>
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.description.")) }}
                             </p>
                         </div>
                     </label>
@@ -76,11 +73,8 @@
                                 :checked="!newDataEvent.allProjectSensors"
                             />
                             <span class="radio-label">{{ $tc("comments.eventTypeSelector.justTheseSensors.radioLabel") }}</span>
-                            <p v-if="!isPartnerCustomisationEnabled()">
-                                {{ $tc("comments.eventTypeSelector.justTheseSensors.description") }}
-                            </p>
-                            <p v-if="isPartnerCustomisationEnabled()">
-                                {{ $tc("floodnet.comments.eventTypeSelector.justTheseSensors.description") }}
+                            <p>
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.description.")) }}
                             </p>
                         </div>
                     </label>
@@ -293,7 +287,7 @@ import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
-import { isCustomisationEnabled } from "@/views/shared/partners";
+import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "Comments",
@@ -684,8 +678,8 @@ export default Vue.extend({
         sortRecent(a, b) {
             return b.createdAt - a.createdAt;
         },
-        isPartnerCustomisationEnabled(): boolean {
-            return isCustomisationEnabled();
+        interpolatePartner(baseString) {
+            return interpolatePartner(baseString);
         },
     },
 });
