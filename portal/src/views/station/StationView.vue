@@ -43,7 +43,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     <div>
@@ -365,7 +364,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-           // min-height: 192px;
             position: relative;
             border-radius: 2px;
             overflow: hidden;
