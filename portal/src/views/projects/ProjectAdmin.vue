@@ -187,6 +187,7 @@ export default Vue.extend({
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
+        // tooltip is shown via CSS on desktop, the js makes sure the tooltip doesn't overflow the screen on mobile
         showTooltip(ref: string): void {
             const refs = this.$refs[ref];
             const el = refs ? refs[0] : null;
