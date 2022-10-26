@@ -51,9 +51,15 @@
                 <div class="details-bottom">
                     <div class="details-team">
                         <div class="title">Team</div>
-                        <template v-for="projectUser in displayProject.users">
-                            <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" v-bind:key="projectUser.user.email" />
-                        </template>
+                        <div
+                            class="team-member"
+                            v-for="(projectUser, index) in displayProject.users"
+                            v-bind:key="projectUser.user.email"
+                            @mouseover="showTooltip('member-tooltip-' + index)"
+                        >
+                            <span :ref="'member-tooltip-' + index" class="member-name">{{ projectUser.user.name }}</span>
+                            <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" />
+                        </div>
                     </div>
                     <div class="details-modules">
                         <div class="title">Modules</div>
@@ -101,6 +107,7 @@ import Comments from "../comments/Comments.vue";
 import TeamManager from "./TeamManager.vue";
 import * as utils from "../../utilities";
 import { twitterCardMeta } from "@/social";
+import { isMobile } from "../../utilities";
 
 export default Vue.extend({
     name: "ProjectAdmin",
@@ -179,6 +186,29 @@ export default Vue.extend({
         },
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
+        },
+        showTooltip(ref: string): void {
+            const refs = this.$refs[ref];
+            const el = refs ? refs[0] : null;
+
+            if (!utils.isMobile() || !el) {
+                return;
+            }
+
+            const boundingRect = el.getBoundingClientRect();
+            const buffer = 15;
+            const elHalfWidth = boundingRect.width / 2;
+            const screenWidth = window.screen.availWidth;
+
+            if (boundingRect.left < 0 + buffer) {
+                el.style.left = elHalfWidth + "px";
+                el.style.right = "unset";
+            }
+
+            if (boundingRect.right > screenWidth) {
+                el.style.left = "unset";
+                el.style.right = -elHalfWidth + "px";
+            }
         },
     },
 });
@@ -341,6 +371,37 @@ export default Vue.extend({
     @include bp-down($xs) {
         flex-basis: 100%;
         margin-bottom: 15px;
+    }
+
+    .member-name {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.25s;
+        padding: 8px 16px;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
+        border: solid 1px #f4f5f7;
+        background-color: #fff;
+        font-size: 14px;
+        white-space: nowrap;
+        transform: translateX(-50%);
+        z-index: $z-index-top;
+        @include position(absolute, null null calc(-100% + 10px) 50%);
+
+        @include bp-down($sm) {
+            bottom: calc(-100% + 15px);
+        }
+    }
+}
+
+.team-member {
+    position: relative;
+
+    @include attention() {
+        .member-name {
+            visibility: visible;
+            opacity: 1;
+        }
     }
 }
 
