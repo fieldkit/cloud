@@ -145,9 +145,10 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 	} else {
 		if err := mc.Publish(ctx, &messages.ProcessIngestion{
 			messages.IngestionReceived{
-				QueuedID: id,
-				UserID:   body.UserID,
-				Verbose:  false,
+				QueuedID:    id,
+				IngestionID: &ingestion.ID,
+				UserID:      body.UserID,
+				Verbose:     false,
 			},
 		}); err != nil {
 			return err
