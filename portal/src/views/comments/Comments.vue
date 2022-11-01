@@ -9,7 +9,7 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
-            :showRightLabel="user.admin || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
+            :showToggle="(user && user.admin) || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
