@@ -209,7 +209,7 @@ export default Vue.extend({
                 }),
             ],
             onUpdate({ editor }) {
-                changed(editor.getJSON());
+              console.log("editor-update");
             },
             onBlur({ editor }) {
                 console.log("editor-blur");
@@ -233,7 +233,8 @@ export default Vue.extend({
             console.log("on-change", args);
         },
         onSave() {
-            if (this.editor && !this.editor.isEmpty) {
+          if (this.editor && !this.editor.isEmpty) {
+                this.$emit("input", this.editor.getJSON());
                 this.$emit("save");
             }
         },
