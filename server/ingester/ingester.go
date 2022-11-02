@@ -132,8 +132,9 @@ func NewIngesterHandler(ctx context.Context, o *IngesterOptions) http.Handler {
 			"device_name", headers.FkDeviceName, "blocks", headers.FkBlocks)
 
 		if err := o.Publisher.Publish(ctx, &messages.IngestionReceived{
-			QueuedID: queuedID,
-			UserID:   userID,
+			IngestionID: &ingestion.ID,
+			QueuedID:    queuedID,
+			UserID:      userID,
 		}); err != nil {
 			log.Warnw("publishing", "err", err)
 		}
