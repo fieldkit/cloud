@@ -176,31 +176,38 @@ func (r *RecordRepository) findMeta(ctx context.Context, provisionId, number int
 	return records[0], nil
 }
 
-func hasNaNs(dr *pb.DataRecord) bool {
+func acceptableJson(value float64) bool {
+	return !math.IsNaN(value) && !math.IsInf(value, 0)
+}
+
+func hasUnaccecptableJsonNumbers(dr *pb.DataRecord) bool {
 	for _, sg := range dr.Readings.SensorGroups {
 		for _, sr := range sg.Readings {
-			if math.IsNaN(float64(sr.Value)) {
+			if !acceptableJson(float64(sr.Value)) {
 				return true
 			}
 
 		}
 	}
+
 	return false
 }
 
 func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
-	if !hasNaNs(dr) {
+	if !hasUnaccecptableJsonNumbers(dr) {
 		return dr
 	}
+
 	for _, sg := range dr.Readings.SensorGroups {
 		newReadings := make([]*pb.SensorAndValue, 0, len(sg.Readings))
 		for _, sr := range sg.Readings {
-			if !math.IsNaN(float64(sr.Value)) {
+			if acceptableJson(float64(sr.Value)) {
 				newReadings = append(newReadings, sr)
 			}
 		}
 		sg.Readings = newReadings
 	}
+
 	return dr
 }
 
@@ -238,7 +245,6 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 		PB:           pb,
 	}
 
-	// TODO Sanitize
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
 		return nil, nil, fmt.Errorf("error setting data json: %w", err)
 	}
