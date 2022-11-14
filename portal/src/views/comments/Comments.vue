@@ -340,7 +340,7 @@ export default Vue.extend({
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
-                Id: typeof this.parentData === "number" ? this.parentData : null,
+                projectId: typeof this.parentData === "number" ? this.parentData : null,
                 bookmark: null,
                 body: "",
             },
