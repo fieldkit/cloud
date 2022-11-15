@@ -352,7 +352,7 @@ export default Vue.extend({
 }
 
 ::v-deep .view-type-container {
-    @include bp-down($xs) {
+    @include bp-down($sm) {
         top: 68px;
     }
 }
