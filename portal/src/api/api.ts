@@ -224,11 +224,6 @@ export class CurrentUser {
     tncDate: number;
 }
 
-export enum UserRolesEnum {
-    admin = "Administrator",
-    member = "Member",
-}
-
 export interface Project {
     description: string;
     goal: string;

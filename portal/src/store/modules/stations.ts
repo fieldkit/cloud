@@ -30,7 +30,6 @@ import {
 import { VizSensor, VizConfig } from "@/views/viz/viz";
 
 import * as d3 from "d3";
-import { UserState } from "@/store";
 
 export const NEED_SENSOR_META = "NEED_SENSOR_META";
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
@@ -553,9 +552,6 @@ const getters = {
     },
     mapped(state: StationsState): MappedStations | null {
         return state.mapped;
-    },
-    isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
-        return state.projectUsers[projectId].find((user) => user.user.id === userId);
     },
 };
 
