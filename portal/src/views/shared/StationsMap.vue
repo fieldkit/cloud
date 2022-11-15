@@ -115,6 +115,13 @@ export default Vue.extend({
             console.log("map: visible-readings");
             this.updateMap();
         },
+        showStations(): void {
+            if (!this.showStations) {
+                this.protectedData.map.setLayoutProperty("station-markers", "visibility", "none");
+                return;
+            }
+            this.protectedData.map.setLayoutProperty("station-markers", "visibility", "visible");
+        },
     },
     methods: {
         onMapInitialized(map: any): void {
