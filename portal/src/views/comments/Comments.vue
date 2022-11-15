@@ -191,6 +191,14 @@ export default Vue.extend({
             errorMessage: null,
         };
     },
+    computed: {
+        projectId(): number {
+            if (typeof this.parentData === "number") {
+                return this.parentData;
+            }
+            return this.parentData.p[0];
+        },
+    },
     watch: {
         parentData(): Promise<void> {
             return this.getComments();
@@ -200,6 +208,7 @@ export default Vue.extend({
         },
     },
     mounted(): Promise<void> {
+        console.log("radoi parent", this.parentData);
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
