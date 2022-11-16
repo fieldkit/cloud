@@ -585,8 +585,8 @@ export default Vue.extend({
                         event.bookmark,
                         event.createdAt,
                         event.updatedAt,
-                        JSON.parse(event.title),
-                        JSON.parse(event.description),
+                        event.title ? JSON.parse(event.title) : event.title,
+                        event.description ? JSON.parse(event.description) : event.description,
                         event.start,
                         event.end
                     )
