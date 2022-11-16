@@ -38,4 +38,5 @@ export interface GlobalGetters {
     isAuthenticated: boolean;
     isBusy: boolean;
     mapped: MappedStations;
+    isAdminForProject: { (userId: number, projectId: number): boolean };
 }

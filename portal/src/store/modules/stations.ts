@@ -553,6 +553,9 @@ const getters = {
     mapped(state: StationsState): MappedStations | null {
         return state.mapped;
     },
+    isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
+        return state.projectUsers[projectId].some((user) => user.user.id === userId);
+    },
 };
 
 const actions = (services: Services) => {

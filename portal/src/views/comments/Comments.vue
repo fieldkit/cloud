@@ -191,6 +191,17 @@ export default Vue.extend({
             errorMessage: null,
         };
     },
+    computed: {
+        projectId(): number {
+            if (typeof this.parentData === "number") {
+                return this.parentData;
+            }
+            return this.parentData.p[0];
+        },
+        isAdmin(): boolean {
+            return this.$getters.isAdminForProject(this.user.id, this.projectId);
+        },
+    },
     watch: {
         parentData(): Promise<void> {
             return this.getComments();
@@ -359,12 +370,16 @@ export default Vue.extend({
                 ];
             }
 
-            return [
-                {
-                    label: "Delete post",
-                    event: "delete-comment",
-                },
-            ];
+            if (this.isAdmin) {
+                return [
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [];
         },
         highlightComment() {
             this.$nextTick(() => {
