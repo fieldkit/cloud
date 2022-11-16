@@ -379,14 +379,20 @@
         },
         "eventTypeSelector": {
             "allProjectSensors": {
-                "radioLabel": "All Project Sensors",
+                "radioLabel": {
+                    "fieldkit": "All Project Stations",
+                    "floodnet": "All Project Sensors"
+                },
                 "description": {
                     "fieldkit": "People will see this event when viewing data for any stations belonging to the selected projects",
                     "floodnet": "People will see this event when viewing data for any sensors belonging to the selected projects"
                 }
             },
             "justTheseSensors": {
-                "radioLabel": "Just These Sensors",
+                "radioLabel": {
+                    "fieldkit": "Just These Stations",
+                    "floodnet": "Just These Sensors"
+                },
                 "description": {
                     "fieldkit": "People will see this event only when viewing data for the selected stations",
                     "floodnet": "People will see this event only when viewing data for the selected sensors"

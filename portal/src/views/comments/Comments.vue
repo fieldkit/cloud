@@ -56,7 +56,9 @@
                                 :value="true"
                                 :checked="newDataEvent.allProjectSensors"
                             />
-                            <span class="radio-label">{{ $tc("comments.eventTypeSelector.allProjectSensors.radioLabel") }}</span>
+                            <span class="radio-label">
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.radioLabel.")) }}
+                            </span>
                             <p>
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.description.")) }}
                             </p>
@@ -72,7 +74,9 @@
                                 :value="false"
                                 :checked="!newDataEvent.allProjectSensors"
                             />
-                            <span class="radio-label">{{ $tc("comments.eventTypeSelector.justTheseSensors.radioLabel") }}</span>
+                            <span class="radio-label">
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.radioLabel.")) }}
+                            </span>
                             <p>
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.description.")) }}
                             </p>
