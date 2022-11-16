@@ -253,15 +253,24 @@ func (ra *RecordAdder) Handle(ctx context.Context, pr *ParsedRecord) (warning er
 
 				ra.queue = append(ra.queue, pr)
 			} else {
-				// I'm not sure if this is entirely necessary, just better safe than sorry.
-				if ra.keyRecord != nil {
-					if err := ra.onMeta(ctx, ra.provision, ra.ingestion, ra.keyRecord.adjustRecordNumber(record), pr.DataRecord, pr.Bytes); err != nil {
-						return nil, err
+				// I'm wasn't sure if this is entirely necessary and added this
+				// in a better safe than sorry mentality and it seems to have
+				// been a mistake. Right now, the only way to end up here is if
+				// record is greater than 0, which will indicate a valid record
+				// number. So, there's no need to adjust it.
+				/*
+					if ra.keyRecord != nil {
+						if err := ra.onMeta(ctx, ra.provision, ra.ingestion, ra.keyRecord.adjustRecordNumber(record), pr.DataRecord, pr.Bytes); err != nil {
+							return nil, err
+						}
+					} else {
+						if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
+							return nil, err
+						}
 					}
-				} else {
-					if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
-						return nil, err
-					}
+				*/
+				if err := ra.onMeta(ctx, ra.provision, ra.ingestion, record, pr.DataRecord, pr.Bytes); err != nil {
+					return nil, err
 				}
 			}
 		} else {
