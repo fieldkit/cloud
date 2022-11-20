@@ -69,22 +69,16 @@
                     </div>
                 </div>
                 <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                    <div class="photo-container cursor-pointer" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                         <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                         <div v-else class="photo-placeholder">
                             <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                         </div>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
+                    <a @click="navigateToPhotos()" class="station-photos-nav cursor-pointer">
                         <i class="icon icon-grid"></i>
                         {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
+                    </a>
                 </div>
             </section>
 
@@ -296,6 +290,12 @@ export default Vue.extend({
         },
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
+        },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
         },
     },
 });
