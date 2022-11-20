@@ -1585,6 +1585,14 @@ class FKApi {
             url: this.baseUrl + `/bookmarks/resolve?${qp.toString()}`,
         });
     }
+
+    public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
+        return this.invoke({
+            auth: Auth.None,
+            method: "GET",
+            url: this.baseUrl + "/projects/station/" + id,
+        });
+    }
 }
 
 export default FKApi;

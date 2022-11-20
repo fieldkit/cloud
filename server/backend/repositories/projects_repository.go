@@ -153,3 +153,18 @@ func (pr *ProjectRepository) Delete(outerCtx context.Context, projectID int32) e
 		return nil
 	})
 }
+
+func (pr *ProjectRepository) QueryProjectsForStation(ctx context.Context, id int32) ([]*data.ProjectStation, error) {
+
+    projectStations := []*data.ProjectStation{}
+    	if err := pr.db.SelectContext(ctx, &projectStations, `
+    		SELECT
+    			ps.project_id, ps.station_id
+    		FROM fieldkit.project_station AS ps
+    		WHERE ps.station_id = $1
+    		`, id); err != nil {
+    		return nil, err
+    	}
+
+    return projectStations, nil
+}
