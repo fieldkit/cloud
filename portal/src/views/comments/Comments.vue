@@ -844,8 +844,11 @@ header {
             background-color: rgba(#f4f5f7, 0.55);
 
             .tiptap-container {
-                margin-top: 10px;
                 background-color: white;
+
+                &:nth-of-type(2) {
+                    margin-top: 10px;
+                }
             }
         }
     }
