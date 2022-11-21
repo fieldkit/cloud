@@ -36,8 +36,7 @@ export default Vue.extend({
         },
         showToggle: {
             type: Boolean,
-            default: true,
-            required: false,
+            required: true,
         },
     },
     data(): {
