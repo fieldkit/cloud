@@ -230,4 +230,8 @@ li {
         margin-top: 2px;
     }
 }
+
+#silentbox-overlay {
+    z-index: 9999 !important;
+}
 </style>

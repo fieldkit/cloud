@@ -19,16 +19,23 @@
                 </template>
             </DoubleHeader>
 
-            <div class="flex flex-wrap flex-space-between" v-if="media">
-                <div class="photo-wrap" v-for="photo in photos" v-bind:key="photo.key">
+            <silent-box :gallery="gallery">
+                <template v-slot:silentbox-item="{ silentboxItem }">
                     <button class="photo-options" v-if="!readOnly">
-                        <ListItemOptions :options="photoOptions" @listItemOptionClick="onPhotoOptionClick($event, photo)"></ListItemOptions>
+                        <ListItemOptions
+                            :options="photoOptions"
+                            @listItemOptionClick="
+                                $event.stop.prevent();
+                                onPhotoOptionClick($event, silentboxItem.photo);
+                            "
+                        ></ListItemOptions>
                     </button>
-                    <AuthenticatedPhoto :url="photo.url" :loading="photo.id === loadingPhotoId" />
-                </div>
-                <div v-if="photos.length === 0" class="empty-photos">
-                    {{ $t("station.emptyPhotos") }}
-                </div>
+                    <AuthenticatedPhoto :url="silentboxItem.photo.url" :loading="silentboxItem.photo.id === loadingPhotoId" />
+                </template>
+            </silent-box>
+
+            <div v-if="photos.length === 0" class="empty-photos">
+                {{ $t("station.emptyPhotos") }}
             </div>
         </div>
     </StandardLayout>
@@ -60,6 +67,10 @@ export default Vue.extend({
             return parseInt(this.$route.params.stationId, 10);
         },
         photos(): NoteMedia[] {
+            console.log("photos radoi", this.$state.notes.media);
+            if (!this.$state.notes.media) {
+                return [];
+            }
             return NoteMedia.onlyPhotos(this.$state.notes.media);
         },
         media(): PortalNoteMedia[] {
@@ -72,11 +83,19 @@ export default Vue.extend({
     data: (): {
         photoOptions: ListItemOption[];
         loadingPhotoId: number | null;
+        gallery: any;
     } => {
         return {
             photoOptions: [],
             loadingPhotoId: null,
+            gallery: [],
         };
+    },
+    watch: {
+        photos() {
+            console.log("radoi change");
+            this.initGallery();
+        },
     },
     methods: {
         async onPhotoOptionClick(event: string, photo: PortalNoteMedia) {
@@ -147,6 +166,16 @@ export default Vue.extend({
 
             reader.readAsDataURL(image);
         },
+        initGallery(): void {
+            this.photos.forEach((photo) => {
+                this.$services.api.loadMedia(photo["url"]).then((src) => {
+                    this.gallery.push({
+                        src: src,
+                        photo: photo,
+                    });
+                });
+            });
+        },
     },
     mounted() {
         this.photoOptions = [
@@ -170,35 +199,6 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "src/scss/mixins";
-
-.photo-wrap {
-    margin-top: 10px;
-    flex: 0 0 calc(50% - 5px);
-    position: relative;
-    min-height: 200px;
-    background-color: #e2e4e6;
-
-    &:nth-of-type(1) {
-        flex: 0 0 100%;
-        margin-top: 15px;
-    }
-
-    @include bp-down($xs) {
-        &:nth-of-type(even) {
-            ::v-deep .options-btns {
-                right: auto;
-            }
-        }
-    }
-
-    ::v-deep img {
-        width: 100%;
-        min-height: 200px;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 2px;
-    }
-}
 
 .photo-options {
     @include position(absolute, 20px 20px null null);
@@ -251,5 +251,38 @@ input[type="file"] {
 
 .empty-photos {
     margin-top: 10px;
+}
+
+#silentbox-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+::v-deep .silentbox-item {
+    position: relative;
+    margin-top: 10px;
+    flex: 0 0 calc(50% - 5px);
+
+    &:nth-of-type(1) {
+        flex: 0 0 100%;
+        margin-top: 15px;
+    }
+
+    @include bp-down($xs) {
+        &:nth-of-type(even) {
+            .options-btns {
+                right: auto;
+            }
+        }
+    }
+
+    img {
+        object-fit: cover;
+        border-radius: 2px;
+        width: 100%;
+        min-height: 200px;
+        max-height: 400px;
+    }
 }
 </style>
