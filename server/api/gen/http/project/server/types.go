@@ -183,22 +183,7 @@ type DownloadPhotoResponseBody struct {
 
 // GetProjectsForStationResponseBody is the type of the "project" service "get
 // projects for station" endpoint HTTP response body.
-type GetProjectsForStationResponseBody struct {
-	ID           int32                         `form:"id" json:"id" xml:"id"`
-	Name         string                        `form:"name" json:"name" xml:"name"`
-	Description  string                        `form:"description" json:"description" xml:"description"`
-	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
-	Location     string                        `form:"location" json:"location" xml:"location"`
-	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
-	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
-	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
-}
+type GetProjectsForStationResponseBody []*ProjectResponse
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
@@ -1916,6 +1901,36 @@ type ProjectFollowingResponseBody struct {
 	Following bool  `form:"following" json:"following" xml:"following"`
 }
 
+// ProjectResponse is used to define fields on response body types.
+type ProjectResponse struct {
+	ID           int32                     `form:"id" json:"id" xml:"id"`
+	Name         string                    `form:"name" json:"name" xml:"name"`
+	Description  string                    `form:"description" json:"description" xml:"description"`
+	Goal         string                    `form:"goal" json:"goal" xml:"goal"`
+	Location     string                    `form:"location" json:"location" xml:"location"`
+	Tags         string                    `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                     `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                   `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                   `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                   `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                      `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                      `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponse    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponse `form:"following" json:"following" xml:"following"`
+}
+
+// ProjectBoundsResponse is used to define fields on response body types.
+type ProjectBoundsResponse struct {
+	Min []float64 `form:"min" json:"min" xml:"min"`
+	Max []float64 `form:"max" json:"max" xml:"max"`
+}
+
+// ProjectFollowingResponse is used to define fields on response body types.
+type ProjectFollowingResponse struct {
+	Total     int32 `form:"total" json:"total" xml:"total"`
+	Following bool  `form:"following" json:"following" xml:"following"`
+}
+
 // ProjectBoundsRequestBodyRequestBody is used to define fields on request body
 // types.
 type ProjectBoundsRequestBodyRequestBody struct {
@@ -2099,26 +2114,10 @@ func NewDownloadPhotoResponseBody(res *projectviews.DownloadedPhotoView) *Downlo
 
 // NewGetProjectsForStationResponseBody builds the HTTP response body from the
 // result of the "get projects for station" endpoint of the "project" service.
-func NewGetProjectsForStationResponseBody(res *projectviews.ProjectView) *GetProjectsForStationResponseBody {
-	body := &GetProjectsForStationResponseBody{
-		ID:           *res.ID,
-		Name:         *res.Name,
-		Description:  *res.Description,
-		Goal:         *res.Goal,
-		Location:     *res.Location,
-		Tags:         *res.Tags,
-		Privacy:      *res.Privacy,
-		StartTime:    res.StartTime,
-		EndTime:      res.EndTime,
-		Photo:        res.Photo,
-		ReadOnly:     *res.ReadOnly,
-		ShowStations: *res.ShowStations,
-	}
-	if res.Bounds != nil {
-		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
-	}
-	if res.Following != nil {
-		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
+func NewGetProjectsForStationResponseBody(res []*project.Project) GetProjectsForStationResponseBody {
+	body := make([]*ProjectResponse, len(res))
+	for i, val := range res {
+		body[i] = marshalProjectProjectToProjectResponse(val)
 	}
 	return body
 }

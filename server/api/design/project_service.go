@@ -636,7 +636,7 @@ var _ = Service("project", func() {
     			Attribute("token", String)
     		})
 
-    		Result(Project)
+    		Result(Projects)
 
     		HTTP(func() {
     			GET("projects/station/{id}")

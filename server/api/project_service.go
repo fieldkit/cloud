@@ -1018,7 +1018,7 @@ func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.Fo
 	}, nil
 }
 
-func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *project.GetProjectsForStationPayload) ([]*data.Project, error) {
+func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *project.GetProjectsForStationPayload) ([]*project.Project, error) {
 
 	pr := repositories.NewProjectRepository(c.options.Database)
 
@@ -1026,6 +1026,28 @@ func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *pro
     	if err != nil {
     		return nil, err
     	}
+
+    projectsCollection := make([]*project.Project, len(projects))
+        for i, project := range projects {
+            numberOfFollowers := findNumberOfFollowers(followers, project.ID)
+            if rel, ok := relationships[project.ID]; ok {
+                project, err := ProjectType(signer, project, numberOfFollowers, rel)
+                if err != nil {
+                    return nil, err
+                }
+                projectsCollection[i] = project
+            } else {
+                project, err := ProjectType(signer, project, numberOfFollowers, &data.UserProjectRelationship{})
+                if err != nil {
+                    return nil, err
+                }
+                projectsCollection[i] = project
+            }
+        }
+
+        return &project.Projects{
+            Projects: projectsCollection,
+        }, nil
 
 	return projects, nil
 }

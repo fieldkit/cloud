@@ -2610,9 +2610,9 @@ func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter)
 // returned by the project get projects for station endpoint.
 func EncodeGetProjectsForStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*projectviews.Project)
+		res := v.([]*project.Project)
 		enc := encoder(ctx, w)
-		body := NewGetProjectsForStationResponseBody(res.Projected)
+		body := NewGetProjectsForStationResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
@@ -2827,6 +2827,65 @@ func unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Proje
 	res.Max = make([]float64, len(v.Max))
 	for i, val := range v.Max {
 		res.Max[i] = val
+	}
+
+	return res
+}
+
+// marshalProjectProjectToProjectResponse builds a value of type
+// *ProjectResponse from a value of type *project.Project.
+func marshalProjectProjectToProjectResponse(v *project.Project) *ProjectResponse {
+	res := &ProjectResponse{
+		ID:           v.ID,
+		Name:         v.Name,
+		Description:  v.Description,
+		Goal:         v.Goal,
+		Location:     v.Location,
+		Tags:         v.Tags,
+		Privacy:      v.Privacy,
+		StartTime:    v.StartTime,
+		EndTime:      v.EndTime,
+		Photo:        v.Photo,
+		ReadOnly:     v.ReadOnly,
+		ShowStations: v.ShowStations,
+	}
+	if v.Bounds != nil {
+		res.Bounds = marshalProjectProjectBoundsToProjectBoundsResponse(v.Bounds)
+	}
+	if v.Following != nil {
+		res.Following = marshalProjectProjectFollowingToProjectFollowingResponse(v.Following)
+	}
+
+	return res
+}
+
+// marshalProjectProjectBoundsToProjectBoundsResponse builds a value of type
+// *ProjectBoundsResponse from a value of type *project.ProjectBounds.
+func marshalProjectProjectBoundsToProjectBoundsResponse(v *project.ProjectBounds) *ProjectBoundsResponse {
+	res := &ProjectBoundsResponse{}
+	if v.Min != nil {
+		res.Min = make([]float64, len(v.Min))
+		for i, val := range v.Min {
+			res.Min[i] = val
+		}
+	}
+	if v.Max != nil {
+		res.Max = make([]float64, len(v.Max))
+		for i, val := range v.Max {
+			res.Max[i] = val
+		}
+	}
+
+	return res
+}
+
+// marshalProjectProjectFollowingToProjectFollowingResponse builds a value of
+// type *ProjectFollowingResponse from a value of type
+// *project.ProjectFollowing.
+func marshalProjectProjectFollowingToProjectFollowingResponse(v *project.ProjectFollowing) *ProjectFollowingResponse {
+	res := &ProjectFollowingResponse{
+		Total:     v.Total,
+		Following: v.Following,
 	}
 
 	return res

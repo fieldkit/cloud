@@ -22,6 +22,7 @@ import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddUpdateRequest instantiates a HTTP request object with method and
@@ -3249,13 +3250,17 @@ func DecodeGetProjectsForStationResponse(decoder func(*http.Response) goahttp.De
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
 			}
-			p := NewGetProjectsForStationProjectOK(&body)
-			view := "default"
-			vres := &projectviews.Project{Projected: p, View: view}
-			if err = projectviews.ValidateProject(vres); err != nil {
+			for _, e := range body {
+				if e != nil {
+					if err2 := ValidateProjectResponse(e); err2 != nil {
+						err = goa.MergeErrors(err, err2)
+					}
+				}
+			}
+			if err != nil {
 				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
 			}
-			res := project.NewProject(vres)
+			res := NewGetProjectsForStationProjectOK(body)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -3441,6 +3446,57 @@ func marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Project
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
+	}
+
+	return res
+}
+
+// unmarshalProjectResponseToProjectProject builds a value of type
+// *project.Project from a value of type *ProjectResponse.
+func unmarshalProjectResponseToProjectProject(v *ProjectResponse) *project.Project {
+	res := &project.Project{
+		ID:           *v.ID,
+		Name:         *v.Name,
+		Description:  *v.Description,
+		Goal:         *v.Goal,
+		Location:     *v.Location,
+		Tags:         *v.Tags,
+		Privacy:      *v.Privacy,
+		StartTime:    v.StartTime,
+		EndTime:      v.EndTime,
+		Photo:        v.Photo,
+		ReadOnly:     *v.ReadOnly,
+		ShowStations: *v.ShowStations,
+	}
+	res.Bounds = unmarshalProjectBoundsResponseToProjectProjectBounds(v.Bounds)
+	res.Following = unmarshalProjectFollowingResponseToProjectProjectFollowing(v.Following)
+
+	return res
+}
+
+// unmarshalProjectBoundsResponseToProjectProjectBounds builds a value of type
+// *project.ProjectBounds from a value of type *ProjectBoundsResponse.
+func unmarshalProjectBoundsResponseToProjectProjectBounds(v *ProjectBoundsResponse) *project.ProjectBounds {
+	res := &project.ProjectBounds{}
+	res.Min = make([]float64, len(v.Min))
+	for i, val := range v.Min {
+		res.Min[i] = val
+	}
+	res.Max = make([]float64, len(v.Max))
+	for i, val := range v.Max {
+		res.Max[i] = val
+	}
+
+	return res
+}
+
+// unmarshalProjectFollowingResponseToProjectProjectFollowing builds a value of
+// type *project.ProjectFollowing from a value of type
+// *ProjectFollowingResponse.
+func unmarshalProjectFollowingResponseToProjectProjectFollowing(v *ProjectFollowingResponse) *project.ProjectFollowing {
+	res := &project.ProjectFollowing{
+		Total:     *v.Total,
+		Following: *v.Following,
 	}
 
 	return res

@@ -185,22 +185,7 @@ type DownloadPhotoResponseBody struct {
 
 // GetProjectsForStationResponseBody is the type of the "project" service "get
 // projects for station" endpoint HTTP response body.
-type GetProjectsForStationResponseBody struct {
-	ID           *int32                        `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name         *string                       `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Description  *string                       `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Goal         *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
-	Location     *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Tags         *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Privacy      *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
-	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly     *bool                         `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
-	ShowStations *bool                         `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
-	Bounds       *ProjectBoundsResponseBody    `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
-	Following    *ProjectFollowingResponseBody `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
-}
+type GetProjectsForStationResponseBody []*ProjectResponse
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
@@ -1925,6 +1910,36 @@ type ProjectBoundsRequestBodyRequestBody struct {
 	Max []float64 `form:"max" json:"max" xml:"max"`
 }
 
+// ProjectResponse is used to define fields on response body types.
+type ProjectResponse struct {
+	ID           *int32                    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name         *string                   `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Description  *string                   `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal         *string                   `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location     *string                   `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags         *string                   `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Privacy      *int32                    `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
+	StartTime    *string                   `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                   `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                   `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     *bool                     `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	ShowStations *bool                     `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
+	Bounds       *ProjectBoundsResponse    `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
+	Following    *ProjectFollowingResponse `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
+}
+
+// ProjectBoundsResponse is used to define fields on response body types.
+type ProjectBoundsResponse struct {
+	Min []float64 `form:"min,omitempty" json:"min,omitempty" xml:"min,omitempty"`
+	Max []float64 `form:"max,omitempty" json:"max,omitempty" xml:"max,omitempty"`
+}
+
+// ProjectFollowingResponse is used to define fields on response body types.
+type ProjectFollowingResponse struct {
+	Total     *int32 `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
+	Following *bool  `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
+}
+
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the
 // "add update" endpoint of the "project" service.
 func NewAddUpdateRequestBody(p *project.AddUpdatePayload) *AddUpdateRequestBody {
@@ -3481,24 +3496,11 @@ func NewDownloadPhotoBadRequest(body *DownloadPhotoBadRequestResponseBody) *goa.
 
 // NewGetProjectsForStationProjectOK builds a "project" service "get projects
 // for station" endpoint result from a HTTP "OK" response.
-func NewGetProjectsForStationProjectOK(body *GetProjectsForStationResponseBody) *projectviews.ProjectView {
-	v := &projectviews.ProjectView{
-		ID:           body.ID,
-		Name:         body.Name,
-		Description:  body.Description,
-		Goal:         body.Goal,
-		Location:     body.Location,
-		Tags:         body.Tags,
-		Privacy:      body.Privacy,
-		StartTime:    body.StartTime,
-		EndTime:      body.EndTime,
-		Photo:        body.Photo,
-		ReadOnly:     body.ReadOnly,
-		ShowStations: body.ShowStations,
+func NewGetProjectsForStationProjectOK(body []*ProjectResponse) []*project.Project {
+	v := make([]*project.Project, len(body))
+	for i, val := range body {
+		v[i] = unmarshalProjectResponseToProjectProject(val)
 	}
-	v.Bounds = unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView(body.Bounds)
-	v.Following = unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(body.Following)
-
 	return v
 }
 
@@ -5899,6 +5901,78 @@ func ValidateProjectBoundsRequestBodyRequestBody(body *ProjectBoundsRequestBodyR
 	}
 	if body.Max == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
+	}
+	return
+}
+
+// ValidateProjectResponse runs the validations defined on ProjectResponse
+func ValidateProjectResponse(body *ProjectResponse) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Description == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
+	}
+	if body.Goal == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("goal", "body"))
+	}
+	if body.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
+	}
+	if body.Privacy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("privacy", "body"))
+	}
+	if body.Tags == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "body"))
+	}
+	if body.ReadOnly == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "body"))
+	}
+	if body.ShowStations == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("showStations", "body"))
+	}
+	if body.Bounds == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bounds", "body"))
+	}
+	if body.Following == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
+	}
+	if body.Bounds != nil {
+		if err2 := ValidateProjectBoundsResponse(body.Bounds); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if body.Following != nil {
+		if err2 := ValidateProjectFollowingResponse(body.Following); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectBoundsResponse runs the validations defined on
+// ProjectBoundsResponse
+func ValidateProjectBoundsResponse(body *ProjectBoundsResponse) (err error) {
+	if body.Min == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("min", "body"))
+	}
+	if body.Max == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
+	}
+	return
+}
+
+// ValidateProjectFollowingResponse runs the validations defined on
+// ProjectFollowingResponse
+func ValidateProjectFollowingResponse(body *ProjectFollowingResponse) (err error) {
+	if body.Total == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total", "body"))
+	}
+	if body.Following == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
 	}
 	return
 }
