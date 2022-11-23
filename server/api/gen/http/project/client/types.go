@@ -183,6 +183,25 @@ type DownloadPhotoResponseBody struct {
 	Body        []byte  `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
+// GetProjectsForStationResponseBody is the type of the "project" service "get
+// projects for station" endpoint HTTP response body.
+type GetProjectsForStationResponseBody struct {
+	ID           *int32                        `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name         *string                       `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Description  *string                       `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Goal         *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
+	Location     *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	Tags         *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
+	Privacy      *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     *bool                         `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
+	ShowStations *bool                         `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
+	Following    *ProjectFollowingResponseBody `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
+}
+
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
 type AddUpdateUnauthorizedResponseBody struct {
@@ -1760,6 +1779,82 @@ type DownloadPhotoNotFoundResponseBody struct {
 // DownloadPhotoBadRequestResponseBody is the type of the "project" service
 // "download photo" endpoint HTTP response body for the "bad-request" error.
 type DownloadPhotoBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetProjectsForStationUnauthorizedResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "unauthorized" error.
+type GetProjectsForStationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetProjectsForStationForbiddenResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "forbidden" error.
+type GetProjectsForStationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetProjectsForStationNotFoundResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "not-found" error.
+type GetProjectsForStationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetProjectsForStationBadRequestResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "bad-request" error.
+type GetProjectsForStationBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -3372,6 +3467,89 @@ func NewDownloadPhotoNotFound(body *DownloadPhotoNotFoundResponseBody) *goa.Serv
 // NewDownloadPhotoBadRequest builds a project service download photo endpoint
 // bad-request error.
 func NewDownloadPhotoBadRequest(body *DownloadPhotoBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetProjectsForStationProjectOK builds a "project" service "get projects
+// for station" endpoint result from a HTTP "OK" response.
+func NewGetProjectsForStationProjectOK(body *GetProjectsForStationResponseBody) *projectviews.ProjectView {
+	v := &projectviews.ProjectView{
+		ID:           body.ID,
+		Name:         body.Name,
+		Description:  body.Description,
+		Goal:         body.Goal,
+		Location:     body.Location,
+		Tags:         body.Tags,
+		Privacy:      body.Privacy,
+		StartTime:    body.StartTime,
+		EndTime:      body.EndTime,
+		Photo:        body.Photo,
+		ReadOnly:     body.ReadOnly,
+		ShowStations: body.ShowStations,
+	}
+	v.Bounds = unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView(body.Bounds)
+	v.Following = unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(body.Following)
+
+	return v
+}
+
+// NewGetProjectsForStationUnauthorized builds a project service get projects
+// for station endpoint unauthorized error.
+func NewGetProjectsForStationUnauthorized(body *GetProjectsForStationUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetProjectsForStationForbidden builds a project service get projects for
+// station endpoint forbidden error.
+func NewGetProjectsForStationForbidden(body *GetProjectsForStationForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetProjectsForStationNotFound builds a project service get projects for
+// station endpoint not-found error.
+func NewGetProjectsForStationNotFound(body *GetProjectsForStationNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetProjectsForStationBadRequest builds a project service get projects for
+// station endpoint bad-request error.
+func NewGetProjectsForStationBadRequest(body *GetProjectsForStationBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -5475,6 +5653,102 @@ func ValidateDownloadPhotoNotFoundResponseBody(body *DownloadPhotoNotFoundRespon
 // ValidateDownloadPhotoBadRequestResponseBody runs the validations defined on
 // download photo_bad-request_response_body
 func ValidateDownloadPhotoBadRequestResponseBody(body *DownloadPhotoBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetProjectsForStationUnauthorizedResponseBody runs the validations
+// defined on get projects for station_unauthorized_response_body
+func ValidateGetProjectsForStationUnauthorizedResponseBody(body *GetProjectsForStationUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetProjectsForStationForbiddenResponseBody runs the validations
+// defined on get projects for station_forbidden_response_body
+func ValidateGetProjectsForStationForbiddenResponseBody(body *GetProjectsForStationForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetProjectsForStationNotFoundResponseBody runs the validations
+// defined on get projects for station_not-found_response_body
+func ValidateGetProjectsForStationNotFoundResponseBody(body *GetProjectsForStationNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetProjectsForStationBadRequestResponseBody runs the validations
+// defined on get projects for station_bad-request_response_body
+func ValidateGetProjectsForStationBadRequestResponseBody(body *GetProjectsForStationBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

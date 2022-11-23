@@ -62,6 +62,8 @@ type Service interface {
 	UploadPhoto(context.Context, *UploadPhotoPayload, io.ReadCloser) (err error)
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
+	// GetProjectsForStation implements get projects for station.
+	GetProjectsForStation(context.Context, *GetProjectsForStationPayload) (res *Project, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -78,7 +80,7 @@ const ServiceName = "project"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [22]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept project invite", "reject project invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "edit user", "remove user", "add station", "remove station", "delete", "upload photo", "download photo"}
+var MethodNames = [23]string{"add update", "delete update", "modify update", "invites", "lookup invite", "accept project invite", "reject project invite", "accept invite", "reject invite", "add", "update", "get", "list community", "list mine", "invite", "edit user", "remove user", "add station", "remove station", "delete", "upload photo", "download photo", "get projects for station"}
 
 // AddUpdatePayload is the payload type of the project service add update
 // method.
@@ -282,6 +284,14 @@ type DownloadedPhoto struct {
 	ContentType string
 	Etag        string
 	Body        []byte
+}
+
+// GetProjectsForStationPayload is the payload type of the project service get
+// projects for station method.
+type GetProjectsForStationPayload struct {
+	Auth  string
+	ID    int32
+	Token *string
 }
 
 type PendingInvite struct {

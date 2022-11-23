@@ -1017,3 +1017,15 @@ func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.Fo
 		Projects: projectsCollection,
 	}, nil
 }
+
+func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *project.GetProjectsForStationPayload) ([]*data.Project, error) {
+
+	pr := repositories.NewProjectRepository(c.options.Database)
+
+	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+    	if err != nil {
+    		return nil, err
+    	}
+
+	return projects, nil
+}

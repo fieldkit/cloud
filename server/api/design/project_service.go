@@ -631,12 +631,12 @@ var _ = Service("project", func() {
     		Payload(func() {
     			Token("auth")
     			Required("auth")
-    			Attribute("id", Int64)
+    			Attribute("id", Int32)
     			Required("id")
     			Attribute("token", String)
     		})
 
-    		 Result(Empty)
+    		Result(Project)
 
     		HTTP(func() {
     			GET("projects/station/{id}")
