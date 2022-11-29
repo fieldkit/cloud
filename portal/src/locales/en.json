@@ -402,11 +402,11 @@
         "eventForm": {
             "title": {
                 "placeholder": "Event Title",
-                "saveLabel": "Post"
+                "saveLabel": "Save"
             },
             "description": {
                 "placeholder": "Event Description",
-                "saveLabel": "Post"
+                "saveLabel": "Save"
             }
         },
         "noComments": "There are no comments yet.",
