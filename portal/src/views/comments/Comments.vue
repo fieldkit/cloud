@@ -59,6 +59,11 @@
                             <span class="radio-label">
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.radioLabel.")) }}
                             </span>
+
+                            <InfoTooltip
+                                :message="$tc(interpolatePartner('comments.eventTypeSelector.allProjectSensors.description.'))"
+                            ></InfoTooltip>
+
                             <p>
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.description.")) }}
                             </p>
@@ -77,6 +82,11 @@
                             <span class="radio-label">
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.radioLabel.")) }}
                             </span>
+
+                            <InfoTooltip
+                                :message="$tc(interpolatePartner('comments.eventTypeSelector.justTheseSensors.description.'))"
+                            ></InfoTooltip>
+
                             <p>
                                 {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.description.")) }}
                             </p>
@@ -292,6 +302,7 @@ import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
+import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 
 export default Vue.extend({
     name: "Comments",
@@ -300,6 +311,7 @@ export default Vue.extend({
         ListItemOptions,
         Tiptap,
         SectionToggle,
+        InfoTooltip,
     },
     props: {
         user: {
@@ -1059,6 +1071,27 @@ header {
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
+
+    .info {
+        display: none;
+    }
+
+    @include bp-down($xs) {
+        flex-direction: column;
+
+        label {
+            width: 100%;
+        }
+
+        .info {
+            display: inline-block;
+            float: right;
+        }
+
+        ::v-deep .info-content {
+            right: 0;
+        }
+    }
 }
 .event-level-radio {
     width: 340px;
@@ -1070,8 +1103,19 @@ header {
     border-radius: 3px;
     flex: 1;
 
+    @include bp-down($xs) {
+        width: calc(100% - 10px);
+        height: auto;
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+
     p {
         margin-left: 30px;
+
+        @include bp-down($xs) {
+            display: none;
+        }
     }
 
     .radio-label {
