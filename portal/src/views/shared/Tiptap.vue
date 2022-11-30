@@ -209,7 +209,7 @@ export default Vue.extend({
                 }),
             ],
             onUpdate({ editor }) {
-              console.log("editor-update");
+                changed(editor.getJSON());
             },
             onBlur({ editor }) {
                 console.log("editor-blur");
@@ -233,8 +233,7 @@ export default Vue.extend({
             console.log("on-change", args);
         },
         onSave() {
-          if (this.editor && !this.editor.isEmpty) {
-                this.$emit("input", this.editor.getJSON());
+            if (this.editor && !this.editor.isEmpty) {
                 this.$emit("save");
             }
         },
@@ -293,7 +292,8 @@ export default Vue.extend({
 }
 
 .ProseMirror {
-    @supports (-webkit-touch-callout: none) { // iOS only - prevent zoom in behaviour
+    @supports (-webkit-touch-callout: none) {
+        // iOS only - prevent zoom in behaviour
         font-size: 16px;
     }
 
