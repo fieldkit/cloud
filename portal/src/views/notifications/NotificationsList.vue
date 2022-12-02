@@ -91,6 +91,7 @@ export default Vue.extend({
         font-family: $font-family-light;
         margin-bottom: 10px;
         line-height: 1.4em;
+        padding: 0 10px;
 
         > div {
             padding-right: 7px;
@@ -139,6 +140,10 @@ export default Vue.extend({
             height: 35px;
             margin-right: 7px;
             margin-top: 0;
+        }
+
+        &:hover {
+            background-color: #f4f5f7;
         }
     }
 
