@@ -19,15 +19,12 @@
                 </template>
             </DoubleHeader>
 
-            <silent-box :gallery="gallery">
-                <template v-slot:silentbox-item="{ silentboxItem }">
+            <silent-box v-if="photos" :gallery="gallery">
+                <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
                     <button class="photo-options" v-if="!readOnly">
                         <ListItemOptions
                             :options="photoOptions"
-                            @listItemOptionClick="
-                                $event.stop.prevent();
-                                onPhotoOptionClick($event, silentboxItem.photo);
-                            "
+                            @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
                         ></ListItemOptions>
                     </button>
                     <AuthenticatedPhoto :url="silentboxItem.photo.url" :loading="silentboxItem.photo.id === loadingPhotoId" />
@@ -67,10 +64,6 @@ export default Vue.extend({
             return parseInt(this.$route.params.stationId, 10);
         },
         photos(): NoteMedia[] {
-            console.log("photos radoi", this.$state.notes.media);
-            if (!this.$state.notes.media) {
-                return [];
-            }
             return NoteMedia.onlyPhotos(this.$state.notes.media);
         },
         media(): PortalNoteMedia[] {
@@ -83,7 +76,7 @@ export default Vue.extend({
     data: (): {
         photoOptions: ListItemOption[];
         loadingPhotoId: number | null;
-        gallery: any;
+        gallery: { src: string; photo: NoteMedia }[];
     } => {
         return {
             photoOptions: [],
@@ -93,7 +86,6 @@ export default Vue.extend({
     },
     watch: {
         photos() {
-            console.log("radoi change");
             this.initGallery();
         },
     },
@@ -263,6 +255,8 @@ input[type="file"] {
     position: relative;
     margin-top: 10px;
     flex: 0 0 calc(50% - 5px);
+    background-color: #e2e4e6;
+    min-height: 300px;
 
     &:nth-of-type(1) {
         flex: 0 0 100%;
