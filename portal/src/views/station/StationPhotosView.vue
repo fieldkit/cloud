@@ -19,7 +19,7 @@
                 </template>
             </DoubleHeader>
 
-            <silent-box v-if="photos" :gallery="gallery">
+            <silent-box v-if="photos && photos.length > 0" :gallery="gallery">
                 <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
                     <button class="photo-options" v-if="!readOnly">
                         <ListItemOptions
@@ -27,11 +27,15 @@
                             @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
                         ></ListItemOptions>
                     </button>
-                    <AuthenticatedPhoto :url="silentboxItem.photo.url" :loading="silentboxItem.photo.id === loadingPhotoId" />
+                    <AuthenticatedPhoto
+                        v-if="silentboxItem.photo"
+                        :url="silentboxItem.photo.url"
+                        :loading="silentboxItem.photo.id === loadingPhotoId"
+                    />
                 </template>
             </silent-box>
 
-            <div v-if="photos.length === 0" class="empty-photos">
+            <div v-else class="empty-photos">
                 {{ $t("station.emptyPhotos") }}
             </div>
         </div>
@@ -64,7 +68,10 @@ export default Vue.extend({
             return parseInt(this.$route.params.stationId, 10);
         },
         photos(): NoteMedia[] {
-            return NoteMedia.onlyPhotos(this.$state.notes.media);
+            if (this.$state.notes.media) {
+                return NoteMedia.onlyPhotos(this.$state.notes.media);
+            }
+            return [];
         },
         media(): PortalNoteMedia[] {
             return this.$state.notes.media;
@@ -86,6 +93,7 @@ export default Vue.extend({
     },
     watch: {
         photos() {
+            console.log("radoi ph", this.photos);
             this.initGallery();
         },
     },
@@ -121,11 +129,9 @@ export default Vue.extend({
                 this.loadingPhotoId = photo.id;
                 this.$services.api
                     .setStationImage(this.stationId, photo.id)
-                    .then(async () => {
-                        await this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
-                    })
-                    .finally(() => {
+                    .then(() => {
                         this.onFinishedPhotoAction(this.$tc("successSetAsStationPhoto"), SnackbarStyle.success);
+                        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
                     })
                     .catch(() => {
                         this.onFinishedPhotoAction(this.$tc("somethingWentWrong"), SnackbarStyle.fail);
@@ -159,6 +165,7 @@ export default Vue.extend({
             reader.readAsDataURL(image);
         },
         initGallery(): void {
+            this.gallery = [];
             this.photos.forEach((photo) => {
                 this.$services.api.loadMedia(photo["url"]).then((src) => {
                     this.gallery.push({
@@ -277,6 +284,38 @@ input[type="file"] {
         width: 100%;
         min-height: 200px;
         max-height: 400px;
+    }
+}
+
+::v-deep #silentbox-overlay__arrow-buttons {
+    @include bp-down($md) {
+        .arrow-previous {
+            left: 30px;
+        }
+        .arrow-next {
+            right: 30px;
+        }
+    }
+
+    @include bp-down($xs) {
+        .arrow-previous {
+            left: 15px;
+        }
+        .arrow-next {
+            right: 15px;
+        }
+    }
+}
+
+::v-deep #silentbox-overlay__close-button .icon {
+    @include bp-down($md) {
+        left: 35px;
+        top: -20px;
+    }
+
+    @include bp-down($xs) {
+        left: 45px;
+        top: -40px;
     }
 }
 </style>
