@@ -55,7 +55,7 @@ import { VisibleReadings, DecoratedReading } from "@/store";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
-import { interpolatePartner, isCustomisationEnabled } from "./partners";
+import { getPartnerCustomizationWithDefault, interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
 
@@ -167,7 +167,7 @@ export default Vue.extend({
         latestPrimaryColor(): string {
             const reading: DecoratedReading | null = this.decoratedReading;
             if (reading === null) {
-                return "#777a80";
+                return getPartnerCustomizationWithDefault().latestPrimaryNoDataColor;
             }
             if (reading) {
                 return reading?.color;
@@ -350,6 +350,10 @@ export default Vue.extend({
     .no-data {
         color: #777a80;
         font-family: $font-family-bold;
+
+        body.floodnet & {
+            color: #cccccc;
+        }
     }
 }
 </style>

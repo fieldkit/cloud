@@ -186,7 +186,9 @@
         "edit": {
             "title": "Edit Project",
             "link": "Edit Project"
-        }
+        },
+        "updateSuccess": "Project details updated!",
+        "addSuccess": "Project added!"
     },
     "station": {
         "readings": {
@@ -379,7 +381,9 @@
         "complete": "Complete",
         "btn": {
             "save": "Save"
-        }
+        },
+        "updateSuccess": "Field notes updated!",
+        "updateFail": "Field notes update failed!"
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",

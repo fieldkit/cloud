@@ -133,6 +133,7 @@ import * as ActionTypes from "@/store/actions";
 import PlaceholderImage from "@/assets/image-placeholder.svg";
 import { mapState } from "vuex";
 import StationsMap from "@/views/shared/StationsMap.vue";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 const afterOtherDate = (afterOtherDate) =>
     helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function(this: any, value, parentVm) {
@@ -315,6 +316,10 @@ export default Vue.extend({
                         id: project.id,
                     };
                     return this.$services.api.uploadProjectImage(params).then(() => {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("project.addSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                         return this.$router.push({
                             name: "viewProject",
                             params: { id: project.id },
@@ -323,6 +328,10 @@ export default Vue.extend({
                 });
             } else {
                 await this.$store.dispatch(ActionTypes.ADD_PROJECT, data).then((project) => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("project.addSuccess"),
+                        type: SnackbarStyle.success,
+                    });
                     return this.$router.push({
                         name: "viewProject",
                         params: { id: project.id },
@@ -344,21 +353,24 @@ export default Vue.extend({
                     id: this.project.id,
                 };
                 await this.$services.api.uploadProjectImage(payload).then(() => {
-                    return this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
-                        return this.$router.push({
-                            name: "viewProject",
-                            params: { id: this.project.id },
-                        });
-                    });
+                    this.saveProject(data);
                 });
             } else {
-                await this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
-                    return this.$router.push({
-                        name: "viewProject",
-                        params: { id: this.project.id },
-                    });
-                });
+                await this.saveProject(data);
             }
+        },
+
+        async saveProject(data): Promise<void> {
+            await this.$store.dispatch(ActionTypes.SAVE_PROJECT, data).then(() => {
+                this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("project.updateSuccess"),
+                    type: SnackbarStyle.success,
+                });
+                return this.$router.push({
+                    name: "viewProject",
+                    params: { id: this.project.id },
+                });
+            });
         },
         async deleteProject(): Promise<void> {
             if (window.confirm("Are you sure you want to delete this project?")) {
