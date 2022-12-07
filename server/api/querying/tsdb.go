@@ -79,6 +79,7 @@ type DataRow struct {
 
 type SelectedAggregate struct {
 	Specifier  string
+	Interval   time.Duration
 	BucketSize int
 	DataEnd    *time.Time
 }
@@ -231,6 +232,7 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 			return &SelectedAggregate{
 				Specifier:  Window1m.Specifier,
 				BucketSize: Window1m.BucketSize(),
+				Interval:   Window1m.Interval,
 				DataEnd:    maybeDataEnd,
 			}, nil
 		}
@@ -266,6 +268,7 @@ func (tsdb *TimeScaleDBBackend) pickAggregate(ctx context.Context, qp *backend.Q
 	return &SelectedAggregate{
 		Specifier:  selected.Specifier,
 		BucketSize: selected.BucketSize(),
+		Interval:   selected.Interval,
 		DataEnd:    maybeDataEnd,
 	}, nil
 }
@@ -281,6 +284,23 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 	if aggregate == nil {
 		log.Infow("tsdb:empty")
 		return "", nil, nil, nil
+	}
+
+	// Should we loop over all of them and find a good compromise?
+	if len(ids.SensorIDs) == 1 {
+		sensorID := ids.SensorIDs[0]
+		sensorSpec := tsdb.querySpec.Sensors[sensorID]
+		if sensorSpec != nil && sensorSpec.BucketWidths != nil {
+			if aggregate.Interval > 1*time.Hour {
+				log.Infow("tsdb:custom-buckets", "sensor_id", sensorID, "bucket_widths", sensorSpec.BucketWidths, "bucket", aggregate.Interval)
+
+				for _, customWidth := range *sensorSpec.BucketWidths {
+					return tsdb.rebucketeQuery(ctx, qp, ids, aggregate, time.Duration(customWidth)*time.Second)
+				}
+			} else {
+				log.Infow("tsdb:custom-buckets-ignoring", "sensor_id", sensorID, "bucket_widths", sensorSpec.BucketWidths, "bucket", aggregate.BucketSize)
+			}
+		}
 	}
 
 	sql := fmt.Sprintf(`
@@ -733,7 +753,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}, nil
 }
 
-func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
+func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, *SelectedAggregate, error) {
 	sql := fmt.Sprintf(`
 		SELECT
 			time_bucket('%f seconds', "bucket_time") AS bucket_time,
@@ -755,5 +775,12 @@ func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Co
 
 	args := []interface{}{qp.Stations, ids.ModuleIDs, ids.SensorIDs, qp.Start, qp.End}
 
-	return sql, args, nil
+	adjusted := &SelectedAggregate{
+		Specifier:  fmt.Sprintf("custom_%ds", duration/time.Second),
+		Interval:   duration,
+		BucketSize: int(duration.Seconds()),
+		DataEnd:    source.DataEnd,
+	}
+
+	return sql, args, adjusted, nil
 }
