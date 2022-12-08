@@ -1104,7 +1104,7 @@ header {
     flex: 1;
 
     @include bp-down($xs) {
-        width: calc(100% - 10px);
+        width: calc(100% - 20px);
         height: auto;
         margin-right: 10px;
         margin-bottom: 5px;
