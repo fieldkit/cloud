@@ -164,9 +164,12 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">{{ $tc("comments.noComments") }}</div>
-        <div v-if="isLoading" class="no-comments">{{ $tc("comments.loadingComments") }}</div>
-
+        <div v-if="!isLoading && posts.length === 0" class="no-comments">
+            {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
+        </div>
+        <div v-if="isLoading" class="no-comments">
+            {{ viewType === "data" ? $tc("comments.loadingEventsComments") : $tc("comments.loadingComments") }}
+        </div>
         <div class="list" v-if="postsAndEvents && postsAndEvents.length > 0">
             <div class="subheader">
                 <span class="comments-counter" v-if="viewType === 'project'">

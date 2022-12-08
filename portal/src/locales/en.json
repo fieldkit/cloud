@@ -410,7 +410,9 @@
             }
         },
         "noComments": "There are no comments yet.",
+        "noEventsComments": "There are no events or comments yet.",
         "loadingComments": "Loading comments...",
+        "loadingEventsComments": "Loading events and comments...",
         "comments": "comments",
         "reply": {
             "placeholder": "Reply to comment",
