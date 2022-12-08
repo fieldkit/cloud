@@ -2610,7 +2610,7 @@ func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter)
 // returned by the project get projects for station endpoint.
 func EncodeGetProjectsForStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*projectviews.Project)
+		res := v.(*projectviews.Projects)
 		enc := encoder(ctx, w)
 		body := NewGetProjectsForStationResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)

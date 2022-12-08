@@ -63,7 +63,7 @@ type Service interface {
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// GetProjectsForStation implements get projects for station.
-	GetProjectsForStation(context.Context, *GetProjectsForStationPayload) (res *Project, err error)
+	GetProjectsForStation(context.Context, *GetProjectsForStationPayload) (res *Projects, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.

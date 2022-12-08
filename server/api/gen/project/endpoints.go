@@ -608,7 +608,7 @@ func NewGetProjectsForStationEndpoint(s Service, authJWTFn security.AuthJWTFunc)
 		if err != nil {
 			return nil, err
 		}
-		vres := NewViewedProject(res, "default")
+		vres := NewViewedProjects(res, "default")
 		return vres, nil
 	}
 }

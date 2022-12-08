@@ -2989,7 +2989,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records data --record-id 5690907779027166168 --auth "Ut quibusdam qui est."
+    `+os.Args[0]+` records data --record-id 1154109085306497470 --auth "Aliquam at est nobis voluptates pariatur autem."
 `, os.Args[0])
 }
 
@@ -3001,7 +3001,7 @@ Meta implements meta.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records meta --record-id 9015662134991557746 --auth "Modi fugiat ullam et."
+    `+os.Args[0]+` records meta --record-id 1454641653565430451 --auth "Error enim veritatis velit voluptatem dolorem hic."
 `, os.Args[0])
 }
 
@@ -3013,7 +3013,7 @@ Resolved implements resolved.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records resolved --record-id 110303220924921047 --auth "Ad qui quis velit."
+    `+os.Args[0]+` records resolved --record-id 641937676669007670 --auth "Sed fuga."
 `, os.Args[0])
 }
 
@@ -3054,7 +3054,7 @@ StationMeta implements station meta.
     -stations STRING: 
 
 Example:
-    `+os.Args[0]+` sensor station- meta --stations "Aspernatur excepturi nam non doloribus."
+    `+os.Args[0]+` sensor station- meta --stations "Et illum praesentium recusandae eos aut id."
 `, os.Args[0])
 }
 
@@ -3084,7 +3084,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 1323192780656123877 --end 969962528760610816 --stations "Corrupti accusamus similique." --sensors "Quia beatae." --resolution 162368176 --aggregate "Aperiam non corrupti." --complete false --tail 145445853 --backend "Totam nostrum officiis aut." --auth "Sapiente deleniti suscipit."
+    `+os.Args[0]+` sensor data --start 4905123021041348433 --end 3620182594779415859 --stations "Officia et nulla magni quia ut nam." --sensors "Aut quidem." --resolution 1618937012 --aggregate "Harum animi vel ut repellat consequuntur reiciendis." --complete false --tail 1694482215 --backend "Molestias sequi id ratione cum." --auth "Ipsum et."
 `, os.Args[0])
 }
 
@@ -3097,7 +3097,7 @@ Tail implements tail.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor tail --stations "Ut nobis sint." --backend "Ut fugit." --auth "Quia suscipit facilis excepturi velit."
+    `+os.Args[0]+` sensor tail --stations "Enim totam nostrum officiis aut." --backend "Sapiente deleniti suscipit." --auth "Veniam quos rerum est tempora."
 `, os.Args[0])
 }
 
@@ -3109,7 +3109,7 @@ Recently implements recently.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor recently --stations "Ut culpa et autem velit." --auth "Dolores blanditiis."
+    `+os.Args[0]+` sensor recently --stations "Suscipit facilis excepturi velit illo quam omnis." --auth "Nihil id id rerum."
 `, os.Args[0])
 }
 
@@ -3121,7 +3121,7 @@ Bookmark implements bookmark.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor bookmark --bookmark "Consequuntur dolores in." --auth "Nobis ut laudantium."
+    `+os.Args[0]+` sensor bookmark --bookmark "Et sunt dicta sed qui." --auth "Ad aut nihil nam repellendus dolor temporibus."
 `, os.Args[0])
 }
 
@@ -3133,7 +3133,7 @@ Resolve implements resolve.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor resolve --v2 "Ullam ducimus accusamus quasi sint." --auth "Quia molestias."
+    `+os.Args[0]+` sensor resolve --v2 "Ratione libero fugiat vitae illum." --auth "Quae eum est architecto."
 `, os.Args[0])
 }
 
@@ -3160,7 +3160,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Dolor soluta neque cupiditate deleniti animi." --auth "Qui tempora atque cupiditate sequi quaerat."
+    `+os.Args[0]+` information device- layout --device-id "Nemo quibusdam delectus expedita." --auth "Rem nesciunt cupiditate dolor."
 `, os.Args[0])
 }
 
@@ -3171,7 +3171,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Ut quae tempora omnis sunt aut."
+    `+os.Args[0]+` information firmware- statistics --auth "Id ad est dolores est dignissimos."
 `, os.Args[0])
 }
 
@@ -3210,11 +3210,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "deviceId": "Blanditiis aut rerum ipsa atque quaerat.",
-      "locationName": "Odio ullam.",
-      "name": "Est tenetur commodi doloribus nemo natus.",
-      "statusPb": "Omnis aliquid a enim deserunt culpa odit."
-   }' --auth "Laudantium autem quibusdam distinctio nisi maiores aspernatur."
+      "deviceId": "Aliquid a enim.",
+      "locationName": "Culpa odit.",
+      "name": "Atque quaerat est odio ullam debitis.",
+      "statusPb": "Laudantium autem quibusdam distinctio nisi maiores aspernatur."
+   }' --auth "Eius vel pariatur."
 `, os.Args[0])
 }
 

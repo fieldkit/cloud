@@ -184,20 +184,7 @@ type DownloadPhotoResponseBody struct {
 // GetProjectsForStationResponseBody is the type of the "project" service "get
 // projects for station" endpoint HTTP response body.
 type GetProjectsForStationResponseBody struct {
-	ID           int32                         `form:"id" json:"id" xml:"id"`
-	Name         string                        `form:"name" json:"name" xml:"name"`
-	Description  string                        `form:"description" json:"description" xml:"description"`
-	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
-	Location     string                        `form:"location" json:"location" xml:"location"`
-	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
-	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
-	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
-	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
-	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
-	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
@@ -2099,26 +2086,13 @@ func NewDownloadPhotoResponseBody(res *projectviews.DownloadedPhotoView) *Downlo
 
 // NewGetProjectsForStationResponseBody builds the HTTP response body from the
 // result of the "get projects for station" endpoint of the "project" service.
-func NewGetProjectsForStationResponseBody(res *projectviews.ProjectView) *GetProjectsForStationResponseBody {
-	body := &GetProjectsForStationResponseBody{
-		ID:           *res.ID,
-		Name:         *res.Name,
-		Description:  *res.Description,
-		Goal:         *res.Goal,
-		Location:     *res.Location,
-		Tags:         *res.Tags,
-		Privacy:      *res.Privacy,
-		StartTime:    res.StartTime,
-		EndTime:      res.EndTime,
-		Photo:        res.Photo,
-		ReadOnly:     *res.ReadOnly,
-		ShowStations: *res.ShowStations,
-	}
-	if res.Bounds != nil {
-		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
-	}
-	if res.Following != nil {
-		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
+func NewGetProjectsForStationResponseBody(res *projectviews.ProjectsView) *GetProjectsForStationResponseBody {
+	body := &GetProjectsForStationResponseBody{}
+	if res.Projects != nil {
+		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		for i, val := range res.Projects {
+			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
+		}
 	}
 	return body
 }

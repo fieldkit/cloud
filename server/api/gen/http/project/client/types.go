@@ -186,20 +186,7 @@ type DownloadPhotoResponseBody struct {
 // GetProjectsForStationResponseBody is the type of the "project" service "get
 // projects for station" endpoint HTTP response body.
 type GetProjectsForStationResponseBody struct {
-	ID           *int32                        `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name         *string                       `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Description  *string                       `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Goal         *string                       `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
-	Location     *string                       `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Tags         *string                       `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Privacy      *int32                        `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
-	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly     *bool                         `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
-	ShowStations *bool                         `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
-	Bounds       *ProjectBoundsResponseBody    `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
-	Following    *ProjectFollowingResponseBody `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
@@ -3479,25 +3466,14 @@ func NewDownloadPhotoBadRequest(body *DownloadPhotoBadRequestResponseBody) *goa.
 	return v
 }
 
-// NewGetProjectsForStationProjectOK builds a "project" service "get projects
+// NewGetProjectsForStationProjectsOK builds a "project" service "get projects
 // for station" endpoint result from a HTTP "OK" response.
-func NewGetProjectsForStationProjectOK(body *GetProjectsForStationResponseBody) *projectviews.ProjectView {
-	v := &projectviews.ProjectView{
-		ID:           body.ID,
-		Name:         body.Name,
-		Description:  body.Description,
-		Goal:         body.Goal,
-		Location:     body.Location,
-		Tags:         body.Tags,
-		Privacy:      body.Privacy,
-		StartTime:    body.StartTime,
-		EndTime:      body.EndTime,
-		Photo:        body.Photo,
-		ReadOnly:     body.ReadOnly,
-		ShowStations: body.ShowStations,
+func NewGetProjectsForStationProjectsOK(body *GetProjectsForStationResponseBody) *projectviews.ProjectsView {
+	v := &projectviews.ProjectsView{}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
 	}
-	v.Bounds = unmarshalProjectBoundsResponseBodyToProjectviewsProjectBoundsView(body.Bounds)
-	v.Following = unmarshalProjectFollowingResponseBodyToProjectviewsProjectFollowingView(body.Following)
 
 	return v
 }

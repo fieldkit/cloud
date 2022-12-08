@@ -3249,13 +3249,13 @@ func DecodeGetProjectsForStationResponse(decoder func(*http.Response) goahttp.De
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
 			}
-			p := NewGetProjectsForStationProjectOK(&body)
+			p := NewGetProjectsForStationProjectsOK(&body)
 			view := "default"
-			vres := &projectviews.Project{Projected: p, View: view}
-			if err = projectviews.ValidateProject(vres); err != nil {
+			vres := &projectviews.Projects{Projected: p, View: view}
+			if err = projectviews.ValidateProjects(vres); err != nil {
 				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
 			}
-			res := project.NewProject(vres)
+			res := project.NewProjects(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
