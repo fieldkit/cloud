@@ -367,7 +367,7 @@ export default Vue.extend({
                 threadId: null,
             },
             newDataEvent: {
-                allProjectSensors: false,
+                allProjectSensors: true,
                 bookmark: null,
                 body: "",
                 title: "",
