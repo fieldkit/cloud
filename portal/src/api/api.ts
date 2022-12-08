@@ -427,6 +427,11 @@ export interface SavedBookmark {
     bookmark: string;
 }
 
+export enum MapViewType {
+    map = "map",
+    list = "list",
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
