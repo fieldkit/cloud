@@ -3199,19 +3199,14 @@ func EncodeGetProjectsForStationRequest(encoder func(*http.Request) goahttp.Enco
 		if !ok {
 			return goahttp.ErrInvalidType("project", "get projects for station", "*project.GetProjectsForStationPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
 				req.Header.Set("Authorization", head)
 			}
 		}
-		values := req.URL.Query()
-		if p.Token != nil {
-			values.Add("token", *p.Token)
-		}
-		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

@@ -289,9 +289,8 @@ type DownloadedPhoto struct {
 // GetProjectsForStationPayload is the payload type of the project service get
 // projects for station method.
 type GetProjectsForStationPayload struct {
-	Auth  string
-	ID    int32
-	Token *string
+	Auth *string
+	ID   int32
 }
 
 type PendingInvite struct {

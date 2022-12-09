@@ -383,3 +383,46 @@ func TestGetProjectUsers(t *testing.T) {
 			"users": [ "<<PRESENCE>>" ]
 		}`)
 }
+
+func TestGetStationProjectsAsAnonymous(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	project, err := e.AddProjectWithPrivacy(data.Public)
+	assert.NoError(err)
+
+	owner, err := e.AddUser()
+	assert.NoError(err)
+
+	fd, err := e.AddStationsToProject(project, owner, 5)
+	assert.NoError(err)
+
+	api, err := NewTestableApi(e)
+	assert.NoError(err)
+
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/projects/station/%d", fd.Stations[0].ID), nil)
+	rr := tests.ExecuteRequest(req, api)
+
+	assert.Equal(http.StatusOK, rr.Code)
+
+	ja := jsonassert.New(t)
+	ja.Assertf(rr.Body.String(), `
+	{
+		"projects": [
+			{
+				"bounds": { "max": null,"min": null },
+				"description": "",
+				"following": { "following": false, "total": 0 },
+				"goal": "",
+				"id": "<<PRESENCE>>",
+				"location": "",
+				"name": "<<PRESENCE>>",
+				"privacy": 1,
+				"readOnly": true,
+				"showStations": false,
+				"tags": ""
+			}
+		]
+	}`)
+}

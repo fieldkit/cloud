@@ -3666,10 +3666,9 @@ func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, 
 
 // NewGetProjectsForStationPayload builds a project service get projects for
 // station endpoint payload.
-func NewGetProjectsForStationPayload(id int32, token *string, auth string) *project.GetProjectsForStationPayload {
+func NewGetProjectsForStationPayload(id int32, auth *string) *project.GetProjectsForStationPayload {
 	v := &project.GetProjectsForStationPayload{}
 	v.ID = id
-	v.Token = token
 	v.Auth = auth
 
 	return v

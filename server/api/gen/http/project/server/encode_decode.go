@@ -2623,10 +2623,9 @@ func EncodeGetProjectsForStationResponse(encoder func(context.Context, http.Resp
 func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id    int32
-			token *string
-			auth  string
-			err   error
+			id   int32
+			auth *string
+			err  error
 
 			params = mux.Vars(r)
 		)
@@ -2638,22 +2637,20 @@ func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Re
 			}
 			id = int32(v)
 		}
-		tokenRaw := r.URL.Query().Get("token")
-		if tokenRaw != "" {
-			token = &tokenRaw
-		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetProjectsForStationPayload(id, token, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		payload := NewGetProjectsForStationPayload(id, auth)
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil
