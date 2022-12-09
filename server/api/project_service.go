@@ -919,6 +919,39 @@ func (s *ProjectService) DownloadPhoto(ctx context.Context, payload *project.Dow
 	}, nil
 }
 
+func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *project.GetProjectsForStationPayload) (*project.Projects, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	relationships := make(map[int32]*data.UserProjectRelationship)
+	if !p.Anonymous() {
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	pr := repositories.NewProjectRepository(c.options.Database)
+	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	projectIDs := make([]int32, len(projects))
+	for _, project := range projects {
+		projectIDs = append(projectIDs, project.ID)
+	}
+
+	followers, err := pr.QueryFollowersForProjects(ctx, projectIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return ProjectsType(c.options.signer, projects, followers, relationships)
+}
+
 func (s *ProjectService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
@@ -1016,16 +1049,4 @@ func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.Fo
 	return &project.Projects{
 		Projects: projectsCollection,
 	}, nil
-}
-
-func (c *ProjectService) GetProjectsForStation(ctx context.Context, payload *project.GetProjectsForStationPayload) ([]*data.Project, error) {
-
-	pr := repositories.NewProjectRepository(c.options.Database)
-
-	projects, err := pr.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return projects, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -152,4 +153,22 @@ func (pr *ProjectRepository) Delete(outerCtx context.Context, projectID int32) e
 		}
 		return nil
 	})
+}
+
+func (pr *ProjectRepository) QueryFollowersForProjects(ctx context.Context, projectIDs []int32) ([]*data.FollowersSummary, error) {
+	followers := make([]*data.FollowersSummary, 0)
+	if len(projectIDs) == 0 {
+		return followers, nil
+	}
+
+	if query, args, err := sqlx.In(`
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (?) GROUP BY f.project_id
+		`, projectIDs); err != nil {
+		return nil, err
+	} else {
+		if err := pr.db.SelectContext(ctx, &followers, pr.db.Rebind(query), args...); err != nil {
+			return nil, err
+		}
+		return followers, nil
+	}
 }
