@@ -192,6 +192,8 @@
                                 <span class="author">
                                     {{ item.author.name }}
                                 </span>
+                                <span v-if="item.body" class="icon icon-comment"></span>
+                                <span v-else class="icon icon-flag"></span>
                                 <ListItemOptions
                                     v-if="user && (user.id === item.author.id || user.admin)"
                                     @listItemOptionClick="onListItemOptionClick($event, item)"
@@ -1034,6 +1036,12 @@ header {
 .post-header {
     display: flex;
     margin-bottom: 5px;
+
+    .icon {
+        font-size: 12px;
+        margin-top: 4px;
+        margin-left: 5px;
+    }
 }
 
 .need-login-msg {
