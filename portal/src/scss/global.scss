@@ -173,3 +173,17 @@
     color: #6a6d71;
     font-family: var(--font-family-light);
 }
+
+.loading-photo {
+    background-color: #e2e4e6;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+
+    ::v-deep .spinner {
+        width: 20px;
+        height: 20px;
+    }
+}

@@ -1,13 +1,20 @@
 <template>
-    <img v-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />
-    <img v-else-if="missing" src="@/assets/fieldkit_project.png" class="project-photo project-image photo" alt="FieldKit Project" />
+    <div v-if="loading" class="station-photo loading-photo">
+        <Spinner class="spinner" />
+    </div>
+    <img v-else-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />
+    <img v-else src="@/assets/fieldkit_project.png" class="project-photo project-image photo" alt="FieldKit Project" />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
+import Spinner from "@/views/shared/Spinner.vue";
 
 export default Vue.extend({
     name: "ProjectPhoto",
+    components: {
+        Spinner,
+    },
     props: {
         project: {
             type: Object,
@@ -18,19 +25,15 @@ export default Vue.extend({
             default: 800,
         },
     },
-    data(): { photo: unknown } {
+    data(): { photo: unknown; loading: boolean } {
         return {
             photo: null,
+            loading: false,
         };
     },
     watch: {
         async project(): Promise<void> {
             void this.refresh();
-        },
-    },
-    computed: {
-        missing(): boolean {
-            return !this.project.photo;
         },
     },
     mounted(): Promise<void> {
@@ -39,9 +42,15 @@ export default Vue.extend({
     methods: {
         async refresh(): Promise<void> {
             if (this.project.photo) {
-                this.photo = await this.$services.api.loadMedia(this.project.photo, { size: this.imageSize }).catch((e) => {
-                    this.photo = null;
-                });
+                this.loading = true;
+                this.photo = await this.$services.api
+                    .loadMedia(this.project.photo, { size: this.imageSize })
+                    .catch(() => {
+                        this.photo = null;
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
             } else {
                 this.photo = null;
             }

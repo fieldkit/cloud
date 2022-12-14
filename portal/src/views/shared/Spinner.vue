@@ -44,6 +44,19 @@ export default Vue.extend({
 .spinner div:nth-child(3) {
     animation-delay: -0.15s;
 }
+@at-root .loading-photo {
+    background-color: #e2e4e6;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+
+    ::v-deep .spinner {
+        width: 20px;
+        height: 20px;
+    }
+}
 @keyframes spinner {
     0% {
         transform: rotate(0deg);
