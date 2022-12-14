@@ -176,11 +176,11 @@
 
 .loading-photo {
     background-color: #e2e4e6;
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1;
+    height: 100%;
 
     ::v-deep .spinner {
         width: 20px;

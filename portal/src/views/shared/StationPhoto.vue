@@ -34,7 +34,7 @@ export default Vue.extend({
     } {
         return {
             photo: null,
-            loading: true,
+            loading: false,
         };
     },
     watch: {
@@ -56,8 +56,6 @@ export default Vue.extend({
                 } finally {
                     this.loading = false;
                 }
-            } else {
-                this.loading = false;
             }
         },
         interpolatePartner(baseString: string): string {
@@ -67,6 +65,4 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

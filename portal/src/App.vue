@@ -68,6 +68,7 @@ export default Vue.extend({
 @import "scss/mixins";
 @import "scss/typography";
 @import "scss/icons";
+@import "scss/layout.scss";
 @import "icomoon/style.css";
 
 html {

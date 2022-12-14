@@ -43,7 +43,10 @@
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
-                <div class="busy-panel">&nbsp;</div>
+                <div class="busy-panel" v-if="busy">
+                    &nbsp;
+                    <Spinner></Spinner>
+                </div>
 
                 <div class="station-summary" v-if="selectedStation">
                     <StationSummaryContent :station="selectedStation" v-if="workspace && !workspace.empty" class="summary-content">
@@ -73,7 +76,7 @@
 
                 <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark"></Comments>
+                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -101,6 +104,7 @@ import { isMobile, getBatteryIcon } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
+import Spinner from "@/views/shared/Spinner.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
@@ -115,6 +119,7 @@ export default Vue.extend({
         PaginationControls,
         StationBattery,
         InfoTooltip,
+        Spinner,
     },
     props: {
         token: {
@@ -472,6 +477,7 @@ export default Vue.extend({
     border-radius: 1px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 1px #f4f5f7;
+    min-height: 70vh;
 
     @include bp-down($sm) {
         border: 0;
@@ -570,11 +576,24 @@ export default Vue.extend({
         display: none;
         z-index: 5;
         opacity: 0.5;
+        align-items: center;
+        justify-content: center;
     }
 
     &.busy .busy-panel {
-        display: block;
-        background-color: #efefef;
+        display: flex;
+        background-color: #e2e4e6;
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+
+            div {
+                width: 60px;
+                height: 60px;
+                border-width: 6px;
+            }
+        }
     }
 
     .viz-loading {
@@ -1012,5 +1031,4 @@ export default Vue.extend({
         left: 20px;
     }
 }
-
 </style>

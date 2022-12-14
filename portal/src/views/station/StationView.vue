@@ -353,7 +353,7 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            width: 90px;
+            flex: 0 0 90px;
             height: 90px;
             object-fit: cover;
             margin-right: 20px;
