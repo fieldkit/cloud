@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loading" class="station-photo loading-photo">
+    <div v-if="loading" class="station-photo loading-container">
         <Spinner class="spinner" />
     </div>
     <img v-else-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />

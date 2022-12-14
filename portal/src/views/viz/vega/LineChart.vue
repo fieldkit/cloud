@@ -1,7 +1,7 @@
 <template>
     <div class="h-100">
         <div class="viz linechart"></div>
-        <div v-if="isLoading" class="loading-photo">
+        <div v-if="isLoading" class="loading-container">
             <Spinner class="spinner" />
         </div>
     </div>
