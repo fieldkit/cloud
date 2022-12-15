@@ -15,10 +15,6 @@ export class ScrubberSpecFactory {
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
         const interactiveMarks = () => {
-            if (this.settings.mobile) {
-                return [];
-            }
-
             return [
                 {
                     type: "rect",
