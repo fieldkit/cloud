@@ -17,28 +17,29 @@ import (
 
 // Endpoints wraps the "project" service endpoints.
 type Endpoints struct {
-	AddUpdate           goa.Endpoint
-	DeleteUpdate        goa.Endpoint
-	ModifyUpdate        goa.Endpoint
-	Invites             goa.Endpoint
-	LookupInvite        goa.Endpoint
-	AcceptProjectInvite goa.Endpoint
-	RejectProjectInvite goa.Endpoint
-	AcceptInvite        goa.Endpoint
-	RejectInvite        goa.Endpoint
-	Add                 goa.Endpoint
-	Update              goa.Endpoint
-	Get                 goa.Endpoint
-	ListCommunity       goa.Endpoint
-	ListMine            goa.Endpoint
-	Invite              goa.Endpoint
-	EditUser            goa.Endpoint
-	RemoveUser          goa.Endpoint
-	AddStation          goa.Endpoint
-	RemoveStation       goa.Endpoint
-	Delete              goa.Endpoint
-	UploadPhoto         goa.Endpoint
-	DownloadPhoto       goa.Endpoint
+	AddUpdate             goa.Endpoint
+	DeleteUpdate          goa.Endpoint
+	ModifyUpdate          goa.Endpoint
+	Invites               goa.Endpoint
+	LookupInvite          goa.Endpoint
+	AcceptProjectInvite   goa.Endpoint
+	RejectProjectInvite   goa.Endpoint
+	AcceptInvite          goa.Endpoint
+	RejectInvite          goa.Endpoint
+	Add                   goa.Endpoint
+	Update                goa.Endpoint
+	Get                   goa.Endpoint
+	ListCommunity         goa.Endpoint
+	ListMine              goa.Endpoint
+	Invite                goa.Endpoint
+	EditUser              goa.Endpoint
+	RemoveUser            goa.Endpoint
+	AddStation            goa.Endpoint
+	RemoveStation         goa.Endpoint
+	Delete                goa.Endpoint
+	UploadPhoto           goa.Endpoint
+	DownloadPhoto         goa.Endpoint
+	GetProjectsForStation goa.Endpoint
 }
 
 // UploadPhotoRequestData holds both the payload and the HTTP request body
@@ -55,28 +56,29 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		AddUpdate:           NewAddUpdateEndpoint(s, a.JWTAuth),
-		DeleteUpdate:        NewDeleteUpdateEndpoint(s, a.JWTAuth),
-		ModifyUpdate:        NewModifyUpdateEndpoint(s, a.JWTAuth),
-		Invites:             NewInvitesEndpoint(s, a.JWTAuth),
-		LookupInvite:        NewLookupInviteEndpoint(s, a.JWTAuth),
-		AcceptProjectInvite: NewAcceptProjectInviteEndpoint(s, a.JWTAuth),
-		RejectProjectInvite: NewRejectProjectInviteEndpoint(s, a.JWTAuth),
-		AcceptInvite:        NewAcceptInviteEndpoint(s, a.JWTAuth),
-		RejectInvite:        NewRejectInviteEndpoint(s, a.JWTAuth),
-		Add:                 NewAddEndpoint(s, a.JWTAuth),
-		Update:              NewUpdateEndpoint(s, a.JWTAuth),
-		Get:                 NewGetEndpoint(s, a.JWTAuth),
-		ListCommunity:       NewListCommunityEndpoint(s, a.JWTAuth),
-		ListMine:            NewListMineEndpoint(s, a.JWTAuth),
-		Invite:              NewInviteEndpoint(s, a.JWTAuth),
-		EditUser:            NewEditUserEndpoint(s, a.JWTAuth),
-		RemoveUser:          NewRemoveUserEndpoint(s, a.JWTAuth),
-		AddStation:          NewAddStationEndpoint(s, a.JWTAuth),
-		RemoveStation:       NewRemoveStationEndpoint(s, a.JWTAuth),
-		Delete:              NewDeleteEndpoint(s, a.JWTAuth),
-		UploadPhoto:         NewUploadPhotoEndpoint(s, a.JWTAuth),
-		DownloadPhoto:       NewDownloadPhotoEndpoint(s, a.JWTAuth),
+		AddUpdate:             NewAddUpdateEndpoint(s, a.JWTAuth),
+		DeleteUpdate:          NewDeleteUpdateEndpoint(s, a.JWTAuth),
+		ModifyUpdate:          NewModifyUpdateEndpoint(s, a.JWTAuth),
+		Invites:               NewInvitesEndpoint(s, a.JWTAuth),
+		LookupInvite:          NewLookupInviteEndpoint(s, a.JWTAuth),
+		AcceptProjectInvite:   NewAcceptProjectInviteEndpoint(s, a.JWTAuth),
+		RejectProjectInvite:   NewRejectProjectInviteEndpoint(s, a.JWTAuth),
+		AcceptInvite:          NewAcceptInviteEndpoint(s, a.JWTAuth),
+		RejectInvite:          NewRejectInviteEndpoint(s, a.JWTAuth),
+		Add:                   NewAddEndpoint(s, a.JWTAuth),
+		Update:                NewUpdateEndpoint(s, a.JWTAuth),
+		Get:                   NewGetEndpoint(s, a.JWTAuth),
+		ListCommunity:         NewListCommunityEndpoint(s, a.JWTAuth),
+		ListMine:              NewListMineEndpoint(s, a.JWTAuth),
+		Invite:                NewInviteEndpoint(s, a.JWTAuth),
+		EditUser:              NewEditUserEndpoint(s, a.JWTAuth),
+		RemoveUser:            NewRemoveUserEndpoint(s, a.JWTAuth),
+		AddStation:            NewAddStationEndpoint(s, a.JWTAuth),
+		RemoveStation:         NewRemoveStationEndpoint(s, a.JWTAuth),
+		Delete:                NewDeleteEndpoint(s, a.JWTAuth),
+		UploadPhoto:           NewUploadPhotoEndpoint(s, a.JWTAuth),
+		DownloadPhoto:         NewDownloadPhotoEndpoint(s, a.JWTAuth),
+		GetProjectsForStation: NewGetProjectsForStationEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -104,6 +106,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Delete = m(e.Delete)
 	e.UploadPhoto = m(e.UploadPhoto)
 	e.DownloadPhoto = m(e.DownloadPhoto)
+	e.GetProjectsForStation = m(e.GetProjectsForStation)
 }
 
 // NewAddUpdateEndpoint returns an endpoint function that calls the method "add
@@ -582,6 +585,30 @@ func NewDownloadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 			return nil, err
 		}
 		vres := NewViewedDownloadedPhoto(res, "default")
+		return vres, nil
+	}
+}
+
+// NewGetProjectsForStationEndpoint returns an endpoint function that calls the
+// method "get projects for station" of service "project".
+func NewGetProjectsForStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetProjectsForStationPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.GetProjectsForStation(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProject(res, "default")
 		return vres, nil
 	}
 }

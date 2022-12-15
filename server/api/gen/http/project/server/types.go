@@ -181,6 +181,25 @@ type DownloadPhotoResponseBody struct {
 	Etag        string `form:"etag" json:"etag" xml:"etag"`
 }
 
+// GetProjectsForStationResponseBody is the type of the "project" service "get
+// projects for station" endpoint HTTP response body.
+type GetProjectsForStationResponseBody struct {
+	ID           int32                         `form:"id" json:"id" xml:"id"`
+	Name         string                        `form:"name" json:"name" xml:"name"`
+	Description  string                        `form:"description" json:"description" xml:"description"`
+	Goal         string                        `form:"goal" json:"goal" xml:"goal"`
+	Location     string                        `form:"location" json:"location" xml:"location"`
+	Tags         string                        `form:"tags" json:"tags" xml:"tags"`
+	Privacy      int32                         `form:"privacy" json:"privacy" xml:"privacy"`
+	StartTime    *string                       `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
+	EndTime      *string                       `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
+	Photo        *string                       `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+	ReadOnly     bool                          `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	ShowStations bool                          `form:"showStations" json:"showStations" xml:"showStations"`
+	Bounds       *ProjectBoundsResponseBody    `form:"bounds" json:"bounds" xml:"bounds"`
+	Following    *ProjectFollowingResponseBody `form:"following" json:"following" xml:"following"`
+}
+
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
 type AddUpdateUnauthorizedResponseBody struct {
@@ -1773,6 +1792,82 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// GetProjectsForStationUnauthorizedResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "unauthorized" error.
+type GetProjectsForStationUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetProjectsForStationForbiddenResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "forbidden" error.
+type GetProjectsForStationForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetProjectsForStationNotFoundResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "not-found" error.
+type GetProjectsForStationNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetProjectsForStationBadRequestResponseBody is the type of the "project"
+// service "get projects for station" endpoint HTTP response body for the
+// "bad-request" error.
+type GetProjectsForStationBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // PendingInviteResponseBody is used to define fields on response body types.
 type PendingInviteResponseBody struct {
 	ID      int64                       `form:"id" json:"id" xml:"id"`
@@ -1998,6 +2093,32 @@ func NewDownloadPhotoResponseBody(res *projectviews.DownloadedPhotoView) *Downlo
 		ContentType: *res.ContentType,
 		Etag:        *res.Etag,
 		Body:        res.Body,
+	}
+	return body
+}
+
+// NewGetProjectsForStationResponseBody builds the HTTP response body from the
+// result of the "get projects for station" endpoint of the "project" service.
+func NewGetProjectsForStationResponseBody(res *projectviews.ProjectView) *GetProjectsForStationResponseBody {
+	body := &GetProjectsForStationResponseBody{
+		ID:           *res.ID,
+		Name:         *res.Name,
+		Description:  *res.Description,
+		Goal:         *res.Goal,
+		Location:     *res.Location,
+		Tags:         *res.Tags,
+		Privacy:      *res.Privacy,
+		StartTime:    res.StartTime,
+		EndTime:      res.EndTime,
+		Photo:        res.Photo,
+		ReadOnly:     *res.ReadOnly,
+		ShowStations: *res.ShowStations,
+	}
+	if res.Bounds != nil {
+		body.Bounds = marshalProjectviewsProjectBoundsViewToProjectBoundsResponseBody(res.Bounds)
+	}
+	if res.Following != nil {
+		body.Following = marshalProjectviewsProjectFollowingViewToProjectFollowingResponseBody(res.Following)
 	}
 	return body
 }
@@ -3242,6 +3363,66 @@ func NewDownloadPhotoBadRequestResponseBody(res *goa.ServiceError) *DownloadPhot
 	return body
 }
 
+// NewGetProjectsForStationUnauthorizedResponseBody builds the HTTP response
+// body from the result of the "get projects for station" endpoint of the
+// "project" service.
+func NewGetProjectsForStationUnauthorizedResponseBody(res *goa.ServiceError) *GetProjectsForStationUnauthorizedResponseBody {
+	body := &GetProjectsForStationUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetProjectsForStationForbiddenResponseBody builds the HTTP response body
+// from the result of the "get projects for station" endpoint of the "project"
+// service.
+func NewGetProjectsForStationForbiddenResponseBody(res *goa.ServiceError) *GetProjectsForStationForbiddenResponseBody {
+	body := &GetProjectsForStationForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetProjectsForStationNotFoundResponseBody builds the HTTP response body
+// from the result of the "get projects for station" endpoint of the "project"
+// service.
+func NewGetProjectsForStationNotFoundResponseBody(res *goa.ServiceError) *GetProjectsForStationNotFoundResponseBody {
+	body := &GetProjectsForStationNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetProjectsForStationBadRequestResponseBody builds the HTTP response body
+// from the result of the "get projects for station" endpoint of the "project"
+// service.
+func NewGetProjectsForStationBadRequestResponseBody(res *goa.ServiceError) *GetProjectsForStationBadRequestResponseBody {
+	body := &GetProjectsForStationBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddUpdatePayload builds a project service add update endpoint payload.
 func NewAddUpdatePayload(body *AddUpdateRequestBody, projectID int32, auth string) *project.AddUpdatePayload {
 	v := &project.AddUpdatePayload{
@@ -3504,6 +3685,17 @@ func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, 
 	v.ProjectID = projectID
 	v.Size = size
 	v.IfNoneMatch = ifNoneMatch
+	v.Auth = auth
+
+	return v
+}
+
+// NewGetProjectsForStationPayload builds a project service get projects for
+// station endpoint payload.
+func NewGetProjectsForStationPayload(id int32, token *string, auth string) *project.GetProjectsForStationPayload {
+	v := &project.GetProjectsForStationPayload{}
+	v.ID = id
+	v.Token = token
 	v.Auth = auth
 
 	return v

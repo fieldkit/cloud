@@ -224,6 +224,11 @@ export class CurrentUser {
     tncDate: number;
 }
 
+export enum UserRolesEnum {
+    admin = "Administrator",
+    member = "Member",
+}
+
 export interface Project {
     description: string;
     goal: string;
@@ -1578,6 +1583,14 @@ class FKApi {
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + `/bookmarks/resolve?${qp.toString()}`,
+        });
+    }
+
+    public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
+        return this.invoke({
+            auth: Auth.None,
+            method: "GET",
+            url: this.baseUrl + "/projects/station/" + id,
         });
     }
 }

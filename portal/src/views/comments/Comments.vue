@@ -31,7 +31,7 @@
         <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
         <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
-        <div class="list" v-if="posts && posts.length > 0">
+        <div class="list" v-if="isProjectLoaded && posts && posts.length > 0">
             <div class="subheader">
                 <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
                 <header v-if="viewType === 'data'">Notes & Comments</header>
@@ -136,6 +136,7 @@ import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark } from "../viz/viz";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     name: "Comments",
@@ -174,7 +175,7 @@ export default Vue.extend({
     } {
         return {
             posts: [],
-            isLoading: false,
+            isLoading: true,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -191,6 +192,27 @@ export default Vue.extend({
             errorMessage: null,
         };
     },
+    computed: {
+        projectId(): number {
+            if (typeof this.parentData === "number") {
+                return this.parentData;
+            }
+            return this.parentData.p[0];
+        },
+        stationId(): number | null {
+            if (typeof this.parentData !== "number") {
+                return this.parentData.s[0];
+            }
+            return null;
+        },
+        isAdmin(): boolean {
+            return this.$getters.isAdminForProject(this.user.id, this.projectId);
+        },
+        // needed so we can find out if the current user is an admin and give him permissions to delete posts
+        isProjectLoaded(): boolean {
+            return !!this.$getters.projectsById[this.projectId];
+        },
+    },
     watch: {
         parentData(): Promise<void> {
             return this.getComments();
@@ -199,7 +221,17 @@ export default Vue.extend({
             this.highlightComment();
         },
     },
+    beforeMount(): Promise<void> | void {
+        // project could be already loaded if the Comments are viewed from Project Page
+        if (!this.isProjectLoaded) {
+            return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+        }
+    },
     mounted(): Promise<void> {
+        console.log("radoi p", this.parentData);
+        this.$services.api.getProjectsForStation(this.stationId).then((projects) => {
+            console.log("radoi ppp", projects);
+        });
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
@@ -359,12 +391,16 @@ export default Vue.extend({
                 ];
             }
 
-            return [
-                {
-                    label: "Delete post",
-                    event: "delete-comment",
-                },
-            ];
+            if (this.isAdmin) {
+                return [
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [];
         },
         highlightComment() {
             this.$nextTick(() => {

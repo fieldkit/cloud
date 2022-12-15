@@ -697,3 +697,34 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 
 	return v, nil
 }
+
+// BuildGetProjectsForStationPayload builds the payload for the project get
+// projects for station endpoint from CLI flags.
+func BuildGetProjectsForStationPayload(projectGetProjectsForStationID string, projectGetProjectsForStationToken string, projectGetProjectsForStationAuth string) (*project.GetProjectsForStationPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectGetProjectsForStationID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var token *string
+	{
+		if projectGetProjectsForStationToken != "" {
+			token = &projectGetProjectsForStationToken
+		}
+	}
+	var auth string
+	{
+		auth = projectGetProjectsForStationAuth
+	}
+	v := &project.GetProjectsForStationPayload{}
+	v.ID = id
+	v.Token = token
+	v.Auth = auth
+
+	return v, nil
+}

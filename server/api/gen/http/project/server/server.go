@@ -20,30 +20,31 @@ import (
 
 // Server lists the project service endpoint HTTP handlers.
 type Server struct {
-	Mounts              []*MountPoint
-	AddUpdate           http.Handler
-	DeleteUpdate        http.Handler
-	ModifyUpdate        http.Handler
-	Invites             http.Handler
-	LookupInvite        http.Handler
-	AcceptProjectInvite http.Handler
-	RejectProjectInvite http.Handler
-	AcceptInvite        http.Handler
-	RejectInvite        http.Handler
-	Add                 http.Handler
-	Update              http.Handler
-	Get                 http.Handler
-	ListCommunity       http.Handler
-	ListMine            http.Handler
-	Invite              http.Handler
-	EditUser            http.Handler
-	RemoveUser          http.Handler
-	AddStation          http.Handler
-	RemoveStation       http.Handler
-	Delete              http.Handler
-	UploadPhoto         http.Handler
-	DownloadPhoto       http.Handler
-	CORS                http.Handler
+	Mounts                []*MountPoint
+	AddUpdate             http.Handler
+	DeleteUpdate          http.Handler
+	ModifyUpdate          http.Handler
+	Invites               http.Handler
+	LookupInvite          http.Handler
+	AcceptProjectInvite   http.Handler
+	RejectProjectInvite   http.Handler
+	AcceptInvite          http.Handler
+	RejectInvite          http.Handler
+	Add                   http.Handler
+	Update                http.Handler
+	Get                   http.Handler
+	ListCommunity         http.Handler
+	ListMine              http.Handler
+	Invite                http.Handler
+	EditUser              http.Handler
+	RemoveUser            http.Handler
+	AddStation            http.Handler
+	RemoveStation         http.Handler
+	Delete                http.Handler
+	UploadPhoto           http.Handler
+	DownloadPhoto         http.Handler
+	GetProjectsForStation http.Handler
+	CORS                  http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -101,6 +102,7 @@ func New(
 			{"Delete", "DELETE", "/projects/{projectId}"},
 			{"UploadPhoto", "POST", "/projects/{projectId}/media"},
 			{"DownloadPhoto", "GET", "/projects/{projectId}/media"},
+			{"GetProjectsForStation", "GET", "/projects/station/{id}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates/{updateId}"},
 			{"CORS", "OPTIONS", "/projects/invites/pending"},
@@ -117,30 +119,32 @@ func New(
 			{"CORS", "OPTIONS", "/projects/{projectId}/members"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/media"},
+			{"CORS", "OPTIONS", "/projects/station/{id}"},
 		},
-		AddUpdate:           NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
-		DeleteUpdate:        NewDeleteUpdateHandler(e.DeleteUpdate, mux, decoder, encoder, errhandler, formatter),
-		ModifyUpdate:        NewModifyUpdateHandler(e.ModifyUpdate, mux, decoder, encoder, errhandler, formatter),
-		Invites:             NewInvitesHandler(e.Invites, mux, decoder, encoder, errhandler, formatter),
-		LookupInvite:        NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
-		AcceptProjectInvite: NewAcceptProjectInviteHandler(e.AcceptProjectInvite, mux, decoder, encoder, errhandler, formatter),
-		RejectProjectInvite: NewRejectProjectInviteHandler(e.RejectProjectInvite, mux, decoder, encoder, errhandler, formatter),
-		AcceptInvite:        NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
-		RejectInvite:        NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
-		Add:                 NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Update:              NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
-		Get:                 NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
-		ListCommunity:       NewListCommunityHandler(e.ListCommunity, mux, decoder, encoder, errhandler, formatter),
-		ListMine:            NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
-		Invite:              NewInviteHandler(e.Invite, mux, decoder, encoder, errhandler, formatter),
-		EditUser:            NewEditUserHandler(e.EditUser, mux, decoder, encoder, errhandler, formatter),
-		RemoveUser:          NewRemoveUserHandler(e.RemoveUser, mux, decoder, encoder, errhandler, formatter),
-		AddStation:          NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
-		RemoveStation:       NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
-		Delete:              NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		UploadPhoto:         NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
-		DownloadPhoto:       NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
-		CORS:                NewCORSHandler(),
+		AddUpdate:             NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
+		DeleteUpdate:          NewDeleteUpdateHandler(e.DeleteUpdate, mux, decoder, encoder, errhandler, formatter),
+		ModifyUpdate:          NewModifyUpdateHandler(e.ModifyUpdate, mux, decoder, encoder, errhandler, formatter),
+		Invites:               NewInvitesHandler(e.Invites, mux, decoder, encoder, errhandler, formatter),
+		LookupInvite:          NewLookupInviteHandler(e.LookupInvite, mux, decoder, encoder, errhandler, formatter),
+		AcceptProjectInvite:   NewAcceptProjectInviteHandler(e.AcceptProjectInvite, mux, decoder, encoder, errhandler, formatter),
+		RejectProjectInvite:   NewRejectProjectInviteHandler(e.RejectProjectInvite, mux, decoder, encoder, errhandler, formatter),
+		AcceptInvite:          NewAcceptInviteHandler(e.AcceptInvite, mux, decoder, encoder, errhandler, formatter),
+		RejectInvite:          NewRejectInviteHandler(e.RejectInvite, mux, decoder, encoder, errhandler, formatter),
+		Add:                   NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Update:                NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Get:                   NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		ListCommunity:         NewListCommunityHandler(e.ListCommunity, mux, decoder, encoder, errhandler, formatter),
+		ListMine:              NewListMineHandler(e.ListMine, mux, decoder, encoder, errhandler, formatter),
+		Invite:                NewInviteHandler(e.Invite, mux, decoder, encoder, errhandler, formatter),
+		EditUser:              NewEditUserHandler(e.EditUser, mux, decoder, encoder, errhandler, formatter),
+		RemoveUser:            NewRemoveUserHandler(e.RemoveUser, mux, decoder, encoder, errhandler, formatter),
+		AddStation:            NewAddStationHandler(e.AddStation, mux, decoder, encoder, errhandler, formatter),
+		RemoveStation:         NewRemoveStationHandler(e.RemoveStation, mux, decoder, encoder, errhandler, formatter),
+		Delete:                NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		UploadPhoto:           NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
+		DownloadPhoto:         NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		GetProjectsForStation: NewGetProjectsForStationHandler(e.GetProjectsForStation, mux, decoder, encoder, errhandler, formatter),
+		CORS:                  NewCORSHandler(),
 	}
 }
 
@@ -171,6 +175,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Delete = m(s.Delete)
 	s.UploadPhoto = m(s.UploadPhoto)
 	s.DownloadPhoto = m(s.DownloadPhoto)
+	s.GetProjectsForStation = m(s.GetProjectsForStation)
 	s.CORS = m(s.CORS)
 }
 
@@ -198,6 +203,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountDeleteHandler(mux, h.Delete)
 	MountUploadPhotoHandler(mux, h.UploadPhoto)
 	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
+	MountGetProjectsForStationHandler(mux, h.GetProjectsForStation)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -1324,6 +1330,57 @@ func NewDownloadPhotoHandler(
 	})
 }
 
+// MountGetProjectsForStationHandler configures the mux to serve the "project"
+// service "get projects for station" endpoint.
+func MountGetProjectsForStationHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/station/{id}", f)
+}
+
+// NewGetProjectsForStationHandler creates a HTTP handler which loads the HTTP
+// request and calls the "project" service "get projects for station" endpoint.
+func NewGetProjectsForStationHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetProjectsForStationRequest(mux, decoder)
+		encodeResponse = EncodeGetProjectsForStationResponse(encoder)
+		encodeError    = EncodeGetProjectsForStationError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get projects for station")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service project.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -1350,6 +1407,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/projects/{projectId}/members", f)
 	mux.Handle("OPTIONS", "/projects/{projectId}/stations/{stationId}", f)
 	mux.Handle("OPTIONS", "/projects/{projectId}/media", f)
+	mux.Handle("OPTIONS", "/projects/station/{id}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

@@ -120,3 +120,8 @@ func UploadPhotoProjectPath(projectID int32) string {
 func DownloadPhotoProjectPath(projectID int32) string {
 	return fmt.Sprintf("/projects/%v/media", projectID)
 }
+
+// GetProjectsForStationProjectPath returns the URL path to the project service get projects for station HTTP endpoint.
+func GetProjectsForStationProjectPath(id int32) string {
+	return fmt.Sprintf("/projects/station/%v", id)
+}

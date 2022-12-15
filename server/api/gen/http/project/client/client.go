@@ -100,6 +100,10 @@ type Client struct {
 	// photo endpoint.
 	DownloadPhotoDoer goahttp.Doer
 
+	// GetProjectsForStation Doer is the HTTP client used to make requests to the
+	// get projects for station endpoint.
+	GetProjectsForStationDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -123,34 +127,35 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		AddUpdateDoer:           doer,
-		DeleteUpdateDoer:        doer,
-		ModifyUpdateDoer:        doer,
-		InvitesDoer:             doer,
-		LookupInviteDoer:        doer,
-		AcceptProjectInviteDoer: doer,
-		RejectProjectInviteDoer: doer,
-		AcceptInviteDoer:        doer,
-		RejectInviteDoer:        doer,
-		AddDoer:                 doer,
-		UpdateDoer:              doer,
-		GetDoer:                 doer,
-		ListCommunityDoer:       doer,
-		ListMineDoer:            doer,
-		InviteDoer:              doer,
-		EditUserDoer:            doer,
-		RemoveUserDoer:          doer,
-		AddStationDoer:          doer,
-		RemoveStationDoer:       doer,
-		DeleteDoer:              doer,
-		UploadPhotoDoer:         doer,
-		DownloadPhotoDoer:       doer,
-		CORSDoer:                doer,
-		RestoreResponseBody:     restoreBody,
-		scheme:                  scheme,
-		host:                    host,
-		decoder:                 dec,
-		encoder:                 enc,
+		AddUpdateDoer:             doer,
+		DeleteUpdateDoer:          doer,
+		ModifyUpdateDoer:          doer,
+		InvitesDoer:               doer,
+		LookupInviteDoer:          doer,
+		AcceptProjectInviteDoer:   doer,
+		RejectProjectInviteDoer:   doer,
+		AcceptInviteDoer:          doer,
+		RejectInviteDoer:          doer,
+		AddDoer:                   doer,
+		UpdateDoer:                doer,
+		GetDoer:                   doer,
+		ListCommunityDoer:         doer,
+		ListMineDoer:              doer,
+		InviteDoer:                doer,
+		EditUserDoer:              doer,
+		RemoveUserDoer:            doer,
+		AddStationDoer:            doer,
+		RemoveStationDoer:         doer,
+		DeleteDoer:                doer,
+		UploadPhotoDoer:           doer,
+		DownloadPhotoDoer:         doer,
+		GetProjectsForStationDoer: doer,
+		CORSDoer:                  doer,
+		RestoreResponseBody:       restoreBody,
+		scheme:                    scheme,
+		host:                      host,
+		decoder:                   dec,
+		encoder:                   enc,
 	}
 }
 
@@ -677,6 +682,30 @@ func (c *Client) DownloadPhoto() goa.Endpoint {
 		resp, err := c.DownloadPhotoDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("project", "download photo", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GetProjectsForStation returns an endpoint that makes HTTP requests to the
+// project service get projects for station server.
+func (c *Client) GetProjectsForStation() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetProjectsForStationRequest(c.encoder)
+		decodeResponse = DecodeGetProjectsForStationResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildGetProjectsForStationRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetProjectsForStationDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("project", "get projects for station", err)
 		}
 		return decodeResponse(resp)
 	}
