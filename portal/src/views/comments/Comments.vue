@@ -892,8 +892,6 @@ header {
 .author {
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 5px;
-    margin-top: 2px;
     position: relative;
 }
 
@@ -1035,12 +1033,16 @@ header {
 
 .post-header {
     display: flex;
+    align-items: center;
     margin-bottom: 5px;
 
     .icon {
         font-size: 12px;
-        margin-top: 4px;
         margin-left: 5px;
+
+        @include bp-up($md) {
+            margin-top: -2px;
+        }
     }
 }
 
@@ -1154,10 +1156,26 @@ header {
     > * {
         margin-top: 10px;
     }
+
+    .tiptap-container:first-child {
+        font-weight: bold;
+    }
 }
 
 .event-range {
-    margin-top: 10px;
+    margin-top: 0px;
     font-size: 12px;
+}
+
+.icon-flag,
+.icon-comment,
+.icon-view-data {
+    &::before {
+        color: $color-floodnet-dark;
+
+        body.floodnet & {
+            color: $color-floodnet-dark;
+        }
+    }
 }
 </style>
