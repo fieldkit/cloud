@@ -1171,8 +1171,6 @@ header {
 .icon-comment,
 .icon-view-data {
     &::before {
-        color: $color-floodnet-dark;
-
         body.floodnet & {
             color: $color-floodnet-dark;
         }
