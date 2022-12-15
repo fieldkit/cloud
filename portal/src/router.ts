@@ -38,6 +38,7 @@ import { ActionTypes } from "@/store";
 
 import { getPartnerCustomization } from "@/views/shared/partners";
 import StationPhotosView from "@/views/station/StationPhotosView.vue";
+import { MapViewType } from "@/api/api";
 
 Vue.use(Router);
 
@@ -55,7 +56,7 @@ function makeDefaultRouteForProject(projectId: number) {
         },
         meta: {
             secured: true,
-            viewType: "map",
+            viewType: MapViewType.map,
         },
     };
 }
@@ -257,7 +258,7 @@ const routes = [
         },
         meta: {
             secured: true,
-            viewType: "map",
+            viewType: MapViewType.map,
         },
     },
     {
@@ -273,7 +274,7 @@ const routes = [
         },
         meta: {
             secured: true,
-            viewType: "list",
+            viewType: MapViewType.list,
         },
     },
     {
@@ -320,13 +321,25 @@ const routes = [
         },
     },
     {
-        path: "/dashboard/stations",
+        path: "/dashboard/stations/map",
         name: "mapAllStations",
         component: StationsView,
         props: true,
         meta: {
             bodyClass: "map-view",
             secured: true,
+            viewType: MapViewType.map,
+        },
+    },
+    {
+        path: "/dashboard/stations/list",
+        name: "listAllStations",
+        component: StationsView,
+        props: true,
+        meta: {
+            bodyClass: "map-view",
+            secured: true,
+            viewType: MapViewType.list,
         },
     },
     {
