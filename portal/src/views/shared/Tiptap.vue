@@ -1,5 +1,6 @@
 <template>
     <div :class="'tiptap-container' + (readonly ? ' tiptap-reading' : ' tiptap-editing')">
+        <p v-if="placeholder && !readonly && editor.isEmpty" class="placeholder">{{ placeholder }}</p>
         <div class="tiptap-row">
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
@@ -146,7 +147,6 @@ export default Vue.extend({
                 Document,
                 Paragraph,
                 Text,
-                Placeholder.configure({ placeholder: this.placeholder }),
                 ModifyEnter,
                 CustomNewLine,
                 Mention.configure({
@@ -267,6 +267,8 @@ export default Vue.extend({
 .tiptap-container {
     width: 100%;
     text-align: justify;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .tiptap-editing {
@@ -292,7 +294,8 @@ export default Vue.extend({
 }
 
 .ProseMirror {
-    @supports (-webkit-touch-callout: none) { // iOS only - prevent zoom in behaviour
+    @supports (-webkit-touch-callout: none) {
+        // iOS only - prevent zoom in behaviour
         font-size: 16px;
     }
 
@@ -420,5 +423,12 @@ export default Vue.extend({
     @at-root body.floodnet & {
         color: var(--color-dark);
     }
+}
+
+.placeholder {
+    position: absolute;
+    opacity: 0.25;
+    top: 0;
+    left: 10px;
 }
 </style>
