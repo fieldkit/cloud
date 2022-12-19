@@ -137,6 +137,7 @@ export default Vue.extend({
     background: #fcfcfc;
     position: relative;
     width: 100%;
+    min-width: 0; // makes sure this flex item doesn't allow content overflow on x axis
 
     body.floodnet & {
         background: #{lighten($color-floodnet-border, 5%)};
