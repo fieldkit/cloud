@@ -96,7 +96,7 @@ func (r *RecordRepository) AddMetaRecord(ctx context.Context, p *data.Provision,
 	if err := r.db.NamedGetContext(ctx, metaRecord, `
 		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw, pb) VALUES (:provision_id, :time, :number, :raw, :pb)
 		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, pb = EXCLUDED.pb
-		RETURNING *
+		RETURNING id
 		`, metaRecord); err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (r *RecordRepository) AddSignedMetaRecord(ctx context.Context, p *data.Prov
 	if err := r.db.NamedGetContext(ctx, metaRecord, `
 		INSERT INTO fieldkit.meta_record (provision_id, time, number, raw, pb) VALUES (:provision_id, :time, :number, :raw, :pb)
 		ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, raw = EXCLUDED.raw, pb = EXCLUDED.pb
-		RETURNING *
+		RETURNING id
 		`, metaRecord); err != nil {
 		return nil, err
 	}
