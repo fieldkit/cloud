@@ -896,8 +896,10 @@ header {
 }
 
 ::v-deep .options-trigger {
-    opacity: 0;
-    visibility: hidden;
+    @include bp-up($sm) {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 .body {
