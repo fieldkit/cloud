@@ -116,6 +116,9 @@ export default Vue.extend({
             this.updateMap();
         },
         showStations(): void {
+            if (!this.protectedData.map.getLayer("station-markers")) {
+                return;
+            }
             if (!this.showStations) {
                 this.protectedData.map.setLayoutProperty("station-markers", "visibility", "none");
                 return;
