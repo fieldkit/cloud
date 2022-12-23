@@ -319,7 +319,6 @@ export const ViewingControls = Vue.extend({
             this.$emit("viz-change-sensors", ...args);
         },
         raiseManualTime(fromPicker, pickerType): void {
-            console.log("RADOI");
             if (fromPicker) {
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
