@@ -6,7 +6,7 @@ require (
 	github.com/DataDog/datadog-go/v5 v5.1.1
 	github.com/Nerzal/gocloak/v7 v7.11.0
 	github.com/O-C-R/singlepage v0.0.0-20170327184421-bbbe2159ecec
-	github.com/aws/aws-sdk-go v1.29.20
+	github.com/aws/aws-sdk-go v1.33.0
 	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/crewjam/saml v0.4.2
@@ -87,7 +87,7 @@ require (
 	github.com/jackc/pgtype v1.12.0 // indirect
 	github.com/jackc/puddle/v2 v2.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/jonboulle/clockwork v0.2.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/llgcode/ps v0.0.0-20210114104736-f4b0c5d1e02e // indirect
