@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"database/sql/driver"
-
-	"github.com/lib/pq"
 )
 
 const (
@@ -64,9 +62,8 @@ type AggregatedReading struct {
 }
 
 type SensorQueryingSpec struct {
-	SensorID     int64          `db:"sensor_id" json:"sensor_id"`
-	Function     string         `db:"function" json:"function"`
-	BucketWidths *pq.Int64Array `db:"bucket_widths" json:"bucket_widths"`
+	SensorID int64  `db:"sensor_id" json:"sensor_id"`
+	Function string `db:"function" json:"function"`
 }
 
 type QueryingSpec struct {
