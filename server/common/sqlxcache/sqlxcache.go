@@ -42,7 +42,6 @@ func (db *DB) cacheStmtContext(ctx context.Context, query string) (*sqlx.Stmt, e
 	if err != nil {
 		return nil, fmt.Errorf("(prepare) %w", err)
 	}
-
 	return db.stmtWithTx(ctx, stmt), nil
 }
 
@@ -59,7 +58,6 @@ func (db *DB) cacheNamedStmtContext(ctx context.Context, query string) (*sqlx.Na
 	if err != nil {
 		return nil, fmt.Errorf("(prepare) %w", err)
 	}
-
 	return db.namedStmtWithTx(ctx, namedStmt), nil
 }
 
@@ -107,6 +105,8 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 		return err
 	}
 
+	defer stmt.Close()
+
 	return stmt.Get(dest, args...)
 }
 
@@ -115,6 +115,8 @@ func (db *DB) Select(dest interface{}, query string, args ...interface{}) error 
 	if err != nil {
 		return err
 	}
+
+	defer stmt.Close()
 
 	return stmt.Select(dest, args...)
 }
@@ -125,6 +127,8 @@ func (db *DB) GetContext(ctx context.Context, dest interface{}, query string, ar
 		return err
 	}
 
+	defer stmt.Close()
+
 	return stmt.GetContext(ctx, dest, args...)
 }
 
@@ -133,6 +137,8 @@ func (db *DB) ExecContext(ctx context.Context, query string, args ...interface{}
 	if err != nil {
 		return nil, err
 	}
+
+	defer stmt.Close()
 
 	return stmt.ExecContext(ctx, args...)
 }
@@ -143,6 +149,8 @@ func (db *DB) NamedGetContext(ctx context.Context, dest interface{}, query strin
 		return err
 	}
 
+	defer namedStmt.Close()
+
 	return namedStmt.GetContext(ctx, dest, arg)
 }
 
@@ -151,6 +159,8 @@ func (db *DB) NamedSelectContext(ctx context.Context, dest interface{}, query st
 	if err != nil {
 		return err
 	}
+
+	defer namedStmt.Close()
 
 	return namedStmt.SelectContext(ctx, dest, arg)
 }
@@ -161,6 +171,8 @@ func (db *DB) NamedExecContext(ctx context.Context, query string, arg interface{
 		return nil, err
 	}
 
+	defer namedStmt.Close()
+
 	return namedStmt.ExecContext(ctx, arg)
 }
 
@@ -169,6 +181,8 @@ func (db *DB) NamedQueryContext(ctx context.Context, query string, arg interface
 	if err != nil {
 		return nil, err
 	}
+
+	defer namedStmt.Close()
 
 	return namedStmt.QueryxContext(ctx, arg)
 }
@@ -179,6 +193,8 @@ func (db *DB) QueryxContext(ctx context.Context, query string, args ...interface
 		return nil, err
 	}
 
+	defer stmt.Close()
+
 	return stmt.QueryxContext(ctx, args...)
 }
 
@@ -187,6 +203,8 @@ func (db *DB) SelectContext(ctx context.Context, dest interface{}, query string,
 	if err != nil {
 		return err
 	}
+
+	defer stmt.Close()
 
 	return stmt.SelectContext(ctx, dest, args...)
 }
