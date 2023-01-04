@@ -222,7 +222,7 @@ func (r *StationRepository) UpsertConfiguration(ctx context.Context, configurati
 				(provision_id, source_id, updated_at) VALUES
 				(:provision_id, :source_id, :updated_at)
 			ON CONFLICT (provision_id, source_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
-			RETURNING *
+			RETURNING id
 			`, configuration); err != nil {
 			return nil, err
 		}
@@ -234,7 +234,7 @@ func (r *StationRepository) UpsertConfiguration(ctx context.Context, configurati
 				(provision_id, meta_record_id, updated_at) VALUES
 				(:provision_id, :meta_record_id, :updated_at)
 			ON CONFLICT (provision_id, meta_record_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
-			RETURNING *
+			RETURNING id
 			`, configuration); err != nil {
 			return nil, err
 		}
@@ -269,7 +269,7 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
 						  version = EXCLUDED.version
-		RETURNING *
+		RETURNING id
 		`, module); err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
                           unit_of_measure = EXCLUDED.unit_of_measure,
 						  reading_last = COALESCE(EXCLUDED.reading_last, s.reading_last),
 						  reading_time = COALESCE(EXCLUDED.reading_time, s.reading_time)
-		RETURNING *
+		RETURNING id
 		`, sensor); err != nil {
 		return nil, err
 	}
