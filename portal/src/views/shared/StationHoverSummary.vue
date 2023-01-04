@@ -55,7 +55,7 @@ import { VisibleReadings, DecoratedReading } from "@/store";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
-import { interpolatePartner, isCustomisationEnabled } from "./partners";
+import { getPartnerCustomizationWithDefault, interpolatePartner, isCustomisationEnabled } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
 
@@ -167,7 +167,7 @@ export default Vue.extend({
         latestPrimaryColor(): string {
             const reading: DecoratedReading | null = this.decoratedReading;
             if (reading === null) {
-                return "#777a80";
+                return getPartnerCustomizationWithDefault().latestPrimaryNoDataColor;
             }
             if (reading) {
                 return reading?.color;
@@ -191,9 +191,6 @@ export default Vue.extend({
         },
         wantCloseSummary() {
             this.$emit("close");
-        },
-        layoutChange() {
-            this.$emit("layoutChange");
         },
         openStationPageTab() {
             const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
@@ -237,6 +234,7 @@ export default Vue.extend({
     position: absolute;
     background-color: #ffffff;
     border: solid 1px #d8dce0;
+    border-radius: 3px;
     z-index: 2;
     display: flex;
     flex-direction: column;
@@ -250,6 +248,40 @@ export default Vue.extend({
 
     * {
         font-family: $font-family-light;
+    }
+
+    @include bp-down($xs) {
+        width: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        border-radius: 10px;
+        padding: 25px 10px 12px 10px;
+
+        .close-button {
+            display: none;
+        }
+
+        .navigate-button {
+            width: 14px;
+            height: 14px;
+            right: -3px;
+            top: -17px;
+        }
+
+        .image-container {
+            flex-basis: 62px;
+            height: 62px;
+            margin-right: 10px;
+        }
+
+        .station-name {
+            font-size: 14px;
+        }
+
+        .explore-button {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
     }
 }
 
@@ -350,6 +382,10 @@ export default Vue.extend({
     .no-data {
         color: #777a80;
         font-family: $font-family-bold;
+
+        body.floodnet & {
+            color: #cccccc;
+        }
     }
 }
 </style>

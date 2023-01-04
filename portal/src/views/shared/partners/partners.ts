@@ -129,6 +129,7 @@ export interface PartnerCustomization {
     components: {
         project: Component | null;
     };
+    latestPrimaryNoDataColor: string;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -198,6 +199,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             components: {
                 project: FloodNetProjectDescription,
             },
+            latestPrimaryNoDataColor: "#cccccc",
         };
     }
     return null;
@@ -252,6 +254,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         components: {
             project: FieldKitProjectDescription,
         },
+        latestPrimaryNoDataColor: "#777a80",
     };
 }
 

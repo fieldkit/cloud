@@ -265,9 +265,9 @@ export default Vue.extend({
                 const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
                 const instance = new ValueMarkerCtor({
                     propsData: {
-                        color: readings && readings.length > 0 ? readings[0].color : "#ccc",
-                        value: readings && readings.length > 0 ? readings[0].value : null,
-                        id: feature.properties.id,
+                        ...(readings && readings.length > 0 && { color: readings[0].color }),
+                        ...{ value: readings && readings.length > 0 ? readings[0].value : null },
+                        ...{ id: feature.properties.id },
                     },
                 });
                 instance.$mount();
@@ -284,7 +284,9 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/global";
+
 .map-view #map {
     height: 100%;
     position: relative;
@@ -298,5 +300,46 @@ export default Vue.extend({
 .marker {
     height: 10px;
     width: 10px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+    border: solid 1px #f4f5f7;
+    border-radius: 0;
+    height: 40px;
+
+    @include bp-down($sm) {
+        width: 40px;
+    }
+
+    &.mapboxgl-ctrl-geocoder--collapsed {
+        min-width: 40px;
+    }
+
+    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
+        @include bp-down($xs) {
+            min-width: calc(100vw - 20px) !important;
+        }
+    }
+
+    input {
+        outline: none;
+        height: 37px;
+        padding-left: 38px;
+        font-size: 16px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-search {
+    top: 9px;
+    left: 8px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 4px;
+
+    @include bp-down($sm) {
+        margin-top: 3px;
+    }
 }
 </style>

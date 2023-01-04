@@ -47,6 +47,10 @@ import (
 	"github.com/fieldkit/cloud/server/storage"
 
 	_ "github.com/fieldkit/cloud/server/messages"
+
+	"expvar"
+
+	_ "github.com/tevjef/go-runtime-metrics/expvar"
 )
 
 type Options struct {
@@ -481,6 +485,7 @@ func main() {
 	rootRouter := mux.NewRouter()
 	rootRouter.Handle("/status", statusFinal)
 	rootRouter.Handle("/robots.txt", robotsFinal)
+	rootRouter.Handle("/debug/vars", expvar.Handler())
 	rootRouter.PathPrefix("/.well-known").Handler(wellKnownServer)
 
 	socialMeta := social.NewContext(services.Database, config.PortalRoot)
