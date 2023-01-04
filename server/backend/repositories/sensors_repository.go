@@ -45,7 +45,7 @@ func (r *SensorsRepository) QueryQueryingSpec(ctx context.Context) (*data.Queryi
 	specs := []*data.SensorQueryingSpec{}
 	if err := r.db.SelectContext(ctx, &specs, `
 		SELECT
-			agg_sensor.id AS sensor_id, aggregation_function AS function, bucket_widths
+			agg_sensor.id AS sensor_id, aggregation_function AS function
 		FROM
 			fieldkit.aggregated_sensor AS agg_sensor JOIN
 			fieldkit.sensor_meta AS sensor_meta ON (agg_sensor.key = sensor_meta.full_key)
