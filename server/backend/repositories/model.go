@@ -223,5 +223,4 @@ type PersistedSensorMeta struct {
 	Ranges              types.JSONText  `db:"ranges" json:"ranges"`
 	Aliases             *pq.StringArray `db:"aliases" json:"aliases"`
 	AggregationFunction *string         `db:"aggregation_function" json:"aggregationFunction"`
-	BucketWidths        *pq.Int64Array  `db:"bucket_widths" json:"bucket_widths"`
 }
