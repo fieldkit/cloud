@@ -16,7 +16,7 @@ require (
 	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
 	github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2
 	github.com/go-pg/pg/v10 v10.9.1
-	github.com/goadesign/goa v1.4.0
+	github.com/goadesign/goa v1.4.3
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0
@@ -73,6 +73,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-resty/resty/v2 v2.3.0 // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
@@ -107,7 +108,6 @@ require (
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
 	github.com/russellhaering/goxmldsig v1.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
-	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
 	github.com/segmentio/ksuid v1.0.3 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
