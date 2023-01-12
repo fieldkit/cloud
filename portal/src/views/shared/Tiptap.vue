@@ -5,7 +5,7 @@
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
             </div>
-            <div class="tiptap-side" v-if="!readonly && !empty">
+            <div class="tiptap-side" v-if="!readonly && !empty && showSaveButton">
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
         </div>
@@ -44,6 +44,10 @@ export default Vue.extend({
         readonly: {
             type: Boolean,
             default: false,
+        },
+        showSaveButton: {
+            type: Boolean,
+            default: true,
         },
         placeholder: {
             type: String,

@@ -101,6 +101,7 @@
                                 v-model="newDataEvent.title"
                                 :placeholder="$tc('comments.eventForm.title.placeholder')"
                                 :saveLabel="$tc('comments.eventForm.title.saveLabel')"
+                                :showSaveButton="false"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                             <Tiptap
@@ -214,6 +215,7 @@
                                     :readonly="item.readonly"
                                     :placeholder="$tc('comments.eventForm.title.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.title.saveLabel')"
+                                    :showSaveButton="false"
                                     @save="saveEditDataEvent(item)"
                                 />
                                 <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>

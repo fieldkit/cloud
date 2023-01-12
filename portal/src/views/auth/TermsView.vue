@@ -21,7 +21,7 @@ import { GlobalState } from "@/store";
 import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
-    name: "CreateAccountView",
+    name: "TermsView",
     components: {
         ...CommonComponents,
     },
