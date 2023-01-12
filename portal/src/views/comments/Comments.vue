@@ -385,10 +385,13 @@ export default Vue.extend({
     },
     watch: {
         async parentData(): Promise<void> {
-            await this.getDataEvents();
+          console.log('aici22222222222222222');
+
+          await this.getDataEvents();
             return this.getComments();
         },
         $route() {
+            console.log('aici11111111111111');
             this.highlightComment();
         },
     },
@@ -681,7 +684,7 @@ export default Vue.extend({
                     const el = document.querySelector(location.hash);
 
                     if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
+                        el.scrollIntoView({ behavior: "smooth", block: "center" });
                         el.classList.add("highlight");
                         setTimeout(() => {
                             el.classList.remove("highlight");
