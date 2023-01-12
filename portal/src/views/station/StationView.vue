@@ -2,9 +2,9 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                backRoute="viewProject"
-                :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
-                :backRouteParams="{ id: projectId }"
+                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
+                :backRouteParams="{ id: projectId || station.id }"
             >
                 <template v-slot:default>
                     <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
