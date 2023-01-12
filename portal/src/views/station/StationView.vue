@@ -3,8 +3,6 @@
         <div class="container-wrap" v-if="station">
             <DoubleHeader
                 backRoute="viewProject"
-                :title="station.name"
-                :subtitle="headerSubtitle"
                 :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
                 :backRouteParams="{ id: projectId }"
             >
@@ -21,6 +19,8 @@
                         <StationPhoto :station="station" />
                         <div>
                             <div class="station-name">{{ station.name }}</div>
+
+                            <div class="station-deployed-date">{{ deployedDate }}</div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
@@ -217,8 +217,8 @@ export default Vue.extend({
             const station = this.$state.stations.stations[this.$route.params.stationId];
             return station.attributes;
         },
-        headerSubtitle(): string | null {
-            if (this.station && this.$options.filters?.prettyDate) {
+        deployedDate(): string | null {
+            if (this.station) {
                 const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
                 if (deploymentDate) {
                     return this.$tc("station.deployed") + " " + deploymentDate;
@@ -331,7 +331,6 @@ export default Vue.extend({
     }
 
     &-station {
-        margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
@@ -616,6 +615,11 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
         }
     }
+
+    &-deployed-date {
+        color: #6a6d71;
+        margin-bottom: 10px;
+    }
 }
 
 .small-light {
@@ -668,5 +672,9 @@ section {
             color: $color-dark;
         }
     }
+}
+
+::v-deep .back {
+    margin-bottom: 15px;
 }
 </style>
