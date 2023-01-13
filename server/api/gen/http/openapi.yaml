@@ -5918,16 +5918,26 @@ definitions:
       station:
         attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -7055,14 +7065,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -7209,6 +7219,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -7225,45 +7236,45 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     required:
     - station
     - hidden
@@ -7297,16 +7308,26 @@ definitions:
       station:
         attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -8434,14 +8455,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -8588,6 +8609,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -8604,45 +8626,45 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     - hidden: true
       location:
       - distance: 0.32588857
@@ -8666,16 +8688,26 @@ definitions:
       station:
         attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -9803,14 +9835,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -9957,6 +9989,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -9973,45 +10006,45 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
   AssociatedViaLocationResponseBody:
     title: AssociatedViaLocationResponseBody
     type: object
@@ -12155,6 +12188,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       recordingStartedAt: 8181623388231511880
       updatedAt: 744811324009836510
@@ -27521,7 +27555,7 @@ definitions:
         $ref: '#/definitions/StationDataSummaryResponseBody'
       deviceId:
         type: string
-        example: Vel voluptatem voluptas fuga voluptatem tempora.
+        example: Eum unde dolor temporibus doloribus.
       firmwareNumber:
         type: integer
         example: 1002328938
@@ -27577,14 +27611,14 @@ definitions:
         example: Et aliquid qui ducimus.
       readOnly:
         type: boolean
-        example: true
+        example: false
       recordingStartedAt:
         type: integer
         example: 4870928574094190106
         format: int64
       status:
         type: string
-        example: Aliquam rerum qui aliquam sed quam.
+        example: Sed quam.
       syncedAt:
         type: integer
         example: 4209226551319990974
@@ -27603,59 +27637,47 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
-        - blocks:
-          - 442659245519894994
-          - 6910822585695413511
-          - 4631112066078792023
-          - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
-        - blocks:
-          - 442659245519894994
-          - 6910822585695413511
-          - 4631112066078792023
-          - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     description: AddResponseBody result type (default view)
     example:
       attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.10986896
       configurations:
         all:
@@ -28783,14 +28805,14 @@ definitions:
       ingestionAt: 1572612147890600243
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 1111314542725704383
       location:
         precise:
@@ -28937,6 +28959,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -28953,45 +28976,45 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     required:
     - id
     - name
@@ -29342,6 +29365,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -29458,6 +29482,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -29574,6 +29599,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -29697,6 +29723,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -29813,6 +29840,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -29929,6 +29957,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -30045,6 +30074,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -33058,37 +33088,47 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     description: StationFullResponseBody result type (default view)
     example:
       attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.47657678
       configurations:
         all:
@@ -34216,14 +34256,14 @@ definitions:
       ingestionAt: 538988070849406059
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 3270555828668683297
       location:
         precise:
@@ -34370,6 +34410,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -34386,34 +34427,34 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     required:
     - id
     - name
@@ -34436,16 +34477,26 @@ definitions:
     example:
     - attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.6942271
       configurations:
         all:
@@ -35573,14 +35624,14 @@ definitions:
       ingestionAt: 3981049358189515870
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 5700363257470548520
       location:
         precise:
@@ -35727,6 +35778,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -35743,57 +35795,67 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     - attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.6942271
       configurations:
         all:
@@ -36921,14 +36983,14 @@ definitions:
       ingestionAt: 3981049358189515870
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 5700363257470548520
       location:
         precise:
@@ -37075,6 +37137,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -37091,57 +37154,67 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     - attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.6942271
       configurations:
         all:
@@ -38269,14 +38342,14 @@ definitions:
       ingestionAt: 3981049358189515870
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 5700363257470548520
       location:
         precise:
@@ -38423,6 +38496,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -38439,57 +38513,67 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     - attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.6942271
       configurations:
         all:
@@ -39617,14 +39701,14 @@ definitions:
       ingestionAt: 3981049358189515870
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 5700363257470548520
       location:
         precise:
@@ -39771,6 +39855,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -39787,45 +39872,45 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
   StationGetBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -40053,48 +40138,58 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     description: GetResponseBody result type (default view)
     example:
       attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.84105146
       configurations:
         all:
@@ -41222,14 +41317,14 @@ definitions:
       ingestionAt: 3116722948959790954
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 3542694263980932382
       location:
         precise:
@@ -41376,6 +41471,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -41392,23 +41488,23 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     required:
     - id
     - name
@@ -41474,40 +41570,40 @@ definitions:
         items:
           $ref: '#/definitions/StationInterestingnessWindowResponseBody'
         example:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
     example:
       windows:
-      - interestingness: 0.7663114632162892
-        seconds: 346658777
-        time: 5267690698111332049
-        value: 0.8071560846576038
-      - interestingness: 0.7663114632162892
-        seconds: 346658777
-        time: 5267690698111332049
-        value: 0.8071560846576038
-      - interestingness: 0.7663114632162892
-        seconds: 346658777
-        time: 5267690698111332049
-        value: 0.8071560846576038
-      - interestingness: 0.7663114632162892
-        seconds: 346658777
-        time: 5267690698111332049
-        value: 0.8071560846576038
+      - interestingness: 0.8877936074222665
+        seconds: 1296898599
+        time: 6910866038585305159
+        value: 0.15296536941270772
+      - interestingness: 0.8877936074222665
+        seconds: 1296898599
+        time: 6910866038585305159
+        value: 0.15296536941270772
+      - interestingness: 0.8877936074222665
+        seconds: 1296898599
+        time: 6910866038585305159
+        value: 0.15296536941270772
+      - interestingness: 0.8877936074222665
+        seconds: 1296898599
+        time: 6910866038585305159
+        value: 0.15296536941270772
     required:
     - windows
   StationInterestingnessWindowResponseBody:
@@ -41516,25 +41612,25 @@ definitions:
     properties:
       interestingness:
         type: number
-        example: 0.9840180415279484
+        example: 0.024640376102196136
         format: double
       seconds:
         type: integer
-        example: 194048058
+        example: 103403316
         format: int32
       time:
         type: integer
-        example: 5243952530789296433
+        example: 7395761595947203429
         format: int64
       value:
         type: number
-        example: 0.9058577155139046
+        example: 0.07753346580758076
         format: double
     example:
-      interestingness: 0.7531545619005978
-      seconds: 1864702193
-      time: 8330849619291304977
-      value: 0.3597920490498756
+      interestingness: 0.5584910186883522
+      seconds: 111539681
+      time: 1616054772933389029
+      value: 0.9472546415865061
     required:
     - seconds
     - interestingness
@@ -41819,6 +41915,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -41935,6 +42032,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -42051,6 +42149,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -42167,6 +42266,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -42290,6 +42390,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -42406,6 +42507,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -42522,6 +42624,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 7447393027274562547
         updatedAt: 6218594393067882505
@@ -42733,16 +42836,26 @@ definitions:
         station:
           attributes:
             attributes:
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
           battery: 0.6942271
           configurations:
             all:
@@ -43870,14 +43983,14 @@ definitions:
           ingestionAt: 3981049358189515870
           interestingness:
             windows:
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
           lastReadingAt: 5700363257470548520
           location:
             precise:
@@ -44024,6 +44137,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           photos:
             small: Dolores est dignissimos consequatur dolor enim.
@@ -44040,45 +44154,45 @@ definitions:
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
       - hidden: true
         location:
         - distance: 0.32588857
@@ -44102,16 +44216,26 @@ definitions:
         station:
           attributes:
             attributes:
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
           battery: 0.6942271
           configurations:
             all:
@@ -45239,14 +45363,14 @@ definitions:
           ingestionAt: 3981049358189515870
           interestingness:
             windows:
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
           lastReadingAt: 5700363257470548520
           location:
             precise:
@@ -45393,6 +45517,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           photos:
             small: Dolores est dignissimos consequatur dolor enim.
@@ -45409,45 +45534,45 @@ definitions:
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
     required:
     - stations
   StationListAssociatedUnauthorizedResponseBody:
@@ -45633,16 +45758,26 @@ definitions:
       stations:
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -46770,14 +46905,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -46924,6 +47059,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -46940,57 +47076,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -48118,14 +48264,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -48272,6 +48418,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -48288,57 +48435,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -49466,14 +49623,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -49620,6 +49777,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -49636,57 +49794,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -50814,14 +50982,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -50968,6 +51136,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -50984,45 +51153,45 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     required:
     - stations
   StationListMineUnauthorizedResponseBody:
@@ -51229,16 +51398,26 @@ definitions:
         station:
           attributes:
             attributes:
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
           battery: 0.6942271
           configurations:
             all:
@@ -52366,14 +52545,14 @@ definitions:
           ingestionAt: 3981049358189515870
           interestingness:
             windows:
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
           lastReadingAt: 5700363257470548520
           location:
             precise:
@@ -52520,6 +52699,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           photos:
             small: Dolores est dignissimos consequatur dolor enim.
@@ -52536,45 +52716,45 @@ definitions:
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
       - hidden: true
         location:
         - distance: 0.32588857
@@ -52598,16 +52778,26 @@ definitions:
         station:
           attributes:
             attributes:
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
-            - attributeId: 8188450733196959687
-              name: Molestiae similique unde.
-              priority: 1260084452
-              projectId: 1296898599
-              stringValue: Culpa nobis dolores amet.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
+            - attributeId: 4567841681934386334
+              name: Nobis dolores.
+              priority: 450422624
+              projectId: 935767534
+              stringValue: Magni quod voluptatibus.
           battery: 0.6942271
           configurations:
             all:
@@ -53735,14 +53925,14 @@ definitions:
           ingestionAt: 3981049358189515870
           interestingness:
             windows:
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
-            - interestingness: 0.7663114632162892
-              seconds: 346658777
-              time: 5267690698111332049
-              value: 0.8071560846576038
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
+            - interestingness: 0.8877936074222665
+              seconds: 1296898599
+              time: 6910866038585305159
+              value: 0.15296536941270772
           lastReadingAt: 5700363257470548520
           location:
             precise:
@@ -53889,6 +54079,7 @@ definitions:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           photos:
             small: Dolores est dignissimos consequatur dolor enim.
@@ -53905,45 +54096,45 @@ definitions:
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
     required:
     - stations
   StationListProjectAssociatedUnauthorizedResponseBody:
@@ -54129,16 +54320,26 @@ definitions:
       stations:
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -55266,14 +55467,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -55420,6 +55621,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -55436,57 +55638,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -56614,14 +56826,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -56768,6 +56980,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -56784,57 +56997,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -57962,14 +58185,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -58116,6 +58339,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -58132,57 +58356,67 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       - attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.6942271
         configurations:
           all:
@@ -59310,14 +59544,14 @@ definitions:
         ingestionAt: 3981049358189515870
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 5700363257470548520
         location:
           precise:
@@ -59464,6 +59698,7 @@ definitions:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -59480,45 +59715,45 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     required:
     - stations
   StationListProjectUnauthorizedResponseBody:
@@ -60043,13 +60278,17 @@ definitions:
         type: integer
         example: 1254915944
         format: int32
+      mediaURL:
+        type: string
+        example: Est ad maiores ad optio debitis.
       name:
         type: string
         example: Laudantium quaerat.
     example:
-      email: Debitis provident odit atque occaecati quasi corporis.
-      id: 2128917832
-      name: Ad maiores ad.
+      email: Vel voluptatem voluptas fuga voluptatem tempora.
+      id: 332725884
+      mediaURL: Alias natus.
+      name: Atque occaecati quasi corporis.
     required:
     - id
     - name
@@ -60059,9 +60298,9 @@ definitions:
     properties:
       small:
         type: string
-        example: Sunt eos dicta non quia autem omnis.
+        example: Omnis porro omnis consequuntur officia.
     example:
-      small: Omnis consequuntur officia.
+      small: Illo expedita aliquam.
     required:
     - small
   StationProgressBadRequestResponseBody:
@@ -60272,28 +60511,28 @@ definitions:
     properties:
       attributeId:
         type: integer
-        example: 715120000450076350
+        example: 5886668050950949790
         format: int64
       name:
         type: string
-        example: Non asperiores.
+        example: Dolorem sit animi est voluptatem quos.
       priority:
         type: integer
-        example: 1591096195
+        example: 1378022677
         format: int32
       projectId:
         type: integer
-        example: 52914804
+        example: 1591096195
         format: int32
       stringValue:
         type: string
-        example: Quod natus perspiciatis.
+        example: Iusto eum.
     example:
-      attributeId: 4661318739054850094
-      name: Sit animi est voluptatem quos iste iusto.
-      priority: 1693120859
-      projectId: 1370596711
-      stringValue: Dolorum autem modi provident et eaque minus.
+      attributeId: 7103713289369017560
+      name: Et eaque minus dolorem quia.
+      priority: 1969572735
+      projectId: 1828626815
+      stringValue: Id vero natus sint.
     required:
     - projectId
     - attributeId
@@ -60309,28 +60548,33 @@ definitions:
         items:
           $ref: '#/definitions/StationProjectAttributeResponseBody'
         example:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
     example:
       attributes:
-      - attributeId: 8188450733196959687
-        name: Molestiae similique unde.
-        priority: 1260084452
-        projectId: 1296898599
-        stringValue: Culpa nobis dolores amet.
-      - attributeId: 8188450733196959687
-        name: Molestiae similique unde.
-        priority: 1260084452
-        projectId: 1296898599
-        stringValue: Culpa nobis dolores amet.
+      - attributeId: 4567841681934386334
+        name: Nobis dolores.
+        priority: 450422624
+        projectId: 935767534
+        stringValue: Magni quod voluptatibus.
+      - attributeId: 4567841681934386334
+        name: Nobis dolores.
+        priority: 450422624
+        projectId: 935767534
+        stringValue: Magni quod voluptatibus.
     required:
     - attributes
   StationRegionResponseBody:
@@ -60889,48 +61133,58 @@ definitions:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
     description: UpdateResponseBody result type (default view)
     example:
       attributes:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       battery: 0.28170663
       configurations:
         all:
@@ -62058,14 +62312,14 @@ definitions:
       ingestionAt: 6151120177181444120
       interestingness:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       lastReadingAt: 3657935658773536566
       location:
         precise:
@@ -62212,6 +62466,7 @@ definitions:
       owner:
         email: Veritatis sapiente enim et soluta unde.
         id: 2140936355
+        mediaURL: Molestiae aliquid accusantium placeat.
         name: Quidem voluptas ratione unde sed.
       photos:
         small: Dolores est dignissimos consequatur dolor enim.
@@ -62228,23 +62483,23 @@ definitions:
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
       - blocks:
         - 442659245519894994
         - 6910822585695413511
         - 4631112066078792023
         - 2105688750839251782
-        id: 1194079917504476477
-        size: 5358913567942513668
-        time: 7076181190627093105
-        type: Ut quae tempora omnis sunt aut.
-        uploadId: Aspernatur cumque soluta qui.
-        url: Et numquam et repudiandae.
+        id: 2121958059739255445
+        size: 8235412945664949278
+        time: 2673550516266587404
+        type: Tempora omnis sunt aut.
+        uploadId: Qui et optio.
+        url: Et repudiandae facilis ut.
     required:
     - id
     - name
@@ -62309,43 +62564,42 @@ definitions:
         type: array
         items:
           type: integer
-          example: 1921499500228515834
+          example: 4716029936394177171
           format: int64
         example:
-        - 79456516694972650
-        - 142971434057426790
+        - 1219627679819119491
+        - 4162387210640363484
       id:
         type: integer
-        example: 8494864072725976074
+        example: 3544698595418855734
         format: int64
       size:
         type: integer
-        example: 837017278171948215
+        example: 6067260541389217365
         format: int64
       time:
         type: integer
-        example: 5124700421410052242
+        example: 8760409469754134353
         format: int64
       type:
         type: string
-        example: Nihil tempora temporibus.
+        example: Consequuntur qui ea.
       uploadId:
         type: string
-        example: Sint nam aperiam.
+        example: Dolorem nemo nihil tempora.
       url:
         type: string
-        example: Ut itaque dolorem.
+        example: Repellat fugiat ad.
     example:
       blocks:
-      - 8082069826562370003
-      - 6517138985151560631
-      - 4884575070259807634
-      id: 7095138849740698820
-      size: 1219627679819119491
-      time: 6400909073713471536
-      type: Porro quibusdam laboriosam quam ut omnis deserunt.
-      uploadId: Ea minima rerum.
-      url: Ab quis excepturi.
+      - 7985120228714745344
+      - 3578228241482318645
+      id: 3988042245739137003
+      size: 6564879260154630305
+      time: 5612054321724613284
+      type: Similique reiciendis autem sunt.
+      uploadId: Sapiente porro quibusdam laboriosam quam ut.
+      url: Eum ab.
     required:
     - id
     - time

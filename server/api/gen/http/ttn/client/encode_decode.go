@@ -84,11 +84,11 @@ func EncodeWebhookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 // webhook endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeWebhookResponse may return the following errors:
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- "unauthorized" (type ttn.Unauthorized): http.StatusUnauthorized
-//	- error: internal error
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - "unauthorized" (type ttn.Unauthorized): http.StatusUnauthorized
+//   - error: internal error
 func DecodeWebhookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

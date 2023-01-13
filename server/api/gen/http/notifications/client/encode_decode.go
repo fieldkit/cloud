@@ -45,11 +45,11 @@ func (c *Client) BuildListenRequest(ctx context.Context, v interface{}) (*http.R
 // notifications listen endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeListenResponse may return the following errors:
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- "unauthorized" (type notifications.Unauthorized): http.StatusUnauthorized
-//	- error: internal error
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - "unauthorized" (type notifications.Unauthorized): http.StatusUnauthorized
+//   - error: internal error
 func DecodeListenResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -177,11 +177,11 @@ func EncodeSeenRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.R
 // notifications seen endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeSeenResponse may return the following errors:
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- "unauthorized" (type notifications.Unauthorized): http.StatusUnauthorized
-//	- error: internal error
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - "unauthorized" (type notifications.Unauthorized): http.StatusUnauthorized
+//   - error: internal error
 func DecodeSeenResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

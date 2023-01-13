@@ -8,6 +8,7 @@ var Owner = Type("StationOwner", func() {
 	Attribute("id", Int32)
 	Attribute("name", String)
 	Attribute("email", String)
+	Attribute("mediaURL", String)
 	Required("id", "name")
 })
 

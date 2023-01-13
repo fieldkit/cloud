@@ -100,9 +100,10 @@ type StationFullModelView struct {
 
 // StationOwnerView is a type that runs validations on a projected type.
 type StationOwnerView struct {
-	ID    *int32
-	Name  *string
-	Email *string
+	ID       *int32
+	Name     *string
+	Email    *string
+	MediaURL *string
 }
 
 // StationInterestingnessView is a type that runs validations on a projected
