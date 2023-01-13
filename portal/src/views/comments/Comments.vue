@@ -385,13 +385,11 @@ export default Vue.extend({
     },
     watch: {
         async parentData(): Promise<void> {
-          console.log('aici22222222222222222');
 
           await this.getDataEvents();
             return this.getComments();
         },
         $route() {
-            console.log('aici11111111111111');
             this.highlightComment();
         },
     },

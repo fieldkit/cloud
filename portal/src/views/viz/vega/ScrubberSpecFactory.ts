@@ -5,7 +5,11 @@ import { TimeRange } from "../common";
 export { ChartSettings };
 
 export class ScrubberSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container, private readonly dataEvents = null) {}
+    constructor(
+        private readonly allSeries,
+        private readonly settings: ChartSettings = ChartSettings.Container,
+        private readonly dataEvents = null
+    ) {}
 
     create() {
         const first = this.allSeries[0]; // TODO
@@ -87,41 +91,39 @@ export class ScrubberSpecFactory {
                     name: "de_circle",
                     type: "symbol",
                     interactive: true,
-                    from:
-                        {
-                            data: "data_events"
-                        },
+                    from: {
+                        data: "data_events",
+                    },
                     encode: {
                         enter: {
-                            yc: {value: 50},
-                            fill: {value: "white"},
-                            stroke: {value: "#999"},
-                            size: {value: 700},
+                            yc: { value: 50 },
+                            fill: { value: "white" },
+                            stroke: { value: "#999" },
+                            size: { value: 700 },
                         },
                         update: {
-                            "x": {"scale": "x", "field": "start"}
-                        }
-                    }
+                            x: { scale: "x", field: "start" },
+                        },
+                    },
                 },
                 {
                     name: "de_flag",
                     type: "path",
                     interactive: false,
-                    from:
-                        {
-                            data: "data_events"
-                        },
+                    from: {
+                        data: "data_events",
+                    },
                     encode: {
                         enter: {
-                            yc: {value: 50},
-                            fill: {value: "#52b5e4"},
-                            size: {value: 100},
-                            path: {value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z"}
+                            yc: { value: 50 },
+                            fill: "transparent",
+                            size: { value: 100 },
+                            path: { value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z" },
                         },
                         update: {
-                            "x": {"scale": "x", "field": "start"}
-                        }
-                    }
+                            x: { scale: "x", field: "start" },
+                        },
+                    },
                 },
             ];
         };
@@ -235,14 +237,10 @@ export class ScrubberSpecFactory {
                                 field: [],
                                 order: [],
                             },
-                            as:
-                            [
-                                "value_start",
-                                "value_end"
-                            ],
-                            offset: "zero"
-                        }
-                    ]
+                            as: ["value_start", "value_end"],
+                            offset: "zero",
+                        },
+                    ],
                 },
                 {
                     name: "data_events",
@@ -267,42 +265,30 @@ export class ScrubberSpecFactory {
                 {
                     name: "event_click",
                     init: "",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            {
+                            events: {
                                 source: "scope",
                                 type: "mouseup",
-                                filter:
-                                [
-                                    "event.item.mark.name === \"de_circle\""
-                                ]
-
+                                filter: ['event.item.mark.name === "de_circle"'],
                             },
-                            update: "event.item.datum.id"
-                        }
-                    ]
+                            update: "event.item.datum.id",
+                        },
+                    ],
                 },
                 {
                     name: "event_hover",
                     init: "[0,0]",
-                    on:
-                    [
+                    on: [
                         {
-                            events:
-                            {
+                            events: {
                                 source: "scope",
                                 type: "mouseover",
-                                filter:
-                                [
-                                    "event.item.mark.name === \"de_circle\""
-                                ]
-
+                                filter: ['event.item.mark.name === "de_circle"'],
                             },
-                            update: "[event.item.datum.start, event.item.datum.end]"
-                        }
-                    ]
+                            update: "[event.item.datum.start, event.item.datum.end]",
+                        },
+                    ],
                 },
                 {
                     name: "unit",
@@ -353,8 +339,7 @@ export class ScrubberSpecFactory {
                     on: [
                         {
                             // Update brush xy on area mousedown
-                            events:
-                            {
+                            events: {
                                 source: "scope",
                                 type: "mousedown",
                                 filter: [

@@ -70,7 +70,11 @@
                     </div>
                 </div>
 
-                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" @event-clicked="eventClicked"
+                <VizWorkspace
+                    v-if="workspace && !workspace.empty"
+                    :workspace="workspace"
+                    @change="onChange"
+                    @event-clicked="eventClicked"
                 />
 
                 <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark"></Comments>
@@ -364,7 +368,7 @@ export default Vue.extend({
             return getPartnerCustomizationWithDefault();
         },
         eventClicked(id: number): void {
-          this.$emit("event-clicked", id);
+            this.$emit("event-clicked", id);
         },
     },
 });
@@ -1016,4 +1020,11 @@ export default Vue.extend({
     }
 }
 
+::v-deep .de_flag path {
+    fill: #52b5e4;
+
+  body.floodnet & {
+        fill: var(--color-dark);
+    }
+}
 </style>
