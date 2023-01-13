@@ -682,7 +682,7 @@ export default Vue.extend({
                     const el = document.querySelector(location.hash);
 
                     if (el) {
-                        el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        el.scrollIntoView({ behavior: "smooth" });
                         el.classList.add("highlight");
                         setTimeout(() => {
                             el.classList.remove("highlight");
@@ -929,6 +929,7 @@ header {
 
     @include bp-down($xs) {
         padding: 15px 10px 0 10px;
+        scroll-margin-top: 50px;
     }
 
     &-first-level {
