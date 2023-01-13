@@ -1087,6 +1087,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
+			MediaURL: sf.Owner.MediaURL,
 		},
 		Photos: photos,
 	}, nil

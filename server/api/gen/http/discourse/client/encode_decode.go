@@ -57,12 +57,12 @@ func EncodeAuthenticateRequest(encoder func(*http.Request) goahttp.Encoder) func
 // discourse authenticate endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeAuthenticateResponse may return the following errors:
-//	- "user-unverified" (type *goa.ServiceError): http.StatusForbidden
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "user-unverified" (type *goa.ServiceError): http.StatusForbidden
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeAuthenticateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

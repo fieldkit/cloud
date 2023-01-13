@@ -173,6 +173,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -289,6 +290,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -405,6 +407,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -681,6 +684,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -797,6 +801,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -913,6 +918,7 @@ paths:
                   owner:
                     email: Veritatis sapiente enim et soluta unde.
                     id: 2140936355
+                    mediaURL: Molestiae aliquid accusantium placeat.
                     name: Quidem voluptas ratione unde sed.
                   recordingStartedAt: 7447393027274562547
                   updatedAt: 6218594393067882505
@@ -6327,26 +6333,16 @@ paths:
                 stations:
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -6938,7 +6934,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -6946,18 +6942,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -7070,59 +7066,63 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -7714,7 +7714,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -7722,18 +7722,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -7846,59 +7846,63 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -8490,7 +8494,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -8498,18 +8502,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -8622,37 +8626,51 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
         "400":
           description: ""
           content:
@@ -9137,26 +9155,16 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
                     battery: 0.5468714
                     configurations:
                       all:
@@ -9748,7 +9756,7 @@ paths:
                       end: 3636874576722561497
                       numberOfSamples: 5758815084605736183
                       start: 8606592342783883535
-                    deviceId: Deserunt sequi est sunt qui occaecati.
+                    deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                     firmwareNumber: 2043230017
                     firmwareTime: 935825251242629127
                     hidden: false
@@ -9756,18 +9764,18 @@ paths:
                     ingestionAt: 6531986932300060548
                     interestingness:
                       windows:
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
                     lastReadingAt: 6064010795564662914
                     location:
                       precise:
@@ -9880,37 +9888,51 @@ paths:
                     owner:
                       email: Et quo.
                       id: 1529085094
+                      mediaURL: Deserunt sequi est sunt qui occaecati.
                       name: Quod facilis hic ea incidunt.
                     photos:
-                      small: Impedit ipsam enim minima recusandae modi aliquid.
+                      small: Recusandae modi.
                     placeNameNative: Nostrum occaecati facilis placeat dolorem.
                     placeNameOther: Sint tempore nesciunt error.
                     readOnly: true
                     recordingStartedAt: 6263555156768608226
-                    status: Dolores sit.
+                    status: Qui dolores sit.
                     syncedAt: 1640918549389409287
                     updatedAt: 7887283515049619400
                     uploads:
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
+                    - blocks:
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                 - hidden: true
                   location:
                   - distance: 0.30949908
@@ -9929,26 +9951,16 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
                     battery: 0.5468714
                     configurations:
                       all:
@@ -10540,7 +10552,7 @@ paths:
                       end: 3636874576722561497
                       numberOfSamples: 5758815084605736183
                       start: 8606592342783883535
-                    deviceId: Deserunt sequi est sunt qui occaecati.
+                    deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                     firmwareNumber: 2043230017
                     firmwareTime: 935825251242629127
                     hidden: false
@@ -10548,18 +10560,18 @@ paths:
                     ingestionAt: 6531986932300060548
                     interestingness:
                       windows:
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
                     lastReadingAt: 6064010795564662914
                     location:
                       precise:
@@ -10672,37 +10684,51 @@ paths:
                     owner:
                       email: Et quo.
                       id: 1529085094
+                      mediaURL: Deserunt sequi est sunt qui occaecati.
                       name: Quod facilis hic ea incidunt.
                     photos:
-                      small: Impedit ipsam enim minima recusandae modi aliquid.
+                      small: Recusandae modi.
                     placeNameNative: Nostrum occaecati facilis placeat dolorem.
                     placeNameOther: Sint tempore nesciunt error.
                     readOnly: true
                     recordingStartedAt: 6263555156768608226
-                    status: Dolores sit.
+                    status: Qui dolores sit.
                     syncedAt: 1640918549389409287
                     updatedAt: 7887283515049619400
                     uploads:
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
+                    - blocks:
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
         "400":
           description: ""
           content:
@@ -13223,16 +13249,26 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
                 battery: 0.45971856
                 configurations:
                   all:
@@ -14360,14 +14396,14 @@ paths:
                 ingestionAt: 1585236012872521254
                 interestingness:
                   windows:
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
                 lastReadingAt: 1139448150595763060
                 location:
                   precise:
@@ -14480,6 +14516,7 @@ paths:
                 owner:
                   email: Veritatis sapiente enim et soluta unde.
                   id: 2140936355
+                  mediaURL: Molestiae aliquid accusantium placeat.
                   name: Quidem voluptas ratione unde sed.
                 photos:
                   small: Dolores est dignissimos consequatur dolor enim.
@@ -14496,45 +14533,45 @@ paths:
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
         "400":
           description: ""
           content:
@@ -14617,16 +14654,26 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
                 battery: 0.920956
                 configurations:
                   all:
@@ -15754,14 +15801,14 @@ paths:
                 ingestionAt: 2876956474666341486
                 interestingness:
                   windows:
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
                 lastReadingAt: 8123643143535451743
                 location:
                   precise:
@@ -15874,6 +15921,7 @@ paths:
                 owner:
                   email: Veritatis sapiente enim et soluta unde.
                   id: 2140936355
+                  mediaURL: Molestiae aliquid accusantium placeat.
                   name: Quidem voluptas ratione unde sed.
                 photos:
                   small: Dolores est dignissimos consequatur dolor enim.
@@ -15890,45 +15938,45 @@ paths:
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
         "400":
           description: ""
           content:
@@ -16020,16 +16068,26 @@ paths:
               example:
                 attributes:
                   attributes:
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
-                  - attributeId: 8188450733196959687
-                    name: Molestiae similique unde.
-                    priority: 1260084452
-                    projectId: 1296898599
-                    stringValue: Culpa nobis dolores amet.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
+                  - attributeId: 4567841681934386334
+                    name: Nobis dolores.
+                    priority: 450422624
+                    projectId: 935767534
+                    stringValue: Magni quod voluptatibus.
                 battery: 0.5467053
                 configurations:
                   all:
@@ -17157,14 +17215,14 @@ paths:
                 ingestionAt: 8322325405642459452
                 interestingness:
                   windows:
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
-                  - interestingness: 0.7663114632162892
-                    seconds: 346658777
-                    time: 5267690698111332049
-                    value: 0.8071560846576038
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
+                  - interestingness: 0.8877936074222665
+                    seconds: 1296898599
+                    time: 6910866038585305159
+                    value: 0.15296536941270772
                 lastReadingAt: 6142502221140974678
                 location:
                   precise:
@@ -17277,6 +17335,7 @@ paths:
                 owner:
                   email: Veritatis sapiente enim et soluta unde.
                   id: 2140936355
+                  mediaURL: Molestiae aliquid accusantium placeat.
                   name: Quidem voluptas ratione unde sed.
                 photos:
                   small: Dolores est dignissimos consequatur dolor enim.
@@ -17293,34 +17352,34 @@ paths:
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
                 - blocks:
                   - 442659245519894994
                   - 6910822585695413511
                   - 4631112066078792023
                   - 2105688750839251782
-                  id: 1194079917504476477
-                  size: 5358913567942513668
-                  time: 7076181190627093105
-                  type: Ut quae tempora omnis sunt aut.
-                  uploadId: Aspernatur cumque soluta qui.
-                  url: Et numquam et repudiandae.
+                  id: 2121958059739255445
+                  size: 8235412945664949278
+                  time: 2673550516266587404
+                  type: Tempora omnis sunt aut.
+                  uploadId: Qui et optio.
+                  url: Et repudiandae facilis ut.
         "400":
           description: ""
           content:
@@ -17555,26 +17614,16 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
                     battery: 0.5468714
                     configurations:
                       all:
@@ -18166,7 +18215,7 @@ paths:
                       end: 3636874576722561497
                       numberOfSamples: 5758815084605736183
                       start: 8606592342783883535
-                    deviceId: Deserunt sequi est sunt qui occaecati.
+                    deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                     firmwareNumber: 2043230017
                     firmwareTime: 935825251242629127
                     hidden: false
@@ -18174,18 +18223,18 @@ paths:
                     ingestionAt: 6531986932300060548
                     interestingness:
                       windows:
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
                     lastReadingAt: 6064010795564662914
                     location:
                       precise:
@@ -18298,37 +18347,51 @@ paths:
                     owner:
                       email: Et quo.
                       id: 1529085094
+                      mediaURL: Deserunt sequi est sunt qui occaecati.
                       name: Quod facilis hic ea incidunt.
                     photos:
-                      small: Impedit ipsam enim minima recusandae modi aliquid.
+                      small: Recusandae modi.
                     placeNameNative: Nostrum occaecati facilis placeat dolorem.
                     placeNameOther: Sint tempore nesciunt error.
                     readOnly: true
                     recordingStartedAt: 6263555156768608226
-                    status: Dolores sit.
+                    status: Qui dolores sit.
                     syncedAt: 1640918549389409287
                     updatedAt: 7887283515049619400
                     uploads:
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
+                    - blocks:
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                 - hidden: true
                   location:
                   - distance: 0.30949908
@@ -18347,26 +18410,16 @@ paths:
                   station:
                     attributes:
                       attributes:
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
-                      - attributeId: 899269234555983951
-                        name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                        priority: 497394973
-                        projectId: 1301465489
-                        stringValue: Ut quae sunt in officia perspiciatis maiores.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
+                      - attributeId: 1816130987409952621
+                        name: Ut quae sunt in officia perspiciatis maiores.
+                        priority: 292555471
+                        projectId: 126465405
+                        stringValue: Similique similique vel.
                     battery: 0.5468714
                     configurations:
                       all:
@@ -18958,7 +19011,7 @@ paths:
                       end: 3636874576722561497
                       numberOfSamples: 5758815084605736183
                       start: 8606592342783883535
-                    deviceId: Deserunt sequi est sunt qui occaecati.
+                    deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                     firmwareNumber: 2043230017
                     firmwareTime: 935825251242629127
                     hidden: false
@@ -18966,18 +19019,18 @@ paths:
                     ingestionAt: 6531986932300060548
                     interestingness:
                       windows:
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
-                      - interestingness: 0.9879424357633158
-                        seconds: 138439757
-                        time: 6265326695585801180
-                        value: 0.5129071450766951
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
+                      - interestingness: 0.45963032895010125
+                        seconds: 1747239950
+                        time: 8175471059320548570
+                        value: 0.09021219440561899
                     lastReadingAt: 6064010795564662914
                     location:
                       precise:
@@ -19090,37 +19143,51 @@ paths:
                     owner:
                       email: Et quo.
                       id: 1529085094
+                      mediaURL: Deserunt sequi est sunt qui occaecati.
                       name: Quod facilis hic ea incidunt.
                     photos:
-                      small: Impedit ipsam enim minima recusandae modi aliquid.
+                      small: Recusandae modi.
                     placeNameNative: Nostrum occaecati facilis placeat dolorem.
                     placeNameOther: Sint tempore nesciunt error.
                     readOnly: true
                     recordingStartedAt: 6263555156768608226
-                    status: Dolores sit.
+                    status: Qui dolores sit.
                     syncedAt: 1640918549389409287
                     updatedAt: 7887283515049619400
                     uploads:
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
                     - blocks:
-                      - 2546463155989257386
-                      - 2344607860324883146
-                      - 3358572229498074290
-                      id: 7682922868070384673
-                      size: 7610860023129243077
-                      time: 44366409423168046
-                      type: Qui eveniet dolor eveniet.
-                      uploadId: Dolores ut odit.
-                      url: Est rerum similique architecto et et vero.
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
+                    - blocks:
+                      - 4248281901781778886
+                      - 1368791136041262928
+                      - 8954379409839860152
+                      - 1423630875388456846
+                      id: 1572630737197674529
+                      size: 7069800281688926139
+                      time: 346811034453362382
+                      type: Eveniet ipsum aperiam et.
+                      uploadId: Animi est rerum similique architecto.
+                      url: Vero aut qui eveniet.
         "400":
           description: ""
           content:
@@ -21069,26 +21136,16 @@ paths:
                 stations:
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -21680,7 +21737,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -21688,18 +21745,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -21812,59 +21869,63 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -22456,7 +22517,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -22464,18 +22525,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -22588,59 +22649,63 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                 - attributes:
                     attributes:
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
-                    - attributeId: 899269234555983951
-                      name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                      priority: 497394973
-                      projectId: 1301465489
-                      stringValue: Ut quae sunt in officia perspiciatis maiores.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
+                    - attributeId: 1816130987409952621
+                      name: Ut quae sunt in officia perspiciatis maiores.
+                      priority: 292555471
+                      projectId: 126465405
+                      stringValue: Similique similique vel.
                   battery: 0.5468714
                   configurations:
                     all:
@@ -23232,7 +23297,7 @@ paths:
                     end: 3636874576722561497
                     numberOfSamples: 5758815084605736183
                     start: 8606592342783883535
-                  deviceId: Deserunt sequi est sunt qui occaecati.
+                  deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
                   firmwareNumber: 2043230017
                   firmwareTime: 935825251242629127
                   hidden: false
@@ -23240,18 +23305,18 @@ paths:
                   ingestionAt: 6531986932300060548
                   interestingness:
                     windows:
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
-                    - interestingness: 0.9879424357633158
-                      seconds: 138439757
-                      time: 6265326695585801180
-                      value: 0.5129071450766951
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
+                    - interestingness: 0.45963032895010125
+                      seconds: 1747239950
+                      time: 8175471059320548570
+                      value: 0.09021219440561899
                   lastReadingAt: 6064010795564662914
                   location:
                     precise:
@@ -23364,37 +23429,51 @@ paths:
                   owner:
                     email: Et quo.
                     id: 1529085094
+                    mediaURL: Deserunt sequi est sunt qui occaecati.
                     name: Quod facilis hic ea incidunt.
                   photos:
-                    small: Impedit ipsam enim minima recusandae modi aliquid.
+                    small: Recusandae modi.
                   placeNameNative: Nostrum occaecati facilis placeat dolorem.
                   placeNameOther: Sint tempore nesciunt error.
                   readOnly: true
                   recordingStartedAt: 6263555156768608226
-                  status: Dolores sit.
+                  status: Qui dolores sit.
                   syncedAt: 1640918549389409287
                   updatedAt: 7887283515049619400
                   uploads:
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
                   - blocks:
-                    - 2546463155989257386
-                    - 2344607860324883146
-                    - 3358572229498074290
-                    id: 7682922868070384673
-                    size: 7610860023129243077
-                    time: 44366409423168046
-                    type: Qui eveniet dolor eveniet.
-                    uploadId: Dolores ut odit.
-                    url: Est rerum similique architecto et et vero.
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
+                  - blocks:
+                    - 4248281901781778886
+                    - 1368791136041262928
+                    - 8954379409839860152
+                    - 1423630875388456846
+                    id: 1572630737197674529
+                    size: 7069800281688926139
+                    time: 346811034453362382
+                    type: Eveniet ipsum aperiam et.
+                    uploadId: Animi est rerum similique architecto.
+                    url: Vero aut qui eveniet.
         "400":
           description: ""
           content:
@@ -24601,26 +24680,16 @@ components:
         station:
           attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -25212,7 +25281,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -25220,18 +25289,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -25344,37 +25413,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
       required:
       - station
       - hidden
@@ -26363,26 +26446,16 @@ components:
         station:
           attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -26974,7 +27047,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -26982,18 +27055,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -27106,37 +27179,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
       - hidden: true
         location:
         - distance: 0.30949908
@@ -27155,26 +27242,16 @@ components:
         station:
           attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -27766,7 +27843,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -27774,18 +27851,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -27898,37 +27975,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
       - hidden: true
         location:
         - distance: 0.30949908
@@ -27947,26 +28038,16 @@ components:
         station:
           attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -28558,7 +28639,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -28566,18 +28647,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -28690,37 +28771,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
       - hidden: true
         location:
         - distance: 0.30949908
@@ -28739,26 +28834,16 @@ components:
         station:
           attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -29350,7 +29435,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -29358,18 +29443,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -29482,37 +29567,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
     AssociatedStations:
       type: object
       properties:
@@ -29538,26 +29637,16 @@ components:
           station:
             attributes:
               attributes:
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
+              - attributeId: 1816130987409952621
+                name: Ut quae sunt in officia perspiciatis maiores.
+                priority: 292555471
+                projectId: 126465405
+                stringValue: Similique similique vel.
+              - attributeId: 1816130987409952621
+                name: Ut quae sunt in officia perspiciatis maiores.
+                priority: 292555471
+                projectId: 126465405
+                stringValue: Similique similique vel.
             battery: 0.5468714
             configurations:
               all:
@@ -30149,7 +30238,7 @@ components:
               end: 3636874576722561497
               numberOfSamples: 5758815084605736183
               start: 8606592342783883535
-            deviceId: Deserunt sequi est sunt qui occaecati.
+            deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
             firmwareNumber: 2043230017
             firmwareTime: 935825251242629127
             hidden: false
@@ -30157,18 +30246,18 @@ components:
             ingestionAt: 6531986932300060548
             interestingness:
               windows:
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
             lastReadingAt: 6064010795564662914
             location:
               precise:
@@ -30281,37 +30370,51 @@ components:
             owner:
               email: Et quo.
               id: 1529085094
+              mediaURL: Deserunt sequi est sunt qui occaecati.
               name: Quod facilis hic ea incidunt.
             photos:
-              small: Impedit ipsam enim minima recusandae modi aliquid.
+              small: Recusandae modi.
             placeNameNative: Nostrum occaecati facilis placeat dolorem.
             placeNameOther: Sint tempore nesciunt error.
             readOnly: true
             recordingStartedAt: 6263555156768608226
-            status: Dolores sit.
+            status: Qui dolores sit.
             syncedAt: 1640918549389409287
             updatedAt: 7887283515049619400
             uploads:
             - blocks:
-              - 2546463155989257386
-              - 2344607860324883146
-              - 3358572229498074290
-              id: 7682922868070384673
-              size: 7610860023129243077
-              time: 44366409423168046
-              type: Qui eveniet dolor eveniet.
-              uploadId: Dolores ut odit.
-              url: Est rerum similique architecto et et vero.
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
             - blocks:
-              - 2546463155989257386
-              - 2344607860324883146
-              - 3358572229498074290
-              id: 7682922868070384673
-              size: 7610860023129243077
-              time: 44366409423168046
-              type: Qui eveniet dolor eveniet.
-              uploadId: Dolores ut odit.
-              url: Est rerum similique architecto et et vero.
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
+            - blocks:
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
         - hidden: true
           location:
           - distance: 0.30949908
@@ -30330,26 +30433,16 @@ components:
           station:
             attributes:
               attributes:
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
-              - attributeId: 899269234555983951
-                name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-                priority: 497394973
-                projectId: 1301465489
-                stringValue: Ut quae sunt in officia perspiciatis maiores.
+              - attributeId: 1816130987409952621
+                name: Ut quae sunt in officia perspiciatis maiores.
+                priority: 292555471
+                projectId: 126465405
+                stringValue: Similique similique vel.
+              - attributeId: 1816130987409952621
+                name: Ut quae sunt in officia perspiciatis maiores.
+                priority: 292555471
+                projectId: 126465405
+                stringValue: Similique similique vel.
             battery: 0.5468714
             configurations:
               all:
@@ -30941,7 +31034,7 @@ components:
               end: 3636874576722561497
               numberOfSamples: 5758815084605736183
               start: 8606592342783883535
-            deviceId: Deserunt sequi est sunt qui occaecati.
+            deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
             firmwareNumber: 2043230017
             firmwareTime: 935825251242629127
             hidden: false
@@ -30949,18 +31042,18 @@ components:
             ingestionAt: 6531986932300060548
             interestingness:
               windows:
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
-              - interestingness: 0.9879424357633158
-                seconds: 138439757
-                time: 6265326695585801180
-                value: 0.5129071450766951
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
+              - interestingness: 0.45963032895010125
+                seconds: 1747239950
+                time: 8175471059320548570
+                value: 0.09021219440561899
             lastReadingAt: 6064010795564662914
             location:
               precise:
@@ -31073,37 +31166,51 @@ components:
             owner:
               email: Et quo.
               id: 1529085094
+              mediaURL: Deserunt sequi est sunt qui occaecati.
               name: Quod facilis hic ea incidunt.
             photos:
-              small: Impedit ipsam enim minima recusandae modi aliquid.
+              small: Recusandae modi.
             placeNameNative: Nostrum occaecati facilis placeat dolorem.
             placeNameOther: Sint tempore nesciunt error.
             readOnly: true
             recordingStartedAt: 6263555156768608226
-            status: Dolores sit.
+            status: Qui dolores sit.
             syncedAt: 1640918549389409287
             updatedAt: 7887283515049619400
             uploads:
             - blocks:
-              - 2546463155989257386
-              - 2344607860324883146
-              - 3358572229498074290
-              id: 7682922868070384673
-              size: 7610860023129243077
-              time: 44366409423168046
-              type: Qui eveniet dolor eveniet.
-              uploadId: Dolores ut odit.
-              url: Est rerum similique architecto et et vero.
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
             - blocks:
-              - 2546463155989257386
-              - 2344607860324883146
-              - 3358572229498074290
-              id: 7682922868070384673
-              size: 7610860023129243077
-              time: 44366409423168046
-              type: Qui eveniet dolor eveniet.
-              uploadId: Dolores ut odit.
-              url: Est rerum similique architecto et et vero.
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
+            - blocks:
+              - 4248281901781778886
+              - 1368791136041262928
+              - 8954379409839860152
+              - 1423630875388456846
+              id: 1572630737197674529
+              size: 7069800281688926139
+              time: 346811034453362382
+              type: Eveniet ipsum aperiam et.
+              uploadId: Animi est rerum similique architecto.
+              url: Vero aut qui eveniet.
       required:
       - stations
     AssociatedViaLocation:
@@ -33813,6 +33920,7 @@ components:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         recordingStartedAt: 8710418825638514642
         updatedAt: 1680050311432121156
@@ -34494,6 +34602,7 @@ components:
             owner:
               email: Veritatis sapiente enim et soluta unde.
               id: 2140936355
+              mediaURL: Molestiae aliquid accusantium placeat.
               name: Quidem voluptas ratione unde sed.
             recordingStartedAt: 7447393027274562547
             updatedAt: 6218594393067882505
@@ -34610,6 +34719,7 @@ components:
             owner:
               email: Veritatis sapiente enim et soluta unde.
               id: 2140936355
+              mediaURL: Molestiae aliquid accusantium placeat.
               name: Quidem voluptas ratione unde sed.
             recordingStartedAt: 7447393027274562547
             updatedAt: 6218594393067882505
@@ -34726,6 +34836,7 @@ components:
             owner:
               email: Veritatis sapiente enim et soluta unde.
               id: 2140936355
+              mediaURL: Molestiae aliquid accusantium placeat.
               name: Quidem voluptas ratione unde sed.
             recordingStartedAt: 7447393027274562547
             updatedAt: 6218594393067882505
@@ -34842,6 +34953,7 @@ components:
             owner:
               email: Veritatis sapiente enim et soluta unde.
               id: 2140936355
+              mediaURL: Molestiae aliquid accusantium placeat.
               name: Quidem voluptas ratione unde sed.
             recordingStartedAt: 7447393027274562547
             updatedAt: 6218594393067882505
@@ -34964,6 +35076,7 @@ components:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -35080,6 +35193,7 @@ components:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -35196,6 +35310,7 @@ components:
           owner:
             email: Veritatis sapiente enim et soluta unde.
             id: 2140936355
+            mediaURL: Molestiae aliquid accusantium placeat.
             name: Quidem voluptas ratione unde sed.
           recordingStartedAt: 7447393027274562547
           updatedAt: 6218594393067882505
@@ -37869,7 +37984,7 @@ components:
           $ref: '#/components/schemas/StationDataSummary'
         deviceId:
           type: string
-          example: Amet consequuntur illum sed itaque.
+          example: Voluptas unde cum enim.
         firmwareNumber:
           type: integer
           example: 1451796441
@@ -37951,36 +38066,46 @@ components:
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
           - blocks:
             - 442659245519894994
             - 6910822585695413511
             - 4631112066078792023
             - 2105688750839251782
-            id: 1194079917504476477
-            size: 5358913567942513668
-            time: 7076181190627093105
-            type: Ut quae tempora omnis sunt aut.
-            uploadId: Aspernatur cumque soluta qui.
-            url: Et numquam et repudiandae.
+            id: 2121958059739255445
+            size: 8235412945664949278
+            time: 2673550516266587404
+            type: Tempora omnis sunt aut.
+            uploadId: Qui et optio.
+            url: Et repudiandae facilis ut.
       example:
         attributes:
           attributes:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
         battery: 0.70054066
         configurations:
           all:
@@ -39108,14 +39233,14 @@ components:
         ingestionAt: 1218252648400183406
         interestingness:
           windows:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
         lastReadingAt: 4197069402702591147
         location:
           precise:
@@ -39228,6 +39353,7 @@ components:
         owner:
           email: Veritatis sapiente enim et soluta unde.
           id: 2140936355
+          mediaURL: Molestiae aliquid accusantium placeat.
           name: Quidem voluptas ratione unde sed.
         photos:
           small: Dolores est dignissimos consequatur dolor enim.
@@ -39244,23 +39370,23 @@ components:
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
         - blocks:
           - 442659245519894994
           - 6910822585695413511
           - 4631112066078792023
           - 2105688750839251782
-          id: 1194079917504476477
-          size: 5358913567942513668
-          time: 7076181190627093105
-          type: Ut quae tempora omnis sunt aut.
-          uploadId: Aspernatur cumque soluta qui.
-          url: Et numquam et repudiandae.
+          id: 2121958059739255445
+          size: 8235412945664949278
+          time: 2673550516266587404
+          type: Tempora omnis sunt aut.
+          uploadId: Qui et optio.
+          url: Et repudiandae facilis ut.
       required:
       - id
       - name
@@ -39281,26 +39407,16 @@ components:
       example:
       - attributes:
           attributes:
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
         battery: 0.5468714
         configurations:
           all:
@@ -39892,7 +40008,7 @@ components:
           end: 3636874576722561497
           numberOfSamples: 5758815084605736183
           start: 8606592342783883535
-        deviceId: Deserunt sequi est sunt qui occaecati.
+        deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
         firmwareNumber: 2043230017
         firmwareTime: 935825251242629127
         hidden: false
@@ -39900,18 +40016,18 @@ components:
         ingestionAt: 6531986932300060548
         interestingness:
           windows:
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
         lastReadingAt: 6064010795564662914
         location:
           precise:
@@ -40024,59 +40140,63 @@ components:
         owner:
           email: Et quo.
           id: 1529085094
+          mediaURL: Deserunt sequi est sunt qui occaecati.
           name: Quod facilis hic ea incidunt.
         photos:
-          small: Impedit ipsam enim minima recusandae modi aliquid.
+          small: Recusandae modi.
         placeNameNative: Nostrum occaecati facilis placeat dolorem.
         placeNameOther: Sint tempore nesciunt error.
         readOnly: true
         recordingStartedAt: 6263555156768608226
-        status: Dolores sit.
+        status: Qui dolores sit.
         syncedAt: 1640918549389409287
         updatedAt: 7887283515049619400
         uploads:
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
+        - blocks:
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
       - attributes:
           attributes:
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
         battery: 0.5468714
         configurations:
           all:
@@ -40668,7 +40788,7 @@ components:
           end: 3636874576722561497
           numberOfSamples: 5758815084605736183
           start: 8606592342783883535
-        deviceId: Deserunt sequi est sunt qui occaecati.
+        deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
         firmwareNumber: 2043230017
         firmwareTime: 935825251242629127
         hidden: false
@@ -40676,18 +40796,18 @@ components:
         ingestionAt: 6531986932300060548
         interestingness:
           windows:
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
         lastReadingAt: 6064010795564662914
         location:
           precise:
@@ -40800,59 +40920,63 @@ components:
         owner:
           email: Et quo.
           id: 1529085094
+          mediaURL: Deserunt sequi est sunt qui occaecati.
           name: Quod facilis hic ea incidunt.
         photos:
-          small: Impedit ipsam enim minima recusandae modi aliquid.
+          small: Recusandae modi.
         placeNameNative: Nostrum occaecati facilis placeat dolorem.
         placeNameOther: Sint tempore nesciunt error.
         readOnly: true
         recordingStartedAt: 6263555156768608226
-        status: Dolores sit.
+        status: Qui dolores sit.
         syncedAt: 1640918549389409287
         updatedAt: 7887283515049619400
         uploads:
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
+        - blocks:
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
       - attributes:
           attributes:
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
         battery: 0.5468714
         configurations:
           all:
@@ -41444,7 +41568,7 @@ components:
           end: 3636874576722561497
           numberOfSamples: 5758815084605736183
           start: 8606592342783883535
-        deviceId: Deserunt sequi est sunt qui occaecati.
+        deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
         firmwareNumber: 2043230017
         firmwareTime: 935825251242629127
         hidden: false
@@ -41452,18 +41576,18 @@ components:
         ingestionAt: 6531986932300060548
         interestingness:
           windows:
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
         lastReadingAt: 6064010795564662914
         location:
           precise:
@@ -41576,59 +41700,63 @@ components:
         owner:
           email: Et quo.
           id: 1529085094
+          mediaURL: Deserunt sequi est sunt qui occaecati.
           name: Quod facilis hic ea incidunt.
         photos:
-          small: Impedit ipsam enim minima recusandae modi aliquid.
+          small: Recusandae modi.
         placeNameNative: Nostrum occaecati facilis placeat dolorem.
         placeNameOther: Sint tempore nesciunt error.
         readOnly: true
         recordingStartedAt: 6263555156768608226
-        status: Dolores sit.
+        status: Qui dolores sit.
         syncedAt: 1640918549389409287
         updatedAt: 7887283515049619400
         uploads:
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
+        - blocks:
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
       - attributes:
           attributes:
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
-          - attributeId: 899269234555983951
-            name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-            priority: 497394973
-            projectId: 1301465489
-            stringValue: Ut quae sunt in officia perspiciatis maiores.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
+          - attributeId: 1816130987409952621
+            name: Ut quae sunt in officia perspiciatis maiores.
+            priority: 292555471
+            projectId: 126465405
+            stringValue: Similique similique vel.
         battery: 0.5468714
         configurations:
           all:
@@ -42220,7 +42348,7 @@ components:
           end: 3636874576722561497
           numberOfSamples: 5758815084605736183
           start: 8606592342783883535
-        deviceId: Deserunt sequi est sunt qui occaecati.
+        deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
         firmwareNumber: 2043230017
         firmwareTime: 935825251242629127
         hidden: false
@@ -42228,18 +42356,18 @@ components:
         ingestionAt: 6531986932300060548
         interestingness:
           windows:
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
-          - interestingness: 0.9879424357633158
-            seconds: 138439757
-            time: 6265326695585801180
-            value: 0.5129071450766951
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
+          - interestingness: 0.45963032895010125
+            seconds: 1747239950
+            time: 8175471059320548570
+            value: 0.09021219440561899
         lastReadingAt: 6064010795564662914
         location:
           precise:
@@ -42352,37 +42480,51 @@ components:
         owner:
           email: Et quo.
           id: 1529085094
+          mediaURL: Deserunt sequi est sunt qui occaecati.
           name: Quod facilis hic ea incidunt.
         photos:
-          small: Impedit ipsam enim minima recusandae modi aliquid.
+          small: Recusandae modi.
         placeNameNative: Nostrum occaecati facilis placeat dolorem.
         placeNameOther: Sint tempore nesciunt error.
         readOnly: true
         recordingStartedAt: 6263555156768608226
-        status: Dolores sit.
+        status: Qui dolores sit.
         syncedAt: 1640918549389409287
         updatedAt: 7887283515049619400
         uploads:
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
         - blocks:
-          - 2546463155989257386
-          - 2344607860324883146
-          - 3358572229498074290
-          id: 7682922868070384673
-          size: 7610860023129243077
-          time: 44366409423168046
-          type: Qui eveniet dolor eveniet.
-          uploadId: Dolores ut odit.
-          url: Est rerum similique architecto et et vero.
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
+        - blocks:
+          - 4248281901781778886
+          - 1368791136041262928
+          - 8954379409839860152
+          - 1423630875388456846
+          id: 1572630737197674529
+          size: 7069800281688926139
+          time: 346811034453362382
+          type: Eveniet ipsum aperiam et.
+          uploadId: Animi est rerum similique architecto.
+          url: Vero aut qui eveniet.
     StationFullModel:
       type: object
       properties:
@@ -42406,40 +42548,40 @@ components:
           items:
             $ref: '#/components/schemas/StationInterestingnessWindow'
           example:
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
-          - interestingness: 0.7663114632162892
-            seconds: 346658777
-            time: 5267690698111332049
-            value: 0.8071560846576038
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
+          - interestingness: 0.8877936074222665
+            seconds: 1296898599
+            time: 6910866038585305159
+            value: 0.15296536941270772
       example:
         windows:
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
-        - interestingness: 0.7663114632162892
-          seconds: 346658777
-          time: 5267690698111332049
-          value: 0.8071560846576038
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
+        - interestingness: 0.8877936074222665
+          seconds: 1296898599
+          time: 6910866038585305159
+          value: 0.15296536941270772
       required:
       - windows
     StationInterestingnessWindow:
@@ -42447,25 +42589,25 @@ components:
       properties:
         interestingness:
           type: number
-          example: 0.736342690729721
+          example: 0.8237503408080417
           format: double
         seconds:
           type: integer
-          example: 1123084642
+          example: 635672360
           format: int32
         time:
           type: integer
-          example: 9018778778215289148
+          example: 4207411406010557259
           format: int64
         value:
           type: number
-          example: 0.029486083052662013
+          example: 0.3576314774763013
           format: double
       example:
-        interestingness: 0.19010309192709512
-        seconds: 662705405
-        time: 5704991455898285992
-        value: 0.08165884708537395
+        interestingness: 0.17392116313674716
+        seconds: 1013568543
+        time: 8556780367256322429
+        value: 0.48000283040659714
       required:
       - seconds
       - interestingness
@@ -42616,13 +42758,17 @@ components:
           type: integer
           example: 250711759
           format: int32
+        mediaURL:
+          type: string
+          example: Recusandae non.
         name:
           type: string
           example: Inventore maxime nisi asperiores.
       example:
-        email: Veniam minima eum.
-        id: 677865330
-        name: Non ut debitis.
+        email: Amet consequuntur illum sed itaque.
+        id: 2134574048
+        mediaURL: Cumque qui assumenda quos magnam velit.
+        name: Voluptatem veniam minima eum.
       required:
       - id
       - name
@@ -42669,28 +42815,28 @@ components:
       properties:
         attributeId:
           type: integer
-          example: 2401492401147107873
+          example: 4103426438615703177
           format: int64
         name:
           type: string
-          example: Veritatis rem repellat in.
+          example: Ea non esse beatae quia.
         priority:
           type: integer
-          example: 1619456249
+          example: 1858850318
           format: int32
         projectId:
           type: integer
-          example: 1362744300
+          example: 567904721
           format: int32
         stringValue:
           type: string
-          example: Molestiae incidunt sit nesciunt at occaecati sit.
+          example: Provident maiores.
       example:
-        attributeId: 8954996587386142199
-        name: Quia ab provident.
-        priority: 866258431
-        projectId: 2075873640
-        stringValue: Quia et laboriosam voluptatem sapiente corrupti velit.
+        attributeId: 4389643376639630528
+        name: Sapiente corrupti velit cupiditate.
+        priority: 619530110
+        projectId: 1204389903
+        stringValue: Ut est quam amet qui voluptatem.
       required:
       - projectId
       - attributeId
@@ -42705,28 +42851,33 @@ components:
           items:
             $ref: '#/components/schemas/StationProjectAttribute'
           example:
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
-          - attributeId: 8188450733196959687
-            name: Molestiae similique unde.
-            priority: 1260084452
-            projectId: 1296898599
-            stringValue: Culpa nobis dolores amet.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
+          - attributeId: 4567841681934386334
+            name: Nobis dolores.
+            priority: 450422624
+            projectId: 935767534
+            stringValue: Magni quod voluptatibus.
       example:
         attributes:
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
-        - attributeId: 8188450733196959687
-          name: Molestiae similique unde.
-          priority: 1260084452
-          projectId: 1296898599
-          stringValue: Culpa nobis dolores amet.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
+        - attributeId: 4567841681934386334
+          name: Nobis dolores.
+          priority: 450422624
+          projectId: 935767534
+          stringValue: Magni quod voluptatibus.
       required:
       - attributes
     StationRegion:
@@ -42916,43 +43067,44 @@ components:
           type: array
           items:
             type: integer
-            example: 2307602891270647589
+            example: 3121358828627339432
             format: int64
           example:
-          - 8823895680273211384
-          - 3121358828627339432
+          - 6272502525273335929
+          - 4944335611598176590
+          - 6667899335694543805
         id:
           type: integer
-          example: 8198848798578561859
+          example: 7393529922761403911
           format: int64
         size:
           type: integer
-          example: 6270505238095051378
+          example: 733610588979608611
           format: int64
         time:
           type: integer
-          example: 5154126851941385330
+          example: 3900829146608115353
           format: int64
         type:
           type: string
-          example: Eum molestias repudiandae voluptates ipsum est culpa.
+          example: Ipsum est culpa soluta quis eum.
         uploadId:
           type: string
-          example: Qui voluptatem minus.
+          example: Beatae dolores.
         url:
           type: string
-          example: Voluptatibus quia eaque beatae dolores doloribus animi.
+          example: Itaque eum molestias repudiandae.
       example:
         blocks:
         - 592198361693691405
         - 8762647255423720901
         - 5617720343099895936
-        id: 4562296223751354466
-        size: 3351006584751789769
-        time: 6272502525273335929
+        id: 7875432414763851854
+        size: 1236991357493717784
+        time: 6231976620338291690
         type: Sint qui soluta itaque id facilis.
-        uploadId: Quibusdam sunt libero deleniti quod quia.
-        url: Harum tempora voluptatum molestiae quis qui.
+        uploadId: Quod quia est nihil.
+        url: Voluptatum molestiae quis qui.
       required:
       - id
       - time
@@ -42970,26 +43122,16 @@ components:
         stations:
         - attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -43581,7 +43723,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -43589,18 +43731,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -43713,59 +43855,63 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
         - attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -44357,7 +44503,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -44365,18 +44511,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -44489,59 +44635,63 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
         - attributes:
             attributes:
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
-            - attributeId: 899269234555983951
-              name: Repudiandae nam delectus quasi explicabo adipisci sunt.
-              priority: 497394973
-              projectId: 1301465489
-              stringValue: Ut quae sunt in officia perspiciatis maiores.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
+            - attributeId: 1816130987409952621
+              name: Ut quae sunt in officia perspiciatis maiores.
+              priority: 292555471
+              projectId: 126465405
+              stringValue: Similique similique vel.
           battery: 0.5468714
           configurations:
             all:
@@ -45133,7 +45283,7 @@ components:
             end: 3636874576722561497
             numberOfSamples: 5758815084605736183
             start: 8606592342783883535
-          deviceId: Deserunt sequi est sunt qui occaecati.
+          deviceId: Sapiente tempore a dicta culpa aperiam incidunt.
           firmwareNumber: 2043230017
           firmwareTime: 935825251242629127
           hidden: false
@@ -45141,18 +45291,18 @@ components:
           ingestionAt: 6531986932300060548
           interestingness:
             windows:
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
-            - interestingness: 0.9879424357633158
-              seconds: 138439757
-              time: 6265326695585801180
-              value: 0.5129071450766951
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
+            - interestingness: 0.45963032895010125
+              seconds: 1747239950
+              time: 8175471059320548570
+              value: 0.09021219440561899
           lastReadingAt: 6064010795564662914
           location:
             precise:
@@ -45265,37 +45415,51 @@ components:
           owner:
             email: Et quo.
             id: 1529085094
+            mediaURL: Deserunt sequi est sunt qui occaecati.
             name: Quod facilis hic ea incidunt.
           photos:
-            small: Impedit ipsam enim minima recusandae modi aliquid.
+            small: Recusandae modi.
           placeNameNative: Nostrum occaecati facilis placeat dolorem.
           placeNameOther: Sint tempore nesciunt error.
           readOnly: true
           recordingStartedAt: 6263555156768608226
-          status: Dolores sit.
+          status: Qui dolores sit.
           syncedAt: 1640918549389409287
           updatedAt: 7887283515049619400
           uploads:
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
           - blocks:
-            - 2546463155989257386
-            - 2344607860324883146
-            - 3358572229498074290
-            id: 7682922868070384673
-            size: 7610860023129243077
-            time: 44366409423168046
-            type: Qui eveniet dolor eveniet.
-            uploadId: Dolores ut odit.
-            url: Est rerum similique architecto et et vero.
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
+          - blocks:
+            - 4248281901781778886
+            - 1368791136041262928
+            - 8954379409839860152
+            - 1423630875388456846
+            id: 1572630737197674529
+            size: 7069800281688926139
+            time: 346811034453362382
+            type: Eveniet ipsum aperiam et.
+            uploadId: Animi est rerum similique architecto.
+            url: Vero aut qui eveniet.
       required:
       - stations
     TransmissionToken:

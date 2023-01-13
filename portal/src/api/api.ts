@@ -248,6 +248,7 @@ export interface Project {
 export interface Owner {
     id: number;
     name: string;
+    mediaUrl: string;
 }
 
 export interface Upload {
