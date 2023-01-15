@@ -344,6 +344,7 @@ export class DisplayStation {
         }
 
         this.firmwareNumber = station.firmwareNumber;
+
     }
 }
 

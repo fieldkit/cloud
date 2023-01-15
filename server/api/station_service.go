@@ -1047,7 +1047,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		})
 	}
 
-	return &station.StationFull{
+	stationFull := &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,
 		ReadOnly: readOnly,
@@ -1087,10 +1087,19 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
-			MediaURL: sf.Owner.MediaURL,
+		//	Photo: sf.Owner.Photo,
 		},
 		Photos: photos,
-	}, nil
+	};
+
+	/* if sf.Owner.Photo != nil {
+        url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
+        sf.Owner.Photo = &sf.Owner.Photo{
+            URL: &url,
+        }
+    } */
+
+	return stationFull, nil
 }
 
 func optionalTime(t *time.Time) *int64 {

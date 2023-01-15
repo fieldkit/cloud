@@ -1716,10 +1716,25 @@ func marshalStationviewsStationFullModelViewToStationFullModelResponseBody(v *st
 // *stationviews.StationOwnerView.
 func marshalStationviewsStationOwnerViewToStationOwnerResponseBody(v *stationviews.StationOwnerView) *StationOwnerResponseBody {
 	res := &StationOwnerResponseBody{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		Email:    v.Email,
-		MediaURL: v.MediaURL,
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: v.Email,
+	}
+	if v.Photo != nil {
+		res.Photo = marshalStationviewsUserPhotoViewToUserPhotoResponseBody(v.Photo)
+	}
+
+	return res
+}
+
+// marshalStationviewsUserPhotoViewToUserPhotoResponseBody builds a value of
+// type *UserPhotoResponseBody from a value of type *stationviews.UserPhotoView.
+func marshalStationviewsUserPhotoViewToUserPhotoResponseBody(v *stationviews.UserPhotoView) *UserPhotoResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &UserPhotoResponseBody{
+		URL: v.URL,
 	}
 
 	return res
