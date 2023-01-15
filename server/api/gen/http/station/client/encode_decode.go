@@ -2108,10 +2108,25 @@ func unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView(v *
 // *StationOwnerResponseBody.
 func unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v *StationOwnerResponseBody) *stationviews.StationOwnerView {
 	res := &stationviews.StationOwnerView{
-		ID:       v.ID,
-		Name:     v.Name,
-		Email:    v.Email,
-		MediaURL: v.MediaURL,
+		ID:    v.ID,
+		Name:  v.Name,
+		Email: v.Email,
+	}
+	if v.Photo != nil {
+		res.Photo = unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView(v.Photo)
+	}
+
+	return res
+}
+
+// unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView builds a value of
+// type *stationviews.UserPhotoView from a value of type *UserPhotoResponseBody.
+func unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView(v *UserPhotoResponseBody) *stationviews.UserPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.UserPhotoView{
+		URL: v.URL,
 	}
 
 	return res

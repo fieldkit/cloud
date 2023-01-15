@@ -20,7 +20,14 @@
                         <div>
                             <div class="station-name">{{ station.name }}</div>
 
-                            <div class="station-deployed-date">{{ deployedDate }}</div>
+                            <div class="flex flex-al-center">
+                                <span class="station-deployed-date">{{ deployedDate }}</span>
+                                <div class="station-owner">
+                                    <UserPhoto :user="station.owner" />
+                                    {{ $t("station.belongsTo") }}
+                                    <span>{{ station.owner.name }}</span>
+                                </div>
+                            </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
@@ -160,6 +167,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import UserPhoto from "@/views/shared/UserPhoto.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -173,6 +181,7 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
+        UserPhoto,
     },
     data(): {
         selectedModule: DisplayModule | null;
@@ -619,6 +628,25 @@ export default Vue.extend({
     &-deployed-date {
         color: #6a6d71;
         margin-bottom: 10px;
+    }
+
+    &-owner {
+        color: #6a6d71;
+        font-size: 10px;
+        margin-bottom: 10px;
+        margin-left: 5px;
+        @include flex(center);
+
+        ::v-deep .default-user-icon {
+            width: 18px;
+            height: 18px;
+            margin-top: 0;
+            margin-right: 5px;
+        }
+
+        span {
+            margin-left: 3px;
+        }
     }
 }
 

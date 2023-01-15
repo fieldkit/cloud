@@ -236,10 +236,14 @@ type StationFullModel struct {
 }
 
 type StationOwner struct {
-	ID       int32
-	Name     string
-	Email    *string
-	MediaURL *string
+	ID    int32
+	Name  string
+	Email *string
+	Photo *UserPhoto
+}
+
+type UserPhoto struct {
+	URL *string
 }
 
 type StationInterestingness struct {
@@ -961,10 +965,25 @@ func transformStationviewsStationOwnerViewToStationOwner(v *stationviews.Station
 		return nil
 	}
 	res := &StationOwner{
-		ID:       *v.ID,
-		Name:     *v.Name,
-		Email:    v.Email,
-		MediaURL: v.MediaURL,
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Email: v.Email,
+	}
+	if v.Photo != nil {
+		res.Photo = transformStationviewsUserPhotoViewToUserPhoto(v.Photo)
+	}
+
+	return res
+}
+
+// transformStationviewsUserPhotoViewToUserPhoto builds a value of type
+// *UserPhoto from a value of type *stationviews.UserPhotoView.
+func transformStationviewsUserPhotoViewToUserPhoto(v *stationviews.UserPhotoView) *UserPhoto {
+	if v == nil {
+		return nil
+	}
+	res := &UserPhoto{
+		URL: v.URL,
 	}
 
 	return res
@@ -1230,10 +1249,25 @@ func transformStationFullModelToStationviewsStationFullModelView(v *StationFullM
 // *stationviews.StationOwnerView from a value of type *StationOwner.
 func transformStationOwnerToStationviewsStationOwnerView(v *StationOwner) *stationviews.StationOwnerView {
 	res := &stationviews.StationOwnerView{
-		ID:       &v.ID,
-		Name:     &v.Name,
-		Email:    v.Email,
-		MediaURL: v.MediaURL,
+		ID:    &v.ID,
+		Name:  &v.Name,
+		Email: v.Email,
+	}
+	if v.Photo != nil {
+		res.Photo = transformUserPhotoToStationviewsUserPhotoView(v.Photo)
+	}
+
+	return res
+}
+
+// transformUserPhotoToStationviewsUserPhotoView builds a value of type
+// *stationviews.UserPhotoView from a value of type *UserPhoto.
+func transformUserPhotoToStationviewsUserPhotoView(v *UserPhoto) *stationviews.UserPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.UserPhotoView{
+		URL: v.URL,
 	}
 
 	return res
