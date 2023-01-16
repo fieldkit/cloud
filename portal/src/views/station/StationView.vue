@@ -20,7 +20,7 @@
                         <div>
                             <div class="station-name">{{ station.name }}</div>
 
-                            <div class="flex flex-al-center">
+                            <div class="flex flex-al-center flex-wrap">
                                 <span class="station-deployed-date">{{ deployedDate }}</span>
                                 <div class="station-owner">
                                     <UserPhoto :user="station.owner" />
@@ -628,13 +628,13 @@ export default Vue.extend({
     &-deployed-date {
         color: #6a6d71;
         margin-bottom: 10px;
+        margin-right: 5px;
     }
 
     &-owner {
         color: #6a6d71;
         font-size: 10px;
         margin-bottom: 10px;
-        margin-left: 5px;
         @include flex(center);
 
         ::v-deep .default-user-icon {
