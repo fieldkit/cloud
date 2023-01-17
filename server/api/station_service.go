@@ -1087,17 +1087,16 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Owner: &station.StationOwner{
 			ID:   sf.Owner.ID,
 			Name: sf.Owner.Name,
-		//	Photo: sf.Owner.Photo,
 		},
 		Photos: photos,
 	};
 
-	/* if sf.Owner.Photo != nil {
+    if sf.Owner.MediaURL != nil {
         url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
-        sf.Owner.Photo = &sf.Owner.Photo{
+        stationFull.Owner.Photo = &station.UserPhoto{
             URL: &url,
         }
-    } */
+    }
 
 	return stationFull, nil
 }
