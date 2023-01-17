@@ -210,7 +210,6 @@ export default Vue.extend({
             return this.$route.params.projectId;
         },
         station(): DisplayStation {
-            console.log("radoi", this.$state.stations.stations[this.$route.params.stationId]);
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
