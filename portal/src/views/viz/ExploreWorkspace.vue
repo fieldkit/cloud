@@ -874,6 +874,14 @@ export default Vue.extend({
     }
 }
 
+.de_flag path {
+    fill: #52b5e0;
+
+    body.floodnet & {
+        fill: var(--color-dark);
+    }
+}
+
 .one {
     display: flex;
     flex-direction: row;
@@ -1017,14 +1025,6 @@ export default Vue.extend({
         position: absolute;
         top: 17px;
         left: 20px;
-    }
-}
-
-::v-deep .de_flag path {
-    fill: #52b5e4;
-
-  body.floodnet & {
-        fill: var(--color-dark);
     }
 }
 </style>

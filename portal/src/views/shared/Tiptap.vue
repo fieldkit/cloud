@@ -1,6 +1,6 @@
 <template>
     <div :class="'tiptap-container' + (readonly ? ' tiptap-reading' : ' tiptap-editing')">
-        <p v-if="placeholder && !readonly && editor.isEmpty" class="placeholder">{{ placeholder }}</p>
+        <p v-if="placeholder && !readonly && editor && editor.isEmpty" class="placeholder">{{ placeholder }}</p>
         <div class="tiptap-row">
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
