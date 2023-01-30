@@ -77,6 +77,7 @@ export default Vue.extend({
         },
         value(value: string): void {
             if (this.editor) {
+                if (JSON.stringify(this.editor.getJSON()) === JSON.stringify(value)) return;
                 this.editor.commands.setContent(value);
             }
         },
@@ -317,7 +318,7 @@ export default Vue.extend({
     }
 
     p {
-        word-break: break-all;
+        word-break: normal;
         margin: 14px 0;
     }
 }
