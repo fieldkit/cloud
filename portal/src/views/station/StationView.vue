@@ -68,23 +68,25 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                        <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
-                        <div v-else class="photo-placeholder">
-                            <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                <div>
+                    <div v-if="photos" class="station-photos">
+                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                            <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
+                            <div v-else class="photo-placeholder">
+                                <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                            </div>
                         </div>
+                        <router-link
+                            :to="{
+                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                                params: { projectId: projectId, stationId: station.id },
+                            }"
+                            class="station-photos-nav"
+                        >
+                            <i class="icon icon-grid"></i>
+                            {{ $t("station.btn.linkToPhotos") }}
+                        </router-link>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
-                        <i class="icon icon-grid"></i>
-                        {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
                 </div>
             </section>
 
@@ -98,7 +100,8 @@
                             @click="selectedModule = module"
                         >
                             <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <span>{{ $t(getModuleName(module)) }}</span>
+                            <input :disabled="true" :value="$t(getModuleName(module))" />
+                            <a href="javascript:void(0)" v-if="!isCustomizationEnabled()" class="module-edit-name">{{ $t("edit") }}</a>
                         </li>
                     </ul>
                     <header v-if="isMobileView">
@@ -201,6 +204,7 @@ export default Vue.extend({
             return this.$route.params.projectId;
         },
         station(): DisplayStation {
+            console.log("radoi", this.$state.stations.stations[this.$route.params.stationId]);
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
@@ -534,8 +538,14 @@ export default Vue.extend({
                 height: 40px;
             }
 
-            span {
+            input {
                 margin-left: 10px;
+                background-color: transparent;
+                border: 0;
+                padding: 0;
+                font-size: 16px;
+                color: var(--color-dark);
+                font-family: $font-family-medium;
 
                 @include bp-down($sm) {
                     display: none;
@@ -667,5 +677,12 @@ section {
             color: $color-dark;
         }
     }
+}
+
+.module-edit-name {
+    opacity: 0.4;
+    font-size: 12px;
+    margin-left: 7px;
+    margin-bottom: -1px;
 }
 </style>
