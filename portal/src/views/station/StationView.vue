@@ -94,14 +94,31 @@
                 <div class="station-readings">
                     <ul>
                         <li
-                            v-for="module in station.modules"
+                            v-for="(module, moduleIndex) in station.modules"
                             v-bind:key="module.name"
                             :class="{ active: module.name === selectedModule.name }"
                             @click="selectedModule = module"
                         >
                             <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <input :disabled="true" :value="$t(getModuleName(module))" />
-                            <a href="javascript:void(0)" v-if="!isCustomizationEnabled()" class="module-edit-name">{{ $t("edit") }}</a>
+                            <input maxlength="25" :disabled="editModuleIndex !== moduleIndex" :value="$t(getModuleName(module))" />
+                            <template v-if="!isCustomizationEnabled()">
+                                <a
+                                    href="javascript:void(0)"
+                                    v-if="editModuleIndex !== moduleIndex"
+                                    @click="onEditModuleNameClick(moduleIndex)"
+                                    class="module-edit-name"
+                                >
+                                    {{ $t("edit") }}
+                                </a>
+                                <a
+                                    href="javascript:void(0)"
+                                    v-if="editModuleIndex === moduleIndex"
+                                    @click="saveModuleName()"
+                                    class="module-edit-name"
+                                >
+                                    {{ $t("save") }}
+                                </a>
+                            </template>
                         </li>
                     </ul>
                     <header v-if="isMobileView">
@@ -182,12 +199,14 @@ export default Vue.extend({
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        editModuleIndex: number | null;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            editModuleIndex: null,
         };
     },
     watch: {
@@ -300,6 +319,12 @@ export default Vue.extend({
         },
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
+        },
+        onEditModuleNameClick(index): void {
+            this.editModuleIndex = index;
+        },
+        saveModuleName(): void {
+            console.log("TEst");
         },
     },
 });
@@ -539,13 +564,18 @@ export default Vue.extend({
             }
 
             input {
-                margin-left: 10px;
+                margin-left: 5px;
                 background-color: transparent;
                 border: 0;
-                padding: 0;
+                padding: 5px;
                 font-size: 16px;
                 color: var(--color-dark);
                 font-family: $font-family-medium;
+                outline: none;
+
+                &:not(:disabled) {
+                    border: 1px solid $color-border;
+                }
 
                 @include bp-down($sm) {
                     display: none;
