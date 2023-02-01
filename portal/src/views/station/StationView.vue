@@ -88,6 +88,21 @@
                 </div>
             </section>
 
+            <section class="container-box">
+                <h2>{{ $t("station.data") }}</h2>
+
+                <ul class="flex flex-wrap flex-space-between">
+                    <li class="module-data-item" v-for="module in station.modules" v-bind:key="module.name">
+                        <h3 class="module-data-title flex flex-al-center">
+                            <img alt="Module icon" :src="getModuleImg(module)" />
+                            {{ getModuleName(module) }}
+                        </h3>
+                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                    </li>
+                </ul>
+                <button class="btn module-data-btn">{{ $t("station.exploreData") }}</button>
+            </section>
+
             <section class="container-box section-readings" v-if="selectedModule">
                 <div class="station-readings">
                     <ul>
@@ -160,6 +175,8 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
+import TinyChart from "@/views/viz/TinyChart.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -173,18 +190,21 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
+        TinyChart,
     },
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        sensorDataQuerier: SensorDataQuerier;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     watch: {
@@ -320,6 +340,10 @@ export default Vue.extend({
     @include bp-down($xs) {
         padding: 10px;
     }
+}
+
+.container-title {
+    font-size: 20px;
 }
 
 .section {
@@ -667,5 +691,31 @@ section {
             color: $color-dark;
         }
     }
+}
+
+.module-data-item {
+    flex: 0 0 calc(50% - 10px);
+    margin-bottom: 30px;
+
+    @include bp-down($sm) {
+        flex: 0 0 100%;
+    }
+}
+
+.module-data-title {
+    color: $color-primary;
+    font-size: 12px;
+    margin-bottom: 10px;
+
+    img {
+        margin-right: 7px;
+        width: 19px;
+        height: 19px;
+    }
+}
+
+.module-data-btn {
+    margin: 0 auto 8px auto;
+    display: block;
 }
 </style>
