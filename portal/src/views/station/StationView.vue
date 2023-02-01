@@ -29,6 +29,10 @@
                                 </div>
                             </div>
 
+                          <div class="station-description">
+                              {{station.description}}
+                          </div>
+
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
                                 <span>{{ partnerCustomization().stationLocationName(station) }}</span>

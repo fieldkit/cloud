@@ -74,6 +74,7 @@ type StationFullView struct {
 	ReadOnly           *bool
 	Status             *string
 	Hidden             *bool
+	Description        *string
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32
@@ -337,6 +338,7 @@ var (
 			"photos",
 			"readOnly",
 			"hidden",
+			"description",
 			"status",
 			"battery",
 			"recordingStartedAt",
@@ -419,6 +421,7 @@ var (
 			"photos",
 			"readOnly",
 			"hidden",
+			"description",
 			"status",
 			"battery",
 			"recordingStartedAt",

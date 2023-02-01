@@ -2038,6 +2038,7 @@ func marshalStationviewsStationFullViewToStationFullResponseBody(v *stationviews
 		ReadOnly:           *v.ReadOnly,
 		Status:             v.Status,
 		Hidden:             v.Hidden,
+		Description:        v.Description,
 		Battery:            v.Battery,
 		RecordingStartedAt: v.RecordingStartedAt,
 		MemoryUsed:         v.MemoryUsed,

@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Nemo natus.\",\n      \"locationName\": \"Blanditiis aut rerum ipsa atque quaerat.\",\n      \"name\": \"Nihil consequatur est tenetur commodi.\",\n      \"statusPb\": \"Odio ullam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Omnis aliquid a enim deserunt culpa odit.\",\n      \"deviceId\": \"Nemo natus.\",\n      \"locationName\": \"Blanditiis aut rerum ipsa atque quaerat.\",\n      \"name\": \"Nihil consequatur est tenetur commodi.\",\n      \"statusPb\": \"Odio ullam.\"\n   }'")
 		}
 	}
 	var auth string
@@ -35,6 +35,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 		DeviceID:     body.DeviceID,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
+		Description:  body.Description,
 	}
 	v.Auth = auth
 
@@ -145,7 +146,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Repellat voluptatibus.\",\n      \"name\": \"Enim dolor corporis quasi consectetur.\",\n      \"statusPb\": \"Iure dolor libero est aperiam dolorum eum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Et est quo sed ipsam.\",\n      \"locationName\": \"Est aperiam dolorum eum unde quia.\",\n      \"name\": \"Sed iure dolor.\",\n      \"statusPb\": \"Tenetur voluptatem.\"\n   }'")
 		}
 	}
 	var id int32
@@ -165,6 +166,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 		Name:         body.Name,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
+		Description:  body.Description,
 	}
 	v.ID = id
 	v.Auth = auth

@@ -351,6 +351,7 @@ export interface Station {
         attributes: ProjectAttribute[];
     };
     status: StationStatus;
+    description: string;
 }
 
 export interface ProjectsResponse {

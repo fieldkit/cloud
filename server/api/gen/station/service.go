@@ -70,6 +70,7 @@ type AddPayload struct {
 	DeviceID     string
 	LocationName *string
 	StatusPb     *string
+	Description  *string
 }
 
 // StationFull is the result type of the station service add method.
@@ -86,6 +87,7 @@ type StationFull struct {
 	ReadOnly           bool
 	Status             *string
 	Hidden             *bool
+	Description        *string
 	Battery            *float32
 	RecordingStartedAt *int64
 	MemoryUsed         *int32
@@ -132,6 +134,7 @@ type UpdatePayload struct {
 	Name         string
 	LocationName *string
 	StatusPb     *string
+	Description  *string
 }
 
 // ListMinePayload is the payload type of the station service list mine method.
@@ -524,6 +527,7 @@ func NewViewedStationProgress(res *StationProgress, view string) *stationviews.S
 func newStationFull(vres *stationviews.StationFullView) *StationFull {
 	res := &StationFull{
 		Hidden:             vres.Hidden,
+		Description:        vres.Description,
 		Status:             vres.Status,
 		Battery:            vres.Battery,
 		RecordingStartedAt: vres.RecordingStartedAt,
@@ -596,6 +600,7 @@ func newStationFullView(res *StationFull) *stationviews.StationFullView {
 		ReadOnly:           &res.ReadOnly,
 		Status:             res.Status,
 		Hidden:             res.Hidden,
+		Description:        res.Description,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,

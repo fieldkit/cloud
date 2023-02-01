@@ -20,6 +20,7 @@ type AddRequestBody struct {
 	DeviceID     *string `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
 	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	StatusPb     *string `form:"statusPb,omitempty" json:"statusPb,omitempty" xml:"statusPb,omitempty"`
+	Description  *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 }
 
 // UpdateRequestBody is the type of the "station" service "update" endpoint
@@ -28,6 +29,7 @@ type UpdateRequestBody struct {
 	Name         *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	LocationName *string `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
 	StatusPb     *string `form:"statusPb,omitempty" json:"statusPb,omitempty" xml:"statusPb,omitempty"`
+	Description  *string `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 }
 
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
@@ -44,6 +46,7 @@ type AddResponseBody struct {
 	Photos             *StationPhotosResponseBody            `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                                  `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Description        *string                               `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
@@ -77,6 +80,7 @@ type GetResponseBody struct {
 	Photos             *StationPhotosResponseBody            `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                                  `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Description        *string                               `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
@@ -110,6 +114,7 @@ type UpdateResponseBody struct {
 	Photos             *StationPhotosResponseBody            `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                                  `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Description        *string                               `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
@@ -1371,6 +1376,7 @@ type StationFullResponseBody struct {
 	Photos             *StationPhotosResponseBody            `form:"photos" json:"photos" xml:"photos"`
 	ReadOnly           bool                                  `form:"readOnly" json:"readOnly" xml:"readOnly"`
 	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Description        *string                               `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
@@ -1459,6 +1465,7 @@ func NewAddResponseBody(res *stationviews.StationFullView) *AddResponseBody {
 		ReadOnly:           *res.ReadOnly,
 		Status:             res.Status,
 		Hidden:             res.Hidden,
+		Description:        res.Description,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,
@@ -1516,6 +1523,7 @@ func NewGetResponseBody(res *stationviews.StationFullView) *GetResponseBody {
 		ReadOnly:           *res.ReadOnly,
 		Status:             res.Status,
 		Hidden:             res.Hidden,
+		Description:        res.Description,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,
@@ -1573,6 +1581,7 @@ func NewUpdateResponseBody(res *stationviews.StationFullView) *UpdateResponseBod
 		ReadOnly:           *res.ReadOnly,
 		Status:             res.Status,
 		Hidden:             res.Hidden,
+		Description:        res.Description,
 		Battery:            res.Battery,
 		RecordingStartedAt: res.RecordingStartedAt,
 		MemoryUsed:         res.MemoryUsed,
@@ -2536,6 +2545,7 @@ func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 		DeviceID:     *body.DeviceID,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
+		Description:  body.Description,
 	}
 	v.Auth = auth
 
@@ -2578,6 +2588,7 @@ func NewUpdatePayload(body *UpdateRequestBody, id int32, auth string) *station.U
 		Name:         *body.Name,
 		LocationName: body.LocationName,
 		StatusPb:     body.StatusPb,
+		Description:  body.Description,
 	}
 	v.ID = id
 	v.Auth = auth
