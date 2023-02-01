@@ -163,6 +163,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("readOnly", Boolean)
 		Attribute("status", String)
 		Attribute("hidden", Boolean)
+		Attribute("description", String)
 		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
@@ -199,6 +200,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("photos")
 		Attribute("readOnly")
 		Attribute("hidden")
+		Attribute("description")
 		Attribute("status")
 
 		Attribute("battery")
@@ -361,6 +363,7 @@ var _ = Service("station", func() {
 			Attribute("deviceId", String)
 			Attribute("locationName", String)
 			Attribute("statusPb", String)
+			Attribute("description", String)
 			Required("name", "deviceId")
 		})
 
@@ -449,6 +452,7 @@ var _ = Service("station", func() {
 			Attribute("name", String)
 			Attribute("locationName", String)
 			Attribute("statusPb", String)
+			Attribute("description", String)
 			Required("name")
 		})
 

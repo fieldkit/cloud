@@ -57,9 +57,9 @@ func (r *StationRepository) AddStation(ctx context.Context, adding *data.Station
 	if err := r.db.NamedGetContext(ctx, adding, `
 		INSERT INTO fieldkit.station
 		(name, device_id, owner_id, model_id, created_at, updated_at, synced_at, ingestion_at, location, location_name, place_other, place_native,
-		 battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at, hidden, status) VALUES
+		 battery, memory_used, memory_available, firmware_number, firmware_time, recording_started_at, hidden, description, status) VALUES
 		(:name, :device_id, :owner_id, :model_id, :created_at, :updated_at, :synced_at, :ingestion_at, ST_SetSRID(ST_GeomFromText(:location), 4326), :location_name, :place_other, :place_native,
-         :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at, :hidden, :status)
+         :battery, :memory_used, :memory_available, :firmware_number, :firmware_time, :recording_started_at, :hidden, :description, :status)
 		RETURNING id
 		`, adding); err != nil {
 		return nil, err
@@ -87,6 +87,7 @@ func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Sta
 			   ingestion_at = :ingestion_at,
 			   model_id = :model_id,
 			   hidden = :hidden,
+			   description = :description,
 			   status = :status
 		WHERE id = :id
 		`, station); err != nil {
