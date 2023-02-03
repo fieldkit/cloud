@@ -1078,6 +1078,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Location:           location,
 		Data:               dataSummary,
 		Hidden:             sf.Station.Hidden,
+		Description:        sf.Station.Description,
 		Status:             sf.Station.Status,
 		Model: &station.StationFullModel{
 			Name:                      sf.Model.Name,
