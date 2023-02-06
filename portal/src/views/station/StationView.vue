@@ -29,9 +29,9 @@
                                 </div>
                             </div>
 
-                          <div class="station-description">
-                              {{station.description}}
-                          </div>
+                            <div v-if="!isPartnerCustomisationEnabled" class="station-description">
+                                {{ station.description }}
+                            </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
@@ -257,6 +257,9 @@ export default Vue.extend({
             }
 
             return false;
+        },
+        isPartnerCustomisationEnabled(): boolean {
+            return isCustomisationEnabled();
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
@@ -650,6 +653,13 @@ export default Vue.extend({
         span {
             margin-left: 3px;
         }
+    }
+
+    &-description {
+        font-size: 12px;
+        color: #6a6d71;
+        margin-top: -2px;
+        margin-bottom: 10px;
     }
 }
 
