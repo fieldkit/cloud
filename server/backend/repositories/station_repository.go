@@ -152,6 +152,28 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	return station, nil
 }
 
+func (r *StationRepository) QueryStationByArbitraryDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
+	station, err = r.QueryStationByDeviceID(ctx, deviceIdBytes)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	if station != nil {
+		return station, nil
+	}
+
+	station = &data.Station{}
+	if err := r.db.GetContext(ctx, station, `
+		SELECT
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, photo_id,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, status
+		FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.station_dev_eui WHERE dev_eui = $1)
+		`, deviceIdBytes); err != nil {
+		return nil, err
+	}
+	return station, nil
+}
+
 func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
