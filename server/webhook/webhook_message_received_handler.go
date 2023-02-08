@@ -78,7 +78,7 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 				}
 
 				if saved, err := h.model.Save(ctx, parsed); err != nil {
-					return nil, err
+					return nil, fmt.Errorf("save-model-error: %w", err)
 				} else if parsed.ReceivedAt != nil {
 
 					for _, parsedSensor := range parsed.Data {
@@ -110,11 +110,11 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 		}
 
 		if err := h.model.Close(ctx); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("close-model-error: %w", err)
 		}
 
 		if err := h.iness.Close(ctx); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("close-iness-error: %w", err)
 		}
 	}
 
@@ -148,7 +148,7 @@ func (h *WebHookMessageReceivedHandler) saveMessages(ctx context.Context, incomi
 			DO UPDATE SET value = EXCLUDED.value
 		`, ir.Time, ir.StationID, ir.ModuleID, meta.ID, ir.Value)
 		if err != nil {
-			return err
+			return fmt.Errorf("save-error: %w", err)
 		}
 	}
 
