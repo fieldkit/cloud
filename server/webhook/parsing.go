@@ -181,7 +181,56 @@ func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, 
 			return false, nil
 		}
 	}
+
 	return true, nil
+}
+
+func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, stationSchema *MessageSchemaStation, source interface{}) (err error) {
+	log := Logger(ctx).Sugar()
+
+	for _, extractorSpec := range stationSchema.Extractors {
+		extractor, err := FindExtractor(ctx, extractorSpec.Type)
+		if err != nil {
+			return err
+		}
+
+		extractingFrom, err := m.evaluate(ctx, cache, source, extractorSpec.Source)
+		if err != nil {
+			log.Infow("evaluation-error", "error", err)
+		}
+
+		extracted, err := extractor.Extract(ctx, source, extractingFrom)
+		if err != nil {
+			return fmt.Errorf("extraction error: %w", err)
+		}
+
+		log.Infow("extractor-done", "extracted", extracted)
+
+		// This is annoying, wish there was a better way to "half serialize" an
+		// object, until then we serialize to bytes and then deserialize into
+		// opaque/unstructured types.
+		serialized, err := json.Marshal(extracted)
+		if err != nil {
+			return fmt.Errorf("extraction json error: %w", err)
+		}
+
+		extractedOpaque := make(map[string]interface{})
+
+		if err := json.Unmarshal(serialized, &extractedOpaque); err != nil {
+			return fmt.Errorf("extraction json error: %w", err)
+		}
+
+		// Inserts the extracted data/payload into the source object so that the
+		// jq expressions can pull information.
+		sourceObject, ok := source.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("expected object source")
+		}
+
+		sourceObject["extracted"] = extractedOpaque
+	}
+
+	return nil
 }
 
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
@@ -197,13 +246,16 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		}
 	}
 
+	if err := m.applyExtractors(ctx, cache, stationSchema, source); err != nil {
+		return nil, fmt.Errorf("apply-extractors: %w", err)
+	}
+
 	deviceIDRaw, err := m.evaluate(ctx, cache, source, stationSchema.IdentifierExpression)
 	if err != nil {
 		return nil, fmt.Errorf("evaluating identifier-expression: %w", err)
 	}
 
 	var deviceName *string
-
 	if stationSchema.NameExpression != "" {
 		if deviceNameRaw, err := m.evaluate(ctx, cache, source, stationSchema.NameExpression); err != nil {
 			if _, ok := err.(*EvaluationError); !ok {
@@ -219,7 +271,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	}
 
 	var receivedAt *time.Time
-
 	if stationSchema.ReceivedExpression != "" {
 		receivedAtRaw, err := m.evaluate(ctx, cache, source, stationSchema.ReceivedExpression)
 		if err != nil {
@@ -297,31 +348,34 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			moduleKeyPrefix := module.KeyPrefix()
 			fullSensorKey := fmt.Sprintf("%s.%s", moduleKeyPrefix, sensor.Key)
 
-			maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
-			if err != nil {
-				log.Infow("evaluation-error", "error", err)
-			} else {
-				if value, ok := toFloat(maybeValue); ok {
-					filtered := false
-					if sensor.Filter != nil && len(*sensor.Filter) == 2 {
-						if value < (*sensor.Filter)[0] || value > (*sensor.Filter)[1] {
-							filtered = true
-						}
-					}
-					if !filtered {
-						reading := &ParsedReading{
-							Key:             sensor.Key,
-							ModuleKeyPrefix: moduleKeyPrefix,
-							FullSensorKey:   fullSensorKey,
-							Battery:         sensor.Battery,
-							Transient:       sensor.Transient,
-							Value:           value,
-						}
-
-						sensors = append(sensors, reading)
-					}
+			if sensor.Expression != "" {
+				maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
+				if err != nil {
+					fmt.Printf("\n\n%v\n\n", source)
+					log.Infow("evaluation-error", "error", err)
 				} else {
-					return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+					if value, ok := toFloat(maybeValue); ok {
+						filtered := false
+						if sensor.Filter != nil && len(*sensor.Filter) == 2 {
+							if value < (*sensor.Filter)[0] || value > (*sensor.Filter)[1] {
+								filtered = true
+							}
+						}
+						if !filtered {
+							reading := &ParsedReading{
+								Key:             sensor.Key,
+								ModuleKeyPrefix: moduleKeyPrefix,
+								FullSensorKey:   fullSensorKey,
+								Battery:         sensor.Battery,
+								Transient:       sensor.Transient,
+								Value:           value,
+							}
+
+							sensors = append(sensors, reading)
+						}
+					} else {
+						return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
+					}
 				}
 			}
 		}
