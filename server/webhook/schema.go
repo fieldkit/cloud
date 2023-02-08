@@ -3,18 +3,26 @@ package webhook
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 )
 
 type MessageSchemaSensor struct {
-	Key                 string     `json:"key"`
-	Name                string     `json:"name"`
-	ConditionExpression string     `json:"condition"`
-	Expression          string     `json:"expression"`
-	Battery             bool       `json:"battery"`
-	Transient           bool       `json:"transient"`
-	UnitOfMeasure       *string    `json:"units"`
-	Filter              *[]float64 `json:"filter"`
+	Key                 string                  `json:"key"`
+	Name                string                  `json:"name"`
+	ConditionExpression string                  `json:"condition"`
+	Expression          string                  `json:"expression"`
+	Battery             bool                    `json:"battery"`
+	Transient           bool                    `json:"transient"`
+	UnitOfMeasure       *string                 `json:"units"`
+	Filter              *[]float64              `json:"filter"`
+	Extractor           *MessageSchemaExtractor `json:"extractor"`
+}
+
+type MessageSchemaExtractor struct {
+	Source     string `json:"source"`
+	Type       string `json:"type"`
+	Expression string `json:"expression"`
 }
 
 type MessageSchemaModule struct {
@@ -24,6 +32,9 @@ type MessageSchemaModule struct {
 }
 
 func (m *MessageSchemaModule) KeyPrefix() string {
+	if strings.HasPrefix(m.Key, "fk.") {
+		return m.Key
+	}
 	return fmt.Sprintf("%s.%s", WebHookSensorPrefix, m.Key)
 }
 
@@ -44,6 +55,7 @@ type MessageSchemaStation struct {
 	IdentifierExpression string                    `json:"identifier"`
 	NameExpression       string                    `json:"name"`
 	ReceivedExpression   string                    `json:"received"`
+	Extractors           []*MessageSchemaExtractor `json:"extractors"`
 	Modules              []*MessageSchemaModule    `json:"modules"`
 	Attributes           []*MessageSchemaAttribute `json:"attributes"`
 }
