@@ -93,24 +93,29 @@ func (e *FkReadingsExtractor) Extract(ctx context.Context, complete interface{},
 		return nil, fmt.Errorf("read-error(packet): %w", err)
 	}
 
-	age, err := binary.ReadVarint(buf)
-	if err != nil {
-		return nil, fmt.Errorf("read-error(age): %w", err)
-	}
-
-	block, err := binary.ReadVarint(buf)
-	if err != nil {
-		return nil, fmt.Errorf("read-error(reading): %w", err)
-	}
-
-	log.Infof("fk:readings age=%v block=%v position=%v/%v", age, block, buf.Len(), len(raw))
-
 	readings := FkLoRaReadings{
 		Packet:   packet,
-		Age:      age,
-		Block:    block,
+		Age:      0,
+		Block:    0,
 		Readings: make([]float32, 0),
 	}
+
+	if packet == 0 {
+		age, err := binary.ReadVarint(buf)
+		if err != nil {
+			return nil, fmt.Errorf("read-error(age): %w", err)
+		}
+
+		block, err := binary.ReadVarint(buf)
+		if err != nil {
+			return nil, fmt.Errorf("read-error(reading): %w", err)
+		}
+
+		readings.Age = age
+		readings.Block = block
+	}
+
+	log.Infof("fk:readings position=%v/%v", buf.Len(), len(raw))
 
 	for buf.Len() > 0 {
 		var value float32
