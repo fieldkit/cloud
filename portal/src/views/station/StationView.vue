@@ -100,7 +100,7 @@
                             @click="selectedModule = module"
                         >
                             <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <input maxlength="25" :disabled="editModuleIndex !== moduleIndex" :value="$t(getModuleName(module))" />
+                            <input class="input" maxlength="25" :disabled="editModuleIndex !== moduleIndex" :value="$t(getModuleName(module))" />
                             <template v-if="!isCustomizationEnabled()">
                                 <a
                                     href="javascript:void(0)"
@@ -565,21 +565,6 @@ export default Vue.extend({
 
             input {
                 margin-left: 5px;
-                background-color: transparent;
-                border: 0;
-                padding: 5px;
-                font-size: 16px;
-                color: var(--color-dark);
-                font-family: $font-family-medium;
-                outline: none;
-
-                &:not(:disabled) {
-                    border: 1px solid $color-border;
-                }
-
-                @include bp-down($sm) {
-                    display: none;
-                }
             }
         }
 
