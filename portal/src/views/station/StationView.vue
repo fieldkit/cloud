@@ -30,7 +30,8 @@
                             </div>
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
-                                {{ station.description }}
+                                <input :value="station.description" />
+                                <span class="station-description-edit">{{ $t("edit") }}</span>
                             </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
@@ -660,6 +661,14 @@ export default Vue.extend({
         color: #6a6d71;
         margin-top: -2px;
         margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    &-description-edit {
+        margin-left: auto;
+        padding-left: 5px;
+        cursor: pointer;
     }
 }
 
