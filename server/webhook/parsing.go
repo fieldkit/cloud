@@ -204,7 +204,7 @@ func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, st
 			return fmt.Errorf("extraction error: %w", err)
 		}
 
-		log.Infow("extractor-done", "extracted", extracted)
+		log.Infow("extractor:done", "extracted", extracted)
 
 		// This is annoying, wish there was a better way to "half serialize" an
 		// object, until then we serialize to bytes and then deserialize into
@@ -332,6 +332,8 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				return nil, fmt.Errorf("empty sensor-key")
 			}
 
+			log.Infow("parsing:sensor", "sensor_key", sensor.Key)
+
 			expectedKey := strcase.ToLowerCamel(sensor.Key)
 			if expectedKey != sensor.Key {
 				return nil, fmt.Errorf("unexpected sensor-key formatting '%s' (expected '%s')", sensor.Key, expectedKey)
@@ -341,6 +343,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 				if pass, err := m.evaluateCondition(ctx, cache, sensor.ConditionExpression, false, source); err != nil {
 					return nil, err
 				} else if !pass {
+					log.Infow("sensor:skipped:condition")
 					continue
 				}
 			}
@@ -351,7 +354,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 			if sensor.Expression != "" {
 				maybeValue, err := m.evaluate(ctx, cache, source, sensor.Expression)
 				if err != nil {
-					fmt.Printf("\n\n%v\n\n", source)
 					log.Infow("evaluation-error", "error", err)
 				} else {
 					if value, ok := toFloat(maybeValue); ok {
@@ -372,11 +374,15 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 							}
 
 							sensors = append(sensors, reading)
+						} else {
+							log.Infow("sensor:skipped:filtered")
 						}
 					} else {
 						return nil, fmt.Errorf("non-numeric sensor value '%s'/'%s': %v", sensor.Name, sensor.Expression, maybeValue)
 					}
 				}
+			} else {
+				log.Infow("sensor:skipped:no-expression")
 			}
 		}
 	}
