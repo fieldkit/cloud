@@ -63,6 +63,8 @@ func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMe
 func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *WebHookMessage) ([]*data.IncomingReading, error) {
 	rowLog := Logger(ctx).Sugar().With("schema_id", row.SchemaID).With("message_id", row.ID)
 
+	rowLog.Infow("wh:parsing")
+
 	incoming := make([]*data.IncomingReading, 0)
 
 	allParsed, err := row.Parse(ctx, h.jqCache, h.batch.Schemas)
