@@ -30,9 +30,10 @@
                             </div>
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
-                                <input
+                                <textarea
                                     class="input"
                                     :placeholder="$t('station.addDescription')"
+                                    oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
                                     v-model="form.description"
                                     :disabled="!editingDescription"
                                 />
@@ -377,11 +378,9 @@ export default Vue.extend({
             console.log("TEst");
         },
         updateStationDescription(): void {
-            console.log("radoi updated", this.form);
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
-            this.$services.api.updateStation(payload).then((response) => {
-                console.log("radoi response", response);
-            });
+            this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+            this.editingDescription = false;
         },
     },
 });
@@ -730,9 +729,11 @@ export default Vue.extend({
         display: flex;
         align-items: center;
 
-        input {
+        .input {
             font-size: 12px;
             width: 100%;
+            resize: none;
+            overflow: hidden;
 
             &:disabled {
                 padding: 0;

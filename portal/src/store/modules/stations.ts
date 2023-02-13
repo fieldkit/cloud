@@ -641,6 +641,18 @@ const actions = (services: Services) => {
 
             commit(MutationTypes.LOADING, { stations: false });
         },
+        [ActionTypes.UPDATE_STATION]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            payload: {id: number, name: string, description: string | null }
+        ) => {
+            commit(MutationTypes.LOADING, { stations: true });
+
+            services.api.updateStation(payload).then((station) => {
+                commit(STATION_UPDATE, { station });
+            });
+
+            commit(MutationTypes.LOADING, { stations: false });
+        },
         [ActionTypes.CLEAR_STATION]: async (
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
             id: number
