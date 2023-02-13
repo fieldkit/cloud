@@ -216,7 +216,8 @@
         },
         "inactive": "Inactive",
         "ownerAvatar": "Owner avatar",
-        "belongsTo": "Belongs To:"
+        "belongsTo": "Belongs To:",
+        "addDescription": "Add a description here"
     },
     "user": {
         "profile": {

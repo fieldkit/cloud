@@ -30,8 +30,28 @@
                             </div>
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
-                                <input :value="station.description" />
-                                <span class="station-description-edit">{{ $t("edit") }}</span>
+                                <input
+                                    class="input"
+                                    :placeholder="$t('station.addDescription')"
+                                    v-model="form.description"
+                                    :disabled="!editingDescription"
+                                />
+                                <a
+                                    href="javascript:void(0)"
+                                    v-if="!editingDescription"
+                                    @click="editingDescription = true"
+                                    class="station-description-edit"
+                                >
+                                    {{ $t("edit") }}
+                                </a>
+                                <a
+                                    href="javascript:void(0)"
+                                    @click="updateStationDescription()"
+                                    v-if="editingDescription"
+                                    class="station-description-edit"
+                                >
+                                    {{ $t("save") }}
+                                </a>
                             </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
@@ -80,23 +100,25 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                        <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
-                        <div v-else class="photo-placeholder">
-                            <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                <div>
+                    <div v-if="photos" class="station-photos">
+                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                            <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
+                            <div v-else class="photo-placeholder">
+                                <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                            </div>
                         </div>
+                        <router-link
+                            :to="{
+                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                                params: { projectId: projectId, stationId: station.id },
+                            }"
+                            class="station-photos-nav"
+                        >
+                            <i class="icon icon-grid"></i>
+                            {{ $t("station.btn.linkToPhotos") }}
+                        </router-link>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
-                        <i class="icon icon-grid"></i>
-                        {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
                 </div>
             </section>
 
@@ -104,13 +126,36 @@
                 <div class="station-readings">
                     <ul>
                         <li
-                            v-for="module in station.modules"
+                            v-for="(module, moduleIndex) in station.modules"
                             v-bind:key="module.name"
                             :class="{ active: module.name === selectedModule.name }"
                             @click="selectedModule = module"
                         >
                             <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <span>{{ $t(getModuleName(module)) }}</span>
+                            <input
+                                class="input"
+                                maxlength="25"
+                                :disabled="editModuleIndex !== moduleIndex"
+                                :value="$t(getModuleName(module))"
+                            />
+                            <template v-if="!isCustomizationEnabled()">
+                                <a
+                                    href="javascript:void(0)"
+                                    v-if="editModuleIndex !== moduleIndex"
+                                    @click="onEditModuleNameClick(moduleIndex)"
+                                    class="module-edit-name"
+                                >
+                                    {{ $t("edit") }}
+                                </a>
+                                <a
+                                    href="javascript:void(0)"
+                                    v-if="editModuleIndex === moduleIndex"
+                                    @click="saveModuleName()"
+                                    class="module-edit-name"
+                                >
+                                    {{ $t("save") }}
+                                </a>
+                            </template>
                         </li>
                     </ul>
                     <header v-if="isMobileView">
@@ -193,18 +238,29 @@ export default Vue.extend({
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        editModuleIndex: number | null;
+        editingDescription: boolean;
+        form: {
+            description: string | null;
+        };
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            editModuleIndex: null,
+            editingDescription: false,
+            form: {
+                description: null,
+            },
         };
     },
     watch: {
         station() {
             this.loading = false;
             this.selectedModule = this.station.modules[0];
+            this.form.description = this.station.description;
         },
     },
     computed: {
@@ -314,6 +370,19 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        onEditModuleNameClick(index): void {
+            this.editModuleIndex = index;
+        },
+        saveModuleName(): void {
+            console.log("TEst");
+        },
+        updateStationDescription(): void {
+            console.log("radoi updated", this.form);
+            const payload = { id: this.station.id, name: this.station.name, ...this.form };
+            this.$services.api.updateStation(payload).then((response) => {
+                console.log("radoi response", response);
+            });
+        },
     },
 });
 </script>
@@ -347,6 +416,7 @@ export default Vue.extend({
     }
 
     &-station {
+        margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
@@ -550,12 +620,8 @@ export default Vue.extend({
                 height: 40px;
             }
 
-            span {
-                margin-left: 10px;
-
-                @include bp-down($sm) {
-                    display: none;
-                }
+            input {
+                margin-left: 5px;
             }
         }
 
@@ -663,6 +729,15 @@ export default Vue.extend({
         margin-bottom: 10px;
         display: flex;
         align-items: center;
+
+        input {
+            font-size: 12px;
+            width: 100%;
+
+            &:disabled {
+                padding: 0;
+            }
+        }
     }
 
     &-description-edit {
@@ -724,7 +799,10 @@ section {
     }
 }
 
-::v-deep .back {
-    margin-bottom: 15px;
+.module-edit-name {
+    opacity: 0.4;
+    font-size: 12px;
+    margin-left: 7px;
+    margin-bottom: -1px;
 }
 </style>

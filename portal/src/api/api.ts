@@ -774,6 +774,15 @@ class FKApi {
         });
     }
 
+    updateStation(data: { description: string | null }): Promise<Station> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.id,
+            data: data,
+        });
+    }
+
     getUserStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
         if (!this.token.authenticated()) {
             return onNoAuth();
