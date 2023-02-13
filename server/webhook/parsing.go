@@ -194,8 +194,25 @@ func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, 
 	}
 }
 
+const (
+	ExtractedKey = "extracted"
+)
+
 func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, stationSchema *MessageSchemaStation, source interface{}) (err error) {
 	log := Logger(ctx).Sugar()
+
+	// Because we'll end up inserting the extracted data into the message, we
+	// need to be sure that's possible, which it only is on objects.
+	sourceObject, ok := source.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("expected object source")
+	}
+
+	// Skip if an extractor has already succeeded for this message.
+	if sourceObject[ExtractedKey] != nil {
+		log.Infow("extractor:cached")
+		return nil
+	}
 
 	for _, extractorSpec := range stationSchema.Extractors {
 		extractor, err := FindExtractor(ctx, extractorSpec.Type)
@@ -231,12 +248,7 @@ func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, st
 
 		// Inserts the extracted data/payload into the source object so that the
 		// jq expressions can pull information.
-		sourceObject, ok := source.(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("expected object source")
-		}
-
-		sourceObject["extracted"] = extractedOpaque
+		sourceObject[ExtractedKey] = extractedOpaque
 	}
 
 	return nil
