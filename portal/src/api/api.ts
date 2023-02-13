@@ -774,7 +774,7 @@ class FKApi {
         });
     }
 
-    updateStation(data: { description: string | null }): Promise<Station> {
+    updateStation(data: {id: number, name: string, description: string | null }): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
