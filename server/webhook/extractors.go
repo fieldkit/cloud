@@ -59,7 +59,7 @@ func (e *FkStatusExtractor) Extract(ctx context.Context, complete interface{}, s
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	log.Infow("fk:status", "status", status)
+	log.Infow("extractor:fk:status", "status", status)
 
 	return status, nil
 }
@@ -115,8 +115,6 @@ func (e *FkReadingsExtractor) Extract(ctx context.Context, complete interface{},
 		readings.Block = block
 	}
 
-	log.Infof("fk:readings position=%v/%v", buf.Len(), len(raw))
-
 	for buf.Len() > 0 {
 		var value float32
 		if err := binary.Read(buf, binary.LittleEndian, &value); err != nil {
@@ -130,7 +128,7 @@ func (e *FkReadingsExtractor) Extract(ctx context.Context, complete interface{},
 		readings.Readings = append(readings.Readings, value)
 	}
 
-	log.Infow("fk:readings", "readings", readings)
+	log.Infow("extractor:fk:readings", "readings", readings)
 
 	return readings, nil
 }
@@ -170,7 +168,7 @@ func (e *FkLocationExtractor) Extract(ctx context.Context, complete interface{},
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	log.Infow("fk:location", "location", location)
+	log.Infow("extractor:fk:location", "location", location)
 
 	return location, nil
 }
