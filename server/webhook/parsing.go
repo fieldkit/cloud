@@ -168,6 +168,8 @@ func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source in
 }
 
 func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, expression string, allowEmpty bool, source interface{}) (bool, error) {
+	log := Logger(ctx).Sugar()
+
 	if value, err := m.evaluate(ctx, cache, source, expression); err != nil {
 		if _, ok := err.(*EvaluationError); ok {
 			// No luck, skipping and maybe another stationSchema will cover this message.
@@ -176,13 +178,20 @@ func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, 
 		return false, fmt.Errorf("evaluating condition-expression: %w", err)
 	} else if value == nil {
 		return false, nil
-	} else if stringValue, ok := value.(string); ok {
-		if !allowEmpty && len(stringValue) == 0 {
-			return false, nil
-		}
-	}
+	} else {
+		log.Infow("parsing:condition", "expression", expression, "value", value)
 
-	return true, nil
+		switch v := value.(type) {
+		case string: // TODO Consider a warning to encourage returning bool.
+			if !allowEmpty && len(v) == 0 {
+				return false, nil
+			}
+		case bool:
+			return v, nil
+		}
+
+		return true, nil
+	}
 }
 
 func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, stationSchema *MessageSchemaStation, source interface{}) (err error) {
