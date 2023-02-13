@@ -185,6 +185,9 @@ func (c *StationService) add(ctx context.Context, payload *station.AddPayload) (
 }
 
 func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (response *station.StationFull, err error) {
+	log := Logger(ctx).Sugar()
+	log.Errorw("ffffffffffffffff", "fffffffffffffff")
+
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -309,6 +312,9 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 		}
 		return nil, err
 	}
+	log := Logger(ctx).Sugar()
+
+	log.Errorw("11111aaaaaaaaaaaaaaaaaaa", "111111aaaaaaaaaaaaaaaaaaa", updating)
 
 	p, err := NewPermissions(ctx, c.options).ForStation(updating)
 	if err != nil {
@@ -323,6 +329,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	if payload.LocationName != nil {
 		updating.LocationName = payload.LocationName
 	}
+	updating.Description = payload.Description
 
 	if err := c.updateStation(ctx, updating, payload.StatusPb); err != nil {
 		return nil, err
@@ -1089,14 +1096,14 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Name: sf.Owner.Name,
 		},
 		Photos: photos,
-	};
+	}
 
-    if sf.Owner.MediaURL != nil {
-        url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
-        stationFull.Owner.Photo = &station.UserPhoto{
-            URL: &url,
-        }
-    }
+	if sf.Owner.MediaURL != nil {
+		url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
+		stationFull.Owner.Photo = &station.UserPhoto{
+			URL: &url,
+		}
+	}
 
 	return stationFull, nil
 }
