@@ -69,8 +69,8 @@ type FkReadingsExtractor struct {
 
 type FkLoRaReadings struct {
 	Packet   byte      `json:"packet"`
-	Age      int64     `json:"age"`
-	Block    int64     `json:"block"`
+	Age      uint64    `json:"age"`
+	Block    uint64    `json:"block"`
 	Readings []float32 `json:"readings"`
 }
 
@@ -101,12 +101,12 @@ func (e *FkReadingsExtractor) Extract(ctx context.Context, complete interface{},
 	}
 
 	if packet == 0 {
-		age, err := binary.ReadVarint(buf)
+		age, err := binary.ReadUvarint(buf)
 		if err != nil {
 			return nil, fmt.Errorf("read-error(age): %w", err)
 		}
 
-		block, err := binary.ReadVarint(buf)
+		block, err := binary.ReadUvarint(buf)
 		if err != nil {
 			return nil, fmt.Errorf("read-error(reading): %w", err)
 		}
