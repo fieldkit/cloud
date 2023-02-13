@@ -236,6 +236,10 @@ func (m *WebHookMessage) applyExtractors(ctx context.Context, cache *JqCache, st
 func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaRegistration *MessageSchemaRegistration, stationSchema *MessageSchemaStation, source interface{}) (p *ParsedMessage, err error) {
 	log := Logger(ctx).Sugar()
 
+	if err := m.applyExtractors(ctx, cache, stationSchema, source); err != nil {
+		return nil, fmt.Errorf("apply-extractors: %w", err)
+	}
+
 	// Check condition expression if one is present. If this returns nothing we
 	// skip this message w/o errors.
 	if stationSchema.ConditionExpression != "" {
@@ -244,10 +248,6 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 		} else if !pass {
 			return nil, nil
 		}
-	}
-
-	if err := m.applyExtractors(ctx, cache, stationSchema, source); err != nil {
-		return nil, fmt.Errorf("apply-extractors: %w", err)
 	}
 
 	deviceIDRaw, err := m.evaluate(ctx, cache, source, stationSchema.IdentifierExpression)
