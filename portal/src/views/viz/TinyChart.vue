@@ -43,6 +43,10 @@ export default Vue.extend({
             type: SensorDataQuerier,
             required: true,
         },
+        moduleKey: {
+            type: String,
+            required: false,
+        },
     },
     data(): {
         chartSettings: ChartSettings;
@@ -70,11 +74,21 @@ export default Vue.extend({
         async load(): Promise<void> {
             // TODO Show busy when loading?
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
+            const selectedModuleKey = this.moduleKey;
 
-            function getFirstQuickSensor(quickSensors): VizSensor {
-                const sensorModuleId = quickSensors.station[0].moduleId;
-                const sensorId = quickSensors.station[0].sensorId;
-                return [quickSensors.station[0].stationId, [sensorModuleId, sensorId]];
+            function getQuickSensor(quickSensors): VizSensor {
+                let stationId, sensorModuleId, sensorId;
+                if (selectedModuleKey) {
+                    const module = quickSensors.station.find((station) => station.moduleKey === selectedModuleKey);
+                    stationId = module.stationId;
+                    sensorModuleId = module.moduleId;
+                    sensorId = module.sensorId;
+                } else {
+                    stationId = quickSensors.station[0].stationId;
+                    sensorModuleId = quickSensors.station[0].moduleId;
+                    sensorId = quickSensors.station[0].sensorId;
+                }
+                return [stationId, [sensorModuleId, sensorId]];
             }
 
             // Not happy with this, no easy way until we get rid of the 'quick sensors'
@@ -97,7 +111,7 @@ export default Vue.extend({
                     return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSize: 0 } };
                 }
 
-                const vizSensor = getFirstQuickSensor(quickSensors);
+                const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
 

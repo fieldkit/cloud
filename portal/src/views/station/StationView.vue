@@ -95,12 +95,12 @@
                     <li class="module-data-item" v-for="module in station.modules" v-bind:key="module.name">
                         <h3 class="module-data-title flex flex-al-center">
                             <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ getModuleName(module) }}
+                            {{ $t(getModuleName(module)) }}
                         </h3>
-                        <TinyChart :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                        <TinyChart :moduleKey="module.name" :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
                     </li>
                 </ul>
-                <button class="btn module-data-btn">{{ $t("station.exploreData") }}</button>
+                <button class="btn module-data-btn" @click="onClickExplore">{{ $t("station.exploreData") }}</button>
             </section>
 
             <section class="container-box section-readings" v-if="selectedModule">
@@ -177,6 +177,8 @@ import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 import TinyChart from "@/views/viz/TinyChart.vue";
+import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
+import { ExploreContext } from "@/views/viz/common";
 
 export default Vue.extend({
     name: "StationView",
@@ -316,6 +318,14 @@ export default Vue.extend({
         },
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
+        },
+        onClickExplore() {
+            const exploreContext = new ExploreContext();
+            const bm = BookmarkFactory.forStation(this.station.id, exploreContext);
+            return this.$router.push({
+                name: "exploreBookmark",
+                query: { bookmark: serializeBookmark(bm) },
+            });
         },
     },
 });
@@ -695,6 +705,7 @@ section {
 
 .module-data-item {
     flex: 0 0 calc(50% - 10px);
+    min-width: 0;
     margin-bottom: 30px;
 
     @include bp-down($sm) {
