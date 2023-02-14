@@ -235,6 +235,9 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
+	log := Logger(ctx).Sugar()
+	log.Errorw("aaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaa", sf.Modules)
+
 	return transformStationFull(c.options.signer, p, sf, preciseLocation, false, mm)
 }
 
@@ -759,6 +762,38 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 	}, nil
 }
 
+func (c *StationService) UpdateModule(ctx context.Context, payload *station.UpdateModulePayload) (response *station.StationFull, err error) {
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	updatingStation, err := sr.QueryStationByID(ctx, payload.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, station.MakeNotFound(errors.New("station not found"))
+		}
+		return nil, err
+	}
+
+	p, err := NewPermissions(ctx, c.options).ForStation(updatingStation)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return nil, err
+	}
+
+	updatingModule, err := sr.QueryStationModuleByID(ctx, payload.ModuleID)
+
+	if _, err := sr.UpsertStationModule(ctx, updatingModule); err != nil {
+		return nil, err
+	}
+
+	return c.Get(ctx, &station.GetPayload{
+		Auth: &payload.Auth,
+		ID:   payload.ID,
+	})
+}
+
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
@@ -904,6 +939,7 @@ func transformModules(from *data.StationFull, configurationID int64, moduleMeta 
 			HardwareID:       &hardwareID,
 			HardwareIDBase64: &hardwareIDBase64,
 			Name:             translatedName,
+			Label:            v.Label,
 			Position:         int32(v.Position),
 			Flags:            int32(v.Flags),
 			Internal:         v.Flags > 0 || v.Position == 255,
@@ -1046,6 +1082,8 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Priority:    attribute.Priority,
 		})
 	}
+
+	fmt.Errorf("1111aaaaaaaaaaaaaaaaaaa: %s", configurations)
 
 	return &station.StationFull{
 		ID:       sf.Station.ID,

@@ -269,6 +269,7 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
 						  version = EXCLUDED.version
+						  label = EXCLUDED.label
 		RETURNING id
 		`, module); err != nil {
 		return nil, err
@@ -1497,4 +1498,16 @@ func (r *StationRepository) QueryAssociatedStations(ctx context.Context, station
 
 		return byID, nil
 	}
+}
+
+func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32) (module *data.StationModule, err error) {
+	module = &data.StationModule{}
+	if err := r.db.GetContext(ctx, module, `
+		SELECT
+			id, configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
+		FROM fieldkit.station_module WHERE id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+	return module, nil
 }
