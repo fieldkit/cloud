@@ -29,10 +29,11 @@ type Client struct {
 	DeleteEndpoint                goa.Endpoint
 	AdminSearchEndpoint           goa.Endpoint
 	ProgressEndpoint              goa.Endpoint
+	UpdateModuleEndpoint          goa.Endpoint
 }
 
 // NewClient initializes a "station" service client given the endpoints.
-func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, listAssociated, listProjectAssociated, downloadPhoto, listAll, delete_, adminSearch, progress goa.Endpoint) *Client {
+func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, listAssociated, listProjectAssociated, downloadPhoto, listAll, delete_, adminSearch, progress, updateModule goa.Endpoint) *Client {
 	return &Client{
 		AddEndpoint:                   add,
 		GetEndpoint:                   get,
@@ -48,6 +49,7 @@ func NewClient(add, get, transfer, defaultPhoto, update, listMine, listProject, 
 		DeleteEndpoint:                delete_,
 		AdminSearchEndpoint:           adminSearch,
 		ProgressEndpoint:              progress,
+		UpdateModuleEndpoint:          updateModule,
 	}
 }
 
@@ -178,4 +180,14 @@ func (c *Client) Progress(ctx context.Context, p *ProgressPayload) (res *Station
 		return
 	}
 	return ires.(*StationProgress), nil
+}
+
+// UpdateModule calls the "update module" endpoint of the "station" service.
+func (c *Client) UpdateModule(ctx context.Context, p *UpdateModulePayload) (res *StationFull, err error) {
+	var ires interface{}
+	ires, err = c.UpdateModuleEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*StationFull), nil
 }

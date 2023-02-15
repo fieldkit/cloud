@@ -118,11 +118,15 @@ export class DisplaySensor {
 }
 
 export class DisplayModule {
+    id: number;
     name: string;
+    label: string;
     sensors: DisplaySensor[];
 
     constructor(module: StationModule) {
+        this.id = module.id;
         this.name = module.name;
+        this.label = module.label ?? '';
         this.sensors = module.sensors.map((s) => new DisplaySensor(s));
     }
 }

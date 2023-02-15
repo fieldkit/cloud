@@ -30,6 +30,12 @@ type UpdateRequestBody struct {
 	StatusPb     *string `form:"statusPb,omitempty" json:"statusPb,omitempty" xml:"statusPb,omitempty"`
 }
 
+// UpdateModuleRequestBody is the type of the "station" service "update module"
+// endpoint HTTP request body.
+type UpdateModuleRequestBody struct {
+	Label *string `form:"label,omitempty" json:"label,omitempty" xml:"label,omitempty"`
+}
+
 // AddResponseBody is the type of the "station" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
@@ -180,6 +186,39 @@ type AdminSearchResponseBody struct {
 // endpoint HTTP response body.
 type ProgressResponseBody struct {
 	Jobs []*StationJobResponseBody `form:"jobs" json:"jobs" xml:"jobs"`
+}
+
+// UpdateModuleResponseBody is the type of the "station" service "update
+// module" endpoint HTTP response body.
+type UpdateModuleResponseBody struct {
+	ID                 int32                                 `form:"id" json:"id" xml:"id"`
+	Name               string                                `form:"name" json:"name" xml:"name"`
+	Model              *StationFullModelResponseBody         `form:"model" json:"model" xml:"model"`
+	Owner              *StationOwnerResponseBody             `form:"owner" json:"owner" xml:"owner"`
+	DeviceID           string                                `form:"deviceId" json:"deviceId" xml:"deviceId"`
+	Interestingness    *StationInterestingnessResponseBody   `form:"interestingness" json:"interestingness" xml:"interestingness"`
+	Attributes         *StationProjectAttributesResponseBody `form:"attributes" json:"attributes" xml:"attributes"`
+	Uploads            []*StationUploadResponseBody          `form:"uploads" json:"uploads" xml:"uploads"`
+	Photos             *StationPhotosResponseBody            `form:"photos" json:"photos" xml:"photos"`
+	ReadOnly           bool                                  `form:"readOnly" json:"readOnly" xml:"readOnly"`
+	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
+	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
+	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
+	MemoryAvailable    *int32                                `form:"memoryAvailable,omitempty" json:"memoryAvailable,omitempty" xml:"memoryAvailable,omitempty"`
+	FirmwareNumber     *int32                                `form:"firmwareNumber,omitempty" json:"firmwareNumber,omitempty" xml:"firmwareNumber,omitempty"`
+	FirmwareTime       *int64                                `form:"firmwareTime,omitempty" json:"firmwareTime,omitempty" xml:"firmwareTime,omitempty"`
+	Configurations     *StationConfigurationsResponseBody    `form:"configurations" json:"configurations" xml:"configurations"`
+	UpdatedAt          int64                                 `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
+	LastReadingAt      *int64                                `form:"lastReadingAt,omitempty" json:"lastReadingAt,omitempty" xml:"lastReadingAt,omitempty"`
+	Location           *StationLocationResponseBody          `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	LocationName       *string                               `form:"locationName,omitempty" json:"locationName,omitempty" xml:"locationName,omitempty"`
+	PlaceNameOther     *string                               `form:"placeNameOther,omitempty" json:"placeNameOther,omitempty" xml:"placeNameOther,omitempty"`
+	PlaceNameNative    *string                               `form:"placeNameNative,omitempty" json:"placeNameNative,omitempty" xml:"placeNameNative,omitempty"`
+	SyncedAt           *int64                                `form:"syncedAt,omitempty" json:"syncedAt,omitempty" xml:"syncedAt,omitempty"`
+	IngestionAt        *int64                                `form:"ingestionAt,omitempty" json:"ingestionAt,omitempty" xml:"ingestionAt,omitempty"`
+	Data               *StationDataSummaryResponseBody       `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
 }
 
 // AddStationOwnerConflictResponseBody is the type of the "station" service
@@ -1212,6 +1251,78 @@ type ProgressBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// UpdateModuleUnauthorizedResponseBody is the type of the "station" service
+// "update module" endpoint HTTP response body for the "unauthorized" error.
+type UpdateModuleUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateModuleForbiddenResponseBody is the type of the "station" service
+// "update module" endpoint HTTP response body for the "forbidden" error.
+type UpdateModuleForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateModuleNotFoundResponseBody is the type of the "station" service
+// "update module" endpoint HTTP response body for the "not-found" error.
+type UpdateModuleNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateModuleBadRequestResponseBody is the type of the "station" service
+// "update module" endpoint HTTP response body for the "bad-request" error.
+type UpdateModuleBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // StationFullModelResponseBody is used to define fields on response body types.
 type StationFullModelResponseBody struct {
 	Name                      string `form:"name" json:"name" xml:"name"`
@@ -1296,6 +1407,7 @@ type StationModuleResponseBody struct {
 	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
 	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
 	Name             string                       `form:"name" json:"name" xml:"name"`
+	Label            *string                      `form:"label,omitempty" json:"label,omitempty" xml:"label,omitempty"`
 	Position         int32                        `form:"position" json:"position" xml:"position"`
 	Flags            int32                        `form:"flags" json:"flags" xml:"flags"`
 	Internal         bool                         `form:"internal" json:"internal" xml:"internal"`
@@ -1717,6 +1829,63 @@ func NewProgressResponseBody(res *stationviews.StationProgressView) *ProgressRes
 		for i, val := range res.Jobs {
 			body.Jobs[i] = marshalStationviewsStationJobViewToStationJobResponseBody(val)
 		}
+	}
+	return body
+}
+
+// NewUpdateModuleResponseBody builds the HTTP response body from the result of
+// the "update module" endpoint of the "station" service.
+func NewUpdateModuleResponseBody(res *stationviews.StationFullView) *UpdateModuleResponseBody {
+	body := &UpdateModuleResponseBody{
+		ID:                 *res.ID,
+		Name:               *res.Name,
+		DeviceID:           *res.DeviceID,
+		ReadOnly:           *res.ReadOnly,
+		Status:             res.Status,
+		Hidden:             res.Hidden,
+		Battery:            res.Battery,
+		RecordingStartedAt: res.RecordingStartedAt,
+		MemoryUsed:         res.MemoryUsed,
+		MemoryAvailable:    res.MemoryAvailable,
+		FirmwareNumber:     res.FirmwareNumber,
+		FirmwareTime:       res.FirmwareTime,
+		UpdatedAt:          *res.UpdatedAt,
+		LastReadingAt:      res.LastReadingAt,
+		LocationName:       res.LocationName,
+		PlaceNameOther:     res.PlaceNameOther,
+		PlaceNameNative:    res.PlaceNameNative,
+		SyncedAt:           res.SyncedAt,
+		IngestionAt:        res.IngestionAt,
+	}
+	if res.Model != nil {
+		body.Model = marshalStationviewsStationFullModelViewToStationFullModelResponseBody(res.Model)
+	}
+	if res.Owner != nil {
+		body.Owner = marshalStationviewsStationOwnerViewToStationOwnerResponseBody(res.Owner)
+	}
+	if res.Interestingness != nil {
+		body.Interestingness = marshalStationviewsStationInterestingnessViewToStationInterestingnessResponseBody(res.Interestingness)
+	}
+	if res.Attributes != nil {
+		body.Attributes = marshalStationviewsStationProjectAttributesViewToStationProjectAttributesResponseBody(res.Attributes)
+	}
+	if res.Uploads != nil {
+		body.Uploads = make([]*StationUploadResponseBody, len(res.Uploads))
+		for i, val := range res.Uploads {
+			body.Uploads[i] = marshalStationviewsStationUploadViewToStationUploadResponseBody(val)
+		}
+	}
+	if res.Photos != nil {
+		body.Photos = marshalStationviewsStationPhotosViewToStationPhotosResponseBody(res.Photos)
+	}
+	if res.Configurations != nil {
+		body.Configurations = marshalStationviewsStationConfigurationsViewToStationConfigurationsResponseBody(res.Configurations)
+	}
+	if res.Location != nil {
+		body.Location = marshalStationviewsStationLocationViewToStationLocationResponseBody(res.Location)
+	}
+	if res.Data != nil {
+		body.Data = marshalStationviewsStationDataSummaryViewToStationDataSummaryResponseBody(res.Data)
 	}
 	return body
 }
@@ -2523,6 +2692,62 @@ func NewProgressBadRequestResponseBody(res *goa.ServiceError) *ProgressBadReques
 	return body
 }
 
+// NewUpdateModuleUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "update module" endpoint of the "station" service.
+func NewUpdateModuleUnauthorizedResponseBody(res *goa.ServiceError) *UpdateModuleUnauthorizedResponseBody {
+	body := &UpdateModuleUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateModuleForbiddenResponseBody builds the HTTP response body from the
+// result of the "update module" endpoint of the "station" service.
+func NewUpdateModuleForbiddenResponseBody(res *goa.ServiceError) *UpdateModuleForbiddenResponseBody {
+	body := &UpdateModuleForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateModuleNotFoundResponseBody builds the HTTP response body from the
+// result of the "update module" endpoint of the "station" service.
+func NewUpdateModuleNotFoundResponseBody(res *goa.ServiceError) *UpdateModuleNotFoundResponseBody {
+	body := &UpdateModuleNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateModuleBadRequestResponseBody builds the HTTP response body from the
+// result of the "update module" endpoint of the "station" service.
+func NewUpdateModuleBadRequestResponseBody(res *goa.ServiceError) *UpdateModuleBadRequestResponseBody {
+	body := &UpdateModuleBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddPayload builds a station service add endpoint payload.
 func NewAddPayload(body *AddRequestBody, auth string) *station.AddPayload {
 	v := &station.AddPayload{
@@ -2669,6 +2894,19 @@ func NewProgressPayload(stationID int32, auth string) *station.ProgressPayload {
 	return v
 }
 
+// NewUpdateModulePayload builds a station service update module endpoint
+// payload.
+func NewUpdateModulePayload(body *UpdateModuleRequestBody, id int32, moduleID int32, auth string) *station.UpdateModulePayload {
+	v := &station.UpdateModulePayload{
+		Label: *body.Label,
+	}
+	v.ID = id
+	v.ModuleID = moduleID
+	v.Auth = auth
+
+	return v
+}
+
 // ValidateAddRequestBody runs the validations defined on AddRequestBody
 func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	if body.Name == nil {
@@ -2684,6 +2922,15 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateUpdateModuleRequestBody runs the validations defined on Update
+// ModuleRequestBody
+func ValidateUpdateModuleRequestBody(body *UpdateModuleRequestBody) (err error) {
+	if body.Label == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("label", "body"))
 	}
 	return
 }

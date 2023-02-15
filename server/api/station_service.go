@@ -235,9 +235,6 @@ func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (
 		return nil, err
 	}
 
-	log := Logger(ctx).Sugar()
-	log.Errorw("aaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaa", sf.Modules)
-
 	return transformStationFull(c.options.signer, p, sf, preciseLocation, false, mm)
 }
 
@@ -763,6 +760,7 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 }
 
 func (c *StationService) UpdateModule(ctx context.Context, payload *station.UpdateModulePayload) (response *station.StationFull, err error) {
+		log := Logger(ctx).Sugar()
 	sr := repositories.NewStationRepository(c.options.Database)
 
 	updatingStation, err := sr.QueryStationByID(ctx, payload.ID)
@@ -783,8 +781,10 @@ func (c *StationService) UpdateModule(ctx context.Context, payload *station.Upda
 	}
 
 	updatingModule, err := sr.QueryStationModuleByID(ctx, payload.ModuleID)
+    updatingModule.Label = &payload.Label
+    	log.Errorw("aaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaa", updatingModule)
 
-	if _, err := sr.UpsertStationModule(ctx, updatingModule); err != nil {
+	if _, err := sr.UpdateStationModule(ctx, updatingModule); err != nil {
 		return nil, err
 	}
 

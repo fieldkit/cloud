@@ -50,8 +50,8 @@
                             <span class="bold">{{ $tc("station.modules") }}</span>
                             <div class="station-modules ml-10">
                                 <img
-                                    v-for="module in station.modules"
-                                    v-bind:key="module.name"
+                                    v-for="(module, moduleIndex) in station.modules"
+                                    v-bind:key="moduleIndex"
                                     alt="Module icon"
                                     :src="getModuleImg(module)"
                                 />
@@ -95,25 +95,36 @@
                     <ul>
                         <li
                             v-for="(module, moduleIndex) in station.modules"
-                            v-bind:key="module.name"
+                            v-bind:key="moduleIndex"
                             :class="{ active: module.name === selectedModule.name }"
-                            @click="selectedModule = module"
+                            @click="selectModule(module)"
                         >
-                            <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
-                            <input class="input" maxlength="25" :disabled="editModuleIndex !== moduleIndex" :value="$t(getModuleName(module))" />
+                            <img alt="Module icon" :src="getModuleImg(module)" />
+                            <input
+                                v-if="editedModule && editedModule.id === module.id"
+                                class="input"
+                                maxlength="25"
+                                :disabled="editedModule.id !== selectedModule.id"
+                                v-model="editedModule.label"
+                            />
+                            <input
+                                v-else
+                                class="input"
+                                maxlength="25"
+                                disabled
+                                :value="module.label ? module.label : $t(getModuleName(module))"
+                            />
                             <template v-if="!isCustomizationEnabled()">
                                 <a
-                                    href="javascript:void(0)"
-                                    v-if="editModuleIndex !== moduleIndex"
-                                    @click="onEditModuleNameClick(moduleIndex)"
+                                    v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
+                                    @click="onEditModuleNameClick(module)"
                                     class="module-edit-name"
                                 >
                                     {{ $t("edit") }}
                                 </a>
                                 <a
-                                    href="javascript:void(0)"
-                                    v-if="editModuleIndex === moduleIndex"
-                                    @click="saveModuleName()"
+                                    v-if="editedModule && editedModule.id === module.id"
+                                    @click="saveModuleName(module)"
                                     class="module-edit-name"
                                 >
                                     {{ $t("save") }}
@@ -199,14 +210,14 @@ export default Vue.extend({
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
-        editModuleIndex: number | null;
+        editedModule: DisplayModule | null;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
-            editModuleIndex: null,
+            editedModule: null,
         };
     },
     watch: {
@@ -320,11 +331,23 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
-        onEditModuleNameClick(index): void {
-            this.editModuleIndex = index;
+        onEditModuleNameClick(module: DisplayModule): void {
+            this.editedModule = JSON.parse(JSON.stringify(module));
         },
-        saveModuleName(): void {
-            console.log("TEst");
+        saveModuleName(module): void {
+            console.log("radoi save", module);
+            if (!this.editedModule) {
+                return;
+            }
+
+            const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
+
+            this.$services.api.updateModule(payload).then((response) => {
+                console.log("res radoi", response);
+            });
+        },
+        selectModule(module: DisplayModule) {
+            this.selectedModule = module;
         },
     },
 });
@@ -699,5 +722,6 @@ section {
     font-size: 12px;
     margin-left: 7px;
     margin-bottom: -1px;
+    cursor: pointer;
 }
 </style>

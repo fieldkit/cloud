@@ -282,6 +282,28 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 	return module, nil
 }
 
+func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+		Logger(ctx).Sugar().Infow("module:renamed 1", "original_name", module, "name", module.Name, "module_id", module.ID, "verbose", true)
+
+	if _,err := r.db.NamedExecContext(ctx, `
+        UPDATE fieldkit.station_module SET
+			  module_index = :module_index,
+              position = :position,
+              flags = :flags,
+              name = :name,
+              manufacturer = :manufacturer,
+              kind = :kind,
+              version = :version
+              label = :label
+		WHERE id = :id
+		`, module); err != nil {
+		return nil, err
+	}
+		Logger(ctx).Sugar().Infow("module:renamed 2", "original_name", module, "name", module.Name, "module_id", module.ID, "verbose", true)
+
+	return module, nil
+}
+
 func migrateSensorName(name string) string {
 	name = strings.ReplaceAll(name, "-", "_")
 	if strings.Contains(name, "_") {
@@ -1382,12 +1404,12 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			q.full_sensor_key AS sensor_key,
 			q.sensor_read_at
 		FROM (
-			SELECT    
+			SELECT
 				station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 				encode(station_module.hardware_id, 'base64') AS module_id,
 				station_module.name AS module_key,
 				station_module.name || '.' || module_sensor.name AS full_sensor_key,
-				module_sensor.reading_time AS sensor_read_at                                                                                                                      
+				module_sensor.reading_time AS sensor_read_at
 			FROM fieldkit.station AS station
 			LEFT JOIN fieldkit.visible_configuration AS vc ON (vc.station_id = station.id)
 			LEFT JOIN fieldkit.station_module AS station_module ON (vc.configuration_id = station_module.configuration_id)
