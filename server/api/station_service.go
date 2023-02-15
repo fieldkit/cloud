@@ -760,7 +760,6 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 }
 
 func (c *StationService) UpdateModule(ctx context.Context, payload *station.UpdateModulePayload) (response *station.StationFull, err error) {
-		log := Logger(ctx).Sugar()
 	sr := repositories.NewStationRepository(c.options.Database)
 
 	updatingStation, err := sr.QueryStationByID(ctx, payload.ID)
@@ -781,8 +780,7 @@ func (c *StationService) UpdateModule(ctx context.Context, payload *station.Upda
 	}
 
 	updatingModule, err := sr.QueryStationModuleByID(ctx, payload.ModuleID)
-    updatingModule.Label = &payload.Label
-    	log.Errorw("aaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaa", updatingModule)
+	updatingModule.Label = &payload.Label
 
 	if _, err := sr.UpdateStationModule(ctx, updatingModule); err != nil {
 		return nil, err
@@ -1082,9 +1080,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Priority:    attribute.Priority,
 		})
 	}
-
-	fmt.Errorf("1111aaaaaaaaaaaaaaaaaaa: %s", configurations)
-
+	
 	return &station.StationFull{
 		ID:       sf.Station.ID,
 		Name:     sf.Station.Name,

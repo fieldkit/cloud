@@ -268,7 +268,7 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
                           name = EXCLUDED.name,
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
-						  version = EXCLUDED.version
+						  version = EXCLUDED.version,
 						  label = EXCLUDED.label
 		RETURNING id
 		`, module); err != nil {
@@ -283,9 +283,8 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 }
 
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
-		Logger(ctx).Sugar().Infow("module:renamed 1", "original_name", module, "name", module.Name, "module_id", module.ID, "verbose", true)
 
-	if _,err := r.db.NamedExecContext(ctx, `
+	if _, err := r.db.NamedExecContext(ctx, `
         UPDATE fieldkit.station_module SET
 			  module_index = :module_index,
               position = :position,
@@ -293,13 +292,12 @@ func (r *StationRepository) UpdateStationModule(ctx context.Context, module *dat
               name = :name,
               manufacturer = :manufacturer,
               kind = :kind,
-              version = :version
+              version = :version,
               label = :label
 		WHERE id = :id
 		`, module); err != nil {
 		return nil, err
 	}
-		Logger(ctx).Sugar().Infow("module:renamed 2", "original_name", module, "name", module.Name, "module_id", module.ID, "verbose", true)
 
 	return module, nil
 }
