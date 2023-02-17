@@ -360,11 +360,15 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 	}
 
 	query, args, err := sqlx.In(`
-		SELECT s.id AS station_id, m.id AS module_id, m.hardware_id
+		WITH station_ids AS (
+			SELECT device_id, id AS station_id FROM fieldkit.station UNION
+			SELECT dev_eui, station_id FROM fieldkit.station_dev_eui
+		)
+		SELECT s.station_id, m.id AS module_id, m.hardware_id
 		FROM fieldkit.station_module AS m
 		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = m.configuration_id)
 		LEFT JOIN fieldkit.provision AS p ON (c.provision_id = p.id)
-		LEFT JOIN fieldkit.station AS s ON (p.device_id = s.device_id)
+		LEFT JOIN station_ids AS s ON (p.device_id = s.device_id)
 		WHERE m.hardware_id IN (?)
 	`, moduleHardwareIDs)
 	if err != nil {
