@@ -368,12 +368,12 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		WHERE m.hardware_id IN (?)
 	`, moduleHardwareIDs)
 	if err != nil {
-		return nil, fmt.Errorf("(get-ids) %w", err)
+		return nil, fmt.Errorf("(get-ids(%v)) %w", moduleHardwareIDs, err)
 	}
 
 	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, fmt.Errorf("(get-ids) %w", err)
+		return nil, fmt.Errorf("(get-ids(%v)) %w", moduleHardwareIDs, err)
 	}
 
 	log := Logger(ctx).Sugar()
