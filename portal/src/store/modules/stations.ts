@@ -554,8 +554,6 @@ const getters = {
         return state.mapped;
     },
     isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
-        console.log("radoi proj id", projectId);
-        console.log("radoi state.projectUsers", state.projectUsers);
         return state.projectUsers[projectId].some((user) => user.user.id === userId);
     },
 };

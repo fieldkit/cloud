@@ -228,10 +228,9 @@ export default Vue.extend({
         }
     },
     mounted(): Promise<void> {
-        console.log("radoi p", this.parentData);
-        this.$services.api.getProjectsForStation(this.stationId).then((projects) => {
-            console.log("radoi ppp", projects);
-        });
+        if (this.stationId) {
+          this.$services.api.getProjectsForStation(this.stationId);
+        }
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
