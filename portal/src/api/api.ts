@@ -1050,7 +1050,7 @@ class FKApi {
         });
     }
 
-    updateModule(data: {stationId: number, moduleId: number, label: string}) {
+    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
 
         return this.invoke({
             auth: Auth.Required,

@@ -105,16 +105,18 @@
                                 class="input"
                                 maxlength="25"
                                 :disabled="editedModule.id !== selectedModule.id"
+                                :title="editedModule.label"
                                 v-model="editedModule.label"
                             />
                             <input
                                 v-else
                                 class="input"
                                 maxlength="25"
+                                :title="module.label ? module.label : $t(getModuleName(module))"
                                 disabled
                                 :value="module.label ? module.label : $t(getModuleName(module))"
                             />
-                            <template v-if="!isCustomizationEnabled()">
+                            <template v-if="!isCustomizationEnabled() && isUserTeamMemberOfStation">
                                 <a
                                     v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
                                     @click="onEditModuleNameClick(module)"
@@ -122,11 +124,7 @@
                                 >
                                     {{ $t("edit") }}
                                 </a>
-                                <a
-                                    v-if="editedModule && editedModule.id === module.id"
-                                    @click="saveModuleName(module)"
-                                    class="module-edit-name"
-                                >
+                                <a v-if="editedModule && editedModule.id === module.id" @click="saveModuleName()" class="module-edit-name">
                                     {{ $t("save") }}
                                 </a>
                             </template>
@@ -179,6 +177,7 @@ import {
     BoundingRectangle,
     DisplayModule,
     DisplayStation,
+    GlobalState,
     MappedStations,
     ProjectAttribute,
     ProjectModule,
@@ -191,6 +190,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { mapState } from "vuex";
 
 export default Vue.extend({
     name: "StationView",
@@ -227,6 +227,12 @@ export default Vue.extend({
         },
     },
     computed: {
+        ...mapState({
+            userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
+        }),
+        isUserTeamMemberOfStation(): boolean {
+            return this.userStations.some((station) => station.id === this.station.id);
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
@@ -234,7 +240,6 @@ export default Vue.extend({
             return this.$route.params.projectId;
         },
         station(): DisplayStation {
-            console.log("radoi", this.$state.stations.stations[this.$route.params.stationId]);
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
@@ -334,16 +339,13 @@ export default Vue.extend({
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
         },
-        saveModuleName(module): void {
-            console.log("radoi save", module);
+        saveModuleName(): void {
             if (!this.editedModule) {
                 return;
             }
-
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
-
-            this.$services.api.updateModule(payload).then((response) => {
-                console.log("res radoi", response);
+            this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
+                this.editedModule = null;
             });
         },
         selectModule(module: DisplayModule) {
@@ -558,7 +560,7 @@ export default Vue.extend({
 
         li {
             @include flex(center);
-            min-width: 250px;
+            width: 300px;
             padding: 13px 16px;
             cursor: pointer;
             border-right: 1px solid var(--color-border);
@@ -588,6 +590,10 @@ export default Vue.extend({
 
             input {
                 margin-left: 5px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 100%;
             }
         }
 

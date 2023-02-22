@@ -126,7 +126,7 @@ export class DisplayModule {
     constructor(module: StationModule) {
         this.id = module.id;
         this.name = module.name;
-        this.label = module.label ?? '';
+        this.label = module.label ?? "";
         this.sensors = module.sensors.map((s) => new DisplaySensor(s));
     }
 }
@@ -645,6 +645,15 @@ const actions = (services: Services) => {
             id: number
         ) => {
             commit(STATION_CLEAR, id);
+        },
+        [ActionTypes.UPDATE_STATION_MODULE]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            payload: { stationId: number; moduleId: number; label: string }
+        ) => {
+            await services.api.updateModule(payload).then((station) => {
+                console.log("res radoi", station);
+                commit(STATION_UPDATE, { station });
+            });
         },
         [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             await services.api.followProject(payload.projectId);
