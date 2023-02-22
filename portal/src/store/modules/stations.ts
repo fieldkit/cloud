@@ -651,7 +651,6 @@ const actions = (services: Services) => {
             payload: { stationId: number; moduleId: number; label: string }
         ) => {
             await services.api.updateModule(payload).then((station) => {
-                console.log("res radoi", station);
                 commit(STATION_UPDATE, { station });
             });
         },
