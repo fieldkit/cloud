@@ -231,7 +231,7 @@ export default Vue.extend({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
         isUserTeamMemberOfStation(): boolean {
-            return this.userStations.some((station) => station.id === this.station.id);
+            return this.$getters.isUserTeamMemberOfStation(this.station.id);
         },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
