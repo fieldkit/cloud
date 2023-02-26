@@ -15,9 +15,9 @@
 
             <section class="section-station">
                 <div class="container-box">
-                    <div class="flex flex-al-center">
+                    <div class="flex">
                         <StationPhoto :station="station" />
-                        <div>
+                        <div class="w-100">
                             <div class="station-name">{{ station.name }}</div>
 
                             <div class="flex flex-al-center flex-wrap">
@@ -31,28 +31,37 @@
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
                                 <textarea
+                                    v-if="form.description !== undefined"
                                     class="input"
-                                    :placeholder="$t('station.addDescription')"
                                     oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
                                     v-model="form.description"
-                                    :disabled="!editingDescription"
+                                    :disabled="!editingDescription || (form.description === undefined && isUserTeamMemberOfStation)"
                                 />
                                 <a
-                                    href="javascript:void(0)"
-                                    v-if="!editingDescription"
-                                    @click="editingDescription = true"
-                                    class="station-description-edit"
+                                    v-if="form.description === undefined && isUserTeamMemberOfStation"
+                                    @click="form.description = ''; editingDescription = true"
+                                    class="station-description-add"
                                 >
-                                    {{ $t("edit") }}
+                                    {{ $t("station.addDescription") }}
                                 </a>
-                                <a
-                                    href="javascript:void(0)"
-                                    @click="updateStationDescription()"
-                                    v-if="editingDescription"
-                                    class="station-description-edit"
-                                >
-                                    {{ $t("save") }}
-                                </a>
+
+                                <template>
+                                    <a
+                                        v-if="form.description && !editingDescription && isUserTeamMemberOfStation"
+                                        @click="editingDescription = true"
+                                        class="station-description-edit"
+                                    >
+                                        {{ $t("edit") }}
+                                    </a>
+                                    <a
+                                        @click="updateStationDescription()"
+                                        v-if="editingDescription && form.description"
+                                        class="station-description-edit"
+                                        style="margin-top: 4px;"
+                                    >
+                                        {{ $t("save") }}
+                                    </a>
+                                </template>
                             </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
@@ -141,19 +150,13 @@
                             />
                             <template v-if="!isCustomizationEnabled()">
                                 <a
-                                    href="javascript:void(0)"
                                     v-if="editModuleIndex !== moduleIndex"
                                     @click="onEditModuleNameClick(moduleIndex)"
                                     class="module-edit-name"
                                 >
                                     {{ $t("edit") }}
                                 </a>
-                                <a
-                                    href="javascript:void(0)"
-                                    v-if="editModuleIndex === moduleIndex"
-                                    @click="saveModuleName()"
-                                    class="module-edit-name"
-                                >
+                                <a v-if="editModuleIndex === moduleIndex" @click="saveModuleName()" class="module-edit-name">
                                     {{ $t("save") }}
                                 </a>
                             </template>
@@ -265,6 +268,9 @@ export default Vue.extend({
         },
     },
     computed: {
+        isUserTeamMemberOfStation(): boolean {
+            return this.$getters.isUserTeamMemberOfStation(this.station.id);
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
@@ -727,7 +733,11 @@ export default Vue.extend({
         margin-top: -2px;
         margin-bottom: 10px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
+
+        a {
+            cursor: pointer;
+        }
 
         .input {
             font-size: 12px;
@@ -745,6 +755,10 @@ export default Vue.extend({
         margin-left: auto;
         padding-left: 5px;
         cursor: pointer;
+    }
+
+    &-description-add {
+        opacity: 0.5;
     }
 }
 

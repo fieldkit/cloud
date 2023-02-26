@@ -558,6 +558,9 @@ const getters = {
     mapped(state: StationsState): MappedStations | null {
         return state.mapped;
     },
+    isUserTeamMemberOfStation: (state: StationsState) => (stationId: number) => {
+        return !!state.user.stations[stationId];
+    },
 };
 
 const actions = (services: Services) => {
