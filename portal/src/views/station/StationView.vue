@@ -726,7 +726,6 @@ section {
 .module-edit-name {
     opacity: 0.4;
     font-size: 12px;
-    margin-left: 7px;
     margin-bottom: -1px;
     cursor: pointer;
 }
