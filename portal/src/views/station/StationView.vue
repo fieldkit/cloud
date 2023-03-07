@@ -88,7 +88,7 @@
                 </div>
             </section>
 
-            <section class="container-box">
+            <section class="container-box" v-if="isUserTeamMemberOfStation">
                 <h2>{{ $t("station.data") }}</h2>
 
                 <ul class="flex flex-wrap flex-space-between">
@@ -216,6 +216,9 @@ export default Vue.extend({
         },
     },
     computed: {
+        isUserTeamMemberOfStation(): boolean {
+            return this.$getters.isUserTeamMemberOfStation(this.station.id);
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
