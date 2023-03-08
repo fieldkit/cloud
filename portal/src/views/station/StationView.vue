@@ -88,7 +88,7 @@
                 </div>
             </section>
 
-            <section class="container-box" v-if="isUserTeamMemberOfStation">
+            <section class="container-box" v-if="station.modules.length > 0 && isUserTeamMemberOfStation">
                 <h2>{{ $t("station.data") }}</h2>
 
                 <ul class="flex flex-wrap flex-space-between">
@@ -226,6 +226,7 @@ export default Vue.extend({
             return this.$route.params.projectId;
         },
         station(): DisplayStation {
+          console.log("radoi st", this.$state.stations.stations[this.$route.params.stationId]);
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
