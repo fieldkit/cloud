@@ -1,6 +1,9 @@
 <template>
     <div class="note-editor">
-        <div class="title">{{ note.help.title }}</div>
+        <div class="title">
+            {{ note.help.title }}
+            <a class="edit-btn" v-if="editableTitle">{{ $t("edit") }}</a>
+        </div>
         <div class="field" v-if="!readonly">
             <TextAreaField v-model="body" @input="v.$touch()" />
         </div>
@@ -47,6 +50,10 @@ export default Vue.extend({
             type: Object,
             required: true,
         },
+        editableTitle: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         body: {
@@ -88,6 +95,8 @@ export default Vue.extend({
 .title {
     font-size: 16px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
 
     @include bp-down($xs) {
         font-size: 14px;
@@ -98,5 +107,12 @@ export default Vue.extend({
     color: #6a6d71;
     font-size: 13px;
     padding-top: 0.5em;
+}
+
+.edit-btn {
+    opacity: 0.4;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
 }
 </style>

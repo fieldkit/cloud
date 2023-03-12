@@ -118,12 +118,13 @@ export class AddedPhoto {
 }
 
 export class Notes {
-    static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription"];
+    static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription", "customKey"];
 
     public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp("Study Objective"));
     public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp("Purpose of Site Location"));
     public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp("Site Criteria"));
     public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp("Site Description"));
+    public readonly customKey: NoteForm = new NoteForm("", new NoteHelp("Your own custom title"));
 
     constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
 
@@ -146,6 +147,8 @@ export class Notes {
         return portalNotes.notes.reduceRight((formNotes, portalNote) => {
             const key = portalNote.key;
             if (!formNotes[key]) {
+                console.log("radoi key", key);
+                console.log("radoi formNotes", formNotes);
                 throw new Error("unexpected note");
             }
             Object.assign(formNotes[key], {
@@ -165,6 +168,7 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
         sitePurpose: notesForm.sitePurpose,
         siteCriteria: notesForm.siteCriteria,
         siteDescription: notesForm.siteDescription,
+        customKey: notesForm.customKey,
     };
 
     const media = {};
