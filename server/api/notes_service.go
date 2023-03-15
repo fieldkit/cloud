@@ -50,8 +50,8 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			INSERT INTO fieldkit.notes (station_id, author_id, created_at, updated_at, key, body, label) VALUES
-			(:station_id, :author_id, :created_at, :updated_at, :key, :body, :label) RETURNING *
+			INSERT INTO fieldkit.notes (station_id, author_id, created_at, updated_at, key, body, title) VALUES
+			(:station_id, :author_id, :created_at, :updated_at, :key, :body, :title) RETURNING *
 		`, note); err != nil {
 			return nil, err
 		}
