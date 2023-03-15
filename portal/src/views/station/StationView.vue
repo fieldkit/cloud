@@ -131,6 +131,10 @@
                     @change="dirtyNotes = true"
                 />
             </section>
+
+            <section class="section-notes container-box">
+                <FieldNotes></FieldNotes>
+            </section>
         </div>
     </StandardLayout>
 </template>
@@ -160,6 +164,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import FieldNotes from "@/views/notes/FieldNotes.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -173,6 +178,7 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
+        FieldNotes,
     },
     data(): {
         selectedModule: DisplayModule | null;
@@ -314,7 +320,7 @@ export default Vue.extend({
     border: 1px solid var(--color-border);
     border-radius: 2px;
     background-color: #fff;
-    padding: 20px;
+    padding: 15px 20px;
     font-size: 14px;
 
     @include bp-down($xs) {

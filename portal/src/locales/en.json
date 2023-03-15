@@ -371,7 +371,7 @@
     "seeMore": "See more",
     "seeLess": "See less",
     "notes": {
-        "title": "Field Notes",
+        "title": "Station Details",
         "failed": "Oops, there was a problem saving your changes.",
         "success": "Saved.",
         "confirmLeavePopupMessage": "You may have unsaved changes, are you sure you'd like to leave?",
@@ -380,6 +380,10 @@
         "btn": {
             "save": "Save"
         }
+    },
+    "fieldNotes": {
+        "title": "Field Notes",
+        "btnExport": "Export Field Notes"
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",

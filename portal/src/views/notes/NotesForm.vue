@@ -113,7 +113,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
 @import "../../scss/global";
 @import "../../scss/notes";
 
