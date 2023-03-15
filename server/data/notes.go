@@ -22,6 +22,7 @@ type Note struct {
 	AuthorID  int32     `db:"author_id"`
 	Version   int64     `db:"version"`
 	Key       *string   `db:"key"`
+	Title     *string   `db:"title"`
 	Body      *string   `db:"body"`
 }
 

@@ -45,12 +45,13 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			StationID: payload.StationID,
 			AuthorID:  p.UserID(),
 			Key:       webNote.Key,
+			Title:     webNote.Title,
 			Body:      webNote.Body,
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			INSERT INTO fieldkit.notes (station_id, author_id, created_at, updated_at, key, body) VALUES
-			(:station_id, :author_id, :created_at, :updated_at, :key, :body) RETURNING *
+			INSERT INTO fieldkit.notes (station_id, author_id, created_at, updated_at, key, body, label) VALUES
+			(:station_id, :author_id, :created_at, :updated_at, :key, :body, :label) RETURNING *
 		`, note); err != nil {
 			return nil, err
 		}
@@ -191,6 +192,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 			Media:     media,
 			Version:   n.Version,
 			Key:       n.Key,
+			Title:     n.Title,
 			Body:      n.Body,
 		})
 	}
