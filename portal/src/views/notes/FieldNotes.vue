@@ -103,10 +103,20 @@ export default Vue.extend({
 .new-note {
     display: flex;
     align-items: center;
+    padding: 25px 0;
 }
 
 ::v-deep .default-user-icon {
     width: 36px;
     height: 36px;
+    margin: 0 15px 0 0;
+}
+
+.new-comment-wrap {
+    width: 100%;
+}
+
+::v-deep .tiptap-container {
+    box-sizing: border-box;
 }
 </style>
