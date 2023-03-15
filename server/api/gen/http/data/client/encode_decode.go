@@ -69,11 +69,11 @@ func EncodeDeviceSummaryRequest(encoder func(*http.Request) goahttp.Encoder) fun
 // data device summary endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeviceSummaryResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDeviceSummaryResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

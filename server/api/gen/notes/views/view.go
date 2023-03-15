@@ -41,6 +41,7 @@ type FieldNoteView struct {
 	UpdatedAt *int64
 	Author    *FieldNoteAuthorView
 	Key       *string
+	Title     *string
 	Body      *string
 	Version   *int64
 	Media     []*NoteMediaView

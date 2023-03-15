@@ -25,6 +25,7 @@ export interface PortalStationNotes {
     key: string;
     body: string;
     media: { id: number; key: string; url: string; contentType: string }[];
+    label: string;
 }
 
 export interface PortalNoteMedia {
@@ -76,11 +77,12 @@ export class NoteForm {
         public readonly body: string,
         public readonly help: NoteHelp,
         public readonly photos: NoteMedia[] = [],
-        public readonly audio: NoteMedia[] = []
+        public readonly audio: NoteMedia[] = [],
+        public readonly label: string
     ) {}
 
     public withBody(body: string) {
-        return new NoteForm(body, this.help, this.photos, this.audio);
+        return new NoteForm(body, this.help, this.photos, this.audio, this.label);
     }
 }
 
@@ -178,7 +180,6 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
             const photoIds = value.photos.map((m) => media[m.key]).filter((v) => v);
             const audioIds = value.audio.map((m) => media[m.key]).filter((v) => v);
             const mediaIds = [...photoIds, ...audioIds];
-
             if (portalExisting[key]) {
                 return {
                     creating: null,

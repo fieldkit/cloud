@@ -77,11 +77,11 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // update endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeUpdateResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -226,11 +226,11 @@ func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
 // DecodeGetResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -375,11 +375,11 @@ func EncodeDownloadMediaRequest(encoder func(*http.Request) goahttp.Encoder) fun
 // notes download media endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeDownloadMediaResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDownloadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -548,11 +548,11 @@ func EncodeUploadMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(
 // notes upload media endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeUploadMediaResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeUploadMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -710,11 +710,11 @@ func EncodeDeleteMediaRequest(encoder func(*http.Request) goahttp.Encoder) func(
 // notes delete media endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteMediaResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeDeleteMediaResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -820,9 +820,10 @@ func marshalNotesFieldNoteUpdateToFieldNoteUpdateRequestBody(v *notes.FieldNoteU
 // *notes.ExistingFieldNote.
 func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.ExistingFieldNote) *ExistingFieldNoteRequestBody {
 	res := &ExistingFieldNoteRequestBody{
-		ID:   v.ID,
-		Key:  v.Key,
-		Body: v.Body,
+		ID:    v.ID,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -838,8 +839,9 @@ func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.Existi
 // *NewFieldNoteRequestBody from a value of type *notes.NewFieldNote.
 func marshalNotesNewFieldNoteToNewFieldNoteRequestBody(v *notes.NewFieldNote) *NewFieldNoteRequestBody {
 	res := &NewFieldNoteRequestBody{
-		Key:  v.Key,
-		Body: v.Body,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -876,9 +878,10 @@ func marshalFieldNoteUpdateRequestBodyToNotesFieldNoteUpdate(v *FieldNoteUpdateR
 // *ExistingFieldNoteRequestBody.
 func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFieldNoteRequestBody) *notes.ExistingFieldNote {
 	res := &notes.ExistingFieldNote{
-		ID:   v.ID,
-		Key:  v.Key,
-		Body: v.Body,
+		ID:    v.ID,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -894,8 +897,9 @@ func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFiel
 // *notes.NewFieldNote from a value of type *NewFieldNoteRequestBody.
 func marshalNewFieldNoteRequestBodyToNotesNewFieldNote(v *NewFieldNoteRequestBody) *notes.NewFieldNote {
 	res := &notes.NewFieldNote{
-		Key:  v.Key,
-		Body: v.Body,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -915,6 +919,7 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
 		Key:       v.Key,
+		Title:     v.Title,
 		Body:      v.Body,
 		Version:   v.Version,
 	}
