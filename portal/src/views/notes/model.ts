@@ -179,9 +179,6 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
 
     const media = {};
 
-    console.log("radoi portalNotes", portalNotes);
-    console.log("radoi notesForm", notesForm);
-
     const modifications = _(localByKey)
         .mapValues((value, key) => {
             const photoIds = value.photos.map((m) => media[m.key]).filter((v) => v);

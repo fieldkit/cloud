@@ -84,7 +84,6 @@ export default Vue.extend({
     },
     mounted(this: any) {
         this.form = Notes.createFrom(this.notes);
-        console.log("radoi form", this.form);
     },
     methods: {
         async onSave(): Promise<void> {
@@ -97,7 +96,7 @@ export default Vue.extend({
             this.notesState.failed = false;
 
             const payload = mergeNotes({ notes: this.notes, media: this.media }, this.form);
-            console.log("payload radoi", payload);
+
             return this.$services.api.patchStationNotes(this.station.id, payload).then(
                 () => {
                     this.notesState.dirty = false;
