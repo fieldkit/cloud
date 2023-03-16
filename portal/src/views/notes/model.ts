@@ -11,7 +11,12 @@ export class ExistingFieldNote {
 }
 
 export class NewFieldNote {
-    constructor(public readonly key: string, public readonly body: string, public readonly mediaIds: number[]) {}
+    constructor(
+        public readonly key: string,
+        public readonly body: string,
+        public readonly mediaIds: number[],
+        public readonly title: string
+    ) {}
 }
 
 export class Ids {
@@ -25,7 +30,6 @@ export interface PortalStationNotes {
     key: string;
     body: string;
     media: { id: number; key: string; url: string; contentType: string }[];
-    label: string;
 }
 
 export interface PortalNoteMedia {
@@ -78,11 +82,11 @@ export class NoteForm {
         public readonly help: NoteHelp,
         public readonly photos: NoteMedia[] = [],
         public readonly audio: NoteMedia[] = [],
-        public readonly label: string
+        public readonly title: string = ""
     ) {}
 
-    public withBody(body: string) {
-        return new NoteForm(body, this.help, this.photos, this.audio, this.label);
+    public withBody(body: string, title = "") {
+        return new NoteForm(body, this.help, this.photos, this.audio, title ?? this.title);
     }
 }
 
@@ -175,6 +179,9 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
 
     const media = {};
 
+    console.log("radoi portalNotes", portalNotes);
+    console.log("radoi notesForm", notesForm);
+
     const modifications = _(localByKey)
         .mapValues((value, key) => {
             const photoIds = value.photos.map((m) => media[m.key]).filter((v) => v);
@@ -187,7 +194,7 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
                 };
             }
             return {
-                creating: new NewFieldNote(key, value.body, mediaIds),
+                creating: new NewFieldNote(key, value.body, mediaIds, value.title),
                 updating: null,
             };
         })

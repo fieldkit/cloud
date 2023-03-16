@@ -1,8 +1,12 @@
 <template>
     <div class="note-editor">
         <div class="title">
-            {{ note.help.title }}
-            <a class="edit-btn" v-if="editableTitle">{{ $t("edit") }}</a>
+            <template v-if="editableTitle">
+                <TextAreaField v-if="editingTitle" v-model="title" @input="v.$touch()" />
+                <template v-else>{{ note.help.title }}</template>
+                <a class="edit-btn" v-if="editableTitle" @click="editingTitle = !editingTitle">{{ $t("edit") }}</a>
+            </template>
+            <template v-if="!editableTitle">{{ note.help.title }}</template>
         </div>
         <div class="field" v-if="!readonly">
             <TextAreaField v-model="body" @input="v.$touch()" />
@@ -55,6 +59,11 @@ export default Vue.extend({
             default: false,
         },
     },
+    data() {
+        return {
+            editingTitle: false,
+        };
+    },
     computed: {
         body: {
             get(this: any) {
@@ -62,6 +71,14 @@ export default Vue.extend({
             },
             set(this: any, value) {
                 this.$emit("change", this.note.withBody(value));
+            },
+        },
+        title: {
+            get(this: any) {
+                return this.note.title ?? this.note.help.title;
+            },
+            set(this: any, value) {
+                this.$emit("change", this.note.withBody(this.note.body, value));
             },
         },
     },
@@ -114,5 +131,9 @@ export default Vue.extend({
     font-size: 12px;
     cursor: pointer;
     margin-left: 8px;
+}
+
+::v-deep .title textarea {
+    padding-top: 0;
 }
 </style>
