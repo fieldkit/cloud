@@ -1,9 +1,6 @@
 <template>
     <div class="tiny-chart">
-        <LineChart v-if="!noData" :series="series" :settings="chartSettings" />
-        <div v-else class="no-data">
-            {{ $t("noData") }}
-        </div>
+        <LineChart :series="series" :settings="chartSettings" />
     </div>
 </template>
 
@@ -54,12 +51,10 @@ export default Vue.extend({
     data(): {
         chartSettings: ChartSettings;
         series: SeriesData[];
-        noData: boolean;
     } {
         return {
             chartSettings: ChartSettings.Tiny,
             series: [],
-            noData: false,
         };
     },
     watch: {
@@ -80,7 +75,6 @@ export default Vue.extend({
             // TODO Show busy when loading?
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
             const selectedModuleKey = this.moduleKey;
-            this.noData = false;
 
             function getQuickSensor(quickSensors): VizSensor {
                 let stationId, sensorModuleId, sensorId;
@@ -147,7 +141,6 @@ export default Vue.extend({
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
-                this.noData = true;
                 return;
             }
 
@@ -201,12 +194,5 @@ export default Vue.extend({
 
 .tiny-chart .fit-y {
     height: 100%;
-}
-
-.no-data {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>
