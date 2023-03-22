@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.29.20
 	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/crewjam/saml v0.4.2
+	github.com/crewjam/saml v0.4.13
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
@@ -41,7 +41,7 @@ require (
 	github.com/pkg/profile v1.5.0
 	github.com/robinjoseph08/go-pg-migrations/v3 v3.0.0
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/vgarvardt/gue v1.0.2
 	github.com/vgarvardt/gue/v4 v4.0.0
@@ -57,7 +57,7 @@ require (
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
-	github.com/crewjam/httperr v0.0.0-20190612203328-a946449404da // indirect
+	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deepmap/oapi-codegen v1.8.2 // indirect
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1 // indirect
@@ -73,6 +73,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-resty/resty/v2 v2.3.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
@@ -88,11 +89,12 @@ require (
 	github.com/jackc/puddle/v2 v2.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
-	github.com/jonboulle/clockwork v0.2.1 // indirect
+	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/llgcode/ps v0.0.0-20210114104736-f4b0c5d1e02e // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d // indirect
+	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
@@ -105,7 +107,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
-	github.com/russellhaering/goxmldsig v1.1.0 // indirect
+	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
 	github.com/segmentio/ksuid v1.0.3 // indirect
