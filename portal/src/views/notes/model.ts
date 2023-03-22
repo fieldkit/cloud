@@ -29,6 +29,7 @@ export interface PortalStationNotes {
     author: { id: number; name: number };
     key: string;
     body: string;
+    title: string;
     media: { id: number; key: string; url: string; contentType: string }[];
 }
 
@@ -162,6 +163,7 @@ export class Notes {
                 photos: NoteMedia.onlyPhotos(portalNote.media),
                 audio: NoteMedia.onlyAudio(portalNote.media),
                 body: portalNote.body,
+                title: portalNote.title,
             });
             return formNotes;
         }, new Notes());
