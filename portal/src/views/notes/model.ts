@@ -85,8 +85,9 @@ export class NoteForm {
         public readonly title: string = ""
     ) {}
 
-    public withBody(body: string, title = "") {
-        return new NoteForm(body, this.help, this.photos, this.audio, title ?? this.title);
+    public withBody(body: string, title: string) {
+        console.log("radoi with b", title);
+        return new NoteForm(body, this.help, this.photos, this.audio, title !== "" ? title : this.title);
     }
 }
 
