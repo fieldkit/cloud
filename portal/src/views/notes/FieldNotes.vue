@@ -10,11 +10,11 @@
         <div class="new-note" :class="{ 'align-center': !user }">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
-                <div class="new-comment-wrap">
+                <div class="new-note-wrap">
                     <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newNote)" />
                 </div>
             </template>
-            <template v-else>
+            <!--            <template v-else>
                 <p class="need-login-msg">
                     {{ $tc("comments.loginToComment.part1") }}
                     <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
@@ -28,7 +28,7 @@
                 >
                     {{ $t("login.loginButton") }}
                 </router-link>
-            </template>
+            </template>-->
         </div>
     </div>
 </template>
@@ -38,7 +38,7 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { mapGetters, mapState } from "vuex";
 import { GlobalState } from "@/store";
-import { Comment } from "@/views/comments/model";
+import { Comment, CommentsErrorsEnum, NewComment } from "@/views/comments/model";
 import Tiptap from "@/views/shared/Tiptap.vue";
 
 export default Vue.extend({
@@ -89,8 +89,20 @@ export default Vue.extend({
         };
     },
     methods: {
-        save(): void {
-            console.log("saved");
+        async save(note: any): Promise<void> {
+            this.errorMessage = null;
+            console.log("new note radoi", note);
+            // TODO: Achil api
+
+            await this.$services.api
+                .postComment(note)
+                .then((response: { post: Comment }) => {
+                    this.newNote.body = "";
+                    // add the comment to the replies array
+                })
+                .catch((e) => {
+                    this.errorMessage = CommentsErrorsEnum.postComment;
+                });
         },
     },
 });
@@ -118,5 +130,65 @@ export default Vue.extend({
 
 ::v-deep .tiptap-container {
     box-sizing: border-box;
+}
+
+::v-deep .new-note {
+    @include flex(flex-end);
+    padding: 22px 20px;
+    position: relative;
+
+    @include bp-down($xs) {
+        padding: 15px 10px;
+    }
+
+    .container.data-view & {
+        &:not(.reply) {
+            background-color: rgba(#f4f5f7, 0.55);
+            padding: 18px 23px 17px 15px;
+        }
+    }
+
+    &.reply {
+        padding: 0 0 0;
+        margin: 10px 0 0 0;
+        width: 100%;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
+
+    img {
+        margin-top: 0 !important;
+        width: 30px;
+        height: 30px;
+    }
+
+    .button-submit {
+        margin-left: auto;
+
+        @media screen and (max-width: 320px) {
+            width: 100%;
+        }
+    }
+
+    &:not(.reply) {
+        img {
+            width: 46px;
+            height: 46px;
+
+            @include bp-down($xs) {
+                width: 42px;
+                height: 42px;
+            }
+        }
+    }
+
+    &-wrap {
+        display: flex;
+        width: 100%;
+        position: relative;
+        background-color: #fff;
+    }
 }
 </style>
