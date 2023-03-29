@@ -41,6 +41,14 @@ import { GlobalState } from "@/store";
 import { Comment, CommentsErrorsEnum, NewComment } from "@/views/comments/model";
 import Tiptap from "@/views/shared/Tiptap.vue";
 
+interface FieldNote {
+    id: number;
+    author: { id: number; name: string; photo: object };
+    body: string;
+    createdAt: number;
+    updatedAt: number;
+}
+
 export default Vue.extend({
     name: "FieldNotes",
     components: {
@@ -54,7 +62,7 @@ export default Vue.extend({
         }),
     },
     data(): {
-        posts: Comment[];
+        fieldNotes: FieldNote[];
         isLoading: boolean;
         placeholder: string | null;
         newNote: {
@@ -71,7 +79,20 @@ export default Vue.extend({
         errorMessage: string | null;
     } {
         return {
-            posts: [],
+            fieldNotes: [
+                {
+                    author: "Christine",
+                    body:
+                        "In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms.",
+                    date: "9/17/22 11:02",
+                },
+                {
+                    author: "Christine",
+                    body:
+                        "In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms.",
+                    date: "9/17/22 11:02",
+                },
+            ],
             isLoading: false,
             placeholder: null,
             newNote: {
@@ -158,29 +179,11 @@ export default Vue.extend({
         align-items: center;
     }
 
-    img {
-        margin-top: 0 !important;
-        width: 30px;
-        height: 30px;
-    }
-
     .button-submit {
         margin-left: auto;
 
         @media screen and (max-width: 320px) {
             width: 100%;
-        }
-    }
-
-    &:not(.reply) {
-        img {
-            width: 46px;
-            height: 46px;
-
-            @include bp-down($xs) {
-                width: 42px;
-                height: 42px;
-            }
         }
     }
 
