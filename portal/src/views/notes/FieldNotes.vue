@@ -11,7 +11,7 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-note-wrap">
-                    <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newNote)" />
+                    <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="fieldNote" @save="save(newNote)" />
                 </div>
             </template>
             <!--            <template v-else>
@@ -30,6 +30,104 @@
                 </router-link>
             </template>-->
         </div>
+
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+
+        <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">There are no comments yet.</div>
+        <div v-if="isLoading" class="no-comments">Loading comments...</div>
+
+        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
+            <transition-group name="fade">
+                <div
+                    class="comment comment-first-level"
+                    v-for="fieldNote in fieldNotes"
+                    v-bind:key="fieldNote.id"
+                    v-bind:id="'comment-id-' + fieldNote.id"
+                    :ref="fieldNote.id"
+                >
+                    <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
+                        <UserPhoto :user="fieldNote.author"></UserPhoto>
+                        <div class="column-fieldNote">
+                            <div class="fieldNote-header">
+                                <span class="author">
+                                    {{ fieldNote.author.name }}
+                                </span>
+                                <ListItemOptions
+                                    v-if="user && (user.id === fieldNote.author.id || user.admin)"
+                                    @listItemOptionClick="onListItemOptionClick($event, fieldNote)"
+                                    :options="getFieldNotesOptions(fieldNote)"
+                                />
+                                <span class="timestamp">{{ formatTimestamp(fieldNote.createdAt) }}</span>
+                            </div>
+                            <Tiptap
+                                v-model="fieldNote.body"
+                                :readonly="fieldNote.readonly"
+                                saveLabel="Save"
+                                @save="saveEdit(fieldNote.id, fieldNote.body)"
+                            />
+                        </div>
+                    </div>
+                    <div class="column">
+                        <transition-group name="fade" class="comment-replies">
+                            <div
+                                class="comment"
+                                v-for="reply in fieldNote.replies"
+                                v-bind:key="reply.id"
+                                v-bind:id="'comment-id-' + reply.id"
+                                :ref="reply.id"
+                            >
+                                <div class="comment-main">
+                                    <UserPhoto :user="reply.author"></UserPhoto>
+                                    <div class="column-reply">
+                                        <div class="fieldNote-header">
+                                            <span class="author">
+                                                {{ reply.author.name }}
+                                            </span>
+                                            <ListItemOptions
+                                                v-if="user && (user.id === reply.author.id || user.admin)"
+                                                @listItemOptionClick="onListItemOptionClick($event, reply)"
+                                                :options="getFieldNotesOptions(reply)"
+                                            />
+                                        </div>
+                                        <Tiptap
+                                            v-model="reply.body"
+                                            :readonly="reply.readonly"
+                                            saveLabel="Save"
+                                            @save="saveEdit(reply.id, reply.body)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </transition-group>
+
+                        <transition name="fade">
+                            <div class="new-comment reply" v-if="newReply && newReply.threadId === fieldNote.id">
+                                <div class="new-comment-wrap">
+                                    <UserPhoto :user="user"></UserPhoto>
+                                    <Tiptap
+                                        v-model="newReply.body"
+                                        placeholder="Reply to comment"
+                                        @save="save(newReply)"
+                                        saveLabel="fieldNote"
+                                    />
+                                </div>
+                            </div>
+                        </transition>
+
+                        <div class="actions">
+                            <button v-if="user" @click="addReply(fieldNote)">
+                                <i class="icon icon-reply"></i>
+                                {{ $t("comments.actions.reply") }}
+                            </button>
+                            <button v-if="viewType === 'data'" @click="viewDataClick(fieldNote)">
+                                <i class="icon icon-view-data"></i>
+                                {{ $t("comments.actions.viewData") }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </transition-group>
+        </div>
     </div>
 </template>
 
@@ -38,7 +136,7 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { mapGetters, mapState } from "vuex";
 import { GlobalState } from "@/store";
-import { Comment, CommentsErrorsEnum, NewComment } from "@/views/comments/model";
+import {Comment, CommentsErrorsEnum, FiledNotesErrorsEnum, NewComment} from "@/views/comments/model";
 import Tiptap from "@/views/shared/Tiptap.vue";
 
 interface FieldNote {
@@ -115,15 +213,36 @@ export default Vue.extend({
             console.log("new note radoi", note);
             // TODO: Achil api
 
-            await this.$services.api
+           /* await this.$services.api
                 .postComment(note)
-                .then((response: { post: Comment }) => {
+                .then((response: { fieldNote: FiledN }) => {
                     this.newNote.body = "";
                     // add the comment to the replies array
                 })
                 .catch((e) => {
-                    this.errorMessage = CommentsErrorsEnum.postComment;
-                });
+                    this.errorMessage = FiledNotesErrorsEnum.getFiledNotes;
+                });*/
+        },
+        getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
+            if (this.user && this.user.id === post.author.id) {
+                return [
+                    {
+                        label: "Edit",
+                        event: "edit-comment",
+                    },
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [
+                {
+                    label: "Delete",
+                    event: "delete-comment",
+                },
+            ];
         },
     },
 });
@@ -137,25 +256,6 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     padding: 25px 0;
-}
-
-::v-deep .default-user-icon {
-    width: 36px;
-    height: 36px;
-    margin: 0 15px 0 0;
-}
-
-.new-comment-wrap {
-    width: 100%;
-}
-
-::v-deep .tiptap-container {
-    box-sizing: border-box;
-}
-
-::v-deep .new-note {
-    @include flex(flex-end);
-    padding: 22px 20px;
     position: relative;
 
     @include bp-down($xs) {
@@ -193,5 +293,19 @@ export default Vue.extend({
         position: relative;
         background-color: #fff;
     }
+}
+
+::v-deep .default-user-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0 15px 0 0;
+}
+
+.new-comment-wrap {
+    width: 100%;
+}
+
+::v-deep .tiptap-container {
+    box-sizing: border-box;
 }
 </style>

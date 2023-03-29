@@ -51,3 +51,7 @@ export enum CommentsErrorsEnum {
     deleteComment = "Something went wrong deleting your comment.",
     editComment = "Something went wrong editing your comment. Your changes will are not saved.",
 }
+
+export enum FiledNotesErrorsEnum {
+    getFiledNotes = "Something went wrong loading the notes",
+}
