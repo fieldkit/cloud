@@ -80,17 +80,21 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return cached.station, nil
 	}
 
-	updating, err := m.sr.QueryStationByDeviceID(ctx, pm.DeviceID)
+	// Add or create station model, we use this during creation and updating.
+	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	if err != nil {
+		return nil, err
+	}
+
+	updating, err := m.sr.QueryStationByArbitraryDeviceID(ctx, pm.DeviceID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return nil, fmt.Errorf("querying station: %w", err)
 		}
 	}
 
-	// Add or create station model, we use this during creation and updating.
-	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
-	if err != nil {
-		return nil, err
+	if updating == nil {
+		log.Infow("station-missing", "device_id", pm.DeviceID)
 	}
 
 	// Add or create the station.
@@ -100,6 +104,10 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 		if pm.DeviceName != nil && *pm.DeviceName != "" {
 			deviceName = *pm.DeviceName
+		}
+
+		if pm.DeviceName == nil {
+			return nil, fmt.Errorf("no-device-name")
 		}
 
 		updating = &data.Station{
