@@ -1,5 +1,7 @@
 <template>
     <div>
+        <vue-confirm-dialog />
+
         <header class="header">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
@@ -7,11 +9,11 @@
             </div>
         </header>
 
-        <div class="new-note" :class="{ 'align-center': !user }">
+        <div class="new-field-note" v-if="user">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
-                <div class="new-note-wrap">
-                    <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="fieldNote" @save="save(newNote)" />
+                <div class="new-field-note-wrap">
+                    <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="Save" @save="save(newNote)" />
                 </div>
             </template>
             <!--            <template v-else>
@@ -39,91 +41,47 @@
         <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
             <transition-group name="fade">
                 <div
-                    class="comment comment-first-level"
+                    class="field-note"
                     v-for="fieldNote in fieldNotes"
                     v-bind:key="fieldNote.id"
-                    v-bind:id="'comment-id-' + fieldNote.id"
+                    v-bind:id="'field-note-id-' + fieldNote.id"
                     :ref="fieldNote.id"
                 >
-                    <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
-                        <UserPhoto :user="fieldNote.author"></UserPhoto>
-                        <div class="column-fieldNote">
-                            <div class="fieldNote-header">
-                                <span class="author">
-                                    {{ fieldNote.author.name }}
-                                </span>
-                                <ListItemOptions
-                                    v-if="user && (user.id === fieldNote.author.id || user.admin)"
-                                    @listItemOptionClick="onListItemOptionClick($event, fieldNote)"
-                                    :options="getFieldNotesOptions(fieldNote)"
-                                />
-                                <span class="timestamp">{{ formatTimestamp(fieldNote.createdAt) }}</span>
-                            </div>
-                            <Tiptap
-                                v-model="fieldNote.body"
-                                :readonly="fieldNote.readonly"
-                                saveLabel="Save"
-                                @save="saveEdit(fieldNote.id, fieldNote.body)"
-                            />
+                    <UserPhoto :user="fieldNote.author"></UserPhoto>
+                    <span class="author">
+                        {{ fieldNote.author.name }}
+                    </span>
+                    <div class="timestamps">
+                        <div class="timestamp-1">{{ formatTimestamp(fieldNote.createdAt) }}</div>
+                        <div class="timestamp-2">
+                            {{ $tc("fieldNotes.lastUpdated") }}
+                            {{ formatTimestamp(fieldNote.updatedAt) }}
                         </div>
                     </div>
-                    <div class="column">
-                        <transition-group name="fade" class="comment-replies">
-                            <div
-                                class="comment"
-                                v-for="reply in fieldNote.replies"
-                                v-bind:key="reply.id"
-                                v-bind:id="'comment-id-' + reply.id"
-                                :ref="reply.id"
-                            >
-                                <div class="comment-main">
-                                    <UserPhoto :user="reply.author"></UserPhoto>
-                                    <div class="column-reply">
-                                        <div class="fieldNote-header">
-                                            <span class="author">
-                                                {{ reply.author.name }}
-                                            </span>
-                                            <ListItemOptions
-                                                v-if="user && (user.id === reply.author.id || user.admin)"
-                                                @listItemOptionClick="onListItemOptionClick($event, reply)"
-                                                :options="getFieldNotesOptions(reply)"
-                                            />
-                                        </div>
-                                        <Tiptap
-                                            v-model="reply.body"
-                                            :readonly="reply.readonly"
-                                            saveLabel="Save"
-                                            @save="saveEdit(reply.id, reply.body)"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </transition-group>
+                    <Tiptap
+                        v-model="fieldNote.body"
+                        :readonly="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)"
+                        saveLabel="Save"
+                        @save="saveEdit(fieldNote.id, fieldNote.body)"
+                    />
+                    <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
+                        <button v-if="user" @click="editFieldNote(fieldNote)">
+                            <i class="icon icon-edit"></i>
+                            {{ $t("fieldNotes.edit") }}
+                        </button>
+                        <button @click="deleteFieldNote(fieldNote)">
+                            <i class="icon icon-trash"></i>
+                            {{ $t("fieldNotes.delete") }}
+                        </button>
+                    </div>
 
-                        <transition name="fade">
-                            <div class="new-comment reply" v-if="newReply && newReply.threadId === fieldNote.id">
-                                <div class="new-comment-wrap">
-                                    <UserPhoto :user="user"></UserPhoto>
-                                    <Tiptap
-                                        v-model="newReply.body"
-                                        placeholder="Reply to comment"
-                                        @save="save(newReply)"
-                                        saveLabel="fieldNote"
-                                    />
-                                </div>
-                            </div>
-                        </transition>
-
-                        <div class="actions">
-                            <button v-if="user" @click="addReply(fieldNote)">
-                                <i class="icon icon-reply"></i>
-                                {{ $t("comments.actions.reply") }}
-                            </button>
-                            <button v-if="viewType === 'data'" @click="viewDataClick(fieldNote)">
-                                <i class="icon icon-view-data"></i>
-                                {{ $t("comments.actions.viewData") }}
-                            </button>
-                        </div>
+                    <div v-if="editingFieldNote && editingFieldNote.id === fieldNote.id" class="update-actions">
+                        <button v-if="user" @click="cancelEdit(fieldNote)">
+                            {{ $t("fieldNotes.cancel") }}
+                        </button>
+                        <button @click="save(fieldNote)">
+                            {{ $t("fieldNotes.update") }}
+                        </button>
                     </div>
                 </div>
             </transition-group>
@@ -136,8 +94,9 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { mapGetters, mapState } from "vuex";
 import { GlobalState } from "@/store";
-import {Comment, CommentsErrorsEnum, FiledNotesErrorsEnum, NewComment} from "@/views/comments/model";
 import Tiptap from "@/views/shared/Tiptap.vue";
+import moment from "moment";
+import _ from "lodash";
 
 interface FieldNote {
     id: number;
@@ -145,6 +104,10 @@ interface FieldNote {
     body: string;
     createdAt: number;
     updatedAt: number;
+}
+
+interface GroupedFieldNotes {
+  [date: string]: FieldNote[]
 }
 
 export default Vue.extend({
@@ -160,7 +123,7 @@ export default Vue.extend({
         }),
     },
     data(): {
-        fieldNotes: FieldNote[];
+        fieldNotes: GroupedFieldNotes[];
         isLoading: boolean;
         placeholder: string | null;
         newNote: {
@@ -175,20 +138,26 @@ export default Vue.extend({
             threadId: number | null;
         };
         errorMessage: string | null;
+        editingFieldNote: FieldNote | null;
+        testFieldNotes: FieldNote[];
     } {
         return {
-            fieldNotes: [
+            testFieldNotes: [
                 {
-                    author: "Christine",
+                    id: 0,
+                    author: { id: 1, name: "Christine", photo: {} },
                     body:
-                        "In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms.",
-                    date: "9/17/22 11:02",
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1668775672000,
+                    updatedAt: 1668775672000,
                 },
                 {
-                    author: "Christine",
+                    id: 1,
+                    author: { id: 2, name: "Christine", photo: {} },
                     body:
-                        "In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms.",
-                    date: "9/17/22 11:02",
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1768775672000,
+                    updatedAt: 1868775672000,
                 },
             ],
             isLoading: false,
@@ -205,7 +174,11 @@ export default Vue.extend({
                 threadId: null,
             },
             errorMessage: null,
+            editingFieldNote: null,
         };
+    },
+    mounted() {
+        this.groupByMonth();
     },
     methods: {
         async save(note: any): Promise<void> {
@@ -213,7 +186,7 @@ export default Vue.extend({
             console.log("new note radoi", note);
             // TODO: Achil api
 
-           /* await this.$services.api
+            /* await this.$services.api
                 .postComment(note)
                 .then((response: { fieldNote: FiledN }) => {
                     this.newNote.body = "";
@@ -222,6 +195,9 @@ export default Vue.extend({
                 .catch((e) => {
                     this.errorMessage = FiledNotesErrorsEnum.getFiledNotes;
                 });*/
+        },
+        saveEdit(): void {
+            console.log("rr");
         },
         getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
             if (this.user && this.user.id === post.author.id) {
@@ -244,6 +220,46 @@ export default Vue.extend({
                 },
             ];
         },
+        editFieldNote(fieldNote: FieldNote) {
+            this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
+        },
+        deleteFieldNote() {
+            console.log("r");
+        },
+        formatTimestamp(timestamp: number): string {
+            return moment(timestamp).fromNow();
+        },
+        cancelEdit(fieldNote: FieldNote) {
+            if (JSON.stringify(fieldNote.body) !== JSON.stringify(this.editingFieldNote?.body)) {
+                console.log("radoi diff");
+                this.$confirm({
+                    message: this.$tc("fieldNotes.sureCancelEdit"),
+                    button: {
+                        no: this.$tc("no"),
+                        yes: this.$tc("yes"),
+                    },
+                    callback: async (confirm) => {
+                        if (confirm) {
+                            this.editingFieldNote = null;
+                        }
+                    },
+                });
+                return;
+            }
+
+            this.editingFieldNote = null;
+        },
+        groupByMonth() {
+            const groupedItems = _.groupBy(this.fieldNotes, (b) =>
+                moment(b.updatedAt)
+                    .startOf("month")
+                    .format("YYYY/MM")
+            );
+
+            _.values(groupedItems).forEach((arr) => arr.sort((a, b) => moment(a.modDate).day() - moment(b.modDate).day()));
+
+            console.log("radoi", groupedItems);
+        },
     },
 });
 </script>
@@ -252,7 +268,7 @@ export default Vue.extend({
 @import "../../scss/global";
 @import "../../scss/notes";
 
-.new-note {
+.new-field-note {
     display: flex;
     align-items: center;
     padding: 25px 0;
@@ -292,6 +308,11 @@ export default Vue.extend({
         width: 100%;
         position: relative;
         background-color: #fff;
+
+        ::v-deep .tiptap-container {
+            flex: 0 0 100%;
+            margin-left: 0;
+        }
     }
 }
 
@@ -307,5 +328,61 @@ export default Vue.extend({
 
 ::v-deep .tiptap-container {
     box-sizing: border-box;
+    flex: 0 0 calc(100% - 52px);
+    margin-left: 52px;
+}
+
+.field-note {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 30px 0;
+    border-top: solid 1px #d8dce0;
+}
+.author {
+    font-size: 18px;
+    color: #6a6d71;
+}
+
+.timestamps {
+    margin-left: auto;
+    margin-top: -10px;
+    color: #818388;
+    text-align: right;
+}
+
+.timestamp-1 {
+    font-size: 14px;
+}
+
+.timestamp-2 {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+button {
+    background-color: transparent;
+    border: 0;
+    font-size: 14px;
+    padding: 0;
+    margin-right: 12px;
+}
+
+.actions {
+    padding-left: 52px;
+    margin-top: 15px;
+}
+
+.update-actions {
+    color: #818388;
+    margin-left: auto;
+    margin-right: -12px;
+    margin-top: 12px;
+
+    button:nth-of-type(2) {
+        color: $color-fieldkit-primary;
+        font-weight: 900;
+    }
 }
 </style>
