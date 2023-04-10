@@ -1593,7 +1593,7 @@ class FKApi {
 
     public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
         return this.invoke({
-            auth: Auth.None,
+            auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/station/" + id,
         });

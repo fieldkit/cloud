@@ -2606,27 +2606,26 @@ func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter)
 	}
 }
 
-// EncodeGetProjectsForStationResponse returns an encoder for responses
-// returned by the project get projects for station endpoint.
-func EncodeGetProjectsForStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeProjectsStationResponse returns an encoder for responses returned by
+// the project projects station endpoint.
+func EncodeProjectsStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.([]*project.Project)
+		res := v.(*projectviews.Projects)
 		enc := encoder(ctx, w)
-		body := NewGetProjectsForStationResponseBody(res)
+		body := NewProjectsStationResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeGetProjectsForStationRequest returns a decoder for requests sent to
-// the project get projects for station endpoint.
-func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+// DecodeProjectsStationRequest returns a decoder for requests sent to the
+// project projects station endpoint.
+func DecodeProjectsStationRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id    int32
-			token *string
-			auth  string
-			err   error
+			id   int32
+			auth string
+			err  error
 
 			params = mux.Vars(r)
 		)
@@ -2638,10 +2637,6 @@ func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Re
 			}
 			id = int32(v)
 		}
-		tokenRaw := r.URL.Query().Get("token")
-		if tokenRaw != "" {
-			token = &tokenRaw
-		}
 		auth = r.Header.Get("Authorization")
 		if auth == "" {
 			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
@@ -2649,7 +2644,7 @@ func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Re
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetProjectsForStationPayload(id, token, auth)
+		payload := NewProjectsStationPayload(id, auth)
 		if strings.Contains(payload.Auth, " ") {
 			// Remove authorization scheme prefix (e.g. "Bearer")
 			cred := strings.SplitN(payload.Auth, " ", 2)[1]
@@ -2660,9 +2655,9 @@ func DecodeGetProjectsForStationRequest(mux goahttp.Muxer, decoder func(*http.Re
 	}
 }
 
-// EncodeGetProjectsForStationError returns an encoder for errors returned by
-// the get projects for station project endpoint.
-func EncodeGetProjectsForStationError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeProjectsStationError returns an encoder for errors returned by the
+// projects station project endpoint.
+func EncodeProjectsStationError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -2677,7 +2672,7 @@ func EncodeGetProjectsForStationError(encoder func(context.Context, http.Respons
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetProjectsForStationUnauthorizedResponseBody(res)
+				body = NewProjectsStationUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -2689,7 +2684,7 @@ func EncodeGetProjectsForStationError(encoder func(context.Context, http.Respons
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetProjectsForStationForbiddenResponseBody(res)
+				body = NewProjectsStationForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -2701,7 +2696,7 @@ func EncodeGetProjectsForStationError(encoder func(context.Context, http.Respons
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetProjectsForStationNotFoundResponseBody(res)
+				body = NewProjectsStationNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -2713,7 +2708,7 @@ func EncodeGetProjectsForStationError(encoder func(context.Context, http.Respons
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetProjectsForStationBadRequestResponseBody(res)
+				body = NewProjectsStationBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -2827,65 +2822,6 @@ func unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Proje
 	res.Max = make([]float64, len(v.Max))
 	for i, val := range v.Max {
 		res.Max[i] = val
-	}
-
-	return res
-}
-
-// marshalProjectProjectToProjectResponse builds a value of type
-// *ProjectResponse from a value of type *project.Project.
-func marshalProjectProjectToProjectResponse(v *project.Project) *ProjectResponse {
-	res := &ProjectResponse{
-		ID:           v.ID,
-		Name:         v.Name,
-		Description:  v.Description,
-		Goal:         v.Goal,
-		Location:     v.Location,
-		Tags:         v.Tags,
-		Privacy:      v.Privacy,
-		StartTime:    v.StartTime,
-		EndTime:      v.EndTime,
-		Photo:        v.Photo,
-		ReadOnly:     v.ReadOnly,
-		ShowStations: v.ShowStations,
-	}
-	if v.Bounds != nil {
-		res.Bounds = marshalProjectProjectBoundsToProjectBoundsResponse(v.Bounds)
-	}
-	if v.Following != nil {
-		res.Following = marshalProjectProjectFollowingToProjectFollowingResponse(v.Following)
-	}
-
-	return res
-}
-
-// marshalProjectProjectBoundsToProjectBoundsResponse builds a value of type
-// *ProjectBoundsResponse from a value of type *project.ProjectBounds.
-func marshalProjectProjectBoundsToProjectBoundsResponse(v *project.ProjectBounds) *ProjectBoundsResponse {
-	res := &ProjectBoundsResponse{}
-	if v.Min != nil {
-		res.Min = make([]float64, len(v.Min))
-		for i, val := range v.Min {
-			res.Min[i] = val
-		}
-	}
-	if v.Max != nil {
-		res.Max = make([]float64, len(v.Max))
-		for i, val := range v.Max {
-			res.Max[i] = val
-		}
-	}
-
-	return res
-}
-
-// marshalProjectProjectFollowingToProjectFollowingResponse builds a value of
-// type *ProjectFollowingResponse from a value of type
-// *project.ProjectFollowing.
-func marshalProjectProjectFollowingToProjectFollowingResponse(v *project.ProjectFollowing) *ProjectFollowingResponse {
-	res := &ProjectFollowingResponse{
-		Total:     v.Total,
-		Following: v.Following,
 	}
 
 	return res

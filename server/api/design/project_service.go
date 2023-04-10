@@ -480,7 +480,7 @@ var _ = Service("project", func() {
 
 		HTTP(func() {
 			PATCH("projects/{projectId}/roles")
-            Body("edit")
+			Body("edit")
 			httpAuthentication()
 		})
 	})
@@ -623,31 +623,26 @@ var _ = Service("project", func() {
 		})
 	})
 
-	Method("get projects for station", func() {
-    		Security(JWTAuth, func() {
-    			Scope("api:access")
-    		})
+	Method("projects station", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
 
-    		Payload(func() {
-    			Token("auth")
-    			Required("auth")
-    			Attribute("id", Int32)
-    			Required("id")
-    			Attribute("token", String)
-    		})
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+		})
 
-    		Result(Projects)
+		Result(Projects)
 
-    		HTTP(func() {
-    			GET("projects/station/{id}")
+		HTTP(func() {
+			GET("projects/station/{id}")
 
-    			Params(func() {
-    				Param("token")
-    			})
-
-    			httpAuthentication()
-    		})
-    	})
+			httpAuthentication()
+		})
+	})
 
 	commonOptions()
 })

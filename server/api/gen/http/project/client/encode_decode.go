@@ -22,7 +22,6 @@ import (
 	project "github.com/fieldkit/cloud/server/api/gen/project"
 	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddUpdateRequest instantiates a HTTP request object with method and
@@ -3166,24 +3165,23 @@ func DecodeDownloadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, r
 	}
 }
 
-// BuildGetProjectsForStationRequest instantiates a HTTP request object with
-// method and path set to call the "project" service "get projects for station"
-// endpoint
-func (c *Client) BuildGetProjectsForStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+// BuildProjectsStationRequest instantiates a HTTP request object with method
+// and path set to call the "project" service "projects station" endpoint
+func (c *Client) BuildProjectsStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
 	var (
 		id int32
 	)
 	{
-		p, ok := v.(*project.GetProjectsForStationPayload)
+		p, ok := v.(*project.ProjectsStationPayload)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("project", "get projects for station", "*project.GetProjectsForStationPayload", v)
+			return nil, goahttp.ErrInvalidType("project", "projects station", "*project.ProjectsStationPayload", v)
 		}
 		id = p.ID
 	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetProjectsForStationProjectPath(id)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProjectsStationProjectPath(id)}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("project", "get projects for station", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("project", "projects station", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -3192,13 +3190,13 @@ func (c *Client) BuildGetProjectsForStationRequest(ctx context.Context, v interf
 	return req, nil
 }
 
-// EncodeGetProjectsForStationRequest returns an encoder for requests sent to
-// the project get projects for station server.
-func EncodeGetProjectsForStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+// EncodeProjectsStationRequest returns an encoder for requests sent to the
+// project projects station server.
+func EncodeProjectsStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*project.GetProjectsForStationPayload)
+		p, ok := v.(*project.ProjectsStationPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("project", "get projects for station", "*project.GetProjectsForStationPayload", v)
+			return goahttp.ErrInvalidType("project", "projects station", "*project.ProjectsStationPayload", v)
 		}
 		{
 			head := p.Auth
@@ -3208,25 +3206,20 @@ func EncodeGetProjectsForStationRequest(encoder func(*http.Request) goahttp.Enco
 				req.Header.Set("Authorization", head)
 			}
 		}
-		values := req.URL.Query()
-		if p.Token != nil {
-			values.Add("token", *p.Token)
-		}
-		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
 
-// DecodeGetProjectsForStationResponse returns a decoder for responses returned
-// by the project get projects for station endpoint. restoreBody controls
-// whether the response body should be restored after having been read.
-// DecodeGetProjectsForStationResponse may return the following errors:
+// DecodeProjectsStationResponse returns a decoder for responses returned by
+// the project projects station endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeProjectsStationResponse may return the following errors:
 //   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
 //   - "not-found" (type *goa.ServiceError): http.StatusNotFound
 //   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
 //   - error: internal error
-func DecodeGetProjectsForStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeProjectsStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -3243,84 +3236,80 @@ func DecodeGetProjectsForStationResponse(decoder func(*http.Response) goahttp.De
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body GetProjectsForStationResponseBody
+				body ProjectsStationResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			for _, e := range body {
-				if e != nil {
-					if err2 := ValidateProjectResponse(e); err2 != nil {
-						err = goa.MergeErrors(err, err2)
-					}
-				}
+			p := NewProjectsStationProjectsOK(&body)
+			view := "default"
+			vres := &projectviews.Projects{Projected: p, View: view}
+			if err = projectviews.ValidateProjects(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			if err != nil {
-				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
-			}
-			res := NewGetProjectsForStationProjectOK(body)
+			res := project.NewProjects(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
-				body GetProjectsForStationUnauthorizedResponseBody
+				body ProjectsStationUnauthorizedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			err = ValidateGetProjectsForStationUnauthorizedResponseBody(&body)
+			err = ValidateProjectsStationUnauthorizedResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			return nil, NewGetProjectsForStationUnauthorized(&body)
+			return nil, NewProjectsStationUnauthorized(&body)
 		case http.StatusForbidden:
 			var (
-				body GetProjectsForStationForbiddenResponseBody
+				body ProjectsStationForbiddenResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			err = ValidateGetProjectsForStationForbiddenResponseBody(&body)
+			err = ValidateProjectsStationForbiddenResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			return nil, NewGetProjectsForStationForbidden(&body)
+			return nil, NewProjectsStationForbidden(&body)
 		case http.StatusNotFound:
 			var (
-				body GetProjectsForStationNotFoundResponseBody
+				body ProjectsStationNotFoundResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			err = ValidateGetProjectsForStationNotFoundResponseBody(&body)
+			err = ValidateProjectsStationNotFoundResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			return nil, NewGetProjectsForStationNotFound(&body)
+			return nil, NewProjectsStationNotFound(&body)
 		case http.StatusBadRequest:
 			var (
-				body GetProjectsForStationBadRequestResponseBody
+				body ProjectsStationBadRequestResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("project", "get projects for station", err)
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			err = ValidateGetProjectsForStationBadRequestResponseBody(&body)
+			err = ValidateProjectsStationBadRequestResponseBody(&body)
 			if err != nil {
-				return nil, goahttp.ErrValidationError("project", "get projects for station", err)
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			return nil, NewGetProjectsForStationBadRequest(&body)
+			return nil, NewProjectsStationBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("project", "get projects for station", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("project", "projects station", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -3446,57 +3435,6 @@ func marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Project
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
-	}
-
-	return res
-}
-
-// unmarshalProjectResponseToProjectProject builds a value of type
-// *project.Project from a value of type *ProjectResponse.
-func unmarshalProjectResponseToProjectProject(v *ProjectResponse) *project.Project {
-	res := &project.Project{
-		ID:           *v.ID,
-		Name:         *v.Name,
-		Description:  *v.Description,
-		Goal:         *v.Goal,
-		Location:     *v.Location,
-		Tags:         *v.Tags,
-		Privacy:      *v.Privacy,
-		StartTime:    v.StartTime,
-		EndTime:      v.EndTime,
-		Photo:        v.Photo,
-		ReadOnly:     *v.ReadOnly,
-		ShowStations: *v.ShowStations,
-	}
-	res.Bounds = unmarshalProjectBoundsResponseToProjectProjectBounds(v.Bounds)
-	res.Following = unmarshalProjectFollowingResponseToProjectProjectFollowing(v.Following)
-
-	return res
-}
-
-// unmarshalProjectBoundsResponseToProjectProjectBounds builds a value of type
-// *project.ProjectBounds from a value of type *ProjectBoundsResponse.
-func unmarshalProjectBoundsResponseToProjectProjectBounds(v *ProjectBoundsResponse) *project.ProjectBounds {
-	res := &project.ProjectBounds{}
-	res.Min = make([]float64, len(v.Min))
-	for i, val := range v.Min {
-		res.Min[i] = val
-	}
-	res.Max = make([]float64, len(v.Max))
-	for i, val := range v.Max {
-		res.Max[i] = val
-	}
-
-	return res
-}
-
-// unmarshalProjectFollowingResponseToProjectProjectFollowing builds a value of
-// type *project.ProjectFollowing from a value of type
-// *ProjectFollowingResponse.
-func unmarshalProjectFollowingResponseToProjectProjectFollowing(v *ProjectFollowingResponse) *project.ProjectFollowing {
-	res := &project.ProjectFollowing{
-		Total:     *v.Total,
-		Following: *v.Following,
 	}
 
 	return res

@@ -183,9 +183,11 @@ type DownloadPhotoResponseBody struct {
 	Body        []byte  `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 }
 
-// GetProjectsForStationResponseBody is the type of the "project" service "get
-// projects for station" endpoint HTTP response body.
-type GetProjectsForStationResponseBody []*ProjectResponse
+// ProjectsStationResponseBody is the type of the "project" service "projects
+// station" endpoint HTTP response body.
+type ProjectsStationResponseBody struct {
+	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
+}
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
 // update" endpoint HTTP response body for the "unauthorized" error.
@@ -1779,10 +1781,9 @@ type DownloadPhotoBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// GetProjectsForStationUnauthorizedResponseBody is the type of the "project"
-// service "get projects for station" endpoint HTTP response body for the
-// "unauthorized" error.
-type GetProjectsForStationUnauthorizedResponseBody struct {
+// ProjectsStationUnauthorizedResponseBody is the type of the "project" service
+// "projects station" endpoint HTTP response body for the "unauthorized" error.
+type ProjectsStationUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1798,10 +1799,9 @@ type GetProjectsForStationUnauthorizedResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// GetProjectsForStationForbiddenResponseBody is the type of the "project"
-// service "get projects for station" endpoint HTTP response body for the
-// "forbidden" error.
-type GetProjectsForStationForbiddenResponseBody struct {
+// ProjectsStationForbiddenResponseBody is the type of the "project" service
+// "projects station" endpoint HTTP response body for the "forbidden" error.
+type ProjectsStationForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1817,10 +1817,9 @@ type GetProjectsForStationForbiddenResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// GetProjectsForStationNotFoundResponseBody is the type of the "project"
-// service "get projects for station" endpoint HTTP response body for the
-// "not-found" error.
-type GetProjectsForStationNotFoundResponseBody struct {
+// ProjectsStationNotFoundResponseBody is the type of the "project" service
+// "projects station" endpoint HTTP response body for the "not-found" error.
+type ProjectsStationNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1836,10 +1835,9 @@ type GetProjectsForStationNotFoundResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// GetProjectsForStationBadRequestResponseBody is the type of the "project"
-// service "get projects for station" endpoint HTTP response body for the
-// "bad-request" error.
-type GetProjectsForStationBadRequestResponseBody struct {
+// ProjectsStationBadRequestResponseBody is the type of the "project" service
+// "projects station" endpoint HTTP response body for the "bad-request" error.
+type ProjectsStationBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -1908,36 +1906,6 @@ type ProjectFollowingResponseBody struct {
 type ProjectBoundsRequestBodyRequestBody struct {
 	Min []float64 `form:"min" json:"min" xml:"min"`
 	Max []float64 `form:"max" json:"max" xml:"max"`
-}
-
-// ProjectResponse is used to define fields on response body types.
-type ProjectResponse struct {
-	ID           *int32                    `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name         *string                   `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Description  *string                   `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Goal         *string                   `form:"goal,omitempty" json:"goal,omitempty" xml:"goal,omitempty"`
-	Location     *string                   `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	Tags         *string                   `form:"tags,omitempty" json:"tags,omitempty" xml:"tags,omitempty"`
-	Privacy      *int32                    `form:"privacy,omitempty" json:"privacy,omitempty" xml:"privacy,omitempty"`
-	StartTime    *string                   `form:"startTime,omitempty" json:"startTime,omitempty" xml:"startTime,omitempty"`
-	EndTime      *string                   `form:"endTime,omitempty" json:"endTime,omitempty" xml:"endTime,omitempty"`
-	Photo        *string                   `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
-	ReadOnly     *bool                     `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
-	ShowStations *bool                     `form:"showStations,omitempty" json:"showStations,omitempty" xml:"showStations,omitempty"`
-	Bounds       *ProjectBoundsResponse    `form:"bounds,omitempty" json:"bounds,omitempty" xml:"bounds,omitempty"`
-	Following    *ProjectFollowingResponse `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
-}
-
-// ProjectBoundsResponse is used to define fields on response body types.
-type ProjectBoundsResponse struct {
-	Min []float64 `form:"min,omitempty" json:"min,omitempty" xml:"min,omitempty"`
-	Max []float64 `form:"max,omitempty" json:"max,omitempty" xml:"max,omitempty"`
-}
-
-// ProjectFollowingResponse is used to define fields on response body types.
-type ProjectFollowingResponse struct {
-	Total     *int32 `form:"total,omitempty" json:"total,omitempty" xml:"total,omitempty"`
-	Following *bool  `form:"following,omitempty" json:"following,omitempty" xml:"following,omitempty"`
 }
 
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the
@@ -3494,19 +3462,21 @@ func NewDownloadPhotoBadRequest(body *DownloadPhotoBadRequestResponseBody) *goa.
 	return v
 }
 
-// NewGetProjectsForStationProjectOK builds a "project" service "get projects
-// for station" endpoint result from a HTTP "OK" response.
-func NewGetProjectsForStationProjectOK(body []*ProjectResponse) []*project.Project {
-	v := make([]*project.Project, len(body))
-	for i, val := range body {
-		v[i] = unmarshalProjectResponseToProjectProject(val)
+// NewProjectsStationProjectsOK builds a "project" service "projects station"
+// endpoint result from a HTTP "OK" response.
+func NewProjectsStationProjectsOK(body *ProjectsStationResponseBody) *projectviews.ProjectsView {
+	v := &projectviews.ProjectsView{}
+	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+	for i, val := range body.Projects {
+		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
 	}
+
 	return v
 }
 
-// NewGetProjectsForStationUnauthorized builds a project service get projects
-// for station endpoint unauthorized error.
-func NewGetProjectsForStationUnauthorized(body *GetProjectsForStationUnauthorizedResponseBody) *goa.ServiceError {
+// NewProjectsStationUnauthorized builds a project service projects station
+// endpoint unauthorized error.
+func NewProjectsStationUnauthorized(body *ProjectsStationUnauthorizedResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3519,9 +3489,9 @@ func NewGetProjectsForStationUnauthorized(body *GetProjectsForStationUnauthorize
 	return v
 }
 
-// NewGetProjectsForStationForbidden builds a project service get projects for
-// station endpoint forbidden error.
-func NewGetProjectsForStationForbidden(body *GetProjectsForStationForbiddenResponseBody) *goa.ServiceError {
+// NewProjectsStationForbidden builds a project service projects station
+// endpoint forbidden error.
+func NewProjectsStationForbidden(body *ProjectsStationForbiddenResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3534,9 +3504,9 @@ func NewGetProjectsForStationForbidden(body *GetProjectsForStationForbiddenRespo
 	return v
 }
 
-// NewGetProjectsForStationNotFound builds a project service get projects for
-// station endpoint not-found error.
-func NewGetProjectsForStationNotFound(body *GetProjectsForStationNotFoundResponseBody) *goa.ServiceError {
+// NewProjectsStationNotFound builds a project service projects station
+// endpoint not-found error.
+func NewProjectsStationNotFound(body *ProjectsStationNotFoundResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -3549,9 +3519,9 @@ func NewGetProjectsForStationNotFound(body *GetProjectsForStationNotFoundRespons
 	return v
 }
 
-// NewGetProjectsForStationBadRequest builds a project service get projects for
-// station endpoint bad-request error.
-func NewGetProjectsForStationBadRequest(body *GetProjectsForStationBadRequestResponseBody) *goa.ServiceError {
+// NewProjectsStationBadRequest builds a project service projects station
+// endpoint bad-request error.
+func NewProjectsStationBadRequest(body *ProjectsStationBadRequestResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -5676,9 +5646,9 @@ func ValidateDownloadPhotoBadRequestResponseBody(body *DownloadPhotoBadRequestRe
 	return
 }
 
-// ValidateGetProjectsForStationUnauthorizedResponseBody runs the validations
-// defined on get projects for station_unauthorized_response_body
-func ValidateGetProjectsForStationUnauthorizedResponseBody(body *GetProjectsForStationUnauthorizedResponseBody) (err error) {
+// ValidateProjectsStationUnauthorizedResponseBody runs the validations defined
+// on projects station_unauthorized_response_body
+func ValidateProjectsStationUnauthorizedResponseBody(body *ProjectsStationUnauthorizedResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -5700,9 +5670,9 @@ func ValidateGetProjectsForStationUnauthorizedResponseBody(body *GetProjectsForS
 	return
 }
 
-// ValidateGetProjectsForStationForbiddenResponseBody runs the validations
-// defined on get projects for station_forbidden_response_body
-func ValidateGetProjectsForStationForbiddenResponseBody(body *GetProjectsForStationForbiddenResponseBody) (err error) {
+// ValidateProjectsStationForbiddenResponseBody runs the validations defined on
+// projects station_forbidden_response_body
+func ValidateProjectsStationForbiddenResponseBody(body *ProjectsStationForbiddenResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -5724,9 +5694,9 @@ func ValidateGetProjectsForStationForbiddenResponseBody(body *GetProjectsForStat
 	return
 }
 
-// ValidateGetProjectsForStationNotFoundResponseBody runs the validations
-// defined on get projects for station_not-found_response_body
-func ValidateGetProjectsForStationNotFoundResponseBody(body *GetProjectsForStationNotFoundResponseBody) (err error) {
+// ValidateProjectsStationNotFoundResponseBody runs the validations defined on
+// projects station_not-found_response_body
+func ValidateProjectsStationNotFoundResponseBody(body *ProjectsStationNotFoundResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -5748,9 +5718,9 @@ func ValidateGetProjectsForStationNotFoundResponseBody(body *GetProjectsForStati
 	return
 }
 
-// ValidateGetProjectsForStationBadRequestResponseBody runs the validations
-// defined on get projects for station_bad-request_response_body
-func ValidateGetProjectsForStationBadRequestResponseBody(body *GetProjectsForStationBadRequestResponseBody) (err error) {
+// ValidateProjectsStationBadRequestResponseBody runs the validations defined
+// on projects station_bad-request_response_body
+func ValidateProjectsStationBadRequestResponseBody(body *ProjectsStationBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
@@ -5901,78 +5871,6 @@ func ValidateProjectBoundsRequestBodyRequestBody(body *ProjectBoundsRequestBodyR
 	}
 	if body.Max == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
-	}
-	return
-}
-
-// ValidateProjectResponse runs the validations defined on ProjectResponse
-func ValidateProjectResponse(body *ProjectResponse) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.Description == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("description", "body"))
-	}
-	if body.Goal == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("goal", "body"))
-	}
-	if body.Location == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("location", "body"))
-	}
-	if body.Privacy == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("privacy", "body"))
-	}
-	if body.Tags == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("tags", "body"))
-	}
-	if body.ReadOnly == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("readOnly", "body"))
-	}
-	if body.ShowStations == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("showStations", "body"))
-	}
-	if body.Bounds == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("bounds", "body"))
-	}
-	if body.Following == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
-	}
-	if body.Bounds != nil {
-		if err2 := ValidateProjectBoundsResponse(body.Bounds); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if body.Following != nil {
-		if err2 := ValidateProjectFollowingResponse(body.Following); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateProjectBoundsResponse runs the validations defined on
-// ProjectBoundsResponse
-func ValidateProjectBoundsResponse(body *ProjectBoundsResponse) (err error) {
-	if body.Min == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("min", "body"))
-	}
-	if body.Max == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
-	}
-	return
-}
-
-// ValidateProjectFollowingResponse runs the validations defined on
-// ProjectFollowingResponse
-func ValidateProjectFollowingResponse(body *ProjectFollowingResponse) (err error) {
-	if body.Total == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("total", "body"))
-	}
-	if body.Following == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("following", "body"))
 	}
 	return
 }

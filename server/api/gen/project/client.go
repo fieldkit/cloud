@@ -16,57 +16,57 @@ import (
 
 // Client is the "project" service client.
 type Client struct {
-	AddUpdateEndpoint             goa.Endpoint
-	DeleteUpdateEndpoint          goa.Endpoint
-	ModifyUpdateEndpoint          goa.Endpoint
-	InvitesEndpoint               goa.Endpoint
-	LookupInviteEndpoint          goa.Endpoint
-	AcceptProjectInviteEndpoint   goa.Endpoint
-	RejectProjectInviteEndpoint   goa.Endpoint
-	AcceptInviteEndpoint          goa.Endpoint
-	RejectInviteEndpoint          goa.Endpoint
-	AddEndpoint                   goa.Endpoint
-	UpdateEndpoint                goa.Endpoint
-	GetEndpoint                   goa.Endpoint
-	ListCommunityEndpoint         goa.Endpoint
-	ListMineEndpoint              goa.Endpoint
-	InviteEndpoint                goa.Endpoint
-	EditUserEndpoint              goa.Endpoint
-	RemoveUserEndpoint            goa.Endpoint
-	AddStationEndpoint            goa.Endpoint
-	RemoveStationEndpoint         goa.Endpoint
-	DeleteEndpoint                goa.Endpoint
-	UploadPhotoEndpoint           goa.Endpoint
-	DownloadPhotoEndpoint         goa.Endpoint
-	GetProjectsForStationEndpoint goa.Endpoint
+	AddUpdateEndpoint           goa.Endpoint
+	DeleteUpdateEndpoint        goa.Endpoint
+	ModifyUpdateEndpoint        goa.Endpoint
+	InvitesEndpoint             goa.Endpoint
+	LookupInviteEndpoint        goa.Endpoint
+	AcceptProjectInviteEndpoint goa.Endpoint
+	RejectProjectInviteEndpoint goa.Endpoint
+	AcceptInviteEndpoint        goa.Endpoint
+	RejectInviteEndpoint        goa.Endpoint
+	AddEndpoint                 goa.Endpoint
+	UpdateEndpoint              goa.Endpoint
+	GetEndpoint                 goa.Endpoint
+	ListCommunityEndpoint       goa.Endpoint
+	ListMineEndpoint            goa.Endpoint
+	InviteEndpoint              goa.Endpoint
+	EditUserEndpoint            goa.Endpoint
+	RemoveUserEndpoint          goa.Endpoint
+	AddStationEndpoint          goa.Endpoint
+	RemoveStationEndpoint       goa.Endpoint
+	DeleteEndpoint              goa.Endpoint
+	UploadPhotoEndpoint         goa.Endpoint
+	DownloadPhotoEndpoint       goa.Endpoint
+	ProjectsStationEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, editUser, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto, getProjectsForStation goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, editUser, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto, projectsStation goa.Endpoint) *Client {
 	return &Client{
-		AddUpdateEndpoint:             addUpdate,
-		DeleteUpdateEndpoint:          deleteUpdate,
-		ModifyUpdateEndpoint:          modifyUpdate,
-		InvitesEndpoint:               invites,
-		LookupInviteEndpoint:          lookupInvite,
-		AcceptProjectInviteEndpoint:   acceptProjectInvite,
-		RejectProjectInviteEndpoint:   rejectProjectInvite,
-		AcceptInviteEndpoint:          acceptInvite,
-		RejectInviteEndpoint:          rejectInvite,
-		AddEndpoint:                   add,
-		UpdateEndpoint:                update,
-		GetEndpoint:                   get,
-		ListCommunityEndpoint:         listCommunity,
-		ListMineEndpoint:              listMine,
-		InviteEndpoint:                invite,
-		EditUserEndpoint:              editUser,
-		RemoveUserEndpoint:            removeUser,
-		AddStationEndpoint:            addStation,
-		RemoveStationEndpoint:         removeStation,
-		DeleteEndpoint:                delete_,
-		UploadPhotoEndpoint:           uploadPhoto,
-		DownloadPhotoEndpoint:         downloadPhoto,
-		GetProjectsForStationEndpoint: getProjectsForStation,
+		AddUpdateEndpoint:           addUpdate,
+		DeleteUpdateEndpoint:        deleteUpdate,
+		ModifyUpdateEndpoint:        modifyUpdate,
+		InvitesEndpoint:             invites,
+		LookupInviteEndpoint:        lookupInvite,
+		AcceptProjectInviteEndpoint: acceptProjectInvite,
+		RejectProjectInviteEndpoint: rejectProjectInvite,
+		AcceptInviteEndpoint:        acceptInvite,
+		RejectInviteEndpoint:        rejectInvite,
+		AddEndpoint:                 add,
+		UpdateEndpoint:              update,
+		GetEndpoint:                 get,
+		ListCommunityEndpoint:       listCommunity,
+		ListMineEndpoint:            listMine,
+		InviteEndpoint:              invite,
+		EditUserEndpoint:            editUser,
+		RemoveUserEndpoint:          removeUser,
+		AddStationEndpoint:          addStation,
+		RemoveStationEndpoint:       removeStation,
+		DeleteEndpoint:              delete_,
+		UploadPhotoEndpoint:         uploadPhoto,
+		DownloadPhotoEndpoint:       downloadPhoto,
+		ProjectsStationEndpoint:     projectsStation,
 	}
 }
 
@@ -244,13 +244,13 @@ func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (re
 	return ires.(*DownloadedPhoto), nil
 }
 
-// GetProjectsForStation calls the "get projects for station" endpoint of the
-// "project" service.
-func (c *Client) GetProjectsForStation(ctx context.Context, p *GetProjectsForStationPayload) (res []*Project, err error) {
+// ProjectsStation calls the "projects station" endpoint of the "project"
+// service.
+func (c *Client) ProjectsStation(ctx context.Context, p *ProjectsStationPayload) (res *Projects, err error) {
 	var ires interface{}
-	ires, err = c.GetProjectsForStationEndpoint(ctx, p)
+	ires, err = c.ProjectsStationEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.([]*Project), nil
+	return ires.(*Projects), nil
 }
