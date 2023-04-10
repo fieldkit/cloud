@@ -9,6 +9,7 @@ import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZo
 import { vueTickHack } from "@/utilities";
 import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
+import { DisplayModule } from "@/store";
 
 interface VueDatepickerStyles {
     // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
@@ -216,6 +217,15 @@ export const ViewingControls = Vue.extend({
             required: true,
         },
     },
+    data(): {
+        isStartDateFocused: boolean;
+        isEndDateFocused: boolean;
+    } {
+        return {
+            isStartDateFocused: false,
+            isEndDateFocused: false,
+        };
+    },
     computed: {
         chartTypes(): { label: string; id: ChartType }[] {
             const allTypes = [
@@ -319,6 +329,9 @@ export const ViewingControls = Vue.extend({
             this.$emit("viz-change-sensors", ...args);
         },
         raiseManualTime(fromPicker, pickerType): void {
+            if (this.isStartDateFocused || this.isEndDateFocused) {
+                return;
+            }
             if (fromPicker) {
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
@@ -380,7 +393,7 @@ export const ViewingControls = Vue.extend({
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
                     </div>
 					<div class="date-picker flex" v-if="manualRangeValue">
-						<v-date-picker :value="manualRangeValue.start" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
+						<v-date-picker :value="manualRangeValue.start" @input="raiseManualTime($event, 'start')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
                                        :drag-attribute="datepickerStyles" :maxDate="manualRangeValue.end" is-inline
                         >
                             <template v-slot="{ inputValue, inputEvents }">
@@ -388,21 +401,23 @@ export const ViewingControls = Vue.extend({
                                     <input
                                         :value="inputValue"
                                         v-on="inputEvents"
-                                        @blur="raiseManualTime($event, 'start')"
+                                        @focus="isStartDateFocused = true"
+                                        @blur="isStartDateFocused = false; raiseManualTime(new Date($event.target.value), 'start')"
                                         placeholder="Start date"
                                         class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
                                     />
                                 </div>
                             </template>
                         </v-date-picker>
-                        <v-date-picker :value="manualRangeValue.end" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
+                        <v-date-picker :value="manualRangeValue.end" @input="raiseManualTime($event, 'end')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"
                                      :drag-attribute="datepickerStyles" :minDate="manualRangeValue.start">
                         <template v-slot="{ inputValue, inputEvents }">
                           <div class="flex justify-center items-center">
                             <input
                                 :value="inputValue"
                                 v-on="inputEvents"
-                                @blur="raiseManualTime($event, 'end')"
+                                @focus="isEndDateFocused = true"
+                                @blur="isEndDateFocused = false; raiseManualTime(new Date($event.target.value), 'end')"
                                 placeholder="End date"
                                 class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
                             />
