@@ -496,7 +496,6 @@ export class StationsState {
     };
     mapped: MappedStations | null = null;
     readings: { [index: number]: StationReadings } = {};
-    isAdminForProject: { (userId: number, projectId: number): boolean };
 }
 
 export class DisplayProject {
