@@ -70,11 +70,6 @@ export default Vue.extend({
                 this.editor.setOptions({ editable: !value });
             }
         },
-        value(value: string): void {
-            if (this.editor) {
-                this.editor.commands.setContent(value);
-            }
-        },
     },
     computed: {
         empty(): boolean {
