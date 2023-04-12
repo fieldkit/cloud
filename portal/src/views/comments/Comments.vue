@@ -10,7 +10,7 @@
                 </div>
             </template>
             <template v-else>
-                <p class="need-login-msg" @click="test()">
+                <p class="need-login-msg">
                     {{ $tc("comments.loginToComment.part1") }}
                     <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
                         {{ $tc("comments.loginToComment.part2") }}
@@ -52,7 +52,7 @@
                                     {{ post.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user && (user.id === post.author.id || user.admin)"
+                                    v-if="getCommentOptions(post).length > 0"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
@@ -206,10 +206,15 @@ export default Vue.extend({
             return null;
         },
         isAdmin(): boolean {
-            return this.$getters.isAdminForProject(this.user.id, this.projectId);
+            console.log("Radoi", this.$state.stations);
+            return this.$state.stations.isAdminForProject(this.user.id, this.projectId);
         },
-        // needed so we can find out if the current user is an admin and give him permissions to delete posts
+        // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
+            const project = this.$getters.projectsById[this.projectId];
+            if (!project) {
+                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            }
             return !!this.$getters.projectsById[this.projectId];
         },
     },
@@ -221,16 +226,7 @@ export default Vue.extend({
             this.highlightComment();
         },
     },
-    beforeMount(): Promise<void> | void {
-        // project could be already loaded if the Comments are viewed from Project Page
-        if (!this.isProjectLoaded) {
-            return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
-        }
-    },
     mounted(): Promise<void> {
-        if (this.stationId) {
-          this.$services.api.getProjectsForStation(this.stationId);
-        }
         this.placeholder = this.getNewCommentPlaceholder();
         return this.getComments();
     },
@@ -377,6 +373,10 @@ export default Vue.extend({
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
+            if (!this.user) {
+                return [];
+            }
+
             if (this.user.id === post.author.id) {
                 return [
                     {
@@ -751,6 +751,10 @@ header {
 
 .no-comments {
     margin-left: 20px;
+
+    @at-root .data-view .no-comments {
+        margin-top: 5px;
+    }
 
     @include bp-down($xs) {
         margin-left: 10px;

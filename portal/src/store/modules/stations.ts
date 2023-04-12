@@ -24,7 +24,7 @@ import {
     VizThresholds,
     QueryRecentlyResponse,
     RecentlyAggregatedWindows,
-    RecentlyAggregatedLast,
+    RecentlyAggregatedLast, UserRolesEnum,
 } from "@/api";
 
 import { VizSensor, VizConfig } from "@/views/viz/viz";
@@ -496,6 +496,7 @@ export class StationsState {
     };
     mapped: MappedStations | null = null;
     readings: { [index: number]: StationReadings } = {};
+    isAdminForProject: { (userId: number, projectId: number): boolean };
 }
 
 export class DisplayProject {
@@ -554,7 +555,7 @@ const getters = {
         return state.mapped;
     },
     isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
-        return state.projectUsers[projectId].some((user) => user.user.id === userId);
+        return state.projectUsers[projectId].some((user) => user.user.id === userId && user.role === UserRolesEnum.admin);
     },
 };
 
