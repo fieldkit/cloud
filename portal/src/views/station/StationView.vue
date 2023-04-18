@@ -68,23 +68,33 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
-                        <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
-                        <div v-else class="photo-placeholder">
-                            <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
-                        </div>
+                <div>
+                    <div class="station-projects" v-if="stationProjects.length > 0">
+                        <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
+                        <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
+                        <span v-for="(project, index) in stationProjects" v-bind:key="project.id">
+                            <span>{{ project.name }}</span>
+                            <template v-if="index !== 0 && index !== stationProjects.length - 1">,&nbsp;</template>
+                        </span>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
-                        <i class="icon icon-grid"></i>
-                        {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
+                    <div v-if="photos" class="station-photos">
+                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                            <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
+                            <div v-else class="photo-placeholder">
+                                <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
+                            </div>
+                        </div>
+                        <router-link
+                            :to="{
+                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                                params: { projectId: projectId, stationId: station.id },
+                            }"
+                            class="station-photos-nav"
+                        >
+                            <i class="icon icon-grid"></i>
+                            {{ $t("station.btn.linkToPhotos") }}
+                        </router-link>
+                    </div>
                 </div>
             </section>
 
@@ -160,6 +170,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { Project } from "@/api";
 
 export default Vue.extend({
     name: "StationView",
@@ -245,6 +256,9 @@ export default Vue.extend({
 
             return false;
         },
+        stationProjects(): Project[] {
+            return this.$store.getters.stationProjects;
+        },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
         if (this.dirtyNotes) {
@@ -267,6 +281,7 @@ export default Vue.extend({
     },
     beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+        this.$store.dispatch(ActionTypes.NEED_PROJECTS_FOR_STATION, { id: this.$route.params.stationId });
 
         return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
@@ -613,6 +628,16 @@ export default Vue.extend({
 
         .photo {
             flex: 0 0 calc(50% - 5px);
+        }
+    }
+
+    &-projects {
+        font-size: 16px;
+        color: #6a6d71;
+        margin: 30px 0;
+
+        @include bp-down($xs) {
+            margin: 20px 0;
         }
     }
 }
