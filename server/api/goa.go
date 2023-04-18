@@ -90,6 +90,9 @@ import (
 
 	notificationsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/notifications/server"
 	notificationsService "github.com/fieldkit/cloud/server/api/gen/notifications"
+
+	mapsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/maps/server"
+	mapsService "github.com/fieldkit/cloud/server/api/gen/maps"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -153,6 +156,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcSvc := NewOidcService(ctx, options)
 	oidcEndpoints := oidcService.NewEndpoints(oidcSvc)
 
+	mapsSvc := NewMapsService(ctx, options)
+	mapsEndpoints := mapsService.NewEndpoints(mapsSvc)
+
 	// We're moving to this extra-package options struct so we can start to move
 	// away from the functional separation we're using package wise.
 	commonOptions := &common.ServiceOptions{
@@ -191,6 +197,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		oidcEndpoints.Use(mw)
 		ttnEndpoints.Use(mw)
 		notificationsEndpoints.Use(mw)
+		mapsEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -233,6 +240,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
+	mapsServer := mapsServiceSvr.New(mapsEndpoints, mux, dec, enc, eh, nil)
 
 	upgrader := &websocket.Upgrader{}
 	upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -282,6 +290,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcServiceSvr.Mount(mux, oidcServer)
 	ttnServiceSvr.Mount(mux, ttnServer)
 	notificationsServiceSvr.Mount(mux, notificationsServer)
+	mapsServiceSvr.Mount(mux, mapsServer)
 
 	log := Logger(ctx).Sugar()
 
@@ -349,6 +358,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range notificationsServer.Mounts {
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
+	for _, m := range mapsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 
