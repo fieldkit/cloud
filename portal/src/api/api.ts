@@ -437,6 +437,10 @@ export enum MapViewType {
     list = "list",
 }
 
+export interface CoverageMap {
+    features: { type: string }[],
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
@@ -1596,6 +1600,14 @@ class FKApi {
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/station/" + id,
+        });
+    }
+
+    public async coverageMap(): Promise<CoverageMap> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + `/maps/coverage`,
         });
     }
 }

@@ -40,6 +40,8 @@ import { getPartnerCustomization } from "@/views/shared/partners";
 import StationPhotosView from "@/views/station/StationPhotosView.vue";
 import { MapViewType } from "@/api/api";
 
+import  CoverageMapView from "@/views/maps/CoverageMapView.vue"
+
 Vue.use(Router);
 
 function makeDefaultRouteForProject(projectId: number) {
@@ -569,6 +571,25 @@ const routes = [
         component: NotificationsView,
         meta: {
             secured: true,
+        },
+    },
+    {
+        path: "/maps/coverage",
+        name: "mapsCoverage",
+        component: CoverageMapView,
+        meta: {
+        },
+    },
+    {
+        path: "/maps/coverage/:bounds",
+        name: "mapsCoverageWithBounds",
+        component: CoverageMapView,
+        props: (route) => {
+            return {
+                bounds: JSON.parse(route.params.bounds),
+            };
+        },
+        meta: {
         },
     },
     {
