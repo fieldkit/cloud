@@ -71,29 +71,22 @@ export function convertOldFirmwareResponse(module) {
 
 export function getModuleImg(module) {
     switch (module.name) {
-        case "modules.distance":
-        case "distance":
+        case "fk.distance":
             return "modules/icon-module-distance.svg";
-        case "modules.weather":
-        case "weather":
+        case "fk.weather":
             return "modules/icon-module-weather.svg";
-        case "modules.water.ec":
-        case "water.ec":
+        case "fk.water.ec":
             return "modules/icon-module-water-conductivity.svg";
-        case "modules.water.ph":
-        case "water.ph":
+        case "fk.water.ph":
             return "modules/icon-module-water-ph.svg";
-        case "modules.water.do":
-        case "water.do":
+        case "fk.water.do":
             return "modules/icon-module-dissolved-oxygen.svg";
-        case "modules.water.temp":
-        case "water.temp":
+        case "fk.water.temp":
             return "modules/icon-module-water-temp.svg";
-        case "modules.water.orp":
-        case "water.orp":
+        case "fk.water":
+        case "fk.water.orp":
             return "modules/icon-module-water.svg";
-        case "modules.water.unknown":
-        case "water.unknown":
+        case "fk.water.unknown":
             return "modules/icon-module-water.svg";
         case "wh.floodnet":
             return "modules/icon-module-floodnet.png";
