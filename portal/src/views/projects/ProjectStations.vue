@@ -397,6 +397,7 @@ export default Vue.extend({
     position: relative;
     flex: 2;
     min-height: 420px;
+    overflow: hidden;
 
     #map {
         height: 100%;

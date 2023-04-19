@@ -216,6 +216,15 @@ export const ViewingControls = Vue.extend({
             required: true,
         },
     },
+    data(): {
+        isStartDateFocused: boolean;
+        isEndDateFocused: boolean;
+    } {
+        return {
+            isStartDateFocused: false,
+            isEndDateFocused: false,
+        };
+    },
     computed: {
         chartTypes(): { label: string; id: ChartType }[] {
             const allTypes = [
@@ -319,6 +328,9 @@ export const ViewingControls = Vue.extend({
             this.$emit("viz-change-sensors", ...args);
         },
         raiseManualTime(fromPicker, pickerType): void {
+            if (this.isStartDateFocused || this.isEndDateFocused) {
+                return;
+            }
             if (fromPicker) {
                 // When the user picks a fast time this gets raised when
                 // the viz changes the visible time, which we're bound to
@@ -388,6 +400,8 @@ export const ViewingControls = Vue.extend({
                                     <input
                                         :value="inputValue"
                                         v-on="inputEvents"
+                                        @focus="isStartDateFocused = true"
+                                        @blur="isStartDateFocused = false; raiseManualTime(new Date($event.target.value), 'start')"
                                         placeholder="Start date"
                                         class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
                                     />
@@ -401,6 +415,8 @@ export const ViewingControls = Vue.extend({
                             <input
                                 :value="inputValue"
                                 v-on="inputEvents"
+                                @focus="isEndDateFocused = true"
+                                @blur="isEndDateFocused = false; raiseManualTime(new Date($event.target.value), 'end')"
                                 placeholder="End date"
                                 class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
                             />
