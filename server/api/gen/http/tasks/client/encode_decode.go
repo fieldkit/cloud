@@ -36,11 +36,11 @@ func (c *Client) BuildFiveRequest(ctx context.Context, v interface{}) (*http.Req
 // five endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeFiveResponse may return the following errors:
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- "unauthorized" (type tasks.Unauthorized): http.StatusUnauthorized
-//	- error: internal error
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - "unauthorized" (type tasks.Unauthorized): http.StatusUnauthorized
+//   - error: internal error
 func DecodeFiveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
