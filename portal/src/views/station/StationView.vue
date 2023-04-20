@@ -450,7 +450,6 @@ export default Vue.extend({
     }
     &-row {
         padding: 15px 0;
-        max-width: 350px;
         @include flex(center);
 
         &:not(:last-of-type) {
