@@ -42,6 +42,21 @@
 
             <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
 
+            <div class="workspace-container" v-if="!workspace && currentStation">
+                <div class="station-summary">
+                    <StationSummaryContent :station="currentStation" class="summary-content">
+                        <template #top-right-actions>
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
+                                @click="openStationPageTab"
+                            />
+                        </template>
+                    </StationSummaryContent>
+                </div>
+            </div>
+
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel">&nbsp;</div>
 
@@ -183,6 +198,9 @@ export default Vue.extend({
                 return this.workspace.getStation(this.workspace.selectedStationId);
             }
             return null;
+        },
+        currentStation(): DisplayStation | null {
+            return this.bookmark.s.length > 0 ? this.$getters.stationsById[this.bookmark.s[0]] : null;
         },
     },
     watch: {
@@ -351,8 +369,13 @@ export default Vue.extend({
             this.selectedIndex = evt;
         },
         openStationPageTab() {
-            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.selectedStation.id } });
-            window.open(routeData.href, "_blank");
+            if (this.selectedStation || this.currentStation) {
+                const routeData = this.$router.resolve({
+                    name: "viewStationFromMap",
+                    params: { stationId: this.selectedStation ? this.selectedStation.id : this.currentStation.id },
+                });
+                window.open(routeData.href, "_blank");
+            }
         },
         getBatteryIcon() {
             return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
@@ -1012,5 +1035,4 @@ export default Vue.extend({
         left: 20px;
     }
 }
-
 </style>
