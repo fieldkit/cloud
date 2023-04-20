@@ -302,10 +302,9 @@ export class ScrubberSpecFactory {
                                         markname: "right_scrub",
                                     },
                                     {
-                                        source: "scope",
+                                        source: "window",
                                         type: "mouseup",
                                         filter: ['!event.item || (event.item.mark.name !== "brush_brush")'],
-                                        markname: "right_scrub",
                                     },
                                 ],
                             },
@@ -321,12 +320,13 @@ export class ScrubberSpecFactory {
                                     {
                                         source: "scope",
                                         type: "mousedown",
+                                        markname: "left_scrub",
                                         filter: [
                                             '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',
                                         ],
                                     },
                                     {
-                                        source: "scope",
+                                        source: "window",
                                         type: "mouseup",
                                         filter: [
                                             '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',

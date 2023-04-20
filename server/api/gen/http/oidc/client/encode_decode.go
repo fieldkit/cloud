@@ -63,11 +63,11 @@ func EncodeRequiredRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // required endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeRequiredResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeRequiredResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -203,11 +203,11 @@ func EncodeURLRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
 // DecodeURLResponse may return the following errors:
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeURLResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -337,12 +337,12 @@ func EncodeAuthenticateRequest(encoder func(*http.Request) goahttp.Encoder) func
 // oidc authenticate endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeAuthenticateResponse may return the following errors:
-//	- "user-unverified" (type *goa.ServiceError): http.StatusForbidden
-//	- "forbidden" (type *goa.ServiceError): http.StatusForbidden
-//	- "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//	- "not-found" (type *goa.ServiceError): http.StatusNotFound
-//	- "bad-request" (type *goa.ServiceError): http.StatusBadRequest
-//	- error: internal error
+//   - "user-unverified" (type *goa.ServiceError): http.StatusForbidden
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeAuthenticateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {

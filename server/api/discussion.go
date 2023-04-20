@@ -233,18 +233,18 @@ func (c *DiscussionService) UpdateMessage(ctx context.Context, payload *discServ
 }
 
 func (c *DiscussionService) DeleteMessage(ctx context.Context, payload *discService.DeleteMessagePayload) error {
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
 	dr := repositories.NewDiscussionRepository(c.db)
 	post, err := dr.QueryPostByID(ctx, payload.PostID)
 	if err != nil {
 		return err
 	}
 
-	if post.UserID != p.UserID() && !p.IsAdmin() {
+	p, err := NewPermissions(ctx, c.options).ForDiscussions(post)
+	if err != nil {
+		return err
+	}
+
+	if p.CanDelete() != nil {
 		return discService.MakeForbidden(errors.New("unauthorized"))
 	}
 
