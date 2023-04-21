@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loading" class="station-photo station-photo--loading">
+    <div v-if="loading" class="station-photo loading-container">
         <Spinner class="spinner" />
     </div>
     <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo" alt="Station Image" />
@@ -34,7 +34,7 @@ export default Vue.extend({
     } {
         return {
             photo: null,
-            loading: true,
+            loading: false,
         };
     },
     watch: {
@@ -56,8 +56,6 @@ export default Vue.extend({
                 } finally {
                     this.loading = false;
                 }
-            } else {
-                this.loading = false;
             }
         },
         interpolatePartner(baseString: string): string {
@@ -67,18 +65,4 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped lang="scss">
-.station-photo--loading {
-    background-color: #e2e4e6;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-
-    ::v-deep .spinner {
-        width: 20px;
-        height: 20px;
-    }
-}
-</style>
+<style scoped lang="scss"></style>
