@@ -103,6 +103,12 @@ type StationOwnerView struct {
 	ID    *int32
 	Name  *string
 	Email *string
+	Photo *UserPhotoView
+}
+
+// UserPhotoView is a type that runs validations on a projected type.
+type UserPhotoView struct {
+	URL *string
 }
 
 // StationInterestingnessView is a type that runs validations on a projected
@@ -647,6 +653,12 @@ func ValidateStationOwnerView(result *StationOwnerView) (err error) {
 	if result.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
+	return
+}
+
+// ValidateUserPhotoView runs the validations defined on UserPhotoView.
+func ValidateUserPhotoView(result *UserPhotoView) (err error) {
+
 	return
 }
 
