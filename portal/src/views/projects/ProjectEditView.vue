@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true" :viewingProject="activeProject">
         <div class="main-panel" v-if="!loading">
-            <ProjectForm :project="activeProject" @updating="onProjectUpdate" />
+            <ProjectForm :project="activeProject" @updating="onProjectUpdate" @change="projectDirty = true" />
         </div>
     </StandardLayout>
 </template>
@@ -29,11 +29,13 @@ export default Vue.extend({
         user: unknown;
         activeProject: Project | null;
         loading: boolean;
+        projectDirty: boolean;
     } {
         return {
             user: {},
             activeProject: null,
             loading: true,
+            projectDirty: false,
         };
     },
     async mounted(): Promise<void> {
@@ -46,6 +48,25 @@ export default Vue.extend({
     beforeMount(): Promise<void> | void {
         if (this.id) {
             return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id });
+        }
+    },
+    beforeRouteLeave(to: never, from: never, next: any) {
+        if (this.projectDirty) {
+            this.$confirm({
+                message: this.$tc("project.form.confirmLeavePopupMessage"),
+                button: {
+                    no: this.$tc("no"),
+                    yes: this.$tc("yes"),
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        this.projectDirty = false;
+                        next();
+                    }
+                },
+            });
+        } else {
+            next();
         }
     },
     methods: {
@@ -66,6 +87,7 @@ export default Vue.extend({
         },
         onProjectUpdate(): void {
             this.loading = true;
+            this.projectDirty = false;
         },
     },
 });

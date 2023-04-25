@@ -11,7 +11,7 @@
 
         <form id="form" @submit.prevent="saveForm">
             <div class="outer-input-container">
-                <TextField v-model="form.name" label="Project Name" />
+                <TextField v-model="form.name" @input="$emit('change')" label="Project Name" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.name.required">{{ $t("project.form.name.required") }}</div>
@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.description" label="Short Description" />
+                <TextField v-model="form.description" @input="$emit('change')" label="Short Description" />
 
                 <div class="validation-errors" v-if="$v.form.description.$error">
                     <div v-if="!$v.form.description.required">{{ $t("project.form.description.required") }}</div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.goal" label="Project Goal" />
+                <TextField v-model="form.goal" @input="$emit('change')" label="Project Goal" />
 
                 <div class="validation-errors" v-if="$v.form.goal.$error">
                     <div v-if="!$v.form.goal.required">{{ $t("project.form.goal.required") }}</div>
@@ -38,7 +38,7 @@
                 <ImageUploader :image="{ url: project ? project.photo : null }" :placeholder="imagePlaceholder" @change="onImage" />
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.location" label="Location" />
+                <TextField v-model="form.location" @input="$emit('change')" label="Location" />
 
                 <div class="validation-errors" v-if="$v.form.location.$error">
                     <div v-if="!$v.form.location.required">{{ $t("project.form.location.required") }}</div>
@@ -47,8 +47,8 @@
             </div>
 
             <div class="dates-row">
-                <DateField v-model="form.startTime" :label="$tc('project.form.startDate')"></DateField>
-                <DateField v-model="form.endTime" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
+                <DateField v-model="form.startTime" @input="$emit('change')" :label="$tc('project.form.startDate')"></DateField>
+                <DateField v-model="form.endTime" @input="$emit('change')" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
             </div>
 
             <div class="outer-input-container tags-container">
@@ -388,6 +388,7 @@ export default Vue.extend({
         },
         onImage(image): void {
             this.image = image;
+            this.$emit("change");
         },
     },
 });
