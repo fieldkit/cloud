@@ -6,7 +6,13 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                    <Tiptap
+                        ref="tipTap"
+                        v-model="newComment.body"
+                        placeholder="Join the discussion!"
+                        saveLabel="Post"
+                        @save="save(newComment)"
+                    />
                 </div>
             </template>
             <template v-else>
@@ -238,6 +244,11 @@ export default Vue.extend({
             }
         },
         async save(comment: NewComment): Promise<void> {
+            console.log("Radoi commm", comment);
+            if (comment.body === "") {
+                return;
+            }
+
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -247,7 +258,12 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    this.newComment.body = "";
+                    console.log("radoi r", this.$refs);
+
+                    if (this.$refs.tipTap as typeof Tiptap)
+
+                    this.$refs.tipTap?.editor.commands.clearContent();
+                    //    this.newComment = JSON.parse(JSON.stringify(this.newComment));
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -280,7 +296,7 @@ export default Vue.extend({
                                     response.post.updatedAt
                                 )
                             );
-                            this.newComment.body = "";
+                            //  this.newComment.body = "";
                         } else {
                             console.log(`posts is null`);
                         }
