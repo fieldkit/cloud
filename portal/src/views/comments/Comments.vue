@@ -245,10 +245,6 @@ export default Vue.extend({
         },
         async save(comment: NewComment): Promise<void> {
 
-            if (comment.body === "") {
-                return;
-            }
-
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -292,7 +288,7 @@ export default Vue.extend({
                                     response.post.updatedAt
                                 )
                             );
-                            //  this.newComment.body = "";
+                            this.newComment.body = "";
                         } else {
                             console.log(`posts is null`);
                         }
