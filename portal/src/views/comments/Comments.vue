@@ -244,7 +244,7 @@ export default Vue.extend({
             }
         },
         async save(comment: NewComment): Promise<void> {
-            console.log("Radoi commm", comment);
+
             if (comment.body === "") {
                 return;
             }
@@ -258,12 +258,8 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    console.log("radoi r", this.$refs);
-
-                    if (this.$refs.tipTap as typeof Tiptap)
-
-                    this.$refs.tipTap?.editor.commands.clearContent();
-                    //    this.newComment = JSON.parse(JSON.stringify(this.newComment));
+                    // TODO: find a way to avoid any
+                    (this.$refs.tipTap as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
