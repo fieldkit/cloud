@@ -285,6 +285,7 @@ export default Vue.extend({
 .photo-container {
     width: 288px;
     max-height: 139px;
+    height: 100%;
     align-self: center;
 
     @include bp-down($sm) {

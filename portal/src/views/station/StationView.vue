@@ -2,11 +2,9 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                backRoute="viewProject"
-                :title="station.name"
-                :subtitle="headerSubtitle"
-                :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
-                :backRouteParams="{ id: projectId }"
+                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
+                :backRouteParams="{ id: projectId || station.id }"
             >
                 <template v-slot:default>
                     <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
@@ -21,6 +19,8 @@
                         <StationPhoto :station="station" />
                         <div>
                             <div class="station-name">{{ station.name }}</div>
+
+                            <div class="station-deployed-date">{{ deployedDate }}</div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
@@ -73,7 +73,9 @@
                         <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
                         <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
                         <span v-for="(project, index) in stationProjects" v-bind:key="project.id">
-                            <span>{{ project.name }}</span>
+                            <router-link :to="{ name: 'viewProject', params: { id: project.id } }" target="_blank">
+                                {{ project.name }}
+                            </router-link>
                             <template v-if="index !== 0 && index !== stationProjects.length - 1">,&nbsp;</template>
                         </span>
                     </div>
@@ -227,8 +229,8 @@ export default Vue.extend({
             const station = this.$state.stations.stations[this.$route.params.stationId];
             return station.attributes;
         },
-        headerSubtitle(): string | null {
-            if (this.station && this.$options.filters?.prettyDate) {
+        deployedDate(): string | null {
+            if (this.station) {
                 const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
                 if (deploymentDate) {
                     return this.$tc("station.deployed") + " " + deploymentDate;
@@ -345,7 +347,6 @@ export default Vue.extend({
     }
 
     &-station {
-        margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
@@ -368,7 +369,7 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            width: 90px;
+            flex: 0 0 90px;
             height: 90px;
             object-fit: cover;
             margin-right: 20px;
@@ -465,7 +466,6 @@ export default Vue.extend({
     }
     &-row {
         padding: 15px 0;
-        max-width: 350px;
         @include flex(center);
 
         &:not(:last-of-type) {
@@ -631,6 +631,11 @@ export default Vue.extend({
         }
     }
 
+    &-deployed-date {
+        color: #6a6d71;
+        margin-bottom: 10px;
+    }
+
     &-projects {
         font-size: 16px;
         color: #6a6d71;
@@ -692,5 +697,9 @@ section {
             color: $color-dark;
         }
     }
+}
+
+::v-deep .back {
+    margin-bottom: 15px;
 }
 </style>

@@ -70,11 +70,6 @@ export default Vue.extend({
                 this.editor.setOptions({ editable: !value });
             }
         },
-        value(value: string): void {
-            if (this.editor) {
-                this.editor.commands.setContent(value);
-            }
-        },
     },
     computed: {
         empty(): boolean {
@@ -292,7 +287,8 @@ export default Vue.extend({
 }
 
 .ProseMirror {
-    @supports (-webkit-touch-callout: none) { // iOS only - prevent zoom in behaviour
+    @supports (-webkit-touch-callout: none) {
+        // iOS only - prevent zoom in behaviour
         font-size: 16px;
     }
 
