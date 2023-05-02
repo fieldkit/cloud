@@ -272,9 +272,11 @@ export default Vue.extend({
         }
     },
     beforeMount(): Promise<any> {
-        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+        const stationId = this.$route.params.stationId;
 
-        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
+        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: stationId });
+
+        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
                 return this.$router.push({
                     name: "login",

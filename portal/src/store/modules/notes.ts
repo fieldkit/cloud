@@ -28,6 +28,14 @@ const actions = (services: Services) => {
             const notes = await services.api.getStationNotes(payload.id);
             commit(MutationTypes.NOTES_UPDATE, notes);
         },
+        [ActionTypes.NEED_FIELD_NOTES]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: NotesState },
+            payload: { id: number }
+        ) => {
+            const notes = await services.api.getStationFieldNotes(payload.id);
+            console.log("radoi notes", notes);
+            commit(MutationTypes.FIELD_NOTES_UPDATE, notes);
+        },
     };
 };
 

@@ -1234,6 +1234,14 @@ class FKApi {
         });
     }
 
+    public getStationFieldNotes(stationId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/station/" + stationId + "/station-notes",
+        });
+    }
+
     public patchStationNotes(stationId: number, payload: any): Promise<any> {
         return this.invoke({
             auth: Auth.Required,

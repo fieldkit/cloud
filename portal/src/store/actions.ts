@@ -47,6 +47,7 @@ export const NOTIFICATIONS_SEEN = "NOTIFICATIONS_SEEN";
 // Notes
 
 export const NEED_NOTES = "NEED_NOTES";
+export const NEED_FIELD_NOTES = "NEED_FIELD_NOTES";
 
 // Snackbar
 

@@ -38,7 +38,7 @@
         <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">There are no comments yet.</div>
         <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
-        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
+        <!--        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
             <transition-group name="fade">
                 <div
                     class="field-note"
@@ -85,7 +85,7 @@
                     </div>
                 </div>
             </transition-group>
-        </div>
+        </div>-->
     </div>
 </template>
 
@@ -93,10 +93,11 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { mapGetters, mapState } from "vuex";
-import { GlobalState } from "@/store";
+import { ActionTypes, AuthenticationRequiredError, GlobalState } from "@/store";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import moment from "moment";
 import _ from "lodash";
+import { PortalStationNotes } from "@/views/notes/model";
 
 interface FieldNote {
     id: number;
@@ -107,7 +108,7 @@ interface FieldNote {
 }
 
 interface GroupedFieldNotes {
-  [date: string]: FieldNote[]
+    [date: string]: FieldNote[];
 }
 
 export default Vue.extend({
@@ -123,7 +124,7 @@ export default Vue.extend({
         }),
     },
     data(): {
-        fieldNotes: GroupedFieldNotes[];
+        fieldNotes: GroupedFieldNotes[] | null;
         isLoading: boolean;
         placeholder: string | null;
         newNote: {
@@ -139,10 +140,10 @@ export default Vue.extend({
         };
         errorMessage: string | null;
         editingFieldNote: FieldNote | null;
-        testFieldNotes: FieldNote[];
     } {
         return {
-            testFieldNotes: [
+            fieldNotes: null,
+            /*fieldNotes: [
                 {
                     id: 0,
                     author: { id: 1, name: "Christine", photo: {} },
@@ -159,7 +160,7 @@ export default Vue.extend({
                     createdAt: 1768775672000,
                     updatedAt: 1868775672000,
                 },
-            ],
+            ],*/
             isLoading: false,
             placeholder: null,
             newNote: {
@@ -176,6 +177,11 @@ export default Vue.extend({
             errorMessage: null,
             editingFieldNote: null,
         };
+    },
+    beforeMount(): void {
+        const stationId = this.$route.params.stationId;
+
+        this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: stationId });
     },
     mounted() {
         this.groupByMonth();
