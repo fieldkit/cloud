@@ -60,10 +60,10 @@ project (add- update|delete- update|modify- update|invites|lookup- invite|accept
 records (data|meta|resolved)
 sensor (meta|station- meta|sensor- meta|data|tail|recently|bookmark|resolve)
 information (device- layout|firmware- statistics)
-station (add|get|transfer|default- photo|update|list- mine|list- project|list- associated|list- project- associated|download- photo|list- all|delete|admin- search|progress)
 tasks five
 test (get|error|email)
 ttn webhook
+station (add|get|transfer|default- photo|update|list- mine|list- project|list- associated|list- project- associated|download- photo|list- all|delete|admin- search|progress)
 user (roles|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- terms- and- conditions|admin- delete|admin- search|mentionables)
 `
 }
@@ -469,6 +469,30 @@ func ParseEndpoint(
 		informationFirmwareStatisticsFlags    = flag.NewFlagSet("firmware- statistics", flag.ExitOnError)
 		informationFirmwareStatisticsAuthFlag = informationFirmwareStatisticsFlags.String("auth", "REQUIRED", "")
 
+		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
+
+		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
+
+		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
+
+		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
+		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
+
+		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
+
+		testEmailFlags       = flag.NewFlagSet("email", flag.ExitOnError)
+		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
+		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
+
+		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
+
+		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
+		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
+		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
+		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
+		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
+		ttnWebhookStreamFlag        = ttnWebhookFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+
 		stationFlags = flag.NewFlagSet("station", flag.ContinueOnError)
 
 		stationAddFlags    = flag.NewFlagSet("add", flag.ExitOnError)
@@ -535,30 +559,6 @@ func ParseEndpoint(
 		stationProgressFlags         = flag.NewFlagSet("progress", flag.ExitOnError)
 		stationProgressStationIDFlag = stationProgressFlags.String("station-id", "REQUIRED", "")
 		stationProgressAuthFlag      = stationProgressFlags.String("auth", "REQUIRED", "")
-
-		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
-
-		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
-
-		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
-
-		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
-		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
-
-		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
-
-		testEmailFlags       = flag.NewFlagSet("email", flag.ExitOnError)
-		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
-		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
-
-		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
-
-		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
-		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
-		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
-		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
-		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
-		ttnWebhookStreamFlag        = ttnWebhookFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		userFlags = flag.NewFlagSet("user", flag.ContinueOnError)
 
@@ -758,6 +758,17 @@ func ParseEndpoint(
 	informationDeviceLayoutFlags.Usage = informationDeviceLayoutUsage
 	informationFirmwareStatisticsFlags.Usage = informationFirmwareStatisticsUsage
 
+	tasksFlags.Usage = tasksUsage
+	tasksFiveFlags.Usage = tasksFiveUsage
+
+	testFlags.Usage = testUsage
+	testGetFlags.Usage = testGetUsage
+	testErrorFlags.Usage = testErrorUsage
+	testEmailFlags.Usage = testEmailUsage
+
+	ttnFlags.Usage = ttnUsage
+	ttnWebhookFlags.Usage = ttnWebhookUsage
+
 	stationFlags.Usage = stationUsage
 	stationAddFlags.Usage = stationAddUsage
 	stationGetFlags.Usage = stationGetUsage
@@ -773,17 +784,6 @@ func ParseEndpoint(
 	stationDeleteFlags.Usage = stationDeleteUsage
 	stationAdminSearchFlags.Usage = stationAdminSearchUsage
 	stationProgressFlags.Usage = stationProgressUsage
-
-	tasksFlags.Usage = tasksUsage
-	tasksFiveFlags.Usage = tasksFiveUsage
-
-	testFlags.Usage = testUsage
-	testGetFlags.Usage = testGetUsage
-	testErrorFlags.Usage = testErrorUsage
-	testEmailFlags.Usage = testEmailUsage
-
-	ttnFlags.Usage = ttnUsage
-	ttnWebhookFlags.Usage = ttnWebhookUsage
 
 	userFlags.Usage = userUsage
 	userRolesFlags.Usage = userRolesUsage
@@ -859,14 +859,14 @@ func ParseEndpoint(
 			svcf = sensorFlags
 		case "information":
 			svcf = informationFlags
-		case "station":
-			svcf = stationFlags
 		case "tasks":
 			svcf = tasksFlags
 		case "test":
 			svcf = testFlags
 		case "ttn":
 			svcf = ttnFlags
+		case "station":
+			svcf = stationFlags
 		case "user":
 			svcf = userFlags
 		default:
@@ -1180,6 +1180,33 @@ func ParseEndpoint(
 
 			}
 
+		case "tasks":
+			switch epn {
+			case "five":
+				epf = tasksFiveFlags
+
+			}
+
+		case "test":
+			switch epn {
+			case "get":
+				epf = testGetFlags
+
+			case "error":
+				epf = testErrorFlags
+
+			case "email":
+				epf = testEmailFlags
+
+			}
+
+		case "ttn":
+			switch epn {
+			case "webhook":
+				epf = ttnWebhookFlags
+
+			}
+
 		case "station":
 			switch epn {
 			case "add":
@@ -1223,33 +1250,6 @@ func ParseEndpoint(
 
 			case "progress":
 				epf = stationProgressFlags
-
-			}
-
-		case "tasks":
-			switch epn {
-			case "five":
-				epf = tasksFiveFlags
-
-			}
-
-		case "test":
-			switch epn {
-			case "get":
-				epf = testGetFlags
-
-			case "error":
-				epf = testErrorFlags
-
-			case "email":
-				epf = testEmailFlags
-
-			}
-
-		case "ttn":
-			switch epn {
-			case "webhook":
-				epf = ttnWebhookFlags
 
 			}
 
@@ -1648,6 +1648,36 @@ func ParseEndpoint(
 				endpoint = c.FirmwareStatistics()
 				data, err = informationc.BuildFirmwareStatisticsPayload(*informationFirmwareStatisticsAuthFlag)
 			}
+		case "tasks":
+			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "five":
+				endpoint = c.Five()
+				data = nil
+			}
+		case "test":
+			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get":
+				endpoint = c.Get()
+				data, err = testc.BuildGetPayload(*testGetIDFlag)
+			case "error":
+				endpoint = c.Error()
+				data = nil
+			case "email":
+				endpoint = c.Email()
+				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
+			}
+		case "ttn":
+			c := ttnc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "webhook":
+				endpoint = c.Webhook()
+				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
+				if err == nil {
+					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
+				}
+			}
 		case "station":
 			c := stationc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -1693,36 +1723,6 @@ func ParseEndpoint(
 			case "progress":
 				endpoint = c.Progress()
 				data, err = stationc.BuildProgressPayload(*stationProgressStationIDFlag, *stationProgressAuthFlag)
-			}
-		case "tasks":
-			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "five":
-				endpoint = c.Five()
-				data = nil
-			}
-		case "test":
-			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "get":
-				endpoint = c.Get()
-				data, err = testc.BuildGetPayload(*testGetIDFlag)
-			case "error":
-				endpoint = c.Error()
-				data = nil
-			case "email":
-				endpoint = c.Email()
-				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
-			}
-		case "ttn":
-			c := ttnc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "webhook":
-				endpoint = c.Webhook()
-				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
-				if err == nil {
-					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
-				}
 			}
 		case "user":
 			c := userc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -3173,218 +3173,6 @@ Example:
 `, os.Args[0])
 }
 
-// stationUsage displays the usage of the station command and its subcommands.
-func stationUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the station service interface.
-Usage:
-    %s [globalflags] station COMMAND [flags]
-
-COMMAND:
-    add: Add implements add.
-    get: Get implements get.
-    transfer: Transfer implements transfer.
-    default- photo: DefaultPhoto implements default photo.
-    update: Update implements update.
-    list- mine: ListMine implements list mine.
-    list- project: ListProject implements list project.
-    list- associated: ListAssociated implements list associated.
-    list- project- associated: ListProjectAssociated implements list project associated.
-    download- photo: DownloadPhoto implements download photo.
-    list- all: ListAll implements list all.
-    delete: Delete implements delete.
-    admin- search: AdminSearch implements admin search.
-    progress: Progress implements progress.
-
-Additional help:
-    %s station COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func stationAddUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station add -body JSON -auth STRING
-
-Add implements add.
-    -body JSON: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station add --body '{
-      "deviceId": "Aliquid a enim.",
-      "locationName": "Culpa odit.",
-      "name": "Atque quaerat est odio ullam debitis.",
-      "statusPb": "Laudantium autem quibusdam distinctio nisi maiores aspernatur."
-   }' --auth "Eius vel pariatur."
-`, os.Args[0])
-}
-
-func stationGetUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station get -id INT32 -auth STRING
-
-Get implements get.
-    -id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station get --id 903725847 --auth "Ab corrupti dicta est."
-`, os.Args[0])
-}
-
-func stationTransferUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station transfer -id INT32 -owner-id INT32 -auth STRING
-
-Transfer implements transfer.
-    -id INT32: 
-    -owner-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station transfer --id 1101779159 --owner-id 1364907105 --auth "Quos sapiente est eos dolores quibusdam laudantium."
-`, os.Args[0])
-}
-
-func stationDefaultPhotoUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station default- photo -id INT32 -photo-id INT32 -auth STRING
-
-DefaultPhoto implements default photo.
-    -id INT32: 
-    -photo-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station default- photo --id 1418667413 --photo-id 2033255282 --auth "Et nihil omnis ut magnam dolor."
-`, os.Args[0])
-}
-
-func stationUpdateUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station update -body JSON -id INT32 -auth STRING
-
-Update implements update.
-    -body JSON: 
-    -id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station update --body '{
-      "locationName": "Repellat voluptatibus.",
-      "name": "Enim dolor corporis quasi consectetur.",
-      "statusPb": "Iure dolor libero est aperiam dolorum eum."
-   }' --id 1827381007 --auth "Autem tenetur voluptatem atque et est quo."
-`, os.Args[0])
-}
-
-func stationListMineUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station list- mine -auth STRING
-
-ListMine implements list mine.
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station list- mine --auth "Dolorem consequatur harum dicta voluptatem."
-`, os.Args[0])
-}
-
-func stationListProjectUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station list- project -id INT32 -disable-filtering BOOL -auth STRING
-
-ListProject implements list project.
-    -id INT32: 
-    -disable-filtering BOOL: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station list- project --id 240016600 --disable-filtering true --auth "Architecto quibusdam tempora corporis ut."
-`, os.Args[0])
-}
-
-func stationListAssociatedUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station list- associated -id INT32 -auth STRING
-
-ListAssociated implements list associated.
-    -id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station list- associated --id 221272064 --auth "Quidem iusto."
-`, os.Args[0])
-}
-
-func stationListProjectAssociatedUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station list- project- associated -project-id INT32 -auth STRING
-
-ListProjectAssociated implements list project associated.
-    -project-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station list- project- associated --project-id 1352657203 --auth "Nam aperiam architecto repudiandae."
-`, os.Args[0])
-}
-
-func stationDownloadPhotoUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station download- photo -station-id INT32 -size INT32 -if-none-match STRING -auth STRING
-
-DownloadPhoto implements download photo.
-    -station-id INT32: 
-    -size INT32: 
-    -if-none-match STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station download- photo --station-id 211605205 --size 328272691 --if-none-match "Cumque quis nobis." --auth "Eos rerum omnis voluptas laudantium laudantium."
-`, os.Args[0])
-}
-
-func stationListAllUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station list- all -page INT32 -page-size INT32 -owner-id INT32 -query STRING -sort-by STRING -auth STRING
-
-ListAll implements list all.
-    -page INT32: 
-    -page-size INT32: 
-    -owner-id INT32: 
-    -query STRING: 
-    -sort-by STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station list- all --page 1069137496 --page-size 1242404553 --owner-id 1131586057 --query "Sequi earum." --sort-by "Eligendi eos." --auth "Est repellendus quia alias qui dolorem."
-`, os.Args[0])
-}
-
-func stationDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station delete -station-id INT32 -auth STRING
-
-Delete implements delete.
-    -station-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station delete --station-id 1118615334 --auth "Est aperiam labore incidunt."
-`, os.Args[0])
-}
-
-func stationAdminSearchUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station admin- search -query STRING -auth STRING
-
-AdminSearch implements admin search.
-    -query STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station admin- search --query "Est eum dignissimos qui." --auth "Reprehenderit quasi molestiae quasi corrupti."
-`, os.Args[0])
-}
-
-func stationProgressUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station progress -station-id INT32 -auth STRING
-
-Progress implements progress.
-    -station-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station progress --station-id 218167103 --auth "Doloremque ipsum voluptatem et velit quas et."
-`, os.Args[0])
-}
-
 // tasksUsage displays the usage of the tasks command and its subcommands.
 func tasksUsage() {
 	fmt.Fprintf(os.Stderr, `Service is the tasks service interface.
@@ -3430,7 +3218,7 @@ Get implements get.
     -id INT64: 
 
 Example:
-    `+os.Args[0]+` test get --id 7963125892625369549
+    `+os.Args[0]+` test get --id 5179345884365850026
 `, os.Args[0])
 }
 
@@ -3452,7 +3240,7 @@ Email implements email.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` test email --address "Nisi voluptas a voluptas." --auth "Error sunt."
+    `+os.Args[0]+` test email --address "Libero placeat nostrum distinctio praesentium." --auth "Cum iure beatae."
 `, os.Args[0])
 }
 
@@ -3480,7 +3268,219 @@ Webhook implements webhook.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` ttn webhook --token "Saepe impedit consequatur aut et quia consequatur." --content-type "Ut placeat reprehenderit ut totam repellendus ipsam." --content-length 5038308363120062154 --auth "Minima quod voluptatem rerum." --stream "goa.png"
+    `+os.Args[0]+` ttn webhook --token "Aut sunt laborum." --content-type "Voluptatem distinctio omnis quia debitis esse." --content-length 4576500773712406007 --auth "A delectus autem cum sapiente." --stream "goa.png"
+`, os.Args[0])
+}
+
+// stationUsage displays the usage of the station command and its subcommands.
+func stationUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the station service interface.
+Usage:
+    %s [globalflags] station COMMAND [flags]
+
+COMMAND:
+    add: Add implements add.
+    get: Get implements get.
+    transfer: Transfer implements transfer.
+    default- photo: DefaultPhoto implements default photo.
+    update: Update implements update.
+    list- mine: ListMine implements list mine.
+    list- project: ListProject implements list project.
+    list- associated: ListAssociated implements list associated.
+    list- project- associated: ListProjectAssociated implements list project associated.
+    download- photo: DownloadPhoto implements download photo.
+    list- all: ListAll implements list all.
+    delete: Delete implements delete.
+    admin- search: AdminSearch implements admin search.
+    progress: Progress implements progress.
+
+Additional help:
+    %s station COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func stationAddUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station add -body JSON -auth STRING
+
+Add implements add.
+    -body JSON: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station add --body '{
+      "deviceId": "Consequatur magnam.",
+      "locationName": "Quaerat pariatur est sint repudiandae exercitationem.",
+      "name": "Qui dolorem pariatur numquam molestiae eligendi.",
+      "statusPb": "Praesentium ut atque exercitationem recusandae et ut."
+   }' --auth "Et est a."
+`, os.Args[0])
+}
+
+func stationGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station get -id INT32 -auth STRING
+
+Get implements get.
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station get --id 391745543 --auth "Facilis autem dolor dolorem."
+`, os.Args[0])
+}
+
+func stationTransferUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station transfer -id INT32 -owner-id INT32 -auth STRING
+
+Transfer implements transfer.
+    -id INT32: 
+    -owner-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station transfer --id 948425858 --owner-id 1362808005 --auth "Doloribus voluptatem maiores vitae."
+`, os.Args[0])
+}
+
+func stationDefaultPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station default- photo -id INT32 -photo-id INT32 -auth STRING
+
+DefaultPhoto implements default photo.
+    -id INT32: 
+    -photo-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station default- photo --id 1288358694 --photo-id 1946626874 --auth "Ipsum est dolorem."
+`, os.Args[0])
+}
+
+func stationUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station update -body JSON -id INT32 -auth STRING
+
+Update implements update.
+    -body JSON: 
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station update --body '{
+      "locationName": "Quibusdam tempora.",
+      "name": "Animi maxime ut magnam sunt ullam velit.",
+      "statusPb": "Ut repellendus."
+   }' --id 913348811 --auth "Quo accusamus."
+`, os.Args[0])
+}
+
+func stationListMineUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- mine -auth STRING
+
+ListMine implements list mine.
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- mine --auth "Soluta eos rerum omnis."
+`, os.Args[0])
+}
+
+func stationListProjectUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- project -id INT32 -disable-filtering BOOL -auth STRING
+
+ListProject implements list project.
+    -id INT32: 
+    -disable-filtering BOOL: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- project --id 1556924332 --disable-filtering true --auth "Sunt eum."
+`, os.Args[0])
+}
+
+func stationListAssociatedUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- associated -id INT32 -auth STRING
+
+ListAssociated implements list associated.
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- associated --id 204486387 --auth "Ipsum totam rerum occaecati voluptatem quibusdam sequi."
+`, os.Args[0])
+}
+
+func stationListProjectAssociatedUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- project- associated -project-id INT32 -auth STRING
+
+ListProjectAssociated implements list project associated.
+    -project-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- project- associated --project-id 94382824 --auth "Vero iusto quis architecto et iusto."
+`, os.Args[0])
+}
+
+func stationDownloadPhotoUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station download- photo -station-id INT32 -size INT32 -if-none-match STRING -auth STRING
+
+DownloadPhoto implements download photo.
+    -station-id INT32: 
+    -size INT32: 
+    -if-none-match STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station download- photo --station-id 1369297733 --size 1535570890 --if-none-match "Qui nihil commodi veritatis necessitatibus est aperiam." --auth "Incidunt aut eum commodi odit velit suscipit."
+`, os.Args[0])
+}
+
+func stationListAllUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station list- all -page INT32 -page-size INT32 -owner-id INT32 -query STRING -sort-by STRING -auth STRING
+
+ListAll implements list all.
+    -page INT32: 
+    -page-size INT32: 
+    -owner-id INT32: 
+    -query STRING: 
+    -sort-by STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station list- all --page 1746820977 --page-size 1731149129 --owner-id 303196356 --query "Rerum qui." --sort-by "Ut laboriosam." --auth "Odit autem."
+`, os.Args[0])
+}
+
+func stationDeleteUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station delete -station-id INT32 -auth STRING
+
+Delete implements delete.
+    -station-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station delete --station-id 737399496 --auth "Minus voluptatibus voluptas voluptatibus."
+`, os.Args[0])
+}
+
+func stationAdminSearchUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station admin- search -query STRING -auth STRING
+
+AdminSearch implements admin search.
+    -query STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station admin- search --query "Sit omnis non." --auth "Sit et necessitatibus."
+`, os.Args[0])
+}
+
+func stationProgressUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] station progress -station-id INT32 -auth STRING
+
+Progress implements progress.
+    -station-id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` station progress --station-id 1360497584 --auth "Voluptas a voluptas."
 `, os.Args[0])
 }
 
@@ -3526,7 +3526,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Quisquam harum at."
+    `+os.Args[0]+` user roles --auth "Quia consequatur minus."
 `, os.Args[0])
 }
 
@@ -3540,7 +3540,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Rerum molestiae velit praesentium." --content-length 4576585892909123315 --auth "Doloribus eveniet qui laborum nulla sit consequatur." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Veniam nemo fugit est sit." --content-length 4389840631904911578 --auth "Laborum blanditiis eum asperiores quisquam harum at." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3553,7 +3553,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 731094370 --size 137567131 --if-none-match "Nulla natus excepturi perferendis."
+    `+os.Args[0]+` user download- photo --user-id 752083634 --size 1009104470 --if-none-match "Nisi animi aut rerum molestiae."
 `, os.Args[0])
 }
 
@@ -3565,8 +3565,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "8o9",
-      "password": "nso"
+      "email": "hiv",
+      "password": "8gd"
    }'
 `, os.Args[0])
 }
@@ -3579,7 +3579,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Corporis tenetur et sed sunt."
+      "email": "Quia magni at."
    }'
 `, os.Args[0])
 }
@@ -3592,8 +3592,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "m7u",
-      "token": "Modi odio saepe quidem quae."
+      "password": "mtl",
+      "token": "Cum fugit impedit nobis eveniet."
    }'
 `, os.Args[0])
 }
@@ -3606,7 +3606,7 @@ Resume implements resume.
 
 Example:
     `+os.Args[0]+` user resume --body '{
-      "token": "Sint commodi dolores quia harum rem rem."
+      "token": "Asperiores sit."
    }'
 `, os.Args[0])
 }
@@ -3618,7 +3618,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Repellendus quis alias ut ab minima."
+    `+os.Args[0]+` user logout --auth "Non placeat aliquam sit."
 `, os.Args[0])
 }
 
@@ -3630,7 +3630,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Asperiores eum unde."
+      "refreshToken": "Rem quis."
    }'
 `, os.Args[0])
 }
@@ -3642,7 +3642,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 724479887
+    `+os.Args[0]+` user send- validation --user-id 1948474800
 `, os.Args[0])
 }
 
@@ -3653,7 +3653,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Aut dolorem minus saepe minus fuga eligendi."
+    `+os.Args[0]+` user validate --token "Numquam non sit asperiores."
 `, os.Args[0])
 }
 
@@ -3707,7 +3707,7 @@ Example:
       "showStations": true,
       "startTime": "Fugiat non non.",
       "tags": "Pariatur voluptatem accusantium cupiditate autem voluptate."
-   }' --user-id 279318176 --auth "Vero doloremque."
+   }' --user-id 882559050 --auth "Aut odio occaecati."
 `, os.Args[0])
 }
 
@@ -3721,9 +3721,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "bgc",
-      "oldPassword": "0u1"
-   }' --user-id 554636725 --auth "Veritatis corporis et."
+      "newPassword": "nfr",
+      "oldPassword": "l5e"
+   }' --user-id 313215352 --auth "Maxime et vero doloremque provident."
 `, os.Args[0])
 }
 
@@ -3737,8 +3737,8 @@ AcceptTnc implements accept tnc.
 
 Example:
     `+os.Args[0]+` user accept- tnc --body '{
-      "accept": true
-   }' --user-id 1405503890 --auth "Velit qui commodi dolores iusto possimus eveniet."
+      "accept": false
+   }' --user-id 1235739298 --auth "Voluptatem numquam maiores natus."
 `, os.Args[0])
 }
 
@@ -3749,7 +3749,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Non perspiciatis ab et ipsam quo ut."
+    `+os.Args[0]+` user get- current --auth "Nesciunt id aut sunt aut qui."
 `, os.Args[0])
 }
 
@@ -3761,7 +3761,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 313839585 --auth "Incidunt repellat iusto."
+    `+os.Args[0]+` user list- by- project --project-id 405011255 --auth "Earum placeat quia."
 `, os.Args[0])
 }
 
@@ -3772,7 +3772,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Maxime sequi sint quas dolores commodi repellendus."
+    `+os.Args[0]+` user issue- transmission- token --auth "Doloribus nisi aut."
 `, os.Args[0])
 }
 
@@ -3796,7 +3796,7 @@ AdminTermsAndConditions implements admin terms and conditions.
 Example:
     `+os.Args[0]+` user admin- terms- and- conditions --body '{
       "email": "Quidem dignissimos enim eos doloremque possimus."
-   }' --auth "Eius est odit corporis ut."
+   }' --auth "Distinctio cum necessitatibus corporis."
 `, os.Args[0])
 }
 
@@ -3811,7 +3811,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Distinctio nobis earum fugiat expedita ducimus.",
       "password": "Et vel ut quis reprehenderit."
-   }' --auth "Libero repellat quisquam aut sed."
+   }' --auth "Debitis et debitis."
 `, os.Args[0])
 }
 
@@ -3823,7 +3823,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Eum et voluptatibus." --auth "Perferendis rerum ullam omnis."
+    `+os.Args[0]+` user admin- search --query "Omnis voluptatem consectetur ipsam repellendus." --auth "Saepe tempore nihil autem."
 `, os.Args[0])
 }
 
@@ -3837,6 +3837,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 114757515 --bookmark "Repellat architecto rem natus ut ut." --query "Ab laboriosam ab." --auth "Qui deleniti sunt fugiat et laboriosam earum."
+    `+os.Args[0]+` user mentionables --project-id 1982673352 --bookmark "Sequi aut non facilis." --query "Sit quo." --auth "Et illo architecto."
 `, os.Args[0])
 }

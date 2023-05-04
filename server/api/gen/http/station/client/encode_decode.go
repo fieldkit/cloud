@@ -2112,6 +2112,22 @@ func unmarshalStationOwnerResponseBodyToStationviewsStationOwnerView(v *StationO
 		Name:  v.Name,
 		Email: v.Email,
 	}
+	if v.Photo != nil {
+		res.Photo = unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView(v.Photo)
+	}
+
+	return res
+}
+
+// unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView builds a value of
+// type *stationviews.UserPhotoView from a value of type *UserPhotoResponseBody.
+func unmarshalUserPhotoResponseBodyToStationviewsUserPhotoView(v *UserPhotoResponseBody) *stationviews.UserPhotoView {
+	if v == nil {
+		return nil
+	}
+	res := &stationviews.UserPhotoView{
+		URL: v.URL,
+	}
 
 	return res
 }

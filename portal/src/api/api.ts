@@ -253,6 +253,9 @@ export interface Project {
 export interface Owner {
     id: number;
     name: string;
+    photo: {
+        url: string;
+    };
 }
 
 export interface Upload {
