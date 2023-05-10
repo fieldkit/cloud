@@ -372,7 +372,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            min-height: 192px;
             position: relative;
             border-radius: 2px;
             overflow: hidden;
@@ -594,6 +593,7 @@ export default Vue.extend({
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
+        max-height: 390px;
 
         @include bp-down($sm) {
             margin-top: 20px;
@@ -616,10 +616,6 @@ export default Vue.extend({
                 margin-top: 5px;
                 height: 35px;
             }
-        }
-
-        .photo {
-            flex: 0 0 calc(50% - 5px);
         }
     }
 
