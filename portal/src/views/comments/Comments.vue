@@ -6,7 +6,13 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                    <Tiptap
+                        ref="tipTap"
+                        v-model="newComment.body"
+                        placeholder="Join the discussion!"
+                        saveLabel="Post"
+                        @save="save(newComment)"
+                    />
                 </div>
             </template>
             <template v-else>
@@ -238,6 +244,7 @@ export default Vue.extend({
             }
         },
         async save(comment: NewComment): Promise<void> {
+
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -247,7 +254,8 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    this.newComment.body = "";
+                    // TODO: find a way to avoid any
+                    (this.$refs.tipTap as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
