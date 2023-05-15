@@ -94,6 +94,7 @@ export default Vue.extend({
                         message: this.$tc("notes.updateSuccess"),
                         type: SnackbarStyle.success,
                     });
+                    this.$emit('saved');
                 })
                 .catch(() => {
                   this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {

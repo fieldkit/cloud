@@ -129,6 +129,7 @@
                     :notes="{ notes, media }"
                     :readonly="station.readOnly"
                     @change="dirtyNotes = true"
+                    @saved="dirtyNotes = false"
                 />
             </section>
         </div>
