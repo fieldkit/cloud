@@ -426,6 +426,7 @@ const routes = [
         },
         meta: {
             secured: true,
+            bodyClass: "disable-scrolling",
         },
     },
     {

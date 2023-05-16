@@ -76,22 +76,16 @@
                     </div>
                 </div>
                 <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                    <div class="photo-container cursor-pointer" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                         <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                         <div v-else class="photo-placeholder">
                             <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                         </div>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
+                    <a @click="navigateToPhotos()" class="station-photos-nav cursor-pointer">
                         <i class="icon icon-grid"></i>
                         {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
+                    </a>
                 </div>
             </section>
 
@@ -306,6 +300,12 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
+        },
     },
 });
 </script>
@@ -372,7 +372,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            min-height: 192px;
             position: relative;
             border-radius: 2px;
             overflow: hidden;
@@ -594,6 +593,7 @@ export default Vue.extend({
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
+        max-height: 390px;
 
         @include bp-down($sm) {
             margin-top: 20px;
@@ -616,10 +616,6 @@ export default Vue.extend({
                 margin-top: 5px;
                 height: 35px;
             }
-        }
-
-        .photo {
-            flex: 0 0 calc(50% - 5px);
         }
     }
 
