@@ -53,6 +53,7 @@
         "vue-multiselect": "^2.1.6",
         "vue-property-decorator": "^8.4.2",
         "vue-router": "^3.2.0",
+        "vue-silentbox": "^2.4.6",
         "vue-tiptap": "^2.1.0",
         "vue-tribute": "^1.0.7",
         "vuelidate": "^0.7.5",
