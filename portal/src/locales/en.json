@@ -219,7 +219,9 @@
         "belongsTo": "Belongs To:",
         "addDescription": "Add a station description",
         "singleProjectTitle": "Project:",
-        "multipleProjectsTitle": "Projects:"
+        "multipleProjectsTitle": "Projects:",
+        "data": "Data",
+        "exploreData": "Explore Data"
     },
     "user": {
         "profile": {

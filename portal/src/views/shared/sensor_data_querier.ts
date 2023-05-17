@@ -71,7 +71,6 @@ export class SensorDataQuerier {
                         stations: { [stationId]: response.stations[stationId] },
                     };
                 });
-
                 const quickSensorsQuery = quickSensors.then((response) => {
                     return {
                         station: response.stations[stationId],

@@ -142,6 +142,21 @@
                 </div>
             </section>
 
+            <section class="container-box" v-if="station.modules.length > 0 && isUserTeamMemberOfStation">
+                <h2>{{ $t("station.data") }}</h2>
+
+                <ul class="flex flex-wrap flex-space-between">
+                    <li class="module-data-item" v-for="module in station.modules" v-bind:key="module.name">
+                        <h3 class="module-data-title flex flex-al-center">
+                            <img alt="Module icon" :src="getModuleImg(module)" />
+                            {{ $t(getModuleName(module)) }}
+                        </h3>
+                        <TinyChart :moduleKey="module.name" :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                    </li>
+                </ul>
+                <button class="btn module-data-btn" @click="onClickExplore">{{ $t("station.exploreData") }}</button>
+            </section>
+
             <section class="container-box section-readings" v-if="selectedModule">
                 <div class="station-readings">
                     <ul>
@@ -245,6 +260,10 @@ import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCust
 import UserPhoto from "@/views/shared/UserPhoto.vue";
 import { Project } from "@/api";
 import { mapState } from "vuex";
+import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
+import TinyChart from "@/views/viz/TinyChart.vue";
+import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
+import { ExploreContext } from "@/views/viz/common";
 
 export default Vue.extend({
     name: "StationView",
@@ -258,6 +277,7 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
+        TinyChart,
         UserPhoto,
     },
     data(): {
@@ -265,6 +285,7 @@ export default Vue.extend({
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
         form: {
@@ -283,6 +304,7 @@ export default Vue.extend({
             form: {
                 description: null,
             },
+            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     watch: {
@@ -410,6 +432,14 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        onClickExplore() {
+            const exploreContext = new ExploreContext();
+            const bm = BookmarkFactory.forStation(this.station.id, exploreContext);
+            return this.$router.push({
+                name: "exploreBookmark",
+                query: { bookmark: serializeBookmark(bm) },
+            });
+        },
         navigateToPhotos(): void {
             this.$router.push({
                 name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
@@ -459,6 +489,10 @@ export default Vue.extend({
     @include bp-down($xs) {
         padding: 10px;
     }
+}
+
+.container-title {
+    font-size: 20px;
 }
 
 .section {
@@ -897,6 +931,33 @@ section {
             color: $color-dark;
         }
     }
+}
+
+.module-data-item {
+    flex: 0 0 calc(50% - 10px);
+    min-width: 0;
+    margin-bottom: 30px;
+
+    @include bp-down($sm) {
+        flex: 0 0 100%;
+    }
+}
+
+.module-data-title {
+    color: $color-primary;
+    font-size: 12px;
+    margin-bottom: 10px;
+
+    img {
+        margin-right: 7px;
+        width: 19px;
+        height: 19px;
+    }
+}
+
+.module-data-btn {
+    margin: 0 auto 8px auto;
+    display: block;
 }
 
 .module-edit-name {

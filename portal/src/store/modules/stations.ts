@@ -71,7 +71,6 @@ export class SensorMeta {
         if (byKey.length == 0) {
             throw new Error(`viz: Missing sensor meta: ${sensorKey}`);
         }
-
         return byKey[0];
     }
 

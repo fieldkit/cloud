@@ -208,6 +208,7 @@ type UpdateModuleResponseBody struct {
 	ReadOnly           *bool                                 `form:"readOnly,omitempty" json:"readOnly,omitempty" xml:"readOnly,omitempty"`
 	Status             *string                               `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 	Hidden             *bool                                 `form:"hidden,omitempty" json:"hidden,omitempty" xml:"hidden,omitempty"`
+	Description        *string                               `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
 	Battery            *float32                              `form:"battery,omitempty" json:"battery,omitempty" xml:"battery,omitempty"`
 	RecordingStartedAt *int64                                `form:"recordingStartedAt,omitempty" json:"recordingStartedAt,omitempty" xml:"recordingStartedAt,omitempty"`
 	MemoryUsed         *int32                                `form:"memoryUsed,omitempty" json:"memoryUsed,omitempty" xml:"memoryUsed,omitempty"`
@@ -2690,6 +2691,7 @@ func NewUpdateModuleStationFullOK(body *UpdateModuleResponseBody) *stationviews.
 		ReadOnly:           body.ReadOnly,
 		Status:             body.Status,
 		Hidden:             body.Hidden,
+		Description:        body.Description,
 		Battery:            body.Battery,
 		RecordingStartedAt: body.RecordingStartedAt,
 		MemoryUsed:         body.MemoryUsed,

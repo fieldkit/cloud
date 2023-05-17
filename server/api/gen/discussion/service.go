@@ -104,7 +104,6 @@ type ThreadedPost struct {
 	Replies   []*ThreadedPost
 	Body      string
 	Bookmark  *string
-	CanDelete *bool
 }
 
 type PostAuthor struct {
