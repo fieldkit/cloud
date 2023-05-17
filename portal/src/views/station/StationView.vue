@@ -15,7 +15,7 @@
 
             <section class="section-station">
                 <div class="container-box">
-                    <div class="flex">
+                    <div class="flex flex-al-center">
                         <StationPhoto :station="station" />
                         <div class="w-100">
                             <div class="station-name">{{ station.name }}</div>
@@ -466,6 +466,12 @@ export default Vue.extend({
         selectModule(module: DisplayModule) {
             this.selectedModule = module;
         },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
+        },
     },
 });
 </script>
@@ -868,6 +874,25 @@ export default Vue.extend({
     &-deployed-date {
         color: #6a6d71;
         margin-bottom: 10px;
+        margin-right: 5px;
+    }
+
+    &-owner {
+        color: #6a6d71;
+        font-size: 10px;
+        margin-bottom: 10px;
+        @include flex(center);
+
+        ::v-deep .default-user-icon {
+            width: 18px;
+            height: 18px;
+            margin-top: 0;
+            margin-right: 5px;
+        }
+
+        span {
+            margin-left: 3px;
+        }
     }
 
     &-projects {
