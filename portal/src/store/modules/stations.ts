@@ -36,6 +36,7 @@ import * as d3 from "d3";
 export const NEED_SENSOR_META = "NEED_SENSOR_META";
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
 export const HAVE_USER_PROJECTS = "HAVE_USER_PROJECTS";
+export const HAVE_STATION_PROJECTS = "HAVE_STATION_PROJECTS";
 export const HAVE_COMMUNITY_PROJECTS = "HAVE_COMMUNITY_PROJECTS";
 export const PROJECT_USERS = "PROJECT_USERS";
 export const PROJECT_FOLLOWS = "PROJECT_FOLLOWS";
@@ -502,6 +503,7 @@ export class StationsState {
     };
     mapped: MappedStations | null = null;
     readings: { [index: number]: StationReadings } = {};
+    stationProjects: { [index: number]: Project } = {};
 }
 
 export class DisplayProject {
@@ -564,6 +566,9 @@ const getters = {
     },
     isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
         return state.projectUsers[projectId].some((user) => user.user.id === userId && user.role === UserRolesEnum.admin);
+    },
+    stationProjects(state: StationsState): { [index: number]: Project } {
+        return state.stationProjects;
     },
 };
 
@@ -761,6 +766,16 @@ const actions = (services: Services) => {
 
             return project;
         },
+        [ActionTypes.NEED_PROJECTS_FOR_STATION]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            payload: { id: number }
+        ) => {
+            commit(MutationTypes.LOADING, { stationProjects: true });
+
+            const stationProjects = await services.api.getProjectsForStation(payload.id);
+            commit(HAVE_STATION_PROJECTS, stationProjects.projects);
+            commit(MutationTypes.LOADING, { stationProjects: false });
+        },
     };
 };
 
@@ -794,6 +809,9 @@ const mutations = {
             _.keyBy(projects, (p) => p.id)
         );
         Vue.set(state, "projects", { ...state.projects, ..._.keyBy(projects, (p) => p.id) });
+    },
+    [HAVE_STATION_PROJECTS]: (state: StationsState, projects: Project[]) => {
+        Vue.set(state, "stationProjects", projects);
     },
     [HAVE_USER_STATIONS]: (state: StationsState, payload: { stations: Station[]; recently: QueryRecentlyResponse | null }) => {
         const userStations = makeDisplayStations(state.sensorMeta, payload.stations, payload.recently);

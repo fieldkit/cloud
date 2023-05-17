@@ -217,7 +217,9 @@
         "inactive": "Inactive",
         "ownerAvatar": "Owner avatar",
         "belongsTo": "Belongs To:",
-        "addDescription": "Add a station description"
+        "addDescription": "Add a station description",
+        "singleProjectTitle": "Project:",
+        "multipleProjectsTitle": "Projects:"
     },
     "user": {
         "profile": {

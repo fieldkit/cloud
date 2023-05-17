@@ -111,6 +111,16 @@
                     </div>
                 </div>
                 <div>
+                    <div class="station-projects" v-if="stationProjects.length > 0">
+                        <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
+                        <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
+                        <span v-for="(project, index) in stationProjects" v-bind:key="project.id">
+                            <router-link :to="{ name: 'viewProject', params: { id: project.id } }" target="_blank">
+                                {{ project.name }}
+                            </router-link>
+                            <template v-if="index !== 0 && index !== stationProjects.length - 1">,&nbsp;</template>
+                        </span>
+                    </div>
                     <div v-if="photos" class="station-photos">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
@@ -118,10 +128,16 @@
                                 <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                             </div>
                         </div>
-                      <a @click="navigateToPhotos()" class="station-photos-nav cursor-pointer">
-                        <i class="icon icon-grid"></i>
-                        {{ $t("station.btn.linkToPhotos") }}
-                      </a>
+                        <router-link
+                            :to="{
+                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
+                                params: { projectId: projectId, stationId: station.id },
+                            }"
+                            class="station-photos-nav"
+                        >
+                            <i class="icon icon-grid"></i>
+                            {{ $t("station.btn.linkToPhotos") }}
+                        </router-link>
                     </div>
                 </div>
             </section>
@@ -216,6 +232,7 @@ import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
+import { Project } from "@/api";
 
 export default Vue.extend({
     name: "StationView",
@@ -316,6 +333,9 @@ export default Vue.extend({
 
             return false;
         },
+        stationProjects(): Project[] {
+            return this.$store.getters.stationProjects;
+        },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
@@ -341,6 +361,7 @@ export default Vue.extend({
     },
     beforeMount(): Promise<any> {
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+        this.$store.dispatch(ActionTypes.NEED_PROJECTS_FOR_STATION, { id: this.$route.params.stationId });
 
         return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
@@ -778,6 +799,21 @@ export default Vue.extend({
     &-description-add {
         opacity: 0.5;
     }
+
+    &-deployed-date {
+        color: #6a6d71;
+        margin-bottom: 10px;
+    }
+
+    &-projects {
+        font-size: 16px;
+        color: #6a6d71;
+        margin: 30px 0;
+
+        @include bp-down($xs) {
+            margin: 20px 0;
+        }
+    }
 }
 
 .small-light {
@@ -837,6 +873,10 @@ section {
     font-size: 12px;
     margin-left: 7px;
     margin-bottom: -1px;
+}
+
+::v-deep .back {
+    margin-bottom: 15px;
 }
 
 ::v-deep .back {
