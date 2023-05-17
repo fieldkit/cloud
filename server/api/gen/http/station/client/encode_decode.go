@@ -2091,6 +2091,161 @@ func DecodeProgressResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// BuildUpdateModuleRequest instantiates a HTTP request object with method and
+// path set to call the "station" service "update module" endpoint
+func (c *Client) BuildUpdateModuleRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id       int32
+		moduleID int32
+	)
+	{
+		p, ok := v.(*station.UpdateModulePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("station", "update module", "*station.UpdateModulePayload", v)
+		}
+		id = p.ID
+		moduleID = p.ModuleID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateModuleStationPath(id, moduleID)}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("station", "update module", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateModuleRequest returns an encoder for requests sent to the
+// station update module server.
+func EncodeUpdateModuleRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*station.UpdateModulePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("station", "update module", "*station.UpdateModulePayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewUpdateModuleRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("station", "update module", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateModuleResponse returns a decoder for responses returned by the
+// station update module endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeUpdateModuleResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeUpdateModuleResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateModuleResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update module", err)
+			}
+			p := NewUpdateModuleStationFullOK(&body)
+			view := "default"
+			vres := &stationviews.StationFull{Projected: p, View: view}
+			if err = stationviews.ValidateStationFull(vres); err != nil {
+				return nil, goahttp.ErrValidationError("station", "update module", err)
+			}
+			res := station.NewStationFull(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body UpdateModuleUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update module", err)
+			}
+			err = ValidateUpdateModuleUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "update module", err)
+			}
+			return nil, NewUpdateModuleUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body UpdateModuleForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update module", err)
+			}
+			err = ValidateUpdateModuleForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "update module", err)
+			}
+			return nil, NewUpdateModuleForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body UpdateModuleNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update module", err)
+			}
+			err = ValidateUpdateModuleNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "update module", err)
+			}
+			return nil, NewUpdateModuleNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body UpdateModuleBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("station", "update module", err)
+			}
+			err = ValidateUpdateModuleBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("station", "update module", err)
+			}
+			return nil, NewUpdateModuleBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("station", "update module", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalStationFullModelResponseBodyToStationviewsStationFullModelView
 // builds a value of type *stationviews.StationFullModelView from a value of
 // type *StationFullModelResponseBody.
@@ -2260,6 +2415,7 @@ func unmarshalStationModuleResponseBodyToStationviewsStationModuleView(v *Statio
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             v.Name,
+		Label:            v.Label,
 		Position:         v.Position,
 		Flags:            v.Flags,
 		Internal:         v.Internal,

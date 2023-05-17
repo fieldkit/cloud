@@ -92,8 +92,8 @@
                             <span class="bold">{{ $tc("station.modules") }}</span>
                             <div class="station-modules ml-10">
                                 <img
-                                    v-for="module in station.modules"
-                                    v-bind:key="module.name"
+                                    v-for="(module, moduleIndex) in station.modules"
+                                    v-bind:key="moduleIndex"
                                     alt="Module icon"
                                     :src="getModuleImg(module)"
                                 />
@@ -147,26 +147,36 @@
                     <ul>
                         <li
                             v-for="(module, moduleIndex) in station.modules"
-                            v-bind:key="module.name"
+                            v-bind:key="moduleIndex"
                             :class="{ active: module.name === selectedModule.name }"
-                            @click="selectedModule = module"
+                            @click="selectModule(module)"
                         >
-                            <img v-bind:key="module.name" alt="Module icon" :src="getModuleImg(module)" />
+                            <img alt="Module icon" :src="getModuleImg(module)" />
                             <input
+                                v-if="editedModule && editedModule.id === module.id"
                                 class="input"
                                 maxlength="25"
-                                :disabled="editModuleIndex !== moduleIndex"
-                                :value="$t(getModuleName(module))"
+                                :disabled="editedModule.id !== selectedModule.id"
+                                :title="editedModule.label"
+                                v-model="editedModule.label"
                             />
-                            <template v-if="!isCustomizationEnabled()">
+                            <input
+                                v-else
+                                class="input"
+                                maxlength="25"
+                                :title="module.label ? module.label : $t(getModuleName(module))"
+                                disabled
+                                :value="module.label ? module.label : $t(getModuleName(module))"
+                            />
+                            <template v-if="!isCustomizationEnabled() && isUserTeamMemberOfStation">
                                 <a
-                                    v-if="editModuleIndex !== moduleIndex"
-                                    @click="onEditModuleNameClick(moduleIndex)"
+                                    v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
+                                    @click="onEditModuleNameClick(module)"
                                     class="module-edit-name"
                                 >
                                     {{ $t("edit") }}
                                 </a>
-                                <a v-if="editModuleIndex === moduleIndex" @click="saveModuleName()" class="module-edit-name">
+                                <a v-if="editedModule && editedModule.id === module.id" @click="saveModuleName()" class="module-edit-name">
                                     {{ $t("save") }}
                                 </a>
                             </template>
@@ -219,6 +229,7 @@ import {
     BoundingRectangle,
     DisplayModule,
     DisplayStation,
+    GlobalState,
     MappedStations,
     ProjectAttribute,
     ProjectModule,
@@ -233,6 +244,7 @@ import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
 import { Project } from "@/api";
+import { mapState } from "vuex";
 
 export default Vue.extend({
     name: "StationView",
@@ -258,12 +270,14 @@ export default Vue.extend({
         form: {
             description: string | null;
         };
+        editedModule: DisplayModule | null;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
             form: {
@@ -279,6 +293,9 @@ export default Vue.extend({
         },
     },
     computed: {
+        ...mapState({
+            userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
+        }),
         isUserTeamMemberOfStation(): boolean {
             return this.$getters.isUserTeamMemberOfStation(this.station.id);
         },
@@ -398,16 +415,25 @@ export default Vue.extend({
                 params: { projectId: this.projectId, stationId: this.station.id },
             });
         },
-        onEditModuleNameClick(index): void {
-            this.editModuleIndex = index;
-        },
-        saveModuleName(): void {
-            console.log("TEst");
-        },
         updateStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
             this.editingDescription = false;
+        },
+        onEditModuleNameClick(module: DisplayModule): void {
+            this.editedModule = JSON.parse(JSON.stringify(module));
+        },
+        saveModuleName(): void {
+            if (!this.editedModule) {
+                return;
+            }
+            const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
+            this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
+                this.editedModule = null;
+            });
+        },
+        selectModule(module: DisplayModule) {
+            this.selectedModule = module;
         },
     },
 });
@@ -615,7 +641,7 @@ export default Vue.extend({
 
         li {
             @include flex(center);
-            min-width: 250px;
+            width: 300px;
             padding: 13px 16px;
             cursor: pointer;
             border-right: 1px solid var(--color-border);
@@ -645,6 +671,10 @@ export default Vue.extend({
 
             input {
                 margin-left: 5px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 100%;
             }
         }
 
@@ -881,5 +911,12 @@ section {
 
 ::v-deep .back {
     margin-bottom: 15px;
+}
+
+.module-edit-name {
+    opacity: 0.4;
+    font-size: 12px;
+    margin-bottom: -1px;
+    cursor: pointer;
 }
 </style>

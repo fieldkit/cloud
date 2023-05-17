@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Aliquid a enim.\",\n      \"locationName\": \"Culpa odit.\",\n      \"name\": \"Atque quaerat est odio ullam debitis.\",\n      \"statusPb\": \"Laudantium autem quibusdam distinctio nisi maiores aspernatur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"deviceId\": \"Laborum possimus.\",\n      \"locationName\": \"Et doloribus culpa eum incidunt ut eum.\",\n      \"name\": \"Nisi maiores aspernatur sunt eius vel pariatur.\",\n      \"statusPb\": \"Corrupti ea iusto.\"\n   }'")
 		}
 	}
 	var auth string
@@ -145,7 +145,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Repellat voluptatibus.\",\n      \"name\": \"Enim dolor corporis quasi consectetur.\",\n      \"statusPb\": \"Iure dolor libero est aperiam dolorum eum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"locationName\": \"Tenetur voluptatem.\",\n      \"name\": \"Est aperiam dolorum eum unde quia.\",\n      \"statusPb\": \"Et est quo sed ipsam.\"\n   }'")
 		}
 	}
 	var id int32
@@ -449,6 +449,49 @@ func BuildProgressPayload(stationProgressStationID string, stationProgressAuth s
 	}
 	v := &station.ProgressPayload{}
 	v.StationID = stationID
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildUpdateModulePayload builds the payload for the station update module
+// endpoint from CLI flags.
+func BuildUpdateModulePayload(stationUpdateModuleBody string, stationUpdateModuleID string, stationUpdateModuleModuleID string, stationUpdateModuleAuth string) (*station.UpdateModulePayload, error) {
+	var err error
+	var body UpdateModuleRequestBody
+	{
+		err = json.Unmarshal([]byte(stationUpdateModuleBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"label\": \"Quae maiores eos omnis.\"\n   }'")
+		}
+	}
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationUpdateModuleID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var moduleID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(stationUpdateModuleModuleID, 10, 32)
+		moduleID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for moduleID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = stationUpdateModuleAuth
+	}
+	v := &station.UpdateModulePayload{
+		Label: body.Label,
+	}
+	v.ID = id
+	v.ModuleID = moduleID
 	v.Auth = auth
 
 	return v, nil

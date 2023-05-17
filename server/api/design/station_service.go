@@ -68,6 +68,7 @@ var StationModule = Type("StationModule", func() {
 	Attribute("hardwareIdBase64", String)
 	Attribute("metaRecordId", Int64)
 	Attribute("name", String)
+	Attribute("label", String)
 	Attribute("position", Int32)
 	Attribute("flags", Int32)
 	Attribute("internal", Boolean)
@@ -670,6 +671,31 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			GET("stations/{stationId}/progress")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("update module", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("moduleId", Int32)
+			Required("moduleId")
+			Attribute("label", String)
+			Required("label")
+		})
+
+		Result(StationFull)
+
+		HTTP(func() {
+			PATCH("stations/{id}/modules/{moduleId}")
 
 			httpAuthentication()
 		})

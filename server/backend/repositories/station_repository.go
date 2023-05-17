@@ -291,7 +291,8 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
                           name = EXCLUDED.name,
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
-						  version = EXCLUDED.version
+						  version = EXCLUDED.version,
+						  label = EXCLUDED.label
 		RETURNING id
 		`, module); err != nil {
 		return nil, err
@@ -299,6 +300,26 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 
 	if originalName != module.Name {
 		Logger(ctx).Sugar().Infow("module:renamed", "original_name", originalName, "name", module.Name, "module_id", module.ID, "verbose", true)
+	}
+
+	return module, nil
+}
+
+func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+
+	if _, err := r.db.NamedExecContext(ctx, `
+        UPDATE fieldkit.station_module SET
+			  module_index = :module_index,
+              position = :position,
+              flags = :flags,
+              name = :name,
+              manufacturer = :manufacturer,
+              kind = :kind,
+              version = :version,
+              label = :label
+		WHERE id = :id
+		`, module); err != nil {
+		return nil, err
 	}
 
 	return module, nil
@@ -1520,4 +1541,16 @@ func (r *StationRepository) QueryAssociatedStations(ctx context.Context, station
 
 		return byID, nil
 	}
+}
+
+func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32) (module *data.StationModule, err error) {
+	module = &data.StationModule{}
+	if err := r.db.GetContext(ctx, module, `
+		SELECT
+			id, configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
+		FROM fieldkit.station_module WHERE id = $1
+		`, id); err != nil {
+		return nil, err
+	}
+	return module, nil
 }

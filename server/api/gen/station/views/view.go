@@ -182,6 +182,7 @@ type StationModuleView struct {
 	HardwareIDBase64 *string
 	MetaRecordID     *int64
 	Name             *string
+	Label            *string
 	Position         *int32
 	Flags            *int32
 	Internal         *bool

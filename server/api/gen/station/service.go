@@ -45,6 +45,8 @@ type Service interface {
 	AdminSearch(context.Context, *AdminSearchPayload) (res *PageOfStations, err error)
 	// Progress implements progress.
 	Progress(context.Context, *ProgressPayload) (res *StationProgress, err error)
+	// UpdateModule implements update module.
+	UpdateModule(context.Context, *UpdateModulePayload) (res *StationFull, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -61,7 +63,7 @@ const ServiceName = "station"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [14]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "list project associated", "download photo", "list all", "delete", "admin search", "progress"}
+var MethodNames = [15]string{"add", "get", "transfer", "default photo", "update", "list mine", "list project", "list associated", "list project associated", "download photo", "list all", "delete", "admin search", "progress", "update module"}
 
 // AddPayload is the payload type of the station service add method.
 type AddPayload struct {
@@ -233,6 +235,15 @@ type StationProgress struct {
 	Jobs []*StationJob
 }
 
+// UpdateModulePayload is the payload type of the station service update module
+// method.
+type UpdateModulePayload struct {
+	Auth     string
+	ID       int32
+	ModuleID int32
+	Label    string
+}
+
 type StationFullModel struct {
 	Name                      string
 	OnlyVisibleViaAssociation bool
@@ -305,6 +316,7 @@ type StationModule struct {
 	HardwareIDBase64 *string
 	MetaRecordID     *int64
 	Name             string
+	Label            *string
 	Position         int32
 	Flags            int32
 	Internal         bool
@@ -1144,6 +1156,7 @@ func transformStationviewsStationModuleViewToStationModule(v *stationviews.Stati
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             *v.Name,
+		Label:            v.Label,
 		Position:         *v.Position,
 		Flags:            *v.Flags,
 		Internal:         *v.Internal,
@@ -1413,6 +1426,7 @@ func transformStationModuleToStationviewsStationModuleView(v *StationModule) *st
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             &v.Name,
+		Label:            v.Label,
 		Position:         &v.Position,
 		Flags:            &v.Flags,
 		Internal:         &v.Internal,

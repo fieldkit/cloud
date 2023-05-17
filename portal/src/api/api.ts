@@ -292,6 +292,7 @@ export interface ModuleSensor {
 export interface StationModule {
     id: number;
     name: string;
+    label?: string; // custom name
     hardwareId: string;
     hardwareIdBase64: string;
     position: number;
@@ -1064,6 +1065,16 @@ class FKApi {
             auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/modules/meta",
+        });
+    }
+
+    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.stationId + "/modules/" + data.moduleId,
+            data: {label: data.label},
         });
     }
 

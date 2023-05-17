@@ -80,6 +80,7 @@ type StationModule struct {
 	HardwareIDBase64 *string
 	MetaRecordID     *int64
 	Name             string
+	Label            *string
 	Position         int32
 	Flags            int32
 	Internal         bool
@@ -239,6 +240,7 @@ func transformInformationviewsStationModuleViewToStationModule(v *informationvie
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             *v.Name,
+		Label:            v.Label,
 		Position:         *v.Position,
 		Flags:            *v.Flags,
 		Internal:         *v.Internal,
@@ -347,6 +349,7 @@ func transformStationModuleToInformationviewsStationModuleView(v *StationModule)
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             &v.Name,
+		Label:            v.Label,
 		Position:         &v.Position,
 		Flags:            &v.Flags,
 		Internal:         &v.Internal,
