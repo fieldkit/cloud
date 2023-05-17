@@ -309,6 +309,7 @@ export default Vue.extend({
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
+            console.log("radoi this.$state.notes.notes", this.$state.notes.notes);
             return this.$state.notes.notes;
         },
         media(): PortalNoteMedia[] {

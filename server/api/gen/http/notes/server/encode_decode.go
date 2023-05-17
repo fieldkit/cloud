@@ -646,9 +646,10 @@ func unmarshalFieldNoteUpdateRequestBodyToNotesFieldNoteUpdate(v *FieldNoteUpdat
 // *ExistingFieldNoteRequestBody.
 func unmarshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFieldNoteRequestBody) *notes.ExistingFieldNote {
 	res := &notes.ExistingFieldNote{
-		ID:   *v.ID,
-		Key:  v.Key,
-		Body: v.Body,
+		ID:    *v.ID,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -664,8 +665,9 @@ func unmarshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFi
 // *notes.NewFieldNote from a value of type *NewFieldNoteRequestBody.
 func unmarshalNewFieldNoteRequestBodyToNotesNewFieldNote(v *NewFieldNoteRequestBody) *notes.NewFieldNote {
 	res := &notes.NewFieldNote{
-		Key:  v.Key,
-		Body: v.Body,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -685,6 +687,7 @@ func marshalNotesviewsFieldNoteViewToFieldNoteResponseBody(v *notesviews.FieldNo
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
 		Key:       v.Key,
+		Title:     v.Title,
 		Body:      v.Body,
 		Version:   *v.Version,
 	}

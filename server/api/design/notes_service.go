@@ -33,6 +33,7 @@ var FieldNote = Type("FieldNote", func() {
 	Attribute("updatedAt", Int64)
 	Attribute("author", FieldNoteAuthor)
 	Attribute("key", String)
+	Attribute("title", String)
 	Attribute("body", String)
 	Attribute("version", Int64)
 	Attribute("media", ArrayOf(NoteMedia))
@@ -42,6 +43,7 @@ var FieldNote = Type("FieldNote", func() {
 var ExistingFieldNote = Type("ExistingFieldNote", func() {
 	Attribute("id", Int64)
 	Attribute("key", String)
+	Attribute("title", String)
 	Attribute("body", String)
 	Attribute("mediaIds", ArrayOf(Int64))
 	Required("id")
@@ -49,6 +51,7 @@ var ExistingFieldNote = Type("ExistingFieldNote", func() {
 
 var NewFieldNote = Type("NewFieldNote", func() {
 	Attribute("key", String)
+	Attribute("title", String)
 	Attribute("body", String)
 	Attribute("mediaIds", ArrayOf(Int64))
 })

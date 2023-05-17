@@ -17,6 +17,7 @@
                 <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
                 <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />
                 <NoteEditor v-model="form.siteDescription" :v="$v.form.siteDescription" :readonly="readonly" @change="onChange" />
+                <NoteEditor v-model="form.customKey" :v="$v.form.customKey" :readonly="readonly" :editableTitle="true" @change="onChange" />
             </form>
         </div>
     </div>
@@ -56,6 +57,7 @@ export default Vue.extend({
             sitePurpose: {},
             siteCriteria: {},
             siteDescription: {},
+            customKey: {},
         },
     },
     data: () => {
@@ -94,6 +96,7 @@ export default Vue.extend({
             this.notesState.failed = false;
 
             const payload = mergeNotes({ notes: this.notes, media: this.media }, this.form);
+
             return this.$services.api.patchStationNotes(this.station.id, payload).then(
                 () => {
                     this.notesState.dirty = false;

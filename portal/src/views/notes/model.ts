@@ -11,7 +11,12 @@ export class ExistingFieldNote {
 }
 
 export class NewFieldNote {
-    constructor(public readonly key: string, public readonly body: string, public readonly mediaIds: number[]) {}
+    constructor(
+        public readonly key: string,
+        public readonly body: string,
+        public readonly mediaIds: number[],
+        public readonly title: string
+    ) {}
 }
 
 export class Ids {
@@ -24,6 +29,7 @@ export interface PortalStationNotes {
     author: { id: number; name: number };
     key: string;
     body: string;
+    title: string;
     media: { id: number; key: string; url: string; contentType: string }[];
 }
 
@@ -76,11 +82,13 @@ export class NoteForm {
         public readonly body: string,
         public readonly help: NoteHelp,
         public readonly photos: NoteMedia[] = [],
-        public readonly audio: NoteMedia[] = []
+        public readonly audio: NoteMedia[] = [],
+        public readonly title: string = ""
     ) {}
 
-    public withBody(body: string) {
-        return new NoteForm(body, this.help, this.photos, this.audio);
+    public withBody(body: string, title: string) {
+        console.log("radoi with b", title);
+        return new NoteForm(body, this.help, this.photos, this.audio, title !== "" ? title : this.title);
     }
 }
 
@@ -118,12 +126,13 @@ export class AddedPhoto {
 }
 
 export class Notes {
-    static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription"];
+    static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription", "customKey"];
 
     public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp("Study Objective"));
     public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp("Purpose of Site Location"));
     public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp("Site Criteria"));
     public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp("Site Description"));
+    public readonly customKey: NoteForm = new NoteForm("", new NoteHelp("Your own custom title"));
 
     constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
 
@@ -146,12 +155,15 @@ export class Notes {
         return portalNotes.notes.reduceRight((formNotes, portalNote) => {
             const key = portalNote.key;
             if (!formNotes[key]) {
+                console.log("radoi key", key);
+                console.log("radoi formNotes", formNotes);
                 throw new Error("unexpected note");
             }
             Object.assign(formNotes[key], {
                 photos: NoteMedia.onlyPhotos(portalNote.media),
                 audio: NoteMedia.onlyAudio(portalNote.media),
                 body: portalNote.body,
+                title: portalNote.title,
             });
             return formNotes;
         }, new Notes());
@@ -165,6 +177,7 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
         sitePurpose: notesForm.sitePurpose,
         siteCriteria: notesForm.siteCriteria,
         siteDescription: notesForm.siteDescription,
+        customKey: notesForm.customKey,
     };
 
     const media = {};
@@ -174,7 +187,6 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
             const photoIds = value.photos.map((m) => media[m.key]).filter((v) => v);
             const audioIds = value.audio.map((m) => media[m.key]).filter((v) => v);
             const mediaIds = [...photoIds, ...audioIds];
-
             if (portalExisting[key]) {
                 return {
                     creating: null,
@@ -182,7 +194,7 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
                 };
             }
             return {
-                creating: new NewFieldNote(key, value.body, mediaIds),
+                creating: new NewFieldNote(key, value.body, mediaIds, value.title),
                 updating: null,
             };
         })
