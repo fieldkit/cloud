@@ -24,7 +24,7 @@ func BuildAuthenticatePayload(discourseAuthenticateBody string, discourseAuthent
 	{
 		err = json.Unmarshal([]byte(discourseAuthenticateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Tempore occaecati eos sunt aut adipisci voluptas.\",\n      \"password\": \"84i\",\n      \"sig\": \"Tempore sint beatae id corrupti maxime.\",\n      \"sso\": \"Omnis neque molestias rerum non aut.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Laboriosam pariatur fugit repudiandae.\",\n      \"password\": \"rxn\",\n      \"sig\": \"Voluptatem et.\",\n      \"sso\": \"Occaecati voluptates voluptas rerum quae nostrum ea.\"\n   }'")
 		}
 		if body.Password != nil {
 			if utf8.RuneCountInString(*body.Password) < 10 {

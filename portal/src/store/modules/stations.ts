@@ -24,7 +24,9 @@ import {
     VizThresholds,
     QueryRecentlyResponse,
     RecentlyAggregatedWindows,
-    RecentlyAggregatedLast, Owner,
+    RecentlyAggregatedLast,
+    UserRolesEnum,
+    Owner,
 } from "@/api";
 
 import { VizSensor, VizConfig } from "@/views/viz/viz";
@@ -346,7 +348,6 @@ export class DisplayStation {
         }
 
         this.firmwareNumber = station.firmwareNumber;
-
     }
 }
 
@@ -560,6 +561,9 @@ const getters = {
     },
     isUserTeamMemberOfStation: (state: StationsState) => (stationId: number) => {
         return !!state.user.stations[stationId];
+    },
+    isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
+        return state.projectUsers[projectId].some((user) => user.user.id === userId && user.role === UserRolesEnum.admin);
     },
 };
 

@@ -118,16 +118,10 @@
                                 <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                             </div>
                         </div>
-                        <router-link
-                            :to="{
-                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                                params: { projectId: projectId, stationId: station.id },
-                            }"
-                            class="station-photos-nav"
-                        >
-                            <i class="icon icon-grid"></i>
-                            {{ $t("station.btn.linkToPhotos") }}
-                        </router-link>
+                      <a @click="navigateToPhotos()" class="station-photos-nav cursor-pointer">
+                        <i class="icon icon-grid"></i>
+                        {{ $t("station.btn.linkToPhotos") }}
+                      </a>
                     </div>
                 </div>
             </section>
@@ -377,6 +371,12 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
+        },
         onEditModuleNameClick(index): void {
             this.editModuleIndex = index;
         },
@@ -421,7 +421,6 @@ export default Vue.extend({
     }
 
     &-station {
-        margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
@@ -444,7 +443,7 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            width: 90px;
+            flex: 0 0 90px;
             height: 90px;
             object-fit: cover;
             margin-right: 20px;
@@ -455,7 +454,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            min-height: 192px;
             position: relative;
             border-radius: 2px;
             overflow: hidden;
@@ -541,7 +539,6 @@ export default Vue.extend({
     }
     &-row {
         padding: 15px 0;
-        max-width: 350px;
         @include flex(center);
 
         &:not(:last-of-type) {
@@ -674,6 +671,7 @@ export default Vue.extend({
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
+        max-height: 390px;
 
         @include bp-down($sm) {
             margin-top: 20px;
@@ -697,9 +695,29 @@ export default Vue.extend({
                 height: 35px;
             }
         }
+    }
 
-        .photo {
-            flex: 0 0 calc(50% - 5px);
+    &-deployed-date {
+        color: #6a6d71;
+        margin-bottom: 10px;
+        margin-right: 5px;
+    }
+
+    &-owner {
+        color: #6a6d71;
+        font-size: 10px;
+        margin-bottom: 10px;
+        @include flex(center);
+
+        ::v-deep .default-user-icon {
+            width: 18px;
+            height: 18px;
+            margin-top: 0;
+            margin-right: 5px;
+        }
+
+        span {
+            margin-left: 3px;
         }
     }
 
@@ -819,5 +837,9 @@ section {
     font-size: 12px;
     margin-left: 7px;
     margin-bottom: -1px;
+}
+
+::v-deep .back {
+    margin-bottom: 15px;
 }
 </style>

@@ -6,11 +6,17 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
-                    <Tiptap v-model="newComment.body" placeholder="Join the discussion!" saveLabel="Post" @save="save(newComment)" />
+                    <Tiptap
+                        ref="tipTap"
+                        v-model="newComment.body"
+                        placeholder="Join the discussion!"
+                        saveLabel="Post"
+                        @save="save(newComment)"
+                    />
                 </div>
             </template>
             <template v-else>
-                <p class="need-login-msg" @click="test()">
+                <p class="need-login-msg">
                     {{ $tc("comments.loginToComment.part1") }}
                     <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
                         {{ $tc("comments.loginToComment.part2") }}
@@ -31,7 +37,7 @@
         <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
         <div v-if="isLoading" class="no-comments">Loading comments...</div>
 
-        <div class="list" v-if="posts && posts.length > 0">
+        <div class="list" v-if="isProjectLoaded && posts && posts.length > 0">
             <div class="subheader">
                 <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
                 <header v-if="viewType === 'data'">Notes & Comments</header>
@@ -52,7 +58,7 @@
                                     {{ post.author.name }}
                                 </span>
                                 <ListItemOptions
-                                    v-if="user && (user.id === post.author.id || user.admin)"
+                                    v-if="getCommentOptions(post).length > 0"
                                     @listItemOptionClick="onListItemOptionClick($event, post)"
                                     :options="getCommentOptions(post)"
                                 />
@@ -136,6 +142,7 @@ import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark } from "../viz/viz";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     name: "Comments",
@@ -174,7 +181,7 @@ export default Vue.extend({
     } {
         return {
             posts: [],
-            isLoading: false,
+            isLoading: true,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -190,6 +197,31 @@ export default Vue.extend({
             },
             errorMessage: null,
         };
+    },
+    computed: {
+        projectId(): number {
+            if (typeof this.parentData === "number") {
+                return this.parentData;
+            }
+            return this.parentData.p[0];
+        },
+        stationId(): number | null {
+            if (typeof this.parentData !== "number") {
+                return this.parentData.s[0];
+            }
+            return null;
+        },
+        isAdmin(): boolean {
+            return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
+        },
+        // we need it in order to see if the user is an admin and can delete posts
+        isProjectLoaded(): boolean {
+            const project = this.$getters.projectsById[this.projectId];
+            if (!project) {
+                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            }
+            return !!this.$getters.projectsById[this.projectId];
+        },
     },
     watch: {
         parentData(): Promise<void> {
@@ -212,6 +244,7 @@ export default Vue.extend({
             }
         },
         async save(comment: NewComment): Promise<void> {
+
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -221,7 +254,8 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    this.newComment.body = "";
+                    // TODO: find a way to avoid any
+                    (this.$refs.tipTap as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -346,6 +380,10 @@ export default Vue.extend({
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
+            if (!this.user) {
+                return [];
+            }
+
             if (this.user.id === post.author.id) {
                 return [
                     {
@@ -359,12 +397,16 @@ export default Vue.extend({
                 ];
             }
 
-            return [
-                {
-                    label: "Delete post",
-                    event: "delete-comment",
-                },
-            ];
+            if (this.isAdmin) {
+                return [
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [];
         },
         highlightComment() {
             this.$nextTick(() => {
@@ -716,6 +758,10 @@ header {
 
 .no-comments {
     margin-left: 20px;
+
+    @at-root .data-view .no-comments {
+        margin-top: 5px;
+    }
 
     @include bp-down($xs) {
         margin-left: 10px;

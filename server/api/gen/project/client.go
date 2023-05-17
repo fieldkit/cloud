@@ -38,10 +38,11 @@ type Client struct {
 	DeleteEndpoint              goa.Endpoint
 	UploadPhotoEndpoint         goa.Endpoint
 	DownloadPhotoEndpoint       goa.Endpoint
+	ProjectsStationEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "project" service client given the endpoints.
-func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, editUser, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto goa.Endpoint) *Client {
+func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acceptProjectInvite, rejectProjectInvite, acceptInvite, rejectInvite, add, update, get, listCommunity, listMine, invite, editUser, removeUser, addStation, removeStation, delete_, uploadPhoto, downloadPhoto, projectsStation goa.Endpoint) *Client {
 	return &Client{
 		AddUpdateEndpoint:           addUpdate,
 		DeleteUpdateEndpoint:        deleteUpdate,
@@ -65,6 +66,7 @@ func NewClient(addUpdate, deleteUpdate, modifyUpdate, invites, lookupInvite, acc
 		DeleteEndpoint:              delete_,
 		UploadPhotoEndpoint:         uploadPhoto,
 		DownloadPhotoEndpoint:       downloadPhoto,
+		ProjectsStationEndpoint:     projectsStation,
 	}
 }
 
@@ -240,4 +242,15 @@ func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (re
 		return
 	}
 	return ires.(*DownloadedPhoto), nil
+}
+
+// ProjectsStation calls the "projects station" endpoint of the "project"
+// service.
+func (c *Client) ProjectsStation(ctx context.Context, p *ProjectsStationPayload) (res *Projects, err error) {
+	var ires interface{}
+	ires, err = c.ProjectsStationEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Projects), nil
 }

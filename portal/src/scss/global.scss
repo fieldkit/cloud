@@ -191,3 +191,21 @@
         display: none;
     }
 }
+
+.loading-container {
+    background-color: #e2e4e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+
+    ::v-deep .spinner {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

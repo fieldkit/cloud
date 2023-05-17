@@ -185,9 +185,6 @@ func (c *StationService) add(ctx context.Context, payload *station.AddPayload) (
 }
 
 func (c *StationService) Get(ctx context.Context, payload *station.GetPayload) (response *station.StationFull, err error) {
-	log := Logger(ctx).Sugar()
-	log.Errorw("ffffffffffffffff", "fffffffffffffff")
-
 	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.ID))
 	if err != nil {
 		return nil, err
@@ -312,9 +309,6 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 		}
 		return nil, err
 	}
-	log := Logger(ctx).Sugar()
-
-	log.Errorw("11111aaaaaaaaaaaaaaaaaaa", "111111aaaaaaaaaaaaaaaaaaa", updating)
 
 	p, err := NewPermissions(ctx, c.options).ForStation(updating)
 	if err != nil {

@@ -1,6 +1,9 @@
 <template>
-    <div>
+    <div class="h-100">
         <div class="viz linechart"></div>
+        <div v-if="isLoading" class="loading-container">
+            <Spinner class="spinner" />
+        </div>
     </div>
 </template>
 
@@ -15,6 +18,7 @@ import { TimeZoom, SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
+import Spinner from "@/views/shared/Spinner.vue";
 
 type DragTimeSignal = [number, number] | null;
 
@@ -31,6 +35,9 @@ function roundForDisplay(value: number): number {
 
 export default Vue.extend({
     name: "LineChart",
+    components: {
+        Spinner,
+    },
     props: {
         series: {
             type: Array as PropType<SeriesData[]>,
@@ -43,9 +50,11 @@ export default Vue.extend({
     },
     data(): {
         vega: unknown | undefined;
+        isLoading: boolean;
     } {
         return {
             vega: undefined,
+            isLoading: false,
         };
     },
     async mounted(): Promise<void> {
@@ -58,6 +67,8 @@ export default Vue.extend({
     },
     methods: {
         async refresh(): Promise<void> {
+            this.isLoading = true;
+
             if (this.series.length == 0) {
                 return;
             }
@@ -172,8 +183,8 @@ export default Vue.extend({
                 state: vegaInfo.view.getState(),
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
-            /*
-             */
+
+            this.isLoading = false;
         },
         getFileName(series): string {
             const stationName = series.vizInfo.station.name;
