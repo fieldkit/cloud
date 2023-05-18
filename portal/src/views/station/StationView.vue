@@ -39,7 +39,10 @@
                                 />
                                 <a
                                     v-if="form.description === undefined && isUserTeamMemberOfStation"
-                                    @click="form.description = ''; editingDescription = true"
+                                    @click="
+                                        form.description = '';
+                                        editingDescription = true;
+                                    "
                                     class="station-description-add"
                                 >
                                     {{ $t("station.addDescription") }}
@@ -114,12 +117,15 @@
                     <div class="station-projects" v-if="stationProjects.length > 0">
                         <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
                         <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
-                        <span v-for="(project, index) in stationProjects" v-bind:key="project.id">
-                            <router-link :to="{ name: 'viewProject', params: { id: project.id } }" target="_blank">
-                                {{ project.name }}
-                            </router-link>
-                            <template v-if="index !== 0 && index !== stationProjects.length - 1">,&nbsp;</template>
-                        </span>
+                        <router-link
+                            v-for="(project, index) in stationProjects"
+                            v-bind:key="project.id"
+                            :to="{ name: 'viewProject', params: { id: project.id } }"
+                            target="_blank"
+                        >
+                            {{ project.name }}
+                            <template v-if="stationProjects.length > 1 && index !== stationProjects.length - 1">,&nbsp;</template>
+                        </router-link>
                     </div>
                     <div v-if="photos" class="station-photos">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
@@ -440,12 +446,6 @@ export default Vue.extend({
                 query: { bookmark: serializeBookmark(bm) },
             });
         },
-        navigateToPhotos(): void {
-            this.$router.push({
-                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
-                params: { projectId: this.projectId, stationId: this.station.id },
-            });
-        },
         updateStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
@@ -465,12 +465,6 @@ export default Vue.extend({
         },
         selectModule(module: DisplayModule) {
             this.selectedModule = module;
-        },
-        navigateToPhotos(): void {
-            this.$router.push({
-                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
-                params: { projectId: this.projectId, stationId: this.station.id },
-            });
         },
     },
 });
@@ -763,7 +757,7 @@ export default Vue.extend({
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
-        max-height: 390px;
+        height: 390px;
 
         @include bp-down($sm) {
             margin-top: 20px;
