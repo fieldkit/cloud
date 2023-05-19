@@ -25,6 +25,8 @@ import {
     QueryRecentlyResponse,
     RecentlyAggregatedWindows,
     RecentlyAggregatedLast,
+    UserRolesEnum,
+    Owner,
 } from "@/api";
 
 import { VizSensor, VizConfig } from "@/views/viz/viz";
@@ -240,6 +242,7 @@ export class DisplayStation {
     public readonly attributes: ProjectAttribute[];
     public readonly readOnly: boolean;
     public readonly status: StationStatus;
+    public readonly owner: Owner;
 
     public get latestPrimary(): number | null {
         if (!this.readings) {
@@ -320,6 +323,7 @@ export class DisplayStation {
         this.readOnly = station.readOnly;
         this.status = station.status;
         this.readings = readings;
+        this.owner = station.owner;
 
         if (station.configurations.all.length > 0) {
             const ordered = _.orderBy(station.configurations.all[0].modules, ["position"]);
@@ -342,6 +346,7 @@ export class DisplayStation {
         }
 
         this.firmwareNumber = station.firmwareNumber;
+
     }
 }
 
@@ -552,6 +557,9 @@ const getters = {
     },
     mapped(state: StationsState): MappedStations | null {
         return state.mapped;
+    },
+    isAdminForProject: (state: StationsState) => (userId: number, projectId: number) => {
+        return state.projectUsers[projectId].some((user) => user.user.id === userId && user.role === UserRolesEnum.admin);
     },
 };
 

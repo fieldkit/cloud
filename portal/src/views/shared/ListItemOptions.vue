@@ -1,7 +1,7 @@
 <template>
-    <i class="icon-ellipsis options-trigger" @click="show($event)">
+    <i class="icon-ellipsis options-trigger" @click.stop="show($event)">
         <div class="options-btns">
-            <button v-for="option in options" v-bind:key="option.event" @click="$emit('listItemOptionClick', option.event)">
+            <button v-for="option in options" :key="option.event" @click="$emit('listItemOptionClick', option.event)">
                 <span v-if="option.icon" class="options-icon">
                     <i class="icon" :class="option.icon"></i>
                 </span>

@@ -82,6 +82,7 @@
                     :sensorDataQuerier="sensorDataQuerier"
                     :station="activeStation"
                     :exploreContext="exploreContext"
+                    :hasCupertinoPane="true"
                     @close="onCloseSummary"
                     v-bind:key="activeStation.id"
                 />
@@ -396,6 +397,7 @@ export default Vue.extend({
     position: relative;
     flex: 2;
     min-height: 420px;
+    overflow: hidden;
 
     #map {
         height: 100%;
@@ -453,7 +455,7 @@ export default Vue.extend({
 
 .map-expand {
     background-color: #ffffff;
-    z-index: $z-index-top;
+    z-index: #{$z-index-top} + 1;
     position: absolute;
     right: 10px;
     top: 10px;

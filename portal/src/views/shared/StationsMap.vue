@@ -1,21 +1,23 @@
 <template v-if="mapped.valid && ready">
-    <mapbox
-        class="stations-map"
-        :access-token="mapbox.token"
-        :map-options="{
-            style: mapbox.style,
-            bounds: bounds,
-            zoom: 10,
-        }"
-        :nav-control="{
-            show: !isMobileView,
-            position: 'bottom-left',
-        }"
-        @map-init="onMapInitialized"
-        @map-load="onMapLoaded"
-        @zoomend="newBounds"
-        @dragend="newBounds"
-    />
+    <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
+        <mapbox
+            class="stations-map"
+            :access-token="mapbox.token"
+            :map-options="{
+                style: mapbox.style,
+                bounds: bounds,
+                zoom: 10,
+            }"
+            :nav-control="{
+                show: !isMobileView,
+                position: 'bottom-left',
+            }"
+            @map-init="onMapInitialized"
+            @map-load="onMapLoaded"
+            @zoomend="newBounds"
+            @dragend="newBounds"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -109,12 +111,19 @@ export default Vue.extend({
             console.log("map: mapped changed", this.mapped);
             this.updateMap();
         },
-        showStations(): void {
-            this.updateMap();
-        },
         visibleReadings(): void {
             console.log("map: visible-readings");
             this.updateMap();
+        },
+        showStations(): void {
+            if (!this.protectedData.map.getLayer("station-markers")) {
+                return;
+            }
+            if (!this.showStations) {
+                this.protectedData.map.setLayoutProperty("station-markers", "visibility", "none");
+                return;
+            }
+            this.protectedData.map.setLayoutProperty("station-markers", "visibility", "visible");
         },
     },
     methods: {
@@ -284,7 +293,9 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "../../scss/global";
+
 .map-view #map {
     height: 100%;
     position: relative;
@@ -298,5 +309,58 @@ export default Vue.extend({
 .marker {
     height: 10px;
     width: 10px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+    border: solid 1px #f4f5f7;
+    border-radius: 0;
+    height: 40px;
+
+    @include bp-down($sm) {
+        width: 40px;
+    }
+
+    &.mapboxgl-ctrl-geocoder--collapsed {
+        min-width: 40px;
+    }
+
+    &:not(.mapboxgl-ctrl-geocoder--collapsed) {
+        @include bp-down($xs) {
+            min-width: calc(100vw - 20px) !important;
+        }
+    }
+
+    input {
+        outline: none;
+        height: 37px;
+        padding-left: 38px;
+        font-size: 16px;
+    }
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-search {
+    top: 9px;
+    left: 8px;
+}
+
+::v-deep .mapboxgl-ctrl-geocoder--icon-close {
+    margin-top: 4px;
+
+    @include bp-down($sm) {
+        margin-top: 3px;
+    }
+}
+
+.map-wrap {
+    height: 100%;
+
+    &.hide-markers ::v-deep .mapboxgl-marker {
+        display: none;
+    }
+}
+
+.stations-map {
+    height: 100%;
 }
 </style>

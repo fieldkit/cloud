@@ -152,6 +152,28 @@ func (r *StationRepository) QueryStationByDeviceID(ctx context.Context, deviceId
 	return station, nil
 }
 
+func (r *StationRepository) QueryStationByArbitraryDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
+	station, err = r.QueryStationByDeviceID(ctx, deviceIdBytes)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	if station != nil {
+		return station, nil
+	}
+
+	station = &data.Station{}
+	if err := r.db.GetContext(ctx, station, `
+		SELECT
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, photo_id,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, status
+		FROM fieldkit.station WHERE id IN (SELECT station_id FROM fieldkit.station_dev_eui WHERE dev_eui = $1)
+		`, deviceIdBytes); err != nil {
+		return nil, err
+	}
+	return station, nil
+}
+
 func (r *StationRepository) TryQueryStationByDeviceID(ctx context.Context, deviceIdBytes []byte) (station *data.Station, err error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
@@ -222,7 +244,7 @@ func (r *StationRepository) UpsertConfiguration(ctx context.Context, configurati
 				(provision_id, source_id, updated_at) VALUES
 				(:provision_id, :source_id, :updated_at)
 			ON CONFLICT (provision_id, source_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
-			RETURNING *
+			RETURNING id
 			`, configuration); err != nil {
 			return nil, err
 		}
@@ -234,7 +256,7 @@ func (r *StationRepository) UpsertConfiguration(ctx context.Context, configurati
 				(provision_id, meta_record_id, updated_at) VALUES
 				(:provision_id, :meta_record_id, :updated_at)
 			ON CONFLICT (provision_id, meta_record_id) DO UPDATE SET updated_at = EXCLUDED.updated_at
-			RETURNING *
+			RETURNING id
 			`, configuration); err != nil {
 			return nil, err
 		}
@@ -269,7 +291,7 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
 						  version = EXCLUDED.version
-		RETURNING *
+		RETURNING id
 		`, module); err != nil {
 		return nil, err
 	}
@@ -302,7 +324,7 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
                           unit_of_measure = EXCLUDED.unit_of_measure,
 						  reading_last = COALESCE(EXCLUDED.reading_last, s.reading_last),
 						  reading_time = COALESCE(EXCLUDED.reading_time, s.reading_time)
-		RETURNING *
+		RETURNING id
 		`, sensor); err != nil {
 		return nil, err
 	}
@@ -1381,12 +1403,12 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			q.full_sensor_key AS sensor_key,
 			q.sensor_read_at
 		FROM (
-			SELECT    
+			SELECT
 				station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
 				encode(station_module.hardware_id, 'base64') AS module_id,
 				station_module.name AS module_key,
 				station_module.name || '.' || module_sensor.name AS full_sensor_key,
-				module_sensor.reading_time AS sensor_read_at                                                                                                                      
+				module_sensor.reading_time AS sensor_read_at
 			FROM fieldkit.station AS station
 			LEFT JOIN fieldkit.visible_configuration AS vc ON (vc.station_id = station.id)
 			LEFT JOIN fieldkit.station_module AS station_module ON (vc.configuration_id = station_module.configuration_id)

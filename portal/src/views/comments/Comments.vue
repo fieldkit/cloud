@@ -147,7 +147,7 @@
                 </div>
             </template>
             <template v-else>
-                <p class="need-login-msg" @click="test()">
+                <p class="need-login-msg">
                     {{ $tc("comments.loginToComment.part1") }}
                     <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
                         {{ $tc("comments.loginToComment.part2") }}
@@ -359,7 +359,7 @@ export default Vue.extend({
         return {
             posts: [],
             dataEvents: [],
-            isLoading: false,
+            isLoading: true,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
             newComment: {
@@ -383,6 +383,44 @@ export default Vue.extend({
             logMode: "comment",
         };
     },
+    computed: {
+        projectId(): number {
+            if (typeof this.parentData === "number") {
+                return this.parentData;
+            }
+            return this.parentData.p[0];
+        },
+        stationId(): number | null {
+            if (typeof this.parentData !== "number") {
+                return this.parentData.s[0];
+            }
+            return null;
+        },
+        isAdmin(): boolean {
+            return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
+        },
+        // we need it in order to see if the user is an admin and can delete posts
+        isProjectLoaded(): boolean {
+            const project = this.$getters.projectsById[this.projectId];
+            if (!project) {
+                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            }
+            return !!this.$getters.projectsById[this.projectId];
+        },
+        postsAndEvents(): DiscussionBase[] {
+            return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
+        },
+        projectUser(): ProjectUser | null {
+            const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+
+            if (projectId) {
+                const displayProject = this.$getters.projectsById[projectId];
+                return displayProject?.users?.filter((user) => user.user.id === this.user?.id)[0];
+            }
+
+            return null;
+        },
+    },
     watch: {
         async parentData(): Promise<void> {
 
@@ -404,21 +442,6 @@ export default Vue.extend({
 
         await this.getDataEvents();
         return this.getComments();
-    },
-    computed: {
-        postsAndEvents(): DiscussionBase[] {
-            return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
-        },
-        projectUser(): ProjectUser | null {
-            const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
-
-            if (projectId) {
-                const displayProject = this.$getters.projectsById[projectId];
-                return displayProject?.users?.filter((user) => user.user.id === this.user?.id)[0];
-            }
-
-            return null;
-        },
     },
     methods: {
         getNewCommentPlaceholder(): string {
@@ -456,6 +479,7 @@ export default Vue.extend({
                 });
         },
         async save(comment: NewComment): Promise<void> {
+
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -465,7 +489,8 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    this.newComment.body = "";
+                    // TODO: find a way to avoid any
+                    (this.$refs.tipTap as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -656,6 +681,10 @@ export default Vue.extend({
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
+            if (!this.user) {
+                return [];
+            }
+
             if (this.user.id === post.author.id) {
                 return [
                     {
@@ -669,12 +698,16 @@ export default Vue.extend({
                 ];
             }
 
-            return [
-                {
-                    label: "Delete post",
-                    event: "delete-comment",
-                },
-            ];
+            if (this.isAdmin) {
+                return [
+                    {
+                        label: "Delete post",
+                        event: "delete-comment",
+                    },
+                ];
+            }
+
+            return [];
         },
         highlightComment() {
             this.$nextTick(() => {
@@ -1079,6 +1112,10 @@ header {
 
 .no-comments {
     margin-left: 20px;
+
+    @at-root .data-view .no-comments {
+        margin-top: 5px;
+    }
 
     @include bp-down($xs) {
         margin-left: 10px;

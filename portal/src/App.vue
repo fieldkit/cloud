@@ -68,6 +68,7 @@ export default Vue.extend({
 @import "scss/mixins";
 @import "scss/typography";
 @import "scss/icons";
+@import "scss/layout.scss";
 @import "icomoon/style.css";
 
 html {
@@ -229,5 +230,9 @@ li {
         height: 3px;
         margin-top: 2px;
     }
+}
+
+#silentbox-overlay {
+    z-index: 9999 !important;
 }
 </style>

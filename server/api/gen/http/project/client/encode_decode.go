@@ -3165,6 +3165,155 @@ func DecodeDownloadPhotoResponse(decoder func(*http.Response) goahttp.Decoder, r
 	}
 }
 
+// BuildProjectsStationRequest instantiates a HTTP request object with method
+// and path set to call the "project" service "projects station" endpoint
+func (c *Client) BuildProjectsStationRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*project.ProjectsStationPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("project", "projects station", "*project.ProjectsStationPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ProjectsStationProjectPath(id)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("project", "projects station", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeProjectsStationRequest returns an encoder for requests sent to the
+// project projects station server.
+func EncodeProjectsStationRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*project.ProjectsStationPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("project", "projects station", "*project.ProjectsStationPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeProjectsStationResponse returns a decoder for responses returned by
+// the project projects station endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeProjectsStationResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeProjectsStationResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ProjectsStationResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
+			}
+			p := NewProjectsStationProjectsOK(&body)
+			view := "default"
+			vres := &projectviews.Projects{Projected: p, View: view}
+			if err = projectviews.ValidateProjects(vres); err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
+			}
+			res := project.NewProjects(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ProjectsStationUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
+			}
+			err = ValidateProjectsStationUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
+			}
+			return nil, NewProjectsStationUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ProjectsStationForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
+			}
+			err = ValidateProjectsStationForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
+			}
+			return nil, NewProjectsStationForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ProjectsStationNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
+			}
+			err = ValidateProjectsStationNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
+			}
+			return nil, NewProjectsStationNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ProjectsStationBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("project", "projects station", err)
+			}
+			err = ValidateProjectsStationBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("project", "projects station", err)
+			}
+			return nil, NewProjectsStationBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("project", "projects station", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalPendingInviteResponseBodyToProjectviewsPendingInviteView builds a
 // value of type *projectviews.PendingInviteView from a value of type
 // *PendingInviteResponseBody.

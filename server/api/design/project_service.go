@@ -623,5 +623,26 @@ var _ = Service("project", func() {
 		})
 	})
 
+	Method("projects station", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+		})
+
+		Result(Projects)
+
+		HTTP(func() {
+			GET("projects/station/{id}")
+
+			httpAuthentication()
+		})
+	})
+
 	commonOptions()
 })
