@@ -337,14 +337,16 @@ export default Vue.extend({
             return this.$state.stations.stations[this.$route.params.stationId];
         },
         notes(): PortalStationNotes[] {
-            console.log("radoi this.$state.notes.notes", this.$state.notes.notes);
             return this.$state.notes.notes;
         },
         media(): PortalNoteMedia[] {
             return this.$state.notes.media;
         },
-        photos(): NoteMedia[] {
-            return NoteMedia.onlyPhotos(this.$state.notes.media);
+        photos(): NoteMedia[] | null {
+            if (this.$state.notes.media) {
+                return NoteMedia.onlyPhotos(this.$state.notes.media);
+            }
+            return null;
         },
         attributes(): ProjectAttribute[] {
             const station = this.$state.stations.stations[this.$route.params.stationId];

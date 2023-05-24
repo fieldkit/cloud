@@ -87,7 +87,6 @@ export class NoteForm {
     ) {}
 
     public withBody(body: string, title: string) {
-        console.log("radoi with b", title);
         return new NoteForm(body, this.help, this.photos, this.audio, title !== "" ? title : this.title);
     }
 }
@@ -155,8 +154,6 @@ export class Notes {
         return portalNotes.notes.reduceRight((formNotes, portalNote) => {
             const key = portalNote.key;
             if (!formNotes[key]) {
-                console.log("radoi key", key);
-                console.log("radoi formNotes", formNotes);
                 throw new Error("unexpected note");
             }
             Object.assign(formNotes[key], {
