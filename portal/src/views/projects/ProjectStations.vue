@@ -52,7 +52,7 @@
                                 :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 width="24px"
                                 height="24px"
-                                @click="openNotes(station)"
+                                @click="navigateToStation(station)"
                             />
                         </div>
                     </TinyStation>
@@ -258,14 +258,15 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
         },
-        openNotes(this: any, station: DisplayStation): Promise<any> {
-            return this.$router.push({
+        navigateToStation(this: any, station: DisplayStation): void {
+            const routeData = this.$router.resolve({
                 name: "viewStation",
                 params: {
                     projectId: this.project.id,
                     stationId: station.id,
                 },
             });
+            window.open(routeData.href, "_blank");
         },
         onCloseSummary(): void {
             this.activeStationId = null;
