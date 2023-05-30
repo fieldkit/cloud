@@ -19,7 +19,12 @@
                 </template>
             </DoubleHeader>
 
-            <silent-box v-if="photos && photos.length > 0" :gallery="gallery">
+            <silent-box
+                v-if="photos && photos.length > 0"
+                :gallery="gallery"
+                @silentbox-overlay-opened="togglePageScroll()"
+                @silentbox-overlay-hidden="togglePageScroll()"
+            >
                 <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
                     <button class="photo-options" v-if="!readOnly">
                         <ListItemOptions
@@ -173,6 +178,9 @@ export default Vue.extend({
                     });
                 });
             });
+        },
+        togglePageScroll(): void {
+            document.body.classList.toggle("disable-scrolling");
         },
     },
     mounted() {

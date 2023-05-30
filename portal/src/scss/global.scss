@@ -1,5 +1,9 @@
 @import "mixins";
 
+a {
+    cursor: pointer;
+}
+
 .button-solid {
     width: 240px;
     height: 45px;

@@ -128,22 +128,16 @@
                         </router-link>
                     </div>
                     <div v-if="photos" class="station-photos">
-                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                        <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">
                                 <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                             </div>
                         </div>
-                        <router-link
-                            :to="{
-                                name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                                params: { projectId: projectId, stationId: station.id },
-                            }"
-                            class="station-photos-nav"
-                        >
+                        <a class="station-photos-nav" @click="navigateToPhotos()">
                             <i class="icon icon-grid"></i>
                             {{ $t("station.btn.linkToPhotos") }}
-                        </router-link>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -468,6 +462,12 @@ export default Vue.extend({
         selectModule(module: DisplayModule) {
             this.selectedModule = module;
         },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
+        },
     },
 });
 </script>
@@ -542,6 +542,7 @@ export default Vue.extend({
             border-radius: 2px;
             overflow: hidden;
             background-color: #e2e4e6;
+            cursor: pointer;
 
             &:nth-of-type(3),
             &:nth-of-type(4) {
@@ -712,6 +713,7 @@ export default Vue.extend({
                 overflow: hidden;
                 text-overflow: ellipsis;
                 width: 100%;
+                cursor: pointer;
             }
         }
 
