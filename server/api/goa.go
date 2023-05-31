@@ -61,6 +61,9 @@ import (
 	notesSvr "github.com/fieldkit/cloud/server/api/gen/http/notes/server"
 	notes "github.com/fieldkit/cloud/server/api/gen/notes"
 
+    stationNotesSvr "github.com/fieldkit/cloud/server/api/gen/http/station_note/server"
+    stationNotes "github.com/fieldkit/cloud/server/api/gen/station_note"
+
 	recordsSvr "github.com/fieldkit/cloud/server/api/gen/http/records/server"
 	records "github.com/fieldkit/cloud/server/api/gen/records"
 
@@ -129,6 +132,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notesSvc := NewNotesService(ctx, options)
 	notesEndpoints := notes.NewEndpoints(notesSvc)
 
+    stationNotesSvc := NewStationNoteService(ctx, options)
+    stationNotesEndpoints := stationNotes.NewEndpoints(stationNotesSvc)
+
 	recordsSvc := NewRecordsService(ctx, options)
 	recordsEndpoints := records.NewEndpoints(recordsSvc)
 
@@ -181,6 +187,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		informationEndpoints.Use(mw)
 		sensorEndpoints.Use(mw)
 		notesEndpoints.Use(mw)
+		stationNotesEndpoints.Use(mw)
 		recordsEndpoints.Use(mw)
 		firmwareEndpoints.Use(mw)
 		dataEndpoints.Use(mw)
@@ -224,6 +231,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationServer := informationSvr.New(informationEndpoints, mux, dec, enc, eh, nil)
 	sensorServer := sensorSvr.New(sensorEndpoints, mux, dec, enc, eh, nil)
 	notesServer := notesSvr.New(notesEndpoints, mux, dec, enc, eh, nil)
+	stationNotesServer := stationNotesSvr.New(stationNotesEndpoints, mux, dec, enc, eh, nil)
 	recordsServer := recordsSvr.New(recordsEndpoints, mux, dec, enc, eh, nil)
 	firmwareServer := firmwareSvr.New(firmwareEndpoints, mux, dec, enc, eh, nil)
 	dataServer := datasSvr.New(dataEndpoints, mux, dec, enc, eh, nil)
@@ -272,6 +280,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvr.Mount(mux, informationServer)
 	sensorSvr.Mount(mux, sensorServer)
 	notesSvr.Mount(mux, notesServer)
+	stationNotesSvr.Mount(mux, stationNotesServer)
 	recordsSvr.Mount(mux, recordsServer)
 	firmwareSvr.Mount(mux, firmwareServer)
 	datasSvr.Mount(mux, dataServer)
@@ -321,6 +330,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	for _, m := range notesServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
+	for _, m := range stationNotesServer.Mounts {
+    		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+    	}
 	for _, m := range recordsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}

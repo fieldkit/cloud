@@ -32,7 +32,9 @@ func (c *StationNoteService) Station(ctx context.Context, payload *stationNoteSe
 
 	getting := &data.Station{}
 	if err := c.options.Database.GetContext(ctx, getting, `
-        SELECT p.* FROM fieldkit.station AS p WHERE s.id = $1
+          SELECT id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, photo_id,
+            recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, status
+          FROM fieldkit.station WHERE id = $1
         `, payload.StationID); err != nil {
 
 		return nil, err
