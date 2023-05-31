@@ -218,7 +218,7 @@ export class Bookmark {
         const times: [number, number][] = this.allVizes.map((viz) => viz[1]).filter((times) => times !== undefined) as [number, number][];
         const start = _.min(_.flatten(times.map((r) => r[0])));
         const end = _.max(_.flatten(times.map((r) => r[1])));
-        if (!start || !end) throw new Error(`no time range in bookmark`);
+        if ((start === null || start === undefined) || (end === null || end === undefined)) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
