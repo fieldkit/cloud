@@ -72,10 +72,7 @@ export default Vue.extend({
         },
         title: {
             get(this: any) {
-                if (this.note.title !== "") {
-                    return this.note.title;
-                }
-                return this.note.help.title;
+                return this.note.title || this.note.help.title;
             },
             set(this: any, value) {
                 this.$emit("change", this.note.withBody(this.note.body, value));
