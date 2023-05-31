@@ -1615,7 +1615,7 @@ class FKApi {
         });
     }
 
-    public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
+    public getProjectsForStation(id: number): Promise<ProjectsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
