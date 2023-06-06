@@ -165,7 +165,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">
+        <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
             {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
         </div>
         <div v-if="isLoading" class="no-comments">
