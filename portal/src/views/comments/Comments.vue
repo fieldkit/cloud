@@ -25,7 +25,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
@@ -46,7 +46,7 @@
             </template>
             <template #right>
                 <div class="event-level-selector">
-                    <label for="allProjectRadio">
+                    <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
                             <input
                                 type="radio"
@@ -420,11 +420,13 @@ export default Vue.extend({
 
             return null;
         },
+        stationBelongsToAProject(): boolean {
+            return !!this.parentData.p.length;
+        },
     },
     watch: {
         async parentData(): Promise<void> {
-
-          await this.getDataEvents();
+            await this.getDataEvents();
             return this.getComments();
         },
         $route() {
@@ -439,6 +441,7 @@ export default Vue.extend({
             await this.$getters.projectsById[projectId];
         }
         this.placeholder = this.getNewCommentPlaceholder();
+        this.newDataEvent.allProjectSensors = this.stationBelongsToAProject;
 
         await this.getDataEvents();
         return this.getComments();
@@ -479,7 +482,6 @@ export default Vue.extend({
                 });
         },
         async save(comment: NewComment): Promise<void> {
-
             this.errorMessage = null;
 
             if (this.viewType === "data") {
