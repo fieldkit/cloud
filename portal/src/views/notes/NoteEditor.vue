@@ -11,6 +11,7 @@
             </template>
         </div>
         <div class="attached-audio" v-for="audio in note.audio" v-bind:key="audio.key">
+            for
             <div class="audio-title">
                 {{ audio.key }}
             </div>
@@ -58,6 +59,9 @@ export default Vue.extend({
             },
         },
     },
+    mounted() {
+      console.log("Radoi note", this.note);
+    }
 });
 </script>
 
