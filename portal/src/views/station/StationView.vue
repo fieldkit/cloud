@@ -700,6 +700,10 @@ export default Vue.extend({
                 @include bp-down($sm) {
                     padding-left: 16px;
                 }
+
+                input {
+                    cursor: initial;
+                }
             }
 
             img {
