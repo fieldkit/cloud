@@ -931,13 +931,6 @@ header {
     position: relative;
 }
 
-::v-deep .options-trigger {
-    @include bp-up($sm) {
-        opacity: 0;
-        visibility: hidden;
-    }
-}
-
 .body {
     max-width: unset;
     font-family: $font-family-light;
@@ -998,13 +991,6 @@ header {
     display: flex;
     flex: 100%;
     overflow-wrap: break-word;
-
-    @include attention() {
-        ::v-deep .options-trigger {
-            opacity: 1;
-            visibility: visible;
-        }
-    }
 }
 
 .column {

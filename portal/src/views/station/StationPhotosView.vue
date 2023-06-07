@@ -213,6 +213,8 @@ export default Vue.extend({
         padding: 0;
         display: flex;
         justify-content: center;
+        align-items: center;
+        margin-top: -6px;
         height: 100%;
 
         &:after {
@@ -222,8 +224,9 @@ export default Vue.extend({
     }
 
     ::v-deep .options-btns {
-        right: 0;
-        top: 40px;
+        right: 30px;
+        left: unset;
+        top: 30px;
         border: solid 1px var(--color-border);
         border-radius: 1px;
         padding-right: 25px;
