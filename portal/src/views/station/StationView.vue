@@ -718,6 +718,7 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
+                z-index: -1;
             }
         }
 
