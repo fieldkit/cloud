@@ -52,7 +52,7 @@ timestamps {
 				dir ('dev-ops') {
 					git branch: 'main', url: "https://github.com/conservify/dev-ops.git"
 
-					withAWS(credentials: 'AWS Default', region: 'us-east-1') {
+					withAWS(credentials: 'aws-default', region: 'us-east-1') {
 						sh "cd amis && make clean && make portal-stack charting-stack -j3"
 					}
 				}
