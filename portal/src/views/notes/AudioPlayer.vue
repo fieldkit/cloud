@@ -1,25 +1,31 @@
 <template>
-<!--    <VueAudio :file="loaded" v-if="loaded" />-->
+    <div>
+        <VueAudio :file="loaded" type="audio/mp4" v-if="loaded" />
 
-  <div>
+        <audio v-if="loaded" controls>
+            <source :src="loaded" type="audio/x-caf" />
+        </audio>
+    </div>
+
+    <!--  <div>
     <audio-player v-if="loaded && url"
         ref="audioPlayer"
         :audio-list="[loaded]"
         theme-color="#ff2929"
     />
-  </div>
+  </div>-->
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import VueAudio from "vue-audio";
-import AudioPlayer from '@liripeng/vue-audio-player'
+import AudioPlayer from "@liripeng/vue-audio-player";
 
 export default Vue.extend({
     name: "AudioPlayer",
     components: {
-      //  VueAudio,
-        AudioPlayer,
+        VueAudio,
+        //   AudioPlayer,
     },
     props: {
         url: {
@@ -33,7 +39,6 @@ export default Vue.extend({
         };
     },
     mounted(this: any) {
-
         return this.$services.api.loadMedia(this.url).then((loaded) => {
             console.log("radoi loaded url", this.url);
             console.log("radoi loaded media", loaded);
