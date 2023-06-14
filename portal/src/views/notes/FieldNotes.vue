@@ -13,7 +13,7 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-field-note-wrap">
-                    <Tiptap v-model="newNote.body" placeholder="Join the discussion!" saveLabel="Save" @save="save(newNote)" />
+                    <Tiptap v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
                 </div>
             </template>
             <!--            <template v-else>
@@ -125,17 +125,7 @@ export default Vue.extend({
         groupedFieldNotes: GroupedFieldNotes[] | null;
         isLoading: boolean;
         placeholder: string | null;
-        newNote: {
-            projectId: number | null;
-            bookmark: string | null;
-            body: string | null;
-        };
-        newReply: {
-            projectId: number | null;
-            bookmark: string | null;
-            body: string | null;
-            threadId: number | null;
-        };
+        newNoteText: string | null;
         errorMessage: string | null;
         //    editingFieldNote: FieldNote | null;
     } {
@@ -161,17 +151,7 @@ export default Vue.extend({
             ],*/
             isLoading: false,
             placeholder: null,
-            newNote: {
-                projectId: null,
-                bookmark: null,
-                body: "",
-            },
-            newReply: {
-                projectId: null,
-                bookmark: null,
-                body: "",
-                threadId: null,
-            },
+            newNoteText: null,
             errorMessage: null,
             //    editingFieldNote: null,
         };
@@ -183,15 +163,15 @@ export default Vue.extend({
         this.groupByMonth();
     },
     methods: {
-        async save(note: any): Promise<void> {
+        async save(): Promise<void> {
             this.errorMessage = null;
-            console.log("new note radoi", note);
-            const test = {
-                body: 'test',
+            console.log("new note radoi", this.newNoteText);
+            const note = {
+                body: this.newNoteText,
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
-            await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note: test });
+            await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
         },
         saveEdit(): void {
             console.log("rr");
