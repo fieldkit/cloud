@@ -35,10 +35,10 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-<!--        <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">There are no comments yet.</div>
-        <div v-if="isLoading" class="no-comments">Loading comments...</div>-->
+        <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="isLoading" class="no-comments">{{ $tc("fieldNotes.noNotes") }}</div>
 
-        <!--        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
+        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
             <transition-group name="fade">
                 <div
                     class="field-note"
@@ -85,7 +85,7 @@
                     </div>
                 </div>
             </transition-group>
-        </div>-->
+        </div>
     </div>
 </template>
 
@@ -115,7 +115,41 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
         }),
         fieldNotes(): PortalStationFieldNotes[] {
-            return this.$state.notes.fieldNotes;
+            return [
+                {
+                    id: 0,
+                    author: { id: 1, name: "Christine", photo: {} },
+                    body:
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1668775672000,
+                    updatedAt: 1668775672000,
+                },
+                {
+                    id: 1,
+                    author: { id: 2, name: "Christine", photo: {} },
+                    body:
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1768775672000,
+                    updatedAt: 1868775672000,
+                },
+                {
+                    id: 3,
+                    author: { id: 1, name: "Christine", photo: {} },
+                    body:
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1668775672050,
+                    updatedAt: 1668775672050,
+                },
+                {
+                    id: 3,
+                    author: { id: 1, name: "Christine", photo: {} },
+                    body:
+                        '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"In the last 24 hours there have been some connectivity issues, the station data was interrupted by severe storms."}]}]}',
+                    createdAt: 1665745349000,
+                    updatedAt: 1665745349000,
+                },
+            ];
+            //   return this.$state.notes.fieldNotes;
         },
         stationId(): number {
             return parseInt(this.$route.params.stationId, 10);
@@ -228,12 +262,10 @@ export default Vue.extend({
         },*/
         groupByMonth() {
             const groupedItems = _.groupBy(this.fieldNotes, (b) =>
-                moment(b.updatedAt)
+                moment(b.createdAt)
                     .startOf("month")
                     .format("YYYY/MM")
             );
-
-            _.values(groupedItems).forEach((arr) => arr.sort((a, b) => moment(a.modDate).day() - moment(b.modDate).day()));
 
             console.log("radoi groupe", groupedItems);
         },

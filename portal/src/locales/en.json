@@ -389,7 +389,9 @@
         "delete": "Delete",
         "update": "Update",
         "cancel": "Cancel",
-        "sureCancelEdit": "Are you sure you want to cancel? You will lose all your changes."
+        "sureCancelEdit": "Are you sure you want to cancel? You will lose all your changes.",
+        "loading": "Loading field notes...",
+        "noNotes": "There are no field notes yet."
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",
