@@ -35,8 +35,8 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">There are no comments yet.</div>
-        <div v-if="isLoading" class="no-comments">Loading comments...</div>
+<!--        <div v-if="!isLoading && fieldNotes.length === 0" class="no-comments">There are no comments yet.</div>
+        <div v-if="isLoading" class="no-comments">Loading comments...</div>-->
 
         <!--        <div class="list" v-if="fieldNotes && fieldNotes.length > 0">
             <transition-group name="fade">
@@ -97,18 +97,10 @@ import { ActionTypes, AuthenticationRequiredError, GlobalState } from "@/store";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import moment from "moment";
 import _ from "lodash";
-import { PortalStationNotes } from "@/views/notes/model";
-
-interface FieldNote {
-    id: number;
-    author: { id: number; name: string; photo: object };
-    body: string;
-    createdAt: number;
-    updatedAt: number;
-}
+import { PortalStationFieldNotes, PortalStationNotes } from "@/views/notes/model";
 
 interface GroupedFieldNotes {
-    [date: string]: FieldNote[];
+    [date: string]: PortalStationFieldNotes[];
 }
 
 export default Vue.extend({
@@ -122,9 +114,15 @@ export default Vue.extend({
         ...mapState({
             user: (s: GlobalState) => s.user.user,
         }),
+        fieldNotes(): PortalStationFieldNotes[] {
+            return this.$state.notes.fieldNotes;
+        },
+        stationId(): number {
+            return parseInt(this.$route.params.stationId, 10);
+        },
     },
     data(): {
-        fieldNotes: GroupedFieldNotes[] | null;
+        groupedFieldNotes: GroupedFieldNotes[] | null;
         isLoading: boolean;
         placeholder: string | null;
         newNote: {
@@ -139,10 +137,10 @@ export default Vue.extend({
             threadId: number | null;
         };
         errorMessage: string | null;
-        editingFieldNote: FieldNote | null;
+        //    editingFieldNote: FieldNote | null;
     } {
         return {
-            fieldNotes: null,
+            groupedFieldNotes: null,
             /*fieldNotes: [
                 {
                     id: 0,
@@ -175,13 +173,11 @@ export default Vue.extend({
                 threadId: null,
             },
             errorMessage: null,
-            editingFieldNote: null,
+            //    editingFieldNote: null,
         };
     },
     beforeMount(): void {
-        const stationId = this.$route.params.stationId;
-
-        this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: stationId });
+        this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
     },
     mounted() {
         this.groupByMonth();
@@ -190,22 +186,17 @@ export default Vue.extend({
         async save(note: any): Promise<void> {
             this.errorMessage = null;
             console.log("new note radoi", note);
-            // TODO: Achil api
-
-            /* await this.$services.api
-                .postComment(note)
-                .then((response: { fieldNote: FiledN }) => {
-                    this.newNote.body = "";
-                    // add the comment to the replies array
-                })
-                .catch((e) => {
-                    this.errorMessage = FiledNotesErrorsEnum.getFiledNotes;
-                });*/
+            const test = {
+                body: 'test',
+                userId: this.user?.id,
+                stationId: this.stationId,
+            };
+            await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note: test });
         },
         saveEdit(): void {
             console.log("rr");
         },
-        getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
+        /*getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
             if (this.user && this.user.id === post.author.id) {
                 return [
                     {
@@ -228,14 +219,14 @@ export default Vue.extend({
         },
         editFieldNote(fieldNote: FieldNote) {
             this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
-        },
+        },*/
         deleteFieldNote() {
             console.log("r");
         },
         formatTimestamp(timestamp: number): string {
             return moment(timestamp).fromNow();
         },
-        cancelEdit(fieldNote: FieldNote) {
+        /*cancelEdit(fieldNote: FieldNote) {
             if (JSON.stringify(fieldNote.body) !== JSON.stringify(this.editingFieldNote?.body)) {
                 console.log("radoi diff");
                 this.$confirm({
@@ -254,7 +245,7 @@ export default Vue.extend({
             }
 
             this.editingFieldNote = null;
-        },
+        },*/
         groupByMonth() {
             const groupedItems = _.groupBy(this.fieldNotes, (b) =>
                 moment(b.updatedAt)
@@ -264,7 +255,7 @@ export default Vue.extend({
 
             _.values(groupedItems).forEach((arr) => arr.sort((a, b) => moment(a.modDate).day() - moment(b.modDate).day()));
 
-            console.log("radoi", groupedItems);
+            console.log("radoi groupe", groupedItems);
         },
     },
 });

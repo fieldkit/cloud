@@ -1,18 +1,23 @@
 import Vue from "vue";
 import { Services } from "@/api";
-import { PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
+import { PortalNoteMedia, PortalStationFieldNotes, PortalStationNotes } from "@/views/notes/model";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
+import {ADD_FIELD_NOTE} from '@/store/actions';
 
 export class NotesState {
     media: PortalNoteMedia[];
     notes: PortalStationNotes[];
+    fieldNotes: PortalStationFieldNotes[];
     readOnly: boolean;
 }
 
 const getters = {
     notes(state: NotesState): PortalStationNotes[] {
         return state.notes;
+    },
+    fieldNotes(state: NotesState): PortalStationFieldNotes[] {
+        return state.fieldNotes;
     },
     media(state: NotesState): PortalNoteMedia[] {
         return state.media;
@@ -35,6 +40,14 @@ const actions = (services: Services) => {
             const notes = await services.api.getStationFieldNotes(payload.id);
             console.log("radoi notes", notes);
             commit(MutationTypes.FIELD_NOTES_UPDATE, notes);
+        },
+        [ActionTypes.ADD_FIELD_NOTE]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: NotesState },
+            payload: { stationId: number, note: PortalStationFieldNotes }
+        ) => {
+            const response = await services.api.addStationFieldNote(payload.stationId, payload.note);
+            console.log("radoi notes", response);
+            commit(MutationTypes.FIELD_NOTES_UPDATE, response);
         },
     };
 };

@@ -16,6 +16,7 @@ import { SensorInfoResponse } from "@/views/viz/api";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
+import {PortalStationFieldNotes} from '@/views/notes/model';
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -1080,14 +1081,6 @@ class FKApi {
         });
     }
 
-    getFieldNotes(stationId) {
-        return this.invoke({
-            auth: Auth.Required,
-            method: "GET",
-            url: this.baseUrl + "/stations/" + stationId + "/field-notes",
-        });
-    }
-
     addProjectUpdate(data) {
         return this.invoke({
             auth: Auth.Required,
@@ -1239,6 +1232,23 @@ class FKApi {
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/station/" + stationId + "/station-notes",
+        });
+    }
+
+    public addStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/station/" + stationId + "/station-note",
+            data: note,
+        });
+    }
+
+    public patchStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/station/" + stationId + "/station-note/" + note.id,
         });
     }
 

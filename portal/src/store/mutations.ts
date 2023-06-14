@@ -4,7 +4,6 @@ export const LOADING = "LOADING";
 export const INITIALIZE = "INITIALZE";
 
 export const NOTES_UPDATE = "NOTES_UPDATE";
-export const FIELD_NOTES_UPDATE = "FIELD_NOTES_UPDATE";
 
 export const SHOW_SNACKBAR = "SHOW_SNACKBAR";
 export const HIDE_SNACKBAR = "HIDE_SNACKBAR";
