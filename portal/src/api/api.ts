@@ -1227,15 +1227,23 @@ class FKApi {
         });
     }
 
-    public getStationFieldNotes(stationId: number): Promise<any> {
-        return this.invoke({
+    public async getStationFieldNotes(stationId: number): Promise<any> {
+        const response = await this.invoke({
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/station/" + stationId + "/station-notes",
         });
+
+        const notes = response.notes.map((note) => {
+            note.body = JSON.parse(note.body);
+            return note;
+        });
+
+        return { notes: notes };
     }
 
     public addStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+        note.body = JSON.stringify(note.body);
         return this.invoke({
             auth: Auth.Required,
             method: "POST",

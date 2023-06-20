@@ -209,14 +209,14 @@ func StationNoteWithAuthor(dp *data.StationNote, users map[int32]*data.User) (*s
 }
 
 func StationNotes(notes *data.StationNotesWithUsers) ([]*stationNoteService.StationNote, error) {
-	var response []*stationNoteService.StationNote
+	response := make([]*stationNoteService.StationNote, 0)
 	for _, note := range notes.Notes {
 		tp, err := StationNoteWithAuthor(note, notes.UsersByID)
 		if err != nil {
 			return nil, err
 		}
 
-		response[tp.ID] = tp
+		response = append(response, tp)
 	}
 	return response, nil
 }
