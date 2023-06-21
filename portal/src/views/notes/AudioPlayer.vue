@@ -1,9 +1,7 @@
 <template>
-    <div>
-        <audio controls v-if="loaded">
-            <source :src="loaded" />
-        </audio>
-    </div>
+    <audio controls v-if="loaded">
+        <source :src="loaded" />
+    </audio>
 </template>
 
 <script lang="ts">
