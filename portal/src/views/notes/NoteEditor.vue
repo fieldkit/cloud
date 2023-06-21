@@ -11,7 +11,6 @@
             </template>
         </div>
         <div class="attached-audio" v-for="audio in note.audio" v-bind:key="audio.key">
-            for
             <div class="audio-title">
                 {{ audio.key }}
             </div>
@@ -60,8 +59,8 @@ export default Vue.extend({
         },
     },
     mounted() {
-      console.log("Radoi note", this.note);
-    }
+        console.log("Radoi note", this.note);
+    },
 });
 </script>
 
@@ -71,7 +70,7 @@ export default Vue.extend({
 .attached-audio {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     margin-bottom: 10px;
     border: 1px solid var(--color-border);
     border-radius: 4px;
@@ -82,7 +81,7 @@ export default Vue.extend({
 .audio-title {
     font-size: 14px;
     font-weight: 500;
-    margin-right: 10px;
+    margin-right: auto;
 
     @include bp-down($xs) {
         flex-basis: 100%;

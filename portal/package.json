@@ -12,7 +12,6 @@
     "dependencies": {
         "@babel/runtime": "^7.10.5",
         "@johmun/vue-tags-input": "^2.1.0",
-        "@liripeng/vue-audio-player": "^1.5.1",
         "@mapbox/mapbox-gl-geocoder": "^5.0.0",
         "@messageformat/core": "^3.0.0-beta.3",
         "@messageformat/runtime": "^3.0.0-beta.2",
@@ -44,7 +43,6 @@
         "vega-embed": "^6.20.5",
         "vega-lite": "^5.2.0",
         "vue": "^2.6.11",
-        "vue-audio": "^0.0.12",
         "vue-body-class": "^3.0.2",
         "vue-class-component": "^7.2.3",
         "vue-confirm-dialog": "1.0.2",
