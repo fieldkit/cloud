@@ -115,7 +115,7 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
         }),
         fieldNotes(): PortalStationFieldNotes[] {
-            return [
+            /* return [
                 {
                     id: 0,
                     author: { id: 1, name: "Christine", photo: {} },
@@ -148,8 +148,8 @@ export default Vue.extend({
                     createdAt: 1665745349000,
                     updatedAt: 1665745349000,
                 },
-            ];
-            //   return this.$state.notes.fieldNotes;
+            ];*/
+            return this.$state.notes.fieldNotes;
         },
         stationId(): number {
             return parseInt(this.$route.params.stationId, 10);
@@ -183,7 +183,7 @@ export default Vue.extend({
                     updatedAt: 1868775672000,
                 },
             ],*/
-            isLoading: false,
+            isLoading: true,
             placeholder: null,
             newNoteText: null,
             errorMessage: null,
@@ -193,13 +193,14 @@ export default Vue.extend({
     beforeMount(): void {
         this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
     },
-    mounted() {
-        this.groupByMonth();
+    watch: {
+        fieldNotes() {
+            this.groupByMonth();
+        },
     },
     methods: {
         async save(): Promise<void> {
             this.errorMessage = null;
-            console.log("new note radoi", this.newNoteText);
             const note = {
                 body: this.newNoteText,
                 userId: this.user?.id,
