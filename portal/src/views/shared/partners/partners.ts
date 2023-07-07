@@ -78,16 +78,15 @@ const FloodNetProjectDescription = Vue.extend({
                         <template v-if="isMobileView">{{ $t(link.mobileText) }} ></template>
                         <template v-else>{{ $t(link.text) }} ></template>
                     </a>
-                    <a v-if="isMobileView" href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
+                    <a v-if="isMobileView" href="https://mycoast.org/ny/flood-watch" target="_blank" class="link">
                         {{ $t('floodnet.reportFlood') }} >
                     </a>
                 </div>
             </div>
             <div class="detail-description">{{ project.description }}</div>
             <div class="detail-description">
-                {{ $t('floodnet.reportFlood') }}:
-                <a href="https://survey123.arcgis.com/share/b9b1d621d16543378b6d3a6b3e02b424" target="_blank" class="link">
-                    {{ $t('floodnet.survey') }}
+                <a href="https://mycoast.org/ny/flood-watch" target="_blank" class="link">
+                    {{ $t('floodnet.reportFlood') }}
                 </a>
             </div>
         </div>
