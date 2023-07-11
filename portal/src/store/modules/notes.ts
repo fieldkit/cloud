@@ -1,13 +1,12 @@
 import Vue from "vue";
 import {Services} from "@/api";
-import {PortalNoteMedia, PortalStationFieldNotes, PortalStationNotes} from "@/views/notes/model";
+import {PortalNoteMedia, PortalStationNotes} from "@/views/notes/model";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
 
 export class NotesState {
     media: PortalNoteMedia[];
     notes: PortalStationNotes[];
-    fieldNotes: PortalStationFieldNotes[];
     readOnly: boolean;
 }
 

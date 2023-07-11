@@ -133,7 +133,7 @@
             </section>
 
             <section class="section-notes container-box">
-                <FieldNotes></FieldNotes>
+                <FieldNotes :stationName="station.name"></FieldNotes>
             </section>
         </div>
     </StandardLayout>
@@ -164,7 +164,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
-import FieldNotes from "@/views/notes/FieldNotes.vue";
+import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 
 export default Vue.extend({
     name: "StationView",

@@ -27,14 +27,6 @@ export interface PortalStationNotes {
     media: { id: number; key: string; url: string; contentType: string }[];
 }
 
-export interface PortalStationFieldNotes {
-    id: number;
-    author: { id: number; name: string; photo: object };
-    body: string;
-    createdAt: number;
-    updatedAt: number;
-}
-
 export interface PortalNoteMedia {
     id: number;
     contentType: string;

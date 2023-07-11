@@ -1,8 +1,8 @@
 import Vue from "vue";
-import {Services} from "@/api";
-import {PortalNoteMedia, PortalStationFieldNotes, PortalStationNotes} from "@/views/notes/model";
+import { Services } from "@/api";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
+import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 
 export class FieldNotesState {
     fieldNotes: PortalStationFieldNotes[];
@@ -17,20 +17,35 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.NEED_FIELD_NOTES]: async (
-            {commit, dispatch, state}: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { id: number }
         ) => {
             const notes = await services.api.getStationFieldNotes(payload.id);
-            console.log("radoi field notes response", notes);
-            commit(MutationTypes.FIELD_NOTES_UPDATE, notes);
+            commit(MutationTypes.FIELD_NOTES_UPDATE, notes.notes);
         },
         [ActionTypes.ADD_FIELD_NOTE]: async (
-            {commit, dispatch, state}: { commit: any; dispatch: any; state: FieldNotesState },
-            payload: { stationId: number, note: PortalStationFieldNotes }
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            payload: { stationId: number; note: PortalStationFieldNotes }
         ) => {
             const response = await services.api.addStationFieldNote(payload.stationId, payload.note);
+            const combined = [response].concat(state.fieldNotes);
             console.log("radoi add field notes response", response);
-            commit(MutationTypes.FIELD_NOTES_UPDATE, response);
+            commit(MutationTypes.FIELD_NOTES_UPDATE, combined);
+        },
+        [ActionTypes.UPDATE_FIELD_NOTE]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            payload: { stationId: number; note: PortalStationFieldNotes }
+        ) => {
+            await services.api.updateStationFieldNote(payload.stationId, payload.note);
+        },
+        [ActionTypes.DELETE_FIELD_NOTE]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            payload: { stationId: number; noteId: number }
+        ) => {
+            const response = await services.api.deleteStationFieldNote(payload.stationId, payload.noteId);
+            const newNotes = state.fieldNotes.filter(note => note.id !== payload.noteId);
+            console.log("radoi delete field notes response", response);
+            commit(MutationTypes.FIELD_NOTES_UPDATE, newNotes);
         },
     };
 };
@@ -38,11 +53,11 @@ const actions = (services: Services) => {
 const mutations = {
     [MutationTypes.FIELD_NOTES_UPDATE]: (
         state: FieldNotesState,
-        payload: {
-            fieldNotes: PortalStationFieldNotes[];
-        }
+        payload: PortalStationFieldNotes,
     ) => {
-        Vue.set(state, "fieldNotes", payload.fieldNotes);
+     //   const combined = state.fieldNotes.push(payload);
+        console.log("radoi mutating", payload);
+        Vue.set(state, "fieldNotes", payload);
     },
 };
 

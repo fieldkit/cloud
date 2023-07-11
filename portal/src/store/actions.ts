@@ -48,8 +48,9 @@ export const NOTIFICATIONS_SEEN = "NOTIFICATIONS_SEEN";
 
 export const NEED_NOTES = "NEED_NOTES";
 export const NEED_FIELD_NOTES = "NEED_FIELD_NOTES";
-export const ADD_FIELD_NOTE = "UPDATE_FIELD_NOTE";
+export const ADD_FIELD_NOTE = "ADD_FIELD_NOTE";
 export const UPDATE_FIELD_NOTE = "UPDATE_FIELD_NOTE";
+export const DELETE_FIELD_NOTE = "DELETE_FIELD_NOTE";
 
 // Snackbar
 

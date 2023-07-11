@@ -390,6 +390,7 @@
         "update": "Update",
         "cancel": "Cancel",
         "sureCancelEdit": "Are you sure you want to cancel? You will lose all your changes.",
+        "sureDelete": "Are you sure you want to delete this field note?",
         "loading": "Loading field notes...",
         "noNotes": "There are no field notes yet."
     },

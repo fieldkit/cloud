@@ -1,0 +1,496 @@
+<template>
+    <div>
+        <vue-confirm-dialog />
+
+        <header class="header">
+            <div class="name">{{ $t("fieldNotes.title") }}</div>
+            <div class="buttons" v-if="isAuthenticated">
+                <button class="button" @click="generatePDF">{{ $t("fieldNotes.btnExport") }}</button>
+            </div>
+        </header>
+
+        <div class="new-field-note" v-if="user">
+            <UserPhoto :user="user"></UserPhoto>
+            <template v-if="user">
+                <div class="new-field-note-wrap">
+                    <Tiptap v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
+                </div>
+            </template>
+            <!--            <template v-else>
+    <p class="need-login-msg">
+        {{ $tc("comments.loginToComment.part1") }}
+        <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+            {{ $tc("comments.loginToComment.part2") }}
+        </router-link>
+        {{ $tc("comments.loginToComment.part3") }}
+    </p>
+    <router-link
+        :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+        class="button-submit"
+    >
+        {{ $t("login.loginButton") }}
+    </router-link>
+</template>-->
+        </div>
+
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+
+        <div v-if="!isLoading && !groupedFieldNotes" class="no-comments">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="isLoading" class="no-comments">{{ $tc("fieldNotes.loading") }}</div>
+
+        <div class="list" v-if="groupedFieldNotes" ref="pdfContent">
+            <div
+                class="field-note-group hidden"
+                :ref="'field-note-group-' + index"
+                v-for="(monthItems, month, index) in groupedFieldNotes"
+                :key="month"
+            >
+                <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
+                    <i class="icon icon-chevron-right"></i>
+                    <div class="month-name">{{ getMonthName(month) }} Entries</div>
+                    <div class="month-last-updated">Last updated: {{ getMonthLastUpdated(monthItems) }}</div>
+                </div>
+
+                <transition-group name="fade">
+                    <div v-for="fieldNote in monthItems" :key="fieldNote.id" class="field-note">
+                        <UserPhoto :user="fieldNote.author"></UserPhoto>
+                        <span class="author">
+                            {{ fieldNote.author.name }}
+                        </span>
+                        <div class="timestamps">
+                            <div class="timestamp-1">{{ formatTimestamp(fieldNote.createdAt) }}</div>
+                            <div class="timestamp-2">
+                                {{ $tc("fieldNotes.lastUpdated") }}
+                                {{ formatTimestamp(fieldNote.updatedAt) }}
+                            </div>
+                        </div>
+                        <template v-if="editingFieldNote && editingFieldNote.id === fieldNote.id">
+                            <Tiptap v-model="editingFieldNote.body" :readonly="false" saveLabel="Save" />
+                        </template>
+                        <template v-else>
+                            <Tiptap v-model="fieldNote.body" :readonly="true" saveLabel="Save" />
+                        </template>
+                        <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
+                            <button v-if="user" @click="editFieldNote(fieldNote)">
+                                <i class="icon icon-edit"></i>
+                                {{ $t("fieldNotes.edit") }}
+                            </button>
+                            <button @click="deleteFieldNote(fieldNote.id)">
+                                <i class="icon icon-trash"></i>
+                                {{ $t("fieldNotes.delete") }}
+                            </button>
+                        </div>
+
+                        <div v-if="editingFieldNote && editingFieldNote.id === fieldNote.id" class="update-actions">
+                            <button v-if="user" @click="cancelEdit(fieldNote)">
+                                {{ $t("fieldNotes.cancel") }}
+                            </button>
+                            <button @click="saveEdit()">
+                                {{ $t("fieldNotes.update") }}
+                            </button>
+                        </div>
+                    </div>
+                </transition-group>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import CommonComponents from "@/views/shared";
+import { mapGetters, mapState } from "vuex";
+import { ActionTypes, GlobalState } from "@/store";
+import Tiptap from "@/views/shared/Tiptap.vue";
+import moment from "moment";
+import _ from "lodash";
+import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
+import { jsPDF } from "jspdf";
+
+interface GroupedFieldNotes {
+    [date: string]: PortalStationFieldNotes[];
+}
+
+export default Vue.extend({
+    name: "FieldNotes",
+    components: {
+        ...CommonComponents,
+        Tiptap,
+    },
+    props: {
+        stationName: {
+            type: String,
+            required: true,
+        },
+    },
+    computed: {
+        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapState({
+            user: (s: GlobalState) => s.user.user,
+        }),
+        fieldNotes(): PortalStationFieldNotes[] {
+            return this.$state.fieldNotes.fieldNotes;
+        },
+        stationId(): number {
+            return parseInt(this.$route.params.stationId, 10);
+        },
+    },
+    data(): {
+        groupedFieldNotes: GroupedFieldNotes[] | null;
+        isLoading: boolean;
+        placeholder: string | null;
+        newNoteText: string | null;
+        errorMessage: string | null;
+        editingFieldNote: PortalStationFieldNotes | null;
+    } {
+        return {
+            groupedFieldNotes: null,
+            isLoading: true,
+            placeholder: null,
+            newNoteText: null,
+            errorMessage: null,
+            editingFieldNote: null,
+        };
+    },
+    beforeMount(): void {
+        this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+    },
+    watch: {
+        fieldNotes() {
+            this.groupByMonth();
+        },
+    },
+    methods: {
+        async save(): Promise<void> {
+            this.errorMessage = null;
+            const note = {
+                body: this.newNoteText,
+                userId: this.user?.id,
+                stationId: this.stationId,
+            };
+            console.log("radoi new note save", note);
+            await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
+            this.newNoteText = null;
+        },
+        async saveEdit(): void {
+            console.log("radoi save edit", this.editingFieldNote);
+            const payload = {
+                id: this.editingFieldNote?.id,
+                body: JSON.stringify(this.editingFieldNote?.body),
+                userId: this.user?.id,
+                stationId: this.stationId,
+            };
+            console.log("radoi save edit pauload", payload);
+            this.$nextTick(async () => {
+                this.editingFieldNote = null;
+                await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
+                setTimeout(() => {
+                    this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+                }, 5000);
+            });
+        },
+        /*getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
+    if (this.user && this.user.id === post.author.id) {
+        return [
+            {
+                label: "Edit",
+                event: "edit-comment",
+            },
+            {
+                label: "Delete post",
+                event: "delete-comment",
+            },
+        ];
+    }
+
+    return [
+        {
+            label: "Delete",
+            event: "delete-comment",
+        },
+    ];
+},
+*/
+
+        editFieldNote(fieldNote: PortalStationFieldNotes) {
+            this.$nextTick(() => {
+                this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
+                console.log("radoi editing", this.editingFieldNote);
+            });
+        },
+        deleteFieldNote(noteId: number) {
+            this.$confirm({
+                message: this.$tc("fieldNotes.sureDelete"),
+                button: {
+                    no: this.$tc("no"),
+                    yes: this.$tc("yes"),
+                },
+                callback: async (confirm) => {
+                    if (confirm) {
+                        await this.$store.dispatch(ActionTypes.DELETE_FIELD_NOTE, { stationId: this.stationId, noteId });
+                    }
+                },
+            });
+        },
+        formatTimestamp(timestamp: number): string {
+            return moment(timestamp).fromNow();
+        },
+        cancelEdit(fieldNote: PortalStationFieldNotes) {
+            if (JSON.stringify(fieldNote.body) !== JSON.stringify(this.editingFieldNote?.body)) {
+                this.$confirm({
+                    message: this.$tc("fieldNotes.sureCancelEdit"),
+                    button: {
+                        no: this.$tc("no"),
+                        yes: this.$tc("yes"),
+                    },
+                    callback: async (confirm) => {
+                        if (confirm) {
+                            this.editingFieldNote = null;
+                        }
+                    },
+                });
+                return;
+            }
+
+            this.editingFieldNote = null;
+        },
+        groupByMonth() {
+            const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) =>
+                moment(b.createdAt)
+                    .startOf("month")
+                    .format("YYYY/MM")
+            );
+
+            this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
+            this.isLoading = false;
+        },
+
+        getMonthName(month): string {
+            return moment(month, "YYYY/MM").format("MMMM");
+        },
+        getMonthLastUpdated(items): string {
+            const mostRecentUpdatedAt = items.reduce((maxUpdatedAt, obj) => {
+                return Math.max(maxUpdatedAt, obj.updatedAt);
+            }, 0);
+
+            return this.formatTimestamp(mostRecentUpdatedAt);
+        },
+        toggleFieldNoteGroup(ref) {
+            const elements = this.$refs[ref] as (HTMLElement | undefined)[];
+            if (elements && elements.length > 0) {
+                const element = elements[0];
+                if (element instanceof HTMLElement) {
+                    element.classList.toggle("hidden");
+                }
+            }
+        },
+        async generatePDF() {
+            const doc = new jsPDF();
+            const elementHTML = this.$refs.pdfContent as HTMLElement;
+
+            const actionsEls = elementHTML.querySelectorAll(".actions");
+            const groupEls = elementHTML.querySelectorAll(".field-note-group");
+
+            // prepare HTML
+            groupEls.forEach((el) => {
+                el.classList.remove("hidden");
+            });
+            actionsEls.forEach((el) => {
+                el.classList.add("hidden");
+            });
+
+            doc.html(elementHTML, {
+                callback: (doc) => {
+                    // Save the PDF
+                    const fileName = this.stationName + " " + this.$tc("fieldNotes.title") + ".pdf";
+                    doc.save(fileName);
+                    // display back the actions els
+                    actionsEls.forEach((el) => {
+                        el.classList.remove("hidden");
+                    });
+                },
+                margin: [10, 10, 10, 10],
+                autoPaging: "text",
+                x: 0,
+                y: 0,
+                width: 190, //target width in the PDF document
+                windowWidth: 675, //window width in CSS pixels
+            });
+        },
+    },
+});
+</script>
+
+<style scoped lang="scss">
+@import "src/scss/global";
+@import "src/scss/notes";
+
+.new-field-note {
+    display: flex;
+    align-items: center;
+    padding: 25px 0;
+    position: relative;
+
+    @include bp-down($xs) {
+        padding: 15px 10px;
+    }
+
+    .container.data-view & {
+        &:not(.reply) {
+            background-color: rgba(#f4f5f7, 0.55);
+            padding: 18px 23px 17px 15px;
+        }
+    }
+
+    &.reply {
+        padding: 0 0 0;
+        margin: 10px 0 0 0;
+        width: 100%;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
+
+    .button-submit {
+        margin-left: auto;
+
+        @media screen and (max-width: 320px) {
+            width: 100%;
+        }
+    }
+
+    &-wrap {
+        display: flex;
+        width: 100%;
+        position: relative;
+        background-color: #fff;
+
+        ::v-deep .tiptap-container {
+            flex: 0 0 100%;
+            margin-left: 0;
+        }
+    }
+}
+
+::v-deep .default-user-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0 15px 0 0;
+}
+
+.new-comment-wrap {
+    width: 100%;
+}
+
+::v-deep .tiptap-container {
+    box-sizing: border-box;
+    flex: 0 0 calc(100% - 52px);
+    margin-left: 52px;
+}
+
+.field-note {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    width: 100%;
+    padding: 30px 20px;
+    margin-left: -20px;
+    border-top: solid 1px #d8dce0;
+
+    .field-note-group.hidden & {
+        display: none;
+    }
+}
+
+.author {
+    font-size: 18px;
+    color: #6a6d71;
+}
+
+.timestamps {
+    margin-left: auto;
+    margin-top: -10px;
+    color: #818388;
+    text-align: right;
+}
+
+.timestamp-1 {
+    font-size: 14px;
+}
+
+.timestamp-2 {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+button {
+    background-color: transparent;
+    border: 0;
+    font-size: 14px;
+    padding: 0;
+    margin-right: 12px;
+}
+
+.actions {
+    padding-left: 52px;
+    margin-top: 15px;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.update-actions {
+    color: #818388;
+    margin-left: auto;
+    margin-right: -12px;
+    margin-top: 12px;
+
+    button:nth-of-type(2) {
+        color: $color-fieldkit-primary;
+        font-weight: 900;
+    }
+}
+
+.month-row {
+    flex: 0 0 100%;
+    width: 100%;
+    padding: 0 20px;
+    margin-left: -20px;
+    display: flex;
+    align-items: center;
+    height: 88px;
+    border-top: solid 1px #d8dce0;
+    cursor: pointer;
+
+    .icon-chevron-right {
+        font-size: 32px;
+        transform: rotate(270deg);
+        transition: all 250ms;
+        margin-top: -5px;
+
+        .field-note-group.hidden & {
+            transform: rotate(90deg);
+        }
+    }
+
+    .month-name {
+        color: #6a6d71;
+        font-size: 18px;
+    }
+
+    .month-last-updated {
+        color: #818388;
+        font-size: 14px;
+        margin-left: auto;
+    }
+
+    &.expanded {
+        .icon-chevron-right {
+            transform: rotate(270deg);
+        }
+    }
+}
+</style>

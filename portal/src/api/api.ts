@@ -16,7 +16,7 @@ import { SensorInfoResponse } from "@/views/viz/api";
 import { NewComment } from "@/views/comments/model";
 import { Comment } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
-import {PortalStationFieldNotes} from '@/views/notes/model';
+import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -1228,18 +1228,19 @@ class FKApi {
     }
 
     public async getStationFieldNotes(stationId: number): Promise<any> {
-        const response = await this.invoke({
+        return this.invoke({
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/station/" + stationId + "/station-notes",
         });
+    }
 
-        const notes = response.notes.map((note) => {
-            note.body = JSON.parse(note.body);
-            return note;
+    public async deleteStationFieldNote(stationId: number, noteId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "DELETE",
+            url: this.baseUrl + "/station/" + stationId + "/station-note/" + noteId,
         });
-
-        return { notes: notes };
     }
 
     public addStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
@@ -1252,11 +1253,12 @@ class FKApi {
         });
     }
 
-    public patchStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+    public updateStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/station/" + stationId + "/station-note/" + note.id,
+            data: note,
         });
     }
 
