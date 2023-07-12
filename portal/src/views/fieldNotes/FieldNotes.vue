@@ -64,11 +64,12 @@
                                 {{ formatTimestamp(fieldNote.updatedAt) }}
                             </div>
                         </div>
-<!--                        <template v-if="editingFieldNote && editingFieldNote.id === fieldNote.id">
-                            <Tiptap v-model="editingFieldNote.body" :readonly="false" saveLabel="Save" />
-                        </template>-->
                         <template>
-                            <Tiptap :ref="'save-' + fieldNote.id" :value="fieldNote.body" :readonly="!editingFieldNote" @change="onEditChange($event)"/>
+                            <Tiptap
+                                :ref="'save-' + fieldNote.id"
+                                :value="fieldNote.body"
+                                :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
+                            />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
                             <button v-if="user" @click="editFieldNote(fieldNote)">
@@ -157,7 +158,6 @@ export default Vue.extend({
     },
     watch: {
         fieldNotes() {
-            console.log("RADOI WATCH FIELDNOTES CHANGE");
             this.groupByMonth();
         },
     },
@@ -169,18 +169,11 @@ export default Vue.extend({
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
-            console.log("radoi new note save", note);
             await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
             this.newNoteText = null;
         },
         async saveEdit(ref): void {
-         //   console.log("radoi save edit", this.editingFieldNote);
-          const editedText = this.$refs[ref][0].$refs['contentContainer'].textContent;
-
-            console.log("Radoi save", this.$refs[ref]);
-   /*         console.log("Radoi save", ref);
-            console.log("Radoi save", this.$refs[ref].event);
-            console.log("Radoi save", this.$refs[ref].event.target.value);*/
+            const editedText = this.$refs[ref][0].editor.getHTML();
 
             const payload = {
                 id: this.editingFieldNote?.id,
@@ -188,13 +181,11 @@ export default Vue.extend({
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
-            console.log("radoi save edit pauload", payload);
             await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
             await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
         editFieldNote(fieldNote: PortalStationFieldNotes) {
             this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
-            console.log("radoi editing", this.editingFieldNote);
         },
         deleteFieldNote(noteId: number) {
             this.$confirm({
@@ -305,9 +296,6 @@ export default Vue.extend({
                 windowWidth: 675, //window width in CSS pixels
             });
         },
-      onEditChange(event) {
-          console.log("radoi ev", event);
-      }
     },
 });
 </script>

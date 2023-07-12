@@ -1257,7 +1257,7 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/station/" + stationId + "/station-note/" + note.id,
-            data: { body: JSON.stringify(note.body) },
+            data: { body: note.body },
         });
     }
 

@@ -29,7 +29,6 @@ const actions = (services: Services) => {
         ) => {
             const response = await services.api.addStationFieldNote(payload.stationId, payload.note);
             const combined = [response].concat(state.fieldNotes);
-            console.log("radoi add field notes response", response);
             commit(MutationTypes.FIELD_NOTES_UPDATE, combined);
         },
         [ActionTypes.UPDATE_FIELD_NOTE]: async (
@@ -44,7 +43,6 @@ const actions = (services: Services) => {
         ) => {
             const response = await services.api.deleteStationFieldNote(payload.stationId, payload.noteId);
             const newNotes = state.fieldNotes.filter(note => note.id !== payload.noteId);
-            console.log("radoi delete field notes response", response);
             commit(MutationTypes.FIELD_NOTES_UPDATE, newNotes);
         },
     };
@@ -55,8 +53,6 @@ const mutations = {
         state: FieldNotesState,
         payload: PortalStationFieldNotes,
     ) => {
-     //   const combined = state.fieldNotes.push(payload);
-        console.log("radoi mutating", payload);
         Vue.set(state, "fieldNotes", payload);
     },
 };
