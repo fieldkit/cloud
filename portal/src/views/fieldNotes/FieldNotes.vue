@@ -38,7 +38,7 @@
         <div v-if="!isLoading && !groupedFieldNotes" class="loading-notes">{{ $tc("fieldNotes.noData") }}</div>
         <div v-if="isLoading" class="loading-notes">{{ $tc("fieldNotes.loading") }}</div>
 
-        <div class="list" v-if="groupedFieldNotes" ref="pdfContent">
+        <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
             <div
                 class="field-note-group hidden"
                 :ref="'field-note-group-' + index"
@@ -314,23 +314,6 @@ export default Vue.extend({
         padding: 20px 0;
     }
 
-    .container.data-view & {
-        &:not(.reply) {
-            background-color: rgba(#f4f5f7, 0.55);
-            padding: 18px 23px 17px 15px;
-        }
-    }
-
-    &.reply {
-        padding: 0 0 0;
-        margin: 10px 0 0 0;
-        width: 100%;
-    }
-
-    &.align-center {
-        align-items: center;
-    }
-
     .button-submit {
         margin-left: auto;
 
@@ -363,10 +346,6 @@ export default Vue.extend({
     width: 36px;
     height: 36px;
     margin: 0 15px 0 0;
-}
-
-.new-comment-wrap {
-    width: 100%;
 }
 
 ::v-deep .tiptap-container {
@@ -497,7 +476,11 @@ button {
 
 .field-notes-wrap {
     @include bp-down($sm) {
-        padding: 20px 10px 0;
+        padding: 20px 10px 20px;
     }
+}
+
+.field-note-list {
+    margin-bottom: -20px;
 }
 </style>
