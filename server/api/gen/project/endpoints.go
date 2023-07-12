@@ -39,6 +39,7 @@ type Endpoints struct {
 	Delete              goa.Endpoint
 	UploadPhoto         goa.Endpoint
 	DownloadPhoto       goa.Endpoint
+	ProjectsStation     goa.Endpoint
 }
 
 // UploadPhotoRequestData holds both the payload and the HTTP request body
@@ -77,6 +78,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Delete:              NewDeleteEndpoint(s, a.JWTAuth),
 		UploadPhoto:         NewUploadPhotoEndpoint(s, a.JWTAuth),
 		DownloadPhoto:       NewDownloadPhotoEndpoint(s, a.JWTAuth),
+		ProjectsStation:     NewProjectsStationEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -104,6 +106,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Delete = m(e.Delete)
 	e.UploadPhoto = m(e.UploadPhoto)
 	e.DownloadPhoto = m(e.DownloadPhoto)
+	e.ProjectsStation = m(e.ProjectsStation)
 }
 
 // NewAddUpdateEndpoint returns an endpoint function that calls the method "add
@@ -582,6 +585,30 @@ func NewDownloadPhotoEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.End
 			return nil, err
 		}
 		vres := NewViewedDownloadedPhoto(res, "default")
+		return vres, nil
+	}
+}
+
+// NewProjectsStationEndpoint returns an endpoint function that calls the
+// method "projects station" of service "project".
+func NewProjectsStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ProjectsStationPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ProjectsStation(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedProjects(res, "default")
 		return vres, nil
 	}
 }

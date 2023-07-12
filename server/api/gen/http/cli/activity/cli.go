@@ -31,7 +31,6 @@ import (
 	recordsc "github.com/fieldkit/cloud/server/api/gen/http/records/client"
 	sensorc "github.com/fieldkit/cloud/server/api/gen/http/sensor/client"
 	stationc "github.com/fieldkit/cloud/server/api/gen/http/station/client"
-	stationnotec "github.com/fieldkit/cloud/server/api/gen/http/station_note/client"
 	tasksc "github.com/fieldkit/cloud/server/api/gen/http/tasks/client"
 	testc "github.com/fieldkit/cloud/server/api/gen/http/test/client"
 	ttnc "github.com/fieldkit/cloud/server/api/gen/http/ttn/client"
@@ -57,15 +56,14 @@ modules meta
 notes (update|get|download- media|upload- media|delete- media)
 notifications (listen|seen)
 oidc (required|url|authenticate)
-project (add- update|delete- update|modify- update|invites|lookup- invite|accept- project- invite|reject- project- invite|accept- invite|reject- invite|add|update|get|list- community|list- mine|invite|edit- user|remove- user|add- station|remove- station|delete|upload- photo|download- photo)
+project (add- update|delete- update|modify- update|invites|lookup- invite|accept- project- invite|reject- project- invite|accept- invite|reject- invite|add|update|get|list- community|list- mine|invite|edit- user|remove- user|add- station|remove- station|delete|upload- photo|download- photo|projects- station)
 records (data|meta|resolved)
 sensor (meta|station- meta|sensor- meta|data|tail|recently|bookmark|resolve)
-station-note (station|add- note|update- note|delete- note)
 information (device- layout|firmware- statistics)
-station (add|get|transfer|default- photo|update|list- mine|list- project|list- associated|list- project- associated|download- photo|list- all|delete|admin- search|progress)
 tasks five
 test (get|error|email)
 ttn webhook
+station (add|get|transfer|default- photo|update|list- mine|list- project|list- associated|list- project- associated|download- photo|list- all|delete|admin- search|progress)
 user (roles|upload- photo|download- photo|login|recovery- lookup|recovery|resume|logout|refresh|send- validation|validate|add|update|change- password|accept- tnc|get- current|list- by- project|issue- transmission- token|project- roles|admin- terms- and- conditions|admin- delete|admin- search|mentionables)
 `
 }
@@ -406,6 +404,10 @@ func ParseEndpoint(
 		projectDownloadPhotoIfNoneMatchFlag = projectDownloadPhotoFlags.String("if-none-match", "", "")
 		projectDownloadPhotoAuthFlag        = projectDownloadPhotoFlags.String("auth", "", "")
 
+		projectProjectsStationFlags    = flag.NewFlagSet("projects- station", flag.ExitOnError)
+		projectProjectsStationIDFlag   = projectProjectsStationFlags.String("id", "REQUIRED", "")
+		projectProjectsStationAuthFlag = projectProjectsStationFlags.String("auth", "REQUIRED", "")
+
 		recordsFlags = flag.NewFlagSet("records", flag.ContinueOnError)
 
 		recordsDataFlags        = flag.NewFlagSet("data", flag.ExitOnError)
@@ -458,28 +460,6 @@ func ParseEndpoint(
 		sensorResolveV2Flag   = sensorResolveFlags.String("v2", "REQUIRED", "")
 		sensorResolveAuthFlag = sensorResolveFlags.String("auth", "", "")
 
-		stationNoteFlags = flag.NewFlagSet("station-note", flag.ContinueOnError)
-
-		stationNoteStationFlags         = flag.NewFlagSet("station", flag.ExitOnError)
-		stationNoteStationStationIDFlag = stationNoteStationFlags.String("station-id", "REQUIRED", "")
-		stationNoteStationAuthFlag      = stationNoteStationFlags.String("auth", "", "")
-
-		stationNoteAddNoteFlags         = flag.NewFlagSet("add- note", flag.ExitOnError)
-		stationNoteAddNoteBodyFlag      = stationNoteAddNoteFlags.String("body", "REQUIRED", "")
-		stationNoteAddNoteStationIDFlag = stationNoteAddNoteFlags.String("station-id", "REQUIRED", "")
-		stationNoteAddNoteAuthFlag      = stationNoteAddNoteFlags.String("auth", "REQUIRED", "")
-
-		stationNoteUpdateNoteFlags             = flag.NewFlagSet("update- note", flag.ExitOnError)
-		stationNoteUpdateNoteBodyFlag          = stationNoteUpdateNoteFlags.String("body", "REQUIRED", "")
-		stationNoteUpdateNoteStationIDFlag     = stationNoteUpdateNoteFlags.String("station-id", "REQUIRED", "")
-		stationNoteUpdateNoteStationNoteIDFlag = stationNoteUpdateNoteFlags.String("station-note-id", "REQUIRED", "")
-		stationNoteUpdateNoteAuthFlag          = stationNoteUpdateNoteFlags.String("auth", "REQUIRED", "")
-
-		stationNoteDeleteNoteFlags             = flag.NewFlagSet("delete- note", flag.ExitOnError)
-		stationNoteDeleteNoteStationIDFlag     = stationNoteDeleteNoteFlags.String("station-id", "REQUIRED", "")
-		stationNoteDeleteNoteStationNoteIDFlag = stationNoteDeleteNoteFlags.String("station-note-id", "REQUIRED", "")
-		stationNoteDeleteNoteAuthFlag          = stationNoteDeleteNoteFlags.String("auth", "REQUIRED", "")
-
 		informationFlags = flag.NewFlagSet("information", flag.ContinueOnError)
 
 		informationDeviceLayoutFlags        = flag.NewFlagSet("device- layout", flag.ExitOnError)
@@ -488,6 +468,30 @@ func ParseEndpoint(
 
 		informationFirmwareStatisticsFlags    = flag.NewFlagSet("firmware- statistics", flag.ExitOnError)
 		informationFirmwareStatisticsAuthFlag = informationFirmwareStatisticsFlags.String("auth", "REQUIRED", "")
+
+		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
+
+		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
+
+		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
+
+		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
+		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
+
+		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
+
+		testEmailFlags       = flag.NewFlagSet("email", flag.ExitOnError)
+		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
+		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
+
+		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
+
+		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
+		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
+		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
+		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
+		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
+		ttnWebhookStreamFlag        = ttnWebhookFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		stationFlags = flag.NewFlagSet("station", flag.ContinueOnError)
 
@@ -555,30 +559,6 @@ func ParseEndpoint(
 		stationProgressFlags         = flag.NewFlagSet("progress", flag.ExitOnError)
 		stationProgressStationIDFlag = stationProgressFlags.String("station-id", "REQUIRED", "")
 		stationProgressAuthFlag      = stationProgressFlags.String("auth", "REQUIRED", "")
-
-		tasksFlags = flag.NewFlagSet("tasks", flag.ContinueOnError)
-
-		tasksFiveFlags = flag.NewFlagSet("five", flag.ExitOnError)
-
-		testFlags = flag.NewFlagSet("test", flag.ContinueOnError)
-
-		testGetFlags  = flag.NewFlagSet("get", flag.ExitOnError)
-		testGetIDFlag = testGetFlags.String("id", "REQUIRED", "")
-
-		testErrorFlags = flag.NewFlagSet("error", flag.ExitOnError)
-
-		testEmailFlags       = flag.NewFlagSet("email", flag.ExitOnError)
-		testEmailAddressFlag = testEmailFlags.String("address", "REQUIRED", "")
-		testEmailAuthFlag    = testEmailFlags.String("auth", "REQUIRED", "")
-
-		ttnFlags = flag.NewFlagSet("ttn", flag.ContinueOnError)
-
-		ttnWebhookFlags             = flag.NewFlagSet("webhook", flag.ExitOnError)
-		ttnWebhookTokenFlag         = ttnWebhookFlags.String("token", "", "")
-		ttnWebhookContentTypeFlag   = ttnWebhookFlags.String("content-type", "REQUIRED", "")
-		ttnWebhookContentLengthFlag = ttnWebhookFlags.String("content-length", "REQUIRED", "")
-		ttnWebhookAuthFlag          = ttnWebhookFlags.String("auth", "", "")
-		ttnWebhookStreamFlag        = ttnWebhookFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
 
 		userFlags = flag.NewFlagSet("user", flag.ContinueOnError)
 
@@ -757,6 +737,7 @@ func ParseEndpoint(
 	projectDeleteFlags.Usage = projectDeleteUsage
 	projectUploadPhotoFlags.Usage = projectUploadPhotoUsage
 	projectDownloadPhotoFlags.Usage = projectDownloadPhotoUsage
+	projectProjectsStationFlags.Usage = projectProjectsStationUsage
 
 	recordsFlags.Usage = recordsUsage
 	recordsDataFlags.Usage = recordsDataUsage
@@ -773,15 +754,20 @@ func ParseEndpoint(
 	sensorBookmarkFlags.Usage = sensorBookmarkUsage
 	sensorResolveFlags.Usage = sensorResolveUsage
 
-	stationNoteFlags.Usage = stationNoteUsage
-	stationNoteStationFlags.Usage = stationNoteStationUsage
-	stationNoteAddNoteFlags.Usage = stationNoteAddNoteUsage
-	stationNoteUpdateNoteFlags.Usage = stationNoteUpdateNoteUsage
-	stationNoteDeleteNoteFlags.Usage = stationNoteDeleteNoteUsage
-
 	informationFlags.Usage = informationUsage
 	informationDeviceLayoutFlags.Usage = informationDeviceLayoutUsage
 	informationFirmwareStatisticsFlags.Usage = informationFirmwareStatisticsUsage
+
+	tasksFlags.Usage = tasksUsage
+	tasksFiveFlags.Usage = tasksFiveUsage
+
+	testFlags.Usage = testUsage
+	testGetFlags.Usage = testGetUsage
+	testErrorFlags.Usage = testErrorUsage
+	testEmailFlags.Usage = testEmailUsage
+
+	ttnFlags.Usage = ttnUsage
+	ttnWebhookFlags.Usage = ttnWebhookUsage
 
 	stationFlags.Usage = stationUsage
 	stationAddFlags.Usage = stationAddUsage
@@ -798,17 +784,6 @@ func ParseEndpoint(
 	stationDeleteFlags.Usage = stationDeleteUsage
 	stationAdminSearchFlags.Usage = stationAdminSearchUsage
 	stationProgressFlags.Usage = stationProgressUsage
-
-	tasksFlags.Usage = tasksUsage
-	tasksFiveFlags.Usage = tasksFiveUsage
-
-	testFlags.Usage = testUsage
-	testGetFlags.Usage = testGetUsage
-	testErrorFlags.Usage = testErrorUsage
-	testEmailFlags.Usage = testEmailUsage
-
-	ttnFlags.Usage = ttnUsage
-	ttnWebhookFlags.Usage = ttnWebhookUsage
 
 	userFlags.Usage = userUsage
 	userRolesFlags.Usage = userRolesUsage
@@ -882,18 +857,16 @@ func ParseEndpoint(
 			svcf = recordsFlags
 		case "sensor":
 			svcf = sensorFlags
-		case "station-note":
-			svcf = stationNoteFlags
 		case "information":
 			svcf = informationFlags
-		case "station":
-			svcf = stationFlags
 		case "tasks":
 			svcf = tasksFlags
 		case "test":
 			svcf = testFlags
 		case "ttn":
 			svcf = ttnFlags
+		case "station":
+			svcf = stationFlags
 		case "user":
 			svcf = userFlags
 		default:
@@ -1151,6 +1124,9 @@ func ParseEndpoint(
 			case "download- photo":
 				epf = projectDownloadPhotoFlags
 
+			case "projects- station":
+				epf = projectProjectsStationFlags
+
 			}
 
 		case "records":
@@ -1194,22 +1170,6 @@ func ParseEndpoint(
 
 			}
 
-		case "station-note":
-			switch epn {
-			case "station":
-				epf = stationNoteStationFlags
-
-			case "add- note":
-				epf = stationNoteAddNoteFlags
-
-			case "update- note":
-				epf = stationNoteUpdateNoteFlags
-
-			case "delete- note":
-				epf = stationNoteDeleteNoteFlags
-
-			}
-
 		case "information":
 			switch epn {
 			case "device- layout":
@@ -1217,6 +1177,33 @@ func ParseEndpoint(
 
 			case "firmware- statistics":
 				epf = informationFirmwareStatisticsFlags
+
+			}
+
+		case "tasks":
+			switch epn {
+			case "five":
+				epf = tasksFiveFlags
+
+			}
+
+		case "test":
+			switch epn {
+			case "get":
+				epf = testGetFlags
+
+			case "error":
+				epf = testErrorFlags
+
+			case "email":
+				epf = testEmailFlags
+
+			}
+
+		case "ttn":
+			switch epn {
+			case "webhook":
+				epf = ttnWebhookFlags
 
 			}
 
@@ -1263,33 +1250,6 @@ func ParseEndpoint(
 
 			case "progress":
 				epf = stationProgressFlags
-
-			}
-
-		case "tasks":
-			switch epn {
-			case "five":
-				epf = tasksFiveFlags
-
-			}
-
-		case "test":
-			switch epn {
-			case "get":
-				epf = testGetFlags
-
-			case "error":
-				epf = testErrorFlags
-
-			case "email":
-				epf = testEmailFlags
-
-			}
-
-		case "ttn":
-			switch epn {
-			case "webhook":
-				epf = ttnWebhookFlags
 
 			}
 
@@ -1633,6 +1593,9 @@ func ParseEndpoint(
 			case "download- photo":
 				endpoint = c.DownloadPhoto()
 				data, err = projectc.BuildDownloadPhotoPayload(*projectDownloadPhotoProjectIDFlag, *projectDownloadPhotoSizeFlag, *projectDownloadPhotoIfNoneMatchFlag, *projectDownloadPhotoAuthFlag)
+			case "projects- station":
+				endpoint = c.ProjectsStation()
+				data, err = projectc.BuildProjectsStationPayload(*projectProjectsStationIDFlag, *projectProjectsStationAuthFlag)
 			}
 		case "records":
 			c := recordsc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1675,22 +1638,6 @@ func ParseEndpoint(
 				endpoint = c.Resolve()
 				data, err = sensorc.BuildResolvePayload(*sensorResolveV2Flag, *sensorResolveAuthFlag)
 			}
-		case "station-note":
-			c := stationnotec.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "station":
-				endpoint = c.Station()
-				data, err = stationnotec.BuildStationPayload(*stationNoteStationStationIDFlag, *stationNoteStationAuthFlag)
-			case "add- note":
-				endpoint = c.AddNote()
-				data, err = stationnotec.BuildAddNotePayload(*stationNoteAddNoteBodyFlag, *stationNoteAddNoteStationIDFlag, *stationNoteAddNoteAuthFlag)
-			case "update- note":
-				endpoint = c.UpdateNote()
-				data, err = stationnotec.BuildUpdateNotePayload(*stationNoteUpdateNoteBodyFlag, *stationNoteUpdateNoteStationIDFlag, *stationNoteUpdateNoteStationNoteIDFlag, *stationNoteUpdateNoteAuthFlag)
-			case "delete- note":
-				endpoint = c.DeleteNote()
-				data, err = stationnotec.BuildDeleteNotePayload(*stationNoteDeleteNoteStationIDFlag, *stationNoteDeleteNoteStationNoteIDFlag, *stationNoteDeleteNoteAuthFlag)
-			}
 		case "information":
 			c := informationc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -1700,6 +1647,36 @@ func ParseEndpoint(
 			case "firmware- statistics":
 				endpoint = c.FirmwareStatistics()
 				data, err = informationc.BuildFirmwareStatisticsPayload(*informationFirmwareStatisticsAuthFlag)
+			}
+		case "tasks":
+			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "five":
+				endpoint = c.Five()
+				data = nil
+			}
+		case "test":
+			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get":
+				endpoint = c.Get()
+				data, err = testc.BuildGetPayload(*testGetIDFlag)
+			case "error":
+				endpoint = c.Error()
+				data = nil
+			case "email":
+				endpoint = c.Email()
+				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
+			}
+		case "ttn":
+			c := ttnc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "webhook":
+				endpoint = c.Webhook()
+				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
+				if err == nil {
+					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
+				}
 			}
 		case "station":
 			c := stationc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -1746,36 +1723,6 @@ func ParseEndpoint(
 			case "progress":
 				endpoint = c.Progress()
 				data, err = stationc.BuildProgressPayload(*stationProgressStationIDFlag, *stationProgressAuthFlag)
-			}
-		case "tasks":
-			c := tasksc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "five":
-				endpoint = c.Five()
-				data = nil
-			}
-		case "test":
-			c := testc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "get":
-				endpoint = c.Get()
-				data, err = testc.BuildGetPayload(*testGetIDFlag)
-			case "error":
-				endpoint = c.Error()
-				data = nil
-			case "email":
-				endpoint = c.Email()
-				data, err = testc.BuildEmailPayload(*testEmailAddressFlag, *testEmailAuthFlag)
-			}
-		case "ttn":
-			c := ttnc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "webhook":
-				endpoint = c.Webhook()
-				data, err = ttnc.BuildWebhookPayload(*ttnWebhookTokenFlag, *ttnWebhookContentTypeFlag, *ttnWebhookContentLengthFlag, *ttnWebhookAuthFlag)
-				if err == nil {
-					data, err = ttnc.BuildWebhookStreamPayload(data, *ttnWebhookStreamFlag)
-				}
 			}
 		case "user":
 			c := userc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -2679,6 +2626,7 @@ COMMAND:
     delete: Delete implements delete.
     upload- photo: UploadPhoto implements upload photo.
     download- photo: DownloadPhoto implements download photo.
+    projects- station: ProjectsStation implements projects station.
 
 Additional help:
     %s project COMMAND --help
@@ -3004,6 +2952,18 @@ Example:
 `, os.Args[0])
 }
 
+func projectProjectsStationUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] project projects- station -id INT32 -auth STRING
+
+ProjectsStation implements projects station.
+    -id INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` project projects- station --id 377366315 --auth "Tempore omnis."
+`, os.Args[0])
+}
+
 // recordsUsage displays the usage of the records command and its subcommands.
 func recordsUsage() {
 	fmt.Fprintf(os.Stderr, `Service is the records service interface.
@@ -3027,7 +2987,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records data --record-id 1620775981645801491 --auth "Tempore omnis."
+    `+os.Args[0]+` records data --record-id 1154109085306497470 --auth "Aliquam at est nobis voluptates pariatur autem."
 `, os.Args[0])
 }
 
@@ -3039,7 +2999,7 @@ Meta implements meta.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records meta --record-id 2218665795763496194 --auth "Autem eum quasi sit aut aut."
+    `+os.Args[0]+` records meta --record-id 1454641653565430451 --auth "Error enim veritatis velit voluptatem dolorem hic."
 `, os.Args[0])
 }
 
@@ -3051,7 +3011,7 @@ Resolved implements resolved.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records resolved --record-id 1454641653565430451 --auth "Error enim veritatis velit voluptatem dolorem hic."
+    `+os.Args[0]+` records resolved --record-id 641937676669007670 --auth "Sed fuga."
 `, os.Args[0])
 }
 
@@ -3092,7 +3052,7 @@ StationMeta implements station meta.
     -stations STRING: 
 
 Example:
-    `+os.Args[0]+` sensor station- meta --stations "Consequuntur aut placeat aut est maxime voluptas."
+    `+os.Args[0]+` sensor station- meta --stations "Et illum praesentium recusandae eos aut id."
 `, os.Args[0])
 }
 
@@ -3122,7 +3082,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 5086794426104357929 --end 1156881719861355378 --stations "Quo beatae dignissimos incidunt quibusdam corrupti minus." --sensors "Aspernatur excepturi nam non doloribus." --resolution 1073010766 --aggregate "Nihil cum alias voluptas." --complete false --tail 511872677 --backend "Molestiae adipisci dolorem." --auth "Officia et nulla magni quia ut nam."
+    `+os.Args[0]+` sensor data --start 4905123021041348433 --end 3620182594779415859 --stations "Officia et nulla magni quia ut nam." --sensors "Aut quidem." --resolution 1618937012 --aggregate "Harum animi vel ut repellat consequuntur reiciendis." --complete false --tail 1694482215 --backend "Molestias sequi id ratione cum." --auth "Ipsum et."
 `, os.Args[0])
 }
 
@@ -3135,7 +3095,7 @@ Tail implements tail.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor tail --stations "Ipsum et." --backend "Quibusdam doloribus." --auth "Possimus ut vel ut asperiores."
+    `+os.Args[0]+` sensor tail --stations "Enim totam nostrum officiis aut." --backend "Sapiente deleniti suscipit." --auth "Veniam quos rerum est tempora."
 `, os.Args[0])
 }
 
@@ -3147,7 +3107,7 @@ Recently implements recently.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor recently --stations "Suscipit nesciunt veniam quos rerum est tempora." --auth "Fugit minus saepe."
+    `+os.Args[0]+` sensor recently --stations "Suscipit facilis excepturi velit illo quam omnis." --auth "Nihil id id rerum."
 `, os.Args[0])
 }
 
@@ -3159,7 +3119,7 @@ Bookmark implements bookmark.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor bookmark --bookmark "Omnis error nihil id id rerum atque." --auth "Id tempore ratione et eum."
+    `+os.Args[0]+` sensor bookmark --bookmark "Et sunt dicta sed qui." --auth "Ad aut nihil nam repellendus dolor temporibus."
 `, os.Args[0])
 }
 
@@ -3171,81 +3131,7 @@ Resolve implements resolve.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor resolve --v2 "Ut nobis ut laudantium eius." --auth "Ratione sapiente."
-`, os.Args[0])
-}
-
-// station-noteUsage displays the usage of the station-note command and its
-// subcommands.
-func stationNoteUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the station_note service interface.
-Usage:
-    %s [globalflags] station-note COMMAND [flags]
-
-COMMAND:
-    station: Station implements station.
-    add- note: AddNote implements add note.
-    update- note: UpdateNote implements update note.
-    delete- note: DeleteNote implements delete note.
-
-Additional help:
-    %s station-note COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func stationNoteStationUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station-note station -station-id INT32 -auth STRING
-
-Station implements station.
-    -station-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station-note station --station-id 956428755 --auth "Ratione libero fugiat vitae illum."
-`, os.Args[0])
-}
-
-func stationNoteAddNoteUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station-note add- note -body JSON -station-id INT32 -auth STRING
-
-AddNote implements add note.
-    -body JSON: 
-    -station-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station-note add- note --body '{
-      "body": "Eos provident deleniti iste eos.",
-      "userId": 1170499894
-   }' --station-id 1263678557 --auth "Autem nemo."
-`, os.Args[0])
-}
-
-func stationNoteUpdateNoteUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station-note update- note -body JSON -station-id INT32 -station-note-id INT32 -auth STRING
-
-UpdateNote implements update note.
-    -body JSON: 
-    -station-id INT32: 
-    -station-note-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station-note update- note --body '{
-      "body": "Voluptas occaecati dolore quam asperiores dolorem."
-   }' --station-id 202534392 --station-note-id 1736584746 --auth "Nesciunt iure consequatur nesciunt cum."
-`, os.Args[0])
-}
-
-func stationNoteDeleteNoteUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] station-note delete- note -station-id INT32 -station-note-id INT32 -auth STRING
-
-DeleteNote implements delete note.
-    -station-id INT32: 
-    -station-note-id INT32: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` station-note delete- note --station-id 1004865477 --station-note-id 619416561 --auth "Et quod provident."
+    `+os.Args[0]+` sensor resolve --v2 "Ratione libero fugiat vitae illum." --auth "Quae eum est architecto."
 `, os.Args[0])
 }
 
@@ -3272,7 +3158,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Consequatur et occaecati." --auth "Tenetur ea est enim."
+    `+os.Args[0]+` information device- layout --device-id "Nemo quibusdam delectus expedita." --auth "Rem nesciunt cupiditate dolor."
 `, os.Args[0])
 }
 
@@ -3283,7 +3169,106 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Tempore non tempora culpa id rerum nam."
+    `+os.Args[0]+` information firmware- statistics --auth "Id ad est dolores est dignissimos."
+`, os.Args[0])
+}
+
+// tasksUsage displays the usage of the tasks command and its subcommands.
+func tasksUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the tasks service interface.
+Usage:
+    %s [globalflags] tasks COMMAND [flags]
+
+COMMAND:
+    five: Five implements five.
+
+Additional help:
+    %s tasks COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func tasksFiveUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] tasks five
+
+Five implements five.
+
+Example:
+    `+os.Args[0]+` tasks five
+`, os.Args[0])
+}
+
+// testUsage displays the usage of the test command and its subcommands.
+func testUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the test service interface.
+Usage:
+    %s [globalflags] test COMMAND [flags]
+
+COMMAND:
+    get: Get implements get.
+    error: Error implements error.
+    email: Email implements email.
+
+Additional help:
+    %s test COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func testGetUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test get -id INT64
+
+Get implements get.
+    -id INT64: 
+
+Example:
+    `+os.Args[0]+` test get --id 5179345884365850026
+`, os.Args[0])
+}
+
+func testErrorUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test error
+
+Error implements error.
+
+Example:
+    `+os.Args[0]+` test error
+`, os.Args[0])
+}
+
+func testEmailUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] test email -address STRING -auth STRING
+
+Email implements email.
+    -address STRING: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` test email --address "Libero placeat nostrum distinctio praesentium." --auth "Cum iure beatae."
+`, os.Args[0])
+}
+
+// ttnUsage displays the usage of the ttn command and its subcommands.
+func ttnUsage() {
+	fmt.Fprintf(os.Stderr, `Service is the ttn service interface.
+Usage:
+    %s [globalflags] ttn COMMAND [flags]
+
+COMMAND:
+    webhook: Webhook implements webhook.
+
+Additional help:
+    %s ttn COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func ttnWebhookUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -token STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
+
+Webhook implements webhook.
+    -token STRING: 
+    -content-type STRING: 
+    -content-length INT64: 
+    -auth STRING: 
+    -stream STRING: path to file containing the streamed request body
+
+Example:
+    `+os.Args[0]+` ttn webhook --token "Aut sunt laborum." --content-type "Voluptatem distinctio omnis quia debitis esse." --content-length 4576500773712406007 --auth "A delectus autem cum sapiente." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3322,11 +3307,11 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "deviceId": "Voluptatem distinctio omnis quia debitis esse.",
-      "locationName": "Nesciunt a delectus autem.",
-      "name": "Aut sunt laborum.",
-      "statusPb": "Sapiente ut."
-   }' --auth "Voluptatem est."
+      "deviceId": "Consequatur magnam.",
+      "locationName": "Quaerat pariatur est sint repudiandae exercitationem.",
+      "name": "Qui dolorem pariatur numquam molestiae eligendi.",
+      "statusPb": "Praesentium ut atque exercitationem recusandae et ut."
+   }' --auth "Et est a."
 `, os.Args[0])
 }
 
@@ -3338,7 +3323,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 1367262796 --auth "Nihil omnis ut magnam dolor."
+    `+os.Args[0]+` station get --id 391745543 --auth "Facilis autem dolor dolorem."
 `, os.Args[0])
 }
 
@@ -3351,7 +3336,7 @@ Transfer implements transfer.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station transfer --id 1796746418 --owner-id 968652275 --auth "Et vero nobis consectetur occaecati eum doloribus."
+    `+os.Args[0]+` station transfer --id 948425858 --owner-id 1362808005 --auth "Doloribus voluptatem maiores vitae."
 `, os.Args[0])
 }
 
@@ -3364,7 +3349,7 @@ DefaultPhoto implements default photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station default- photo --id 1773692411 --photo-id 203846566 --auth "Corporis laborum porro ipsum est dolorem."
+    `+os.Args[0]+` station default- photo --id 1288358694 --photo-id 1946626874 --auth "Ipsum est dolorem."
 `, os.Args[0])
 }
 
@@ -3499,105 +3484,6 @@ Example:
 `, os.Args[0])
 }
 
-// tasksUsage displays the usage of the tasks command and its subcommands.
-func tasksUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the tasks service interface.
-Usage:
-    %s [globalflags] tasks COMMAND [flags]
-
-COMMAND:
-    five: Five implements five.
-
-Additional help:
-    %s tasks COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func tasksFiveUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] tasks five
-
-Five implements five.
-
-Example:
-    `+os.Args[0]+` tasks five
-`, os.Args[0])
-}
-
-// testUsage displays the usage of the test command and its subcommands.
-func testUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the test service interface.
-Usage:
-    %s [globalflags] test COMMAND [flags]
-
-COMMAND:
-    get: Get implements get.
-    error: Error implements error.
-    email: Email implements email.
-
-Additional help:
-    %s test COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func testGetUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test get -id INT64
-
-Get implements get.
-    -id INT64: 
-
-Example:
-    `+os.Args[0]+` test get --id 8952977822333473324
-`, os.Args[0])
-}
-
-func testErrorUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test error
-
-Error implements error.
-
-Example:
-    `+os.Args[0]+` test error
-`, os.Args[0])
-}
-
-func testEmailUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] test email -address STRING -auth STRING
-
-Email implements email.
-    -address STRING: 
-    -auth STRING: 
-
-Example:
-    `+os.Args[0]+` test email --address "Optio excepturi vel mollitia." --auth "Non sed qui delectus."
-`, os.Args[0])
-}
-
-// ttnUsage displays the usage of the ttn command and its subcommands.
-func ttnUsage() {
-	fmt.Fprintf(os.Stderr, `Service is the ttn service interface.
-Usage:
-    %s [globalflags] ttn COMMAND [flags]
-
-COMMAND:
-    webhook: Webhook implements webhook.
-
-Additional help:
-    %s ttn COMMAND --help
-`, os.Args[0], os.Args[0])
-}
-func ttnWebhookUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] ttn webhook -token STRING -content-type STRING -content-length INT64 -auth STRING -stream STRING
-
-Webhook implements webhook.
-    -token STRING: 
-    -content-type STRING: 
-    -content-length INT64: 
-    -auth STRING: 
-    -stream STRING: path to file containing the streamed request body
-
-Example:
-    `+os.Args[0]+` ttn webhook --token "Deserunt rerum pariatur voluptatem." --content-type "Nemo doloremque numquam perferendis delectus." --content-length 2920672304757788555 --auth "Ut odio error nulla natus excepturi." --stream "goa.png"
-`, os.Args[0])
-}
-
 // userUsage displays the usage of the user command and its subcommands.
 func userUsage() {
 	fmt.Fprintf(os.Stderr, `Service is the user service interface.
@@ -3640,7 +3526,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Fugiat iusto qui ut nobis repudiandae."
+    `+os.Args[0]+` user roles --auth "Quia consequatur minus."
 `, os.Args[0])
 }
 
@@ -3654,7 +3540,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Cum fugit impedit nobis eveniet." --content-length 4297237130166273183 --auth "Non rerum dolor sed enim." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Veniam nemo fugit est sit." --content-length 4389840631904911578 --auth "Laborum blanditiis eum asperiores quisquam harum at." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3667,7 +3553,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 1682415342 --size 501963510 --if-none-match "Repellat consequatur enim quisquam."
+    `+os.Args[0]+` user download- photo --user-id 752083634 --size 1009104470 --if-none-match "Nisi animi aut rerum molestiae."
 `, os.Args[0])
 }
 
@@ -3679,8 +3565,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "zya",
-      "password": "1qr"
+      "email": "hiv",
+      "password": "8gd"
    }'
 `, os.Args[0])
 }
@@ -3693,7 +3579,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Omnis dicta eum."
+      "email": "Quia magni at."
    }'
 `, os.Args[0])
 }
@@ -3706,8 +3592,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "out",
-      "token": "Eum repudiandae quam."
+      "password": "mtl",
+      "token": "Cum fugit impedit nobis eveniet."
    }'
 `, os.Args[0])
 }
@@ -3720,7 +3606,7 @@ Resume implements resume.
 
 Example:
     `+os.Args[0]+` user resume --body '{
-      "token": "Iure optio eum nostrum error id."
+      "token": "Asperiores sit."
    }'
 `, os.Args[0])
 }
@@ -3732,7 +3618,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Illum at repellat officiis et ipsam."
+    `+os.Args[0]+` user logout --auth "Non placeat aliquam sit."
 `, os.Args[0])
 }
 
@@ -3744,7 +3630,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Suscipit consequuntur sequi consequuntur iusto."
+      "refreshToken": "Rem quis."
    }'
 `, os.Args[0])
 }
@@ -3756,7 +3642,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 1197564903
+    `+os.Args[0]+` user send- validation --user-id 1948474800
 `, os.Args[0])
 }
 
@@ -3767,7 +3653,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Vero doloremque."
+    `+os.Args[0]+` user validate --token "Numquam non sit asperiores."
 `, os.Args[0])
 }
 
@@ -3821,7 +3707,7 @@ Example:
       "showStations": true,
       "startTime": "Fugiat non non.",
       "tags": "Pariatur voluptatem accusantium cupiditate autem voluptate."
-   }' --user-id 347767844 --auth "Consequuntur laudantium itaque omnis."
+   }' --user-id 882559050 --auth "Aut odio occaecati."
 `, os.Args[0])
 }
 
@@ -3835,9 +3721,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "ibu",
-      "oldPassword": "zes"
-   }' --user-id 1390494868 --auth "Ut non perspiciatis ab et ipsam quo."
+      "newPassword": "nfr",
+      "oldPassword": "l5e"
+   }' --user-id 313215352 --auth "Maxime et vero doloremque provident."
 `, os.Args[0])
 }
 
@@ -3852,7 +3738,7 @@ AcceptTnc implements accept tnc.
 Example:
     `+os.Args[0]+` user accept- tnc --body '{
       "accept": false
-   }' --user-id 313839585 --auth "Incidunt repellat iusto."
+   }' --user-id 1235739298 --auth "Voluptatem numquam maiores natus."
 `, os.Args[0])
 }
 
@@ -3863,7 +3749,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Sequi sint quas dolores commodi repellendus nihil."
+    `+os.Args[0]+` user get- current --auth "Nesciunt id aut sunt aut qui."
 `, os.Args[0])
 }
 
@@ -3875,7 +3761,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 276280642 --auth "Ad quidem iusto omnis voluptatem consectetur."
+    `+os.Args[0]+` user list- by- project --project-id 405011255 --auth "Earum placeat quia."
 `, os.Args[0])
 }
 
@@ -3886,7 +3772,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Et illo architecto."
+    `+os.Args[0]+` user issue- transmission- token --auth "Doloribus nisi aut."
 `, os.Args[0])
 }
 
@@ -3910,7 +3796,7 @@ AdminTermsAndConditions implements admin terms and conditions.
 Example:
     `+os.Args[0]+` user admin- terms- and- conditions --body '{
       "email": "Quidem dignissimos enim eos doloremque possimus."
-   }' --auth "Suscipit qui."
+   }' --auth "Distinctio cum necessitatibus corporis."
 `, os.Args[0])
 }
 
@@ -3925,7 +3811,7 @@ Example:
     `+os.Args[0]+` user admin- delete --body '{
       "email": "Distinctio nobis earum fugiat expedita ducimus.",
       "password": "Et vel ut quis reprehenderit."
-   }' --auth "Quas cum perferendis repellendus libero quis sint."
+   }' --auth "Debitis et debitis."
 `, os.Args[0])
 }
 
@@ -3937,7 +3823,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Eum praesentium." --auth "Laborum rerum et officiis reiciendis asperiores."
+    `+os.Args[0]+` user admin- search --query "Omnis voluptatem consectetur ipsam repellendus." --auth "Saepe tempore nihil autem."
 `, os.Args[0])
 }
 
@@ -3951,6 +3837,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 934654608 --bookmark "Labore ipsa." --query "Ut rem est facilis numquam et." --auth "Sed natus aut quia vitae temporibus unde."
+    `+os.Args[0]+` user mentionables --project-id 1982673352 --bookmark "Sequi aut non facilis." --query "Sit quo." --auth "Et illo architecto."
 `, os.Args[0])
 }

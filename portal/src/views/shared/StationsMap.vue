@@ -1,21 +1,23 @@
 <template v-if="mapped.valid && ready">
-    <mapbox
-        class="stations-map"
-        :access-token="mapbox.token"
-        :map-options="{
-            style: mapbox.style,
-            bounds: bounds,
-            zoom: 10,
-        }"
-        :nav-control="{
-            show: !isMobileView,
-            position: 'bottom-left',
-        }"
-        @map-init="onMapInitialized"
-        @map-load="onMapLoaded"
-        @zoomend="newBounds"
-        @dragend="newBounds"
-    />
+    <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
+        <mapbox
+            class="stations-map"
+            :access-token="mapbox.token"
+            :map-options="{
+                style: mapbox.style,
+                bounds: bounds,
+                zoom: 10,
+            }"
+            :nav-control="{
+                show: !isMobileView,
+                position: 'bottom-left',
+            }"
+            @map-init="onMapInitialized"
+            @map-load="onMapLoaded"
+            @zoomend="newBounds"
+            @dragend="newBounds"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -109,12 +111,19 @@ export default Vue.extend({
             console.log("map: mapped changed", this.mapped);
             this.updateMap();
         },
-        showStations(): void {
-            this.updateMap();
-        },
         visibleReadings(): void {
             console.log("map: visible-readings");
             this.updateMap();
+        },
+        showStations(): void {
+            if (!this.protectedData.map.getLayer("station-markers")) {
+                return;
+            }
+            if (!this.showStations) {
+                this.protectedData.map.setLayoutProperty("station-markers", "visibility", "none");
+                return;
+            }
+            this.protectedData.map.setLayoutProperty("station-markers", "visibility", "visible");
         },
     },
     methods: {
@@ -341,5 +350,17 @@ export default Vue.extend({
     @include bp-down($sm) {
         margin-top: 3px;
     }
+}
+
+.map-wrap {
+    height: 100%;
+
+    &.hide-markers ::v-deep .mapboxgl-marker {
+        display: none;
+    }
+}
+
+.stations-map {
+    height: 100%;
 }
 </style>

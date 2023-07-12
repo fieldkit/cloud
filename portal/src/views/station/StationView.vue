@@ -2,11 +2,9 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                backRoute="viewProject"
-                :title="station.name"
-                :subtitle="headerSubtitle"
-                :backTitle="projectId ? $tc('layout.backProjectDashboard') : null"
-                :backRouteParams="{ id: projectId }"
+                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
+                :backRouteParams="{ id: projectId || station.id }"
             >
                 <template v-slot:default>
                     <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
@@ -21,6 +19,15 @@
                         <StationPhoto :station="station" />
                         <div>
                             <div class="station-name">{{ station.name }}</div>
+
+                            <div class="flex flex-al-center flex-wrap">
+                                <span class="station-deployed-date">{{ deployedDate }}</span>
+                                <div class="station-owner">
+                                    <UserPhoto :user="station.owner" />
+                                    {{ $t("station.belongsTo") }}
+                                    <span>{{ station.owner.name }}</span>
+                                </div>
+                            </div>
 
                             <div v-if="partnerCustomization().stationLocationName(station)" class="flex station-location">
                                 <i class="icon icon-location"></i>
@@ -69,22 +76,16 @@
                     </div>
                 </div>
                 <div v-if="photos" class="station-photos">
-                    <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index">
+                    <div class="photo-container cursor-pointer" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                         <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                         <div v-else class="photo-placeholder">
                             <img src="@/assets/image-placeholder-v2.svg" alt="Image placeholder" />
                         </div>
                     </div>
-                    <router-link
-                        :to="{
-                            name: projectId ? 'viewProjectStationPhotos' : 'viewStationPhotos',
-                            params: { projectId: projectId, stationId: station.id },
-                        }"
-                        class="station-photos-nav"
-                    >
+                    <a @click="navigateToPhotos()" class="station-photos-nav cursor-pointer">
                         <i class="icon icon-grid"></i>
                         {{ $t("station.btn.linkToPhotos") }}
-                    </router-link>
+                    </a>
                 </div>
             </section>
 
@@ -164,6 +165,7 @@ import StationsMap from "@/views/shared/StationsMap.vue";
 import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import UserPhoto from "@/views/shared/UserPhoto.vue";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 
 export default Vue.extend({
@@ -178,6 +180,7 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
+        UserPhoto,
         FieldNotes,
     },
     data(): {
@@ -222,8 +225,8 @@ export default Vue.extend({
             const station = this.$state.stations.stations[this.$route.params.stationId];
             return station.attributes;
         },
-        headerSubtitle(): string | null {
-            if (this.station && this.$options.filters?.prettyDate) {
+        deployedDate(): string | null {
+            if (this.station) {
                 const deploymentDate = this.partnerCustomization().getStationDeploymentDate(this.station);
                 if (deploymentDate) {
                     return this.$tc("station.deployed") + " " + deploymentDate;
@@ -305,6 +308,12 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        navigateToPhotos(): void {
+            this.$router.push({
+                name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
+                params: { projectId: this.projectId, stationId: this.station.id },
+            });
+        },
     },
 });
 </script>
@@ -338,7 +347,6 @@ export default Vue.extend({
     }
 
     &-station {
-        margin-top: 30px;
         display: flex;
         justify-content: space-between;
 
@@ -361,7 +369,7 @@ export default Vue.extend({
         }
 
         ::v-deep .station-photo {
-            width: 90px;
+            flex: 0 0 90px;
             height: 90px;
             object-fit: cover;
             margin-right: 20px;
@@ -372,7 +380,6 @@ export default Vue.extend({
             flex: 0 0 calc(50% - 5px);
             margin-bottom: 10px;
             height: calc(50% - 5px);
-            min-height: 192px;
             position: relative;
             border-radius: 2px;
             overflow: hidden;
@@ -458,7 +465,6 @@ export default Vue.extend({
     }
     &-row {
         padding: 15px 0;
-        max-width: 350px;
         @include flex(center);
 
         &:not(:last-of-type) {
@@ -595,6 +601,7 @@ export default Vue.extend({
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
+        max-height: 390px;
 
         @include bp-down($sm) {
             margin-top: 20px;
@@ -618,9 +625,29 @@ export default Vue.extend({
                 height: 35px;
             }
         }
+    }
 
-        .photo {
-            flex: 0 0 calc(50% - 5px);
+    &-deployed-date {
+        color: #6a6d71;
+        margin-bottom: 10px;
+        margin-right: 5px;
+    }
+
+    &-owner {
+        color: #6a6d71;
+        font-size: 10px;
+        margin-bottom: 10px;
+        @include flex(center);
+
+        ::v-deep .default-user-icon {
+            width: 18px;
+            height: 18px;
+            margin-top: 0;
+            margin-right: 5px;
+        }
+
+        span {
+            margin-left: 3px;
         }
     }
 }
@@ -675,5 +702,9 @@ section {
             color: $color-dark;
         }
     }
+}
+
+::v-deep .back {
+    margin-bottom: 15px;
 }
 </style>

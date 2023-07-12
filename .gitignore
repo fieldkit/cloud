@@ -28,3 +28,4 @@ fkserver.json
 influxdb
 .tsdb
 .db
+*.swp

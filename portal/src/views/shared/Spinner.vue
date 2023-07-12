@@ -44,6 +44,7 @@ export default Vue.extend({
 .spinner div:nth-child(3) {
     animation-delay: -0.15s;
 }
+
 @keyframes spinner {
     0% {
         transform: rotate(0deg);

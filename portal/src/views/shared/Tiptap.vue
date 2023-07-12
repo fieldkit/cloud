@@ -27,6 +27,7 @@ import MentionList from "../comments/MentionList.vue";
 import tippy from "tippy.js";
 
 export default Vue.extend({
+    name: "TipTap",
     components: {
         // ResizeAuto,
         EditorContent,
@@ -68,11 +69,6 @@ export default Vue.extend({
         readonly(value: boolean): void {
             if (this.editor) {
                 this.editor.setOptions({ editable: !value });
-            }
-        },
-        value(value: string): void {
-            if (this.editor) {
-                this.editor.commands.setContent(value);
             }
         },
     },
@@ -235,6 +231,7 @@ export default Vue.extend({
         onSave() {
             if (this.editor && !this.editor.isEmpty) {
                 this.$emit("save");
+                this.editor.commands.clearContent();
             }
         },
         truncate() {
@@ -292,7 +289,8 @@ export default Vue.extend({
 }
 
 .ProseMirror {
-    @supports (-webkit-touch-callout: none) { // iOS only - prevent zoom in behaviour
+    @supports (-webkit-touch-callout: none) {
+        // iOS only - prevent zoom in behaviour
         font-size: 16px;
     }
 

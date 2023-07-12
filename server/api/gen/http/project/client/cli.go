@@ -697,3 +697,27 @@ func BuildDownloadPhotoPayload(projectDownloadPhotoProjectID string, projectDown
 
 	return v, nil
 }
+
+// BuildProjectsStationPayload builds the payload for the project projects
+// station endpoint from CLI flags.
+func BuildProjectsStationPayload(projectProjectsStationID string, projectProjectsStationAuth string) (*project.ProjectsStationPayload, error) {
+	var err error
+	var id int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(projectProjectsStationID, 10, 32)
+		id = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = projectProjectsStationAuth
+	}
+	v := &project.ProjectsStationPayload{}
+	v.ID = id
+	v.Auth = auth
+
+	return v, nil
+}

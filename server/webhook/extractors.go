@@ -30,7 +30,7 @@ type FkLoRaStatus struct {
 func (e *FkStatusExtractor) Extract(ctx context.Context, complete interface{}, source interface{}) (interface{}, error) {
 	asString, ok := source.(string)
 	if !ok {
-		return nil, fmt.Errorf("fk:location expected string")
+		return nil, fmt.Errorf("fk:status expected string")
 	}
 
 	log := Logger(ctx).Sugar()
@@ -77,7 +77,7 @@ type FkLoRaReadings struct {
 func (e *FkReadingsExtractor) Extract(ctx context.Context, complete interface{}, source interface{}) (interface{}, error) {
 	asString, ok := source.(string)
 	if !ok {
-		return nil, fmt.Errorf("fk:location expected string")
+		return nil, fmt.Errorf("fk:readings expected string")
 	}
 
 	log := Logger(ctx).Sugar()
