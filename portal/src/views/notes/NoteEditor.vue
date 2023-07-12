@@ -58,9 +58,6 @@ export default Vue.extend({
             },
         },
     },
-    mounted() {
-        console.log("Radoi note", this.note);
-    },
 });
 </script>
 

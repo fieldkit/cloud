@@ -27,7 +27,7 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 import CommonComponents from "@/views/shared";
 
-import { mergeNotes, NoteMedia, Notes, PortalNoteMedia } from "./model";
+import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "./model";
 import NoteEditor from "./NoteEditor.vue";
 
 export default Vue.extend({
@@ -38,10 +38,6 @@ export default Vue.extend({
     },
     props: {
         station: {
-            type: Object,
-            required: true,
-        },
-        notes: {
             type: Object,
             required: true,
         },
@@ -70,18 +66,21 @@ export default Vue.extend({
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),
+        notes(): PortalStationNotes[] {
+            return this.$state.notes.notes;
+        },
         media(): PortalNoteMedia[] {
             return this.$state.notes.media;
         },
         completed(this: any) {
             const notesProgress = this.form.progress;
-            const anyPhotos = NoteMedia.onlyPhotos(this.form.addedPhotos).length + NoteMedia.onlyPhotos(this.notes.media).length > 0;
+            const anyPhotos = NoteMedia.onlyPhotos(this.form.addedPhotos).length + NoteMedia.onlyPhotos(this.media).length > 0;
             const percentage = ((notesProgress.completed + anyPhotos) / (notesProgress.total + 1)) * 100;
             return percentage.toFixed(0);
         },
     },
     mounted(this: any) {
-        this.form = Notes.createFrom(this.notes);
+        this.form = Notes.createFrom({ notes: this.notes, media: this.media });
     },
     methods: {
         async onSave(): Promise<void> {
