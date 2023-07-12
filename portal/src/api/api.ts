@@ -1244,12 +1244,11 @@ class FKApi {
     }
 
     public addStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
-        note.body = JSON.stringify(note.body);
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/station/" + stationId + "/station-note",
-            data: note,
+            data: { userId: note.userId, body: JSON.stringify(note.body) },
         });
     }
 
@@ -1258,7 +1257,7 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/station/" + stationId + "/station-note/" + note.id,
-            data: note,
+            data: { body: JSON.stringify(note.body) },
         });
     }
 

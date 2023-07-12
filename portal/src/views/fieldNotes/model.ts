@@ -4,4 +4,5 @@ export interface PortalStationFieldNotes {
     body: string;
     createdAt: number;
     updatedAt: number;
+    userId?: number;
 }
