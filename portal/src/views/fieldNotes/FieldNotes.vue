@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="field-notes-wrap">
         <vue-confirm-dialog />
 
         <header class="header">
@@ -16,27 +16,27 @@
                     <Tiptap v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
                 </div>
             </template>
-            <!--            <template v-else>
-    <p class="need-login-msg">
-        {{ $tc("comments.loginToComment.part1") }}
-        <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
-            {{ $tc("comments.loginToComment.part2") }}
-        </router-link>
-        {{ $tc("comments.loginToComment.part3") }}
-    </p>
-    <router-link
-        :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
-        class="button-submit"
-    >
-        {{ $t("login.loginButton") }}
-    </router-link>
-</template>-->
+            <template v-else>
+                <p class="need-login-msg">
+                    {{ $tc("comments.loginToComment.part1") }}
+                    <router-link :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }" class="link">
+                        {{ $tc("comments.loginToComment.part2") }}
+                    </router-link>
+                    {{ $tc("comments.loginToComment.part3") }}
+                </p>
+                <router-link
+                    :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                    class="button-submit"
+                >
+                    {{ $t("login.loginButton") }}
+                </router-link>
+            </template>
         </div>
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && !groupedFieldNotes" class="no-comments">{{ $tc("fieldNotes.noData") }}</div>
-        <div v-if="isLoading" class="no-comments">{{ $tc("fieldNotes.loading") }}</div>
+        <div v-if="!isLoading && !groupedFieldNotes" class="loading-notes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="isLoading" class="loading-notes">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="list" v-if="groupedFieldNotes" ref="pdfContent">
             <div
@@ -64,18 +64,18 @@
                                 {{ formatTimestamp(fieldNote.updatedAt) }}
                             </div>
                         </div>
-                        <template v-if="editingFieldNote && editingFieldNote.id === fieldNote.id">
+<!--                        <template v-if="editingFieldNote && editingFieldNote.id === fieldNote.id">
                             <Tiptap v-model="editingFieldNote.body" :readonly="false" saveLabel="Save" />
-                        </template>
-                        <template v-else>
-                            <Tiptap v-model="fieldNote.body" :readonly="true" saveLabel="Save" />
+                        </template>-->
+                        <template>
+                            <Tiptap :ref="'save-' + fieldNote.id" :value="fieldNote.body" :readonly="!editingFieldNote" @change="onEditChange($event)"/>
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
                             <button v-if="user" @click="editFieldNote(fieldNote)">
-                                <i class="icon icon-edit"></i>
+                                <i class="icon icon-edit" v-if="canEdit(fieldNote)"></i>
                                 {{ $t("fieldNotes.edit") }}
                             </button>
-                            <button @click="deleteFieldNote(fieldNote.id)">
+                            <button @click="deleteFieldNote(fieldNote.id)" v-if="canDelete(fieldNote)">
                                 <i class="icon icon-trash"></i>
                                 {{ $t("fieldNotes.delete") }}
                             </button>
@@ -85,7 +85,7 @@
                             <button v-if="user" @click="cancelEdit(fieldNote)">
                                 {{ $t("fieldNotes.cancel") }}
                             </button>
-                            <button @click="saveEdit()">
+                            <button @click="saveEdit('save-' + fieldNote.id)">
                                 {{ $t("fieldNotes.update") }}
                             </button>
                         </div>
@@ -157,6 +157,7 @@ export default Vue.extend({
     },
     watch: {
         fieldNotes() {
+            console.log("RADOI WATCH FIELDNOTES CHANGE");
             this.groupByMonth();
         },
     },
@@ -172,51 +173,28 @@ export default Vue.extend({
             await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
             this.newNoteText = null;
         },
-        async saveEdit(): void {
-            console.log("radoi save edit", this.editingFieldNote);
+        async saveEdit(ref): void {
+         //   console.log("radoi save edit", this.editingFieldNote);
+          const editedText = this.$refs[ref][0].$refs['contentContainer'].textContent;
+
+            console.log("Radoi save", this.$refs[ref]);
+   /*         console.log("Radoi save", ref);
+            console.log("Radoi save", this.$refs[ref].event);
+            console.log("Radoi save", this.$refs[ref].event.target.value);*/
+
             const payload = {
                 id: this.editingFieldNote?.id,
-                body: JSON.stringify(this.editingFieldNote?.body),
+                body: editedText,
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
             console.log("radoi save edit pauload", payload);
-            this.$nextTick(async () => {
-                this.editingFieldNote = null;
-                await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
-                setTimeout(() => {
-                    this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
-                }, 5000);
-            });
+            await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
+            await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
-        /*getFieldNotesOptions(post: FieldNote): { label: string; event: string }[] {
-    if (this.user && this.user.id === post.author.id) {
-        return [
-            {
-                label: "Edit",
-                event: "edit-comment",
-            },
-            {
-                label: "Delete post",
-                event: "delete-comment",
-            },
-        ];
-    }
-
-    return [
-        {
-            label: "Delete",
-            event: "delete-comment",
-        },
-    ];
-},
-*/
-
         editFieldNote(fieldNote: PortalStationFieldNotes) {
-            this.$nextTick(() => {
-                this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
-                console.log("radoi editing", this.editingFieldNote);
-            });
+            this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
+            console.log("radoi editing", this.editingFieldNote);
         },
         deleteFieldNote(noteId: number) {
             this.$confirm({
@@ -234,6 +212,13 @@ export default Vue.extend({
         },
         formatTimestamp(timestamp: number): string {
             return moment(timestamp).fromNow();
+        },
+        canEdit(fieldNote: PortalStationFieldNotes) {
+            return fieldNote.author.id === this.user?.id;
+        },
+        // Duplicate functions that currently do the same thing since I expect the condition to change here
+        canDelete(fieldNote: PortalStationFieldNotes) {
+            return fieldNote.author.id === this.user?.id;
         },
         cancelEdit(fieldNote: PortalStationFieldNotes) {
             if (JSON.stringify(fieldNote.body) !== JSON.stringify(this.editingFieldNote?.body)) {
@@ -262,7 +247,11 @@ export default Vue.extend({
             );
 
             this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
-            this.isLoading = false;
+
+            this.$nextTick(() => {
+                this.editingFieldNote = null;
+                this.isLoading = false;
+            });
         },
 
         getMonthName(month): string {
@@ -301,7 +290,6 @@ export default Vue.extend({
 
             doc.html(elementHTML, {
                 callback: (doc) => {
-                    // Save the PDF
                     const fileName = this.stationName + " " + this.$tc("fieldNotes.title") + ".pdf";
                     doc.save(fileName);
                     // display back the actions els
@@ -317,6 +305,9 @@ export default Vue.extend({
                 windowWidth: 675, //window width in CSS pixels
             });
         },
+      onEditChange(event) {
+          console.log("radoi ev", event);
+      }
     },
 });
 </script>
@@ -332,7 +323,7 @@ export default Vue.extend({
     position: relative;
 
     @include bp-down($xs) {
-        padding: 15px 10px;
+        padding: 20px 0;
     }
 
     .container.data-view & {
@@ -373,6 +364,13 @@ export default Vue.extend({
     }
 }
 
+.button {
+    @include bp-down($xs) {
+        transform: none;
+        margin-right: 0;
+    }
+}
+
 ::v-deep .default-user-icon {
     width: 36px;
     height: 36px;
@@ -398,6 +396,11 @@ export default Vue.extend({
     padding: 30px 20px;
     margin-left: -20px;
     border-top: solid 1px #d8dce0;
+
+    @include bp-down($xs) {
+        padding: 20px 10px;
+        margin-left: -10px;
+    }
 
     .field-note-group.hidden & {
         display: none;
@@ -465,6 +468,12 @@ button {
     border-top: solid 1px #d8dce0;
     cursor: pointer;
 
+    @include bp-down($xs) {
+        margin-left: -10px;
+        padding: 0 10px;
+        height: 68px;
+    }
+
     .icon-chevron-right {
         font-size: 32px;
         transform: rotate(270deg);
@@ -491,6 +500,16 @@ button {
         .icon-chevron-right {
             transform: rotate(270deg);
         }
+    }
+}
+
+.loading-notes {
+    margin-top: 15px;
+}
+
+.field-notes-wrap {
+    @include bp-down($sm) {
+        padding: 20px 10px 0;
     }
 }
 </style>
