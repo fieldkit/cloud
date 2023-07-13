@@ -218,11 +218,10 @@
                 </div>
             </section>
 
-            <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
+            <section v-if="!isCustomizationEnabled()" class="section-notes container-box">
                 <NotesForm
                     v-bind:key="station.id"
                     :station="station"
-                    :notes="{ notes, media }"
                     :readonly="station.readOnly"
                     @change="dirtyNotes = true"
                 />

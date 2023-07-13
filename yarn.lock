@@ -2,12 +2,245 @@
 # yarn lockfile v1
 
 
+"@any-touch/compute@^2.2.0":
+  "integrity" "sha512-hrw74b/cVT8SmiKFLValmllajw+bBvTa5iUwIXFVVIJM9T3tO15zZC2QbjVz8Uwi6XjH932RDUILGMs2TNvyQg=="
+  "resolved" "https://registry.npmjs.org/@any-touch/compute/-/compute-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "@any-touch/shared" "^2.2.0"
+    "@any-touch/vector" "^2.2.0"
+    "tslib" "^2.3.1"
+
+"@any-touch/core@^2.0.1", "@any-touch/core@^2.0.2", "@any-touch/core@^2.2.0":
+  "integrity" "sha512-xMHAA5aLCatFto+4fQWyE4YAsyN/LsXS4mnYuVpqFYoNz8dl5FsB/TIyb9JrqMKLYMxxcZ9joqR8gDprH1lwBw=="
+  "resolved" "https://registry.npmjs.org/@any-touch/core/-/core-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "@any-touch/shared" "^2.2.0"
+    "any-event" "^2.2.0"
+
+"@any-touch/pan@^2.0.1", "@any-touch/pan@^2.0.2", "@any-touch/pan@^2.2.0":
+  "integrity" "sha512-uMkCHbTm5qWji/FvhumP9n1ZCkPU7hy864g+ZhoWZ0OWAmn7s/TKRo4UqPBfqEPUMV6obGZvatrrgBLWT6J57w=="
+  "resolved" "https://registry.npmjs.org/@any-touch/pan/-/pan-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "@any-touch/compute" "^2.2.0"
+    "@any-touch/shared" "^2.2.0"
+
+"@any-touch/shared@^2.2.0":
+  "integrity" "sha512-2n1zWaATi/3osr/dkIUq5O7aSffKUsTM4DsIbPMW1VEO77v/rX2HkLoxt2Djzj5eCGh7An55Vw8NeA33kTTSRA=="
+  "resolved" "https://registry.npmjs.org/@any-touch/shared/-/shared-2.2.0.tgz"
+  "version" "2.2.0"
+
+"@any-touch/vector@^2.2.0":
+  "integrity" "sha512-t7pGYegIDCJl+swwsohZHZKmF71ZMt+hjwVEyhaEP6nQhcx6S7zulxnRxNp1t8s+c/JdK02Q89HnzQ4Ukg4+IA=="
+  "resolved" "https://registry.npmjs.org/@any-touch/vector/-/vector-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "@any-touch/shared" "^2.2.0"
+
+"@babel/parser@^7.18.4", "@babel/parser@^7.20.15", "@babel/parser@^7.21.3":
+  "integrity" "sha512-VLLsx06XkEYqBtE5YGPwfSGwfrjnyPP5oiGty3S8pQLFDFLaS8VwWSIxkTXpcvr5zeYLE6+MBNl2npl/YnfofA=="
+  "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.22.4.tgz"
+  "version" "7.22.4"
+
 "@johmun/vue-tags-input@^2.1.0":
   "integrity" "sha512-Fdwfss/TqCqMJbGAkmlzKbcG/ia1MstYjhqPBj+zG7h/166tIcE1TIftUxhT9LZ+RWjRSG0EFA1UyaHQSr3k3Q=="
   "resolved" "https://registry.npmjs.org/@johmun/vue-tags-input/-/vue-tags-input-2.1.0.tgz"
   "version" "2.1.0"
   dependencies:
     "vue" "^2.6.10"
+
+"@jridgewell/sourcemap-codec@^1.4.13":
+  "integrity" "sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg=="
+  "resolved" "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz"
+  "version" "1.4.15"
+
+"@liripeng/vue-audio-player@^1.5.1":
+  "integrity" "sha512-UtXhPC1GKvqnF5tNo+PRF89FgSn1NHvRmp/P0Zzcm+pY+1dy/K4O1vxGq5dFZdhKyG8PrjOhMZmrRFNVjVhOqg=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.5.1.tgz"
+  "version" "1.5.1"
+  dependencies:
+    "@any-touch/core" "^2.2.0"
+    "@any-touch/pan" "^2.2.0"
+    "@liripeng/vue-audio-player" "1.5.0"
+    "vue" "^3.2.47"
+    "vue-router" "^4.1.6"
+
+"@liripeng/vue-audio-player@1.3.0-beta5":
+  "integrity" "sha512-00XSEiRjz5ZLcKKkaLXXhcC0092Qz+rgi2vEAsm9vR9wtK2FNP87Ot+qozBKSR/1zWQp1RAhTDcb0tQ+XcbKjw=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.3.0-beta5.tgz"
+  "version" "1.3.0-beta5"
+  dependencies:
+    "@any-touch/core" "^2.0.1"
+    "@any-touch/pan" "^2.0.1"
+    "vue" "^3.2.26"
+    "vue-router" "^4.0.12"
+
+"@liripeng/vue-audio-player@1.4.0":
+  "integrity" "sha512-v4TlS2Vaq6TymzgTiSvU9gBU9xcFcnTDWFrnswmOfWOqU6Qd8v3KdHMRQ0/SWEgPkdqFKkDFivJEk5aGLfa4VQ=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.4.0.tgz"
+  "version" "1.4.0"
+  dependencies:
+    "@any-touch/core" "^2.0.2"
+    "@any-touch/pan" "^2.0.2"
+    "@liripeng/vue-audio-player" "1.3.0-beta5"
+    "vue" "^2.6.14"
+    "vue-router" "^3.5.3"
+
+"@liripeng/vue-audio-player@1.4.1-beta":
+  "integrity" "sha512-w52+E+x+ltHfyswz+H3Jpj1Evx3tomJrPi4hwyzn3Eqvu9UsAf9xTIoNG6eFTTubbNYEu0cPD9q+Kj5eZ4pI9Q=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.4.1-beta.tgz"
+  "version" "1.4.1-beta"
+  dependencies:
+    "@any-touch/core" "^2.0.2"
+    "@any-touch/pan" "^2.0.2"
+    "@liripeng/vue-audio-player" "1.4.0"
+    "vue" "^2.6.14"
+    "vue-router" "^3.5.3"
+
+"@liripeng/vue-audio-player@1.4.1-beta1":
+  "integrity" "sha512-Y4aUFJk9LfdWueFkqDC2Juk17gul35L6hEtoSWyWExNVY9XJflyBsXFe6EHTaVaHLq9Ij7oKSs29JrMmnxvNcQ=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.4.1-beta1.tgz"
+  "version" "1.4.1-beta1"
+  dependencies:
+    "@any-touch/core" "^2.0.2"
+    "@any-touch/pan" "^2.0.2"
+    "@liripeng/vue-audio-player" "1.4.1-beta"
+    "vue" "^2.6.14"
+    "vue-router" "^3.5.3"
+
+"@liripeng/vue-audio-player@1.5.0":
+  "integrity" "sha512-nt51tfMlzanb2LgiLD0nMQWGjoN1iCf2CBQPlnJvpn5SySBBDoCzNxqBPKaLGfNmFsi+yrd84cC3ZY0D/qMICg=="
+  "resolved" "https://registry.npmjs.org/@liripeng/vue-audio-player/-/vue-audio-player-1.5.0.tgz"
+  "version" "1.5.0"
+  dependencies:
+    "@any-touch/core" "^2.0.2"
+    "@any-touch/pan" "^2.0.2"
+    "@liripeng/vue-audio-player" "1.4.1-beta1"
+    "vue" "^3.2.31"
+    "vue-router" "^4.0.14"
+
+"@vue/compiler-core@3.3.4":
+  "integrity" "sha512-cquyDNvZ6jTbf/+x+AgM2Arrp6G4Dzbb0R64jiG804HRMfRiFXWI6kqUVqZ6ZR0bQhIoQjB4+2bhNtVwndW15g=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@babel/parser" "^7.21.3"
+    "@vue/shared" "3.3.4"
+    "estree-walker" "^2.0.2"
+    "source-map-js" "^1.0.2"
+
+"@vue/compiler-dom@3.3.4":
+  "integrity" "sha512-wyM+OjOVpuUukIq6p5+nwHYtj9cFroz9cwkfmP9O1nzH68BenTTv0u7/ndggT8cIQlnBeOo6sUT/gvHcIkLA5w=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/compiler-core" "3.3.4"
+    "@vue/shared" "3.3.4"
+
+"@vue/compiler-sfc@2.7.14":
+  "integrity" "sha512-aNmNHyLPsw+sVvlQFQ2/8sjNuLtK54TC6cuKnVzAY93ks4ZBrvwQSnkkIh7bsbNhum5hJBS00wSDipQ937f5DA=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-2.7.14.tgz"
+  "version" "2.7.14"
+  dependencies:
+    "@babel/parser" "^7.18.4"
+    "postcss" "^8.4.14"
+    "source-map" "^0.6.1"
+
+"@vue/compiler-sfc@3.3.4":
+  "integrity" "sha512-6y/d8uw+5TkCuzBkgLS0v3lSM3hJDntFEiUORM11pQ/hKvkhSKZrXW6i69UyXlJQisJxuUEJKAWEqWbWsLeNKQ=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@babel/parser" "^7.20.15"
+    "@vue/compiler-core" "3.3.4"
+    "@vue/compiler-dom" "3.3.4"
+    "@vue/compiler-ssr" "3.3.4"
+    "@vue/reactivity-transform" "3.3.4"
+    "@vue/shared" "3.3.4"
+    "estree-walker" "^2.0.2"
+    "magic-string" "^0.30.0"
+    "postcss" "^8.1.10"
+    "source-map-js" "^1.0.2"
+
+"@vue/compiler-ssr@3.3.4":
+  "integrity" "sha512-m0v6oKpup2nMSehwA6Uuu+j+wEwcy7QmwMkVNVfrV9P2qE5KshC6RwOCq8fjGS/Eak/uNb8AaWekfiXxbBB6gQ=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/compiler-dom" "3.3.4"
+    "@vue/shared" "3.3.4"
+
+"@vue/devtools-api@^6.5.0":
+  "integrity" "sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q=="
+  "resolved" "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.5.0.tgz"
+  "version" "6.5.0"
+
+"@vue/reactivity-transform@3.3.4":
+  "integrity" "sha512-MXgwjako4nu5WFLAjpBnCj/ieqcjE2aJBINUNQzkZQfzIZA4xn+0fV1tIYBJvvva3N3OvKGofRLvQIwEQPpaXw=="
+  "resolved" "https://registry.npmjs.org/@vue/reactivity-transform/-/reactivity-transform-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@babel/parser" "^7.20.15"
+    "@vue/compiler-core" "3.3.4"
+    "@vue/shared" "3.3.4"
+    "estree-walker" "^2.0.2"
+    "magic-string" "^0.30.0"
+
+"@vue/reactivity@3.3.4":
+  "integrity" "sha512-kLTDLwd0B1jG08NBF3R5rqULtv/f8x3rOFByTDz4J53ttIQEDmALqKqXY0J+XQeN0aV2FBxY8nJDf88yvOPAqQ=="
+  "resolved" "https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/shared" "3.3.4"
+
+"@vue/runtime-core@3.3.4":
+  "integrity" "sha512-R+bqxMN6pWO7zGI4OMlmvePOdP2c93GsHFM/siJI7O2nxFRzj55pLwkpCedEY+bTMgp5miZ8CxfIZo3S+gFqvA=="
+  "resolved" "https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/reactivity" "3.3.4"
+    "@vue/shared" "3.3.4"
+
+"@vue/runtime-dom@3.3.4":
+  "integrity" "sha512-Aj5bTJ3u5sFsUckRghsNjVTtxZQ1OyMWCr5dZRAPijF/0Vy4xEoRCwLyHXcj4D0UFbJ4lbx3gPTgg06K/GnPnQ=="
+  "resolved" "https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/runtime-core" "3.3.4"
+    "@vue/shared" "3.3.4"
+    "csstype" "^3.1.1"
+
+"@vue/server-renderer@3.3.4":
+  "integrity" "sha512-Q6jDDzR23ViIb67v+vM1Dqntu+HUexQcsWKhhQa4ARVzxOY2HbC7QRW/ggkDBd5BU+uM1sV6XOAP0b216o34JQ=="
+  "resolved" "https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/compiler-ssr" "3.3.4"
+    "@vue/shared" "3.3.4"
+
+"@vue/shared@3.3.4":
+  "integrity" "sha512-7OjdcV8vQ74eiz1TZLzZP4JwqM5fA94K6yntPS5Z25r9HDuGNzaGdgvwKYq6S+MxwF0TFRwe50fIR/MYnakdkQ=="
+  "resolved" "https://registry.npmjs.org/@vue/shared/-/shared-3.3.4.tgz"
+  "version" "3.3.4"
+
+"any-event@^2.2.0":
+  "integrity" "sha512-PB4sEiVUjL+5mLmwlAGYdI5/1ouckapxS6+RPIvrGXv9XTMav7M3k3rR/f9fwAR+e2608CTR3FOR5HrOEYTtKA=="
+  "resolved" "https://registry.npmjs.org/any-event/-/any-event-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "tslib" "^2.3.1"
+
+"csstype@^3.1.0", "csstype@^3.1.1":
+  "integrity" "sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ=="
+  "resolved" "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
+  "version" "3.1.2"
+
+"estree-walker@^2.0.2":
+  "integrity" "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="
+  "resolved" "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz"
+  "version" "2.0.2"
 
 "js-tokens@^3.0.0 || ^4.0.0":
   "integrity" "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="
@@ -21,6 +254,32 @@
   dependencies:
     "js-tokens" "^3.0.0 || ^4.0.0"
 
+"magic-string@^0.30.0":
+  "integrity" "sha512-LA+31JYDJLs82r2ScLrlz1GjSgu66ZV518eyWT+S8VhyQn/JL0u9MeBOvQMGYiPk1DBiSN9DDMOcXvigJZaViQ=="
+  "resolved" "https://registry.npmjs.org/magic-string/-/magic-string-0.30.0.tgz"
+  "version" "0.30.0"
+  dependencies:
+    "@jridgewell/sourcemap-codec" "^1.4.13"
+
+"nanoid@^3.3.6":
+  "integrity" "sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA=="
+  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.6.tgz"
+  "version" "3.3.6"
+
+"picocolors@^1.0.0":
+  "integrity" "sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ=="
+  "resolved" "https://registry.npmjs.org/picocolors/-/picocolors-1.0.0.tgz"
+  "version" "1.0.0"
+
+"postcss@^8.1.10", "postcss@^8.4.14":
+  "integrity" "sha512-M0RzbcI0sO/XJNucsGjvWU9ERWxb/ytp1w6dKtxTKgixdtQDq4rmx/g8W1hnaheq9jgwL/oyEdH5Bc4WwJKMqg=="
+  "resolved" "https://registry.npmjs.org/postcss/-/postcss-8.4.24.tgz"
+  "version" "8.4.24"
+  dependencies:
+    "nanoid" "^3.3.6"
+    "picocolors" "^1.0.0"
+    "source-map-js" "^1.0.2"
+
 "redux@4.0.1":
   "integrity" "sha512-R7bAtSkk7nY6O/OYMVR9RiBI+XghjF9rlbl5806HJbQph0LJVHZrU5oaO4q70eUKiqMRqm4y07KLTlMZ2BlVmg=="
   "resolved" "https://registry.npmjs.org/redux/-/redux-4.0.1.tgz"
@@ -29,12 +288,65 @@
     "loose-envify" "^1.4.0"
     "symbol-observable" "^1.2.0"
 
+"source-map-js@^1.0.2":
+  "integrity" "sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw=="
+  "resolved" "https://registry.npmjs.org/source-map-js/-/source-map-js-1.0.2.tgz"
+  "version" "1.0.2"
+
+"source-map@^0.6.1":
+  "integrity" "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
+  "resolved" "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
+  "version" "0.6.1"
+
 "symbol-observable@^1.2.0":
   "integrity" "sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ=="
   "resolved" "https://registry.npmjs.org/symbol-observable/-/symbol-observable-1.2.0.tgz"
   "version" "1.2.0"
 
+"tslib@^2.3.1":
+  "integrity" "sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w=="
+  "resolved" "https://registry.npmjs.org/tslib/-/tslib-2.5.3.tgz"
+  "version" "2.5.3"
+
+"vue-router@^3.5.3":
+  "integrity" "sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ=="
+  "resolved" "https://registry.npmjs.org/vue-router/-/vue-router-3.6.5.tgz"
+  "version" "3.6.5"
+
+"vue-router@^4.0.12":
+  "integrity" "sha512-cChBPPmAflgBGmy3tBsjeoe3f3VOSG6naKyY5pjtrqLGbNEXdzCigFUHgBvp9e3ysAtFtEx7OLqcSDh/1Cq2TQ=="
+  "resolved" "https://registry.npmjs.org/vue-router/-/vue-router-4.2.2.tgz"
+  "version" "4.2.2"
+  dependencies:
+    "@vue/devtools-api" "^6.5.0"
+
+"vue-router@^4.0.14", "vue-router@^4.1.6":
+  "integrity" "sha512-cChBPPmAflgBGmy3tBsjeoe3f3VOSG6naKyY5pjtrqLGbNEXdzCigFUHgBvp9e3ysAtFtEx7OLqcSDh/1Cq2TQ=="
+  "resolved" "https://registry.npmjs.org/vue-router/-/vue-router-4.2.2.tgz"
+  "version" "4.2.2"
+  dependencies:
+    "@vue/devtools-api" "^6.5.0"
+
 "vue@^2.6.10":
   "integrity" "sha512-uhmLFETqPPNyuLLbsKz6ioJ4q7AZHzD8ZVFNATNyICSZouqP2Sz0rotWQC8UNBF6VGSCs5abnKJoStA6JbCbfg=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.12.tgz"
   "version" "2.6.12"
+
+"vue@^2.6.14":
+  "integrity" "sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ=="
+  "resolved" "https://registry.npmjs.org/vue/-/vue-2.7.14.tgz"
+  "version" "2.7.14"
+  dependencies:
+    "@vue/compiler-sfc" "2.7.14"
+    "csstype" "^3.1.0"
+
+"vue@^3.2.0", "vue@^3.2.26", "vue@^3.2.31", "vue@^3.2.47", "vue@3.3.4":
+  "integrity" "sha512-VTyEYn3yvIeY1Py0WaYGZsXnz3y5UnGi62GjVEqvEGPl6nxbOrCXbVOTQWBEJUqAyTUk2uJ5JLVnYJ6ZzGbrSw=="
+  "resolved" "https://registry.npmjs.org/vue/-/vue-3.3.4.tgz"
+  "version" "3.3.4"
+  dependencies:
+    "@vue/compiler-dom" "3.3.4"
+    "@vue/compiler-sfc" "3.3.4"
+    "@vue/runtime-dom" "3.3.4"
+    "@vue/server-renderer" "3.3.4"
+    "@vue/shared" "3.3.4"
