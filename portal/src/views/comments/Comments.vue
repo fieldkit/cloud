@@ -624,6 +624,9 @@ export default Vue.extend({
                 });
             const dataEvents = this.$getters.dataEvents;
             this.dataEvents = [];
+            if (this.dataEvents.length === 0) {
+                return;
+            }
             dataEvents.forEach((event) => {
                 this.dataEvents.push(
                     new DataEvent(
