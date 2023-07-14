@@ -42,7 +42,7 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 		return err
 	}
 
-	log.Infow("station-model:meta", "configuration_id", configuration.ID, "meta_record_id", db.ID)
+	log.Infow("station-model:meta", "configuration_id", configuration.ID, "meta_record_id", db.ID, "modules", len(rawMeta.Modules))
 
 	for moduleIndex, m := range rawMeta.Modules {
 		if m.Header == nil {
