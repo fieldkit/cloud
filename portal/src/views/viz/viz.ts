@@ -223,11 +223,11 @@ export class Bookmark {
     }
 
     private vizStations(vizBookmark: VizBookmark): StationID[] {
-        return [];
+        return vizBookmark[0].map((vs) => vs[0])
     }
 
     private vizSensors(vizBookmark: VizBookmark): SensorSpec[] {
-        return [];
+        return vizBookmark[0].map((vs) => vs[1])
     }
 
     public get allStations(): number[] {
