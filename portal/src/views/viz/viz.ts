@@ -624,6 +624,20 @@ export class Group {
     public static fromBookmark(bm: GroupBookmark, settings: VizSettings): Group {
         return new Group(bm[0].map((vm) => Graph.fromBookmark(vm, settings)));
     }
+
+    public isEmpty(): boolean {
+        let isEmpty = true;
+        this.vizes.forEach((viz) => {
+            if (viz instanceof Graph) {
+                viz.dataSets.forEach((dataSet) => {
+                    if (!dataSet.all?.empty) {
+                        isEmpty = false;
+                    }
+                });
+            }
+        });
+        return isEmpty;
+    }
 }
 
 class DataQuerier {

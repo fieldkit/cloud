@@ -1,9 +1,8 @@
-import _ from "lodash";
 import Vue from "vue";
 
-import { Workspace, Viz, Group, TimeZoom } from "./viz";
-import { VizGraph } from "./VizGraph";
-import { VegaScrubber } from "./VegaScrubber";
+import {Group, TimeZoom, Workspace} from "./viz";
+import {VizGraph} from "./VizGraph";
+import {VegaScrubber} from "./VegaScrubber";
 
 export const VizGroup = Vue.extend({
     components: {
@@ -64,9 +63,13 @@ export const VizGroup = Vue.extend({
         eventClicked(id: number): void {
             this.$emit("event-clicked", id);
         },
+        isGroupEmpty(): boolean {
+            return this.group.isEmpty();
+        },
     },
     template: `
-        <div v-bind:class="{ 'group-container': true, 'busy': false }">
+        <div v-bind:class="{ 'group-container': true, 'busy': false, 'group-no-data': isGroupEmpty() }">
+            <div v-if="isGroupEmpty()" class="group-no-data-msg"> {{$tc('dataView.noData')}} </div>
             <div v-for="(viz, index) in group.vizes" :key="viz.id" v-bind:class="{ 'viz-container': true, 'busy': false }">
                 <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
 

@@ -9,7 +9,7 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
-            :showToggle="(user && user.admin) || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
+            :showToggle="showPostsTypeToggle()"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -303,7 +303,7 @@ import { CurrentUser, ProjectUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
-import { deserializeBookmark } from "../viz/viz";
+import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
@@ -328,6 +328,10 @@ export default Vue.extend({
         parentData: {
             type: [Number, Object],
             required: true,
+        },
+        workspace: {
+            type: Workspace,
+            required: false,
         },
     },
     data(): {
@@ -421,7 +425,7 @@ export default Vue.extend({
             return null;
         },
         stationBelongsToAProject(): boolean {
-            return !!this.parentData.p.length;
+            return !!this.parentData.p?.length;
         },
     },
     watch: {
@@ -742,6 +746,26 @@ export default Vue.extend({
         },
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);
+        },
+        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
+        areWorkspaceGroupsEmpty(): boolean {
+            let areEmpty = false;
+
+            if (this.workspace) {
+                this.workspace.groups.forEach((group) => {
+                    if (group.isEmpty()) {
+                        areEmpty = true;
+                    }
+                });
+            }
+
+            return areEmpty;
+        },
+        showPostsTypeToggle(): boolean {
+            return (
+                ((this.user && this.user.admin) || (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                !this.areWorkspaceGroupsEmpty()
+            );
         },
     },
 });
