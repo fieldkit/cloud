@@ -30,7 +30,7 @@
                             <i class="icon icon-share"></i>
                             <span class="button-submit-text">Share</span>
                         </div>
-                        <div class="button-submit" @click="openExports" v-if="false">
+                        <div class="button-submit" @click="openExports">
                             <i class="icon icon-export"></i>
                             <span class="button-submit-text">Export</span>
                         </div>
