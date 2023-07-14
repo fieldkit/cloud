@@ -149,10 +149,7 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 	log.Infow("processing")
 
-	ir, err := repositories.NewIngestionRepository(h.db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(h.db)
 
 	queued, err := ir.QueryQueuedByID(ctx, m.QueuedID)
 	if err != nil {

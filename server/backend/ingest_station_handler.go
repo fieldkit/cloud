@@ -78,10 +78,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 
 	log.Infow("processing")
 
-	ir, err := repositories.NewIngestionRepository(h.db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(h.db)
 
 	ingestions, err := ir.QueryByStationID(ctx, m.StationID)
 	if err != nil {
@@ -126,10 +123,7 @@ func (h *IngestStationHandler) Start(ctx context.Context, m *messages.IngestStat
 }
 
 func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.MessageContext, body *StationIngestionSaga, ingestionID int64) error {
-	ir, err := repositories.NewIngestionRepository(h.db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(h.db)
 
 	ingestion, err := ir.QueryByID(ctx, ingestionID)
 	if err != nil {
