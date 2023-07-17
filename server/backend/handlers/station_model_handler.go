@@ -163,16 +163,20 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 
 			s := m[sIndex]
 
-			update := &UpdateSensorValue{
-				ID:    s.SensorID,
-				Value: float64(sr.Value),
-				Time:  time.Unix(h.dataRecord.Readings.Time, 0),
-			}
+			if sr.GetCalibrated() != nil {
+				calibrated := sr.GetCalibratedValue()
 
-			if _, err := h.db.NamedExecContext(ctx, `
+				update := &UpdateSensorValue{
+					ID:    s.SensorID,
+					Value: float64(calibrated),
+					Time:  time.Unix(h.dataRecord.Readings.Time, 0),
+				}
+
+				if _, err := h.db.NamedExecContext(ctx, `
 				UPDATE fieldkit.module_sensor SET reading_last = :reading_last, reading_time = :reading_time WHERE id = :id
 				`, update); err != nil {
-				return err
+					return err
+				}
 			}
 		}
 	}
