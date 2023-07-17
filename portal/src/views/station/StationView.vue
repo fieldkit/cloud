@@ -35,7 +35,7 @@
                                     class="input"
                                     oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
                                     v-model="form.description"
-                                    :disabled="!editingDescription || (form.description === undefined && isUserTeamMemberOfStation)"
+                                    :disabled="!editingDescription"
                                 />
                                 <a
                                     v-if="form.description === undefined && isUserTeamMemberOfStation"
@@ -219,12 +219,7 @@
             </section>
 
             <section v-if="!isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm
-                    v-bind:key="station.id"
-                    :station="station"
-                    :readonly="station.readOnly"
-                    @change="dirtyNotes = true"
-                />
+                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" />
             </section>
         </div>
     </StandardLayout>
@@ -318,6 +313,7 @@ export default Vue.extend({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
         isUserTeamMemberOfStation(): boolean {
+            console.log("radoi", this.$getters.isUserTeamMemberOfStation(this.station.id));
             return this.$getters.isUserTeamMemberOfStation(this.station.id);
         },
         visibleReadings(): VisibleReadings {
@@ -531,6 +527,7 @@ export default Vue.extend({
             object-fit: cover;
             margin-right: 20px;
             border-radius: 5px;
+            align-self: start;
         }
 
         .photo-container {
