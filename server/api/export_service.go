@@ -117,7 +117,7 @@ func (c *ExportService) Download(ctx context.Context, payload *exportService.Dow
 		return nil, nil, err
 	}
 
-	disposition := fmt.Sprintf("attachment; filename=\"data.csv\"")
+	disposition := "attachment; filename=\"data.csv\""
 
 	return &exportService.DownloadResult{
 		Length:             opened.Size,
@@ -202,7 +202,7 @@ func (c *ExportService) Csv(ctx context.Context, payload *exportService.CsvPaylo
 		return nil, err
 	}
 
-	de, err := c.exportFormat(ctx, args, backend.CSVFormatter)
+	de, err := c.exportFormat(ctx, args, "csv")
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (c *ExportService) JSONLines(ctx context.Context, payload *exportService.JS
 		return nil, err
 	}
 
-	de, err := c.exportFormat(ctx, args, backend.JSONLinesFormatter)
+	de, err := c.exportFormat(ctx, args, "json")
 	if err != nil {
 		return nil, err
 	}
