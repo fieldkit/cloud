@@ -3,9 +3,11 @@ package backend
 import (
 	"context"
 	"encoding/csv"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"time"
 
 	"github.com/pkg/profile"
@@ -77,72 +79,405 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 		return err
 	}
 
-	exporter := NewFkbExporter(h.files, h.metrics, nil)
-
-	for _, ingestion := range ingestions {
-		if err := exporter.Prepare(ctx, ingestion.URL); err != nil {
-			return fmt.Errorf("pass 1: exporting %v failed: %w", ingestion.URL, err)
+	readFunc := func(ctx context.Context, reader io.Reader) error {
+		metadata := make(map[string]string)
+		af, err := h.files.Archive(ctx, "text/csv", metadata, reader)
+		if err != nil {
+			log.Errorw("archiver:error", "error", err)
+			return err
+		} else {
+			log.Infow("archiver:done", "key", af.Key, "bytes", af.BytesRead)
 		}
+
+		now := time.Now()
+		size := int32(af.BytesRead)
+
+		de.DownloadURL = &af.URL
+		de.CompletedAt = &now
+		de.Progress = 100
+		de.Size = &size
+		if _, err := r.UpdateDataExport(ctx, de); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	for _, ingestion := range ingestions {
-		if err := exporter.Export(ctx, ingestion.URL); err != nil {
-			return fmt.Errorf("pass 2: exporting %v failed: %w", ingestion.URL, err)
+	writeFunc := func(ctx context.Context, writer io.Writer) error {
+		exporter := NewCsvExporter(h.files, h.metrics, writer)
+
+		urls := make([]string, 0, len(ingestions))
+		for _, ingestion := range ingestions {
+			urls = append(urls, ingestion.URL)
 		}
+
+		if err := exporter.Prepare(ctx, urls); err != nil {
+			return fmt.Errorf("preparing: exporting failed: %w", err)
+		}
+
+		if err := exporter.Export(ctx, urls); err != nil {
+			return fmt.Errorf("writing: exporting failed: %w", err)
+		}
+
+		return nil
+	}
+
+	async := NewAsyncFileWriter(readFunc, writeFunc)
+	if err := async.Start(ctx); err != nil {
+		return err
+	}
+
+	if err := async.Wait(ctx); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-type FkbExporter struct {
-	writer *csv.Writer
+type CanExport interface {
+	Prepare(ctx context.Context, urls []string) error
+	Export(ctx context.Context, urls []string) error
+}
+
+type JsonLinesExporter struct {
+	writer io.Writer
 	walker *FkbWalker
 }
 
-func NewFkbExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer) (self *FkbExporter) {
-	self = &FkbExporter{
-		writer: csv.NewWriter(writer),
+func NewJsonLinesExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer) (self *JsonLinesExporter) {
+	self = &JsonLinesExporter{
+		writer: writer,
 	}
 	self.walker = NewFkbWalker(files, metrics, self, true)
 	return
 }
 
-func (e *FkbExporter) Prepare(ctx context.Context, url string) error {
-	if _, err := e.walker.WalkUrl(ctx, url); err != nil {
-		return err
+func (e *JsonLinesExporter) Prepare(ctx context.Context, urls []string) error {
+	return nil
+}
+
+func (e *JsonLinesExporter) Export(ctx context.Context, urls []string) error {
+	for _, url := range urls {
+		if _, err := e.walker.WalkUrl(ctx, url); err != nil {
+			return fmt.Errorf("export %v failed: %w", url, err)
+		}
 	}
 
 	return nil
 }
 
-func (e *FkbExporter) Export(ctx context.Context, url string) error {
-	if _, err := e.walker.WalkUrl(ctx, url); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (e *FkbExporter) OnSignedMeta(ctx context.Context, signedRecord *pb.SignedRecord, rawRecord *pb.DataRecord, bytes []byte) error {
+func (e *JsonLinesExporter) OnSignedMeta(ctx context.Context, signedRecord *pb.SignedRecord, rawRecord *pb.DataRecord, bytes []byte) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("signed-meta", "record_number", signedRecord.Record, "record", rawRecord)
 
-	return nil
+	return e.write(ctx, rawRecord)
 }
 
-func (e *FkbExporter) OnMeta(ctx context.Context, recordNumber int64, rawRecord *pb.DataRecord, bytes []byte) error {
+func (e *JsonLinesExporter) OnMeta(ctx context.Context, recordNumber int64, rawRecord *pb.DataRecord, bytes []byte) error {
 	log := Logger(ctx).Sugar()
 
 	log.Infow("meta", "record_number", recordNumber, "record", rawRecord)
 
+	return e.write(ctx, rawRecord)
+}
+
+func (e *JsonLinesExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawMetaUnused *pb.DataRecord, bytes []byte) error {
+	for _, sensorGroup := range rawRecord.Readings.SensorGroups {
+		for _, reading := range sensorGroup.Readings {
+			if calibrated, ok := reading.Calibrated.(*pb.SensorAndValue_CalibratedValue); ok {
+				if math.IsNaN(float64(calibrated.CalibratedValue)) {
+					reading.Calibrated = &pb.SensorAndValue_CalibratedNull{}
+				}
+			}
+		}
+	}
+
+	return e.write(ctx, rawRecord)
+}
+
+func (e *JsonLinesExporter) write(ctx context.Context, value interface{}) (err error) {
+	b, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	if _, err := e.writer.Write(b); err != nil {
+		return err
+	}
+
+	if _, err := io.WriteString(e.writer, "\n"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (e *FkbExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawMetaUnused *pb.DataRecord, bytes []byte) error {
+func (e *JsonLinesExporter) OnDone(ctx context.Context) (err error) {
 	return nil
 }
 
-func (e *FkbExporter) OnDone(ctx context.Context) (err error) {
+type records struct {
+	meta *pb.DataRecord
+	data *pb.DataRecord
+}
+
+type CsvExporter struct {
+	writer    *csv.Writer
+	walker    *FkbWalker
+	preparing *preparingCsv
+	prepared  *preparingCsv
+	row       []string
+	records   *records
+}
+
+type fieldFunc func(*records) string
+
+type csvField struct {
+	name string
+	get  fieldFunc
+}
+
+type fieldSet struct {
+	fields []*csvField
+}
+
+func newFieldSet() *fieldSet {
+	return &fieldSet{
+		fields: make([]*csvField, 0),
+	}
+}
+
+func (p *fieldSet) addField(name string, get fieldFunc) {
+	p.fields = append(p.fields, &csvField{name: name, get: get})
+}
+
+type preparingCsv struct {
+	fields  *fieldSet
+	metas   map[int64]*pb.DataRecord
+	modules map[string]*fieldSet
+	order   []string
+}
+
+func (p *preparingCsv) addField(name string, get fieldFunc) {
+	p.fields.addField(name, get)
+}
+
+func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer) (self *CsvExporter) {
+	self = &CsvExporter{
+		writer:  csv.NewWriter(writer),
+		records: &records{},
+		row:     nil,
+		preparing: &preparingCsv{
+			fields:  newFieldSet(),
+			metas:   make(map[int64]*pb.DataRecord),
+			modules: make(map[string]*fieldSet),
+			order:   make([]string, 0),
+		},
+	}
+	self.walker = NewFkbWalker(files, metrics, self, true)
+	return
+}
+
+func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
+	e.preparing.addField("unix_time", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Time)
+	})
+	e.preparing.addField("time", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Time)
+	})
+	e.preparing.addField("data_record", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Reading)
+	})
+	e.preparing.addField("meta_record", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Meta)
+	})
+	e.preparing.addField("uptime", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Uptime)
+	})
+	e.preparing.addField("gps", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Location.Fix)
+	})
+	e.preparing.addField("latitude", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Location.Latitude)
+	})
+	e.preparing.addField("longitude", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Location.Longitude)
+	})
+	e.preparing.addField("altitude", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Location.Altitude)
+	})
+	e.preparing.addField("gps_time", func(r *records) string {
+		return fmt.Sprintf("%v", r.data.Readings.Location.Time)
+	})
+	e.preparing.addField("note", func(r *records) string {
+		return ""
+	})
+
+	for _, url := range urls {
+		if _, err := e.walker.WalkUrl(ctx, url); err != nil {
+			return fmt.Errorf("prepare %v failed: %w", url, err)
+		}
+	}
+
+	e.prepared = e.preparing
+	e.preparing = nil
+
+	return nil
+}
+
+func (e *CsvExporter) Export(ctx context.Context, urls []string) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("module", "module_ids", e.prepared.order)
+
+	header := make([]string, 0, len(e.prepared.fields.fields))
+	for _, field := range e.prepared.fields.fields {
+		header = append(header, field.name)
+	}
+	for _, id := range e.prepared.order {
+		for _, field := range e.prepared.modules[id].fields {
+			header = append(header, field.name)
+		}
+	}
+	if err := e.writer.Write(header); err != nil {
+		return err
+	}
+
+	for _, url := range urls {
+		if _, err := e.walker.WalkUrl(ctx, url); err != nil {
+			return fmt.Errorf("export %v failed: %w", url, err)
+		}
+	}
+
+	return nil
+}
+
+func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) error {
+	log := Logger(ctx).Sugar()
+
+	if rawRecord.Metadata != nil {
+		for moduleIndex, module := range rawRecord.Modules {
+			id := hex.EncodeToString(module.Id)
+			if _, ok := e.preparing.modules[id]; ok {
+				continue
+			}
+
+			log.Infow("module", "module_id", id)
+
+			fields := newFieldSet()
+
+			fields.addField("module_index", func(r *records) string {
+				return fmt.Sprintf("%d", moduleIndex)
+			})
+			fields.addField("module_position", func(r *records) string {
+				return fmt.Sprintf("%d", module.Position)
+			})
+			fields.addField("module_name", func(r *records) string {
+				return module.Name
+			})
+			fields.addField("module_id", func(r *records) string {
+				return hex.EncodeToString(module.Id)
+			})
+
+			for sensorIndex, sensor := range module.Sensors {
+				fields.addField(sensor.Name, (func(moduleIndex, sensorIndex int) fieldFunc {
+					return func(r *records) string {
+						if moduleIndex >= len(r.data.Readings.SensorGroups) {
+							return ""
+						}
+
+						sensorGroup := r.data.Readings.SensorGroups[moduleIndex]
+						sensor := sensorGroup.Readings[sensorIndex]
+						if sensor.GetCalibratedNull() {
+							return ""
+						}
+						return fmt.Sprintf("%v", sensor.GetCalibratedValue())
+					}
+				})(moduleIndex, sensorIndex))
+
+				fields.addField(fmt.Sprintf("%s_raw_v", sensor.Name), (func(moduleIndex, sensorIndex int) fieldFunc {
+					return func(r *records) string {
+						if moduleIndex >= len(r.data.Readings.SensorGroups) {
+							return ""
+						}
+
+						sensorGroup := r.data.Readings.SensorGroups[moduleIndex]
+						sensor := sensorGroup.Readings[sensorIndex]
+						if sensor.GetUncalibratedNull() {
+							return ""
+						}
+						return fmt.Sprintf("%v", sensor.GetUncalibratedValue())
+					}
+				})(moduleIndex, sensorIndex))
+			}
+
+			e.preparing.modules[id] = fields
+			e.preparing.order = append(e.preparing.order, id)
+		}
+	}
+
+	return nil
+}
+
+func (e *CsvExporter) OnSignedMeta(ctx context.Context, signedRecord *pb.SignedRecord, rawRecord *pb.DataRecord, bytes []byte) error {
+	return e.OnMeta(ctx, int64(signedRecord.Record), rawRecord, bytes)
+}
+
+func (e *CsvExporter) OnMeta(ctx context.Context, recordNumber int64, rawRecord *pb.DataRecord, bytes []byte) error {
+	if e.preparing != nil {
+		e.preparing.metas[recordNumber] = rawRecord
+
+		if err := e.prepare(ctx, rawRecord); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *CsvExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawMetaUnused *pb.DataRecord, bytes []byte) error {
+	if e.prepared != nil {
+		meta, ok := e.prepared.metas[int64(rawRecord.Readings.Meta)]
+		if !ok {
+			return fmt.Errorf("missing meta: %v", rawRecord.Readings.Meta)
+		}
+
+		e.records.meta = meta
+		e.records.data = rawRecord
+
+		e.row = make([]string, 0, len(e.prepared.fields.fields))
+
+		for _, field := range e.prepared.fields.fields {
+			value := field.get(e.records)
+			e.row = append(e.row, value)
+		}
+
+		for _, id := range e.prepared.order {
+			metaHasModule := false
+			for _, temp := range e.records.meta.Modules {
+				if id == hex.EncodeToString(temp.Id) {
+					metaHasModule = true
+					break
+				}
+			}
+			for _, field := range e.prepared.modules[id].fields {
+				if metaHasModule {
+					value := field.get(e.records)
+					e.row = append(e.row, value)
+				} else {
+					e.row = append(e.row, "")
+				}
+			}
+		}
+
+		if err := e.writer.Write(e.row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *CsvExporter) OnDone(ctx context.Context) (err error) {
 	return nil
 }
