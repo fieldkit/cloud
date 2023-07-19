@@ -9,7 +9,7 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
-            :showToggle="(user && user.admin) || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
+            :showToggle="showPostsTypeToggle()"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -25,7 +25,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
@@ -46,7 +46,7 @@
             </template>
             <template #right>
                 <div class="event-level-selector">
-                    <label for="allProjectRadio">
+                    <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
                             <input
                                 type="radio"
@@ -165,7 +165,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">
+        <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
             {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
         </div>
         <div v-if="isLoading" class="no-comments">
@@ -303,7 +303,7 @@ import { CurrentUser, ProjectUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
-import { deserializeBookmark } from "../viz/viz";
+import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/viz/common";
@@ -328,6 +328,10 @@ export default Vue.extend({
         parentData: {
             type: [Number, Object],
             required: true,
+        },
+        workspace: {
+            type: Workspace,
+            required: false,
         },
     },
     data(): {
@@ -420,11 +424,13 @@ export default Vue.extend({
 
             return null;
         },
+        stationBelongsToAProject(): boolean {
+            return !!this.parentData.p?.length;
+        },
     },
     watch: {
         async parentData(): Promise<void> {
-
-          await this.getDataEvents();
+            await this.getDataEvents();
             return this.getComments();
         },
         $route() {
@@ -439,6 +445,7 @@ export default Vue.extend({
             await this.$getters.projectsById[projectId];
         }
         this.placeholder = this.getNewCommentPlaceholder();
+        this.newDataEvent.allProjectSensors = this.stationBelongsToAProject;
 
         await this.getDataEvents();
         return this.getComments();
@@ -479,7 +486,6 @@ export default Vue.extend({
                 });
         },
         async save(comment: NewComment): Promise<void> {
-
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -622,6 +628,9 @@ export default Vue.extend({
                 });
             const dataEvents = this.$getters.dataEvents;
             this.dataEvents = [];
+            if (this.dataEvents.length === 0) {
+                return;
+            }
             dataEvents.forEach((event) => {
                 this.dataEvents.push(
                     new DataEvent(
@@ -737,6 +746,26 @@ export default Vue.extend({
         },
         interpolatePartner(baseString) {
             return interpolatePartner(baseString);
+        },
+        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
+        areWorkspaceGroupsEmpty(): boolean {
+            let areEmpty = false;
+
+            if (this.workspace) {
+                this.workspace.groups.forEach((group) => {
+                    if (group.isEmpty()) {
+                        areEmpty = true;
+                    }
+                });
+            }
+
+            return areEmpty;
+        },
+        showPostsTypeToggle(): boolean {
+            return (
+                ((this.user && this.user.admin) || (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                !this.areWorkspaceGroupsEmpty()
+            );
         },
     },
 });

@@ -95,7 +95,7 @@
                     @event-clicked="eventClicked"
                 />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
+                <Comments :parentData="bookmark" :workspace="workspace" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -1068,5 +1068,25 @@ export default Vue.extend({
         top: 17px;
         left: 20px;
     }
+}
+
+::v-deep .group-no-data {
+    .viz-container,
+    .scrubber {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+}
+
+::v-deep .group-no-data-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    z-index: $z-index-top;
+    background: #ffff;
+    padding: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 }
 </style>
