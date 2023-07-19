@@ -125,6 +125,7 @@ export interface PartnerCustomization {
     };
     routeAfterLogin: string;
     sidebarNarrow: boolean;
+    exportSupported: boolean;
     components: {
         project: Component | null;
     };
@@ -159,6 +160,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
             icon: "/favicon-floodnet.ico",
+            exportSupported: false,
             sharing: {
                 viz: `Check out this data on FloodNet!`, // TODO i18n
             },
@@ -214,6 +216,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         title: "Data Dashboard - FieldKit",
         class: "fieldkit",
         icon: "/favicon-fieldkit.ico",
+        exportSupported: true,
         sharing: {
             viz: `Check out this data on FieldKit!`, // TODO i18n
         },

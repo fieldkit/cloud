@@ -30,7 +30,7 @@
                             <i class="icon icon-share"></i>
                             <span class="button-submit-text">Share</span>
                         </div>
-                        <div class="button-submit" @click="openExports">
+                        <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
                             <span class="button-submit-text">Export</span>
                         </div>
@@ -399,6 +399,9 @@ return null;
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
         },
+        exportSupported(): boolean {
+            return this.partnerCustomization().exportSupported;
+        }
     },
 });
 </script>
