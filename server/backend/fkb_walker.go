@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -14,9 +15,17 @@ import (
 	"github.com/fieldkit/cloud/server/files"
 )
 
+type WalkProgress struct {
+	read int64
+	file int64
+}
+
+type OnWalkProgress func(ctx context.Context, progress WalkProgress) error
+
 type FkbWalker struct {
 	verbose   bool
 	handler   FkbHandler
+	progress  OnWalkProgress
 	files     files.FileArchive
 	metrics   *logging.Metrics
 	queue     []*parsedRecord
@@ -31,9 +40,10 @@ type FkbHandler interface {
 	OnDone(ctx context.Context) error
 }
 
-func NewFkbWalker(files files.FileArchive, metrics *logging.Metrics, handler FkbHandler, verbose bool) (ra *FkbWalker) {
+func NewFkbWalker(files files.FileArchive, metrics *logging.Metrics, handler FkbHandler, progress OnWalkProgress, verbose bool) (ra *FkbWalker) {
 	return &FkbWalker{
 		verbose:   verbose,
+		progress:  progress,
 		files:     files,
 		metrics:   metrics,
 		handler:   handler,
@@ -197,6 +207,33 @@ func (ra *FkbWalker) handle(ctx context.Context, pr *parsedRecord) (warning erro
 	return nil, nil
 }
 
+type ProgressReader struct {
+	io.ReadCloser
+	ctx    context.Context
+	notify OnWalkProgress
+	file   int64
+}
+
+func (r *ProgressReader) Read(p []byte) (int, error) {
+	n, err := r.ReadCloser.Read(p)
+	r.file += int64(n)
+
+	if r.notify != nil {
+		if err := r.notify(r.ctx, WalkProgress{
+			read: int64(n),
+			file: r.file,
+		}); err != nil {
+			return n, err
+		}
+	}
+
+	return n, err
+}
+
+func (r *ProgressReader) Close() error {
+	return r.ReadCloser.Close()
+}
+
 func (ra *FkbWalker) WalkUrl(ctx context.Context, url string) (info *WalkRecordsInfo, err error) {
 	log := Logger(ctx).Sugar().With("url", url)
 
@@ -205,7 +242,7 @@ func (ra *FkbWalker) WalkUrl(ctx context.Context, url string) (info *WalkRecords
 		return nil, err
 	}
 
-	reader := opened.Body
+	reader := &ProgressReader{opened.Body, ctx, ra.progress, 0}
 
 	defer reader.Close()
 

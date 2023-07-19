@@ -152,7 +152,7 @@ func (ra *RecordAdder) WriteRecords(ctx context.Context, ingestion *data.Ingesti
 		return nil, err
 	}
 
-	fkbWalker := NewFkbWalker(ra.files, ra.metrics, ra, ra.verbose)
+	fkbWalker := NewFkbWalker(ra.files, ra.metrics, ra, nil, ra.verbose)
 
 	walkInfo, err := fkbWalker.WalkUrl(ctx, ingestion.URL)
 	if err != nil {

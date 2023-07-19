@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/profile"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/data"
 	pb "github.com/fieldkit/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -26,19 +27,45 @@ const (
 )
 
 type ExportDataHandler struct {
-	db        *sqlxcache.DB
-	files     files.FileArchive
-	metrics   *logging.Metrics
-	updatedAt time.Time
+	db                  *sqlxcache.DB
+	files               files.FileArchive
+	metrics             *logging.Metrics
+	updatedAt           time.Time
+	bytesExpectedToRead int64
+	bytesRead           int64
 }
 
 func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *logging.Metrics) *ExportDataHandler {
 	return &ExportDataHandler{
-		db:        db,
-		files:     files,
-		metrics:   metrics,
-		updatedAt: time.Now(),
+		db:                  db,
+		files:               files,
+		metrics:             metrics,
+		updatedAt:           time.Now(),
+		bytesExpectedToRead: 0,
+		bytesRead:           0,
 	}
+}
+
+func (h *ExportDataHandler) progress(ctx context.Context, de *data.DataExport, progress WalkProgress) error {
+	elapsed := time.Since(h.updatedAt)
+	if elapsed.Seconds() < SecondsBetweenProgressUpdates {
+		return nil
+	}
+
+	h.updatedAt = time.Now()
+	h.bytesRead += progress.read
+
+	de.Progress = float64(h.bytesRead) / float64(h.bytesExpectedToRead)
+
+	r, err := repositories.NewExportRepository(h.db)
+	if err != nil {
+		return err
+	}
+	if _, err := r.UpdateDataExport(ctx, de); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) error {
@@ -79,6 +106,15 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 		return err
 	}
 
+	sizeOfSinglePass := int64(0)
+	urls := make([]string, 0, len(ingestions))
+	for _, ingestion := range ingestions {
+		urls = append(urls, ingestion.URL)
+		sizeOfSinglePass += ingestion.Size
+	}
+
+	h.bytesExpectedToRead = sizeOfSinglePass * 2
+
 	readFunc := func(ctx context.Context, reader io.Reader) error {
 		metadata := make(map[string]string)
 		af, err := h.files.Archive(ctx, "text/csv", metadata, reader)
@@ -103,13 +139,12 @@ func (h *ExportDataHandler) Handle(ctx context.Context, m *messages.ExportData) 
 		return nil
 	}
 
-	writeFunc := func(ctx context.Context, writer io.Writer) error {
-		exporter := NewCsvExporter(h.files, h.metrics, writer)
+	progressFunc := func(ctx context.Context, progress WalkProgress) error {
+		return h.progress(ctx, de, progress)
+	}
 
-		urls := make([]string, 0, len(ingestions))
-		for _, ingestion := range ingestions {
-			urls = append(urls, ingestion.URL)
-		}
+	writeFunc := func(ctx context.Context, writer io.Writer) error {
+		exporter := NewCsvExporter(h.files, h.metrics, writer, progressFunc)
 
 		if err := exporter.Prepare(ctx, urls); err != nil {
 			return fmt.Errorf("preparing: exporting failed: %w", err)
@@ -144,11 +179,11 @@ type JsonLinesExporter struct {
 	walker *FkbWalker
 }
 
-func NewJsonLinesExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer) (self *JsonLinesExporter) {
+func NewJsonLinesExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer, progress OnWalkProgress) (self *JsonLinesExporter) {
 	self = &JsonLinesExporter{
 		writer: writer,
 	}
-	self.walker = NewFkbWalker(files, metrics, self, true)
+	self.walker = NewFkbWalker(files, metrics, self, progress, true)
 	return
 }
 
@@ -222,12 +257,14 @@ type records struct {
 }
 
 type CsvExporter struct {
-	writer    *csv.Writer
-	walker    *FkbWalker
-	preparing *preparingCsv
-	prepared  *preparingCsv
-	row       []string
-	records   *records
+	writer        *csv.Writer
+	walker        *FkbWalker
+	preparing     *preparingCsv
+	prepared      *preparingCsv
+	row           []string
+	records       *records
+	bytesRead     int64
+	expectedBytes int64
 }
 
 type fieldFunc func(*records) string
@@ -262,11 +299,13 @@ func (p *preparingCsv) addField(name string, get fieldFunc) {
 	p.fields.addField(name, get)
 }
 
-func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer) (self *CsvExporter) {
+func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer, progress OnWalkProgress) (self *CsvExporter) {
 	self = &CsvExporter{
-		writer:  csv.NewWriter(writer),
-		records: &records{},
-		row:     nil,
+		writer:        csv.NewWriter(writer),
+		records:       &records{},
+		row:           nil,
+		bytesRead:     0,
+		expectedBytes: 0,
 		preparing: &preparingCsv{
 			fields:  newFieldSet(),
 			metas:   make(map[int64]*pb.DataRecord),
@@ -274,7 +313,7 @@ func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io
 			order:   make([]string, 0),
 		},
 	}
-	self.walker = NewFkbWalker(files, metrics, self, true)
+	self.walker = NewFkbWalker(files, metrics, self, progress, true)
 	return
 }
 
