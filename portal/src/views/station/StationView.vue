@@ -38,7 +38,7 @@
                                     :disabled="!editingDescription"
                                 />
                                 <a
-                                    v-if="form.description === undefined && isUserTeamMemberOfStation"
+                                    v-if="form.description === undefined"
                                     @click="
                                         form.description = '';
                                         editingDescription = true;
@@ -50,7 +50,7 @@
 
                                 <template>
                                     <a
-                                        v-if="form.description && !editingDescription && isUserTeamMemberOfStation"
+                                        v-if="form.description && !editingDescription"
                                         @click="editingDescription = true"
                                         class="station-description-edit"
                                     >
@@ -142,7 +142,7 @@
                 </div>
             </section>
 
-            <section class="container-box" v-if="station.modules.length > 0 && isUserTeamMemberOfStation">
+            <section class="container-box" v-if="station.modules.length > 0">
                 <h2>{{ $t("station.data") }}</h2>
 
                 <ul class="flex flex-wrap flex-space-between">
@@ -183,7 +183,7 @@
                                 disabled
                                 :value="module.label ? module.label : $t(getModuleName(module))"
                             />
-                            <template v-if="!isCustomizationEnabled() && isUserTeamMemberOfStation">
+                            <template v-if="!isCustomizationEnabled()">
                                 <a
                                     v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
                                     @click="onEditModuleNameClick(module)"
@@ -312,9 +312,6 @@ export default Vue.extend({
         ...mapState({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
-        isUserTeamMemberOfStation(): boolean {
-            return this.$getters.isUserTeamMemberOfStation(this.station.id);
-        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
