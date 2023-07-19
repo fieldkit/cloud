@@ -7,7 +7,7 @@ schema-production
 active-schema
 migration
 grafana-storage
-aws.env
+.env
 .fk
 .log
 fkstreams
