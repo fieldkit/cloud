@@ -819,6 +819,9 @@ class FKApi {
     }
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
+        if (!_.isNumber(projectId)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -965,7 +968,10 @@ class FKApi {
         });
     }
 
-    getProject(id): Promise<Project> {
+    getProject(id: number): Promise<Project> {
+        if (!_.isNumber(id)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -973,7 +979,7 @@ class FKApi {
         });
     }
 
-    getProjectActivity(id): Promise<ProjectActivityResponse> {
+    getProjectActivity(id: number): Promise<ProjectActivityResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

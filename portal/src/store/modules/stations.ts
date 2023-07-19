@@ -613,6 +613,8 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number }
         ) => {
+            if (!_.isNumber(payload.id)) throw new Error("Expected numeric project id");
+
             commit(MutationTypes.LOADING, { projects: true });
 
             const [project, users, stations] = await Promise.all([
