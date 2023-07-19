@@ -57,7 +57,7 @@
                                         {{ $t("edit") }}
                                     </a>
                                     <a
-                                        @click="updateStationDescription()"
+                                        @click="saveStationDescription()"
                                         v-if="editingDescription && form.description"
                                         class="station-description-edit"
                                         style="margin-top: 4px;"
@@ -420,7 +420,10 @@ export default Vue.extend({
             return this.$loadAsset(utils.getModuleImg(module));
         },
         getModuleName(module: DisplayModule) {
-            return module.name.replace("modules.", "fk.");
+            if (!module.label) {
+                return module.name.replace("modules.", "fk.");
+            }
+            return module.label;
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -437,13 +440,16 @@ export default Vue.extend({
             }).href;
             window.open(url, "_blank");
         },
-        updateStationDescription(): void {
+        saveStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
             this.editingDescription = false;
         },
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
+            if (this.editedModule) {
+                this.editedModule.label = this.$tc(this.getModuleName(module));
+            }
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -714,7 +720,6 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
-                z-index: -1;
             }
         }
 
