@@ -428,13 +428,14 @@ export default Vue.extend({
         isCustomizationEnabled(): boolean {
             return isCustomisationEnabled();
         },
-        onClickExplore() {
+        onClickExplore(): void {
             const exploreContext = new ExploreContext();
             const bm = BookmarkFactory.forStation(this.station.id, exploreContext);
-            return this.$router.push({
+            const url = this.$router.resolve({
                 name: "exploreBookmark",
                 query: { bookmark: serializeBookmark(bm) },
-            });
+            }).href;
+            window.open(url, "_blank");
         },
         updateStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
