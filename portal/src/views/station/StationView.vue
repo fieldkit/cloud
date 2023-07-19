@@ -313,7 +313,6 @@ export default Vue.extend({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
         isUserTeamMemberOfStation(): boolean {
-            console.log("radoi", this.$getters.isUserTeamMemberOfStation(this.station.id));
             return this.$getters.isUserTeamMemberOfStation(this.station.id);
         },
         visibleReadings(): VisibleReadings {

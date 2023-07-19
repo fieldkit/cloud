@@ -80,9 +80,11 @@ export default Vue.extend({
                 let stationId, sensorModuleId, sensorId;
                 if (selectedModuleKey) {
                     const module = quickSensors.station.find((station) => station.moduleKey === selectedModuleKey);
-                    stationId = module.stationId;
-                    sensorModuleId = module.moduleId;
-                    sensorId = module.sensorId;
+                    if (module) {
+                        stationId = module.stationId;
+                        sensorModuleId = module.moduleId;
+                        sensorId = module.sensorId;
+                    }
                 } else {
                     stationId = quickSensors.station[0].stationId;
                     sensorModuleId = quickSensors.station[0].moduleId;
