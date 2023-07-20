@@ -527,3 +527,12 @@ func (e *CsvExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawM
 func (e *CsvExporter) OnDone(ctx context.Context) (err error) {
 	return nil
 }
+
+func ExportQueryParams(de *data.DataExport) (*QueryParams, error) {
+	rawParams := &RawQueryParams{}
+	if err := json.Unmarshal(de.Args, rawParams); err != nil {
+		return nil, err
+	}
+
+	return rawParams.BuildQueryParams()
+}

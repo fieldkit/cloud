@@ -108,6 +108,17 @@ func (c *ExportService) Download(ctx context.Context, payload *exportService.Dow
 		return nil, nil, err
 	}
 
+	qp, err := backend.ExportQueryParams(de)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	describe := repositories.NewDescribeEvent(c.db)
+	description, err := describe.Describe(ctx, de.CreatedAt, qp.Stations)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	if de.DownloadURL == nil {
 		return nil, nil, exportService.MakeNotFound(errors.New("not found"))
 	}
@@ -117,7 +128,7 @@ func (c *ExportService) Download(ctx context.Context, payload *exportService.Dow
 		return nil, nil, err
 	}
 
-	disposition := "attachment; filename=\"data.csv\""
+	disposition := fmt.Sprintf("attachment; filename=\"%v.csv\"", description)
 
 	return &exportService.DownloadResult{
 		Length:             opened.Size,
