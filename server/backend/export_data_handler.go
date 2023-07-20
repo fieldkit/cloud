@@ -55,7 +55,7 @@ func (h *ExportDataHandler) progress(ctx context.Context, de *data.DataExport, p
 	h.updatedAt = time.Now()
 	h.bytesRead += progress.read
 
-	de.Progress = float64(h.bytesRead) / float64(h.bytesExpectedToRead)
+	de.Progress = (float64(h.bytesRead) / float64(h.bytesExpectedToRead)) * 100.0
 
 	r, err := repositories.NewExportRepository(h.db)
 	if err != nil {
