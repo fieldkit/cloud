@@ -412,6 +412,9 @@ export default Vue.extend({
             }
             return !!this.$getters.projectsById[this.projectId];
         },
+        dataEventsFromState() {
+            return this.$getters.dataEvents;
+        },
         postsAndEvents(): DiscussionBase[] {
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
         },
@@ -436,6 +439,9 @@ export default Vue.extend({
         },
         $route() {
             this.highlightComment();
+        },
+        dataEventsFromState(): void {
+            this.initDataEvents();
         },
     },
     async mounted(): Promise<void> {
@@ -628,12 +634,10 @@ export default Vue.extend({
                 .finally(() => {
                     this.isLoading = false;
                 });
-            const dataEvents = this.$getters.dataEvents;
+        },
+        initDataEvents() {
             this.dataEvents = [];
-            if (this.dataEvents.length === 0) {
-                return;
-            }
-            dataEvents.forEach((event) => {
+            this.dataEventsFromState.forEach((event) => {
                 this.dataEvents.push(
                     new DataEvent(
                         event.id,
@@ -765,7 +769,8 @@ export default Vue.extend({
         },
         showPostsTypeToggle(): boolean {
             return (
-                ((this.user && this.user.admin) || (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                ((this.user && this.user.admin) ||
+                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
                 !this.areWorkspaceGroupsEmpty()
             );
         },
