@@ -17,6 +17,7 @@
                     <template v-if="user">
                         <div class="new-comment-wrap">
                             <Tiptap
+                                ref="tipTapNewComment"
                                 v-model="newComment.body"
                                 :placeholder="$tc('comments.commentForm.placeholder')"
                                 :saveLabel="$tc('comments.commentForm.saveLabel')"
@@ -411,6 +412,9 @@ export default Vue.extend({
             }
             return !!this.$getters.projectsById[this.projectId];
         },
+        dataEventsFromState() {
+            return this.$getters.dataEvents;
+        },
         postsAndEvents(): DiscussionBase[] {
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
         },
@@ -435,6 +439,9 @@ export default Vue.extend({
         },
         $route() {
             this.highlightComment();
+        },
+        dataEventsFromState(): void {
+            this.initDataEvents();
         },
     },
     async mounted(): Promise<void> {
@@ -496,7 +503,7 @@ export default Vue.extend({
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
                     // TODO: find a way to avoid any
-                    (this.$refs.tipTap as any).editor.commands.clearContent();
+                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -536,6 +543,7 @@ export default Vue.extend({
                     }
                 })
                 .catch((e) => {
+                    console.log("e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -626,12 +634,10 @@ export default Vue.extend({
                 .finally(() => {
                     this.isLoading = false;
                 });
-            const dataEvents = this.$getters.dataEvents;
+        },
+        initDataEvents() {
             this.dataEvents = [];
-            if (this.dataEvents.length === 0) {
-                return;
-            }
-            dataEvents.forEach((event) => {
+            this.dataEventsFromState.forEach((event) => {
                 this.dataEvents.push(
                     new DataEvent(
                         event.id,
@@ -763,7 +769,8 @@ export default Vue.extend({
         },
         showPostsTypeToggle(): boolean {
             return (
-                ((this.user && this.user.admin) || (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                ((this.user && this.user.admin) ||
+                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
                 !this.areWorkspaceGroupsEmpty()
             );
         },
