@@ -426,6 +426,9 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 						}
 
 						sensorGroup := r.data.Readings.SensorGroups[moduleIndex]
+						if sensorIndex >= len(sensorGroup.Readings) {
+							return ""
+						}
 						sensor := sensorGroup.Readings[sensorIndex]
 						if sensor.GetCalibratedNull() {
 							return ""
@@ -441,6 +444,9 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 						}
 
 						sensorGroup := r.data.Readings.SensorGroups[moduleIndex]
+						if sensorIndex >= len(sensorGroup.Readings) {
+							return ""
+						}
 						sensor := sensorGroup.Readings[sensorIndex]
 						if sensor.GetUncalibratedNull() {
 							return ""
