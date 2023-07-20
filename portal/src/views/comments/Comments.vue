@@ -17,6 +17,7 @@
                     <template v-if="user">
                         <div class="new-comment-wrap">
                             <Tiptap
+                                ref="tipTapNewComment"
                                 v-model="newComment.body"
                                 :placeholder="$tc('comments.commentForm.placeholder')"
                                 :saveLabel="$tc('comments.commentForm.saveLabel')"
@@ -496,7 +497,7 @@ export default Vue.extend({
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
                     // TODO: find a way to avoid any
-                    (this.$refs.tipTap as any).editor.commands.clearContent();
+                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -536,6 +537,7 @@ export default Vue.extend({
                     }
                 })
                 .catch((e) => {
+                    console.log("e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
