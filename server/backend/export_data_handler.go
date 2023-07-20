@@ -322,7 +322,8 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 		return fmt.Sprintf("%v", r.data.Readings.Time)
 	})
 	e.preparing.addField("time", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Time)
+		t := time.Unix(r.data.Readings.Time, 0)
+		return fmt.Sprintf("%v", t)
 	})
 	e.preparing.addField("data_record", func(r *records) string {
 		return fmt.Sprintf("%v", r.data.Readings.Reading)
