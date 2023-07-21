@@ -246,9 +246,9 @@ export default Vue.extend({
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
-                    await this.$router.push({ name: "viewProjectBigMap", params: { id: this.bookmark.c.project } });
+                    await this.$router.push({ name: "viewProjectBigMap", params: { id: String(this.bookmark.c.project) } });
                 } else {
-                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.c.project } });
+                    await this.$router.push({ name: "viewProject", params: { id: String(this.bookmark.c.project) } });
                 }
             } else {
                 await this.$router.push({ name: "mapAllStations" });
@@ -360,8 +360,12 @@ export default Vue.extend({
                 });
         },
         getValidStations(): number[] {
-            const validStations = Object.entries(this.workspace.stations)
-                .filter(([key, station]) => !station.hidden && station.sensors.length > 0)
+            if (this.workspace == null) {
+                return [];
+            }
+
+            const validStations = this.workspace.stationsMetas
+                .filter(( station) => !station.hidden && station.sensors.length > 0)
                 .map((d) => +d[0]);
 
             this.selectedIndex = validStations.indexOf(this.selectedId);
@@ -374,15 +378,19 @@ export default Vue.extend({
             this.selectedIndex = evt;
         },
         openStationPageTab() {
-            if (this.selectedStation || this.currentStation) {
+            const station = this.selectedStation ? this.selectedStation: this.currentStation;
+            if (station) {
                 const routeData = this.$router.resolve({
                     name: "viewStationFromMap",
-                    params: { stationId: this.selectedStation ? this.selectedStation.id : this.currentStation.id },
+                    params: { stationId: String(station.id) },
                 });
                 window.open(routeData.href, "_blank");
             }
         },
         getBatteryIcon() {
+            if (this.selectedStation == null) {
+return null;
+            }
             return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
         },
         interpolatePartner(baseString) {

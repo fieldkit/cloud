@@ -433,6 +433,19 @@ export interface InvokeParams {
 export interface SavedBookmark {
     url: string;
     bookmark: string;
+    token: string;
+}
+
+export interface PendingInvite {
+    id: number;
+    project: { id: number; name: string; };
+    time: number;
+    role: number;
+}
+
+export interface PendingInvites {
+    pending: PendingInvite[];
+    projects: Project[];
 }
 
 export enum MapViewType {
@@ -839,7 +852,7 @@ class FKApi {
         });
     }
 
-    getInvitesByUser() {
+    getInvitesByUser(): Promise<PendingInvites> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",

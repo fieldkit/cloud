@@ -112,7 +112,7 @@ export default Vue.extend({
             if (ForbiddenError.isInstance(e)) {
                 return this.$router.push({
                     name: "login",
-                    params: { errorMessage: this.$t("login.privateProject") },
+                    params: { errorMessage: this.$t("login.privateProject").toString() },
                     query: { after: this.$route.path },
                 });
             }
