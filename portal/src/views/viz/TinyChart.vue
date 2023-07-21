@@ -51,10 +51,13 @@ export default Vue.extend({
     data(): {
         chartSettings: ChartSettings;
         series: SeriesData[];
+        // can be used with BookmarkFactory.forSensor to create a bookmark for the currently displayed data
+        vizData: { vizSensor: VizSensor; timeRange: [number, number] } | null;
     } {
         return {
             chartSettings: ChartSettings.Tiny,
             series: [],
+            vizData: null,
         };
     },
     watch: {
@@ -177,6 +180,8 @@ export default Vue.extend({
                     vizInfo
                 ),
             ];
+
+            this.vizData = { vizSensor, timeRange: [queried.timeRange[0], queried.timeRange[1]] };
         },
     },
 });

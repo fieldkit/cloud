@@ -146,12 +146,23 @@
                 <h2>{{ $t("station.data") }}</h2>
 
                 <ul class="flex flex-wrap flex-space-between">
-                    <li class="module-data-item" v-for="module in station.modules" v-bind:key="module.name">
+                    <li
+                        class="module-data-item"
+                        v-for="module in station.modules"
+                        v-bind:key="module.name"
+                        @click="onModuleClick(module.id)"
+                    >
                         <h3 class="module-data-title flex flex-al-center">
                             <img alt="Module icon" :src="getModuleImg(module)" />
                             {{ $t(getModuleName(module)) }}
                         </h3>
-                        <TinyChart :moduleKey="module.name" :station-id="station.id" :station="station" :querier="sensorDataQuerier" />
+                        <TinyChart
+                            :ref="'tinyChart-' + module.id"
+                            :moduleKey="module.name"
+                            :station-id="station.id"
+                            :station="station"
+                            :querier="sensorDataQuerier"
+                        />
                     </li>
                 </ul>
                 <button class="btn module-data-btn" @click="onClickExplore">{{ $t("station.exploreData") }}</button>
@@ -465,6 +476,22 @@ export default Vue.extend({
                 name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
                 params: { projectId: this.projectId, stationId: this.station.id },
             });
+        },
+
+        onModuleClick(moduleId: number) {
+            const tinyChartComp = this.$refs["tinyChart-" + moduleId];
+            if (tinyChartComp && tinyChartComp[0]) {
+                const vizData = tinyChartComp[0].vizData;
+                console.log("Radoi viz", vizData);
+                if (vizData) {
+                    const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
+                    const url = this.$router.resolve({
+                        name: "exploreBookmark",
+                        query: { bookmark: serializeBookmark(bm) },
+                    }).href;
+                    window.open(url, "_blank");
+                }
+            }
         },
     },
 });
@@ -973,6 +1000,7 @@ section {
     color: $color-primary;
     font-size: 12px;
     margin-bottom: 10px;
+    cursor: pointer;
 
     img {
         margin-right: 7px;

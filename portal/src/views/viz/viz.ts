@@ -1329,4 +1329,13 @@ export class BookmarkFactory {
         }
         return new Bookmark(Bookmark.Version, [], [stationId], []);
     }
+    public static forSensor(stationId: number, vizSensor: any, timeRange: [number, number]): Bookmark {
+        return new Bookmark(
+            Bookmark.Version,
+            [[[[[vizSensor], timeRange, [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
+            [stationId],
+            undefined,
+            null
+        );
+    }
 }
