@@ -365,8 +365,8 @@ export default Vue.extend({
             }
 
             const validStations = this.workspace.stationsMetas
-                .filter(( station) => !station.hidden && station.sensors.length > 0)
-                .map((d) => +d[0]);
+                .filter((station) => !station.hidden && station.sensors.length > 0)
+                .map((d) => d.id);
 
             this.selectedIndex = validStations.indexOf(this.selectedId);
 
@@ -389,7 +389,7 @@ export default Vue.extend({
         },
         getBatteryIcon() {
             if (this.selectedStation == null) {
-return null;
+                return null;
             }
             return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
         },
@@ -400,7 +400,20 @@ return null;
             return getPartnerCustomizationWithDefault();
         },
         exportSupported(): boolean {
-            return this.partnerCustomization().exportSupported;
+            if (this.workspace == null) {
+                return false;
+            }
+
+            if (!this.partnerCustomization().exportSupported) {
+                return false;
+            }
+
+            const stationModels = _.uniq(this.workspace.allStations.map((s) => s.model.name));
+            const anyNodeRed = stationModels.filter((name) => name.indexOf("NodeRed") >= 0); // TODO This should be a flag.
+
+            console.log("viz:export-disabled", stationModels, anyNodeRed);
+
+            return anyNodeRed.length == 0;
         }
     },
 });

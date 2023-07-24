@@ -339,6 +339,7 @@ export interface Station {
     name: string;
     owner: Owner;
     deviceId: string;
+    model: { name: string };
     uploads: Upload[];
     photos: Photos;
     readOnly: boolean;
