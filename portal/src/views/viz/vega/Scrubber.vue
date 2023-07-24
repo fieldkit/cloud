@@ -70,16 +70,13 @@ export default Vue.extend({
             this.vega = vegaInfo;
 
             // eslint-disable-next-line
-            const scrubbed = [];
+            let scrubbed: number[] = [];
             vegaInfo.view.addSignalListener("brush", (_, value) => {
-                /*
                 if (value.time) {
                     scrubbed = value.time;
-                } else if (this.series[0].data) {
-                    scrubbed = this.series[0].data.timeRange;
+                } else if (this.series[0].queried) {
+                    scrubbed = this.series[0].queried.timeRange;
                 }
-                */
-               console.log("jacob jacob jacob", this.series);
             });
             vegaInfo.view.addEventListener("mouseup", () => {
                 if (scrubbed.length == 2) {
