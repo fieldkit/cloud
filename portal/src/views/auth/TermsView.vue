@@ -126,6 +126,17 @@ export default Vue.extend({
     }
 }
 
+.close-button {
+    cursor: pointer;
+    float: right;
+}
+.terms-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+/*
+These break the build with 'Cannot read properties of undefined (reading 'spaces')'
 ::v-deep h2 {
     font-size: 26px;
 }
@@ -138,13 +149,8 @@ export default Vue.extend({
 ::v-deep {
     font-size: 14px;
 }
-
-.close-button {
-    cursor: pointer;
-    float: right;
+::v-deep {
+    font-size: 14px;
 }
-.terms-buttons {
-    display: flex;
-    justify-content: space-between;
-}
+*/
 </style>

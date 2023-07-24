@@ -736,6 +736,10 @@ export class Workspace implements VizInfoFactory {
         return this.stationIds;
     }
 
+    public get stationsMetas(): StationMeta[] {
+        return Object.values(this.stations);
+    }
+
     public get allStations(): Station[] {
         return this.stationsFull;
     }

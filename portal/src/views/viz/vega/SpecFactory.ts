@@ -42,7 +42,7 @@ export class ChartSettings {
         public readonly mobile = false
     ) {}
 
-    public apply(spec: unknown): unknown {
+    public apply(spec: unknown) {
         if (this.auto) {
             const autoSize = {
                 autosize: {

@@ -12,7 +12,7 @@ import { SensorMeta } from "@/store";
 import { promiseAfter } from "@/utilities";
 import _ from "lodash";
 
-export { ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
+export { SensorMeta, ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];

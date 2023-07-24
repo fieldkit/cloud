@@ -24,7 +24,7 @@ import Text from "@tiptap/extension-text";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
-import tippy from "tippy.js";
+import tippy, { Props } from "tippy.js";
 
 export default Vue.extend({
     name: "TipTap",
@@ -173,15 +173,28 @@ export default Vue.extend({
                                         propsData: props,
                                     });
 
-                                    popup = tippy("body", {
-                                        getReferenceClientRect: props.clientRect,
+                                    const newProps: Partial<Props> = {
+                                        getReferenceClientRect: null,
                                         appendTo: () => document.body,
                                         content: component.element,
                                         showOnCreate: true,
                                         interactive: true,
                                         trigger: "manual",
                                         placement: "bottom-start",
-                                    });
+                                    };
+
+                                    const clientRect = props.clientRect;
+                                    if (clientRect) {
+                                        newProps.getReferenceClientRect = () => {
+                                            const rect = clientRect();
+                                            if (!rect) {
+                                                throw new Error();
+                                            }
+                                            return rect;
+                                        };
+                                    }
+
+                                    popup = tippy("body", newProps);
                                 },
                                 onUpdate(props) {
                                     console.log("mentions-update", props);
