@@ -14,8 +14,8 @@ type IngestionRepository struct {
 	db *sqlxcache.DB
 }
 
-func NewIngestionRepository(db *sqlxcache.DB) (ir *IngestionRepository, err error) {
-	return &IngestionRepository{db: db}, nil
+func NewIngestionRepository(db *sqlxcache.DB) (ir *IngestionRepository) {
+	return &IngestionRepository{db: db}
 }
 
 func (r *IngestionRepository) QueryByID(ctx context.Context, id int64) (i *data.Ingestion, err error) {

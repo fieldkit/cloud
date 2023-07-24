@@ -66,17 +66,25 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 	queuedData, _, err := e.AddIngestion(user, "/data", data.DataTypeName, station.DeviceID, len(files.Data))
 	assert.NoError(err)
 
+	log := Logger(e.Ctx).Sugar()
+
+	log.Infow("first test")
+
 	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedMeta.ID,
 		UserID:   user.ID,
 		Verbose:  true,
 	}, mc))
 
+	log.Infow("second test")
+
 	assert.NoError(handler.Start(e.Ctx, &messages.IngestionReceived{
 		QueuedID: queuedData.ID,
 		UserID:   user.ID,
 		Verbose:  true,
 	}, mc))
+
+	log.Infow("end ingestion")
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
