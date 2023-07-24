@@ -406,11 +406,14 @@ export default Vue.extend({
         },
         // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
-            const project = this.$getters.projectsById[this.projectId];
-            if (!project) {
-                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            if (this.projectId) {
+                const project = this.$getters.projectsById[this.projectId];
+                if (!project) {
+                    this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+                }
+                return !!this.$getters.projectsById[this.projectId];
             }
-            return !!this.$getters.projectsById[this.projectId];
+            return false;
         },
         dataEventsFromState() {
             return this.$getters.dataEvents;

@@ -16,7 +16,7 @@ import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
 import { DiscussionState } from "@/store/modules/discussion";
 import { ActionTypes } from "@/store";
 
-export default {
+export default Vue.extend({
     name: "Scrubber",
     props: {
         series: {
@@ -33,7 +33,7 @@ export default {
         },
     },
     data(): {
-        vega: unknown | null;
+        vega: any | null;
     } {
         return { vega: null };
     },
@@ -67,25 +67,26 @@ export default {
 
             const factory = new ScrubberSpecFactory(
                 this.series,
-                new ChartSettings(TimeRange.mergeArrays([this.visible]), undefined, { w: 0, h: 0 }, false, false, isMobile()),
+                new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
                 this.dataEvents
             );
 
             const spec = factory.create();
 
-            const vegaInfo = await vegaEmbed(this.$el, spec, {
+            const vegaInfo = await vegaEmbed(this.$el as HTMLElement, spec, {
                 renderer: "svg",
                 actions: { source: false, editor: false, compiled: false },
             });
 
             this.vega = vegaInfo;
 
-            let scrubbed = [];
+            // eslint-disable-next-line
+            let scrubbed: number[] = [];
             vegaInfo.view.addSignalListener("brush", (_, value) => {
                 if (value.time) {
                     scrubbed = value.time;
-                } else if (this.series[0].data) {
-                    scrubbed = this.series[0].data.timeRange;
+                } else if (this.series[0].queried) {
+                    scrubbed = this.series[0].queried.timeRange;
                 }
             });
             // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
@@ -163,7 +164,7 @@ export default {
             this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
         },
     },
-};
+});
 </script>
 
 <style lang="scss">

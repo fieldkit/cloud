@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
 import { TimeRange } from "../common";
+import { VisualizationSpec } from "vega-embed";
+import { Spec, Mark } from "vega";
 
 export { ChartSettings };
 
@@ -11,14 +13,18 @@ export class ScrubberSpecFactory {
         private readonly dataEvents = null
     ) {}
 
-    create() {
+    create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
-        const interactiveMarks = () => {
+        const interactiveMarks = (): Mark[] => {
+            if (this.settings.mobile) {
+                return [];
+            }
+
             return [
                 {
                     type: "rect",
@@ -28,7 +34,7 @@ export class ScrubberSpecFactory {
                             y: { value: 0 },
                             height: { value: 50 },
                             width: { value: 2 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                         },
                         update: {
                             x: { signal: "brush_x[0]" },
@@ -59,7 +65,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {
@@ -77,7 +83,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {

@@ -27,8 +27,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
-import StandardLayout from "../StandardLayout";
-import ProjectThumbnails from "./ProjectThumbnails";
+import StandardLayout from "../StandardLayout.vue";
+import ProjectThumbnails from "./ProjectThumbnails.vue";
+import { PendingInvites } from "@/api";
+import { StationsState } from "@/store/modules/stations";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -36,7 +38,10 @@ export default Vue.extend({
         StandardLayout,
         ProjectThumbnails,
     },
-    data() {
+    data(): {
+        invites: PendingInvites | null;
+    }
+     {
         return {
             invites: null,
         };
@@ -44,8 +49,8 @@ export default Vue.extend({
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
-            userProjects: (s) => Object.values(s.stations.user.projects),
-            publicProjects: (s) => Object.values(s.stations.community.projects),
+            userProjects: (s: { stations: StationsState }) => Object.values(s.stations.user.projects),
+            publicProjects: (s: { stations: StationsState }) => Object.values(s.stations.community.projects),
         }),
     },
     async mounted(): Promise<void> {

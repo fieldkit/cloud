@@ -21,9 +21,12 @@ func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 			withCtx := r.WithContext(newCtx)
 
 			log := Logger(newCtx).Named(name).Sugar()
-			sanitizedUrl := sanitize(r.URL)
+			sanitizedUrl, err := sanitize(r.URL)
+			if err != nil {
+				log.Warnw("req:sanitize:failed", "error", err)
+			}
 
-			log.Infow("req:begin", "req", r.Method+" "+sanitizedUrl.String(), "from", from(r), "ws", IsWebSocket(r))
+			log.Infow("req:begin", "req", r.Method+" "+sanitizedUrl, "from", from(r), "ws", IsWebSocket(r))
 
 			cw := CaptureResponse(w)
 			h.ServeHTTP(AllowWriteHeaderPrevention(cw), withCtx)
@@ -33,7 +36,7 @@ func LoggingAndInfrastructure(name string) func(h http.Handler) http.Handler {
 			log.Infow("req:done", "status", cw.StatusCode, "bytes", cw.ContentLength,
 				"time", fmt.Sprintf("%vns", elapsed.Nanoseconds()),
 				"time_human", elapsed.String(),
-				"req", r.Method+" "+sanitizedUrl.String(),
+				"req", r.Method+" "+sanitizedUrl,
 				"from", from(r), "ws", IsWebSocket(r))
 		})
 	}
@@ -58,11 +61,15 @@ func from(req *http.Request) string {
 	return ip
 }
 
-func sanitize(url *url.URL) *url.URL {
-	q := url.Query()
+func sanitize(orig *url.URL) (string, error) {
+	copy, err := url.Parse(orig.String())
+	if err != nil {
+		return "", err
+	}
+	q := copy.Query()
 	if q.Get("auth") != "" {
 		q.Set("auth", "PRIVATE")
 	}
-	url.RawQuery = q.Encode()
-	return url
+	copy.RawQuery = q.Encode()
+	return copy.String(), nil
 }

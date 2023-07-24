@@ -20,18 +20,20 @@
             </DoubleHeader>
 
             <silent-box v-if="photos && photos.length > 0" :gallery="gallery">
-                <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
-                    <button class="photo-options" v-if="!readOnly">
-                        <ListItemOptions
-                            :options="photoOptions"
-                            @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
-                        ></ListItemOptions>
-                    </button>
-                    <AuthenticatedPhoto
-                        v-if="silentboxItem.photo"
-                        :url="silentboxItem.photo.url"
-                        :loading="silentboxItem.photo.id === loadingPhotoId"
-                    />
+                <template v-slot:silentbox-item="{ silentboxItem }">
+                    <div class="photo-wrap">
+                        <button class="photo-options" v-if="!readOnly">
+                            <ListItemOptions
+                                :options="photoOptions"
+                                @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
+                            ></ListItemOptions>
+                        </button>
+                        <AuthenticatedPhoto
+                            v-if="silentboxItem.photo"
+                            :url="silentboxItem.photo.url"
+                            :loading="silentboxItem.photo.id === loadingPhotoId"
+                        />
+                    </div>
                 </template>
             </silent-box>
 
