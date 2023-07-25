@@ -28,7 +28,9 @@ export FIELDKIT_API_DOMAIN="{_:127\.0\.0\.1|192\.168\.0\.100}:8080"
 
 
 # This may need adjustment for testing scenarios where the server returns a URL.
-export FIELDKIT_API_HOST=http://127.0.0.1:8080
+if [ -z "$FIELDKIT_API_HOST" ]; then
+	export FIELDKIT_API_HOST=http://127.0.0.1:8080
+fi
 
 set -xe
 
