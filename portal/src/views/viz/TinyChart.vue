@@ -1,6 +1,7 @@
 <template>
     <div class="tiny-chart">
         <LineChart :series="series" :settings="chartSettings" />
+        <div v-if="noSensorData" class="no-data">{{ $tc("noData") }}</div>
     </div>
 </template>
 
@@ -53,11 +54,13 @@ export default Vue.extend({
         series: SeriesData[];
         // can be used with BookmarkFactory.forSensor to create a bookmark for the currently displayed data
         vizData: { vizSensor: VizSensor; timeRange: [number, number] } | null;
+        noSensorData: boolean;
     } {
         return {
             chartSettings: ChartSettings.Tiny,
             series: [],
             vizData: null,
+            noSensorData: false,
         };
     },
     watch: {
@@ -78,6 +81,8 @@ export default Vue.extend({
             // TODO Show busy when loading?
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
             const selectedModuleKey = this.moduleKey;
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            const thisComp = this;
 
             function getQuickSensor(quickSensors): VizSensor {
                 let stationId, sensorModuleId, sensorId;
@@ -87,6 +92,8 @@ export default Vue.extend({
                         stationId = module.stationId;
                         sensorModuleId = module.moduleId;
                         sensorId = module.sensorId;
+                    } else {
+                        thisComp.noSensorData = true;
                     }
                 } else {
                     stationId = quickSensors.station[0].stationId;
@@ -115,7 +122,6 @@ export default Vue.extend({
                     const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
                     return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSize: 0 } };
                 }
-
                 const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
@@ -146,9 +152,9 @@ export default Vue.extend({
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
+                thisComp.noSensorData = true;
                 return;
             }
-
             const { vizSensor, sensor, sdr } = maybeSensorMetaAndData;
 
             const queried = new QueriedData("key", TimeRange.eternity, sdr);
@@ -193,6 +199,14 @@ export default Vue.extend({
     width: 100%;
     height: 150px;
     border: solid 1px #d8dce0;
+    position: relative;
+
+    .no-data {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
 }
 
 .tiny-chart .fit-x {
