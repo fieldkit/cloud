@@ -68,7 +68,7 @@ export default {
             const factory = new ScrubberSpecFactory(
                 this.series,
                 new ChartSettings(TimeRange.mergeArrays([this.visible]), undefined, { w: 0, h: 0 }, false, false, isMobile()),
-                this.dataEvents
+                this.dataEvents.filter(event => (event.start > this.visible.start && event.end < this.visible.end)),
             );
 
             const spec = factory.create();
