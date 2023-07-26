@@ -10,7 +10,7 @@ export class ScrubberSpecFactory {
     constructor(
         private readonly allSeries,
         private readonly settings: ChartSettings = ChartSettings.Container,
-        private readonly dataEvents = null
+        private readonly dataEvents = []
     ) {}
 
     create(): VisualizationSpec {
@@ -122,7 +122,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 50 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                             path: { value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z" },
                         },
