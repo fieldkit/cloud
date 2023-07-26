@@ -30,9 +30,10 @@ export const VizGraph = Vue.extend({
         TimeSeriesGraph,
         Histogram,
         Range,
+        // eslint-disable-next-line
         Map,
     },
-    data(): {} {
+    data() {
         return {};
     },
     props: {

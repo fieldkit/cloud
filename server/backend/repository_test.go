@@ -170,8 +170,7 @@ func TestIngestionRepositoryQueryPending(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewIngestionRepository(e.DB)
 
 	sf, err := r.QueryPending(e.Ctx)
 	assert.NoError(err)
@@ -188,8 +187,7 @@ func TestIngestionRepositoryQueryByStationID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewIngestionRepository(e.DB)
 
 	sf, err := r.QueryByStationID(e.Ctx, fd.Stations[0].ID)
 	assert.NoError(err)

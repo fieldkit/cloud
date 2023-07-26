@@ -147,8 +147,7 @@ func TestIngestionReceivedMetaAndData(t *testing.T) {
 		Verbose:  true,
 	}, mc))
 
-	ir, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	ir := repositories.NewIngestionRepository(e.DB)
 
 	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
@@ -211,8 +210,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMeta(t *testing.T) {
 		Verbose:  true,
 	}, mc))
 
-	ir, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	ir := repositories.NewIngestionRepository(e.DB)
 
 	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
@@ -274,8 +272,7 @@ func TestIngestionReceivedMetaAndDataWithMultipleMetaAndStationAlreadyAdded(t *t
 		Verbose:  true,
 	}, mc))
 
-	ir, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	ir := repositories.NewIngestionRepository(e.DB)
 
 	miAfter, err := ir.QueryQueuedByID(e.Ctx, queuedMeta.ID)
 	assert.NoError(err)
