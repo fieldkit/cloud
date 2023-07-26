@@ -307,7 +307,7 @@ import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
-import { TimeRange } from "@/views/viz/viz/common";
+import { TimeRange } from "@/views/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
@@ -415,7 +415,7 @@ export default Vue.extend({
             }
             return false;
         },
-        dataEventsFromState() {
+        dataEventsFromState(): DataEvent[] {
             return this.$state.discussion.dataEvents;
         },
         postsAndEvents(): DiscussionBase[] {
@@ -440,7 +440,7 @@ export default Vue.extend({
             await this.getDataEvents();
             return this.getComments();
         },
-        $route() {
+        $route(): void {
             this.highlightComment();
         },
         dataEventsFromState(): void {
@@ -606,7 +606,7 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.deleteComment;
                 });
         },
-        startEditing(item: Comment | DataEvent) {
+        startEditing(item: Comment | DataEvent): void {
             item.readonly = false;
         },
         saveEdit(commentID: number, body: Record<string, unknown>) {
@@ -638,7 +638,7 @@ export default Vue.extend({
                     this.isLoading = false;
                 });
         },
-        initDataEvents() {
+        initDataEvents(): void {
             this.dataEvents = [];
             this.dataEventsFromState.forEach((event) => {
                 this.dataEvents.push(
@@ -656,8 +656,8 @@ export default Vue.extend({
                 );
             });
         },
-        saveEditDataEvent(dataEvent: DataEvent) {
-            this.$services.api
+        saveEditDataEvent(dataEvent: DataEvent): Promise<void> {
+            return this.$services.api
                 .updateDataEvent(dataEvent)
                 .then((response) => {
                     if (response) {
@@ -671,8 +671,8 @@ export default Vue.extend({
                     this.errorMessage = DataEventsErrorsEnum.postDataEvent;
                 });
         },
-        deleteDataEvent(dataEventID: number) {
-            this.$services.api
+        deleteDataEvent(dataEventID: number): Promise<void> {
+            return this.$services.api
                 .deleteDataEvent(dataEventID)
                 .then((response) => {
                     if (response) {
@@ -727,7 +727,7 @@ export default Vue.extend({
 
             return [];
         },
-        highlightComment() {
+        highlightComment(): void {
             this.$nextTick(() => {
                 if (location.hash) {
                     const el = document.querySelector(location.hash);
@@ -742,7 +742,7 @@ export default Vue.extend({
                 }
             });
         },
-        onSectionToggle(evt) {
+        onSectionToggle(evt): void {
             if (evt === "left") {
                 this.logMode = "comment";
             }
@@ -750,10 +750,10 @@ export default Vue.extend({
                 this.logMode = "event";
             }
         },
-        sortRecent(a, b) {
+        sortRecent(a, b): any {
             return b.createdAt - a.createdAt;
         },
-        interpolatePartner(baseString) {
+        interpolatePartner(baseString): string {
             return interpolatePartner(baseString);
         },
         // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle

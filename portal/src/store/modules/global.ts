@@ -5,7 +5,7 @@ import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
-import {DiscussionState, NotesState} from "@/store";
+import { DiscussionState, NotesState } from "@/store";
 import { SnackbarState } from "@/store/modules/snackbar";
 
 export interface RouteState {

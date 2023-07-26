@@ -5,11 +5,11 @@ import * as MutationTypes from "@/store/mutations";
 import { DataEvent } from "@/views/comments/model";
 
 export class DiscussionState {
-    dataEvents;
+    dataEvents: DataEvent[];
 }
 
 const getters = {
-    dataEvents(state) {
+    dataEvents(state: DiscussionState): DataEvent[] {
         return state.dataEvents;
     },
 };

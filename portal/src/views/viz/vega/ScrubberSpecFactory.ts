@@ -10,7 +10,8 @@ export class ScrubberSpecFactory {
     constructor(
         private readonly allSeries,
         private readonly settings: ChartSettings = ChartSettings.Container,
-        private readonly dataEvents = []
+        // TODO Would love to pull this type in but we'd have to move to common or create a new type.
+        private readonly dataEvents: any[] = []
     ) {}
 
     create(): VisualizationSpec {
