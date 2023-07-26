@@ -327,7 +327,7 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: [Number, Object],
+            type: [Number, Bookmark],
             required: true,
         },
         workspace: {
@@ -390,13 +390,13 @@ export default Vue.extend({
     },
     computed: {
         projectId(): number {
-            if (typeof this.parentData === "number") {
-                return this.parentData;
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData.p[0];
             }
-            return this.parentData.p[0];
+            return this.parentData;
         },
         stationId(): number | null {
-            if (typeof this.parentData !== "number") {
+          if (this.parentData instanceof Bookmark) {
                 return this.parentData.s[0];
             }
             return null;
@@ -422,7 +422,7 @@ export default Vue.extend({
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
         },
         projectUser(): ProjectUser | null {
-            const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+            const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
 
             if (projectId) {
                 const displayProject = this.$getters.projectsById[projectId];
@@ -448,7 +448,7 @@ export default Vue.extend({
         },
     },
     async mounted(): Promise<void> {
-        const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+        const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
 
         if (projectId) {
             await this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: projectId });
