@@ -58,7 +58,7 @@ export default Vue.extend({
     },
     computed: {
         dataEvents() {
-            return this.$getters.dataEvents;
+            return this.$state.discussion.dataEvents;
         },
     },
     methods: {

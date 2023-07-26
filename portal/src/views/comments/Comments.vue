@@ -416,7 +416,7 @@ export default Vue.extend({
             return false;
         },
         dataEventsFromState() {
-            return this.$getters.dataEvents;
+            return this.$state.discussion.dataEvents;
         },
         postsAndEvents(): DiscussionBase[] {
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
