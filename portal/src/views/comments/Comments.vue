@@ -396,7 +396,7 @@ export default Vue.extend({
             return this.parentData;
         },
         stationId(): number | null {
-          if (this.parentData instanceof Bookmark) {
+            if (this.parentData instanceof Bookmark) {
                 return this.parentData.s[0];
             }
             return null;
@@ -432,7 +432,10 @@ export default Vue.extend({
             return null;
         },
         stationBelongsToAProject(): boolean {
-            return !!this.parentData.p?.length;
+            if (this.parentData instanceof Bookmark) {
+                return !!this.parentData.p?.length;
+            }
+            return false;
         },
     },
     watch: {
