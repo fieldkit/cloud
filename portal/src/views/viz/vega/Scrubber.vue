@@ -159,10 +159,6 @@ export default Vue.extend({
                 await this.brush(timeRange);
             }
         },
-
-        getDataEvents() {
-            this.$store.dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) });
-        },
     },
 });
 </script>
