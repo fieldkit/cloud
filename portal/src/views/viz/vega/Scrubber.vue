@@ -15,6 +15,7 @@ import { TimeZoom, SeriesData } from "../viz";
 import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
 import { DiscussionState } from "@/store/modules/discussion";
 import { ActionTypes } from "@/store";
+import { DataEvent } from "@/views/comments/model";
 
 export default Vue.extend({
     name: "Scrubber",
@@ -57,7 +58,7 @@ export default Vue.extend({
         },
     },
     computed: {
-        dataEvents() {
+        dataEvents(): DataEvent[] {
             return this.$state.discussion.dataEvents;
         },
     },
@@ -67,7 +68,7 @@ export default Vue.extend({
 
             const factory = new ScrubberSpecFactory(
                 this.series,
-                new ChartSettings(TimeRange.mergeArrays([this.visible]), undefined, { w: 0, h: 0 }, false, false, isMobile()),
+                new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
                 this.dataEvents.filter(event => (event.start > this.visible.start && event.end < this.visible.end)),
             );
 
