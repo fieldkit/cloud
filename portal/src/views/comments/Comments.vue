@@ -295,6 +295,7 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
@@ -327,7 +328,7 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: [Number, Bookmark],
+            type: Object as PropType<[number, Bookmark]>,
             required: true,
         },
         workspace: {
@@ -355,7 +356,7 @@ export default Vue.extend({
         newDataEvent: {
             allProjectSensors: boolean;
             bookmark: string | null;
-            body: string | null;
+            description: string | null;
             title: string | null;
         };
         errorMessage: string | null;
@@ -381,7 +382,7 @@ export default Vue.extend({
             newDataEvent: {
                 allProjectSensors: true,
                 bookmark: null,
-                body: "",
+                description: "",
                 title: "",
             },
             errorMessage: null,
@@ -393,7 +394,11 @@ export default Vue.extend({
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
             }
-            return this.parentData;
+            if (this.parentData instanceof Number) {
+                // return this.parentData;
+            }
+            throw new Error();
+            
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
@@ -437,6 +442,18 @@ export default Vue.extend({
             }
             return false;
         },
+        parentNumber(): number | null {
+            if (_.isNumber(this.parentData)) {
+                return this.parentData;
+            }
+            return null;
+        },
+        parentBookmark(): Bookmark | null {
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData;
+            }
+            return null;
+        }
     },
     watch: {
         async parentData(): Promise<void> {
@@ -474,14 +491,16 @@ export default Vue.extend({
         async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
             this.errorMessage = null;
 
-            if (this.viewType === "data") {
-                const tb: Bookmark = this.parentData;
-                dataEvent.bookmark = JSON.stringify(this.parentData);
-            }
+            const bookmark = this.parentBookmark;
+            if (bookmark != null) {
+                if (this.viewType === "data") {
+                    dataEvent.bookmark = JSON.stringify(bookmark);
+                }
 
-            const timeRange: TimeRange = this.parentData.allTimeRange;
-            dataEvent.start = timeRange.start;
-            dataEvent.end = timeRange.end;
+                const timeRange: TimeRange = bookmark.allTimeRange;
+                dataEvent.start = timeRange.start;
+                dataEvent.end = timeRange.end;
+            }
 
             await this.$services.api
                 .postDataEvent(dataEvent)
@@ -565,9 +584,13 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            const parentNumber = this.parentNumber;
+            if (parentNumber == null) {
+                return;
+            }
             this.isLoading = true;
             await this.$services.api
-                .getComments(this.parentData)
+                .getComments(parentNumber)
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
@@ -778,6 +801,7 @@ export default Vue.extend({
                 ((this.user && this.user.admin) ||
                     (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
                 !this.areWorkspaceGroupsEmpty()
+                || false
             );
         },
     },

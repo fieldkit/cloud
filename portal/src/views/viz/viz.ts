@@ -718,7 +718,7 @@ export class Workspace implements VizInfoFactory {
     constructor(
         private readonly meta: SensorsResponse,
         private readonly settings: VizSettings,
-        private groups: Group[] = [],
+        public groups: Group[] = [],
         public readonly projects: number[] = [],
         public readonly bookmarkStations: number[] | null = null,
         public readonly context: ExploreContext | null = null

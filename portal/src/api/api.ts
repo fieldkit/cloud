@@ -222,6 +222,7 @@ export class CurrentUser {
     bio: string;
     mediaUrl: string;
     tncDate: number;
+    admin: boolean;
 }
 
 export enum UserRolesEnum {
