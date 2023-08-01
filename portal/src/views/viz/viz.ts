@@ -218,16 +218,16 @@ export class Bookmark {
         const times: [number, number][] = this.allVizes.map((viz) => viz[1]).filter((times) => times !== undefined) as [number, number][];
         const start = _.min(_.flatten(times.map((r) => r[0])));
         const end = _.max(_.flatten(times.map((r) => r[1])));
-        if (!start || !end) throw new Error(`no time range in bookmark`);
+        if ((start === null || start === undefined) || (end === null || end === undefined)) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
     private vizStations(vizBookmark: VizBookmark): StationID[] {
-        return [];
+        return vizBookmark[0].map((vs) => vs[0])
     }
 
     private vizSensors(vizBookmark: VizBookmark): SensorSpec[] {
-        return [];
+        return vizBookmark[0].map((vs) => vs[1])
     }
 
     public get allStations(): number[] {
@@ -624,6 +624,20 @@ export class Group {
     public static fromBookmark(bm: GroupBookmark, settings: VizSettings): Group {
         return new Group(bm[0].map((vm) => Graph.fromBookmark(vm, settings)));
     }
+
+    public isEmpty(): boolean {
+        let isEmpty = true;
+        this.vizes.forEach((viz) => {
+            if (viz instanceof Graph) {
+                viz.dataSets.forEach((dataSet) => {
+                    if (!dataSet.all?.empty) {
+                        isEmpty = false;
+                    }
+                });
+            }
+        });
+        return isEmpty;
+    }
 }
 
 class DataQuerier {
@@ -704,7 +718,7 @@ export class Workspace implements VizInfoFactory {
     constructor(
         private readonly meta: SensorsResponse,
         private readonly settings: VizSettings,
-        private groups: Group[] = [],
+        public groups: Group[] = [],
         public readonly projects: number[] = [],
         public readonly bookmarkStations: number[] | null = null,
         public readonly context: ExploreContext | null = null
@@ -734,6 +748,10 @@ export class Workspace implements VizInfoFactory {
 
     public get allStationIds(): StationID[] {
         return this.stationIds;
+    }
+
+    public get stationsMetas(): StationMeta[] {
+        return Object.values(this.stations);
     }
 
     public get allStations(): Station[] {

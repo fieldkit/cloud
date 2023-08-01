@@ -293,7 +293,7 @@ export class DisplayStation {
         return [1, 0, this.name];
     }
 
-    private get inactive(): boolean {
+    public get inactive(): boolean {
         return this.status == StationStatus.down;
     }
 
@@ -370,7 +370,7 @@ export class ProjectModule {
 
 export class MapFeature {
     public readonly type = "Feature";
-    public readonly geometry: { type: string; coordinates: LngLat | LngLat[][] } | null = null;
+    public readonly geometry: { type: string; coordinates: LngLat /*| LngLat[][]*/ } | null = null;
     public readonly properties: {
         icon: string;
         id: number;
@@ -379,7 +379,7 @@ export class MapFeature {
         color: string;
     } | null = null;
 
-    constructor(private readonly station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
+    constructor(public readonly station: DisplayStation, type: string, coordinates: any, public readonly bounds: LngLat[]) {
         this.geometry = {
             type: type,
             coordinates: coordinates,
@@ -626,6 +626,8 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number }
         ) => {
+            if (!_.isNumber(payload.id)) throw new Error("Expected numeric project id");
+
             commit(MutationTypes.LOADING, { projects: true });
 
             const [project, users, stations] = await Promise.all([

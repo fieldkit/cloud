@@ -411,7 +411,7 @@ export default Vue.extend({
             if (AuthenticationRequiredError.isInstance(e)) {
                 return this.$router.push({
                     name: "login",
-                    params: { errorMessage: this.$t("login.privateStation") },
+                    params: { errorMessage: this.$t("login.privateStation").toString() },
                     query: { after: this.$route.path },
                 });
             }
@@ -474,7 +474,7 @@ export default Vue.extend({
         navigateToPhotos(): void {
             this.$router.push({
                 name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
-                params: { projectId: this.projectId, stationId: this.station.id },
+                params: { projectId: this.projectId, stationId: String(this.station.id) },
             });
         },
 

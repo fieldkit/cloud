@@ -373,6 +373,57 @@
         "actions": {
             "reply": "Reply",
             "viewData": "View Data"
+        },
+        "projectHeader": "Notes & Comments",
+        "dataHeader": "Events & Comments",
+        "sectionToggle": {
+            "leftLabel": "Comment",
+            "rightLabel": "Log an Event"
+        },
+        "commentForm": {
+            "placeholder": "Join the discussion!",
+            "saveLabel": "Post"
+        },
+        "eventTypeSelector": {
+            "allProjectSensors": {
+                "radioLabel": {
+                    "fieldkit": "All Project Stations",
+                    "floodnet": "All Project Sensors"
+                },
+                "description": {
+                    "fieldkit": "People will see this event when viewing data for any stations belonging to the selected projects",
+                    "floodnet": "People will see this event when viewing data for any sensors belonging to the selected projects"
+                }
+            },
+            "justTheseSensors": {
+                "radioLabel": {
+                    "fieldkit": "Just These Stations",
+                    "floodnet": "Just These Sensors"
+                },
+                "description": {
+                    "fieldkit": "People will see this event only when viewing data for the selected stations",
+                    "floodnet": "People will see this event only when viewing data for the selected sensors"
+                }
+            }
+        },
+        "eventForm": {
+            "title": {
+                "placeholder": "Event Title",
+                "saveLabel": "Save"
+            },
+            "description": {
+                "placeholder": "Event Description",
+                "saveLabel": "Save"
+            }
+        },
+        "noComments": "There are no comments yet.",
+        "noEventsComments": "There are no events or comments yet.",
+        "loadingComments": "Loading comments...",
+        "loadingEventsComments": "Loading events and comments...",
+        "comments": "comments",
+        "reply": {
+            "placeholder": "Reply to comment",
+            "saveLabel": "Save"
         }
     },
     "seeMore": "See more",
@@ -435,7 +486,8 @@
     },
     "dataView": {
         "computerTip": "For a better data analysis experience, view this data on your computer.",
-        "swipeTip": "Swipe the chart to see more data."
+        "swipeTip": "Swipe the chart to see more data.",
+        "noData": "There's no data to display."
     },
     "edit": "edit"
 }

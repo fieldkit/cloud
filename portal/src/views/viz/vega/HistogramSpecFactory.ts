@@ -3,7 +3,7 @@ import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds 
 
 export class HistogramSpecFactory {
     constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
-
+    
     create() {
         const first = this.allSeries[0];
 

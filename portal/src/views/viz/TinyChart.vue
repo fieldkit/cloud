@@ -120,7 +120,7 @@ export default Vue.extend({
                     }
 
                     const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
-                    return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSize: 0 } };
+                    return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSamples: 0, bucketSize: 0, dataEnd: null } };
                 }
                 const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
@@ -144,6 +144,8 @@ export default Vue.extend({
                         }
                     ),
                     bucketSize: stationData.stations[station.id].bucketSize,
+                    bucketSamples: 0, // Maybe wrong
+                    dataEnd: null, // Maybe wrong
                 };
 
                 return { vizSensor, sensor, sdr };

@@ -116,7 +116,7 @@ func (c *DiscussionService) PostMessage(ctx context.Context, payload *discServic
 	}
 
 	if payload.Post.ProjectID == nil && payload.Post.Bookmark == nil {
-		return nil, fmt.Errorf("malformed request: missing project or bookmark")
+		return nil, discService.MakeBadRequest(fmt.Errorf("malformed request: missing project or bookmark"))
 	}
 
 	if payload.Post.Body == "" {

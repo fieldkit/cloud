@@ -43,10 +43,7 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 		return err
 	}
 
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(c.options.Database)
 
 	queued, err := ir.QueryPending(ctx)
 	if err != nil {
@@ -130,10 +127,7 @@ func (c *IngestionService) ProcessStationIngestions(ctx context.Context, payload
 func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingestion.ProcessIngestionPayload) (err error) {
 	log := Logger(ctx).Sugar()
 
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(c.options.Database)
 
 	log.Infow("processing", "ingestion_id", payload.IngestionID)
 
@@ -188,10 +182,7 @@ func (c *IngestionService) RefreshViews(ctx context.Context, payload *ingestion.
 func (c *IngestionService) Delete(ctx context.Context, payload *ingestion.DeletePayload) (err error) {
 	log := Logger(ctx).Sugar()
 
-	ir, err := repositories.NewIngestionRepository(c.options.Database)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(c.options.Database)
 
 	log.Infow("deleting", "ingestion_id", payload.IngestionID)
 

@@ -11,7 +11,7 @@
 import _ from "lodash";
 import { isMobile } from "@/utilities";
 import Vue, { PropType } from "vue";
-import { default as vegaEmbed } from "vega-embed";
+import { default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
@@ -80,7 +80,7 @@ export default Vue.extend({
 
             const spec = factory.create();
 
-            const vegaInfo = await vegaEmbed(this.$el, spec, {
+            const vegaInfo = await vegaEmbed(this.$el as HTMLElement, spec as VisualizationSpec, {
                 renderer: "svg",
                 downloadFileName: this.getFileName(this.series[0]),
                 tooltip: {
@@ -142,8 +142,10 @@ export default Vue.extend({
                     // Watch for brush drag outside the window
                     vegaInfo.view.addEventListener("mousedown", (e) => {
                         window.addEventListener("mouseup", (e) => {
-                            if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
-                                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                            if (e.target instanceof Element) {
+                                if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                                }
                             }
                         });
                     });

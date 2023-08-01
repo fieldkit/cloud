@@ -55,3 +55,8 @@ export const NEED_NOTES = "NEED_NOTES";
 
 export const SHOW_SNACKBAR = "SHOW_SNACKBAR";
 export const HIDE_SNACKBAR = "HIDE_SNACKBAR";
+
+// Discussion
+
+export const NEED_DATA_EVENTS = "NEED_DATA_EVENTS";
+export const NEW_DATA_EVENT = "NEW_DATA_EVENT";

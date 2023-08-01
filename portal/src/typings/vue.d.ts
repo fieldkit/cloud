@@ -1,5 +1,4 @@
-// import Vue from "vue";
-// import { Store } from "vuex";
+import Vue from "vue";
 import { GlobalState, GlobalGetters } from "@/store/modules/global";
 import { Services } from "@/api";
 
@@ -15,5 +14,13 @@ declare module "vue/types/vue" {
         $state: GlobalState;
         $services: Services;
         $seriousError: (error: Error) => void;
+        $v: any;
     }
 }
+
+declare module "vue/types/options" {
+    interface ComponentOptions<V extends Vue> {
+      metaInfo?: any;
+      validations?: any;
+    }
+  }
