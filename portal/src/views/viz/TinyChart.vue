@@ -83,6 +83,8 @@ export default Vue.extend({
             const selectedModuleKey = this.moduleKey;
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const thisComp = this;
+            this.series = [];
+            thisComp.noSensorData = false;
 
             function getQuickSensor(quickSensors): VizSensor {
                 let stationId, sensorModuleId, sensorId;
@@ -126,23 +128,29 @@ export default Vue.extend({
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
 
+                console.log("radoi stationData.stations", data);
+
+                if (data.length === 0) {
+                    thisComp.noSensorData = true;
+                    return null;
+                }
+
+                console.log("station.id", station.id);
                 const sdr: SensorDataResponse = {
-                    data: data.map(
-                        (row: TailSensorDataRow): DataRow => {
-                            return {
-                                time: row.time,
-                                stationId: row.stationId,
-                                moduleId: row.moduleId,
-                                sensorId: row.sensorId,
-                                value: row.max !== undefined ? row.max : null, // TODO
-                                avg: row.avg,
-                                min: row.min,
-                                max: row.max,
-                                last: row.last,
-                                location: null,
-                            };
-                        }
-                    ),
+                    data: data.map((row: TailSensorDataRow): DataRow => {
+                        return {
+                            time: row.time,
+                            stationId: row.stationId,
+                            moduleId: row.moduleId,
+                            sensorId: row.sensorId,
+                            value: row.max !== undefined ? row.max : null, // TODO
+                            avg: row.avg,
+                            min: row.min,
+                            max: row.max,
+                            last: row.last,
+                            location: null,
+                        };
+                    }),
                     bucketSize: stationData.stations[station.id].bucketSize,
                     bucketSamples: 0, // Maybe wrong
                     dataEnd: null, // Maybe wrong
@@ -152,6 +160,7 @@ export default Vue.extend({
             }
 
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
+            console.log("Radoi maybeSensorMetaAndData", maybeSensorMetaAndData);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
                 thisComp.noSensorData = true;
@@ -189,6 +198,7 @@ export default Vue.extend({
                 ),
             ];
 
+            console.log("radoi viz sesnsor", vizSensor);
             this.vizData = { vizSensor, timeRange: [queried.timeRange[0], queried.timeRange[1]] };
         },
     },
@@ -208,6 +218,12 @@ export default Vue.extend({
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        height: 100%;
+        width: 100%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 

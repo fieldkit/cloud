@@ -62,6 +62,7 @@ export default Vue.extend({
     },
     watch: {
         async series(): Promise<void> {
+            console.log("series radoi", this.series);
             await this.refresh();
         },
     },
