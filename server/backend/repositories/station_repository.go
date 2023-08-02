@@ -1543,6 +1543,16 @@ func (r *StationRepository) QueryAssociatedStations(ctx context.Context, station
 	}
 }
 
+func (r *StationRepository) QueryStationProjectIds(ctx context.Context, stationID int32) ([]int32, error) {
+	ids := make([]int32, 0)
+	if err := r.db.SelectContext(ctx, &ids, `
+	    SELECT project_id FROM fieldkit.project_station WHERE station_id = $1
+		`, stationID); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
 func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32) (module *data.StationModule, err error) {
 	module = &data.StationModule{}
 	if err := r.db.GetContext(ctx, module, `

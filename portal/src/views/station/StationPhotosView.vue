@@ -25,6 +25,7 @@
                 @silentbox-overlay-opened="togglePageScroll()"
                 @silentbox-overlay-hidden="togglePageScroll()"
             >
+                <!-- eslint-disable-next-line -->
                 <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
                     <button class="photo-options" v-if="!readOnly">
                         <ListItemOptions
