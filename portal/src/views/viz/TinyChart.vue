@@ -2,6 +2,10 @@
     <div class="tiny-chart">
         <LineChart :series="series" :settings="chartSettings" />
         <div v-if="noSensorData" class="no-data">{{ $tc("noData") }}</div>
+        <div v-if="busy" class="no-data">
+            LOADING
+            <Spinner class="spinner" />
+        </div>
     </div>
 </template>
 
@@ -25,10 +29,12 @@ import {
 } from "./vega/SpecFactory";
 
 import LineChart from "./vega/LineChart.vue";
+import Spinner from "@/views/shared/Spinner.vue";
 
 export default Vue.extend({
     name: "TinyChart",
     components: {
+        Spinner,
         LineChart,
     },
     props: {
@@ -55,24 +61,29 @@ export default Vue.extend({
         // can be used with BookmarkFactory.forSensor to create a bookmark for the currently displayed data
         vizData: { vizSensor: VizSensor; timeRange: [number, number] } | null;
         noSensorData: boolean;
+        busy: boolean;
     } {
         return {
             chartSettings: ChartSettings.Tiny,
             series: [],
             vizData: null,
             noSensorData: false,
+            busy: true,
         };
     },
     watch: {
         stationId(): void {
             console.log("tiny-chart:", "station-id");
             // TODO Should we also be checking if we're in view?
+          console.log("Radoi change station");
             void this.load();
         },
     },
     async mounted() {
         new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
+            this.series = [];
+            this.busy = true;
             void this.load();
         });
     },
@@ -83,7 +94,6 @@ export default Vue.extend({
             const selectedModuleKey = this.moduleKey;
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const thisComp = this;
-            this.series = [];
             thisComp.noSensorData = false;
 
             function getQuickSensor(quickSensors): VizSensor {
@@ -95,7 +105,7 @@ export default Vue.extend({
                         sensorModuleId = module.moduleId;
                         sensorId = module.sensorId;
                     } else {
-                        thisComp.noSensorData = true;
+                        thisComp.handleNoDataCase();
                     }
                 } else {
                     stationId = quickSensors.station[0].stationId;
@@ -122,7 +132,11 @@ export default Vue.extend({
                     }
 
                     const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
-                    return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSamples: 0, bucketSize: 0, dataEnd: null } };
+                    return {
+                        vizSensor: [station.id, ["", 0]],
+                        sensor,
+                        sdr: { data: [], bucketSamples: 0, bucketSize: 0, dataEnd: null },
+                    };
                 }
                 const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
@@ -131,7 +145,7 @@ export default Vue.extend({
                 console.log("radoi stationData.stations", data);
 
                 if (data.length === 0) {
-                    thisComp.noSensorData = true;
+                    thisComp.handleNoDataCase();
                     return null;
                 }
 
@@ -163,7 +177,7 @@ export default Vue.extend({
             console.log("Radoi maybeSensorMetaAndData", maybeSensorMetaAndData);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
-                thisComp.noSensorData = true;
+                thisComp.handleNoDataCase();
                 return;
             }
             const { vizSensor, sensor, sdr } = maybeSensorMetaAndData;
@@ -200,6 +214,11 @@ export default Vue.extend({
 
             console.log("radoi viz sesnsor", vizSensor);
             this.vizData = { vizSensor, timeRange: [queried.timeRange[0], queried.timeRange[1]] };
+            this.busy = false;
+        },
+        handleNoDataCase() {
+            this.noSensorData = true;
+            this.busy = false;
         },
     },
 });
