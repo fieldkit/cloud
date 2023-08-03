@@ -398,7 +398,7 @@ export default Vue.extend({
                 // return this.parentData;
             }
             throw new Error();
-            
+
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
@@ -453,7 +453,7 @@ export default Vue.extend({
                 return this.parentData;
             }
             return null;
-        }
+        },
     },
     watch: {
         async parentData(): Promise<void> {
@@ -584,13 +584,13 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
-            const parentNumber = this.parentNumber;
-            if (parentNumber == null) {
+            const queryParam = this.parentNumber ? this.parentNumber : this.parentBookmark;
+            if (!queryParam) {
                 return;
             }
             this.isLoading = true;
             await this.$services.api
-                .getComments(parentNumber)
+                .getComments(queryParam)
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
@@ -798,10 +798,10 @@ export default Vue.extend({
         },
         showPostsTypeToggle(): boolean {
             return (
-                ((this.user && this.user.admin) ||
+                (((this.user && this.user.admin) ||
                     (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
-                !this.areWorkspaceGroupsEmpty()
-                || false
+                    !this.areWorkspaceGroupsEmpty()) ||
+                false
             );
         },
     },
