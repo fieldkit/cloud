@@ -66,13 +66,16 @@ export default Vue.extend({
         async refresh(): Promise<void> {
             console.log("viz:", "scrubber: refresh");
 
-            const queriedStart = this.series[0].queried.timeRange[0];
-            const queriedEnd = this.series[0].queried.timeRange[1];
-
             const factory = new ScrubberSpecFactory(
                 this.series,
                 new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
-                this.dataEvents.filter(event => (event.start > queriedStart && event.end < queriedEnd)),
+                this.dataEvents.filter((event) =>
+                    this.series.every(
+                        (seriesData) =>
+                            event.start > seriesData.queried.timeRange[0] &&
+                            event.end < seriesData.queried.timeRange[1]
+                    )
+                ),
             );
 
             const spec = factory.create();
