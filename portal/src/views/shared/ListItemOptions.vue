@@ -67,7 +67,7 @@ export default Vue.extend({
     &:after {
         @include flex(flex-end);
         content: "...";
-        height: 17px;
+        height: 7px;
         font-size: 32px;
         font-family: "icomoon";
     }

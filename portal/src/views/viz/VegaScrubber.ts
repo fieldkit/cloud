@@ -28,10 +28,13 @@ export const VegaScrubber = Vue.extend({
         raiseTimeZoomed(zoom: TimeZoom): void {
             this.$emit("viz-time-zoomed", zoom);
         },
+        eventClicked(id: number): void {
+            this.$emit("event-clicked", id);
+        },
     },
     template: `
         <div class="viz scrubber">
-            <Scrubber :series="allSeries" :visible="visible" :dragging="dragging" @time-zoomed="raiseTimeZoomed" v-if="allSeries.length > 0" />
+            <Scrubber :series="allSeries" :visible="visible" :dragging="dragging" @time-zoomed="raiseTimeZoomed" @event-clicked="eventClicked" v-if="allSeries.length > 0" />
         </div>
     `,
 });

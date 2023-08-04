@@ -1,4 +1,3 @@
-"
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
@@ -89,9 +88,14 @@
                     </div>
                 </div>
 
-                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+                <VizWorkspace
+                    v-if="workspace && !workspace.empty"
+                    :workspace="workspace"
+                    @change="onChange"
+                    @event-clicked="eventClicked"
+                />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
+                <Comments :parentData="bookmark" :workspace="workspace" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -398,6 +402,9 @@ export default Vue.extend({
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
+        },
+        eventClicked(id: number): void {
+            this.$emit("event-clicked", id);
         },
         exportSupported(): boolean {
             if (this.workspace == null) {
@@ -933,6 +940,14 @@ export default Vue.extend({
     }
 }
 
+.de_flag path {
+    fill: #52b5e0;
+
+    body.floodnet & {
+        fill: var(--color-dark);
+    }
+}
+
 .one {
     display: flex;
     flex-direction: row;
@@ -1077,5 +1092,25 @@ export default Vue.extend({
         top: 17px;
         left: 20px;
     }
+}
+
+::v-deep .group-no-data {
+    .viz-container,
+    .scrubber {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+}
+
+::v-deep .group-no-data-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    z-index: $z-index-top;
+    background: #ffff;
+    padding: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 }
 </style>
