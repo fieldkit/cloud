@@ -16,6 +16,7 @@ import { SensorInfoResponse } from "@/views/viz/api";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
+import { Bookmark } from "@/views/viz/viz";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -1472,13 +1473,13 @@ class FKApi {
         });
     }
 
-    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    public async getComments(projectIDOrBookmark: number | Bookmark): Promise<{ posts: Comment[] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === "number") {
-            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
-        } else {
+        if (projectIDOrBookmark instanceof Bookmark) {
             apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
+        } else {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         }
 
         const returned = await this.invoke({
