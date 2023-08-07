@@ -3,7 +3,6 @@
         <LineChart :series="series" :settings="chartSettings" />
         <div v-if="noSensorData" class="no-data">{{ $tc("noData") }}</div>
         <div v-if="busy" class="no-data">
-            LOADING
             <Spinner class="spinner" />
         </div>
     </div>
@@ -75,7 +74,6 @@ export default Vue.extend({
         stationId(): void {
             console.log("tiny-chart:", "station-id");
             // TODO Should we also be checking if we're in view?
-          console.log("Radoi change station");
             void this.load();
         },
     },
@@ -83,13 +81,12 @@ export default Vue.extend({
         new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
             this.series = [];
-            this.busy = true;
             void this.load();
         });
     },
     methods: {
         async load(): Promise<void> {
-            // TODO Show busy when loading?
+            this.busy = true;
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
             const selectedModuleKey = this.moduleKey;
             // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -142,8 +139,6 @@ export default Vue.extend({
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
 
-                console.log("radoi stationData.stations", data);
-
                 if (data.length === 0) {
                     thisComp.handleNoDataCase();
                     return null;
@@ -174,7 +169,6 @@ export default Vue.extend({
             }
 
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
-            console.log("Radoi maybeSensorMetaAndData", maybeSensorMetaAndData);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
                 thisComp.handleNoDataCase();
@@ -212,7 +206,6 @@ export default Vue.extend({
                 ),
             ];
 
-            console.log("radoi viz sesnsor", vizSensor);
             this.vizData = { vizSensor, timeRange: [queried.timeRange[0], queried.timeRange[1]] };
             this.busy = false;
         },
@@ -239,10 +232,11 @@ export default Vue.extend({
         transform: translate(-50%, -50%);
         height: 100%;
         width: 100%;
-        background: #fff;
+        background-color: #e2e4e6;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-weight: 800;
     }
 }
 
