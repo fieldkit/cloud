@@ -14,7 +14,7 @@ require (
 	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
 	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
-	github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2
+	github.com/fieldkit/data-protocol v0.0.0-20230718145913-fb96ddfb3f7e
 	github.com/go-pg/pg/v10 v10.9.1
 	github.com/goadesign/goa v1.4.0
 	github.com/golang/protobuf v1.5.2
@@ -143,7 +143,7 @@ require (
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.7 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/kyokomi/emoji.v1 v1.5.1 // indirect

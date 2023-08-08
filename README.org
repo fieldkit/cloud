@@ -201,5 +201,11 @@
    sudo mv go /usr/local
    #+END_SRC
 
+**** Postgres Installation
+   #+BEGIN_SRC sh
+   apt install postgresql-client-common
+   #+END_SRC
+
+**** [[https://dev.to/deadwin19/how-to-install-golang-on-wslwsl2-2880][Go Installation]]
 
 *EOF*

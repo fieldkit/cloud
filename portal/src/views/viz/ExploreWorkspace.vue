@@ -1,4 +1,3 @@
-"
 <template>
     <StandardLayout @show-station="showStation" :defaultShowStation="false" :disableScrolling="exportsVisible || shareVisible">
         <ExportPanel v-if="exportsVisible" containerClass="exports-floating" :bookmark="bookmark" @close="closePanel" />
@@ -30,7 +29,7 @@
                             <i class="icon icon-share"></i>
                             <span class="button-submit-text">Share</span>
                         </div>
-                        <div class="button-submit" @click="openExports" v-if="false">
+                        <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
                             <span class="button-submit-text">Export</span>
                         </div>
@@ -89,9 +88,14 @@
                     </div>
                 </div>
 
-                <VizWorkspace v-if="workspace && !workspace.empty" :workspace="workspace" @change="onChange" />
+                <VizWorkspace
+                    v-if="workspace && !workspace.empty"
+                    :workspace="workspace"
+                    @change="onChange"
+                    @event-clicked="eventClicked"
+                />
 
-                <Comments :parentData="bookmark" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
+                <Comments :parentData="bookmark" :workspace="workspace" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -246,9 +250,9 @@ export default Vue.extend({
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
-                    await this.$router.push({ name: "viewProjectBigMap", params: { id: this.bookmark.c.project } });
+                    await this.$router.push({ name: "viewProjectBigMap", params: { id: String(this.bookmark.c.project) } });
                 } else {
-                    await this.$router.push({ name: "viewProject", params: { id: this.bookmark.c.project } });
+                    await this.$router.push({ name: "viewProject", params: { id: String(this.bookmark.c.project) } });
                 }
             } else {
                 await this.$router.push({ name: "mapAllStations" });
@@ -360,9 +364,13 @@ export default Vue.extend({
                 });
         },
         getValidStations(): number[] {
-            const validStations = Object.entries(this.workspace.stations)
-                .filter(([key, station]) => !station.hidden && station.sensors.length > 0)
-                .map((d) => +d[0]);
+            if (this.workspace == null) {
+                return [];
+            }
+
+            const validStations = this.workspace.stationsMetas
+                .filter((station) => !station.hidden && station.sensors.length > 0)
+                .map((d) => d.id);
 
             this.selectedIndex = validStations.indexOf(this.selectedId);
 
@@ -374,15 +382,19 @@ export default Vue.extend({
             this.selectedIndex = evt;
         },
         openStationPageTab() {
-            if (this.selectedStation || this.currentStation) {
+            const station = this.selectedStation ? this.selectedStation: this.currentStation;
+            if (station) {
                 const routeData = this.$router.resolve({
                     name: "viewStationFromMap",
-                    params: { stationId: this.selectedStation ? this.selectedStation.id : this.currentStation.id },
+                    params: { stationId: String(station.id) },
                 });
                 window.open(routeData.href, "_blank");
             }
         },
         getBatteryIcon() {
+            if (this.selectedStation == null) {
+                return null;
+            }
             return this.$loadAsset(getBatteryIcon(this.selectedStation.battery));
         },
         interpolatePartner(baseString) {
@@ -391,6 +403,25 @@ export default Vue.extend({
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
         },
+        eventClicked(id: number): void {
+            this.$emit("event-clicked", id);
+        },
+        exportSupported(): boolean {
+            if (this.workspace == null) {
+                return false;
+            }
+
+            if (!this.partnerCustomization().exportSupported) {
+                return false;
+            }
+
+            const stationModels = _.uniq(this.workspace.allStations.map((s) => s.model.name));
+            const anyNodeRed = stationModels.filter((name) => name.indexOf("NodeRed") >= 0); // TODO This should be a flag.
+
+            console.log("viz:export-disabled", stationModels, anyNodeRed);
+
+            return anyNodeRed.length == 0;
+        }
     },
 });
 </script>
@@ -909,6 +940,14 @@ export default Vue.extend({
     }
 }
 
+.de_flag path {
+    fill: #52b5e0;
+
+    body.floodnet & {
+        fill: var(--color-dark);
+    }
+}
+
 .one {
     display: flex;
     flex-direction: row;
@@ -1053,5 +1092,25 @@ export default Vue.extend({
         top: 17px;
         left: 20px;
     }
+}
+
+::v-deep .group-no-data {
+    .viz-container,
+    .scrubber {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+}
+
+::v-deep .group-no-data-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    z-index: $z-index-top;
+    background: #ffff;
+    padding: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 }
 </style>

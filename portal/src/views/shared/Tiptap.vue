@@ -1,10 +1,11 @@
 <template>
     <div :class="'tiptap-container' + (readonly ? ' tiptap-reading' : ' tiptap-editing')">
+        <p v-if="placeholder && !readonly && editor && editor.isEmpty" class="placeholder">{{ placeholder }}</p>
         <div class="tiptap-row">
             <div ref="contentContainer" class="tiptap-main" :class="{ truncated: readonly }">
                 <editor-content :editor="editor" />
             </div>
-            <div class="tiptap-side" v-if="!readonly && !empty">
+            <div class="tiptap-side" v-if="!readonly && !empty && showSaveButton">
                 <button type="submit" @click="onSave">{{ saveLabel }}</button>
             </div>
         </div>
@@ -24,7 +25,7 @@ import Text from "@tiptap/extension-text";
 import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
-import tippy from "tippy.js";
+import tippy, { Props } from "tippy.js";
 
 export default Vue.extend({
     name: "TipTap",
@@ -44,6 +45,10 @@ export default Vue.extend({
         readonly: {
             type: Boolean,
             default: false,
+        },
+        showSaveButton: {
+            type: Boolean,
+            default: true,
         },
         placeholder: {
             type: String,
@@ -69,6 +74,12 @@ export default Vue.extend({
         readonly(value: boolean): void {
             if (this.editor) {
                 this.editor.setOptions({ editable: !value });
+            }
+        },
+        value(value: string): void {
+            if (this.editor) {
+                if (JSON.stringify(this.editor.getJSON()) === JSON.stringify(value)) return;
+                this.editor.commands.setContent(value);
             }
         },
     },
@@ -142,7 +153,6 @@ export default Vue.extend({
                 Document,
                 Paragraph,
                 Text,
-                Placeholder,
                 ModifyEnter,
                 CustomNewLine,
                 Mention.configure({
@@ -173,15 +183,28 @@ export default Vue.extend({
                                         propsData: props,
                                     });
 
-                                    popup = tippy("body", {
-                                        getReferenceClientRect: props.clientRect,
+                                    const newProps: Partial<Props> = {
+                                        getReferenceClientRect: null,
                                         appendTo: () => document.body,
                                         content: component.element,
                                         showOnCreate: true,
                                         interactive: true,
                                         trigger: "manual",
                                         placement: "bottom-start",
-                                    });
+                                    };
+
+                                    const clientRect = props.clientRect;
+                                    if (clientRect) {
+                                        newProps.getReferenceClientRect = () => {
+                                            const rect = clientRect();
+                                            if (!rect) {
+                                                throw new Error();
+                                            }
+                                            return rect;
+                                        };
+                                    }
+
+                                    popup = tippy("body", newProps);
                                 },
                                 onUpdate(props) {
                                     console.log("mentions-update", props);
@@ -264,6 +287,8 @@ export default Vue.extend({
 .tiptap-container {
     width: 100%;
     text-align: justify;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .tiptap-editing {
@@ -308,7 +333,7 @@ export default Vue.extend({
     }
 
     p {
-        word-break: break-all;
+        word-break: normal;
         margin: 14px 0;
     }
 }
@@ -418,5 +443,12 @@ export default Vue.extend({
     @at-root body.floodnet & {
         color: var(--color-dark);
     }
+}
+
+.placeholder {
+    position: absolute;
+    opacity: 0.25;
+    top: 0;
+    left: 10px;
 }
 </style>

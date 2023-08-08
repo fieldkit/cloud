@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import Logo from "@/views/shared/Logo.vue";
 import {
     StationOrSensor,
@@ -68,6 +68,7 @@ import {
     getPartnerCustomizationWithDefault,
     PartnerCustomization,
 } from "./partners";
+import { DisplayProject, DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "SidebarNav",
@@ -82,9 +83,11 @@ export default Vue.extend({
         viewingStations: { type: Boolean, default: false },
         isAuthenticated: { type: Boolean, required: true },
         stations: {
+            type: Array as PropType<DisplayStation[]>,
             required: true,
         },
         projects: {
+            type: Array as PropType<DisplayProject[]>,
             required: true,
         },
         narrow: {
@@ -125,14 +128,14 @@ export default Vue.extend({
         };
     },
     watch: {
-        $route(to, from) {
+        $route(to, from): void {
             if (to.name === "viewProjectBigMap" || to.name === "root") {
                 this.sidebar.narrow = true;
             }
         },
     },
     computed: {
-        clippedStations() {
+        clippedStations(): DisplayStation[] {
             if (this.clipStations) {
                 return this.stations.slice(0, 10);
             } else {
@@ -141,7 +144,7 @@ export default Vue.extend({
         },
     },
     methods: {
-        showStation(station: unknown): void {
+        showStation(station: DisplayStation): void {
             this.$emit("show-station", station);
             this.closeMenuOnMobile();
         },

@@ -37,7 +37,7 @@ import Mapbox from "mapbox-gl-vue";
 
 export interface ProtectedData {
     map: any;
-    markers: { [index: number]: any };
+    markers: { marker: mapboxgl.Marker; instance: any }[];
 }
 
 export default Vue.extend({
@@ -247,15 +247,14 @@ export default Vue.extend({
 
             // Regenerate custom map markers
             if (this.protectedData.markers) {
-                for (const entry of this.protectedData.markers) {
-                    const { marker } = entry;
-                    marker.remove();
+                for (const marker of this.protectedData.markers) {
+                    marker.marker.remove();
                 }
-                this.protectedData.markers = {};
+                this.protectedData.markers = [];
             }
 
             const ValueMarkerCtor = Vue.extend(ValueMarker);
-            const markers = [];
+            const markers: { marker: mapboxgl.Marker; instance: any }[] = [];
             const sortFactors = _.fromPairs(
                 this.mapped.features.map((feature) => [feature.properties?.id, feature.station.getSortOrder(this.visibleReadings)])
             );
@@ -263,29 +262,31 @@ export default Vue.extend({
                 _.orderBy(
                     _.cloneDeep(this.mapped.features),
                     [
-                        (feature) => sortFactors[feature.properties.id][0],
-                        (feature) => sortFactors[feature.properties.id][1],
-                        (feature) => sortFactors[feature.properties.id][2],
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][0] : 0,
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][1] : 0,
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][2] : 0,
                     ],
                     ["asc", "desc", "asc"]
                 )
             );
             for (const feature of sorted) {
-                const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
-                const instance = new ValueMarkerCtor({
-                    propsData: {
-                        ...(readings && readings.length > 0 && { color: readings[0].color }),
-                        ...{ value: readings && readings.length > 0 ? readings[0].value : null },
-                        ...{ id: feature.properties.id },
-                    },
-                });
-                instance.$mount();
-                instance.$on("marker-click", (evt) => {
-                    this.$emit("show-summary", { id: evt.id });
-                });
+                if (feature.geometry != null && feature.properties != null) {
+                    const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
+                    const instance = new ValueMarkerCtor({
+                        propsData: {
+                            ...(readings && readings.length > 0 && { color: readings[0].color }),
+                            ...{ value: readings && readings.length > 0 ? readings[0].value : null },
+                            ...{ id: feature.properties.id },
+                        },
+                    });
+                    instance.$mount();
+                    instance.$on("marker-click", (evt) => {
+                        this.$emit("show-summary", { id: evt.id });
+                    });
 
-                const marker = new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
-                markers.push({ marker: marker, instance: instance });
+                    const marker = new mapboxgl.Marker(instance.$el as HTMLElement).setLngLat(feature.geometry.coordinates).addTo(map);
+                    markers.push({ marker: marker, instance: instance });
+                }
             }
             this.protectedData.markers = markers;
         },

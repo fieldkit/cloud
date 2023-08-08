@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { default as vegaEmbed } from "vega-embed";
+import {  default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
 import { SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
@@ -39,7 +39,7 @@ export default Vue.extend({
 
             const spec = factory.create();
 
-            const vegaInfo = await vegaEmbed(".histogram", spec, {
+            const vegaInfo = await vegaEmbed(".histogram", spec as VisualizationSpec, {
                 renderer: "svg",
                 tooltip: { offsetX: -50, offsetY: 50 },
                 actions: { source: false, editor: false, compiled: false },

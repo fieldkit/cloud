@@ -15,7 +15,5 @@ module.exports = {
     },
     devServer: {
         hot: false,
-        inline: false,
-        disableHostCheck: true,
     },
 };

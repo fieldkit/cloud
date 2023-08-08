@@ -30,46 +30,46 @@ func TestQueryStationByID(t *testing.T) {
 }
 
 /*
-func TestQueryNearbyProjectStations(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
+	func TestQueryNearbyProjectStations(t *testing.T) {
+		assert := assert.New(t)
+		e, err := tests.NewTestEnv()
+		assert.NoError(err)
 
-	_, err = e.AddStations(5)
-	assert.NoError(err)
+		_, err = e.AddStations(5)
+		assert.NoError(err)
 
-	fd, err := e.AddStations(5)
-	assert.NoError(err)
+		fd, err := e.AddStations(5)
+		assert.NoError(err)
 
-	r := repositories.NewStationRepository(e.DB)
+		r := repositories.NewStationRepository(e.DB)
 
-	location := data.NewLocation([]float64{-73.881775, 40.8283})
-	sfs, err := r.QueryNearbyProjectStations(e.Ctx, fd.Project.ID, location)
-	assert.NoError(err)
+		location := data.NewLocation([]float64{-73.881775, 40.8283})
+		sfs, err := r.QueryNearbyProjectStations(e.Ctx, fd.Project.ID, location)
+		assert.NoError(err)
 
-	assert.NotNil(sfs)
-	assert.Equal(len(sfs), len(fd.Stations))
-}
+		assert.NotNil(sfs)
+		assert.Equal(len(sfs), len(fd.Stations))
+	}
 
-func TestQueryStationsByQueriedStations(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
+	func TestQueryStationsByQueriedStations(t *testing.T) {
+		assert := assert.New(t)
+		e, err := tests.NewTestEnv()
+		assert.NoError(err)
 
-	_, err = e.AddStations(5)
-	assert.NoError(err)
+		_, err = e.AddStations(5)
+		assert.NoError(err)
 
-	fd, err := e.AddStations(5)
-	assert.NoError(err)
+		fd, err := e.AddStations(5)
+		assert.NoError(err)
 
-	r := repositories.NewStationRepository(e.DB)
+		r := repositories.NewStationRepository(e.DB)
 
-	sfs, err := r.QueryStationFullFromQueriedStations(e.Ctx)
-	assert.NoError(err)
+		sfs, err := r.QueryStationFullFromQueriedStations(e.Ctx)
+		assert.NoError(err)
 
-	assert.NotNil(sfs)
-	assert.Equal(len(sfs), len(fd.Stations))
-}
+		assert.NotNil(sfs)
+		assert.Equal(len(sfs), len(fd.Stations))
+	}
 */
 func TestQueryStationsByOwnerID(t *testing.T) {
 	assert := assert.New(t)
@@ -170,8 +170,7 @@ func TestIngestionRepositoryQueryPending(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewIngestionRepository(e.DB)
 
 	sf, err := r.QueryPending(e.Ctx)
 	assert.NoError(err)
@@ -188,8 +187,7 @@ func TestIngestionRepositoryQueryByStationID(t *testing.T) {
 	fd, err := e.AddStations(1)
 	assert.NoError(err)
 
-	r, err := repositories.NewIngestionRepository(e.DB)
-	assert.NoError(err)
+	r := repositories.NewIngestionRepository(e.DB)
 
 	sf, err := r.QueryByStationID(e.Ctx, fd.Stations[0].ID)
 	assert.NoError(err)

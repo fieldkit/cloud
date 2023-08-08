@@ -104,7 +104,7 @@ func BuildLoginPayload(userLoginBody string) (*user.LoginPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userLoginBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"hiv\",\n      \"password\": \"8gd\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"z0b\",\n      \"password\": \"n8h\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -137,7 +137,7 @@ func BuildRecoveryLookupPayload(userRecoveryLookupBody string) (*user.RecoveryLo
 	{
 		err = json.Unmarshal([]byte(userRecoveryLookupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Quia magni at.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Est nemo quas voluptas.\"\n   }'")
 		}
 	}
 	v := &user.RecoveryLookupFields{
@@ -158,7 +158,7 @@ func BuildRecoveryPayload(userRecoveryBody string) (*user.RecoveryPayload, error
 	{
 		err = json.Unmarshal([]byte(userRecoveryBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"mtl\",\n      \"token\": \"Cum fugit impedit nobis eveniet.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"zku\",\n      \"token\": \"Maxime et vero doloremque provident.\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Password) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 10, true))
@@ -188,7 +188,7 @@ func BuildResumePayload(userResumeBody string) (*user.ResumePayload, error) {
 	{
 		err = json.Unmarshal([]byte(userResumeBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Asperiores sit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"token\": \"Natus harum impedit deleniti qui harum veritatis.\"\n   }'")
 		}
 	}
 	v := &user.ResumePayload{}
@@ -220,7 +220,7 @@ func BuildRefreshPayload(userRefreshBody string) (*user.RefreshPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userRefreshBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Rem quis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refreshToken\": \"Dolores iusto possimus eveniet omnis.\"\n   }'")
 		}
 	}
 	v := &user.RefreshPayload{
@@ -269,7 +269,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Magni incidunt ut quo pariatur possimus odio.\",\n      \"logicalAddress\": 2496758607247350557,\n      \"meta\": \"Qui porro similique consequuntur sed.\",\n      \"module\": \"Et rerum rem nam et.\",\n      \"profile\": \"Perferendis laborum.\",\n      \"url\": \"Consequatur qui et non.\",\n      \"version\": \"Necessitatibus velit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Et atque sapiente quas aut.\",\n      \"logicalAddress\": 7121907825964183449,\n      \"meta\": \"Atque consequatur qui sed doloremque.\",\n      \"module\": \"Sed aut.\",\n      \"profile\": \"Non accusamus et.\",\n      \"url\": \"Molestiae repellendus et distinctio.\",\n      \"version\": \"Praesentium sapiente.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -309,7 +309,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.2850797860411386,\n            0.23224165501122568,\n            0.25042038411452955\n         ],\n         \"min\": [\n            0.8847362479065009,\n            0.7360219507478916,\n            0.4957497524686923\n         ]\n      },\n      \"description\": \"Qui consequuntur sint non porro doloremque officia.\",\n      \"endTime\": \"Sit et aut.\",\n      \"goal\": \"Laudantium dolor dolor iure.\",\n      \"location\": \"Deserunt quia quaerat dolores odio aut omnis.\",\n      \"name\": \"Non ex hic quaerat.\",\n      \"privacy\": 1553853517,\n      \"showStations\": true,\n      \"startTime\": \"Fugiat non non.\",\n      \"tags\": \"Pariatur voluptatem accusantium cupiditate autem voluptate.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.8757305136274427,\n            0.6054248793328734,\n            0.08864931010251689,\n            0.3739535561420592\n         ],\n         \"min\": [\n            0.564630051515225,\n            0.5724365061344963,\n            0.6965289758496943,\n            0.5353109807725178\n         ]\n      },\n      \"description\": \"Voluptas repudiandae cumque.\",\n      \"endTime\": \"Doloremque a quia similique.\",\n      \"goal\": \"Ut optio aut.\",\n      \"location\": \"Est error et quia voluptatem ut.\",\n      \"name\": \"Et aspernatur unde suscipit.\",\n      \"privacy\": 7457219,\n      \"showStations\": true,\n      \"startTime\": \"Nulla architecto.\",\n      \"tags\": \"Quas voluptatem.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -359,7 +359,7 @@ func BuildChangePasswordPayload(userChangePasswordBody string, userChangePasswor
 	{
 		err = json.Unmarshal([]byte(userChangePasswordBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"nfr\",\n      \"oldPassword\": \"l5e\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"newPassword\": \"uut\",\n      \"oldPassword\": \"t94\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.OldPassword) < 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.oldPassword", body.OldPassword, utf8.RuneCountInString(body.OldPassword), 10, true))
@@ -405,7 +405,7 @@ func BuildAcceptTncPayload(userAcceptTncBody string, userAcceptTncUserID string,
 	{
 		err = json.Unmarshal([]byte(userAcceptTncBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"accept\": false\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"accept\": true\n   }'")
 		}
 	}
 	var userID int32
@@ -493,7 +493,7 @@ func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string,
 	{
 		err = json.Unmarshal([]byte(userAdminTermsAndConditionsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Quidem dignissimos enim eos doloremque possimus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Porro illo sed culpa illo ullam.\"\n   }'")
 		}
 	}
 	var auth string
@@ -519,7 +519,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Distinctio nobis earum fugiat expedita ducimus.\",\n      \"password\": \"Et vel ut quis reprehenderit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Nulla nobis aut.\",\n      \"password\": \"Aut sunt iusto quibusdam.\"\n   }'")
 		}
 	}
 	var auth string
