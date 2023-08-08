@@ -86,6 +86,9 @@ export const VizWorkspace = Vue.extend({
                 .with((this as any).signal)
                 .query();
         },
+        eventClicked(id: number): void {
+            this.$emit("event-clicked", id);
+        },
     },
     template: `
         <div class="groups-container">
@@ -100,6 +103,7 @@ export const VizWorkspace = Vue.extend({
                     @viz-change-sensors="(...args) => onChangeSensors(group, ...args)"
                     @viz-change-chart="(...args) => onChangeChart(group, ...args)"
                     @viz-change-linkage="(...args) => onChangeLinkage(group, ...args)"
+                    @event-clicked="eventClicked"
                 />
             </template>
         </div>

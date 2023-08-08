@@ -13,6 +13,9 @@ import { isMobile } from "@/utilities";
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
+import { DiscussionState } from "@/store/modules/discussion";
+import { ActionTypes } from "@/store";
+import { DataEvent } from "@/views/comments/model";
 
 export default Vue.extend({
     name: "Scrubber",
@@ -50,6 +53,14 @@ export default Vue.extend({
         async visible(): Promise<void> {
             this.pickRange(this.visible);
         },
+        async dataEvents(): Promise<void> {
+            await this.refresh();
+        },
+    },
+    computed: {
+        dataEvents(): DataEvent[] {
+            return this.$state.discussion.dataEvents;
+        },
     },
     methods: {
         async refresh(): Promise<void> {
@@ -57,7 +68,14 @@ export default Vue.extend({
 
             const factory = new ScrubberSpecFactory(
                 this.series,
-                new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile())
+                new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
+                this.dataEvents.filter((event) =>
+                    this.series.every(
+                        (seriesData) =>
+                            event.start > seriesData.queried.timeRange[0] &&
+                            event.end < seriesData.queried.timeRange[1]
+                    )
+                ),
             );
 
             const spec = factory.create();
@@ -78,11 +96,28 @@ export default Vue.extend({
                     scrubbed = this.series[0].queried.timeRange;
                 }
             });
+            // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
+            //     console.log("SCRUB HANDLE RIGHT", value)
+            // });
+            // vegaInfo.view.addSignalListener("scrub_handle_right", (_, value) => {
+            //     console.log("SCRUB HANDLE RIGHT", value)
+            // });
+            // vegaInfo.view.addEventListener("mousedown", (evt, value) => {
+            //     console.log(evt, value);
+            // });
+            vegaInfo.view.addSignalListener("event_click", (_, value) => {
+              this.$emit("event-clicked", value);
+            });
             vegaInfo.view.addEventListener("mouseup", () => {
                 if (scrubbed.length == 2) {
                     console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
+            });
+
+            console.log("viz: scrubber", {
+                state: vegaInfo.view.getState(),
+                data: vegaInfo.view.data("data_1"),
             });
 
             this.pickRange(this.visible);

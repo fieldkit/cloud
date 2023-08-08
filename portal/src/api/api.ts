@@ -13,9 +13,10 @@ import { BoundingRectangle } from "@/store/map-types";
 import { SensorInfoResponse } from "@/views/viz/api";
 
 // Ew
-import { NewComment } from "@/views/comments/model";
-import { Comment } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
+import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
+import { Bookmark } from "@/views/viz/viz";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -222,6 +223,7 @@ export class CurrentUser {
     bio: string;
     mediaUrl: string;
     tncDate: number;
+    admin: boolean;
 }
 
 export enum UserRolesEnum {
@@ -1450,13 +1452,13 @@ class FKApi {
         });
     }
 
-    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    public async getComments(projectIDOrBookmark: number | Bookmark): Promise<{ posts: Comment[] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === "number") {
-            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
-        } else {
+        if (projectIDOrBookmark instanceof Bookmark) {
             apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
+        } else {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         }
 
         const returned = await this.invoke({
@@ -1514,6 +1516,63 @@ class FKApi {
         console.log("edit", returned);
 
         return returned;
+    }
+
+    public async postDataEvent(dataEvent: NewDataEvent): Promise<{ event: DataEvent }> {
+        console.log("save-event-log", dataEvent);
+
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events",
+            data: {
+                event: _.extend({}, dataEvent, {
+                    body: JSON.stringify(dataEvent.body),
+                    description: JSON.stringify(dataEvent.description),
+                    title: JSON.stringify(dataEvent.title),
+                    allProjectSensors: dataEvent.allProjectSensors,
+                }),
+            },
+        });
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async updateDataEvent(dataEvent: DataEvent): Promise<{ event: DataEvent }> {
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events/" + dataEvent.id,
+            data: {
+                eventId: dataEvent.id,
+                title: typeof dataEvent.title === "object" ? JSON.stringify(dataEvent.title) : dataEvent.title,
+                description: typeof dataEvent.description === "object" ? JSON.stringify(dataEvent.description) : dataEvent.description,
+                start: dataEvent.start,
+                end: dataEvent.end,
+            },
+        });
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async deleteDataEvent(dataEventID: number): Promise<boolean> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/data-events/" + dataEventID,
+        });
+    }
+
+    public async getDataEvents(payload) {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/data-events?bookmark=" + encodeURIComponent(payload),
+        });
     }
 
     public async seenNotifications(payload) {

@@ -7,7 +7,12 @@ import { Spec, Mark } from "vega";
 export { ChartSettings };
 
 export class ScrubberSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
+    constructor(
+        private readonly allSeries,
+        private readonly settings: ChartSettings = ChartSettings.Container,
+        // TODO Would love to pull this type in but we'd have to move to common or create a new type.
+        private readonly dataEvents: any[] = []
+    ) {}
 
     create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
@@ -89,6 +94,44 @@ export class ScrubberSpecFactory {
                         },
                     },
                 },
+                {
+                    name: "de_circle",
+                    type: "symbol",
+                    interactive: true,
+                    from: {
+                        data: "data_events",
+                    },
+                    encode: {
+                        enter: {
+                            yc: { value: 50 },
+                            fill: { value: "white" },
+                            stroke: { value: "#999" },
+                            size: { value: 700 },
+                        },
+                        update: {
+                            x: { scale: "x", field: "start" },
+                        },
+                    },
+                },
+                {
+                    name: "de_flag",
+                    type: "path",
+                    interactive: false,
+                    from: {
+                        data: "data_events",
+                    },
+                    encode: {
+                        enter: {
+                            yc: { value: 50 },
+                            fill: { value: "transparent" },
+                            size: { value: 100 },
+                            path: { value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z" },
+                        },
+                        update: {
+                            x: { scale: "x", field: "start" },
+                        },
+                    },
+                },
             ];
         };
 
@@ -107,6 +150,7 @@ export class ScrubberSpecFactory {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
                     labelColor: "#2c3e50",
+                    offset: 10,
                     titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
@@ -205,6 +249,10 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                {
+                    name: "data_events",
+                    values: this.dataEvents,
+                },
             ],
             signals: [
                 {
@@ -218,6 +266,34 @@ export class ScrubberSpecFactory {
                         {
                             update: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
                             events: "window:resize",
+                        },
+                    ],
+                },
+                {
+                    name: "event_click",
+                    init: "",
+                    on: [
+                        {
+                            events: {
+                                source: "scope",
+                                type: "mouseup",
+                                filter: ['event.item.mark.name === "de_circle"'],
+                            },
+                            update: "event.item.datum.id",
+                        },
+                    ],
+                },
+                {
+                    name: "event_hover",
+                    init: "[0,0]",
+                    on: [
+                        {
+                            events: {
+                                source: "scope",
+                                type: "mouseover",
+                                filter: ['event.item.mark.name === "de_circle"'],
+                            },
+                            update: "[event.item.datum.start, event.item.datum.end]",
                         },
                     ],
                 },
