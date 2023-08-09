@@ -1328,7 +1328,8 @@ export class Workspace implements VizInfoFactory {
         }
 
         console.log(`viz: update-from-bookmark`, bm);
-        await this.addStationIds(bm.s);
+        this.stationIds = bm.s;
+        await this.initialize();
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm, this.settings));
         await this.query();
         return;
