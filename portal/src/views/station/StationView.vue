@@ -229,7 +229,7 @@
                 </div>
             </section>
 
-            <section v-if="!isCustomizationEnabled()" class="section-notes container-box">
+            <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
                 <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" />
             </section>
         </div>
@@ -482,7 +482,6 @@ export default Vue.extend({
             const tinyChartComp = this.$refs["tinyChart-" + moduleId];
             if (tinyChartComp && tinyChartComp[0]) {
                 const vizData = tinyChartComp[0].vizData;
-                console.log("Radoi viz", vizData);
                 if (vizData) {
                     const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
                     const url = this.$router.resolve({

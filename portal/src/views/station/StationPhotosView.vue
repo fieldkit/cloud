@@ -99,7 +99,6 @@ export default Vue.extend({
     },
     watch: {
         photos() {
-            console.log("radoi ph", this.photos);
             this.initGallery();
         },
     },
