@@ -9,8 +9,8 @@ export enum SnackbarStyle {
 }
 
 export class SnackbarState {
-    visible: boolean = false;
-    message: string = "";
+    visible: boolean;
+    message: string;
     style: SnackbarStyle;
 }
 

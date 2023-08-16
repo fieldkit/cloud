@@ -43,6 +43,7 @@ type Server struct {
 	Delete              http.Handler
 	UploadPhoto         http.Handler
 	DownloadPhoto       http.Handler
+	ProjectsStation     http.Handler
 	CORS                http.Handler
 }
 
@@ -101,6 +102,7 @@ func New(
 			{"Delete", "DELETE", "/projects/{projectId}"},
 			{"UploadPhoto", "POST", "/projects/{projectId}/media"},
 			{"DownloadPhoto", "GET", "/projects/{projectId}/media"},
+			{"ProjectsStation", "GET", "/projects/station/{id}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/updates/{updateId}"},
 			{"CORS", "OPTIONS", "/projects/invites/pending"},
@@ -117,6 +119,7 @@ func New(
 			{"CORS", "OPTIONS", "/projects/{projectId}/members"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/projects/{projectId}/media"},
+			{"CORS", "OPTIONS", "/projects/station/{id}"},
 		},
 		AddUpdate:           NewAddUpdateHandler(e.AddUpdate, mux, decoder, encoder, errhandler, formatter),
 		DeleteUpdate:        NewDeleteUpdateHandler(e.DeleteUpdate, mux, decoder, encoder, errhandler, formatter),
@@ -140,6 +143,7 @@ func New(
 		Delete:              NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
 		UploadPhoto:         NewUploadPhotoHandler(e.UploadPhoto, mux, decoder, encoder, errhandler, formatter),
 		DownloadPhoto:       NewDownloadPhotoHandler(e.DownloadPhoto, mux, decoder, encoder, errhandler, formatter),
+		ProjectsStation:     NewProjectsStationHandler(e.ProjectsStation, mux, decoder, encoder, errhandler, formatter),
 		CORS:                NewCORSHandler(),
 	}
 }
@@ -171,6 +175,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Delete = m(s.Delete)
 	s.UploadPhoto = m(s.UploadPhoto)
 	s.DownloadPhoto = m(s.DownloadPhoto)
+	s.ProjectsStation = m(s.ProjectsStation)
 	s.CORS = m(s.CORS)
 }
 
@@ -198,6 +203,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountDeleteHandler(mux, h.Delete)
 	MountUploadPhotoHandler(mux, h.UploadPhoto)
 	MountDownloadPhotoHandler(mux, h.DownloadPhoto)
+	MountProjectsStationHandler(mux, h.ProjectsStation)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -1324,6 +1330,57 @@ func NewDownloadPhotoHandler(
 	})
 }
 
+// MountProjectsStationHandler configures the mux to serve the "project"
+// service "projects station" endpoint.
+func MountProjectsStationHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleProjectOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/projects/station/{id}", f)
+}
+
+// NewProjectsStationHandler creates a HTTP handler which loads the HTTP
+// request and calls the "project" service "projects station" endpoint.
+func NewProjectsStationHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeProjectsStationRequest(mux, decoder)
+		encodeResponse = EncodeProjectsStationResponse(encoder)
+		encodeError    = EncodeProjectsStationError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "projects station")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "project")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service project.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -1350,6 +1407,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/projects/{projectId}/members", f)
 	mux.Handle("OPTIONS", "/projects/{projectId}/stations/{stationId}", f)
 	mux.Handle("OPTIONS", "/projects/{projectId}/media", f)
+	mux.Handle("OPTIONS", "/projects/station/{id}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

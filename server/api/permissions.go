@@ -28,6 +28,12 @@ type StationPermissions interface {
 	IsReadOnly() (bool, error)
 }
 
+type DiscussionPermissions interface {
+	Permissions
+	Discussion() *data.DiscussionPost
+	CanDelete() error
+}
+
 type Permissions interface {
 	Unwrap() (permissions Permissions, err error)
 	UserID() int32
@@ -41,6 +47,7 @@ type Permissions interface {
 	ForStationByID(id int) (permissions StationPermissions, err error)
 	ForStationByDeviceID(id []byte) (permissions StationPermissions, err error)
 	ForStation(station *data.Station) (permissions StationPermissions, err error)
+	ForDiscussions(discussion *data.DiscussionPost) (permissions DiscussionPermissions, err error)
 }
 
 type unwrappedPermissions struct {
@@ -322,6 +329,43 @@ func (p *defaultPermissions) ForStation(station *data.Station) (permissions Stat
 	return
 }
 
+func (p *defaultPermissions) ForDiscussions(discussion *data.DiscussionPost) (permissions DiscussionPermissions, err error) {
+	pr := repositories.NewProjectRepository(p.options.Database)
+
+	if err := p.unwrap(); err != nil {
+		return nil, err
+	}
+
+	var projects []*data.Project
+
+	if discussion.ProjectID != nil {
+		project, err := pr.QueryByID(p.context, *discussion.ProjectID)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, project)
+	}
+
+	if len(discussion.StationIDs) > 0 {
+
+		for _, stationID := range discussion.StationIDs {
+			project, err := pr.QueryProjectsByStationIDForPermissions(p.context, int32(stationID))
+			if err != nil {
+				return nil, err
+			}
+			projects = append(projects, project...)
+		}
+	}
+
+	permissions = &discussionPermissions{
+		defaultPermissions: *p,
+		discussion:         discussion,
+		discussionProjects: projects,
+	}
+
+	return
+}
+
 type stationPermissions struct {
 	defaultPermissions
 	station         *data.Station
@@ -463,4 +507,40 @@ func (p *projectPermissions) CanModify() error {
 	}
 
 	return nil
+}
+
+type discussionPermissions struct {
+	defaultPermissions
+	discussion         *data.DiscussionPost
+	discussionProjects []*data.Project
+}
+
+func (p *discussionPermissions) CanDelete() error {
+	if p.IsAdmin() {
+		return nil
+	}
+
+	if p.discussion.UserID == p.UserID() {
+		return nil
+	}
+
+	for _, project := range p.discussionProjects {
+		if !p.Anonymous() {
+			pr := repositories.NewProjectRepository(p.options.Database)
+			if projectUser, err := pr.QueryProjectUser(p.context, p.UserID(), project.ID); err != nil {
+				return p.forbidden("forbidden")
+			} else if projectUser != nil {
+				if !projectUser.LookupRole().IsProjectAdministrator() {
+					return p.forbidden("forbidden")
+				}
+				return nil
+			}
+		}
+	}
+
+	return p.forbidden("forbidden")
+}
+
+func (p *discussionPermissions) Discussion() *data.DiscussionPost {
+	return p.discussion
 }

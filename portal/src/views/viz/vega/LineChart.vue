@@ -1,6 +1,9 @@
 <template>
-    <div>
+    <div class="h-100">
         <div class="viz linechart"></div>
+        <div v-if="isLoading" class="loading-container">
+            <Spinner class="spinner" />
+        </div>
     </div>
 </template>
 
@@ -8,13 +11,14 @@
 import _ from "lodash";
 import { isMobile } from "@/utilities";
 import Vue, { PropType } from "vue";
-import { default as vegaEmbed } from "vega-embed";
+import { default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
+import Spinner from "@/views/shared/Spinner.vue";
 
 type DragTimeSignal = [number, number] | null;
 
@@ -31,6 +35,9 @@ function roundForDisplay(value: number): number {
 
 export default Vue.extend({
     name: "LineChart",
+    components: {
+        Spinner,
+    },
     props: {
         series: {
             type: Array as PropType<SeriesData[]>,
@@ -43,9 +50,11 @@ export default Vue.extend({
     },
     data(): {
         vega: unknown | undefined;
+        isLoading: boolean;
     } {
         return {
             vega: undefined,
+            isLoading: false,
         };
     },
     async mounted(): Promise<void> {
@@ -58,6 +67,8 @@ export default Vue.extend({
     },
     methods: {
         async refresh(): Promise<void> {
+            this.isLoading = true;
+
             if (this.series.length == 0) {
                 return;
             }
@@ -68,7 +79,7 @@ export default Vue.extend({
 
             const spec = factory.create();
 
-            const vegaInfo = await vegaEmbed(this.$el, spec, {
+            const vegaInfo = await vegaEmbed(this.$el as HTMLElement, spec as VisualizationSpec, {
                 renderer: "svg",
                 downloadFileName: this.getFileName(this.series[0]),
                 tooltip: {
@@ -130,8 +141,10 @@ export default Vue.extend({
                     // Watch for brush drag outside the window
                     vegaInfo.view.addEventListener("mousedown", (e) => {
                         window.addEventListener("mouseup", (e) => {
-                            if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
-                                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                            if (e.target instanceof Element) {
+                                if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {
+                                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+                                }
                             }
                         });
                     });
@@ -172,8 +185,8 @@ export default Vue.extend({
                 state: vegaInfo.view.getState(),
                 // layouts: vegaInfo.view.data("all_layouts"),
             });
-            /*
-             */
+
+            this.isLoading = false;
         },
         getFileName(series): string {
             const stationName = series.vizInfo.station.name;

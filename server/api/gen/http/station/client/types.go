@@ -1220,9 +1220,15 @@ type StationFullModelResponseBody struct {
 
 // StationOwnerResponseBody is used to define fields on response body types.
 type StationOwnerResponseBody struct {
-	ID    *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	ID    *int32                 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name  *string                `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Email *string                `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Photo *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
+}
+
+// UserPhotoResponseBody is used to define fields on response body types.
+type UserPhotoResponseBody struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // StationInterestingnessResponseBody is used to define fields on response body

@@ -70,7 +70,7 @@ export default Vue.extend({
         },
         forwardAfterQuery: {
             type: Object as PropType<{ after?: string }>,
-            default: false,
+            default: () => { return { after: null }; },
         },
         busy: {
             type: Boolean,

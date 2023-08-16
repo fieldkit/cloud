@@ -1,20 +1,27 @@
 import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
 import { TimeRange } from "../common";
+import { VisualizationSpec } from "vega-embed";
+import { Spec, Mark } from "vega";
 
 export { ChartSettings };
 
 export class ScrubberSpecFactory {
-    constructor(private readonly allSeries, private readonly settings: ChartSettings = ChartSettings.Container) {}
+    constructor(
+        private readonly allSeries,
+        private readonly settings: ChartSettings = ChartSettings.Container,
+        // TODO Would love to pull this type in but we'd have to move to common or create a new type.
+        private readonly dataEvents: any[] = []
+    ) {}
 
-    create() {
+    create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
-        const interactiveMarks = () => {
+        const interactiveMarks = (): Mark[] => {
             if (this.settings.mobile) {
                 return [];
             }
@@ -28,7 +35,7 @@ export class ScrubberSpecFactory {
                             y: { value: 0 },
                             height: { value: 50 },
                             width: { value: 2 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                         },
                         update: {
                             x: { signal: "brush_x[0]" },
@@ -59,7 +66,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {
@@ -77,13 +84,51 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {
                             xc: { signal: "brush_x[0] + 1" },
                             fill: { value: "#b6b6b6" },
                             stroke: { value: "#999" },
+                        },
+                    },
+                },
+                {
+                    name: "de_circle",
+                    type: "symbol",
+                    interactive: true,
+                    from: {
+                        data: "data_events",
+                    },
+                    encode: {
+                        enter: {
+                            yc: { value: 50 },
+                            fill: { value: "white" },
+                            stroke: { value: "#999" },
+                            size: { value: 700 },
+                        },
+                        update: {
+                            x: { scale: "x", field: "start" },
+                        },
+                    },
+                },
+                {
+                    name: "de_flag",
+                    type: "path",
+                    interactive: false,
+                    from: {
+                        data: "data_events",
+                    },
+                    encode: {
+                        enter: {
+                            yc: { value: 50 },
+                            fill: { value: "transparent" },
+                            size: { value: 100 },
+                            path: { value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z" },
+                        },
+                        update: {
+                            x: { scale: "x", field: "start" },
                         },
                     },
                 },
@@ -105,6 +150,7 @@ export class ScrubberSpecFactory {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
                     labelColor: "#2c3e50",
+                    offset: 10,
                     titleColor: "#2c3e50",
                     titleFont: "Avenir Light",
                     titleFontSize: 14,
@@ -203,6 +249,10 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
+                {
+                    name: "data_events",
+                    values: this.dataEvents,
+                },
             ],
             signals: [
                 {
@@ -216,6 +266,34 @@ export class ScrubberSpecFactory {
                         {
                             update: "isFinite(containerSize()[0]) ? containerSize()[0] : 200",
                             events: "window:resize",
+                        },
+                    ],
+                },
+                {
+                    name: "event_click",
+                    init: "",
+                    on: [
+                        {
+                            events: {
+                                source: "scope",
+                                type: "mouseup",
+                                filter: ['event.item.mark.name === "de_circle"'],
+                            },
+                            update: "event.item.datum.id",
+                        },
+                    ],
+                },
+                {
+                    name: "event_hover",
+                    init: "[0,0]",
+                    on: [
+                        {
+                            events: {
+                                source: "scope",
+                                type: "mouseover",
+                                filter: ['event.item.mark.name === "de_circle"'],
+                            },
+                            update: "[event.item.datum.start, event.item.datum.end]",
                         },
                     ],
                 },
@@ -302,10 +380,9 @@ export class ScrubberSpecFactory {
                                         markname: "right_scrub",
                                     },
                                     {
-                                        source: "scope",
+                                        source: "window",
                                         type: "mouseup",
                                         filter: ['!event.item || (event.item.mark.name !== "brush_brush")'],
-                                        markname: "right_scrub",
                                     },
                                 ],
                             },
@@ -321,12 +398,13 @@ export class ScrubberSpecFactory {
                                     {
                                         source: "scope",
                                         type: "mousedown",
+                                        markname: "left_scrub",
                                         filter: [
                                             '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',
                                         ],
                                     },
                                     {
-                                        source: "scope",
+                                        source: "window",
                                         type: "mouseup",
                                         filter: [
                                             '!event.item || (event.item.mark.name !== "brush_brush" && event.item.mark.name !== "right_scrub")',

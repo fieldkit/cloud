@@ -209,6 +209,6 @@ export default Vue.extend({
 }
 .reading.degrees .uom {
     align-self: start;
-    padding-top: 5px;
+    padding-top: 9px;
 }
 </style>

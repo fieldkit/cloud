@@ -1,7 +1,7 @@
 <template>
-    <i class="icon-ellipsis options-trigger" @click="show($event)">
+    <i class="icon-ellipsis options-trigger" @click.stop="show($event)">
         <div class="options-btns">
-            <button v-for="option in options" v-bind:key="option.event" @click="$emit('listItemOptionClick', option.event)">
+            <button v-for="option in options" :key="option.event" @click="$emit('listItemOptionClick', option.event)">
                 <span v-if="option.icon" class="options-icon">
                     <i class="icon" :class="option.icon"></i>
                 </span>
@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts">
-
 export interface ListItemOption {
     label: string;
     event: string;
@@ -68,7 +67,7 @@ export default Vue.extend({
     &:after {
         @include flex(flex-end);
         content: "...";
-        height: 17px;
+        height: 7px;
         font-size: 32px;
         font-family: "icomoon";
     }

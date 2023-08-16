@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
@@ -98,4 +100,26 @@ func (r *ExportRepository) UpdateDataExport(ctx context.Context, de *data.DataEx
 		return nil, fmt.Errorf("error updating export: %w", err)
 	}
 	return de, nil
+}
+
+type DescribesExport struct {
+	stations *StationRepository
+}
+
+func NewDescribeEvent(db *sqlxcache.DB) *DescribesExport {
+	return &DescribesExport{
+		stations: NewStationRepository(db),
+	}
+}
+
+func (d *DescribesExport) Describe(ctx context.Context, created time.Time, stationIds []int32) (string, error) {
+	stationNames := make([]string, 0, len(stationIds))
+	for _, stationId := range stationIds {
+		station, err := d.stations.QueryStationByID(ctx, stationId)
+		if err != nil {
+			return "", err
+		}
+		stationNames = append(stationNames, station.Name)
+	}
+	return fmt.Sprintf("%s %s", created.Format("2006-01-02 150405Z0700"), strings.Join(stationNames, ", ")), nil
 }

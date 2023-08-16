@@ -316,10 +316,7 @@ func processJson(ctx context.Context, options *Options, db *sqlxcache.DB, resolv
 }
 
 func processStationIngestions(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, resolver *Resolver, handler MoveDataHandler, stationID int32) error {
-	ir, err := repositories.NewIngestionRepository(db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(db)
 
 	ingestions, err := ir.QueryByStationID(ctx, stationID)
 	if err != nil {
@@ -387,10 +384,7 @@ func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, d
 
 	ingestionReceived := backend.NewIngestionReceivedHandler(db, dbpool, archive, metrics, publisher, options.timeScaleConfig())
 
-	ir, err := repositories.NewIngestionRepository(db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(db)
 
 	if id, err := ir.Enqueue(ctx, ingestionID); err != nil {
 		return err

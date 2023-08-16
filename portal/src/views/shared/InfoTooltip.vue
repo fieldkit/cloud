@@ -28,6 +28,10 @@ export default Vue.extend({
     margin-top: -3px;
     font-family: $font-family-bold;
 
+    @include bp-up($sm) {
+        display: none;
+    }
+
     &:hover {
         .info-content {
             visibility: visible;
@@ -49,10 +53,6 @@ export default Vue.extend({
     opacity: 0.3;
     font-size: 10px;
     font-family: $font-family-medium;
-
-    @include bp-up($sm) {
-        display: none;
-    }
 }
 
 .info-content {

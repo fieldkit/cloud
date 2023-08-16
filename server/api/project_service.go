@@ -1017,3 +1017,34 @@ func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.Fo
 		Projects: projectsCollection,
 	}, nil
 }
+
+func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.ProjectsStationPayload) (*project.Projects, error) {
+	relationships := make(map[int32]*data.UserProjectRelationship)
+
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+	if !p.Anonymous() {
+		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	projects, err := c.projects.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	followers := []*data.FollowersSummary{}
+	if err := c.options.Database.SelectContext(ctx, &followers, `
+		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
+			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY community_ranking DESC LIMIT 10
+		) GROUP BY f.project_id
+		`, data.Public); err != nil {
+		return nil, err
+	}
+
+	return ProjectsType(c.options.signer, projects, followers, relationships)
+}

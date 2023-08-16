@@ -47,6 +47,10 @@ func (r *Role) IsProjectReadOnly() bool {
 	return r.readOnlyProject
 }
 
+func (r *Role) IsProjectAdministrator() bool {
+	return r == AdministratorRole
+}
+
 const (
 	MembershipAccepted = "Accepted"
 	MembershipPending  = "Pending"

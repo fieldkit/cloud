@@ -68,6 +68,7 @@ export default Vue.extend({
 @import "scss/mixins";
 @import "scss/typography";
 @import "scss/icons";
+@import "scss/layout.scss";
 @import "icomoon/style.css";
 
 html {
@@ -98,6 +99,7 @@ body {
     color: var(--color-dark);
     font-family: var(--font-family-medium), Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
     &.floodnet {
         --color-primary: #{$color-floodnet-primary};
@@ -229,5 +231,9 @@ li {
         height: 3px;
         margin-top: 2px;
     }
+}
+
+#silentbox-overlay {
+    z-index: 9999 !important;
 }
 </style>

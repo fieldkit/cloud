@@ -1,21 +1,23 @@
 <template v-if="mapped.valid && ready">
-    <mapbox
-        class="stations-map"
-        :access-token="mapbox.token"
-        :map-options="{
-            style: mapbox.style,
-            bounds: bounds,
-            zoom: 10,
-        }"
-        :nav-control="{
-            show: !isMobileView,
-            position: 'bottom-left',
-        }"
-        @map-init="onMapInitialized"
-        @map-load="onMapLoaded"
-        @zoomend="newBounds"
-        @dragend="newBounds"
-    />
+    <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
+        <mapbox
+            class="stations-map"
+            :access-token="mapbox.token"
+            :map-options="{
+                style: mapbox.style,
+                bounds: bounds,
+                zoom: 10,
+            }"
+            :nav-control="{
+                show: !isMobileView,
+                position: 'bottom-left',
+            }"
+            @map-init="onMapInitialized"
+            @map-load="onMapLoaded"
+            @zoomend="newBounds"
+            @dragend="newBounds"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -35,7 +37,7 @@ import Mapbox from "mapbox-gl-vue";
 
 export interface ProtectedData {
     map: any;
-    markers: { [index: number]: any };
+    markers: { marker: mapboxgl.Marker; instance: any }[];
 }
 
 export default Vue.extend({
@@ -109,12 +111,19 @@ export default Vue.extend({
             console.log("map: mapped changed", this.mapped);
             this.updateMap();
         },
-        showStations(): void {
-            this.updateMap();
-        },
         visibleReadings(): void {
             console.log("map: visible-readings");
             this.updateMap();
+        },
+        showStations(): void {
+            if (!this.protectedData.map.getLayer("station-markers")) {
+                return;
+            }
+            if (!this.showStations) {
+                this.protectedData.map.setLayoutProperty("station-markers", "visibility", "none");
+                return;
+            }
+            this.protectedData.map.setLayoutProperty("station-markers", "visibility", "visible");
         },
     },
     methods: {
@@ -238,15 +247,14 @@ export default Vue.extend({
 
             // Regenerate custom map markers
             if (this.protectedData.markers) {
-                for (const entry of this.protectedData.markers) {
-                    const { marker } = entry;
-                    marker.remove();
+                for (const marker of this.protectedData.markers) {
+                    marker.marker.remove();
                 }
-                this.protectedData.markers = {};
+                this.protectedData.markers = [];
             }
 
             const ValueMarkerCtor = Vue.extend(ValueMarker);
-            const markers = [];
+            const markers: { marker: mapboxgl.Marker; instance: any }[] = [];
             const sortFactors = _.fromPairs(
                 this.mapped.features.map((feature) => [feature.properties?.id, feature.station.getSortOrder(this.visibleReadings)])
             );
@@ -254,29 +262,31 @@ export default Vue.extend({
                 _.orderBy(
                     _.cloneDeep(this.mapped.features),
                     [
-                        (feature) => sortFactors[feature.properties.id][0],
-                        (feature) => sortFactors[feature.properties.id][1],
-                        (feature) => sortFactors[feature.properties.id][2],
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][0] : 0,
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][1] : 0,
+                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][2] : 0,
                     ],
                     ["asc", "desc", "asc"]
                 )
             );
             for (const feature of sorted) {
-                const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
-                const instance = new ValueMarkerCtor({
-                    propsData: {
-                        ...(readings && readings.length > 0 && { color: readings[0].color }),
-                        ...{ value: readings && readings.length > 0 ? readings[0].value : null },
-                        ...{ id: feature.properties.id },
-                    },
-                });
-                instance.$mount();
-                instance.$on("marker-click", (evt) => {
-                    this.$emit("show-summary", { id: evt.id });
-                });
+                if (feature.geometry != null && feature.properties != null) {
+                    const readings = feature.station.inactive ? null : feature.station.getDecoratedReadings(this.visibleReadings);
+                    const instance = new ValueMarkerCtor({
+                        propsData: {
+                            ...(readings && readings.length > 0 && { color: readings[0].color }),
+                            ...{ value: readings && readings.length > 0 ? readings[0].value : null },
+                            ...{ id: feature.properties.id },
+                        },
+                    });
+                    instance.$mount();
+                    instance.$on("marker-click", (evt) => {
+                        this.$emit("show-summary", { id: evt.id });
+                    });
 
-                const marker = new mapboxgl.Marker(instance.$el).setLngLat(feature.geometry.coordinates).addTo(map);
-                markers.push({ marker: marker, instance: instance });
+                    const marker = new mapboxgl.Marker(instance.$el as HTMLElement).setLngLat(feature.geometry.coordinates).addTo(map);
+                    markers.push({ marker: marker, instance: instance });
+                }
             }
             this.protectedData.markers = markers;
         },
@@ -341,5 +351,17 @@ export default Vue.extend({
     @include bp-down($sm) {
         margin-top: 3px;
     }
+}
+
+.map-wrap {
+    height: 100%;
+
+    &.hide-markers ::v-deep .mapboxgl-marker {
+        display: none;
+    }
+}
+
+.stations-map {
+    height: 100%;
 }
 </style>

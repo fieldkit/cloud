@@ -206,7 +206,7 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../scss/mixins.scss";
+@import "src/scss/mixins.scss";
 
 .container-map {
     width: 100%;
