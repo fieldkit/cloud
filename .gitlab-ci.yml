@@ -1,0 +1,47 @@
+image: golang:latest
+
+stages:
+  - test
+  - build
+
+variables:
+  POSTGRES_DB: fieldkit
+  POSTGRES_USER: fieldkit
+  POSTGRES_PASSWORD: password
+  FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
+
+services:
+  - name: kartoza/postgis:14-3
+    alias: db
+  - name: timescale/timescaledb:2.4.2-pg13
+    alias: tsdb
+
+test:go:
+  stage: test
+  script:
+    - (cd server/cmd/server && go build -o build/server)
+    - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
+
+test:js:
+  stage: test
+  image: node:18.17.0
+  script:
+    - cd portal && which node && which npm
+    - npm install
+    - cp src/secrets.ts.template src/secrets.ts
+    - node_modules/.bin/vue-cli-service build
+    - node_modules/.bin/vue-cli-service test:unit
+
+build:compile:
+  stage: build
+  script:
+    - cp portal/src/secrets.ts.aws portal/src/secrets.ts
+    - cd server/cmd/server && go build -o build/server
+
+build:images:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20-10-16-dind
+  script:
+    - echo "one step at a time"
