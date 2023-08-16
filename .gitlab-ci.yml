@@ -40,8 +40,8 @@ build:compile:
 
 build:images:
   stage: build
-  image: docker:20.10.16
+  image: docker:24.0.5
   services:
-    - docker:20-10-16-dind
+    - docker:24.0.5-dind
   script:
     - echo "one step at a time"
