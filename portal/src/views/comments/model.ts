@@ -107,6 +107,8 @@ export interface NewDataEvent extends NewComment {
     title: string;
     description: string;
     allProjectSensors?: boolean;
+    start: number;
+    end: number;
 }
 
 export enum CommentsErrorsEnum {

@@ -251,10 +251,12 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 				SensorKey:   sensor.Key,
 			}
 
-			readings[key] = &ReadingValue{
-				Sensor: sensor,
-				Module: module,
-				Value:  float64(reading.Value),
+			if reading.GetCalibrated() != nil {
+				readings[key] = &ReadingValue{
+					Sensor: sensor,
+					Module: module,
+					Value:  float64(reading.GetCalibratedValue()),
+				}
 			}
 		}
 	}

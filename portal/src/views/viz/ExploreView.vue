@@ -111,7 +111,7 @@ export default Vue.extend({
         async shareWorkspace(): Promise<void> {
             await this.$router.push({ name: "shareWorkspace", query: { v: this.token } });
         },
-        async eventClicked(id: number): void {
+        async eventClicked(id: number): Promise<void> {
           if (this.token) {
             await this.$router.push({
               name: "exploreShortBookmark",

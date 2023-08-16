@@ -113,10 +113,7 @@ func NewIngesterHandler(ctx context.Context, o *IngesterOptions) http.Handler {
 			Flags:        pq.Int64Array([]int64{}),
 		}
 
-		ir, err := repositories.NewIngestionRepository(o.Database)
-		if err != nil {
-			return err
-		}
+		ir := repositories.NewIngestionRepository(o.Database)
 
 		queuedID, err := ir.AddAndQueue(ctx, ingestion)
 		if err != nil {

@@ -135,6 +135,7 @@ import PaginationControls from "@/views/shared/PaginationControls.vue";
 import FKApi, { Station, SimpleUser, EssentialStation } from "@/api/api";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import TransferStation from "./TransferStation.vue";
+import { Buffer } from 'buffer';
 
 export default Vue.extend({
     name: "AdminStations",

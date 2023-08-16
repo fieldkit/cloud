@@ -137,6 +137,12 @@ github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d h1:mYRmhn6a9
 github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d/go.mod h1:dIx9ZOtnUHLC94mPYbYCeXtw4v4fKn23snO3EtqY+UU=
 github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2 h1:aBLv7DiEvHzaZNlPdFUfOMfXHGS77OwIxBViTuuFYF8=
 github.com/fieldkit/data-protocol v0.0.0-20220701190348-69631d28d4a2/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
+github.com/fieldkit/data-protocol v0.0.0-20230715014053-daf0a13d7b76 h1:6UrVSzKK7LQO+3Wgedo7NsxKaebi4DdCRlT+zEeRHyE=
+github.com/fieldkit/data-protocol v0.0.0-20230715014053-daf0a13d7b76/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
+github.com/fieldkit/data-protocol v0.0.0-20230715015314-cf8b434d05af h1:Ht087wwMWf+2hrjgqje6Wul0I1jhmiFGjwNl7qZ2KSQ=
+github.com/fieldkit/data-protocol v0.0.0-20230715015314-cf8b434d05af/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
+github.com/fieldkit/data-protocol v0.0.0-20230718145913-fb96ddfb3f7e h1:x5Sz3s3AYqBu4+6eHgnsu0HVHNFIUzIfV+0d2KorMC8=
+github.com/fieldkit/data-protocol v0.0.0-20230718145913-fb96ddfb3f7e/go.mod h1:zp2kKjYr7P5/yr8lFgx3pGIJSnjInzE4g0f+MzjtWuM=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
@@ -1093,6 +1099,8 @@ google.golang.org/protobuf v1.26.0/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQ
 google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
 google.golang.org/protobuf v1.28.1 h1:d0NfwRgPtno5B1Wa6L2DAG+KivqkdutMf1UhdNx175w=
 google.golang.org/protobuf v1.28.1/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.31.0 h1:g0LDEJHgrBl9N9r17Ru3sqWhkIx2NB67okBHPwC7hs8=
+google.golang.org/protobuf v1.31.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
 gopkg.in/AlecAivazis/survey.v1 v1.8.7 h1:oBJqtgsyBLg9K5FK9twNUbcPnbCPoh+R9a+7nag3qJM=
 gopkg.in/AlecAivazis/survey.v1 v1.8.7/go.mod h1:iBNOmqKz/NUbZx3bA+4hAGLRC7fSK7tgtVDT4tB22XA=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=

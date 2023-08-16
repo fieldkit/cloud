@@ -338,7 +338,7 @@ func (p *defaultPermissions) ForDiscussions(discussion *data.DiscussionPost) (pe
 
 	var projects []*data.Project
 
-	if &discussion.ProjectID != nil {
+	if discussion.ProjectID != nil {
 		project, err := pr.QueryByID(p.context, *discussion.ProjectID)
 		if err != nil {
 			return nil, err

@@ -183,10 +183,9 @@ func acceptableJson(value float64) bool {
 func hasUnaccecptableJsonNumbers(dr *pb.DataRecord) bool {
 	for _, sg := range dr.Readings.SensorGroups {
 		for _, sr := range sg.Readings {
-			if !acceptableJson(float64(sr.Value)) {
+			if !acceptableJson(float64(sr.GetCalibratedValue())) {
 				return true
 			}
-
 		}
 	}
 
@@ -201,7 +200,7 @@ func prepareForMarshalToJson(dr *pb.DataRecord) *pb.DataRecord {
 	for _, sg := range dr.Readings.SensorGroups {
 		newReadings := make([]*pb.SensorAndValue, 0, len(sg.Readings))
 		for _, sr := range sg.Readings {
-			if acceptableJson(float64(sr.Value)) {
+			if acceptableJson(float64(sr.GetCalibratedValue())) {
 				newReadings = append(newReadings, sr)
 			}
 		}

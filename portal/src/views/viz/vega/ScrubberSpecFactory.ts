@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
 import { TimeRange } from "../common";
+import { VisualizationSpec } from "vega-embed";
+import { Spec, Mark } from "vega";
 
 export { ChartSettings };
 
@@ -8,17 +10,22 @@ export class ScrubberSpecFactory {
     constructor(
         private readonly allSeries,
         private readonly settings: ChartSettings = ChartSettings.Container,
-        private readonly dataEvents = null
+        // TODO Would love to pull this type in but we'd have to move to common or create a new type.
+        private readonly dataEvents: any[] = []
     ) {}
 
-    create() {
+    create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
 
-        const interactiveMarks = () => {
+        const interactiveMarks = (): Mark[] => {
+            if (this.settings.mobile) {
+                return [];
+            }
+
             return [
                 {
                     type: "rect",
@@ -28,7 +35,7 @@ export class ScrubberSpecFactory {
                             y: { value: 0 },
                             height: { value: 50 },
                             width: { value: 2 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                         },
                         update: {
                             x: { signal: "brush_x[0]" },
@@ -59,7 +66,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {
@@ -77,7 +84,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 25 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                         },
                         update: {
@@ -116,7 +123,7 @@ export class ScrubberSpecFactory {
                     encode: {
                         enter: {
                             yc: { value: 50 },
-                            fill: "transparent",
+                            fill: { value: "transparent" },
                             size: { value: 100 },
                             path: { value: "M -5 -7 L -5 8 L -3.5805 8 L -3.5805 1.5174 L 7.2081 1.5174 L 3.4937 -2.7413 L 7.2081 -7 z" },
                         },

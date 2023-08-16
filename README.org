@@ -15,10 +15,11 @@
 
    In order to build this project and be able to run it yourself you'll need the following dependencies:
 
-   - Docker (19.03.12) (https://docs.docker.com/get-docker/)
-   - Golang 1.17 (https://golang.org/dl/)
-   - nodejs (12.18.1) (https://nodejs.org/en/download/)
-   - yarn (1.22.4)
+   - [[https://docs.docker.com/get-docker/][Docker (19.03.12)]]
+   - [[https://golang.org/dl/][Golang (1.17)]]
+   - [[https://nodejs.org/en/download/][nodejs (16.13.2)]]
+   - [[https://classic.yarnpkg.com/en/docs/install#windows-stable][yarn (1.22.4)]]
+   - Typescript
 
 	 *NOTE*: It should be possible to use ~npm~ if you'd like to avoid installing ~yarn~.
 
@@ -192,5 +193,26 @@
 	With this in place, you should be able to run ~docker ps~ as your
 	user with no errors.
 
+*** Windows Subsystem for Linux Installations 
+
+**** Go Installation
+   #+BEGIN_SRC sh
+   wget https://dl.google.com/go/go1.18.3.linux-amd64.tar.gz
+   sudo tar -xvf go1.18.3.linux-amd64.tar.gz
+   sudo mv go /usr/local
+   #+END_SRC
+
+**** Postgres Installation
+   #+BEGIN_SRC sh
+   apt install postgresql-client-common
+   #+END_SRC
+
+**** [[https://dev.to/deadwin19/how-to-install-golang-on-wslwsl2-2880][Go Installation]]
+
+**** Typescript
+
+   #+BEGIN_SRC sh
+   npm install -g typescript
+   #+END_SRC
 
 *EOF*

@@ -9,7 +9,7 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
-            :showToggle="(user && user.admin) || (projectUser && projectUser.user && projectUser.role === 'Administrator')"
+            :showToggle="showPostsTypeToggle()"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -17,6 +17,7 @@
                     <template v-if="user">
                         <div class="new-comment-wrap">
                             <Tiptap
+                                ref="tipTapNewComment"
                                 v-model="newComment.body"
                                 :placeholder="$tc('comments.commentForm.placeholder')"
                                 :saveLabel="$tc('comments.commentForm.saveLabel')"
@@ -25,7 +26,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
@@ -46,7 +47,7 @@
             </template>
             <template #right>
                 <div class="event-level-selector">
-                    <label for="allProjectRadio">
+                    <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
                             <input
                                 type="radio"
@@ -165,7 +166,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">
+        <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
             {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
         </div>
         <div v-if="isLoading" class="no-comments">
@@ -294,6 +295,7 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
@@ -303,10 +305,10 @@ import { CurrentUser, ProjectUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
-import { deserializeBookmark } from "../viz/viz";
+import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
-import { TimeRange } from "@/views/viz/viz/common";
+import { TimeRange } from "@/views/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
@@ -326,8 +328,12 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: [Number, Object],
+            type: Object as PropType<[number, Bookmark]>,
             required: true,
+        },
+        workspace: {
+            type: Workspace,
+            required: false,
         },
     },
     data(): {
@@ -350,7 +356,7 @@ export default Vue.extend({
         newDataEvent: {
             allProjectSensors: boolean;
             bookmark: string | null;
-            body: string | null;
+            description: string | null;
             title: string | null;
         };
         errorMessage: string | null;
@@ -376,7 +382,7 @@ export default Vue.extend({
             newDataEvent: {
                 allProjectSensors: true,
                 bookmark: null,
-                body: "",
+                description: "",
                 title: "",
             },
             errorMessage: null,
@@ -385,13 +391,17 @@ export default Vue.extend({
     },
     computed: {
         projectId(): number {
-            if (typeof this.parentData === "number") {
-                return this.parentData;
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData.p[0];
             }
-            return this.parentData.p[0];
+            if (this.parentData instanceof Number) {
+                // return this.parentData;
+            }
+            throw new Error();
+
         },
         stationId(): number | null {
-            if (typeof this.parentData !== "number") {
+            if (this.parentData instanceof Bookmark) {
                 return this.parentData.s[0];
             }
             return null;
@@ -401,17 +411,23 @@ export default Vue.extend({
         },
         // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
-            const project = this.$getters.projectsById[this.projectId];
-            if (!project) {
-                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            if (this.projectId) {
+                const project = this.$getters.projectsById[this.projectId];
+                if (!project) {
+                    this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+                }
+                return !!this.$getters.projectsById[this.projectId];
             }
-            return !!this.$getters.projectsById[this.projectId];
+            return false;
+        },
+        dataEventsFromState(): DataEvent[] {
+            return this.$state.discussion.dataEvents;
         },
         postsAndEvents(): DiscussionBase[] {
             return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
         },
         projectUser(): ProjectUser | null {
-            const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+            const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
 
             if (projectId) {
                 const displayProject = this.$getters.projectsById[projectId];
@@ -420,25 +436,46 @@ export default Vue.extend({
 
             return null;
         },
+        stationBelongsToAProject(): boolean {
+            if (this.parentData instanceof Bookmark) {
+                return !!this.parentData.p?.length;
+            }
+            return false;
+        },
+        parentNumber(): number | null {
+            if (_.isNumber(this.parentData)) {
+                return this.parentData;
+            }
+            return null;
+        },
+        parentBookmark(): Bookmark | null {
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData;
+            }
+            return null;
+        },
     },
     watch: {
         async parentData(): Promise<void> {
-
-          await this.getDataEvents();
+            await this.getDataEvents();
             return this.getComments();
         },
-        $route() {
+        $route(): void {
             this.highlightComment();
+        },
+        dataEventsFromState(): void {
+            this.initDataEvents();
         },
     },
     async mounted(): Promise<void> {
-        const projectId = typeof this.parentData === "number" ? null : this.parentData?.p[0];
+        const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
 
         if (projectId) {
             await this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: projectId });
             await this.$getters.projectsById[projectId];
         }
         this.placeholder = this.getNewCommentPlaceholder();
+        this.newDataEvent.allProjectSensors = this.stationBelongsToAProject;
 
         await this.getDataEvents();
         return this.getComments();
@@ -454,14 +491,16 @@ export default Vue.extend({
         async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
             this.errorMessage = null;
 
-            if (this.viewType === "data") {
-                const tb: Bookmark = this.parentData;
-                dataEvent.bookmark = JSON.stringify(this.parentData);
-            }
+            const bookmark = this.parentBookmark;
+            if (bookmark != null) {
+                if (this.viewType === "data") {
+                    dataEvent.bookmark = JSON.stringify(bookmark);
+                }
 
-            const timeRange: TimeRange = this.parentData.allTimeRange;
-            dataEvent.start = timeRange.start;
-            dataEvent.end = timeRange.end;
+                const timeRange: TimeRange = bookmark.allTimeRange;
+                dataEvent.start = timeRange.start;
+                dataEvent.end = timeRange.end;
+            }
 
             await this.$services.api
                 .postDataEvent(dataEvent)
@@ -479,7 +518,6 @@ export default Vue.extend({
                 });
         },
         async save(comment: NewComment): Promise<void> {
-
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -490,7 +528,7 @@ export default Vue.extend({
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
                     // TODO: find a way to avoid any
-                    (this.$refs.tipTap as any).editor.commands.clearContent();
+                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -530,6 +568,7 @@ export default Vue.extend({
                     }
                 })
                 .catch((e) => {
+                    console.log("e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -545,9 +584,13 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            const queryParam = this.parentNumber ? this.parentNumber : this.parentBookmark;
+            if (!queryParam) {
+                return;
+            }
             this.isLoading = true;
             await this.$services.api
-                .getComments(this.parentData)
+                .getComments(queryParam)
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
@@ -589,7 +632,7 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.deleteComment;
                 });
         },
-        startEditing(item: Comment | DataEvent) {
+        startEditing(item: Comment | DataEvent): void {
             item.readonly = false;
         },
         saveEdit(commentID: number, body: Record<string, unknown>) {
@@ -620,9 +663,10 @@ export default Vue.extend({
                 .finally(() => {
                     this.isLoading = false;
                 });
-            const dataEvents = this.$getters.dataEvents;
+        },
+        initDataEvents(): void {
             this.dataEvents = [];
-            dataEvents.forEach((event) => {
+            this.dataEventsFromState.forEach((event) => {
                 this.dataEvents.push(
                     new DataEvent(
                         event.id,
@@ -638,8 +682,8 @@ export default Vue.extend({
                 );
             });
         },
-        saveEditDataEvent(dataEvent: DataEvent) {
-            this.$services.api
+        saveEditDataEvent(dataEvent: DataEvent): Promise<void> {
+            return this.$services.api
                 .updateDataEvent(dataEvent)
                 .then((response) => {
                     if (response) {
@@ -653,8 +697,8 @@ export default Vue.extend({
                     this.errorMessage = DataEventsErrorsEnum.postDataEvent;
                 });
         },
-        deleteDataEvent(dataEventID: number) {
-            this.$services.api
+        deleteDataEvent(dataEventID: number): Promise<void> {
+            return this.$services.api
                 .deleteDataEvent(dataEventID)
                 .then((response) => {
                     if (response) {
@@ -709,7 +753,7 @@ export default Vue.extend({
 
             return [];
         },
-        highlightComment() {
+        highlightComment(): void {
             this.$nextTick(() => {
                 if (location.hash) {
                     const el = document.querySelector(location.hash);
@@ -724,7 +768,7 @@ export default Vue.extend({
                 }
             });
         },
-        onSectionToggle(evt) {
+        onSectionToggle(evt): void {
             if (evt === "left") {
                 this.logMode = "comment";
             }
@@ -732,11 +776,33 @@ export default Vue.extend({
                 this.logMode = "event";
             }
         },
-        sortRecent(a, b) {
+        sortRecent(a, b): any {
             return b.createdAt - a.createdAt;
         },
-        interpolatePartner(baseString) {
+        interpolatePartner(baseString): string {
             return interpolatePartner(baseString);
+        },
+        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
+        areWorkspaceGroupsEmpty(): boolean {
+            let areEmpty = false;
+
+            if (this.workspace) {
+                this.workspace.groups.forEach((group) => {
+                    if (group.isEmpty()) {
+                        areEmpty = true;
+                    }
+                });
+            }
+
+            return areEmpty;
+        },
+        showPostsTypeToggle(): boolean {
+            return (
+                (((this.user && this.user.admin) ||
+                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                    !this.areWorkspaceGroupsEmpty()) ||
+                false
+            );
         },
     },
 });

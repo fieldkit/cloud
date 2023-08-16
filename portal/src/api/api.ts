@@ -16,6 +16,7 @@ import { SensorInfoResponse } from "@/views/viz/api";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
+import { Bookmark } from "@/views/viz/viz";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -222,6 +223,7 @@ export class CurrentUser {
     bio: string;
     mediaUrl: string;
     tncDate: number;
+    admin: boolean;
 }
 
 export enum UserRolesEnum {
@@ -339,6 +341,7 @@ export interface Station {
     name: string;
     owner: Owner;
     deviceId: string;
+    model: { name: string };
     uploads: Upload[];
     photos: Photos;
     readOnly: boolean;
@@ -433,6 +436,19 @@ export interface InvokeParams {
 export interface SavedBookmark {
     url: string;
     bookmark: string;
+    token: string;
+}
+
+export interface PendingInvite {
+    id: number;
+    project: { id: number; name: string; };
+    time: number;
+    role: number;
+}
+
+export interface PendingInvites {
+    pending: PendingInvite[];
+    projects: Project[];
 }
 
 export enum MapViewType {
@@ -806,6 +822,9 @@ class FKApi {
     }
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
+        if (!_.isNumber(projectId)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -839,7 +858,7 @@ class FKApi {
         });
     }
 
-    getInvitesByUser() {
+    getInvitesByUser(): Promise<PendingInvites> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
@@ -952,7 +971,10 @@ class FKApi {
         });
     }
 
-    getProject(id): Promise<Project> {
+    getProject(id: number): Promise<Project> {
+        if (!_.isNumber(id)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -960,7 +982,7 @@ class FKApi {
         });
     }
 
-    getProjectActivity(id): Promise<ProjectActivityResponse> {
+    getProjectActivity(id: number): Promise<ProjectActivityResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -1430,13 +1452,13 @@ class FKApi {
         });
     }
 
-    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    public async getComments(projectIDOrBookmark: number | Bookmark): Promise<{ posts: Comment[] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === "number") {
-            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
-        } else {
+        if (projectIDOrBookmark instanceof Bookmark) {
             apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
+        } else {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         }
 
         const returned = await this.invoke({
