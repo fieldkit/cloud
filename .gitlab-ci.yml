@@ -9,6 +9,7 @@ variables:
   POSTGRES_USER: fieldkit
   POSTGRES_PASSWORD: password
   FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
+  VERSION: 0.3.50 # TODO
 
 services:
   - name: kartoza/postgis:14-3
@@ -42,6 +43,14 @@ build:images:
   stage: build
   image: docker:24.0.5
   services:
-    - docker:24.0.5-dind
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
   script:
-    - echo "one step at a time"
+    - docker version
+    - docker info
+#   - echo ${VERSION}-${CI_COMMIT_SHA:0:8}
+#   - docker build -t fk-server-node-base node-base
+#   - docker build -t fk-server-build server
+#   - docker build -t fk-portal-build portal
