@@ -36,10 +36,11 @@ test:js:
 build:compile:
   stage: build
   script:
-    - cp portal/src/secrets.ts.aws portal/src/secrets.ts
+    - cp portal/src/secrets.ts.template portal/src/secrets.ts
     - cd server/cmd/server && go build -o build/server
 
 build:images:
+  when: manual
   stage: build
   image: docker:24.0.5
   services:
@@ -47,10 +48,13 @@ build:images:
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
   script:
     - docker version
     - docker info
-#   - echo ${VERSION}-${CI_COMMIT_SHA:0:8}
-#   - docker build -t fk-server-node-base node-base
-#   - docker build -t fk-server-build server
-#   - docker build -t fk-portal-build portal
+    - cp portal/src/secrets.ts.aws portal/src/secrets.ts
+    - export DOCKER_TAG=${VERSION}-${CI_COMMIT_SHA:0:8}
+    - echo $DOCKER_TAG
+    - docker build -t conservify/fk-cloud:$DOCKER_TAG --build-arg GIT_HASH=${CI_COMMIT_SHA:0:8} --build-arg VERSION=${VERSION} .
+    - cd charting
+    - tar -czh --exclude='./node_modules' . | docker build -t conservify/fk-charting:$DOCKER_TAG --build-arg GIT_HASH=${CI_COMMIT_SHA:0:8} --build-arg VERSION=${VERSION} -
