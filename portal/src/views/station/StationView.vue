@@ -145,7 +145,7 @@
             <section class="container-box" v-if="station.modules.length > 0">
                 <h2>{{ $t("station.data") }}</h2>
 
-                <ul class="flex flex-wrap flex-space-between">
+                <ul class="flex flex-wrap flex-space-between module-data-container">
                     <li
                         class="module-data-item"
                         v-for="module in station.modules"
@@ -985,10 +985,17 @@ section {
     }
 }
 
+.module-data-container {
+    gap: 20px;
+
+    @include bp-down($sm) {
+        gap: 10px;
+    }
+}
+
 .module-data-item {
-    flex: 0 0 calc(50% - 10px);
+    flex: 1 1 calc(50% - 10px);
     min-width: 0;
-    margin-bottom: 30px;
 
     @include bp-down($sm) {
         flex: 0 0 100%;
@@ -1009,7 +1016,7 @@ section {
 }
 
 .module-data-btn {
-    margin: 0 auto 8px auto;
+    margin: 30px auto 8px auto;
     display: block;
 }
 
