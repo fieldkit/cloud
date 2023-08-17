@@ -1,5 +1,3 @@
-image: golang:latest
-
 stages:
   - test
   - build
@@ -13,6 +11,11 @@ variables:
 
 test:go:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: golang:latest
   services:
     - name: kartoza/postgis:14-3
       alias: db
@@ -24,6 +27,10 @@ test:go:
 
 test:js:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   image: node:18.17.0
   script:
     - cd portal && which node && which npm
@@ -34,6 +41,11 @@ test:js:
 
 build:compile:
   stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: golang:latest
   script:
     - cp portal/src/secrets.ts.template portal/src/secrets.ts
     - cd server/cmd/server && go build -o build/server
@@ -42,8 +54,8 @@ build:compile:
 # in docker configuration.
 
 build:images:
-  when: manual
   stage: build
+  when: manual
   image: docker:24.0.5
   services:
     - name: docker:24.0.5-dind
