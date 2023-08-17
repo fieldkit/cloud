@@ -15,7 +15,9 @@ WORKDIR /app
 
 COPY ./server/ ./
 
-RUN mkdir build
+RUN mkdir -p build
+RUN ls -alh api
+RUN mkdir -p api
 RUN cd cmd/server && go build -o /app/build/server -ldflags '-extldflags "-static"' *.go
 RUN cd cmd/ingester && go build -o /app/build/ingester -ldflags '-extldflags "-static"' *.go
 
@@ -34,6 +36,7 @@ COPY --from=golang /app/build/ingester /
 COPY --from=node /app/build /portal
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=env /app/static.env /etc/
+COPY --from=golang /app/api /api/
 
 # Downstream Dockerfile's require this. I'd like to use the above paths, though.
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /
