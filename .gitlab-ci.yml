@@ -11,14 +11,13 @@ variables:
   FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
   VERSION: 0.3.50 # TODO
 
-services:
-  - name: kartoza/postgis:14-3
-    alias: db
-  - name: timescale/timescaledb:2.4.2-pg13
-    alias: tsdb
-
 test:go:
   stage: test
+  services:
+    - name: kartoza/postgis:14-3
+      alias: db
+    - name: timescale/timescaledb:2.4.2-pg13
+      alias: tsdb
   script:
     - (cd server/cmd/server && go build -o build/server)
     - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
