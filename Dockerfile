@@ -35,5 +35,9 @@ COPY --from=node /app/build /portal
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=env /app/static.env /etc/
 
+# Downstream Dockerfile's require this. I'd like to use the above paths, though.
+COPY --from=golang /etc/ssl/certs/ca-certificates.crt /
+COPY --from=env /app/static.env /
+
 EXPOSE 80
 ENTRYPOINT ["/server"]
