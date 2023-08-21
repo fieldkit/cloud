@@ -274,16 +274,17 @@ type StationConfiguration struct {
 }
 
 type StationModule struct {
-	ID              int64  `db:"id" json:"id"`
-	ConfigurationID int64  `db:"configuration_id" json:"configuration_id"`
-	HardwareID      []byte `db:"hardware_id" json:"hardware_id"`
-	Index           uint32 `db:"module_index" json:"module_index"`
-	Position        uint32 `db:"position" json:"position"`
-	Name            string `db:"name" json:"name"`
-	Manufacturer    uint32 `db:"manufacturer" json:"manufacturer"`
-	Kind            uint32 `db:"kind" json:"kind"`
-	Version         uint32 `db:"version" json:"version"`
-	Flags           uint32 `db:"flags" json:"flags"`
+	ID              int64   `db:"id" json:"id"`
+	ConfigurationID int64   `db:"configuration_id" json:"configuration_id"`
+	HardwareID      []byte  `db:"hardware_id" json:"hardware_id"`
+	Index           uint32  `db:"module_index" json:"module_index"`
+	Position        uint32  `db:"position" json:"position"`
+	Name            string  `db:"name" json:"name"`
+	Manufacturer    uint32  `db:"manufacturer" json:"manufacturer"`
+	Kind            uint32  `db:"kind" json:"kind"`
+	Version         uint32  `db:"version" json:"version"`
+	Flags           uint32  `db:"flags" json:"flags"`
+	Label           *string `db:"label" json:"label"`
 }
 
 type ModuleSensor struct {

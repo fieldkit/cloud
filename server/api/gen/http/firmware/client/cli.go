@@ -42,7 +42,7 @@ func BuildAddPayload(firmwareAddBody string, firmwareAddAuth string) (*firmware.
 	{
 		err = json.Unmarshal([]byte(firmwareAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Et atque sapiente quas aut.\",\n      \"logicalAddress\": 7121907825964183449,\n      \"meta\": \"Atque consequatur qui sed doloremque.\",\n      \"module\": \"Sed aut.\",\n      \"profile\": \"Non accusamus et.\",\n      \"url\": \"Molestiae repellendus et distinctio.\",\n      \"version\": \"Praesentium sapiente.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Aut aut sed aut et non accusamus.\",\n      \"logicalAddress\": 1510282003840073426,\n      \"meta\": \"Delectus quibusdam consequuntur nulla fugit voluptatem.\",\n      \"module\": \"Ab praesentium.\",\n      \"profile\": \"Quia molestiae repellendus et distinctio repellendus atque.\",\n      \"url\": \"Quaerat dolore sed.\",\n      \"version\": \"Qui sed.\"\n   }'")
 		}
 	}
 	var auth *string

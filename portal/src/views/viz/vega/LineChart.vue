@@ -70,6 +70,7 @@ export default Vue.extend({
             this.isLoading = true;
 
             if (this.series.length == 0) {
+                this.isLoading = false;
                 return;
             }
 

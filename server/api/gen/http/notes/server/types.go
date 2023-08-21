@@ -410,6 +410,7 @@ type FieldNoteResponseBody struct {
 	UpdatedAt int64                        `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	Author    *FieldNoteAuthorResponseBody `form:"author" json:"author" xml:"author"`
 	Key       *string                      `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Title     *string                      `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Body      *string                      `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 	Version   int64                        `form:"version" json:"version" xml:"version"`
 	Media     []*NoteMediaResponseBody     `form:"media" json:"media" xml:"media"`
@@ -445,6 +446,7 @@ type FieldNoteUpdateRequestBody struct {
 type ExistingFieldNoteRequestBody struct {
 	ID       *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Key      *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Title    *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Body     *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 	MediaIds []int64 `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
 }
@@ -452,6 +454,7 @@ type ExistingFieldNoteRequestBody struct {
 // NewFieldNoteRequestBody is used to define fields on request body types.
 type NewFieldNoteRequestBody struct {
 	Key      *string `form:"key,omitempty" json:"key,omitempty" xml:"key,omitempty"`
+	Title    *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	Body     *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 	MediaIds []int64 `form:"mediaIds,omitempty" json:"mediaIds,omitempty" xml:"mediaIds,omitempty"`
 }

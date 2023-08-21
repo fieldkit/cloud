@@ -1037,6 +1037,19 @@ func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.P
 		return nil, err
 	}
 
+	filteredProjects := make([]*data.Project, 0)
+
+	for _, project := range projects {
+		p, err := NewPermissions(ctx, c.options).ForProject(project)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := p.CanView(); err == nil {
+			filteredProjects = append(filteredProjects, project)
+		}
+	}
+
 	followers := []*data.FollowersSummary{}
 	if err := c.options.Database.SelectContext(ctx, &followers, `
 		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
@@ -1046,5 +1059,5 @@ func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.P
 		return nil, err
 	}
 
-	return ProjectsType(c.options.signer, projects, followers, relationships)
+	return ProjectsType(c.options.signer, filteredProjects, followers, relationships)
 }

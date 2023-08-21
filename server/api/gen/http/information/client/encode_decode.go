@@ -332,6 +332,7 @@ func unmarshalStationModuleResponseBodyToInformationviewsStationModuleView(v *St
 		HardwareIDBase64: v.HardwareIDBase64,
 		MetaRecordID:     v.MetaRecordID,
 		Name:             v.Name,
+		Label:            v.Label,
 		Position:         v.Position,
 		Flags:            v.Flags,
 		Internal:         v.Internal,

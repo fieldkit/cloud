@@ -39,4 +39,5 @@ export interface GlobalGetters {
     isAuthenticated: boolean;
     isBusy: boolean;
     mapped: MappedStations;
+    isUserTeamMemberOfStation: { (stationId: number): boolean };
 }
