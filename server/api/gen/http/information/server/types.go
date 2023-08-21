@@ -187,6 +187,7 @@ type StationModuleResponseBody struct {
 	HardwareIDBase64 *string                      `form:"hardwareIdBase64,omitempty" json:"hardwareIdBase64,omitempty" xml:"hardwareIdBase64,omitempty"`
 	MetaRecordID     *int64                       `form:"metaRecordId,omitempty" json:"metaRecordId,omitempty" xml:"metaRecordId,omitempty"`
 	Name             string                       `form:"name" json:"name" xml:"name"`
+	Label            *string                      `form:"label,omitempty" json:"label,omitempty" xml:"label,omitempty"`
 	Position         int32                        `form:"position" json:"position" xml:"position"`
 	Flags            int32                        `form:"flags" json:"flags" xml:"flags"`
 	Internal         bool                         `form:"internal" json:"internal" xml:"internal"`

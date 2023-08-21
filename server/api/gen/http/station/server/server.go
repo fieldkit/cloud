@@ -35,6 +35,7 @@ type Server struct {
 	Delete                http.Handler
 	AdminSearch           http.Handler
 	Progress              http.Handler
+	UpdateModule          http.Handler
 	CORS                  http.Handler
 }
 
@@ -85,6 +86,7 @@ func New(
 			{"Delete", "DELETE", "/admin/stations/{stationId}"},
 			{"AdminSearch", "POST", "/admin/stations/search"},
 			{"Progress", "GET", "/stations/{stationId}/progress"},
+			{"UpdateModule", "PATCH", "/stations/{id}/modules/{moduleId}"},
 			{"CORS", "OPTIONS", "/stations"},
 			{"CORS", "OPTIONS", "/stations/{id}"},
 			{"CORS", "OPTIONS", "/stations/{id}/transfer/{ownerId}"},
@@ -98,6 +100,7 @@ func New(
 			{"CORS", "OPTIONS", "/admin/stations/{stationId}"},
 			{"CORS", "OPTIONS", "/admin/stations/search"},
 			{"CORS", "OPTIONS", "/stations/{stationId}/progress"},
+			{"CORS", "OPTIONS", "/stations/{id}/modules/{moduleId}"},
 		},
 		Add:                   NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
 		Get:                   NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
@@ -113,6 +116,7 @@ func New(
 		Delete:                NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
 		AdminSearch:           NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
 		Progress:              NewProgressHandler(e.Progress, mux, decoder, encoder, errhandler, formatter),
+		UpdateModule:          NewUpdateModuleHandler(e.UpdateModule, mux, decoder, encoder, errhandler, formatter),
 		CORS:                  NewCORSHandler(),
 	}
 }
@@ -136,6 +140,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Delete = m(s.Delete)
 	s.AdminSearch = m(s.AdminSearch)
 	s.Progress = m(s.Progress)
+	s.UpdateModule = m(s.UpdateModule)
 	s.CORS = m(s.CORS)
 }
 
@@ -155,6 +160,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountDeleteHandler(mux, h.Delete)
 	MountAdminSearchHandler(mux, h.AdminSearch)
 	MountProgressHandler(mux, h.Progress)
+	MountUpdateModuleHandler(mux, h.UpdateModule)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -872,6 +878,57 @@ func NewProgressHandler(
 	})
 }
 
+// MountUpdateModuleHandler configures the mux to serve the "station" service
+// "update module" endpoint.
+func MountUpdateModuleHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleStationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PATCH", "/stations/{id}/modules/{moduleId}", f)
+}
+
+// NewUpdateModuleHandler creates a HTTP handler which loads the HTTP request
+// and calls the "station" service "update module" endpoint.
+func NewUpdateModuleHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateModuleRequest(mux, decoder)
+		encodeResponse = EncodeUpdateModuleResponse(encoder)
+		encodeError    = EncodeUpdateModuleError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update module")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "station")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service station.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -895,6 +952,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/admin/stations/{stationId}", f)
 	mux.Handle("OPTIONS", "/admin/stations/search", f)
 	mux.Handle("OPTIONS", "/stations/{stationId}/progress", f)
+	mux.Handle("OPTIONS", "/stations/{id}/modules/{moduleId}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

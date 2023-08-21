@@ -294,6 +294,7 @@ export interface ModuleSensor {
 export interface StationModule {
     id: number;
     name: string;
+    label?: string; // custom name
     hardwareId: string;
     hardwareIdBase64: string;
     position: number;
@@ -359,6 +360,7 @@ export interface Station {
         attributes: ProjectAttribute[];
     };
     status: StationStatus;
+    description: string;
 }
 
 export interface ProjectsResponse {
@@ -794,6 +796,15 @@ class FKApi {
         });
     }
 
+    updateStation(data: {id: number, name: string, description: string | null }): Promise<Station> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.id,
+            data: data,
+        });
+    }
+
     getUserStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
         if (!this.token.authenticated()) {
             return onNoAuth();
@@ -1076,6 +1087,16 @@ class FKApi {
             auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/modules/meta",
+        });
+    }
+
+    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.stationId + "/modules/" + data.moduleId,
+            data: {label: data.label},
         });
     }
 
@@ -1673,7 +1694,7 @@ class FKApi {
         });
     }
 
-    public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
+    public getProjectsForStation(id: number): Promise<ProjectsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

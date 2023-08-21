@@ -323,6 +323,7 @@ func (c *StationService) Update(ctx context.Context, payload *station.UpdatePayl
 	if payload.LocationName != nil {
 		updating.LocationName = payload.LocationName
 	}
+	updating.Description = payload.Description
 
 	if err := c.updateStation(ctx, updating, payload.StatusPb); err != nil {
 		return nil, err
@@ -759,6 +760,39 @@ func (c *StationService) Progress(ctx context.Context, payload *station.Progress
 	}, nil
 }
 
+func (c *StationService) UpdateModule(ctx context.Context, payload *station.UpdateModulePayload) (response *station.StationFull, err error) {
+	sr := repositories.NewStationRepository(c.options.Database)
+
+	updatingStation, err := sr.QueryStationByID(ctx, payload.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, station.MakeNotFound(errors.New("station not found"))
+		}
+		return nil, err
+	}
+
+	p, err := NewPermissions(ctx, c.options).ForStation(updatingStation)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.CanModify(); err != nil {
+		return nil, err
+	}
+
+	updatingModule, err := sr.QueryStationModuleByID(ctx, payload.ModuleID)
+	updatingModule.Label = &payload.Label
+
+	if _, err := sr.UpdateStationModule(ctx, updatingModule); err != nil {
+		return nil, err
+	}
+
+	return c.Get(ctx, &station.GetPayload{
+		Auth: &payload.Auth,
+		ID:   payload.ID,
+	})
+}
+
 func (s *StationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return Authenticate(ctx, common.AuthAttempt{
 		Token:        token,
@@ -904,6 +938,7 @@ func transformModules(from *data.StationFull, configurationID int64, moduleMeta 
 			HardwareID:       &hardwareID,
 			HardwareIDBase64: &hardwareIDBase64,
 			Name:             translatedName,
+			Label:            v.Label,
 			Position:         int32(v.Position),
 			Flags:            int32(v.Flags),
 			Internal:         v.Flags > 0 || v.Position == 255,
@@ -1078,6 +1113,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		Location:           location,
 		Data:               dataSummary,
 		Hidden:             sf.Station.Hidden,
+		Description:        sf.Station.Description,
 		Status:             sf.Station.Status,
 		Model: &station.StationFullModel{
 			Name:                      sf.Model.Name,
@@ -1088,14 +1124,14 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			Name: sf.Owner.Name,
 		},
 		Photos: photos,
-	};
+	}
 
-    if sf.Owner.MediaURL != nil {
-        url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
-        stationFull.Owner.Photo = &station.UserPhoto{
-            URL: &url,
-        }
-    }
+	if sf.Owner.MediaURL != nil {
+		url := fmt.Sprintf("/user/%d/media", sf.Owner.ID)
+		stationFull.Owner.Photo = &station.UserPhoto{
+			URL: &url,
+		}
+	}
 
 	return stationFull, nil
 }

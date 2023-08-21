@@ -19,21 +19,25 @@
                 </template>
             </DoubleHeader>
 
-            <silent-box v-if="photos && photos.length > 0" :gallery="gallery">
-                <template v-slot:silentbox-item="{ silentboxItem }">
-                    <div class="photo-wrap">
-                        <button class="photo-options" v-if="!readOnly">
-                            <ListItemOptions
-                                :options="photoOptions"
-                                @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
-                            ></ListItemOptions>
-                        </button>
-                        <AuthenticatedPhoto
-                            v-if="silentboxItem.photo"
-                            :url="silentboxItem.photo.url"
-                            :loading="silentboxItem.photo.id === loadingPhotoId"
-                        />
-                    </div>
+            <silent-box
+                v-if="photos && photos.length > 0"
+                :gallery="gallery"
+                @silentbox-overlay-opened="togglePageScroll()"
+                @silentbox-overlay-hidden="togglePageScroll()"
+            >
+                <!-- eslint-disable-next-line -->
+                <template v-slot:silentbox-item="{ silentboxItem }" class="photo-wrap">
+                    <button class="photo-options" v-if="!readOnly">
+                        <ListItemOptions
+                            :options="photoOptions"
+                            @listItemOptionClick="onPhotoOptionClick($event, silentboxItem.photo)"
+                        ></ListItemOptions>
+                    </button>
+                    <AuthenticatedPhoto
+                        v-if="silentboxItem.photo"
+                        :url="silentboxItem.photo.url"
+                        :loading="silentboxItem.photo.id === loadingPhotoId"
+                    />
                 </template>
             </silent-box>
 
@@ -95,7 +99,6 @@ export default Vue.extend({
     },
     watch: {
         photos() {
-            console.log("radoi ph", this.photos);
             this.initGallery();
         },
     },
@@ -177,6 +180,9 @@ export default Vue.extend({
                 });
             });
         },
+        togglePageScroll(): void {
+            document.body.classList.toggle("disable-scrolling");
+        },
     },
     mounted() {
         this.photoOptions = [
@@ -218,7 +224,7 @@ export default Vue.extend({
         height: 100%;
 
         &:after {
-            transform: translate(-1px, 3px);
+            transform: translate(-1px, 13px);
             font-weight: bold;
         }
     }

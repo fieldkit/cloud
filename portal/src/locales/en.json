@@ -216,7 +216,12 @@
         },
         "inactive": "Inactive",
         "ownerAvatar": "Owner avatar",
-        "belongsTo": "Belongs To:"
+        "belongsTo": "Belongs To:",
+        "addDescription": "Add a station description",
+        "singleProjectTitle": "Project:",
+        "multipleProjectsTitle": "Projects:",
+        "data": "Data",
+        "exploreData": "Explore Data"
     },
     "user": {
         "profile": {
@@ -424,7 +429,7 @@
     "seeMore": "See more",
     "seeLess": "See less",
     "notes": {
-        "title": "Field Notes",
+        "title": "Station Details",
         "failed": "Oops, there was a problem saving your changes.",
         "success": "Saved.",
         "confirmLeavePopupMessage": "You may have unsaved changes, are you sure you'd like to leave?",
@@ -483,5 +488,6 @@
         "computerTip": "For a better data analysis experience, view this data on your computer.",
         "swipeTip": "Swipe the chart to see more data.",
         "noData": "There's no data to display."
-    }
+    },
+    "edit": "edit"
 }

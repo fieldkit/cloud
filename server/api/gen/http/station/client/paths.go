@@ -80,3 +80,8 @@ func AdminSearchStationPath() string {
 func ProgressStationPath(stationID int32) string {
 	return fmt.Sprintf("/stations/%v/progress", stationID)
 }
+
+// UpdateModuleStationPath returns the URL path to the station service update module HTTP endpoint.
+func UpdateModuleStationPath(id int32, moduleID int32) string {
+	return fmt.Sprintf("/stations/%v/modules/%v", id, moduleID)
+}

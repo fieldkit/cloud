@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.station ADD COLUMN description TEXT;

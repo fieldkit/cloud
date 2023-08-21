@@ -1328,7 +1328,8 @@ export class Workspace implements VizInfoFactory {
         }
 
         console.log(`viz: update-from-bookmark`, bm);
-        await this.addStationIds(bm.s);
+        this.stationIds = bm.s;
+        await this.initialize();
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm, this.settings));
         await this.query();
         return;
@@ -1346,5 +1347,14 @@ export class BookmarkFactory {
             return new Bookmark(Bookmark.Version, [], [stationId], [context.project], context);
         }
         return new Bookmark(Bookmark.Version, [], [stationId], []);
+    }
+    public static forSensor(stationId: number, vizSensor: any, timeRange: [number, number]): Bookmark {
+        return new Bookmark(
+            Bookmark.Version,
+            [[[[[vizSensor], timeRange, [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
+            [stationId],
+            undefined,
+            null
+        );
     }
 }
