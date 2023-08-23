@@ -218,16 +218,16 @@ export class Bookmark {
         const times: [number, number][] = this.allVizes.map((viz) => viz[1]).filter((times) => times !== undefined) as [number, number][];
         const start = _.min(_.flatten(times.map((r) => r[0])));
         const end = _.max(_.flatten(times.map((r) => r[1])));
-        if ((start === null || start === undefined) || (end === null || end === undefined)) throw new Error(`no time range in bookmark`);
+        if (start === null || start === undefined || end === null || end === undefined) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
     private vizStations(vizBookmark: VizBookmark): StationID[] {
-        return vizBookmark[0].map((vs) => vs[0])
+        return vizBookmark[0].map((vs) => vs[0]);
     }
 
     private vizSensors(vizBookmark: VizBookmark): SensorSpec[] {
-        return vizBookmark[0].map((vs) => vs[1])
+        return vizBookmark[0].map((vs) => vs[1]);
     }
 
     public get allStations(): number[] {
@@ -965,13 +965,11 @@ export class Workspace implements VizInfoFactory {
 
         return _.flatten(
             groupGraphs.map((row) => {
-                return row.graph.loadedDataSets.map(
-                    (ds): SeriesData => {
-                        const vizInfo = this.vizInfo(row.graph, ds);
-                        if (ds.all == null) throw new Error("viz: Expected loaded data set");
-                        return new SeriesData(row.graph.id, TimeRange.eternity, ds, ds.all, vizInfo);
-                    }
-                );
+                return row.graph.loadedDataSets.map((ds): SeriesData => {
+                    const vizInfo = this.vizInfo(row.graph, ds);
+                    if (ds.all == null) throw new Error("viz: Expected loaded data set");
+                    return new SeriesData(row.graph.id, TimeRange.eternity, ds, ds.all, vizInfo);
+                });
             })
         );
     }
@@ -1127,47 +1125,44 @@ export class Workspace implements VizInfoFactory {
         // console.log("all-modules-by-module-key", allModulesByModuleKey);
         // console.log(station.sensors);
 
-        const options = _.map(
-            allModules,
-            (sensors, moduleId: ModuleID): SensorTreeOption => {
-                const moduleKey = keysById[moduleId];
-                const moduleMeta = allModulesByModuleKey[moduleKey];
-                const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
-                const children: SensorTreeOption[] = _.flatten(
-                    uniqueSensors.map((row) => {
-                        const age = moment.utc(row.sensorReadAt);
-                        let label = i18n.tc(row.sensorKey) || row.sensorKey;
-                        if (flatten) {
-                            label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
-                        }
-                        const optionId = `${row.moduleId}-${row.sensorId}`;
-                        const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
-                        if (sensor.length > 0) {
-                            if (!this.showInternalSensors) {
-                                if (sensor[0].internal) {
-                                    return [];
-                                }
+        const options = _.map(allModules, (sensors, moduleId: ModuleID): SensorTreeOption => {
+            const moduleKey = keysById[moduleId];
+            const moduleMeta = allModulesByModuleKey[moduleKey];
+            const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
+            const children: SensorTreeOption[] = _.flatten(
+                uniqueSensors.map((row) => {
+                    const age = moment.utc(row.sensorReadAt);
+                    let label = i18n.tc(row.sensorKey) || row.sensorKey;
+                    if (flatten) {
+                        label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
+                    }
+                    const optionId = `${row.moduleId}-${row.sensorId}`;
+                    const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
+                    if (sensor.length > 0) {
+                        if (!this.showInternalSensors) {
+                            if (sensor[0].internal) {
+                                return [];
                             }
                         }
-                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, stationId, age)];
-                    })
-                );
-                const moduleAge = _.max(children.map((c) => c.age));
-                if (!moduleAge) {
-                    throw new Error(`viz: Expected module age: no sensors?`);
-                }
-
-                const label = i18n.tc(moduleKey);
-
-                if (flatten) {
-                    return children[0];
-                } else {
-                    return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, stationId, moduleAge);
-                }
+                    }
+                    return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, stationId, age)];
+                })
+            );
+            const moduleAge = _.max(children.map((c) => c.age));
+            if (!moduleAge) {
+                throw new Error(`viz: Expected module age: no sensors?`);
             }
-        );
 
-        const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
+            const label = i18n.tc(moduleKey);
+
+            if (flatten) {
+                return children[0];
+            } else {
+                return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, stationId, moduleAge);
+            }
+        });
+
+        const sorted = _.sortBy(options as unknown as SensorTreeOption[], (option) => {
             if (option.age) {
                 return -option.age.valueOf();
             }
