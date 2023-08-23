@@ -113,12 +113,14 @@ type FieldNoteUpdate struct {
 type ExistingFieldNote struct {
 	ID       int64
 	Key      *string
+	Title    *string
 	Body     *string
 	MediaIds []int64
 }
 
 type NewFieldNote struct {
 	Key      *string
+	Title    *string
 	Body     *string
 	MediaIds []int64
 }
@@ -129,6 +131,7 @@ type FieldNote struct {
 	UpdatedAt int64
 	Author    *FieldNoteAuthor
 	Key       *string
+	Title     *string
 	Body      *string
 	Version   int64
 	Media     []*NoteMedia
@@ -305,6 +308,7 @@ func transformNotesviewsFieldNoteViewToFieldNote(v *notesviews.FieldNoteView) *F
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
 		Key:       v.Key,
+		Title:     v.Title,
 		Body:      v.Body,
 		Version:   *v.Version,
 	}
@@ -354,6 +358,7 @@ func transformFieldNoteToNotesviewsFieldNoteView(v *FieldNote) *notesviews.Field
 		CreatedAt: &v.CreatedAt,
 		UpdatedAt: &v.UpdatedAt,
 		Key:       v.Key,
+		Title:     v.Title,
 		Body:      v.Body,
 		Version:   &v.Version,
 	}

@@ -712,73 +712,103 @@ func (e *TestEnv) NewDataReading(meta, reading uint64) *pb.DataRecord {
 				Satellites: 6,
 			},
 			SensorGroups: []*pb.SensorGroup{
-				&pb.SensorGroup{
+				{
 					Module: 0,
 					Readings: []*pb.SensorAndValue{
-						&pb.SensorAndValue{
+						{
 							Sensor: 0,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 1,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 2,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 3,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 4,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
 					},
 				},
-				&pb.SensorGroup{
+				{
 					Module: 1,
 					Readings: []*pb.SensorAndValue{
-						&pb.SensorAndValue{
+						{
 							Sensor: 0,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 1,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 2,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 3,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 4,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 5,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 6,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 7,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 8,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
-						&pb.SensorAndValue{
+						{
 							Sensor: 9,
-							Value:  mrand.Float32(),
+							Calibrated: &pb.SensorAndValue_CalibratedValue{
+								CalibratedValue: mrand.Float32(),
+							},
 						},
 					},
 				},

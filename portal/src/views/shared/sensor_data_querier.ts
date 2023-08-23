@@ -12,7 +12,7 @@ import { SensorMeta } from "@/store";
 import { promiseAfter } from "@/utilities";
 import _ from "lodash";
 
-export { ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
+export { SensorMeta, ModuleSensorMeta, QueryRecentlyResponse, RecentlyAggregatedWindows };
 
 export interface StationQuickSensors {
     station: StationInfoResponse[];
@@ -71,7 +71,6 @@ export class SensorDataQuerier {
                         stations: { [stationId]: response.stations[stationId] },
                     };
                 });
-
                 const quickSensorsQuery = quickSensors.then((response) => {
                     return {
                         station: response.stations[stationId],

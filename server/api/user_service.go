@@ -663,7 +663,7 @@ func (s *UserService) IssueTransmissionToken(ctx context.Context, payload *user.
 		return nil, fmt.Errorf("failed to sign token: %w", err)
 	}
 
-	url := fmt.Sprintf("https://api.%s/ingestion", s.options.Domain)
+	url := fmt.Sprintf("%s/ingestion", s.options.Config.ApiHost)
 
 	return &user.TransmissionToken{
 		URL:   url,

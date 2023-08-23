@@ -84,6 +84,7 @@ type Station struct {
 	PlaceNative        *string    `db:"place_native"`
 	PhotoID            *int32     `db:"photo_id"`
 	Hidden             *bool      `db:"hidden"`
+	Description        *string    `db:"description"`
 	Status             *string    `db:"status"`
 }
 

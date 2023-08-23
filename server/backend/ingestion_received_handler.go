@@ -149,10 +149,7 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 
 	log.Infow("processing")
 
-	ir, err := repositories.NewIngestionRepository(h.db)
-	if err != nil {
-		return err
-	}
+	ir := repositories.NewIngestionRepository(h.db)
 
 	queued, err := ir.QueryQueuedByID(ctx, m.QueuedID)
 	if err != nil {
@@ -231,7 +228,7 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 		}
 	}
 
-	if err := ir.MarkProcessedDone(ctx, queued.ID, info.TotalRecords, info.MetaErrors, info.DataErrors); err != nil {
+	if err := ir.MarkProcessedDone(ctx, queued.ID, info.Walk.TotalRecords, info.Walk.MetaErrors, info.Walk.DataErrors); err != nil {
 		return err
 	}
 
@@ -273,7 +270,7 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		return nil
 	}
 
-	if info.DataRecords == 0 {
+	if info.Walk.DataRecords == 0 {
 		return nil
 	}
 
@@ -288,8 +285,8 @@ func recordIngestionActivity(ctx context.Context, log *zap.SugaredLogger, databa
 		},
 		UploaderID:      m.UserID,
 		DataIngestionID: info.IngestionID,
-		DataRecords:     info.DataRecords,
-		Errors:          info.DataErrors > 0 || info.MetaErrors > 0,
+		DataRecords:     info.Walk.DataRecords,
+		Errors:          info.Walk.DataErrors > 0 || info.Walk.MetaErrors > 0,
 	}
 
 	if _, err := database.ExecContext(ctx, `UPDATE fieldkit.station SET ingestion_at = NOW() WHERE id = $1`, *info.StationID); err != nil {

@@ -10,6 +10,7 @@ import { progress } from "./modules/progress";
 import { layout } from "./modules/layout";
 import { exporting } from "./modules/exporting";
 import { notifications } from "./modules/notifications";
+import { dataEvents } from "./modules/discussion";
 import { Services } from "@/api";
 
 export * from "@/api";
@@ -25,6 +26,7 @@ export * from "./modules/notifications";
 export * from "./modules/global";
 export * from "./modules/notes";
 export * from "./modules/fieldNotes";
+export * from "./modules/discussion";
 
 import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
@@ -81,6 +83,7 @@ export default function(services: Services) {
             notes: notes(services),
             fieldNotes: fieldNotes(services),
             snackbar: snackbar(),
+            discussion: dataEvents(services)
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

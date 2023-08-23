@@ -820,9 +820,10 @@ func marshalNotesFieldNoteUpdateToFieldNoteUpdateRequestBody(v *notes.FieldNoteU
 // *notes.ExistingFieldNote.
 func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.ExistingFieldNote) *ExistingFieldNoteRequestBody {
 	res := &ExistingFieldNoteRequestBody{
-		ID:   v.ID,
-		Key:  v.Key,
-		Body: v.Body,
+		ID:    v.ID,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -838,8 +839,9 @@ func marshalNotesExistingFieldNoteToExistingFieldNoteRequestBody(v *notes.Existi
 // *NewFieldNoteRequestBody from a value of type *notes.NewFieldNote.
 func marshalNotesNewFieldNoteToNewFieldNoteRequestBody(v *notes.NewFieldNote) *NewFieldNoteRequestBody {
 	res := &NewFieldNoteRequestBody{
-		Key:  v.Key,
-		Body: v.Body,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -876,9 +878,10 @@ func marshalFieldNoteUpdateRequestBodyToNotesFieldNoteUpdate(v *FieldNoteUpdateR
 // *ExistingFieldNoteRequestBody.
 func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFieldNoteRequestBody) *notes.ExistingFieldNote {
 	res := &notes.ExistingFieldNote{
-		ID:   v.ID,
-		Key:  v.Key,
-		Body: v.Body,
+		ID:    v.ID,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -894,8 +897,9 @@ func marshalExistingFieldNoteRequestBodyToNotesExistingFieldNote(v *ExistingFiel
 // *notes.NewFieldNote from a value of type *NewFieldNoteRequestBody.
 func marshalNewFieldNoteRequestBodyToNotesNewFieldNote(v *NewFieldNoteRequestBody) *notes.NewFieldNote {
 	res := &notes.NewFieldNote{
-		Key:  v.Key,
-		Body: v.Body,
+		Key:   v.Key,
+		Title: v.Title,
+		Body:  v.Body,
 	}
 	if v.MediaIds != nil {
 		res.MediaIds = make([]int64, len(v.MediaIds))
@@ -915,6 +919,7 @@ func unmarshalFieldNoteResponseBodyToNotesviewsFieldNoteView(v *FieldNoteRespons
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
 		Key:       v.Key,
+		Title:     v.Title,
 		Body:      v.Body,
 		Version:   v.Version,
 	}

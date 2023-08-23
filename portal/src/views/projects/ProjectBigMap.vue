@@ -99,7 +99,7 @@ import StationHoverSummary from "@/views/shared/StationHoverSummary.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import CommonComponents from "@/views/shared";
 import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
-import { ExploreContext } from "@/views/viz/common";
+import { ExploreContext, VizThresholds } from "@/views/viz/common";
 
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled } from "@/views/shared/partners";
 import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
@@ -250,11 +250,14 @@ export default Vue.extend({
         onCloseSummary(): void {
             this.activeStationId = null;
         },
-        getThresholds(stations: DisplayStation[]): object[] {
+        getThresholds(stations: DisplayStation[]): VizThresholds {
             try {
                 return stations[0].configurations.all[0].modules[0].sensors[0].meta.viz[0].thresholds;
             } catch (error) {
-                return [];
+                return {
+                    label: {},
+                    levels: [],
+                };
             }
         },
         sidebarToggle() {

@@ -1,0 +1,1 @@
+ALTER TABLE fieldkit.station_module ADD COLUMN label TEXT;

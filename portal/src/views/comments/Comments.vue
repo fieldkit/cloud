@@ -1,16 +1,148 @@
 <template>
     <section class="container" v-bind:class="{ 'data-view': viewType === 'data' }">
-        <header v-if="viewType === 'project'">Notes & Comments</header>
+        <header v-if="viewType === 'project'">{{ $tc("comments.projectHeader") }}</header>
 
-        <div class="new-comment" :class="{ 'align-center': !user }">
+        <SectionToggle
+            class="comment-toggle"
+            :leftLabel="$tc('comments.sectionToggle.leftLabel')"
+            :rightLabel="$tc('comments.sectionToggle.rightLabel')"
+            @toggle="onSectionToggle"
+            :default="logMode === 'comment' ? 'left' : 'right'"
+            v-if="viewType === 'data'"
+            :showToggle="showPostsTypeToggle()"
+        >
+            <template #left>
+                <div class="new-comment" :class="{ 'align-center': !user }">
+                    <UserPhoto :user="user"></UserPhoto>
+                    <template v-if="user">
+                        <div class="new-comment-wrap">
+                            <Tiptap
+                                ref="tipTapNewComment"
+                                v-model="newComment.body"
+                                :placeholder="$tc('comments.commentForm.placeholder')"
+                                :saveLabel="$tc('comments.commentForm.saveLabel')"
+                                @save="save(newComment)"
+                            />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="need-login-msg">
+                            {{ $tc("comments.loginToComment.part1") }}
+                            <router-link
+                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                                class="link"
+                            >
+                                {{ $tc("comments.loginToComment.part2") }}
+                            </router-link>
+                            {{ $tc("comments.loginToComment.part3") }}
+                        </p>
+                        <router-link
+                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                            class="button-submit"
+                        >
+                            {{ $t("login.loginButton") }}
+                        </router-link>
+                    </template>
+                </div>
+            </template>
+            <template #right>
+                <div class="event-level-selector">
+                    <label for="allProjectRadio" v-if="stationBelongsToAProject">
+                        <div class="event-level-radio">
+                            <input
+                                type="radio"
+                                id="allProjectRadio"
+                                name="eventLevel"
+                                v-model="newDataEvent.allProjectSensors"
+                                :value="true"
+                                :checked="newDataEvent.allProjectSensors"
+                            />
+                            <span class="radio-label">
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.radioLabel.")) }}
+                            </span>
+
+                            <InfoTooltip
+                                :message="$tc(interpolatePartner('comments.eventTypeSelector.allProjectSensors.description.'))"
+                            ></InfoTooltip>
+
+                            <p>
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.allProjectSensors.description.")) }}
+                            </p>
+                        </div>
+                    </label>
+                    <label for="allSensorsRadio">
+                        <div class="event-level-radio">
+                            <input
+                                type="radio"
+                                id="allSensorsRadio"
+                                name="eventLevel"
+                                v-model="newDataEvent.allProjectSensors"
+                                :value="false"
+                                :checked="!newDataEvent.allProjectSensors"
+                            />
+                            <span class="radio-label">
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.radioLabel.")) }}
+                            </span>
+
+                            <InfoTooltip
+                                :message="$tc(interpolatePartner('comments.eventTypeSelector.justTheseSensors.description.'))"
+                            ></InfoTooltip>
+
+                            <p>
+                                {{ $tc(interpolatePartner("comments.eventTypeSelector.justTheseSensors.description.")) }}
+                            </p>
+                        </div>
+                    </label>
+                </div>
+                <div class="new-comment" :class="{ 'align-center': !user }">
+                    <UserPhoto :user="user"></UserPhoto>
+                    <template v-if="user">
+                        <div class="new-comment-wrap">
+                            <Tiptap
+                                v-model="newDataEvent.title"
+                                :placeholder="$tc('comments.eventForm.title.placeholder')"
+                                :saveLabel="$tc('comments.eventForm.title.saveLabel')"
+                                :showSaveButton="false"
+                                @save="saveDataEvent(newDataEvent)"
+                            />
+                            <Tiptap
+                                v-model="newDataEvent.description"
+                                :placeholder="$tc('comments.eventForm.description.placeholder')"
+                                :saveLabel="$tc('comments.eventForm.description.saveLabel')"
+                                @save="saveDataEvent(newDataEvent)"
+                            />
+                        </div>
+                    </template>
+                    <template v-else>
+                        <p class="need-login-msg" @click="test()">
+                            {{ $tc("comments.loginToComment.part1") }}
+                            <router-link
+                                :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                                class="link"
+                            >
+                                {{ $tc("comments.loginToComment.part2") }}
+                            </router-link>
+                            {{ $tc("comments.loginToComment.part3") }}
+                        </p>
+                        <router-link
+                            :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
+                            class="button-submit"
+                        >
+                            {{ $t("login.loginButton") }}
+                        </router-link>
+                    </template>
+                </div>
+            </template>
+        </SectionToggle>
+        <!-- TODO: code repeated for project view; componentize -->
+        <div class="new-comment" :class="{ 'align-center': !user }" v-if="viewType === 'project'">
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-comment-wrap">
                     <Tiptap
-                        ref="tipTap"
                         v-model="newComment.body"
-                        placeholder="Join the discussion!"
-                        saveLabel="Post"
+                        :placeholder="$tc('comments.commentForm.placeholder')"
+                        :saveLabel="$tc('comments.commentForm.saveLabel')"
                         @save="save(newComment)"
                     />
                 </div>
@@ -34,44 +166,75 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && posts.length === 0" class="no-comments">There are no comments yet.</div>
-        <div v-if="isLoading" class="no-comments">Loading comments...</div>
-
-        <div class="list" v-if="isProjectLoaded && posts && posts.length > 0">
+        <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
+            {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
+        </div>
+        <div v-if="isLoading" class="no-comments">
+            {{ viewType === "data" ? $tc("comments.loadingEventsComments") : $tc("comments.loadingComments") }}
+        </div>
+        <div class="list" v-if="postsAndEvents && postsAndEvents.length > 0">
             <div class="subheader">
-                <span class="comments-counter" v-if="viewType === 'project'">{{ posts.length }} comments</span>
-                <header v-if="viewType === 'data'">Notes & Comments</header>
+                <span class="comments-counter" v-if="viewType === 'project'">
+                    {{ postsAndEvents.length }} {{ $tc("comments.comments") }}
+                </span>
+                <header v-if="viewType === 'data'">{{ $tc("comments.dataHeader") }}</header>
             </div>
             <transition-group name="fade">
                 <div
                     class="comment comment-first-level"
-                    v-for="post in posts"
-                    v-bind:key="post.id"
-                    v-bind:id="'comment-id-' + post.id"
-                    :ref="post.id"
+                    v-for="item in postsAndEvents"
+                    v-bind:key="(item.type === 'comment' ? 'c' : 'e') + item.id"
+                    v-bind:id="(item.body ? 'comment-id-' : 'event-id-') + item.id"
+                    :ref="item.id"
                 >
                     <div class="comment-main" :style="!user ? { 'padding-bottom': '15px' } : {}">
-                        <UserPhoto :user="post.author"></UserPhoto>
+                        <UserPhoto :user="item.author"></UserPhoto>
                         <div class="column-post">
                             <div class="post-header">
                                 <span class="author">
-                                    {{ post.author.name }}
+                                    {{ item.author.name }}
                                 </span>
+                                <span v-if="item.body" class="icon icon-comment"></span>
+                                <span v-else class="icon icon-flag"></span>
                                 <ListItemOptions
-                                    v-if="getCommentOptions(post).length > 0"
-                                    @listItemOptionClick="onListItemOptionClick($event, post)"
-                                    :options="getCommentOptions(post)"
+                                    v-if="user && (user.id === item.author.id || user.admin)"
+                                    @listItemOptionClick="onListItemOptionClick($event, item)"
+                                    :options="getCommentOptions(item)"
                                 />
-                                <span class="timestamp">{{ formatTimestamp(post.createdAt) }}</span>
+                                <span class="timestamp">{{ formatTimestamp(item.createdAt) }}</span>
                             </div>
-                            <Tiptap v-model="post.body" :readonly="post.readonly" saveLabel="Save" @save="saveEdit(post.id, post.body)" />
+                            <Tiptap
+                                v-if="item.body"
+                                v-model="item.body"
+                                :readonly="item.readonly"
+                                saveLabel="Save"
+                                @save="saveEdit(item.id, item.body)"
+                            />
+                            <div v-else class="edit-event">
+                                <Tiptap
+                                    v-model="item.title"
+                                    :readonly="item.readonly"
+                                    :placeholder="$tc('comments.eventForm.title.placeholder')"
+                                    :saveLabel="$tc('comments.eventForm.title.saveLabel')"
+                                    :showSaveButton="false"
+                                    @save="saveEditDataEvent(item)"
+                                />
+                                <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
+                                <Tiptap
+                                    v-model="item.description"
+                                    :readonly="item.readonly"
+                                    :placeholder="$tc('comments.eventForm.description.placeholder')"
+                                    :saveLabel="$tc('comments.eventForm.description.saveLabel')"
+                                    @save="saveEditDataEvent(item)"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="column">
                         <transition-group name="fade" class="comment-replies">
                             <div
                                 class="comment"
-                                v-for="reply in post.replies"
+                                v-for="reply in item.replies"
                                 v-bind:key="reply.id"
                                 v-bind:id="'comment-id-' + reply.id"
                                 :ref="reply.id"
@@ -92,7 +255,7 @@
                                         <Tiptap
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
-                                            saveLabel="Save"
+                                            :saveLabel="$tc('comments.reply.saveLabel')"
                                             @save="saveEdit(reply.id, reply.body)"
                                         />
                                     </div>
@@ -101,25 +264,25 @@
                         </transition-group>
 
                         <transition name="fade">
-                            <div class="new-comment reply" v-if="newReply && newReply.threadId === post.id">
+                            <div class="new-comment reply" v-if="newReply && newReply.threadId === item.id">
                                 <div class="new-comment-wrap">
                                     <UserPhoto :user="user"></UserPhoto>
                                     <Tiptap
                                         v-model="newReply.body"
-                                        placeholder="Reply to comment"
+                                        :placeholder="$tc('comments.reply.placeholder')"
+                                        :saveLabel="$tc('comments.reply.saveLabel')"
                                         @save="save(newReply)"
-                                        saveLabel="Post"
                                     />
                                 </div>
                             </div>
                         </transition>
 
                         <div class="actions">
-                            <button v-if="user" @click="addReply(post)">
+                            <button v-if="user && item.body" @click="addReply(item)">
                                 <i class="icon icon-reply"></i>
                                 {{ $t("comments.actions.reply") }}
                             </button>
-                            <button v-if="viewType === 'data'" @click="viewDataClick(post)">
+                            <button v-if="viewType === 'data'" @click="viewDataClick(item)">
                                 <i class="icon icon-view-data"></i>
                                 {{ $t("comments.actions.viewData") }}
                             </button>
@@ -132,17 +295,23 @@
 </template>
 
 <script lang="ts">
+import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import { NewComment } from "@/views/comments/model";
-import { Comment } from "@/views/comments/model";
-import { CurrentUser } from "@/api";
+import { DataEventsErrorsEnum, NewComment, NewDataEvent } from "@/views/comments/model";
+import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
+import { CurrentUser, ProjectUser } from "@/api";
 import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
-import { deserializeBookmark } from "../viz/viz";
-import { ActionTypes } from "@/store";
+import { deserializeBookmark, Workspace } from "../viz/viz";
+import SectionToggle from "@/views/shared/SectionToggle.vue";
+import { Bookmark } from "@/views/viz/viz";
+import { TimeRange } from "@/views/viz/common";
+import { ActionTypes, DisplayProject } from "@/store";
+import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
+import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 
 export default Vue.extend({
     name: "Comments",
@@ -150,6 +319,8 @@ export default Vue.extend({
         ...CommonComponents,
         ListItemOptions,
         Tiptap,
+        SectionToggle,
+        InfoTooltip,
     },
     props: {
         user: {
@@ -157,12 +328,17 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: [Number, Object],
+            type: Object as PropType<[number, Bookmark]>,
             required: true,
+        },
+        workspace: {
+            type: Workspace,
+            required: false,
         },
     },
     data(): {
         posts: Comment[];
+        dataEvents: DataEvent[];
         isLoading: boolean;
         placeholder: string | null;
         viewType: string;
@@ -177,10 +353,18 @@ export default Vue.extend({
             body: string | null;
             threadId: number | null;
         };
+        newDataEvent: {
+            allProjectSensors: boolean;
+            bookmark: string | null;
+            description: string | null;
+            title: string | null;
+        };
         errorMessage: string | null;
+        logMode: string;
     } {
         return {
             posts: [],
+            dataEvents: [],
             isLoading: true,
             placeholder: null,
             viewType: typeof this.$props.parentData === "number" ? "project" : "data",
@@ -195,18 +379,29 @@ export default Vue.extend({
                 body: "",
                 threadId: null,
             },
+            newDataEvent: {
+                allProjectSensors: true,
+                bookmark: null,
+                description: "",
+                title: "",
+            },
             errorMessage: null,
+            logMode: "comment",
         };
     },
     computed: {
         projectId(): number {
-            if (typeof this.parentData === "number") {
-                return this.parentData;
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData.p[0];
             }
-            return this.parentData.p[0];
+            if (this.parentData instanceof Number) {
+                // return this.parentData;
+            }
+            throw new Error();
+
         },
         stationId(): number | null {
-            if (typeof this.parentData !== "number") {
+            if (this.parentData instanceof Bookmark) {
                 return this.parentData.s[0];
             }
             return null;
@@ -216,23 +411,73 @@ export default Vue.extend({
         },
         // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
-            const project = this.$getters.projectsById[this.projectId];
-            if (!project) {
-                this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+            if (this.projectId) {
+                const project = this.$getters.projectsById[this.projectId];
+                if (!project) {
+                    this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.projectId });
+                }
+                return !!this.$getters.projectsById[this.projectId];
             }
-            return !!this.$getters.projectsById[this.projectId];
+            return false;
+        },
+        dataEventsFromState(): DataEvent[] {
+            return this.$state.discussion.dataEvents;
+        },
+        postsAndEvents(): DiscussionBase[] {
+            return [...this.posts, ...this.dataEvents].sort(this.sortRecent);
+        },
+        projectUser(): ProjectUser | null {
+            const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
+
+            if (projectId) {
+                const displayProject = this.$getters.projectsById[projectId];
+                return displayProject?.users?.filter((user) => user.user.id === this.user?.id)[0];
+            }
+
+            return null;
+        },
+        stationBelongsToAProject(): boolean {
+            if (this.parentData instanceof Bookmark) {
+                return !!this.parentData.p?.length;
+            }
+            return false;
+        },
+        parentNumber(): number | null {
+            if (_.isNumber(this.parentData)) {
+                return this.parentData;
+            }
+            return null;
+        },
+        parentBookmark(): Bookmark | null {
+            if (this.parentData instanceof Bookmark) {
+                return this.parentData;
+            }
+            return null;
         },
     },
     watch: {
-        parentData(): Promise<void> {
+        async parentData(): Promise<void> {
+            await this.getDataEvents();
             return this.getComments();
         },
-        $route() {
+        $route(): void {
             this.highlightComment();
         },
+        dataEventsFromState(): void {
+            this.initDataEvents();
+        },
     },
-    mounted(): Promise<void> {
+    async mounted(): Promise<void> {
+        const projectId = this.parentData instanceof Bookmark ? this.parentData.p[0] : null;
+
+        if (projectId) {
+            await this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: projectId });
+            await this.$getters.projectsById[projectId];
+        }
         this.placeholder = this.getNewCommentPlaceholder();
+        this.newDataEvent.allProjectSensors = this.stationBelongsToAProject;
+
+        await this.getDataEvents();
         return this.getComments();
     },
     methods: {
@@ -243,8 +488,36 @@ export default Vue.extend({
                 return "Write a comment about this Data View";
             }
         },
-        async save(comment: NewComment): Promise<void> {
+        async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
+            this.errorMessage = null;
 
+            const bookmark = this.parentBookmark;
+            if (bookmark != null) {
+                if (this.viewType === "data") {
+                    dataEvent.bookmark = JSON.stringify(bookmark);
+                }
+
+                const timeRange: TimeRange = bookmark.allTimeRange;
+                dataEvent.start = timeRange.start;
+                dataEvent.end = timeRange.end;
+            }
+
+            await this.$services.api
+                .postDataEvent(dataEvent)
+                .then((response) => {
+                    if (response) {
+                        this.newDataEvent.title = "";
+                        this.newDataEvent.description = "";
+
+                        this.getDataEvents();
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.errorMessage = CommentsErrorsEnum.postComment;
+                });
+        },
+        async save(comment: NewComment): Promise<void> {
             this.errorMessage = null;
 
             if (this.viewType === "data") {
@@ -255,7 +528,7 @@ export default Vue.extend({
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
                     // TODO: find a way to avoid any
-                    (this.$refs.tipTap as any).editor.commands.clearContent();
+                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -295,6 +568,7 @@ export default Vue.extend({
                     }
                 })
                 .catch((e) => {
+                    console.log("e", e);
                     this.errorMessage = CommentsErrorsEnum.postComment;
                 });
         },
@@ -310,9 +584,13 @@ export default Vue.extend({
             this.newReply.body = "";
         },
         async getComments(): Promise<void> {
+            const queryParam = this.parentNumber ? this.parentNumber : this.parentBookmark;
+            if (!queryParam) {
+                return;
+            }
             this.isLoading = true;
             await this.$services.api
-                .getComments(this.parentData)
+                .getComments(queryParam)
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
@@ -354,8 +632,8 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.deleteComment;
                 });
         },
-        startEditing(post: Comment) {
-            post.readonly = false;
+        startEditing(item: Comment | DataEvent): void {
+            item.readonly = false;
         },
         saveEdit(commentID: number, body: Record<string, unknown>) {
             this.$services.api
@@ -371,12 +649,79 @@ export default Vue.extend({
                     this.errorMessage = CommentsErrorsEnum.editComment;
                 });
         },
-        onListItemOptionClick(event: string, post: Comment): void {
+        async getDataEvents(): Promise<void> {
+            if (typeof this.parentData === "number") {
+                this.dataEvents = [];
+                return;
+            }
+            this.isLoading = true;
+            await this.$store
+                .dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) })
+                .catch(() => {
+                    this.errorMessage = DataEventsErrorsEnum.getDataEvents;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        },
+        initDataEvents(): void {
+            this.dataEvents = [];
+            this.dataEventsFromState.forEach((event) => {
+                this.dataEvents.push(
+                    new DataEvent(
+                        event.id,
+                        event.author,
+                        event.bookmark,
+                        event.createdAt,
+                        event.updatedAt,
+                        event.title ? JSON.parse(event.title) : event.title,
+                        event.description ? JSON.parse(event.description) : event.description,
+                        event.start,
+                        event.end
+                    )
+                );
+            });
+        },
+        saveEditDataEvent(dataEvent: DataEvent): Promise<void> {
+            return this.$services.api
+                .updateDataEvent(dataEvent)
+                .then((response) => {
+                    if (response) {
+                        this.newDataEvent.title = "";
+                        this.newDataEvent.description = "";
+                        this.getDataEvents();
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                    this.errorMessage = DataEventsErrorsEnum.postDataEvent;
+                });
+        },
+        deleteDataEvent(dataEventID: number): Promise<void> {
+            return this.$services.api
+                .deleteDataEvent(dataEventID)
+                .then((response) => {
+                    if (response) {
+                        this.getDataEvents();
+                    } else {
+                        this.errorMessage = DataEventsErrorsEnum.deleteDataEvent;
+                    }
+                })
+                .catch(() => {
+                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                });
+        },
+        onListItemOptionClick(event: string, item: Comment | DataEvent): void {
             if (event === "edit-comment") {
-                this.startEditing(post);
+                this.startEditing(item);
             }
             if (event === "delete-comment") {
-                this.deleteComment(post.id);
+                if (item.type === "comment") {
+                    this.deleteComment(item.id);
+                }
+                if (item.type === "event") {
+                    this.deleteDataEvent(item.id);
+                }
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
@@ -408,7 +753,7 @@ export default Vue.extend({
 
             return [];
         },
-        highlightComment() {
+        highlightComment(): void {
             this.$nextTick(() => {
                 if (location.hash) {
                     const el = document.querySelector(location.hash);
@@ -422,6 +767,42 @@ export default Vue.extend({
                     }
                 }
             });
+        },
+        onSectionToggle(evt): void {
+            if (evt === "left") {
+                this.logMode = "comment";
+            }
+            if (evt === "right") {
+                this.logMode = "event";
+            }
+        },
+        sortRecent(a, b): any {
+            return b.createdAt - a.createdAt;
+        },
+        interpolatePartner(baseString): string {
+            return interpolatePartner(baseString);
+        },
+        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
+        areWorkspaceGroupsEmpty(): boolean {
+            let areEmpty = false;
+
+            if (this.workspace) {
+                this.workspace.groups.forEach((group) => {
+                    if (group.isEmpty()) {
+                        areEmpty = true;
+                    }
+                });
+            }
+
+            return areEmpty;
+        },
+        showPostsTypeToggle(): boolean {
+            return (
+                (((this.user && this.user.admin) ||
+                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
+                    !this.areWorkspaceGroupsEmpty()) ||
+                false
+            );
         },
     },
 });
@@ -519,12 +900,19 @@ header {
 }
 
 ::v-deep .new-comment {
-    @include flex(flex-end);
+    @include flex(flex-start);
     padding: 22px 20px;
     position: relative;
+    margin-left: 20px;
+    margin-right: 20px;
 
     @include bp-down($xs) {
+        margin: 0 -10px;
         padding: 15px 10px;
+    }
+
+    @media screen and (max-width: 320px) {
+        flex-wrap: wrap;
     }
 
     .container.data-view & {
@@ -568,6 +956,20 @@ header {
                 height: 42px;
             }
         }
+
+        .new-comment-wrap {
+            flex: 0 0 calc(100% - 65px);
+            flex-direction: column;
+            background-color: rgba(#f4f5f7, 0.55);
+
+            .tiptap-container {
+                background-color: white;
+
+                &:nth-of-type(2) {
+                    margin-top: 10px;
+                }
+            }
+        }
     }
 
     &-wrap {
@@ -577,6 +979,13 @@ header {
         background-color: #fff;
     }
 }
+// .ProseMirror p.is-editor-empty:first-child::before {
+// 	color: #adb5bd;
+// 	content: attr(data-placeholder);
+// 	float: left;
+// 	height: 0;
+// 	pointer-events: none;
+// }
 
 .comments-counter {
     font-family: $font-family-light;
@@ -585,14 +994,7 @@ header {
 .author {
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 5px;
-    margin-top: 2px;
     position: relative;
-}
-
-::v-deep .options-trigger {
-    opacity: 0;
-    visibility: hidden;
 }
 
 .body {
@@ -619,6 +1021,7 @@ header {
 
     @include bp-down($xs) {
         padding: 15px 10px 0 10px;
+        scroll-margin-top: 50px;
     }
 
     &-first-level {
@@ -654,13 +1057,6 @@ header {
     display: flex;
     flex: 100%;
     overflow-wrap: break-word;
-
-    @include attention() {
-        ::v-deep .options-trigger {
-            opacity: 1;
-            visibility: visible;
-        }
-    }
 }
 
 .column {
@@ -728,7 +1124,17 @@ header {
 
 .post-header {
     display: flex;
+    align-items: center;
     margin-bottom: 5px;
+
+    .icon {
+        font-size: 12px;
+        margin-left: 5px;
+
+        @include bp-up($md) {
+            margin-top: -2px;
+        }
+    }
 }
 
 .need-login-msg {
@@ -765,6 +1171,104 @@ header {
 
     @include bp-down($xs) {
         margin-left: 10px;
+    }
+}
+.event-level-selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+
+    .info {
+        display: none;
+    }
+
+    @include bp-down($xs) {
+        flex-direction: column;
+
+        label {
+            width: 100%;
+        }
+
+        .info {
+            display: inline-block;
+            float: right;
+        }
+
+        ::v-deep .info-content {
+            right: 0;
+        }
+    }
+}
+.event-level-radio {
+    width: 340px;
+    height: 115px;
+    border: solid 1px #d8dce0;
+    padding: 15px;
+    padding-bottom: 10px;
+    margin-left: 10px;
+    border-radius: 3px;
+    flex: 1;
+
+    @include bp-down($xs) {
+        width: calc(100% - 20px);
+        height: auto;
+        margin-right: 10px;
+        margin-bottom: 5px;
+    }
+
+    p {
+        margin-left: 30px;
+
+        @include bp-down($xs) {
+            display: none;
+        }
+    }
+
+    .radio-label {
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: 900;
+        margin-left: 10px;
+    }
+    input:checked {
+        background-color: red;
+    }
+}
+
+.event-sensor-radio > input:checked + div {
+    /* (RADIO CHECKED) DIV STYLES */
+    background-color: #ffd6bb;
+    border: 1px solid #ff6600;
+}
+.comment-toggle {
+    margin-top: 20px;
+    //margin-left: 20px;
+}
+
+.edit-event {
+    > * {
+        margin-top: 10px;
+    }
+
+    .tiptap-container:first-child {
+        font-weight: bold;
+    }
+}
+
+.event-range {
+    margin-top: 0px;
+    font-size: 12px;
+}
+
+.icon-flag,
+.icon-comment,
+.icon-view-data {
+    &::before {
+        body.floodnet & {
+            color: $color-floodnet-dark;
+        }
     }
 }
 </style>

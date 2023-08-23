@@ -172,9 +172,13 @@ export default Vue.extend({
             await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
             this.newNoteText = null;
         },
-        async saveEdit(ref): void {
-            const editedText = this.$refs[ref][0].editor.getHTML();
-
+        async saveEdit(ref): Promise<void> {
+            const editorRef = this.$refs[ref];
+            if (!editorRef || !editorRef[0] || !editorRef[0].editor) {
+                console.error("Tip tap ref not found");
+                return;
+            }
+            const editedText = editorRef[0].editor.getHTML();
             const payload = {
                 id: this.editingFieldNote?.id,
                 body: editedText,
@@ -182,7 +186,7 @@ export default Vue.extend({
                 stationId: this.stationId,
             };
             await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
-            await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+            return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
         editFieldNote(fieldNote: PortalStationFieldNotes) {
             this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
@@ -231,11 +235,7 @@ export default Vue.extend({
             this.editingFieldNote = null;
         },
         groupByMonth() {
-            const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) =>
-                moment(b.createdAt)
-                    .startOf("month")
-                    .format("YYYY/MM")
-            );
+            const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
 
             this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
 

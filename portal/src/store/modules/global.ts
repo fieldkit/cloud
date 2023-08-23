@@ -5,7 +5,7 @@ import { UserState } from "./user";
 import { LayoutState } from "./layout";
 import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
-import {FieldNotesState, NotesState} from "@/store";
+import { DiscussionState, NotesState, FieldNotesState } from "@/store";
 import { SnackbarState } from "@/store/modules/snackbar";
 
 export interface RouteState {
@@ -31,6 +31,7 @@ export interface GlobalState {
     readonly notes: NotesState;
     readonly fieldNotes: FieldNotesState;
     readonly snackbar: SnackbarState;
+    readonly discussion: DiscussionState;
 }
 
 export interface GlobalGetters {
@@ -39,4 +40,5 @@ export interface GlobalGetters {
     isAuthenticated: boolean;
     isBusy: boolean;
     mapped: MappedStations;
+    isUserTeamMemberOfStation: { (stationId: number): boolean };
 }

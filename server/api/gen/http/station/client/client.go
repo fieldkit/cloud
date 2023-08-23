@@ -69,6 +69,10 @@ type Client struct {
 	// endpoint.
 	ProgressDoer goahttp.Doer
 
+	// UpdateModule Doer is the HTTP client used to make requests to the update
+	// module endpoint.
+	UpdateModuleDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -106,6 +110,7 @@ func NewClient(
 		DeleteDoer:                doer,
 		AdminSearchDoer:           doer,
 		ProgressDoer:              doer,
+		UpdateModuleDoer:          doer,
 		CORSDoer:                  doer,
 		RestoreResponseBody:       restoreBody,
 		scheme:                    scheme,
@@ -446,6 +451,30 @@ func (c *Client) Progress() goa.Endpoint {
 		resp, err := c.ProgressDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("station", "progress", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UpdateModule returns an endpoint that makes HTTP requests to the station
+// service update module server.
+func (c *Client) UpdateModule() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateModuleRequest(c.encoder)
+		decodeResponse = DecodeUpdateModuleResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUpdateModuleRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateModuleDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("station", "update module", err)
 		}
 		return decodeResponse(resp)
 	}

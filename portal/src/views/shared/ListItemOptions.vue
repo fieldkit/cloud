@@ -67,7 +67,7 @@ export default Vue.extend({
     &:after {
         @include flex(flex-end);
         content: "...";
-        height: 17px;
+        height: 7px;
         font-size: 32px;
         font-family: "icomoon";
     }
@@ -84,13 +84,13 @@ button {
 
 .options {
     &-trigger {
-        // @include position(absolute, 0 -40px null null);
+        position: relative;
         padding-left: 10px;
         transition: opacity 0.33s;
     }
 
     &-btns {
-        @include position(absolute, 0 null null null);
+        @include position(absolute, 0 null null 45px);
         opacity: 0;
         visibility: hidden;
         padding: 8px 12px;

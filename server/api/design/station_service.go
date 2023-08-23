@@ -68,6 +68,7 @@ var StationModule = Type("StationModule", func() {
 	Attribute("hardwareIdBase64", String)
 	Attribute("metaRecordId", Int64)
 	Attribute("name", String)
+	Attribute("label", String)
 	Attribute("position", Int32)
 	Attribute("flags", Int32)
 	Attribute("internal", Boolean)
@@ -164,6 +165,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("readOnly", Boolean)
 		Attribute("status", String)
 		Attribute("hidden", Boolean)
+		Attribute("description", String)
 		Required("id", "name", "model", "owner", "deviceId", "interestingness", "attributes", "uploads", "photos", "readOnly")
 
 		Attribute("battery", Float32)
@@ -200,6 +202,7 @@ var StationFull = ResultType("application/vnd.app.station.full", func() {
 		Attribute("photos")
 		Attribute("readOnly")
 		Attribute("hidden")
+		Attribute("description")
 		Attribute("status")
 
 		Attribute("battery")
@@ -362,6 +365,7 @@ var _ = Service("station", func() {
 			Attribute("deviceId", String)
 			Attribute("locationName", String)
 			Attribute("statusPb", String)
+			Attribute("description", String)
 			Required("name", "deviceId")
 		})
 
@@ -450,6 +454,7 @@ var _ = Service("station", func() {
 			Attribute("name", String)
 			Attribute("locationName", String)
 			Attribute("statusPb", String)
+			Attribute("description", String)
 			Required("name")
 		})
 
@@ -666,6 +671,31 @@ var _ = Service("station", func() {
 
 		HTTP(func() {
 			GET("stations/{stationId}/progress")
+
+			httpAuthentication()
+		})
+	})
+
+	Method("update module", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+			Attribute("id", Int32)
+			Required("id")
+			Attribute("moduleId", Int32)
+			Required("moduleId")
+			Attribute("label", String)
+			Required("label")
+		})
+
+		Result(StationFull)
+
+		HTTP(func() {
+			PATCH("stations/{id}/modules/{moduleId}")
 
 			httpAuthentication()
 		})

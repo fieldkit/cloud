@@ -13,10 +13,11 @@ import { BoundingRectangle } from "@/store/map-types";
 import { SensorInfoResponse } from "@/views/viz/api";
 
 // Ew
-import { NewComment } from "@/views/comments/model";
-import { Comment } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
+import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
+import { Bookmark } from "@/views/viz/viz";
 
 export interface PortalDeployStatus {
     serverName: string;
@@ -223,6 +224,7 @@ export class CurrentUser {
     bio: string;
     mediaUrl: string;
     tncDate: number;
+    admin: boolean;
 }
 
 export enum UserRolesEnum {
@@ -293,6 +295,7 @@ export interface ModuleSensor {
 export interface StationModule {
     id: number;
     name: string;
+    label?: string; // custom name
     hardwareId: string;
     hardwareIdBase64: string;
     position: number;
@@ -340,6 +343,7 @@ export interface Station {
     name: string;
     owner: Owner;
     deviceId: string;
+    model: { name: string };
     uploads: Upload[];
     photos: Photos;
     readOnly: boolean;
@@ -357,6 +361,7 @@ export interface Station {
         attributes: ProjectAttribute[];
     };
     status: StationStatus;
+    description: string;
 }
 
 export interface ProjectsResponse {
@@ -434,6 +439,19 @@ export interface InvokeParams {
 export interface SavedBookmark {
     url: string;
     bookmark: string;
+    token: string;
+}
+
+export interface PendingInvite {
+    id: number;
+    project: { id: number; name: string; };
+    time: number;
+    role: number;
+}
+
+export interface PendingInvites {
+    pending: PendingInvite[];
+    projects: Project[];
 }
 
 export enum MapViewType {
@@ -779,6 +797,15 @@ class FKApi {
         });
     }
 
+    updateStation(data: {id: number, name: string, description: string | null }): Promise<Station> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.id,
+            data: data,
+        });
+    }
+
     getUserStations(onNoAuth: OnNoAuth<StationsResponse>): Promise<StationsResponse> {
         if (!this.token.authenticated()) {
             return onNoAuth();
@@ -807,6 +834,9 @@ class FKApi {
     }
 
     getUsersByProject(projectId): Promise<ProjectUsers> {
+        if (!_.isNumber(projectId)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -840,7 +870,7 @@ class FKApi {
         });
     }
 
-    getInvitesByUser() {
+    getInvitesByUser(): Promise<PendingInvites> {
         return this.invoke({
             auth: Auth.Required,
             method: "GET",
@@ -953,7 +983,10 @@ class FKApi {
         });
     }
 
-    getProject(id): Promise<Project> {
+    getProject(id: number): Promise<Project> {
+        if (!_.isNumber(id)) {
+            throw new Error("Expected numeric projectId");
+        }
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -961,7 +994,7 @@ class FKApi {
         });
     }
 
-    getProjectActivity(id): Promise<ProjectActivityResponse> {
+    getProjectActivity(id: number): Promise<ProjectActivityResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
@@ -1055,6 +1088,16 @@ class FKApi {
             auth: Auth.Required,
             method: "GET",
             url: this.baseUrl + "/modules/meta",
+        });
+    }
+
+    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "PATCH",
+            url: this.baseUrl + "/stations/" + data.stationId + "/modules/" + data.moduleId,
+            data: {label: data.label},
         });
     }
 
@@ -1457,13 +1500,13 @@ class FKApi {
         });
     }
 
-    public async getComments(projectIDOrBookmark: number | string): Promise<{ posts: Comment[] }> {
+    public async getComments(projectIDOrBookmark: number | Bookmark): Promise<{ posts: Comment[] }> {
         let apiURL;
 
-        if (typeof projectIDOrBookmark === "number") {
-            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
-        } else {
+        if (projectIDOrBookmark instanceof Bookmark) {
             apiURL = this.baseUrl + "/discussion?bookmark=" + encodeURIComponent(JSON.stringify(projectIDOrBookmark));
+        } else {
+            apiURL = this.baseUrl + "/discussion/projects/" + projectIDOrBookmark;
         }
 
         const returned = await this.invoke({
@@ -1521,6 +1564,63 @@ class FKApi {
         console.log("edit", returned);
 
         return returned;
+    }
+
+    public async postDataEvent(dataEvent: NewDataEvent): Promise<{ event: DataEvent }> {
+        console.log("save-event-log", dataEvent);
+
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events",
+            data: {
+                event: _.extend({}, dataEvent, {
+                    body: JSON.stringify(dataEvent.body),
+                    description: JSON.stringify(dataEvent.description),
+                    title: JSON.stringify(dataEvent.title),
+                    allProjectSensors: dataEvent.allProjectSensors,
+                }),
+            },
+        });
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async updateDataEvent(dataEvent: DataEvent): Promise<{ event: DataEvent }> {
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/data-events/" + dataEvent.id,
+            data: {
+                eventId: dataEvent.id,
+                title: typeof dataEvent.title === "object" ? JSON.stringify(dataEvent.title) : dataEvent.title,
+                description: typeof dataEvent.description === "object" ? JSON.stringify(dataEvent.description) : dataEvent.description,
+                start: dataEvent.start,
+                end: dataEvent.end,
+            },
+        });
+
+        return {
+            event: returned.event,
+        };
+    }
+
+    public async deleteDataEvent(dataEventID: number): Promise<boolean> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/data-events/" + dataEventID,
+        });
+    }
+
+    public async getDataEvents(payload) {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/data-events?bookmark=" + encodeURIComponent(payload),
+        });
     }
 
     public async seenNotifications(payload) {
@@ -1621,7 +1721,7 @@ class FKApi {
         });
     }
 
-    public getProjectsForStation(id: number): Promise<PortalDeployStatus> {
+    public getProjectsForStation(id: number): Promise<ProjectsResponse> {
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",

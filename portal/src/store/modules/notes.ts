@@ -25,6 +25,7 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: NotesState },
             payload: { id: number }
         ) => {
+            commit(MutationTypes.NOTES_CLEAR);
             const notes = await services.api.getStationNotes(payload.id);
             commit(MutationTypes.NOTES_UPDATE, notes);
         },
@@ -43,6 +44,14 @@ const mutations = {
         Vue.set(state, "notes", payload.notes);
         Vue.set(state, "media", payload.media);
         Vue.set(state, "readOnly", payload.station.readOnly);
+    },
+
+    [MutationTypes.NOTES_CLEAR]: (
+        state: NotesState,
+    ) => {
+        Vue.set(state, "notes", null);
+        Vue.set(state, "media", null);
+        Vue.set(state, "readOnly", true);
     },
 };
 
