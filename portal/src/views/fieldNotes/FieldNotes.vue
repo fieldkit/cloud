@@ -107,6 +107,7 @@ import moment from "moment";
 import _ from "lodash";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { jsPDF } from "jspdf";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 interface GroupedFieldNotes {
     [date: string]: PortalStationFieldNotes[];
@@ -169,7 +170,20 @@ export default Vue.extend({
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
-            await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
+
+            try {
+                await this.$store.dispatch(ActionTypes.ADD_FIELD_NOTE, { stationId: this.stationId, note });
+                await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.addSuccess"),
+                    type: SnackbarStyle.success,
+                });
+            } catch (e) {
+                return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("somethingWentWrong"),
+                    type: SnackbarStyle.fail,
+                });
+            }
+
             this.newNoteText = null;
         },
         async saveEdit(ref): Promise<void> {
@@ -185,8 +199,20 @@ export default Vue.extend({
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
-            await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
-            return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+
+            try {
+                await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
+                await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.editSuccess"),
+                    type: SnackbarStyle.success,
+                });
+                return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+            } catch (e) {
+                return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("somethingWentWrong"),
+                    type: SnackbarStyle.fail,
+                });
+            }
         },
         editFieldNote(fieldNote: PortalStationFieldNotes) {
             this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
@@ -200,7 +226,18 @@ export default Vue.extend({
                 },
                 callback: async (confirm) => {
                     if (confirm) {
-                        await this.$store.dispatch(ActionTypes.DELETE_FIELD_NOTE, { stationId: this.stationId, noteId });
+                        try {
+                            await this.$store.dispatch(ActionTypes.DELETE_FIELD_NOTE, { stationId: this.stationId, noteId });
+                            await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                                message: this.$tc("fieldNotes.deleteSuccess"),
+                                type: SnackbarStyle.success,
+                            });
+                        } catch (e) {
+                            await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                                message: this.$tc("somethingWentWrong"),
+                                type: SnackbarStyle.fail,
+                            });
+                        }
                     }
                 },
             });
