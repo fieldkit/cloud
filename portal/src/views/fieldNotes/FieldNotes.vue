@@ -35,7 +35,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && !groupedFieldNotes" class="loading-notes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="!isLoading && groupedFieldNotes.length === 0" class="loading-notes">{{ $tc("fieldNotes.noData") }}</div>
         <div v-if="isLoading" class="loading-notes">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
@@ -238,7 +238,7 @@ export default Vue.extend({
             const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
 
             this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
-
+            console.log("RADOI GROUPED", this.groupedFieldNotes);
             this.$nextTick(() => {
                 this.editingFieldNote = null;
                 this.isLoading = false;

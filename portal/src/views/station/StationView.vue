@@ -234,7 +234,6 @@
             </section>
 
             <section class="section-notes container-box">
-                field notes
                 <FieldNotes :stationName="station.name"></FieldNotes>
             </section>
         </div>
