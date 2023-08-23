@@ -351,6 +351,10 @@ export class Graph extends Viz {
         return this.settings.mobile;
     }
 
+    public get lastSensorReading(): number | null {
+        return _.max(this.dataSets.map((ds) => ds.lastSensorReading).filter((value) => value != null)) || null;
+    }
+
     public get timeRangeOfAll(): TimeRange | null {
         const everyAllRange = this.dataSets.map((ds) => ds.all?.timeRange).filter((range): range is number[] => range != null);
         if (everyAllRange.length > 0) {
@@ -443,16 +447,19 @@ export class Graph extends Viz {
         return this.geo;
     }
 
-    private getFastRange(fastTime: FastTime) {
-        const sensorRange = this.timeRangeOfAll;
-        if (sensorRange == null) throw new Error(`viz: No timeRangeOfAll`);
+    private getFastRange(fastTime: FastTime): TimeRange {
+        const lastSensorReading = this.lastSensorReading;
+
+        if (lastSensorReading == null) throw new Error(`viz: No timeRangeOfAll`);
         if (fastTime === FastTime.All) {
-            return sensorRange;
+            const range = this.timeRangeOfAll;
+            if (range == null) throw new Error(`viz: No timeRangeOfAll`);
+            return new TimeRange(range.start, lastSensorReading);
         } else {
             const days = fastTime as number;
-            const start = new Date(sensorRange.end);
+            const start = new Date(lastSensorReading);
             start.setDate(start.getDate() - days);
-            return new TimeRange(start.getTime(), sensorRange.end);
+            return new TimeRange(start.getTime(), lastSensorReading);
         }
     }
 
