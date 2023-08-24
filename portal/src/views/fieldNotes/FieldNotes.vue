@@ -36,7 +36,7 @@
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
         <div v-if="!isLoading && !groupedFieldNotes">{{ $tc("fieldNotes.noData") }}</div>
-        <div v-if="!isLoading">{{ $tc("fieldNotes.loading") }}</div>
+        <div v-if="isLoading">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
             <div
@@ -201,8 +201,8 @@ export default Vue.extend({
                 stationId: this.stationId,
             };
 
+            // not the nicest way, but the tiptap editor does not revert itself to the initial body text, so need to reload everything
             if (editorRef[0].editor.isEmpty) {
-                console.log("radoi empty");
                 this.editingFieldNote = null;
                 this.groupedFieldNotes = null;
 
@@ -294,8 +294,6 @@ export default Vue.extend({
                 const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
                 this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
             }
-
-            console.log("RADOI GROUPED", this.groupedFieldNotes);
             this.$nextTick(() => {
                 this.editingFieldNote = null;
                 this.isLoading = false;

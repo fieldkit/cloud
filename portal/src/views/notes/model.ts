@@ -153,8 +153,6 @@ export class Notes {
     public static createFrom(portalNotes: PortalStationNotesReply): Notes {
         return portalNotes.notes.reduceRight((formNotes, portalNote) => {
             const key = portalNote.key;
-            console.log("radoi formnotes", formNotes)
-            console.log("radoi key", key)
             if (!formNotes[key]) {
                 throw new Error("unexpected note");
             }
