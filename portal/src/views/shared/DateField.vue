@@ -34,9 +34,17 @@ export default Vue.extend({
             required: false,
         },
     },
+    data() {
+        return {
+            initialInput: true,
+        };
+    },
     methods: {
         onInput(value) {
-            this.$emit("input", moment(value).format(this.format));
+            if (!this.initialInput) {
+                this.$emit("input", moment(value).format(this.format));
+                this.initialInput = false;
+            }
         },
     },
 });

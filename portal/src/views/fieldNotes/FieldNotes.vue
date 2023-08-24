@@ -1,7 +1,5 @@
 <template>
     <div class="field-notes-wrap">
-        <vue-confirm-dialog />
-
         <header class="header">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
@@ -236,6 +234,7 @@ export default Vue.extend({
             this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
         },
         deleteFieldNote(noteId: number) {
+            console.log("Radoi");
             this.$confirm({
                 message: this.$tc("fieldNotes.sureDelete"),
                 button: {
@@ -246,6 +245,7 @@ export default Vue.extend({
                     if (confirm) {
                         try {
                             await this.$store.dispatch(ActionTypes.DELETE_FIELD_NOTE, { stationId: this.stationId, noteId });
+                            await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
                             await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                                 message: this.$tc("fieldNotes.deleteSuccess"),
                                 type: SnackbarStyle.success,
@@ -293,6 +293,8 @@ export default Vue.extend({
             if (this.fieldNotes.length > 0) {
                 const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
                 this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
+            } else {
+                this.groupedFieldNotes = null;
             }
             this.$nextTick(() => {
                 this.editingFieldNote = null;

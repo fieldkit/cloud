@@ -174,7 +174,8 @@
             "mapTextHide": "Stations will not be visible on the map for others",
             "mapHint": "Pan or zoom to set map view",
             "startDate": "Start date",
-            "endDate": "End date"
+            "endDate": "End date",
+            "confirmLeavePopupMessage": "You have unsaved changes. Are you sure you want to leave?"
         },
         "invite": {
             "accept": "Accept Invite",
@@ -186,7 +187,9 @@
         "edit": {
             "title": "Edit Project",
             "link": "Edit Project"
-        }
+        },
+        "updateSuccess": "Project details updated!",
+        "addSuccess": "Project added!"
     },
     "station": {
         "readings": {
@@ -432,12 +435,14 @@
         "title": "Station Details",
         "failed": "Oops, there was a problem saving your changes.",
         "success": "Saved.",
-        "confirmLeavePopupMessage": "You may have unsaved changes, are you sure you'd like to leave?",
+        "confirmLeavePopupMessage": "You have unsaved changes. Are you sure you want to leave?",
         "noFieldData": "Nothing added yet.",
         "complete": "Complete",
         "btn": {
             "save": "Save"
-        }
+        },
+        "updateSuccess": "Field notes updated!",
+        "updateFail": "Field notes update failed!"
     },
     "fieldNotes": {
         "title": "Field Notes",
