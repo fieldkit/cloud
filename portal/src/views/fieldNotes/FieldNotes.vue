@@ -35,8 +35,8 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && groupedFieldNotes.length === 0" class="loading-notes">{{ $tc("fieldNotes.noData") }}</div>
-        <div v-if="isLoading" class="loading-notes">{{ $tc("fieldNotes.loading") }}</div>
+        <div v-if="!isLoading && !groupedFieldNotes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="!isLoading">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
             <div
@@ -192,6 +192,7 @@ export default Vue.extend({
                 console.error("Tip tap ref not found");
                 return;
             }
+
             const editedText = editorRef[0].editor.getHTML();
             const payload = {
                 id: this.editingFieldNote?.id,
@@ -199,6 +200,23 @@ export default Vue.extend({
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
+
+            if (editorRef[0].editor.isEmpty) {
+                console.log("radoi empty");
+                this.editingFieldNote = null;
+                this.groupedFieldNotes = null;
+
+                await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.emptyNoteCannotSave"),
+                    type: SnackbarStyle.fail,
+                });
+
+                setTimeout(() => {
+                    this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+                }, 1000);
+
+                return;
+            }
 
             try {
                 await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
@@ -272,9 +290,11 @@ export default Vue.extend({
             this.editingFieldNote = null;
         },
         groupByMonth() {
-            const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
+            if (this.fieldNotes.length > 0) {
+                const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
+                this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
+            }
 
-            this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
             console.log("RADOI GROUPED", this.groupedFieldNotes);
             this.$nextTick(() => {
                 this.editingFieldNote = null;
@@ -507,10 +527,6 @@ button {
     }
 }
 
-.loading-notes {
-    margin-top: 15px;
-}
-
 .field-notes-wrap {
     @include bp-down($sm) {
         padding: 20px 10px 20px;
@@ -519,5 +535,9 @@ button {
 
 .field-note-list {
     margin-bottom: -20px;
+
+    ::v-deep .tiptap-side {
+        display: none;
+    }
 }
 </style>
