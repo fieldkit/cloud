@@ -3,7 +3,10 @@
         <header class="header">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button class="button" @click="generatePDF">{{ $t("fieldNotes.btnExport") }}</button>
+                <button class="button" @click="generatePDF">
+                    <i class="icon icon-export"></i>
+                    {{ $t("fieldNotes.btnExport") }}
+                </button>
             </div>
         </header>
 
@@ -539,5 +542,10 @@ button {
     ::v-deep .tiptap-side {
         display: none;
     }
+}
+
+.icon-export:before {
+    color: var(--color-dark);
+    margin-right: 8px;
 }
 </style>
