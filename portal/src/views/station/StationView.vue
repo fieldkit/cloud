@@ -76,7 +76,7 @@
                                 <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
                             </div>
 
-                            <div v-if="station.location" class="flex">
+                            <div v-if="station.location" class="flex flex-wrap">
                                 <div class="station-coordinate">
                                     <span class="bold">{{ $tc("station.latitude") }}</span>
                                     <span>{{ station.location.latitude | prettyCoordinate }}</span>
@@ -638,12 +638,13 @@ export default Vue.extend({
             display: flex;
         }
 
-        &:last-of-type {
-            margin-left: 15px;
+        &:first-of-type {
+            margin-right: 15px;
         }
 
         span:nth-of-type(2) {
             margin-left: 2px;
+            min-width: 45px;
 
             @include bp-down($xs) {
                 order: -1;
