@@ -54,15 +54,15 @@
                                         @click="editingDescription = true"
                                         class="station-description-edit"
                                     >
-                                        {{ $t("edit") }}
+                                        {{ $t("notes.stationDescriptionEditLabel") }}
                                     </a>
                                     <a
                                         @click="saveStationDescription()"
                                         v-if="editingDescription && form.description"
                                         class="station-description-edit"
-                                        style="margin-top: 4px;"
+                                        style="margin-top: 4px"
                                     >
-                                        {{ $t("save") }}
+                                        {{ $t("notes.stationDescriptionSaveLabel") }}
                                     </a>
                                 </template>
                             </div>
@@ -200,10 +200,10 @@
                                     @click="onEditModuleNameClick(module)"
                                     class="module-edit-name"
                                 >
-                                    {{ $t("edit") }}
+                                    {{ $t("notes.moduleNameEditLabel") }}
                                 </a>
                                 <a v-if="editedModule && editedModule.id === module.id" @click="saveModuleName()" class="module-edit-name">
-                                    {{ $t("save") }}
+                                    {{ $t("notes.moduleNameSaveLabel") }}
                                 </a>
                             </template>
                         </li>
@@ -694,6 +694,7 @@ export default Vue.extend({
 
         @include bp-down($xs) {
             padding-top: 54px;
+            display: block;
         }
 
         &-values {
@@ -722,7 +723,7 @@ export default Vue.extend({
 
             @include bp-down($sm) {
                 padding: 10px 20px;
-                min-width: unset;
+                width: 100%;
             }
 
             &.active {
@@ -752,6 +753,10 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
+
+                @include bp-down($sm) {
+                    display: block;
+                }
             }
         }
 
@@ -787,7 +792,7 @@ export default Vue.extend({
             }
 
             @include bp-down($xs) {
-                padding: 15px 10px;
+                padding: 16px 10px;
                 font-size: 18px;
                 @include position(absolute, 0 null null 0);
             }

@@ -442,7 +442,12 @@
             "save": "Save"
         },
         "updateSuccess": "Field notes updated!",
-        "updateFail": "Field notes update failed!"
+        "updateFail": "Field notes update failed!",
+        "customTitleEditLabel": "Edit",
+        "stationDescriptionEditLabel": "Edit",
+        "stationDescriptionSaveLabel": "Save",
+        "moduleNameEditLabel": "Edit",
+        "moduleNameSaveLabel": "Save"
     },
     "fieldNotes": {
         "title": "Field Notes",
@@ -512,5 +517,6 @@
         "swipeTip": "Swipe the chart to see more data.",
         "noData": "There's no data to display."
     },
-    "edit": "edit"
+    "edit": "Edit",
+    "save": "Save"
 }
