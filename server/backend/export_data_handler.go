@@ -277,11 +277,15 @@ type csvField struct {
 }
 
 type fieldSet struct {
+	kind   string
+	module string
 	fields []*csvField
 }
 
-func newFieldSet() *fieldSet {
+func newFieldSet(kind string, module string) *fieldSet {
 	return &fieldSet{
+		kind:   kind,
+		module: module,
 		fields: make([]*csvField, 0),
 	}
 }
@@ -291,10 +295,12 @@ func (p *fieldSet) addField(name string, get optionalFieldFunc) {
 }
 
 type preparingCsv struct {
-	fields  *fieldSet
-	metas   map[int64]*pb.DataRecord
-	modules map[string]*fieldSet
-	order   []string
+	fields    *fieldSet
+	metas     map[int64]*pb.DataRecord
+	conflicts map[string]map[string]bool
+	modules   map[string]*fieldSet
+	order     []string
+	compacted []*fieldSet
 }
 
 func (p *preparingCsv) addField(name string, get fieldFunc) {
@@ -312,10 +318,11 @@ func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io
 		bytesRead:     0,
 		expectedBytes: 0,
 		preparing: &preparingCsv{
-			fields:  newFieldSet(),
-			metas:   make(map[int64]*pb.DataRecord),
-			modules: make(map[string]*fieldSet),
-			order:   make([]string, 0),
+			fields:    newFieldSet("fixed", "fixed"),
+			metas:     make(map[int64]*pb.DataRecord),
+			conflicts: make(map[string]map[string]bool),
+			modules:   make(map[string]*fieldSet),
+			order:     make([]string, 0),
 		},
 	}
 	self.walker = NewFkbWalker(files, metrics, self, progress, true)
@@ -370,6 +377,87 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 	return nil
 }
 
+const CompactFieldSets = true
+
+func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
+	unassigned := make(map[string]*fieldSet)
+	compacted := make([]*fieldSet, 0)
+	for id, fs := range e.prepared.modules {
+		unassigned[id] = fs
+	}
+
+	// The general idea here is to loop over all the module field sets, in the
+	// order they appeared in the data. For each of them we check the remaining,
+	// unassigned field sets to see if they can share columns in the final CSV.
+	// Modules can share columns if:
+	// 1. They are of the same kind, and therefore have the same number of columns.
+	// 2. They were never installed together on the station.
+	// For those can can be compacted, we generate a field set that delegates to
+	// the first field set that returns a value.
+	for _, id := range e.prepared.order {
+		if fs, ok := unassigned[id]; ok {
+			candidates := make([]*fieldSet, 1)
+			candidates[0] = fs
+
+			if CompactFieldSets {
+				conflicts := e.prepared.conflicts[id]
+				for maybe_id, maybe := range unassigned {
+					if maybe_id != id {
+						if maybe.kind == fs.kind {
+							if len(maybe.fields) != len(fs.fields) {
+								panic("What, same kind different fields?")
+							}
+							if conflicts == nil || !conflicts[maybe_id] {
+								candidates = append(candidates, maybe)
+							}
+						}
+					}
+				}
+			}
+
+			for _, fs := range candidates {
+				delete(unassigned, fs.module)
+			}
+
+			// Check to see if two fieldsets are sharing a set of columns, if so
+			// for column values we check to see which of the fieldsets returns
+			// a value and return that one. Note that they should never *both*
+			// return a value because of the conflict check. This could be relaxed.
+			if len(candidates) > 1 {
+				numberFields := len(fs.fields)
+				fields := make([]*csvField, numberFields)
+				for i := 0; i < numberFields; i += 1 {
+					fields[i] = &csvField{
+						name: fs.fields[i].name,
+						get: (func(i int) optionalFieldFunc {
+							return func(r *records) *string {
+								for _, fs := range candidates {
+									value := fs.fields[i].get(r)
+									if value != nil {
+										return value
+									}
+								}
+								return nil
+							}
+						})(i),
+					}
+				}
+				combined := &fieldSet{
+					kind:   fs.kind,
+					module: "", // Would love to drop module field
+					fields: fields,
+				}
+				compacted = append(compacted, combined)
+			} else {
+				compacted = append(compacted, fs)
+			}
+		}
+	}
+	e.prepared.compacted = compacted
+
+	return nil
+}
+
 func (e *CsvExporter) Export(ctx context.Context, urls []string) error {
 	log := Logger(ctx).Sugar()
 
@@ -407,16 +495,37 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 	log := Logger(ctx).Sugar()
 
 	if rawRecord.Metadata != nil {
+		modulesInRow := []string{}
+		for _, module := range rawRecord.Modules {
+			modulesInRow = append(modulesInRow, hex.EncodeToString(module.Id))
+		}
+
 		for moduleIndex, module := range rawRecord.Modules {
 			id := hex.EncodeToString(module.Id)
+
+			// Track which modules "conflict" in the sense that they were both
+			// on the station at one once. I guess they could be considered
+			// siblings?
+			if _, ok := e.preparing.conflicts[id]; !ok {
+				e.preparing.conflicts[id] = make(map[string]bool)
+			}
+			for _, otherId := range modulesInRow {
+				if otherId != id {
+					e.preparing.conflicts[id][otherId] = true
+				}
+			}
+
 			if _, ok := e.preparing.modules[id]; ok {
 				continue
 			}
 
-			log.Infow("module", "module_id", id)
+			log.Infow("module", "module_id", id, "module_name", module.Name)
 
-			fields := newFieldSet()
+			fields := newFieldSet(module.Name, id)
 
+			// Wraps a field getter in a check for the module's presence for
+			// this row, if the module wasn't present when this row was
+			// generated then return nil for no-value.
 			checkForModule := func(get fieldFunc) optionalFieldFunc {
 				return (func(id string) optionalFieldFunc {
 					return func(r *records) *string {
@@ -532,8 +641,8 @@ func (e *CsvExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawM
 			}
 		}
 
-		for _, id := range e.prepared.order {
-			for _, field := range e.prepared.modules[id].fields {
+		for _, fs := range e.prepared.compacted {
+			for _, field := range fs.fields {
 				value := field.get(e.records)
 				if value != nil {
 					e.row = append(e.row, *value)
