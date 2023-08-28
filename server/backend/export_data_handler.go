@@ -252,8 +252,9 @@ func (e *JsonLinesExporter) OnDone(ctx context.Context) (err error) {
 }
 
 type records struct {
-	meta *pb.DataRecord
-	data *pb.DataRecord
+	meta    *pb.DataRecord
+	data    *pb.DataRecord
+	modules map[string]bool
 }
 
 type CsvExporter struct {
@@ -268,10 +269,11 @@ type CsvExporter struct {
 }
 
 type fieldFunc func(*records) string
+type optionalFieldFunc func(*records) *string
 
 type csvField struct {
 	name string
-	get  fieldFunc
+	get  optionalFieldFunc
 }
 
 type fieldSet struct {
@@ -284,7 +286,7 @@ func newFieldSet() *fieldSet {
 	}
 }
 
-func (p *fieldSet) addField(name string, get fieldFunc) {
+func (p *fieldSet) addField(name string, get optionalFieldFunc) {
 	p.fields = append(p.fields, &csvField{name: name, get: get})
 }
 
@@ -296,7 +298,10 @@ type preparingCsv struct {
 }
 
 func (p *preparingCsv) addField(name string, get fieldFunc) {
-	p.fields.addField(name, get)
+	p.fields.addField(name, func(r *records) *string {
+		value := get(r)
+		return &value
+	})
 }
 
 func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io.Writer, progress OnWalkProgress) (self *CsvExporter) {
@@ -368,14 +373,20 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 func (e *CsvExporter) Export(ctx context.Context, urls []string) error {
 	log := Logger(ctx).Sugar()
 
-	log.Infow("module", "module_ids", e.prepared.order)
+	if err := e.compactFieldSets(ctx); err != nil {
+		return err
+	}
+
+	log.Infow("prepared", "conflicts", e.prepared.conflicts)
+	log.Infow("prepared", "module_ids", e.prepared.order)
+	log.Infow("prepared", "compacted", e.prepared.compacted)
 
 	header := make([]string, 0, len(e.prepared.fields.fields))
 	for _, field := range e.prepared.fields.fields {
 		header = append(header, field.name)
 	}
-	for _, id := range e.prepared.order {
-		for _, field := range e.prepared.modules[id].fields {
+	for _, fs := range e.prepared.compacted {
+		for _, field := range fs.fields {
 			header = append(header, field.name)
 		}
 	}
@@ -406,22 +417,35 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 
 			fields := newFieldSet()
 
-			fields.addField("module_index", func(r *records) string {
+			checkForModule := func(get fieldFunc) optionalFieldFunc {
+				return (func(id string) optionalFieldFunc {
+					return func(r *records) *string {
+						if _, ok := r.modules[id]; ok {
+							value := get(r)
+							return &value
+						} else {
+							return nil
+						}
+					}
+				})(id)
+			}
+
+			fields.addField("module_index", checkForModule(func(r *records) string {
 				return fmt.Sprintf("%d", moduleIndex)
-			})
-			fields.addField("module_position", func(r *records) string {
+			}))
+			fields.addField("module_position", checkForModule(func(r *records) string {
 				return fmt.Sprintf("%d", module.Position)
-			})
-			fields.addField("module_name", func(r *records) string {
+			}))
+			fields.addField("module_name", checkForModule(func(r *records) string {
 				return module.Name
-			})
-			fields.addField("module_id", func(r *records) string {
+			}))
+			fields.addField("module_id", checkForModule(func(r *records) string {
 				return hex.EncodeToString(module.Id)
-			})
+			}))
 
 			for sensorIndex, sensor := range module.Sensors {
-				fields.addField(sensor.Name, (func(moduleIndex, sensorIndex int) fieldFunc {
-					return func(r *records) string {
+				fields.addField(sensor.Name, (func(moduleIndex, sensorIndex int) optionalFieldFunc {
+					return checkForModule(func(r *records) string {
 						if moduleIndex >= len(r.data.Readings.SensorGroups) {
 							return ""
 						}
@@ -435,11 +459,11 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 							return ""
 						}
 						return fmt.Sprintf("%v", sensor.GetCalibratedValue())
-					}
+					})
 				})(moduleIndex, sensorIndex))
 
-				fields.addField(fmt.Sprintf("%s_raw_v", sensor.Name), (func(moduleIndex, sensorIndex int) fieldFunc {
-					return func(r *records) string {
+				fields.addField(fmt.Sprintf("%s_raw_v", sensor.Name), (func(moduleIndex, sensorIndex int) optionalFieldFunc {
+					return checkForModule(func(r *records) string {
 						if moduleIndex >= len(r.data.Readings.SensorGroups) {
 							return ""
 						}
@@ -453,7 +477,7 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 							return ""
 						}
 						return fmt.Sprintf("%v", sensor.GetUncalibratedValue())
-					}
+					})
 				})(moduleIndex, sensorIndex))
 			}
 
@@ -488,28 +512,31 @@ func (e *CsvExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord, rawM
 			return fmt.Errorf("missing meta: %v", rawRecord.Readings.Meta)
 		}
 
-		e.records.meta = meta
 		e.records.data = rawRecord
+		if e.records.modules == nil || e.records.meta != meta {
+			e.records.meta = meta
+			e.records.modules = make(map[string]bool)
+			for _, module := range e.records.meta.Modules {
+				e.records.modules[hex.EncodeToString(module.Id)] = true
+			}
+		}
 
 		e.row = make([]string, 0, len(e.prepared.fields.fields))
 
 		for _, field := range e.prepared.fields.fields {
 			value := field.get(e.records)
-			e.row = append(e.row, value)
+			if value != nil {
+				e.row = append(e.row, *value)
+			} else {
+				e.row = append(e.row, "")
+			}
 		}
 
 		for _, id := range e.prepared.order {
-			metaHasModule := false
-			for _, temp := range e.records.meta.Modules {
-				if id == hex.EncodeToString(temp.Id) {
-					metaHasModule = true
-					break
-				}
-			}
 			for _, field := range e.prepared.modules[id].fields {
-				if metaHasModule {
-					value := field.get(e.records)
-					e.row = append(e.row, value)
+				value := field.get(e.records)
+				if value != nil {
+					e.row = append(e.row, *value)
 				} else {
 					e.row = append(e.row, "")
 				}
