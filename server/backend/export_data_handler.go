@@ -278,14 +278,12 @@ type csvField struct {
 
 type fieldSet struct {
 	kind   string
-	module string
 	fields []*csvField
 }
 
-func newFieldSet(kind string, module string) *fieldSet {
+func newFieldSet(kind string) *fieldSet {
 	return &fieldSet{
 		kind:   kind,
-		module: module,
 		fields: make([]*csvField, 0),
 	}
 }
@@ -318,7 +316,7 @@ func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io
 		bytesRead:     0,
 		expectedBytes: 0,
 		preparing: &preparingCsv{
-			fields:    newFieldSet("fixed", "fixed"),
+			fields:    newFieldSet("fixed"),
 			metas:     make(map[int64]*pb.DataRecord),
 			conflicts: make(map[string]map[string]bool),
 			modules:   make(map[string]*fieldSet),
@@ -396,6 +394,8 @@ func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
 	// the first field set that returns a value.
 	for _, id := range e.prepared.order {
 		if fs, ok := unassigned[id]; ok {
+			assigned_ids := make([]string, 0)
+			assigned_ids = append(assigned_ids, id)
 			candidates := make([]*fieldSet, 1)
 			candidates[0] = fs
 
@@ -409,14 +409,15 @@ func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
 							}
 							if conflicts == nil || !conflicts[maybe_id] {
 								candidates = append(candidates, maybe)
+								assigned_ids = append(assigned_ids, maybe_id)
 							}
 						}
 					}
 				}
 			}
 
-			for _, fs := range candidates {
-				delete(unassigned, fs.module)
+			for _, id := range assigned_ids {
+				delete(unassigned, id)
 			}
 
 			// Check to see if two fieldsets are sharing a set of columns, if so
@@ -444,7 +445,6 @@ func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
 				}
 				combined := &fieldSet{
 					kind:   fs.kind,
-					module: "", // Would love to drop module field
 					fields: fields,
 				}
 				compacted = append(compacted, combined)
@@ -521,7 +521,7 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 
 			log.Infow("module", "module_id", id, "module_name", module.Name)
 
-			fields := newFieldSet(module.Name, id)
+			fields := newFieldSet(module.Name)
 
 			// Wraps a field getter in a check for the module's presence for
 			// this row, if the module wasn't present when this row was
