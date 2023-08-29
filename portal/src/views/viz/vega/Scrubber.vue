@@ -108,12 +108,20 @@ export default Vue.extend({
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
               this.$emit("event-clicked", value);
             });
+
             vegaInfo.view.addEventListener("mouseup", () => {
                 if (scrubbed.length == 2) {
                     console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
                     this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
                 }
             });
+
+            window.addEventListener('mouseup', () => {
+              if (scrubbed.length == 2) {
+                console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
+                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
+              }
+            }, false);
 
             console.log("viz: scrubber", {
                 state: vegaInfo.view.getState(),
