@@ -1299,7 +1299,7 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/station/" + stationId + "/station-note",
-            data: { userId: note.userId, body: JSON.stringify(note.body) },
+            data: { userId: note.userId, body: note.body },
         });
     }
 
