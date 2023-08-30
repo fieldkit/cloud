@@ -145,7 +145,8 @@ export default Vue.extend({
             }
             return v as JSONContent;
         }
-
+        // eslint-disable-next-line
+        const thisComp = this;
         this.editor = new Editor({
             editable: !this.readonly,
             content: asContent(this.value),
@@ -235,6 +236,7 @@ export default Vue.extend({
             },
             onFocus({ editor }) {
                 console.log("editor-focus");
+                thisComp.$emit('editor-focus');
             },
         });
 

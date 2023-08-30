@@ -466,7 +466,8 @@
         "addSuccess": "Field note added.",
         "emptyNoteCannotSave": "There's nothing to save.",
         "noData": "There are no field notes yet. Be the first one to post something!",
-        "finishEditingFirst": "Please cancel or update the note that you're currently editing before saving a new one."
+        "finishEditingFirst": "Please cancel or update the note that you're currently editing before saving a new one.",
+        "finishEditingFirstBeforeNewOne": "Please cancel or update the note that you're currently editing before editing a new one."
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",

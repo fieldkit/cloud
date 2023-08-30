@@ -14,7 +14,13 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-field-note-wrap">
-                    <Tiptap ref="newNoteTipTaip" v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
+                    <Tiptap
+                        @editor-focus="checkEditingFieldNote()"
+                        v-model="newNoteText"
+                        placeholder="Join the discussion!"
+                        saveLabel="Save"
+                        @save="save()"
+                    />
                 </div>
             </template>
             <template v-else>
@@ -67,7 +73,7 @@
                         </div>
                         <template>
                             <Tiptap
-                                :ref="'save-' + fieldNote.id"
+                                :ref="'note-ref-' + fieldNote.id"
                                 :value="fieldNote.body"
                                 :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
                             />
@@ -84,10 +90,10 @@
                         </div>
 
                         <div v-if="editingFieldNote && editingFieldNote.id === fieldNote.id" class="update-actions">
-                            <button v-if="user" @click="cancelEdit(fieldNote, 'save-' + fieldNote.id)">
+                            <button v-if="user" @click="cancelEdit(fieldNote)">
                                 {{ $t("fieldNotes.cancel") }}
                             </button>
-                            <button @click="saveEdit('save-' + fieldNote.id)">
+                            <button @click="saveEdit(fieldNote)">
                                 {{ $t("fieldNotes.update") }}
                             </button>
                         </div>
@@ -164,20 +170,22 @@ export default Vue.extend({
         },
     },
     methods: {
+        checkEditingFieldNote() {
+            if (this.editingFieldNote) {
+                this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.finishEditingFirst"),
+                    type: SnackbarStyle.fail,
+                });
+            }
+        },
         async save(): Promise<void> {
-           /* if (this.editingFieldNote) {
+            if (this.editingFieldNote) {
                 await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("fieldNotes.finishEditingFirst"),
                     type: SnackbarStyle.fail,
                 });
-                const ref = this.$refs["newNoteTipTaip"];
-                console.log("radoi new note text", this.newNoteText);
-                console.log("radoi ref", ref);
-                if (ref && ref[0] && ref[0].editor && this.newNoteText) ref[0].editor.setContent(JSON.parse(this.newNoteText));
                 return;
             }
-            console.log("da");*/
-
             this.errorMessage = null;
             const note = {
                 body: this.newNoteText,
@@ -192,7 +200,9 @@ export default Vue.extend({
                     type: SnackbarStyle.success,
                 });
                 this.newNoteText = null;
-                return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+                this.$nextTick(() => {
+                    return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
+                });
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -200,8 +210,8 @@ export default Vue.extend({
                 });
             }
         },
-        async saveEdit(ref): Promise<void> {
-            const editorRef = this.$refs[ref];
+        async saveEdit(fieldNote: PortalStationFieldNotes): Promise<void> {
+            const editorRef = this.$refs["note-ref-" + fieldNote.id];
             if (!editorRef || !editorRef[0] || !editorRef[0].editor) {
                 console.error("Tip tap ref not found");
                 return;
@@ -217,18 +227,10 @@ export default Vue.extend({
 
             // not the nicest way, but the tiptap editor does not revert itself to the initial body text, so need to reload everything
             if (editorRef[0].editor.isEmpty) {
-                this.editingFieldNote = null;
-                this.groupedFieldNotes = null;
-
                 await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("fieldNotes.emptyNoteCannotSave"),
                     type: SnackbarStyle.fail,
                 });
-
-                setTimeout(() => {
-                    this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
-                }, 1000);
-
                 return;
             }
 
@@ -247,10 +249,19 @@ export default Vue.extend({
             }
         },
         editFieldNote(fieldNote: PortalStationFieldNotes) {
-            this.editingFieldNote = JSON.parse(JSON.stringify(fieldNote));
+            if (this.editingFieldNote) {
+                this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.finishEditingFirstBeforeNewOne"),
+                    type: SnackbarStyle.fail,
+                });
+                return;
+            }
+            this.editingFieldNote = {
+                ...JSON.parse(JSON.stringify(fieldNote)),
+                ref: "note-ref-" + fieldNote.id,
+            };
         },
         deleteFieldNote(noteId: number) {
-            console.log("Radoi");
             this.$confirm({
                 message: this.$tc("fieldNotes.sureDelete"),
                 button: {
@@ -286,8 +297,8 @@ export default Vue.extend({
         canDelete(fieldNote: PortalStationFieldNotes) {
             return fieldNote.author.id === this.user?.id;
         },
-        cancelEdit(fieldNote: PortalStationFieldNotes, ref) {
-            const editorRef = this.$refs[ref];
+        cancelEdit(fieldNote: PortalStationFieldNotes) {
+            const editorRef = this.$refs["note-ref-" + fieldNote.id];
             if (!editorRef || !editorRef[0] || !editorRef[0].editor) {
                 console.error("Tip tap ref not found");
                 return;
