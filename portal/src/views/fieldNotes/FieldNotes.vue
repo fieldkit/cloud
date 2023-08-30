@@ -14,7 +14,7 @@
             <UserPhoto :user="user"></UserPhoto>
             <template v-if="user">
                 <div class="new-field-note-wrap">
-                    <Tiptap v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
+                    <Tiptap ref="newNoteTipTaip" v-model="newNoteText" placeholder="Join the discussion!" saveLabel="Save" @save="save()" />
                 </div>
             </template>
             <template v-else>
@@ -84,7 +84,7 @@
                         </div>
 
                         <div v-if="editingFieldNote && editingFieldNote.id === fieldNote.id" class="update-actions">
-                            <button v-if="user" @click="cancelEdit(fieldNote)">
+                            <button v-if="user" @click="cancelEdit(fieldNote, 'save-' + fieldNote.id)">
                                 {{ $t("fieldNotes.cancel") }}
                             </button>
                             <button @click="saveEdit('save-' + fieldNote.id)">
@@ -165,6 +165,19 @@ export default Vue.extend({
     },
     methods: {
         async save(): Promise<void> {
+           /* if (this.editingFieldNote) {
+                await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: this.$tc("fieldNotes.finishEditingFirst"),
+                    type: SnackbarStyle.fail,
+                });
+                const ref = this.$refs["newNoteTipTaip"];
+                console.log("radoi new note text", this.newNoteText);
+                console.log("radoi ref", ref);
+                if (ref && ref[0] && ref[0].editor && this.newNoteText) ref[0].editor.setContent(JSON.parse(this.newNoteText));
+                return;
+            }
+            console.log("da");*/
+
             this.errorMessage = null;
             const note = {
                 body: this.newNoteText,
@@ -178,14 +191,14 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.addSuccess"),
                     type: SnackbarStyle.success,
                 });
+                this.newNoteText = null;
+                return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
                     type: SnackbarStyle.fail,
                 });
             }
-
-            this.newNoteText = null;
         },
         async saveEdit(ref): Promise<void> {
             const editorRef = this.$refs[ref];
@@ -197,7 +210,7 @@ export default Vue.extend({
             const editedText = editorRef[0].editor.getHTML();
             const payload = {
                 id: this.editingFieldNote?.id,
-                body: editedText,
+                body: JSON.stringify(editedText),
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
@@ -220,12 +233,12 @@ export default Vue.extend({
             }
 
             try {
+                this.editingFieldNote = null;
                 await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
                 await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("fieldNotes.editSuccess"),
                     type: SnackbarStyle.success,
                 });
-                return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -273,8 +286,15 @@ export default Vue.extend({
         canDelete(fieldNote: PortalStationFieldNotes) {
             return fieldNote.author.id === this.user?.id;
         },
-        cancelEdit(fieldNote: PortalStationFieldNotes) {
-            if (JSON.stringify(fieldNote.body) !== JSON.stringify(this.editingFieldNote?.body)) {
+        cancelEdit(fieldNote: PortalStationFieldNotes, ref) {
+            const editorRef = this.$refs[ref];
+            if (!editorRef || !editorRef[0] || !editorRef[0].editor) {
+                console.error("Tip tap ref not found");
+                return;
+            }
+            const currentContent = JSON.stringify(editorRef[0].editor.getJSON());
+
+            if (fieldNote.body !== currentContent) {
                 this.$confirm({
                     message: this.$tc("fieldNotes.sureCancelEdit"),
                     button: {
@@ -282,7 +302,8 @@ export default Vue.extend({
                         yes: this.$tc("yes"),
                     },
                     callback: async (confirm) => {
-                        if (confirm) {
+                        if (confirm && this.editingFieldNote) {
+                            editorRef[0].editor.commands.setContent(JSON.parse(fieldNote.body));
                             this.editingFieldNote = null;
                         }
                     },
