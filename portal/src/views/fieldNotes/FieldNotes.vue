@@ -188,7 +188,7 @@ export default Vue.extend({
             }
             this.errorMessage = null;
             const note = {
-                body: this.newNoteText,
+                body: JSON.stringify(this.newNoteText),
                 userId: this.user?.id,
                 stationId: this.stationId,
             };
@@ -198,10 +198,6 @@ export default Vue.extend({
                 await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("fieldNotes.addSuccess"),
                     type: SnackbarStyle.success,
-                });
-                this.newNoteText = null;
-                this.$nextTick(() => {
-                    return this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
                 });
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
@@ -217,7 +213,7 @@ export default Vue.extend({
                 return;
             }
 
-            const editedText = editorRef[0].editor.getHTML();
+            const editedText = editorRef[0].editor.getJSON();
             const payload = {
                 id: this.editingFieldNote?.id,
                 body: JSON.stringify(editedText),
