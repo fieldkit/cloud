@@ -124,3 +124,6 @@ export enum DataEventsErrorsEnum {
     deleteDataEvent = "Something went wrong deleting your event.",
     editDataEvent = "Something went wrong editing your event. Your changes will are not saved.",
 }
+export enum FiledNotesErrorsEnum {
+    getFiledNotes = "Something went wrong loading the notes",
+}

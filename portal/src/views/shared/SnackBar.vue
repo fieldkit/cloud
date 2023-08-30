@@ -29,7 +29,6 @@ export default Vue.extend({
 .snackbar {
     visibility: hidden;
     min-width: 250px;
-    margin-left: -125px;
     background-color: #333;
     color: $color-dark;
     text-align: center;
@@ -38,6 +37,7 @@ export default Vue.extend({
     position: fixed;
     z-index: $z-index-top;
     left: 50%;
+    transform: translateX(-50%);
     bottom: 30px;
     box-shadow: 0 0px 5px 0 rgb(0 0 0 / 15%);
 

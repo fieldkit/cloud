@@ -25,12 +25,14 @@ export * from "./modules/layout";
 export * from "./modules/notifications";
 export * from "./modules/global";
 export * from "./modules/notes";
+export * from "./modules/fieldNotes";
 export * from "./modules/discussion";
 
 import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
 import { notes } from "@/store/modules/notes";
 import { snackbar } from "@/store/modules/snackbar";
+import {fieldNotes} from '@/store/modules/fieldNotes';
 
 export { MutationTypes, ActionTypes };
 
@@ -79,6 +81,7 @@ export default function(services: Services) {
             progress: progress(services),
             layout: layout(services),
             notes: notes(services),
+            fieldNotes: fieldNotes(services),
             snackbar: snackbar(),
             discussion: dataEvents(services)
         },

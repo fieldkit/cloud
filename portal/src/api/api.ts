@@ -16,6 +16,7 @@ import { SensorInfoResponse } from "@/views/viz/api";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent } from "@/views/comments/model";
 import { SensorsResponse, VizConfig } from "@/views/viz/api";
+import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { Bookmark } from "@/views/viz/viz";
 
 export interface PortalDeployStatus {
@@ -1131,14 +1132,6 @@ class FKApi {
         });
     }
 
-    getFieldNotes(stationId) {
-        return this.invoke({
-            auth: Auth.Required,
-            method: "GET",
-            url: this.baseUrl + "/stations/" + stationId + "/field-notes",
-        });
-    }
-
     addProjectUpdate(data) {
         return this.invoke({
             auth: Auth.Required,
@@ -1282,6 +1275,40 @@ class FKApi {
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/stations/" + stationId + "/notes",
+        });
+    }
+
+    public async getStationFieldNotes(stationId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "GET",
+            url: this.baseUrl + "/station/" + stationId + "/station-notes",
+        });
+    }
+
+    public async deleteStationFieldNote(stationId: number, noteId: number): Promise<any> {
+        return this.invoke({
+            auth: Auth.Optional,
+            method: "DELETE",
+            url: this.baseUrl + "/station/" + stationId + "/station-note/" + noteId,
+        });
+    }
+
+    public addStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/station/" + stationId + "/station-note",
+            data: { userId: note.userId, body: JSON.stringify(note.body) },
+        });
+    }
+
+    public updateStationFieldNote(stationId: number, note: PortalStationFieldNotes): Promise<any> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/station/" + stationId + "/station-note/" + note.id,
+            data: { body: note.body },
         });
     }
 

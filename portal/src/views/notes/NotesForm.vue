@@ -1,9 +1,5 @@
 <template>
     <div class="notes-form">
-        <div class="notifications">
-            <div v-if="notesState.failed" class="notification failed">{{ $tc("notes.failed") }}</div>
-            <div v-if="notesState.success" class="notification success">{{ $tc("notes.success") }}</div>
-        </div>
         <div class="header">
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% {{ $t("notes.complete") }}</div>
@@ -30,6 +26,8 @@ import CommonComponents from "@/views/shared";
 
 import { mergeNotes, NoteMedia, Notes, PortalNoteMedia, PortalStationNotes } from "./model";
 import NoteEditor from "./NoteEditor.vue";
+import { ActionTypes } from "@/store";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "NotesForm",
@@ -61,8 +59,6 @@ export default Vue.extend({
             form: new Notes(),
             notesState: {
                 dirty: false,
-                success: false,
-                failed: false,
             },
         };
     },
@@ -91,20 +87,22 @@ export default Vue.extend({
                 return;
             }
 
-            this.notesState.success = false;
-            this.notesState.failed = false;
-
             const payload = mergeNotes({ notes: this.notes, media: this.media }, this.form);
-
-            return this.$services.api.patchStationNotes(this.station.id, payload).then(
-                () => {
-                    this.notesState.dirty = false;
-                    this.notesState.success = true;
-                },
-                () => {
-                    this.notesState.failed = true;
-                }
-            );
+            return this.$services.api
+                .patchStationNotes(this.station.id, payload)
+                .then(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("notes.updateSuccess"),
+                        type: SnackbarStyle.success,
+                    });
+                    this.$emit('saved');
+                })
+                .catch(() => {
+                  this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("notes.updateFail"),
+                        type: SnackbarStyle.fail,
+                    });
+                });
         },
         onChange(): void {
             this.notesState.dirty = true;
@@ -115,24 +113,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
 @import "../../scss/global";
 @import "../../scss/notes";
-
-.notification {
-    margin-top: 0;
-}
-
-.notification.success {
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 2px;
-    border-radius: 4px;
-}
-.notification.success {
-    background-color: #d4edda;
-}
-.notification.failed {
-    background-color: #f8d7da;
-}
 </style>
