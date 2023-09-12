@@ -72,6 +72,9 @@ export default Vue.extend({
         },
         title: {
             get(this: any) {
+                if (this.editingTitle) {
+                    return this.note.title;
+                }
                 return this.note.title || this.note.help.title;
             },
             set(this: any, value) {
