@@ -80,10 +80,11 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			AuthorID:  p.UserID(),
 			Key:       webNote.Key,
 			Body:      webNote.Body,
+			Title:      webNote.Title,
 		}
 
 		if err := s.options.Database.NamedGetContext(ctx, note, `
-			UPDATE fieldkit.notes SET key = :key, body = :body, updated_at = :updated_at WHERE id = :id RETURNING *
+			UPDATE fieldkit.notes SET key = :key, body = :body, title = :title, updated_at = :updated_at WHERE id = :id RETURNING *
 		`, note); err != nil {
 			return nil, err
 		}
