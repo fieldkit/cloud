@@ -386,6 +386,10 @@ export class DataSetSeries {
         return this.vizSensor[1];
     }
 
+    public get lastSensorReading(): number | null {
+        return this.all?.dataEnd || null;
+    }
+
     public shouldConstrainBy(dataRange: [number, number], range: [number, number]): boolean {
         if (this.graphing == null) {
             // console.log("viz: constrain:no-graphing");

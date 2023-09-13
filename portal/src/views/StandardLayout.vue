@@ -1,5 +1,6 @@
 <template>
     <div class="container-ignored" v-bind:class="{ 'scrolling-disabled': disableScrolling }">
+        <vue-confirm-dialog />
         <div class="container-top">
             <SidebarNav
                 :viewingStations="viewingStations"

@@ -15,15 +15,26 @@ timestamps {
 		try {
 			def isDev = params.WorkEnv.indexOf("dev") >= 0
 			def stackName = params.DeployStack ?: "portal-stack"
-			def branchName = params.DeployBranch ?: "main"
+			def branchName = params.DeployBranch
+			def artifactsUrl = params.ArtifactsUrl
 			def statusUrl = isDev ? "https://api.fkdev.org/status" : "https://api.fieldkit.org/status"
 			def selector = params.WhichBuild ? specific(params.WhichBuild) : lastSuccessful()
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
 			stage ('prepare') {
-				def job = getCopyArtifactsJob(stackName, branchName)
-				copyArtifacts(projectName: job, flatten: true, selector: selector)
+				if (artifactsUrl != null) {
+					sh "rm -f archive.zip"
+					sh "wget -o archive.zip ${artifactsUrl}"
+					sh "unzip -j archive.zip"
+				}
+				else if (branchName != null) {
+					def job = getCopyArtifactsJob(stackName, branchName)
+					copyArtifacts(projectName: job, flatten: true, selector: selector)
+				}
+				else {
+					return
+				}
 				sh "ls -alh"
 				sh "ls -alh ${stackName}.tar"
 			}

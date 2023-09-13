@@ -1,6 +1,6 @@
 import Vue from "vue";
-import { Services } from "@/api";
-import { PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
+import {Services} from "@/api";
+import {PortalNoteMedia, PortalStationNotes} from "@/views/notes/model";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
 
