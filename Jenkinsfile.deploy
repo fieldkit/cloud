@@ -28,7 +28,7 @@ timestamps {
 				if (artifactsUrl != null) {
 					sh "rm -f archive.zip"
 					sh "wget -O archive.zip ${artifactsUrl}"
-					sh "unzip -j archive.zip"
+					sh "unzip -oj archive.zip"
 				}
 				else if (branchName != null) {
 					def job = getCopyArtifactsJob(stackName, branchName)
