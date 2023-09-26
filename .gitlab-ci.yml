@@ -95,7 +95,7 @@ deploy:staging:
     - echo "Deploy to staging server"
     - echo TAG=${VERSION}-${CI_COMMIT_SHA:0:8}
     - ls -alh
-    - echo $TRIGGER_DEPLOY_TOKEN
+    - curl ${JENKINS_URL}/job/fk/job/fkdev-portal-deploy/buildWithParameters?token=${TRIGGER_DEPLOY_TOKEN}&ArtifactsUrl=https://www.google.com
     - env
   environment:
     name: staging
