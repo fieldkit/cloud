@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - deploy
 
 variables:
   POSTGRES_DB: fieldkit
@@ -8,6 +9,17 @@ variables:
   POSTGRES_PASSWORD: password
   FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
   VERSION: 0.3.50 # TODO
+
+deploy:staging:
+  stage: deploy
+  script:
+    - echo "Deploy to staging server"
+  environment:
+    name: staging
+    url: https://portal.fkdev.org
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
 
 test:go:
   stage: test
