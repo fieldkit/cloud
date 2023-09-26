@@ -22,19 +22,15 @@ timestamps {
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
-			slackSend channel: '#automation', color: 'good', message: "${params} ${artifactsUrl} ${branchName}"
-
-			println("${params} ${artifactsUrl} ${branchName}")
+			println("Params=${params} ArtifactsUrl=${artifactsUrl} BranchName=${branchName}")
 
 			stage ('prepare') {
 				if (artifactsUrl != null) {
-					println("artifactUrl")
 					sh "rm -f archive.zip"
-					sh "wget -o archive.zip ${artifactsUrl}"
+					sh "wget -O archive.zip ${artifactsUrl}"
 					sh "unzip -j archive.zip"
 				}
 				else if (branchName != null) {
-					println("branchName")
 					def job = getCopyArtifactsJob(stackName, branchName)
 					copyArtifacts(projectName: job, flatten: true, selector: selector)
 				}
