@@ -10,18 +10,6 @@ variables:
   FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
   VERSION: 0.3.50 # TODO
 
-deploy:staging:
-  stage: deploy
-  script:
-    - echo "Deploy to staging server"
-    - env
-  environment:
-    name: staging
-    url: https://portal.fkdev.org
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
-
 test:go:
   stage: test
   rules:
@@ -99,3 +87,18 @@ build:images:
   artifacts:
     paths:
       - dev-ops-main/amis/build/*.tar
+
+deploy:staging:
+  stage: deploy
+  needs: ["build:images"]
+  script:
+    - echo "Deploy to staging server"
+    - echo TAG=${VERSION}-${CI_COMMIT_SHA:0:8}
+    - ls -alh
+    - env
+  environment:
+    name: staging
+    url: https://portal.fkdev.org
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
