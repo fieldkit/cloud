@@ -25,12 +25,12 @@ timestamps {
 			println("Params=${params} ArtifactsUrl=${artifactsUrl} BranchName=${branchName}")
 
 			stage ('prepare') {
-				if (artifactsUrl != null) {
+				if (artifactsUrl != null && artifactsUrl != "") {
 					sh "rm -f archive.zip"
 					sh "wget -O archive.zip ${artifactsUrl}"
 					sh "unzip -oj archive.zip"
 				}
-				else if (branchName != null) {
+				else if (branchName != null && branchName != "") {
 					def job = getCopyArtifactsJob(stackName, branchName)
 					copyArtifacts(projectName: job, flatten: true, selector: selector)
 				}
