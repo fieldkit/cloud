@@ -22,13 +22,19 @@ timestamps {
 
 			slackSend channel: '#automation', color: 'good', message: "${env.JOB_NAME} - #${env.BUILD_NUMBER} Starting (stack = ${stackName}) (<${env.BUILD_URL}|Open>)"
 
+			slackSend channel: '#automation', color: 'good', message: "${params} ${artifactsUrl} ${branchName}"
+
+			println("${params} ${artifactsUrl} ${branchName}")
+
 			stage ('prepare') {
 				if (artifactsUrl != null) {
+					println("artifactUrl")
 					sh "rm -f archive.zip"
 					sh "wget -o archive.zip ${artifactsUrl}"
 					sh "unzip -j archive.zip"
 				}
 				else if (branchName != null) {
+					println("branchName")
 					def job = getCopyArtifactsJob(stackName, branchName)
 					copyArtifacts(projectName: job, flatten: true, selector: selector)
 				}
@@ -46,7 +52,7 @@ timestamps {
 					def known_hosts = "/var/jenkins_home/.ssh/known_hosts"
 					def prepare = ws.servers.value.collectEntries {
 			            if (fileExists(known_hosts)) {
-    		                sh "ssh-keygen -f ${known_hosts} -R ${it.ip}"
+					sh "ssh-keygen -f ${known_hosts} -R ${it.ip}"
 			            }
 
 			            [(it): {
