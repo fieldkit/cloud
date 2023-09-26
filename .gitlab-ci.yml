@@ -14,6 +14,7 @@ deploy:staging:
   stage: deploy
   script:
     - echo "Deploy to staging server"
+    - env
   environment:
     name: staging
     url: https://portal.fkdev.org
