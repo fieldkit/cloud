@@ -92,11 +92,9 @@ deploy:staging:
   stage: deploy
   needs: ["build:images"]
   script:
-    - echo "Deploy to staging server"
-    - echo TAG=${VERSION}-${CI_COMMIT_SHA:0:8}
-    - ls -alh
-    - curl ${JENKINS_URL}/job/fk/job/fkdev-portal-deploy/buildWithParameters?token=${TRIGGER_DEPLOY_TOKEN}&ArtifactsUrl=https://www.google.com
-    - env
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - ls -alh .secure_files
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} whoami
   environment:
     name: staging
     url: https://portal.fkdev.org
