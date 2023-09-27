@@ -94,6 +94,7 @@ deploy:staging:
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - ls -alh .secure_files
+    - chmod 0600 .secure_files/deploy.pem
     - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} whoami
   environment:
     name: staging
