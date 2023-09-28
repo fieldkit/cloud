@@ -110,12 +110,11 @@ deploy:staging:
   needs: ["build:images", "build:migrations"]
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - ls -alh .secure_files
     - chmod 0600 .secure_files/deploy.pem
-    - ssh -r -i .secure_files/deploy.pem -o StrictHostKeyChecking=no "${DEPLOY_HOST}" "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
-    - scp -r -i .secure_files/deploy.pem -o StrictHostKeyChecking=no "migrations/migrate" "migrations/primary" "migrations/tsdb" "${DEPLOY_HOST}:dev-ops/deploy"
-    - scp -r -i .secure_files/deploy.pem -o StrictHostKeyChecking=no "${DEPLOY_HOST}:dev-ops/deploy"
-    - ssh -r -i .secure_files/deploy.pem -o StrictHostKeyChecking=no "${DEPLOY_HOST}" "dev-ops/deploy.sh"
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh dev portal-stack
   environment:
     name: staging
     url: https://portal.fkdev.org
