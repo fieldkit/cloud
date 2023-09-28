@@ -85,6 +85,7 @@ build:images:
     - cd amis && make clean && make portal-stack charting-stack
     - echo $DOCKER_TAG > TAG
   artifacts:
+    name: "cloud-${CI_COMMIT_REF_NAME}"
     paths:
       - dev-ops-main/amis/build/*.tar
 
