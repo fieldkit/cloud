@@ -18,8 +18,8 @@ COPY ./server/ ./
 RUN mkdir -p build
 RUN ls -alh api
 RUN mkdir -p api
-RUN cd cmd/server && go build -o /app/build/server -ldflags '-extldflags "-static"' *.go
-RUN cd cmd/ingester && go build -o /app/build/ingester -ldflags '-extldflags "-static"' *.go
+RUN cd cmd/server && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/build/server *.go
+RUN cd cmd/ingester && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/build/ingester *.go
 
 FROM alpine:latest AS env
 ARG GIT_HASH=missing
