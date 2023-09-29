@@ -108,6 +108,7 @@ build:migrations:
 deploy:staging:
   stage: deploy
   needs: ["build:images", "build:migrations"]
+  when: manual
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 .secure_files/deploy.pem
@@ -118,6 +119,3 @@ deploy:staging:
   environment:
     name: staging
     url: https://portal.fkdev.org
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: manual
