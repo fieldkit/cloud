@@ -29,3 +29,4 @@ influxdb
 .tsdb
 .db
 *.swp
+migrations/migrate

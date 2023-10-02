@@ -1,6 +1,10 @@
 <template>
     <div class="tiny-chart">
         <LineChart :series="series" :settings="chartSettings" />
+        <div v-if="noSensorData" class="no-data">{{ $tc("noData") }}</div>
+        <div v-if="busy" class="no-data">
+            <Spinner class="spinner" />
+        </div>
     </div>
 </template>
 
@@ -24,10 +28,12 @@ import {
 } from "./vega/SpecFactory";
 
 import LineChart from "./vega/LineChart.vue";
+import Spinner from "@/views/shared/Spinner.vue";
 
 export default Vue.extend({
     name: "TinyChart",
     components: {
+        Spinner,
         LineChart,
     },
     props: {
@@ -43,14 +49,25 @@ export default Vue.extend({
             type: SensorDataQuerier,
             required: true,
         },
+        moduleKey: {
+            type: String,
+            required: false,
+        },
     },
     data(): {
         chartSettings: ChartSettings;
         series: SeriesData[];
+        // can be used with BookmarkFactory.forSensor to create a bookmark for the currently displayed data
+        vizData: { vizSensor: VizSensor; timeRange: [number, number] } | null;
+        noSensorData: boolean;
+        busy: boolean;
     } {
         return {
             chartSettings: ChartSettings.Tiny,
             series: [],
+            vizData: null,
+            noSensorData: false,
+            busy: true,
         };
     },
     watch: {
@@ -63,18 +80,36 @@ export default Vue.extend({
     async mounted() {
         new StandardObserver().observe(this.$el, () => {
             console.log("tiny-chart:observed");
+            this.series = [];
             void this.load();
         });
     },
     methods: {
         async load(): Promise<void> {
-            // TODO Show busy when loading?
+            this.busy = true;
             const [stationData, quickSensors, meta] = await this.querier.queryTinyChartData(this.stationId);
+            const selectedModuleKey = this.moduleKey;
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            const thisComp = this;
+            thisComp.noSensorData = false;
 
-            function getFirstQuickSensor(quickSensors): VizSensor {
-                const sensorModuleId = quickSensors.station[0].moduleId;
-                const sensorId = quickSensors.station[0].sensorId;
-                return [quickSensors.station[0].stationId, [sensorModuleId, sensorId]];
+            function getQuickSensor(quickSensors): VizSensor {
+                let stationId, sensorModuleId, sensorId;
+                if (selectedModuleKey) {
+                    const module = quickSensors.station.find((station) => station.moduleKey === selectedModuleKey);
+                    if (module) {
+                        stationId = module.stationId;
+                        sensorModuleId = module.moduleId;
+                        sensorId = module.sensorId;
+                    } else {
+                        thisComp.handleNoDataCase();
+                    }
+                } else {
+                    stationId = quickSensors.station[0].stationId;
+                    sensorModuleId = quickSensors.station[0].moduleId;
+                    sensorId = quickSensors.station[0].sensorId;
+                }
+                return [stationId, [sensorModuleId, sensorId]];
             }
 
             // Not happy with this, no easy way until we get rid of the 'quick sensors'
@@ -94,30 +129,37 @@ export default Vue.extend({
                     }
 
                     const sensor = meta.findSensorByKey(moduleSensor[0].fullKey);
-                    return { vizSensor: [station.id, ["", 0]], sensor, sdr: { data: [], bucketSamples: 0, bucketSize: 0, dataEnd: null } };
+                    return {
+                        vizSensor: [station.id, ["", 0]],
+                        sensor,
+                        sdr: { data: [], bucketSamples: 0, bucketSize: 0, dataEnd: null },
+                    };
                 }
-
-                const vizSensor = getFirstQuickSensor(quickSensors);
+                const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
 
+                if (data.length === 0) {
+                    thisComp.handleNoDataCase();
+                    return null;
+                }
+
+                console.log("station.id", station.id);
                 const sdr: SensorDataResponse = {
-                    data: data.map(
-                        (row: TailSensorDataRow): DataRow => {
-                            return {
-                                time: row.time,
-                                stationId: row.stationId,
-                                moduleId: row.moduleId,
-                                sensorId: row.sensorId,
-                                value: row.max !== undefined ? row.max : null, // TODO
-                                avg: row.avg,
-                                min: row.min,
-                                max: row.max,
-                                last: row.last,
-                                location: null,
-                            };
-                        }
-                    ),
+                    data: data.map((row: TailSensorDataRow): DataRow => {
+                        return {
+                            time: row.time,
+                            stationId: row.stationId,
+                            moduleId: row.moduleId,
+                            sensorId: row.sensorId,
+                            value: row.max !== undefined ? row.max : null, // TODO
+                            avg: row.avg,
+                            min: row.min,
+                            max: row.max,
+                            last: row.last,
+                            location: null,
+                        };
+                    }),
                     bucketSize: stationData.stations[station.id].bucketSize,
                     bucketSamples: 0, // Maybe wrong
                     dataEnd: null, // Maybe wrong
@@ -129,9 +171,9 @@ export default Vue.extend({
             const maybeSensorMetaAndData = getSensorMetaAndData(this.station);
             if (!maybeSensorMetaAndData) {
                 console.log("tiny-chart:empty", { quickSensors, station: this.station });
+                thisComp.handleNoDataCase();
                 return;
             }
-
             const { vizSensor, sensor, sdr } = maybeSensorMetaAndData;
 
             const queried = new QueriedData("key", TimeRange.eternity, sdr);
@@ -163,6 +205,13 @@ export default Vue.extend({
                     vizInfo
                 ),
             ];
+
+            this.vizData = { vizSensor, timeRange: [queried.timeRange[0], queried.timeRange[1]] };
+            this.busy = false;
+        },
+        handleNoDataCase() {
+            this.noSensorData = true;
+            this.busy = false;
         },
     },
 });
@@ -174,6 +223,21 @@ export default Vue.extend({
     width: 100%;
     height: 150px;
     border: solid 1px #d8dce0;
+    position: relative;
+
+    .no-data {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 100%;
+        width: 100%;
+        background-color: #e2e4e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
 }
 
 .tiny-chart .fit-x {

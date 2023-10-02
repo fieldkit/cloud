@@ -30,6 +30,7 @@ type Endpoints struct {
 	Delete                goa.Endpoint
 	AdminSearch           goa.Endpoint
 	Progress              goa.Endpoint
+	UpdateModule          goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "station" service with endpoints.
@@ -51,6 +52,7 @@ func NewEndpoints(s Service) *Endpoints {
 		Delete:                NewDeleteEndpoint(s, a.JWTAuth),
 		AdminSearch:           NewAdminSearchEndpoint(s, a.JWTAuth),
 		Progress:              NewProgressEndpoint(s, a.JWTAuth),
+		UpdateModule:          NewUpdateModuleEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -70,6 +72,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Delete = m(e.Delete)
 	e.AdminSearch = m(e.AdminSearch)
 	e.Progress = m(e.Progress)
+	e.UpdateModule = m(e.UpdateModule)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -413,6 +416,30 @@ func NewProgressEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 			return nil, err
 		}
 		vres := NewViewedStationProgress(res, "default")
+		return vres, nil
+	}
+}
+
+// NewUpdateModuleEndpoint returns an endpoint function that calls the method
+// "update module" of service "station".
+func NewUpdateModuleEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdateModulePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.UpdateModule(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedStationFull(res, "default")
 		return vres, nil
 	}
 }

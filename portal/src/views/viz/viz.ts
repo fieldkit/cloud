@@ -218,16 +218,16 @@ export class Bookmark {
         const times: [number, number][] = this.allVizes.map((viz) => viz[1]).filter((times) => times !== undefined) as [number, number][];
         const start = _.min(_.flatten(times.map((r) => r[0])));
         const end = _.max(_.flatten(times.map((r) => r[1])));
-        if ((start === null || start === undefined) || (end === null || end === undefined)) throw new Error(`no time range in bookmark`);
+        if (start === null || start === undefined || end === null || end === undefined) throw new Error(`no time range in bookmark`);
         return new TimeRange(start, end);
     }
 
     private vizStations(vizBookmark: VizBookmark): StationID[] {
-        return vizBookmark[0].map((vs) => vs[0])
+        return vizBookmark[0].map((vs) => vs[0]);
     }
 
     private vizSensors(vizBookmark: VizBookmark): SensorSpec[] {
-        return vizBookmark[0].map((vs) => vs[1])
+        return vizBookmark[0].map((vs) => vs[1]);
     }
 
     public get allStations(): number[] {
@@ -351,6 +351,10 @@ export class Graph extends Viz {
         return this.settings.mobile;
     }
 
+    public get lastSensorReading(): number | null {
+        return _.max(this.dataSets.map((ds) => ds.lastSensorReading).filter((value) => value != null)) || null;
+    }
+
     public get timeRangeOfAll(): TimeRange | null {
         const everyAllRange = this.dataSets.map((ds) => ds.all?.timeRange).filter((range): range is number[] => range != null);
         if (everyAllRange.length > 0) {
@@ -443,16 +447,19 @@ export class Graph extends Viz {
         return this.geo;
     }
 
-    private getFastRange(fastTime: FastTime) {
-        const sensorRange = this.timeRangeOfAll;
-        if (sensorRange == null) throw new Error(`viz: No timeRangeOfAll`);
+    private getFastRange(fastTime: FastTime): TimeRange {
+        const lastSensorReading = this.lastSensorReading;
+
+        if (lastSensorReading == null) throw new Error(`viz: No timeRangeOfAll`);
         if (fastTime === FastTime.All) {
-            return sensorRange;
+            const range = this.timeRangeOfAll;
+            if (range == null) throw new Error(`viz: No timeRangeOfAll`);
+            return new TimeRange(range.start, lastSensorReading);
         } else {
             const days = fastTime as number;
-            const start = new Date(sensorRange.end);
+            const start = new Date(lastSensorReading);
             start.setDate(start.getDate() - days);
-            return new TimeRange(start.getTime(), sensorRange.end);
+            return new TimeRange(start.getTime(), lastSensorReading);
         }
     }
 
@@ -965,13 +972,11 @@ export class Workspace implements VizInfoFactory {
 
         return _.flatten(
             groupGraphs.map((row) => {
-                return row.graph.loadedDataSets.map(
-                    (ds): SeriesData => {
-                        const vizInfo = this.vizInfo(row.graph, ds);
-                        if (ds.all == null) throw new Error("viz: Expected loaded data set");
-                        return new SeriesData(row.graph.id, TimeRange.eternity, ds, ds.all, vizInfo);
-                    }
-                );
+                return row.graph.loadedDataSets.map((ds): SeriesData => {
+                    const vizInfo = this.vizInfo(row.graph, ds);
+                    if (ds.all == null) throw new Error("viz: Expected loaded data set");
+                    return new SeriesData(row.graph.id, TimeRange.eternity, ds, ds.all, vizInfo);
+                });
             })
         );
     }
@@ -1127,47 +1132,44 @@ export class Workspace implements VizInfoFactory {
         // console.log("all-modules-by-module-key", allModulesByModuleKey);
         // console.log(station.sensors);
 
-        const options = _.map(
-            allModules,
-            (sensors, moduleId: ModuleID): SensorTreeOption => {
-                const moduleKey = keysById[moduleId];
-                const moduleMeta = allModulesByModuleKey[moduleKey];
-                const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
-                const children: SensorTreeOption[] = _.flatten(
-                    uniqueSensors.map((row) => {
-                        const age = moment.utc(row.sensorReadAt);
-                        let label = i18n.tc(row.sensorKey) || row.sensorKey;
-                        if (flatten) {
-                            label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
-                        }
-                        const optionId = `${row.moduleId}-${row.sensorId}`;
-                        const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
-                        if (sensor.length > 0) {
-                            if (!this.showInternalSensors) {
-                                if (sensor[0].internal) {
-                                    return [];
-                                }
+        const options = _.map(allModules, (sensors, moduleId: ModuleID): SensorTreeOption => {
+            const moduleKey = keysById[moduleId];
+            const moduleMeta = allModulesByModuleKey[moduleKey];
+            const uniqueSensors = _.uniqBy(sensors, (s) => s.sensorId);
+            const children: SensorTreeOption[] = _.flatten(
+                uniqueSensors.map((row) => {
+                    const age = moment.utc(row.sensorReadAt);
+                    let label = i18n.tc(row.sensorKey) || row.sensorKey;
+                    if (flatten) {
+                        label = moduleMeta.sensors.filter((d) => d.fullKey === row.sensorKey)[0]["strings"]["enUs"]["label"];
+                    }
+                    const optionId = `${row.moduleId}-${row.sensorId}`;
+                    const sensor = moduleMeta.sensors.filter((s) => s.fullKey == row.sensorKey);
+                    if (sensor.length > 0) {
+                        if (!this.showInternalSensors) {
+                            if (sensor[0].internal) {
+                                return [];
                             }
                         }
-                        return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, stationId, age)];
-                    })
-                );
-                const moduleAge = _.max(children.map((c) => c.age));
-                if (!moduleAge) {
-                    throw new Error(`viz: Expected module age: no sensors?`);
-                }
-
-                const label = i18n.tc(moduleKey);
-
-                if (flatten) {
-                    return children[0];
-                } else {
-                    return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, stationId, moduleAge);
-                }
+                    }
+                    return [new SensorTreeOption(optionId, label, undefined, row.moduleId, row.sensorId, stationId, age)];
+                })
+            );
+            const moduleAge = _.max(children.map((c) => c.age));
+            if (!moduleAge) {
+                throw new Error(`viz: Expected module age: no sensors?`);
             }
-        );
 
-        const sorted = _.sortBy((options as unknown) as SensorTreeOption[], (option) => {
+            const label = i18n.tc(moduleKey);
+
+            if (flatten) {
+                return children[0];
+            } else {
+                return new SensorTreeOption(`${moduleKey}-${moduleId}`, label, children, moduleId, null, stationId, moduleAge);
+            }
+        });
+
+        const sorted = _.sortBy(options as unknown as SensorTreeOption[], (option) => {
             if (option.age) {
                 return -option.age.valueOf();
             }
@@ -1328,7 +1330,8 @@ export class Workspace implements VizInfoFactory {
         }
 
         console.log(`viz: update-from-bookmark`, bm);
-        await this.addStationIds(bm.s);
+        this.stationIds = bm.s;
+        await this.initialize();
         this.groups = bm.g.map((gm) => Group.fromBookmark(gm, this.settings));
         await this.query();
         return;
@@ -1346,5 +1349,14 @@ export class BookmarkFactory {
             return new Bookmark(Bookmark.Version, [], [stationId], [context.project], context);
         }
         return new Bookmark(Bookmark.Version, [], [stationId], []);
+    }
+    public static forSensor(stationId: number, vizSensor: any, timeRange: [number, number]): Bookmark {
+        return new Bookmark(
+            Bookmark.Version,
+            [[[[[vizSensor], timeRange, [], ChartType.TimeSeries, FastTime.TwoWeeks]]]],
+            [stationId],
+            undefined,
+            null
+        );
     }
 }

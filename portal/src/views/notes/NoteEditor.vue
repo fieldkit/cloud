@@ -1,6 +1,10 @@
 <template>
     <div class="note-editor">
-        <div class="title">{{ note.help.title }}</div>
+        <div class="title">
+            <TextAreaField v-if="editingTitle" v-model="title" />
+            <template v-else>{{ title }}</template>
+            <a class="edit-btn" v-if="editableTitle && !editingTitle" @click="editingTitle = !editingTitle">{{ $t("edit") }}</a>
+        </div>
         <div class="field" v-if="!readonly">
             <TextAreaField v-model="body" @input="v.$touch()" />
         </div>
@@ -47,6 +51,15 @@ export default Vue.extend({
             type: Object,
             required: true,
         },
+        editableTitle: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    data() {
+        return {
+            editingTitle: false,
+        };
     },
     computed: {
         body: {
@@ -54,12 +67,17 @@ export default Vue.extend({
                 return this.note.body;
             },
             set(this: any, value) {
-                this.$emit("change", this.note.withBody(value));
+                this.$emit("change", this.note.withBody(value, this.note.title));
             },
         },
-    },
-    mounted() {
-        console.log("Radoi note", this.note);
+        title: {
+            get(this: any) {
+                return this.note.title || this.note.help.title;
+            },
+            set(this: any, value) {
+                this.$emit("change", this.note.withBody(this.note.body, value));
+            },
+        },
     },
 });
 </script>
@@ -91,6 +109,8 @@ export default Vue.extend({
 .title {
     font-size: 16px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
 
     @include bp-down($xs) {
         font-size: 14px;
@@ -101,5 +121,16 @@ export default Vue.extend({
     color: #6a6d71;
     font-size: 13px;
     padding-top: 0.5em;
+}
+
+.edit-btn {
+    opacity: 0.4;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+::v-deep .title textarea {
+    padding-top: 0;
 }
 </style>

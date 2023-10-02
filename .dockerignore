@@ -1,0 +1,8 @@
+build
+**/node_modules
+schema-production
+sanitize-data
+tools
+.db
+.tsdb
+.fs

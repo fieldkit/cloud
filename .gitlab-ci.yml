@@ -1,0 +1,145 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  POSTGRES_DB: fieldkit
+  POSTGRES_USER: fieldkit
+  POSTGRES_PASSWORD: password
+  FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
+  VERSION: 0.3.50 # TODO
+
+test:go:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: golang:latest
+  services:
+    - name: kartoza/postgis:14-3
+      alias: db
+    - name: timescale/timescaledb:2.4.2-pg13
+      alias: tsdb
+  script:
+    - (cd server/cmd/server && go build -o build/server)
+    - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
+
+test:js:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: node:18.17.0
+  script:
+    - cd portal && which node && which npm
+    - npm install
+    - cp src/secrets.ts.template src/secrets.ts
+    - node_modules/.bin/vue-cli-service build
+    - node_modules/.bin/vue-cli-service test:unit
+
+build:compile:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: golang:latest
+  script:
+    - cp portal/src/secrets.ts.template portal/src/secrets.ts
+    - cd server/cmd/server && go build -o build/server
+
+# An opportunity here to use one of the include or sharing features for docker
+# in docker configuration.
+
+build:images:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'web'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker version
+    - docker info
+    - cp portal/src/secrets.ts.aws portal/src/secrets.ts
+    - export DOCKER_TAG=main # This is an interim tag, required by stack build.
+    - docker build -t conservify/fk-cloud:$DOCKER_TAG --build-arg GIT_HASH=${CI_COMMIT_SHA:0:8} --build-arg VERSION=${VERSION} .
+    - cd charting
+    - tar -czh --exclude='./node_modules' . | docker build -t conservify/fk-charting:$DOCKER_TAG --build-arg GIT_HASH=${CI_COMMIT_SHA:0:8} --build-arg VERSION=${VERSION} -
+    - cd ..
+    # docker save conservify/fk-cloud:$DOCKER_TAG -o cloud-${DOCKER_TAG}.tar
+    # docker save conservify/fk-charting:$DOCKER_TAG -o charting-${DOCKER_TAG}.tar
+    - apk add wget make unzip
+    - wget -q https://github.com/conservify/dev-ops/archive/refs/heads/main.zip && unzip -q main.zip && cd dev-ops-main
+    - export TAG=${CI_COMMIT_REF_NAME}
+    - cd amis && make clean && make portal-stack charting-stack
+    - echo $DOCKER_TAG > TAG
+  artifacts:
+    name: "cloud-${CI_COMMIT_REF_NAME}"
+    paths:
+      - dev-ops-main/amis/build/*.tar
+
+build:migrations:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  image: golang:latest
+  script:
+    - cd migrations && go build -o migrate *.go
+  artifacts:
+    name: "cloud-migrations-${CI_COMMIT_REF_NAME}"
+    paths:
+      - migrations/migrate
+      - migrations/tsdb
+      - migrations/primary
+
+deploy:staging:
+  stage: deploy
+  needs: ["build:images", "build:migrations"]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: manual
+      allow_failure: true
+  script:
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - chmod 0600 .secure_files/deploy.pem
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh dev portal-stack
+  environment:
+    name: staging
+    url: https://portal.fkdev.org
+
+deploy:prod:
+  stage: deploy
+  needs: ["build:images", "build:migrations"]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+  script:
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - chmod 0600 .secure_files/deploy.pem
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
+    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
+    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh prod portal-stack
+  environment:
+    name: production
+    url: https://portal.fieldkit.org
