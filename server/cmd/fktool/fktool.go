@@ -15,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"time"
 
 	_ "github.com/google/uuid"
@@ -51,10 +50,6 @@ type Metadata struct {
 	Map     map[string]*string
 }
 
-func getModuleFromJobName(name string) (string, error) {
-	return strings.Replace(name, "/", "-", 1), nil
-}
-
 func getProfileFromFile(module, path string) (string, error) {
 	file := filepath.Base(path)
 	re := regexp.MustCompile(fmt.Sprintf("%s-(.+).bin", module))
@@ -65,22 +60,8 @@ func getProfileFromFile(module, path string) (string, error) {
 	return m[0][1], nil
 }
 
-func getMetaFromEnvironment(moduleOverride, profileOverride, version, file string) (metadata *Metadata, err error) {
-	jobName := os.Getenv("JOB_NAME")
-	if jobName == "" {
-		return nil, fmt.Errorf("ENV[JOB_NAME] missing.")
-	}
-
-	module := moduleOverride
-	if moduleOverride == "" {
-		module, err = getModuleFromJobName(jobName)
-		if err != nil {
-			return nil, fmt.Errorf("error getting module from job name: %w", err)
-		}
-		log.Printf("found module name: '%s'", module)
-	} else {
-		log.Printf("using module override: '%s'", module)
-	}
+func getMetaFromEnvironment(module, profileOverride, version, file string) (metadata *Metadata, err error) {
+	log.Printf("using module override: '%s'", module)
 
 	buildTime := os.Getenv("BUILD_TIMESTAMP")
 	layout := "20060102_150405"
@@ -105,14 +86,21 @@ func getMetaFromEnvironment(moduleOverride, profileOverride, version, file strin
 		Map:     make(map[string]*string),
 	}
 
-	metadata.Map["Build-Id"] = aws.String(os.Getenv("BUILD_ID"))
-	metadata.Map["Build-Number"] = aws.String(os.Getenv("BUILD_NUMBER"))
-	metadata.Map["Build-Tag"] = aws.String(os.Getenv("BUILD_TAG"))
+	if value := os.Getenv("BUILD_ID"); value != "" {
+		metadata.Map["Build-Id"] = aws.String(value)
+	}
+	if value := os.Getenv("BUILD_NUMBER"); value != "" {
+		metadata.Map["Build-Number"] = aws.String(value)
+	}
+	if value := os.Getenv("BUILD_TAG"); value != "" {
+		metadata.Map["Build-Tag"] = aws.String(value)
+	}
+	if value := os.Getenv("JOB_BASE_NAME"); value != "" {
+		metadata.Map["Build-Job-Base"] = aws.String(value)
+	}
 	metadata.Map["Build-Time"] = aws.String(buildTime)
 	metadata.Map["Build-Commit"] = aws.String(os.Getenv("GIT_COMMIT"))
 	metadata.Map["Build-Branch"] = aws.String(os.Getenv("GIT_BRANCH"))
-	metadata.Map["Build-Job-Base"] = aws.String(os.Getenv("JOB_BASE_NAME"))
-	metadata.Map["Build-Job-Name"] = aws.String(jobName)
 	metadata.Map["Build-Module"] = aws.String(module)
 	metadata.Map["Build-Profile"] = aws.String(profile)
 	metadata.Map["Build-Version"] = aws.String(version)
