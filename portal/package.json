@@ -23,7 +23,7 @@
         "@tiptap/vue-2": "^2.0.0-beta.77",
         "@types/mapbox-gl": "^1.12.2",
         "@types/node": "^14.0.14",
-        "axios": "^0.21.1",
+        "axios": "^1.6.0",
         "backoff": "^2.5.0",
         "bluebird": "^3.7.2",
         "bootstrap-vue": "^2.21.2",
